@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07121f">
+  <meta name="description" content="Explore Class 11 and 12 physics with interactive, animated simulations. Change the variables and see the physics respond. Build your own with the drag-and-drop sandbox.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2307121f'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%233bd9c8' stroke-width='3'/%3E%3Cpath d='M13 37c10-22 22-24 38-10M13 37c13-6 26-1 38-10' fill='none' stroke='%23ffc36b' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23fff'/%3E%3C/svg%3E">
+  <title>Physica — Interactive Physics Lab</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./sandbox.css">
+  <script src="./theme.js"></script>
+  <script src="./physics.js" defer></script>
+  <script src="./extras.js" defer></script>
+  <script src="./enhancements.js" defer></script>
+  <script src="./third.js" defer></script>
+  <script src="./fourth.js" defer></script>
+  <script src="./fifth.js" defer></script>
+  <script src="./sixth.js" defer></script>
+  <script src="./vendor/matter.min.js" defer></script>
+  <script src="./experience.js" defer></script>
+  <script src="./app.js" defer></script>
+  <script src="./sandbox-studio.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Physica interactive physics lab">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span class="brand-word">physica<span class="brand-dot">.</span></span>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-sub">INTERACTIVE LAB</span>
+      </div>
+      <div class="topbar-right">
+        <button class="build-btn" id="sandbox-open" type="button" data-testid="open-sandbox-btn">✚ Make your own</button>
+        <label class="theme-picker" for="theme-select"><span>THEME</span><select id="theme-select" aria-label="Website colour theme" data-testid="theme-select">
+          <option value="midnight">Midnight</option>
+          <option value="daylight">Daylight</option>
+          <option value="violet">Violet</option>
+          <option value="chalkboard">Chalkboard</option>
+          <option value="ink">B&amp;W · Ink</option>
+          <option value="paper">B&amp;W · Paper</option>
+        </select></label>
+        <button class="mobile-topics" id="mobile-topics" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Browse chapters"><span class="browse-label">Chapters</span> <span aria-hidden="true">☰</span></button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar" aria-label="Simulation library">
+        <div class="sidebar-top">
+          <div class="sidebar-heading"><span>THE LIBRARY</span><span id="library-count">SIMULATIONS</span></div>
+          <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">Search simulations</span><input id="search" type="search" placeholder="Find a concept…" autocomplete="off" data-testid="search-input"><kbd>/</kbd></label>
+          <div class="grade-tabs" role="group" aria-label="Choose class">
+            <button class="grade-tab active" data-grade="11" type="button" aria-pressed="true" data-testid="grade-11-tab">Class 11</button>
+            <button class="grade-tab" data-grade="12" type="button" aria-pressed="false" data-testid="grade-12-tab">Class 12</button>
+          </div>
+        </div>
+        <section class="favourites" aria-label="Favourite simulations" data-testid="favourites-section">
+          <div class="sidebar-heading"><span>YOUR FAVOURITES</span><span id="favourites-count" data-testid="favourites-count">0</span></div>
+          <div id="favourites-list" data-testid="favourites-list"></div>
+          <p id="favourites-status" role="status" data-testid="favourites-status"></p>
+        </section>
+        <nav class="chapter-list" id="chapter-list" aria-label="Physics chapters"></nav>
+        <div class="sidebar-bottom"><span class="tiny-orbit" aria-hidden="true">◌</span> Move a slider. See the laws come alive.</div>
+      </aside>
+
+      <main class="main" id="main">
+        <div class="workspace-header">
+          <div class="breadcrumbs"><span id="grade-crumb">CLASS 11</span><span class="slash">/</span><span id="chapter-crumb">MOTION IN A PLANE</span></div>
+          <div class="chapter-nav"><button id="prev" type="button" aria-label="Previous chapter" data-testid="prev-chapter-btn">←</button><span id="position">03 / 14</span><button id="next" type="button" aria-label="Next chapter" data-testid="next-chapter-btn">→</button></div>
+        </div>
+        <div class="intro">
+          <div class="intro-text"><div class="eyebrow"><span class="eyebrow-line"></span> INTERACTIVE SIMULATION <span id="sim-number">№ 03</span></div><h1 id="title">Projectile motion</h1><p id="description">Launch an object and see how horizontal and vertical motion combine to form its path.</p></div>
+          <div class="formula-card"><span>KEY RELATION</span><strong id="formula">R = v² sin(2θ) / g</strong></div>
+        </div>
+
+        <div id="simulation-tabs" class="simulation-tabs" role="group" aria-label="Choose a simulation in this chapter"></div>
+        <div class="lab-tools" aria-label="Teaching and discovery tools">
+          <div class="lab-tool-buttons">
+            <button id="favourite-toggle" type="button" aria-pressed="false" data-testid="favourite-toggle">☆ Favourite</button>
+            <button id="physics-toggle" type="button" aria-pressed="false" aria-controls="physics-panel" data-testid="physics-toggle-btn">Show physics</button>
+            <button id="sound-toggle" type="button" aria-pressed="false" aria-describedby="sound-caption" data-testid="sound-toggle-btn">Sound off</button>
+            <label id="volume-wrap" class="volume-control" hidden>Volume <input id="volume" type="range" min="0" max="50" step="5" value="25" aria-label="Sound volume"></label>
+          </div>
+          <button id="surprise-button" class="surprise-button" type="button" data-testid="surprise-btn">Surprise me <span aria-hidden="true">✦</span></button>
+          <span id="sound-caption" class="sound-caption" hidden>Gentle control sounds</span>
+        </div>
+        <section id="wonder-card" class="wonder-card" hidden aria-labelledby="wonder-title">
+          <div class="wonder-copy"><span class="small-index">PREDICT · REVEAL · EXPLORE</span><h2 id="wonder-title" tabindex="-1"></h2><p id="wonder-question"></p><p id="wonder-answer" class="wonder-answer" hidden></p><button id="wonder-reveal" type="button" aria-expanded="false" aria-controls="wonder-answer">Reveal the physics <span aria-hidden="true">↗</span></button></div>
+          <button id="wonder-close" class="wonder-close" type="button" aria-label="Close surprise explanation">×</button>
+        </section>
+
+        <div class="lab-layout" id="lab-layout">
+          <div class="lab-main">
+            <section class="stage" aria-label="Animated physics simulation">
+              <div class="stage-top"><div class="live-label"><span class="live-dot"></span><span id="live-status">LIVE SIMULATION</span></div><div class="stage-hint" id="stage-hint">DRAG THE SLIDERS · OR DRAG ON THE STAGE</div></div>
+              <canvas id="simulation" role="img" aria-label="Physics simulation animation" data-testid="simulation-canvas">Your browser does not support canvas animations.</canvas>
+              <div class="stage-bottom"><div class="transport"><button id="play" class="play-button" type="button" aria-label="Pause simulation" data-testid="play-btn"><span id="play-icon" aria-hidden="true">Ⅱ</span><span id="play-label">Pause</span></button><button id="restart" class="restart-button" type="button" aria-label="Restart simulation" data-testid="restart-btn"><span aria-hidden="true">↺</span> Restart</button><span class="transport-divider"></span><span class="running-time">TIME <strong id="elapsed">0.0 s</strong></span></div><span class="stage-brand">PHYSICA LAB <span aria-hidden="true">✳</span></span></div>
+            </section>
+            <section id="physics-panel" class="physics-panel" hidden aria-labelledby="physics-title">
+              <div class="physics-heading"><span class="small-index">PHYSICS LENS</span><h2 id="physics-title">Live physics</h2></div>
+              <div class="physics-grid"><div class="physics-visual"><canvas id="physics-canvas" width="640" height="330" role="img" aria-label="Force, vector, or equation diagram for the selected experiment"></canvas><p id="physics-scale" class="physics-scale"></p></div><div class="physics-explanation"><p id="physics-note"></p><div id="physics-values" class="physics-values"></div></div></div>
+            </section>
+          </div>
+          <aside class="side-rail" id="side-rail" aria-label="Simulation controls">
+            <section class="controls-card" aria-labelledby="controls-heading">
+              <div class="section-heading"><div><span class="small-index">01 / CONTROLS</span><h2 id="controls-heading">Change the variables</h2></div><div class="rail-buttons"><button id="defaults" type="button" data-testid="reset-values-btn">Reset ↺</button><button id="rail-toggle" type="button" class="rail-toggle" aria-label="Collapse controls" data-testid="rail-toggle-btn">⇥</button></div></div>
+              <div id="controls" class="controls-grid"></div>
+              <div class="simulation-playback" data-testid="simulation-playback">
+                <label for="simulation-speed">Playback speed</label>
+                <select id="simulation-speed" data-testid="simulation-speed"><option value="0.25">0.25× — study slowly</option><option value="0.5">0.5×</option><option value="1" selected>1× — normal</option><option value="2">2×</option></select>
+                <button id="simulation-step" type="button" data-testid="simulation-step">Pause &amp; step 1/30 s</button>
+                <p>Drag a slider or type an exact value. Drag the stage to adjust the first two numeric variables.</p>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <div class="below-stage">
+          <section class="observe-card" aria-labelledby="observe-heading"><div class="section-heading"><div><span class="small-index">02 / OBSERVE</span><h2 id="observe-heading">What to notice</h2></div></div><p id="observation" class="observation"></p><div id="readouts" class="readouts" aria-live="off"></div><div class="try-box"><span class="try-icon">✦</span><div><strong>TRY THIS</strong><p id="try-this"></p></div></div></section>
+        </div>
+        <section id="lesson-section" class="lesson-section" hidden aria-label="Guided experiment details"></section>
+        <footer class="footer"><span>PHYSICA · CLASS 11 &amp; 12 PHYSICS</span><span>Built for curious minds and classrooms.</span></footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Make Your Own: local-first physics studio -->
+  <section id="sandbox-view" class="sandbox-view" hidden aria-label="Make your own simulation">
+    <header class="sandbox-bar">
+      <div class="sb-title">MAKE YOUR OWN <span>· your personal physics studio</span></div>
+      <div class="sb-actions">
+        <input id="sb-name" placeholder="Name your creation…" maxlength="80" aria-label="World name" autocomplete="off" data-testid="sandbox-name-input">
+        <button id="sb-save" type="button" data-testid="sandbox-save-btn">Save</button>
+        <button id="sb-share" type="button" data-testid="sandbox-share-btn">Share / Export</button>
+        <button id="sb-import" type="button" data-testid="sandbox-import-btn">Import file</button>
+        <input id="sb-file" type="file" accept=".json,application/json" hidden data-testid="sandbox-import-file">
+        <button id="sandbox-close" type="button" class="sb-back" data-testid="sandbox-close-btn">← Library</button>
+      </div>
+    </header>
+    <div class="sandbox-body">
+      <div class="sandbox-stage-wrap">
+        <div class="sb-palette" id="sb-palette" data-testid="sandbox-palette" role="toolbar" aria-label="Build tools">
+          <button data-tool="move" class="active" type="button" data-testid="tool-move" aria-pressed="true" title="Select, move and throw">↖<b>Move</b></button>
+          <button data-tool="ball" type="button" data-testid="tool-ball" draggable="true" aria-pressed="false">●<b>Ball</b></button>
+          <button data-tool="box" type="button" data-testid="tool-box" draggable="true" aria-pressed="false">□<b>Box</b></button>
+          <button data-tool="wall" type="button" data-testid="tool-wall" draggable="true" aria-pressed="false">▬<b>Wall</b></button>
+          <button data-tool="ramp" type="button" data-testid="tool-ramp" draggable="true" aria-pressed="false">∠<b>Ramp</b></button>
+          <button data-tool="spring" type="button" data-testid="tool-spring" aria-pressed="false" title="Connect two objects or connect an object to empty space">≈<b>Spring</b></button>
+          <button data-tool="rope" type="button" data-testid="tool-rope" aria-pressed="false" title="Fixed-length connecting rod">—<b>Rod</b></button>
+          <button data-tool="magnet" type="button" data-testid="tool-magnet" draggable="true" aria-pressed="false">⊕<b>Attractor</b></button>
+          <button data-tool="pan" type="button" data-testid="tool-pan" aria-pressed="false">↔<b>Pan</b></button>
+          <button data-tool="erase" type="button" data-testid="tool-erase" aria-pressed="false">×<b>Erase</b></button>
+        </div>
+        <div class="sb-stage-tools">
+          <button id="sb-undo" type="button" data-testid="sandbox-undo" title="Undo edit (Ctrl+Z)">Undo</button>
+          <button id="sb-redo" type="button" data-testid="sandbox-redo" title="Redo edit (Ctrl+Shift+Z)">Redo</button>
+          <button id="sb-zoom-out" type="button" data-testid="sandbox-zoom-out" aria-label="Zoom out">−</button>
+          <span id="sb-zoom-label" data-testid="sandbox-zoom-label">100%</span>
+          <button id="sb-zoom-in" type="button" data-testid="sandbox-zoom-in" aria-label="Zoom in">+</button>
+          <button id="sb-fit" type="button" data-testid="sandbox-fit">Fit world</button>
+          <span id="sb-stats" data-testid="sandbox-stats"></span>
+        </div>
+        <div class="sb-canvas-frame">
+          <canvas id="sandbox-canvas" data-testid="sandbox-canvas" tabindex="0" aria-label="Physics world: select a tool then tap or drag to build">Canvas unsupported.</canvas>
+        </div>
+        <p class="sb-hint" id="sb-hint" data-testid="sandbox-hint">Tap an object to edit it. Drag to move or throw. Pause for precise building.</p>
+        <p id="sb-status" role="status" aria-live="polite" data-testid="sandbox-status"></p>
+      </div>
+      <aside class="sandbox-rail" aria-label="World and object controls">
+        <div class="sb-group">
+          <div class="sb-group-title">PLAY &amp; BUILD</div>
+          <div class="sb-btn-row"><button id="sb-play" type="button" class="sb-primary" data-testid="sandbox-play-btn">Play</button><button id="sb-step" type="button" data-testid="sandbox-step">Step 1/60 s</button></div>
+          <div class="sb-btn-row"><button id="sb-reset" type="button" data-testid="sandbox-reset">Reset run</button><button id="sb-clear" type="button" data-testid="sandbox-clear-btn">Clear all</button></div>
+          <label class="sb-field">Simulation speed<select id="sb-speed" data-testid="sandbox-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+        </div>
+        <div class="sb-group" id="sb-inspector" data-testid="sandbox-inspector">
+          <div class="sb-group-title">SELECTED OBJECT</div>
+          <p class="sb-empty" id="sb-selection-empty">Select any object or connection on the canvas, or use the object list below.</p>
+          <div id="sb-properties" data-testid="sandbox-properties" hidden></div>
+          <div class="sb-btn-row"><button id="sb-duplicate" type="button" data-testid="sandbox-duplicate" disabled>Duplicate</button><button id="sb-delete" type="button" data-testid="sandbox-delete" disabled>Delete</button></div>
+        </div>
+        <details class="sb-group" open><summary data-testid="sandbox-world-toggle">World settings</summary>
+          <label class="sb-slider">Gravity <span id="sb-gravity-val" data-testid="sandbox-gravity-value"></span><input id="sb-gravity" type="range" min="0" max="3" step="0.1" value="1" data-testid="sandbox-gravity"></label>
+          <label class="sb-slider">Gravity direction <span id="sb-direction-val" data-testid="sandbox-direction-value"></span><input id="sb-direction" type="range" min="0" max="360" step="15" value="90" data-testid="sandbox-direction"></label>
+          <label class="sb-slider">All objects: bounce <span id="sb-bounce-val" data-testid="sandbox-bounce-value"></span><input id="sb-bounce" type="range" min="0" max="1" step="0.05" value="0.6" data-testid="sandbox-bounce"></label>
+          <label class="sb-slider">Air drag <span id="sb-friction-val" data-testid="sandbox-friction-value"></span><input id="sb-friction" type="range" min="0" max="0.1" step="0.005" value="0.01" data-testid="sandbox-friction"></label>
+          <label class="sb-slider">Wind acceleration <span id="sb-wind-val" data-testid="sandbox-wind-value"></span><input id="sb-wind" type="range" min="-10" max="10" step="0.5" value="0" data-testid="sandbox-wind"></label>
+          <label class="sb-check"><input id="sb-boundaries" type="checkbox" checked data-testid="sandbox-boundaries"> Contain objects in world</label>
+          <label class="sb-check"><input id="sb-grid" type="checkbox" checked data-testid="sandbox-grid"> Show grid (0.4 m)</label>
+          <label class="sb-check"><input id="sb-snap" type="checkbox" data-testid="sandbox-snap"> Snap placement to grid</label>
+          <label class="sb-check"><input id="sb-vectors" type="checkbox" data-testid="sandbox-vectors"> Show velocity arrows</label>
+          <label class="sb-check"><input id="sb-trails" type="checkbox" data-testid="sandbox-trails"> Show motion trails</label>
+          <label class="sb-check"><input id="sb-labels" type="checkbox" checked data-testid="sandbox-labels"> Show object labels</label>
+        </details>
+        <details class="sb-group" open><summary data-testid="sandbox-objects-toggle">Objects &amp; connections</summary><div id="sb-objects" data-testid="sandbox-objects"></div></details>
+        <details class="sb-group"><summary data-testid="sandbox-presets-toggle">Start from a scene</summary>
+          <div class="sb-btn-row"><button id="sb-preset-tower" type="button" data-testid="sandbox-preset-tower">Ball pit</button><button id="sb-preset-newton" type="button" data-testid="sandbox-preset-newton">Pendulum</button></div>
+          <div class="sb-btn-row"><button id="sb-preset-domino" type="button" data-testid="sandbox-preset-domino">Domino run</button><button id="sb-preset-orbit" type="button" data-testid="sandbox-preset-orbit">Attraction</button></div>
+        </details>
+        <div class="sb-group"><div class="sb-group-title">SAVED CREATIONS · THIS BROWSER</div><div id="sb-saves" class="sb-saves" data-testid="sandbox-saves"></div></div>
+        <p class="sb-tip">100 world pixels = 1 metre. This is a 2D rigid-body playground, not an engineering solver. Springs use solver stiffness; rods keep two endpoints at a fixed distance. Export a file to keep a backup.</p>
+      </aside>
+    </div>
+  </section>
+  <dialog id="sb-share-dialog" class="sb-dialog" data-testid="sandbox-share-dialog" aria-labelledby="sb-share-title">
+    <div class="sb-dialog-heading"><h2 id="sb-share-title">Share your experiment</h2><button id="sb-share-close" type="button" data-testid="sandbox-share-close" aria-label="Close sharing">×</button></div>
+    <p>Send a snapshot of this world. Friends can open the link or import the JSON file. Your browser saves stay private.</p>
+    <label class="sb-field">Share link<textarea id="sb-share-link" readonly rows="3" data-testid="sandbox-share-link"></textarea></label>
+    <div class="sb-btn-row"><button id="sb-copy-link" type="button" data-testid="sandbox-copy-link">Copy link</button><button id="sb-download" type="button" class="sb-primary" data-testid="sandbox-download">Download world file</button></div>
+    <p id="sb-share-status" role="status" data-testid="sandbox-share-status"></p>
+    <p class="sb-tip">Links include the world itself, not an account. Large worlds should be shared as a file. Links use this website’s address; create them on your Netlify site after publishing.</p>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,42 @@
+PHYSICA - NETLIFY-READY STATIC WEBSITE
+
+DEPLOY
+1. Extract this ZIP. index.html must be directly inside the extracted folder.
+2. Open Netlify Drop (https://app.netlify.com/drop) and sign in if requested.
+3. Drag the extracted folder containing index.html into Netlify.
+No build command, backend, database, API keys, or environment variables are needed.
+The ZIP itself can also be used by deployment tools that accept ZIP archives.
+
+INCLUDED
+176 adjustable Class 11 and Class 12 physics simulations (28 new experiments).
+Favourites pinned above the chapter library, stored in the current browser.
+Precise numeric inputs, sliders, stage dragging, playback speed and stepping.
+Physics sandbox with rotatable rigid bodies, collisions, springs, fixed-length
+rods, attraction, toy charges, editable mass/size/velocity, undo/redo, saved worlds,
+world controls, presets, pan/zoom and touch support.
+Original Midnight theme plus Daylight, Violet, Chalkboard, Ink and Paper themes.
+
+SHARING AND STORAGE
+Save stores up to 30 worlds in your current browser, not in a cloud account.
+Share / Export creates a snapshot link or a .physica.json file.
+Friends open a link or use Import file. Imported worlds open paused for editing.
+Create share links on your published Netlify domain, not the preview domain.
+Large worlds should be sent as files. JSON world files are limited to 250 KB.
+Browser data is separate for each domain. Export any preview saves before moving
+sites. An exported file is the safest backup. Clearing browser storage removes
+local favourites and saves.
+
+SANDBOX MODEL
+100 world pixels = 1 metre; fixed 10 m by 6.5 m world, up to 150 objects and
+200 connections. Springs use solver stiffness, rods keep a fixed distance.
+Charge/attractor forces are illustrative, not calibrated electromagnetism.
+Speed is limited to approximately 24 m/s for numerical stability; high-speed
+collisions are approximate. Objects without boundaries stop beyond 50 m.
+All scene changes can be undone (last 50 edits); continuous playback is not
+recorded by undo. Reset run restores the start of the latest Play session.
+Use Pause for precise placement, then select an object to edit its properties.
+
+TECHNICAL
+Plain HTML, CSS and JavaScript. Matter.js 0.20.0 and its MIT licence are included
+locally in vendor/. No external scripts or CDN dependency. No React build is
+needed for this archive. Use a current Chrome, Safari, Firefox or Edge browser.
