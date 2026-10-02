@@ -5,7 +5,7 @@ const n=(label,value)=>({label,value:String(value)}),f=(x,d=2)=>Number(x).toFixe
 const defs=[];const add=(base,id,title,description,formula,observe,tryText,controls,metrics,draw)=>defs.push({base,id,title,description,formula,observe,try:tryText,controls,metrics,draw,idraw:draw});
 function line(c,x,y,X,Y,col=D,w=2){c.beginPath();c.moveTo(x,y);c.lineTo(X,Y);c.strokeStyle=col;c.lineWidth=w;c.stroke()}
 function txt(c,s,x,y,col=W,size=20){c.fillStyle=col;c.font=`500 ${size}px system-ui`;c.textAlign='left';c.textBaseline='middle';c.fillText(String(s),x,y)}
-function ball(c,x,y,rad,col=M){c.beginPath();c.arc(x,y,rad,0,TAU);c.fillStyle=col;c.fill()}
+function ball(c,x,y,rad,col=M){const P3=window.Physica3D,s3=P3?.sphereOK(col,rad);c.beginPath();c.arc(x,y,rad,0,TAU);c.fillStyle=col;if(s3){P3.shadowFill(c,rad);P3.shadeSphere(c,x,y,rad)}else c.fill()}
 function box(c,x,y,w,h,col=M){c.fillStyle=col;c.fillRect(x,y,w,h)}
 function arrow(c,x,y,X,Y,col=M){line(c,x,y,X,Y,col,3);let a=Math.atan2(Y-y,X-x);line(c,X,Y,X-12*Math.cos(a-.5),Y-12*Math.sin(a-.5),col,3);line(c,X,Y,X-12*Math.cos(a+.5),Y-12*Math.sin(a+.5),col,3)}
 function wave(c,x,y,w,A,period,t,col=M){let old=[x,y-A*Math.sin(-t)];for(let k=2;k<=w;k+=2){let q=[x+k,y-A*Math.sin(k/period*TAU-t)];line(c,...old,...q,col,2);old=q}}

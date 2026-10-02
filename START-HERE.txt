@@ -8,7 +8,15 @@ No build command, backend, database, API keys, or environment variables are need
 The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
-176 adjustable Class 11 and Class 12 physics simulations (28 new experiments).
+276 adjustable Class 11 and Class 12 physics simulations, including 100 interactive
+3D experiments (marked 3D) across all 28 chapters.
+Realistic 3D look: lit, shaded spheres and blocks with soft shadows on every
+experiment (toggle with "3D look" or key 3).
+3D experiments: drag the stage to orbit the camera, pinch / Ctrl+scroll / − + to zoom,
+auto-spin, reset view (double-click), or switch dragging back to adjusting values.
+Fine − / + steppers on every slider (hold to repeat), Randomise, Share setup links
+that reopen an experiment with exact values, Snapshot (PNG), Full screen stage,
+0.1×–4× playback, previous / next navigation and keyboard shortcuts (press ?).
 Favourites pinned above the chapter library, stored in the current browser.
 Precise numeric inputs, sliders, stage dragging, playback speed and stepping.
 Physics sandbox with rotatable rigid bodies, collisions, springs, fixed-length
@@ -37,6 +45,9 @@ recorded by undo. Reset run restores the start of the latest Play session.
 Use Pause for precise placement, then select an object to edit its properties.
 
 TECHNICAL
-Plain HTML, CSS and JavaScript. Matter.js 0.20.0 and its MIT licence are included
+Plain HTML, CSS and JavaScript. physica3d.js is a small built-in 3D renderer
+(perspective, depth sorting, lighting, orbit camera) with no external libraries;
+labkit.js and seventh.js to tenth.js hold the 100 3D experiments.
+Matter.js 0.20.0 and its MIT licence are included
 locally in vendor/. No external scripts or CDN dependency. No React build is
 needed for this archive. Use a current Chrome, Safari, Firefox or Edge browser.
