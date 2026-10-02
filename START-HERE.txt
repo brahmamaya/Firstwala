@@ -8,8 +8,16 @@ No build command, backend, database, API keys, or environment variables are need
 The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
-276 adjustable Class 11 and Class 12 physics simulations, including 100 interactive
-3D experiments (marked 3D) across all 28 chapters.
+PHYSICS: 276 adjustable Class 11 and Class 12 physics simulations across all 28
+chapters. Every one is now drawn in rotatable 3D; the original flat drawings remain
+one tap away with the "2D diagram" button (remembered in this browser).
+BIOLOGY: 100 adjustable Class 11 and Class 12 biology simulations arranged chapter-wise
+by the NCERT syllabus (Class 11 chapters 1-19, Class 12 chapters 1-13), all in 3D:
+cells and organelles, mitosis and meiosis, enzymes, photosynthesis and respiration,
+the human body (lungs, heart and ECG, nephron, muscles, neurons, hormones),
+reproduction, Mendelian genetics, DNA and the lac operon, evolution, immunity,
+biotechnology (PCR, gels, recombinant DNA) and ecology. Switch subject with the
+Physics / Biology tabs at the top of the library.
 Realistic 3D look: lit, shaded spheres and blocks with soft shadows on every
 experiment (toggle with "3D look" or key 3).
 3D experiments: drag the stage to orbit the camera, pinch / Ctrl+scroll / − + to zoom,
@@ -19,9 +27,15 @@ that reopen an experiment with exact values, Snapshot (PNG), Full screen stage,
 0.1×–4× playback, previous / next navigation and keyboard shortcuts (press ?).
 Favourites pinned above the chapter library, stored in the current browser.
 Precise numeric inputs, sliders, stage dragging, playback speed and stepping.
-Physics sandbox with rotatable rigid bodies, collisions, springs, fixed-length
-rods, attraction, toy charges, editable mass/size/velocity, undo/redo, saved worlds,
-world controls, presets, pan/zoom and touch support.
+MAKE YOUR OWN: a simple physics sandbox. One-tap quick-start scenes (Cannon,
+Basket challenge with a goal, Newton's cradle, Ramp race, Bridge, Dominoes,
+Pendulums, Orbit, Ball pit); a Launch tool - pull back and let go, with a predicted
+flight path; gravity chips (Earth, Moon, Mars, Jupiter, Space); material chips
+(rubber, wood, metal, ice); a live graph of speed, height and kinetic / potential
+energy for the selected object; shaded 3D-look objects. "Advanced tools" reveals
+springs, rods, attractors, pan, world settings and the object list; rotatable rigid
+bodies, collisions, toy charges, editable mass/size/velocity, undo/redo, saved
+worlds, pan/zoom and touch support remain available.
 Original Midnight theme plus Daylight, Violet, Chalkboard, Ink and Paper themes.
 
 SHARING AND STORAGE
@@ -47,7 +61,9 @@ Use Pause for precise placement, then select an object to edit its properties.
 TECHNICAL
 Plain HTML, CSS and JavaScript. physica3d.js is a small built-in 3D renderer
 (perspective, depth sorting, lighting, orbit camera) with no external libraries;
-labkit.js and seventh.js to tenth.js hold the 100 3D experiments.
+labkit.js and seventh.js to tenth.js hold the 100 newer 3D physics experiments;
+phys3d-a.js to phys3d-d.js give the 176 original physics experiments their 3D scenes;
+biokit.js and bio1.js to bio5.js hold the 100 biology experiments.
 Matter.js 0.20.0 and its MIT licence are included
 locally in vendor/. No external scripts or CDN dependency. No React build is
 needed for this archive. Use a current Chrome, Safari, Firefox or Edge browser.

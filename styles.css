@@ -109,3 +109,7 @@ body.no-scroll{overflow:hidden}
 .tabs-nav button{white-space:nowrap}
 @media(max-width:600px){.lab-tools{flex-direction:column;align-items:stretch}.lab-tool-buttons{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.lab-tool-buttons::-webkit-scrollbar{display:none}.lab-tool-buttons>*{flex:none}.lab-tools .surprise-button{justify-content:center;min-height:40px}.tabs-nav{align-items:flex-end}}
 @media(max-width:600px){.lab-tools,.lab-tool-buttons{min-width:0;max-width:100%}.lab-tools{width:100%}}
+/* Subject switch (Physics / Biology). */
+.subject-tabs{display:flex;gap:6px;margin-top:16px}.subject-tabs+.grade-tabs{margin-top:10px}
+.subject-tab{flex:1;border:1px solid var(--line2);border-radius:9px;background:var(--panel2);color:var(--muted);font-size:14px;font-weight:750;padding:10px 6px;transition:background .2s,color .2s,border-color .2s}
+.subject-tab:hover{border-color:var(--mint);color:var(--text)}.subject-tab.active{background:var(--active);border-color:var(--active-line);color:var(--mint)}

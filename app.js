@@ -33,7 +33,16 @@
     {id:'diode',grade:12,group:'MODERN PHYSICS',chapter:'Semiconductor Electronics',title:'P–N junction diode',description:'Apply a voltage and watch the depletion region change with forward or reverse bias.',formula:'Forward bias → narrow junction',observe:'Forward bias reduces the barrier; reverse bias widens the depletion region.',try:'Move the voltage through zero and compare carrier movement.',controls:[R('voltage','Applied voltage',-2,2,.1,.8,'V',1)],metrics:p=>[N('Bias',p.voltage>0?'Forward':p.voltage<0?'Reverse':'None'),N('Depletion region',p.voltage>0?'Narrower':p.voltage<0?'Wider':'Equilibrium')],draw:'diode'}
   ];
   const chapters=sims.slice();
-  for(const extra of window.ExtraSimulations||[]){const base=chapters.find(s=>s.id===extra.base);sims.push({...base,...extra,draw:extra.id});}
+  for(const s of sims)s.subject='physics';
+  // Physics packs extend an existing chapter (base); biology packs bring their own NCERT chapters.
+  for(const extra of window.ExtraSimulations||[]){const base=extra.base&&chapters.find(s=>s.id===extra.base);if(base){sims.push({...base,...extra,draw:extra.id});continue}
+    const s={subject:'biology',...extra,draw:extra.id};sims.push(s);if(!chapters.some(c=>sameChapter(c,s)))chapters.push(s)}
+  chapters.sort((a,b)=>a.subject===b.subject?(a.chapterNo||0)-(b.chapterNo||0):0);
+  // Original 2D experiments that have a true-3D scene (phys3d-*.js) switch to it; the 2D diagram stays available.
+  const R3=window.Physica3DRenderers||{};for(const s of sims)if(R3[s.id]&&!s.view3d)s.r3=R3[s.id];
+  let classic2D=false;try{classic2D=localStorage.getItem('physica-classic-2d')==='1'}catch{}
+  const is3D=s=>!!(s.view3d||(s.r3&&!classic2D));
+  function sameChapter(a,b){return a.chapter===b.chapter&&a.grade===b.grade&&a.subject===b.subject}
   const $=id=>document.getElementById(id),canvas=$('simulation'),ctx=canvas.getContext('2d');
   const saved=new Map(),defaultFor=sim=>Object.fromEntries(sim.controls.map(c=>[c.key,c.initial]));
   for(const s of sims)saved.set(s.id,defaultFor(s));
@@ -42,6 +51,7 @@
   function applyParams(sim,params){const p=saved.get(sim.id);for(const c of sim.controls){if(!params.has(c.key))continue;const v=params.get(c.key);if(c.options){const o=c.options.find(([val])=>String(val)===v);if(o)p[c.key]=o[0]}else{const n=Number(v);if(Number.isFinite(n)){const k=Math.round((Math.min(c.max,Math.max(c.min,n))-c.min)/c.step);p[c.key]=Number(Math.min(c.max,c.min+k*c.step).toFixed(8))}}}}
   const firstLink=parseHash();
   let current=sims.find(s=>s.id===firstLink.id)||sims.find(s=>s.id==='projectile');
+  let subject=current.subject;const inScope=s=>s.grade===grade&&s.subject===subject;
   if(current.id===firstLink.id)applyParams(current,firstLink.params);
   let playbackSpeed=1;
   const FAV_KEY='physica-favourites';
@@ -67,19 +77,19 @@
   const fmt=c=>`${typeof saved.get(current.id)[c.key]==='number'?saved.get(current.id)[c.key].toFixed(c.digits||0):saved.get(current.id)[c.key]}${c.unit?' '+c.unit:''}`;
   function renderSidebar(){
     const search=$('search').value.trim().toLowerCase();
-    const entries=chapters.filter(s=>s.grade===grade&&(!search||sims.some(x=>x.chapter===s.chapter&&`${x.chapter} ${x.title} ${x.description}`.toLowerCase().includes(search))));
+    const entries=chapters.filter(s=>inScope(s)&&(!search||sims.some(x=>sameChapter(x,s)&&`${x.chapter} ${x.title} ${x.description}`.toLowerCase().includes(search))));
     const nav=$('chapter-list');nav.replaceChildren();let group='';
     if(!entries.length){const empty=document.createElement('p');empty.className='empty-search';empty.textContent='No chapters match. Try a different word.';nav.append(empty);return}
     for(const s of entries){
       if(s.group!==group){group=s.group;const heading=document.createElement('div');heading.className='chapter-group';heading.textContent=group;nav.append(heading)}
-      const button=document.createElement('button');button.type='button';button.dataset.testid='chapter-'+s.id;button.className='chapter-link'+(s.chapter===current.chapter?' active':'');button.setAttribute('aria-current',s.chapter===current.chapter?'page':'false');
-      const num=document.createElement('span');num.className='chapter-num';num.textContent=String(chapters.filter(x=>x.grade===grade).indexOf(s)+1).padStart(2,'0');
+      const button=document.createElement('button');button.type='button';button.dataset.testid='chapter-'+s.id;button.className='chapter-link'+(sameChapter(s,current)?' active':'');button.setAttribute('aria-current',sameChapter(s,current)?'page':'false');
+      const num=document.createElement('span');num.className='chapter-num';num.textContent=String(chapters.filter(inScope).indexOf(s)+1).padStart(2,'0');
       const label=document.createElement('span');label.textContent=s.chapter;
       const arrow=document.createElement('span');arrow.className='chapter-arrow';arrow.textContent='↗';arrow.setAttribute('aria-hidden','true');
       button.append(num,label,arrow);button.addEventListener('click',()=>{select(s);closeSidebar()});nav.append(button)
     }
   }
-  function renderSimulationTabs(){const holder=$('simulation-tabs');holder.replaceChildren();for(const sim of sims.filter(s=>s.chapter===current.chapter&&s.grade===current.grade)){const button=document.createElement('button');button.type='button';button.dataset.testid='sim-tab-'+sim.id;button.textContent=sim.title;button.className=(sim===current?'selected':'')+(sim.view3d?' is-3d':'');if(sim.view3d)button.title='Interactive 3D scene';button.setAttribute('aria-pressed',String(sim===current));button.addEventListener('click',()=>select(sim));holder.append(button)}$('library-count').textContent=`${sims.length} SIMULATIONS`;const inChapter=sims.filter(s=>s.chapter===current.chapter&&s.grade===current.grade),pos=inChapter.indexOf(current)+1;$('tab-count').textContent=`Simulation ${pos} of ${inChapter.length} in this chapter`;const sel=holder.querySelector('.selected');if(sel)holder.scrollLeft=Math.max(0,sel.offsetLeft-holder.clientWidth/2+sel.offsetWidth/2);}
+  function renderSimulationTabs(){const holder=$('simulation-tabs');holder.replaceChildren();for(const sim of sims.filter(s=>sameChapter(s,current))){const button=document.createElement('button');button.type='button';button.dataset.testid='sim-tab-'+sim.id;button.textContent=sim.title;button.className=(sim===current?'selected':'')+(is3D(sim)?' is-3d':'');if(is3D(sim))button.title='Interactive 3D scene';button.setAttribute('aria-pressed',String(sim===current));button.addEventListener('click',()=>select(sim));holder.append(button)}$('library-count').textContent=`${sims.filter(s=>s.subject===subject).length} SIMULATIONS`;const inChapter=sims.filter(s=>sameChapter(s,current)),pos=inChapter.indexOf(current)+1;$('tab-count').textContent=`Simulation ${pos} of ${inChapter.length} in this chapter`;const sel=holder.querySelector('.selected');if(sel)holder.scrollLeft=Math.max(0,sel.offsetLeft-holder.clientWidth/2+sel.offsetWidth/2);}
   function renderLesson(){const holder=$('lesson-section'),lesson=window.SimulationLessons?.[current.id];holder.hidden=!lesson;holder.replaceChildren();if(!lesson)return;const top=document.createElement('div');top.className='lesson-top';const heading=document.createElement('h2');heading.textContent='Try a comparison';const presets=document.createElement('div');presets.className='preset-buttons';for(const preset of lesson.presets){const button=document.createElement('button');button.type='button';button.textContent=preset.label;button.addEventListener('click',()=>{Object.assign(saved.get(current.id),preset.values);elapsed=0;renderControls();updateReadouts(true);draw()});presets.append(button)}top.append(heading,presets);const grid=document.createElement('div');grid.className='lesson-grid';const worked=document.createElement('div');const wl=document.createElement('h3');wl.textContent='With your values';const equation=document.createElement('p');equation.id='worked-equation';worked.append(wl,equation);const assumptions=document.createElement('div');const al=document.createElement('h3');al.textContent='About this model';const ap=document.createElement('p');ap.textContent=lesson.assumption;assumptions.append(al,ap);if(current.reference){const link=document.createElement('a');link.className='model-reference';link.href=current.reference.url;link.textContent=current.reference.label;link.target='_blank';link.rel='noopener noreferrer';assumptions.append(link)}grid.append(worked,assumptions);holder.append(top,grid);}
   function renderControls(){
     const host=$('controls');host.replaceChildren();const p=saved.get(current.id);
@@ -108,30 +118,32 @@
     }
   }
   function updateReadouts(rebuild=false){const data=current.metrics(saved.get(current.id),elapsed);const holder=$('readouts');if(rebuild||holder.children.length!==data.length){holder.replaceChildren();for(const m of data){const box=document.createElement('div');box.className='readout';const key=document.createElement('span');key.className='readout-label';key.textContent=m.label;const val=document.createElement('strong');val.className='readout-value';val.dataset.testid='readout-'+holder.children.length;val.textContent=m.value;box.append(key,val);holder.append(box)}}else data.forEach((m,i)=>{holder.children[i].querySelector('.readout-value').textContent=m.value});$('elapsed').textContent=`${elapsed.toFixed(1)} s`;const equation=$('worked-equation');if(equation&&window.SimulationLessons?.[current.id])equation.textContent=window.SimulationLessons[current.id].worked(saved.get(current.id),elapsed);window.PhysicaExperience?.update()}
-  function render(){const gradeSims=chapters.filter(s=>s.grade===current.grade),ix=gradeSims.findIndex(s=>s.chapter===current.chapter);grade=current.grade;document.title=`${current.title} | Physica`;document.querySelectorAll('.grade-tab').forEach(b=>{let active=Number(b.dataset.grade)===grade;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
-    $('grade-crumb').textContent=`CLASS ${grade}`;$('chapter-crumb').textContent=current.chapter.toUpperCase();$('position').textContent=`${String(ix+1).padStart(2,'0')} / ${gradeSims.length}`;$('sim-number').textContent=`№ ${String(ix+1).padStart(2,'0')}`;$('title').textContent=current.title;$('description').textContent=current.description;$('formula').textContent=current.formula;$('observation').textContent=current.observe;$('try-this').textContent=current.try;canvas.setAttribute('aria-label',`${current.title} animated physics simulation`);$('prev').disabled=ix===0;$('next').disabled=ix===gradeSims.length-1;
+  function render(){grade=current.grade;subject=current.subject;const gradeSims=chapters.filter(inScope),ix=gradeSims.findIndex(s=>sameChapter(s,current));document.querySelectorAll('.subject-tab').forEach(b=>{const on=b.dataset.subject===subject;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});document.documentElement.dataset.subject=subject;document.title=`${current.title} | Physica`;document.querySelectorAll('.grade-tab').forEach(b=>{let active=Number(b.dataset.grade)===grade;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
+    $('grade-crumb').textContent=`${subject==='biology'?'BIOLOGY':'PHYSICS'} · CLASS ${grade}`;$('chapter-crumb').textContent=current.chapter.toUpperCase();$('position').textContent=`${String(ix+1).padStart(2,'0')} / ${gradeSims.length}`;$('sim-number').textContent=`№ ${String(ix+1).padStart(2,'0')}`;$('title').textContent=current.title;$('description').textContent=current.description;$('formula').textContent=current.formula;$('observation').textContent=current.observe;$('try-this').textContent=current.try;canvas.setAttribute('aria-label',`${current.title} animated physics simulation`);$('prev').disabled=ix===0;$('next').disabled=ix===gradeSims.length-1;
     $('search').value='';syncView3d();renderFavourites();renderSidebar();renderControls();renderSimulationTabs();renderLesson();updateReadouts(true);syncPlay();draw();
   }
   function select(s,scroll=true){if(!s)return;window.PhysicaExperience?.onSelect();current=s;elapsed=0;history.replaceState(null,'',`#${s.id}`);render();if(scroll)window.scrollTo({top:0,behavior:'smooth'})}
   function syncPlay(){$('play-icon').textContent=playing?'Ⅱ':'▶';$('play-label').textContent=playing?'Pause':'Play';$('play').setAttribute('aria-label',playing?'Pause simulation':'Play simulation');$('live-status').textContent=playing?'LIVE SIMULATION':'SIMULATION PAUSED';document.querySelector('.stage').classList.toggle('paused',!playing);window.PhysicaExperience?.update()}
   function resize(){const box=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);if(box.width<1)return;canvas.width=Math.round(box.width*dpr);canvas.height=Math.round(box.height*dpr);ctx.setTransform(canvas.width/960,0,0,canvas.height/505,0,0);draw()}
-  function draw(){if(!ctx)return;ctx.clearRect(0,0,960,505);try{window.PhysicsDraw.draw(window.PhysicaTheme.wrapContext(ctx),current.draw,saved.get(current.id),elapsed)}catch(err){console.error('Simulation drawing error',current.id,err);ctx.fillStyle='#0b2030';ctx.fillRect(0,0,960,505);ctx.fillStyle='#eff8ff';ctx.font='22px system-ui';ctx.fillText('This simulation could not be drawn. Try another chapter.',65,235)}}
+  function draw(){if(!ctx)return;ctx.clearRect(0,0,960,505);try{const g=window.PhysicaTheme.wrapContext(ctx);if(current.r3&&!classic2D)window.PhysicaRenderExperiment(g,current,saved.get(current.id),elapsed,current.r3);else window.PhysicsDraw.draw(g,current.draw,saved.get(current.id),elapsed)}catch(err){console.error('Simulation drawing error',current.id,err);ctx.fillStyle='#0b2030';ctx.fillRect(0,0,960,505);ctx.fillStyle='#eff8ff';ctx.font='22px system-ui';ctx.fillText('This simulation could not be drawn. Try another chapter.',65,235)}}
   window.addEventListener('physica-theme-change',draw);
-  function frame(now){let dt=Math.min((now-lastFrame)/1000,.06);lastFrame=now;if(!$('sandbox-view').hidden){requestAnimationFrame(frame);return;}if(playing)elapsed=(elapsed+dt*playbackSpeed)%3600;if(current.view3d)window.Physica3D?.tick(dt);draw();window.PhysicaExperience?.draw();if(now-lastReadout>110){updateReadouts();lastReadout=now}requestAnimationFrame(frame)}
+  function frame(now){let dt=Math.min((now-lastFrame)/1000,.06);lastFrame=now;if(!$('sandbox-view').hidden){requestAnimationFrame(frame);return;}if(playing)elapsed=(elapsed+dt*playbackSpeed)%3600;if(is3D(current))window.Physica3D?.tick(dt);draw();window.PhysicaExperience?.draw();if(now-lastReadout>110){updateReadouts();lastReadout=now}requestAnimationFrame(frame)}
   function closeSidebar(){$('sidebar').classList.remove('open');$('mobile-topics').setAttribute('aria-expanded','false')}
   $('mobile-topics').addEventListener('click',()=>{let open=$('sidebar').classList.toggle('open');$('mobile-topics').setAttribute('aria-expanded',String(open));if(open)$('search').focus()});
   $('search').addEventListener('input',renderSidebar);
-  document.querySelectorAll('.grade-tab').forEach(b=>b.addEventListener('click',()=>{const g=Number(b.dataset.grade);if(g!==grade)select(sims.find(s=>s.grade===g));else renderSidebar()}));
-  $('prev').addEventListener('click',()=>{let l=chapters.filter(s=>s.grade===grade);select(l[l.findIndex(s=>s.chapter===current.chapter)-1])});$('next').addEventListener('click',()=>{let l=chapters.filter(s=>s.grade===grade);select(l[l.findIndex(s=>s.chapter===current.chapter)+1])});
+  document.querySelectorAll('.grade-tab').forEach(b=>b.addEventListener('click',()=>{const g=Number(b.dataset.grade);if(g!==grade)select(sims.find(s=>s.grade===g&&s.subject===subject));else renderSidebar()}));
+  document.querySelectorAll('.subject-tab').forEach(b=>b.addEventListener('click',()=>{const sub=b.dataset.subject;if(sub!==subject)select(sims.find(s=>s.subject===sub&&s.grade===grade)||sims.find(s=>s.subject===sub));else renderSidebar()}));
+  $('prev').addEventListener('click',()=>{let l=chapters.filter(inScope);select(l[l.findIndex(s=>sameChapter(s,current))-1])});$('next').addEventListener('click',()=>{let l=chapters.filter(inScope);select(l[l.findIndex(s=>sameChapter(s,current))+1])});
   $('play').addEventListener('click',()=>{playing=!playing;syncPlay()});$('restart').addEventListener('click',()=>{elapsed=0;updateReadouts();draw()});$('defaults').addEventListener('click',()=>{saved.set(current.id,defaultFor(current));elapsed=0;renderControls();updateReadouts(true);draw()});
   document.addEventListener('keydown',e=>{if(!$('sandbox-view').hidden||$('help-dialog').open)return;shortcut(e);if(e.key==='Escape'){closeSidebar();document.activeElement?.blur()}if(e.key==='/'&&!['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();if(innerWidth<=760){$('sidebar').classList.add('open');$('mobile-topics').setAttribute('aria-expanded','true')}$('search').focus()}if(e.code==='Space'&&!['INPUT','SELECT','TEXTAREA','BUTTON'].includes(document.activeElement?.tagName)){e.preventDefault();playing=!playing;syncPlay()}});
   window.addEventListener('hashchange',()=>{const link=parseHash(),target=sims.find(s=>s.id===link.id);if(!target)return;applyParams(target,link.params);if(target!==current)select(target);else{renderControls();updateReadouts(true);draw()}});
   // ---- Extra controls: 3D view bar, randomise, share, snapshot, full screen, help, shortcuts ----
   let dragMode='rotate',toastTimer=0;
   function toast(msg){const el=$('toast');el.textContent=msg;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.hidden=true},2600)}
-  function syncView3d(){const is3d=!!current.view3d,P3=window.Physica3D;$('view3d-bar').hidden=!is3d;$('drag-mode').textContent=dragMode==='rotate'?'⟲ Drag: rotate view':'⇆ Drag: adjust values';$('drag-mode').setAttribute('aria-pressed',String(dragMode==='rotate'));
+  function syncView3d(){const is3d=is3D(current),P3=window.Physica3D;$('view3d-bar').hidden=!is3d&&!current.r3;$('classic-2d').hidden=!current.r3;$('classic-2d').textContent=classic2D?'◆ Show 3D scene':'▭ 2D diagram';$('classic-2d').setAttribute('aria-pressed',String(classic2D));for(const id of['drag-mode','auto-spin','zoom-in','zoom-out','view-reset'])$(id).hidden=!is3d;$('drag-mode').textContent=dragMode==='rotate'?'⟲ Drag: rotate view':'⇆ Drag: adjust values';$('drag-mode').setAttribute('aria-pressed',String(dragMode==='rotate'));
     $('auto-spin').setAttribute('aria-pressed',String(!!P3?.cam.auto));$('stage-hint').textContent=is3d?(dragMode==='rotate'?'3D · DRAG TO ROTATE · PINCH TO ZOOM':'3D · DRAG TO ADJUST VALUES'):'DRAG THE SLIDERS · OR DRAG ON THE STAGE';
     const on=P3?P3.enabled:true;$('realism-toggle').textContent=`◆ 3D look: ${on?'On':'Off'}`;$('realism-toggle').setAttribute('aria-pressed',String(on))}
+  $('classic-2d').onclick=()=>{classic2D=!classic2D;try{localStorage.setItem('physica-classic-2d',classic2D?'1':'0')}catch{}syncView3d();renderSimulationTabs();draw();toast(classic2D?'Showing the original 2D diagrams':'Showing 3D scenes')};
   $('drag-mode').onclick=()=>{dragMode=dragMode==='rotate'?'values':'rotate';syncView3d()};
   $('auto-spin').onclick=()=>{window.Physica3D?.setAuto(!window.Physica3D.cam.auto);syncView3d()};
   $('zoom-in').onclick=()=>window.Physica3D?.zoomBy(1.15);$('zoom-out').onclick=()=>window.Physica3D?.zoomBy(1/1.15);
@@ -147,13 +159,13 @@
   $('tab-prev').onclick=()=>stepSimulation(-1);$('tab-next').onclick=()=>stepSimulation(1);
   $('fullscreen-btn').onclick=toggleFullscreen;document.addEventListener('fullscreenchange',()=>setTimeout(resize,50));
   $('help-open').onclick=()=>$('help-dialog').showModal();$('help-close').onclick=()=>$('help-dialog').close();$('help-dialog').addEventListener('click',e=>{if(e.target===$('help-dialog'))$('help-dialog').close()});
-  function stepSimulation(d){const order=chapters.filter(ch=>ch.grade===current.grade).flatMap(ch=>sims.filter(s=>s.grade===ch.grade&&s.chapter===ch.chapter)),i=order.indexOf(current),next=order[i+d];if(next)select(next,false)}
+  function stepSimulation(d){const order=chapters.filter(inScope).flatMap(ch=>sims.filter(s=>sameChapter(s,ch))),i=order.indexOf(current),next=order[i+d];if(next)select(next,false)}
   function setSpeed(d){const sel=$('simulation-speed'),opts=[...sel.options].map(o=>o.value),i=Math.max(0,Math.min(opts.length-1,opts.indexOf(sel.value)+d));sel.value=opts[i];playbackSpeed=Number(opts[i]);toast(`Playback ${opts[i]}×`)}
   function shortcut(e){const tag=document.activeElement?.tagName;if(e.ctrlKey||e.metaKey||e.altKey||['INPUT','SELECT','TEXTAREA'].includes(tag))return;const k=e.key;
     if(k==='r'||k==='R'){elapsed=0;updateReadouts();draw()}else if(k==='f'||k==='F')toggleFullscreen();else if(k==='x'||k==='X')randomise();else if(k==='3')$('realism-toggle').click();else if(k==='?'){e.preventDefault();$('help-dialog').showModal()}
     else if(k==='ArrowRight'||k==='ArrowLeft'){if(tag==='BUTTON'&&document.activeElement.closest('.simulation-tabs'))return;e.preventDefault();stepSimulation(k==='ArrowRight'?1:-1)}else if(k===']')setSpeed(1);else if(k==='[')setSpeed(-1);
-    else if(current.view3d&&(k==='+'||k==='='))window.Physica3D?.zoomBy(1.15);else if(current.view3d&&(k==='-'||k==='_'))window.Physica3D?.zoomBy(1/1.15);else if(current.view3d&&k==='0')window.Physica3D?.resetView()}
-  try{if(!localStorage.getItem('physica-welcome-3d')){setTimeout(()=>toast(`New: ${sims.filter(s=>s.view3d).length} experiments in interactive 3D — look for the 3D tabs`),1200);localStorage.setItem('physica-welcome-3d','1')}}catch{}
+    else if(is3D(current)&&(k==='+'||k==='='))window.Physica3D?.zoomBy(1.15);else if(is3D(current)&&(k==='-'||k==='_'))window.Physica3D?.zoomBy(1/1.15);else if(is3D(current)&&k==='0')window.Physica3D?.resetView()}
+  try{if(!localStorage.getItem('physica-welcome-bio')){setTimeout(()=>toast(`New: Biology! ${sims.filter(s=>s.subject==='biology').length} NCERT biology and ${sims.filter(s=>s.subject==='physics').length} physics experiments, all in 3D`),1200);localStorage.setItem('physica-welcome-bio','1')}}catch{}
   // Optional browser agent controls share the exact same state and rendering path as the UI.
   if(document.modelContext?.registerTool){
     const lifecycle=new AbortController();
@@ -169,7 +181,7 @@
     function stageDrag(e){const rng=current.controls.filter(c=>!c.options);if(!rng.length)return;const box=canvas.getBoundingClientRect();if(box.width<1)return;const px=(e.clientX-box.left)/box.width,py=(e.clientY-box.top)/box.height,p=saved.get(current.id);const setC=(c,frac)=>{let v=c.min+(c.max-c.min)*Math.min(1,Math.max(0,frac));v=Math.round((v-c.min)/c.step)*c.step+c.min;p[c.key]=Number(Math.min(c.max,Math.max(c.min,v)).toFixed(8))};setC(rng[0],px);if(rng[1])setC(rng[1],1-py);renderControls();updateReadouts();draw()}
     // In 3D experiments dragging orbits the camera (two fingers pinch-zoom) unless the user chooses value steering.
     const pointers=new Map();let pinch=0;
-    const orbiting=()=>current.view3d&&dragMode==='rotate'&&window.Physica3D;
+    const orbiting=()=>is3D(current)&&dragMode==='rotate'&&window.Physica3D;
     const spread=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y)};
     canvas.style.cursor='grab';
     canvas.addEventListener('pointerdown',e=>{steering=true;canvas.style.cursor='grabbing';pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});try{canvas.setPointerCapture(e.pointerId)}catch{}if(orbiting()){if(pointers.size===2)pinch=spread()}else stageDrag(e)});
@@ -178,7 +190,7 @@
     const stopSteer=e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(!pointers.size){steering=false;canvas.style.cursor='grab'}};
     canvas.addEventListener('pointerup',stopSteer);canvas.addEventListener('pointercancel',stopSteer);
     canvas.addEventListener('wheel',e=>{if(!orbiting()||!(e.ctrlKey||e.metaKey||document.fullscreenElement))return;e.preventDefault();window.Physica3D.zoomBy(Math.exp(-e.deltaY*.0025))},{passive:false});
-    canvas.addEventListener('dblclick',()=>{if(current.view3d)window.Physica3D?.resetView()});
+    canvas.addEventListener('dblclick',()=>{if(is3D(current))window.Physica3D?.resetView()});
     requestAnimationFrame(frame)}
   else{document.querySelector('.stage').insertAdjacentText('beforeend','Canvas animations are unavailable in this browser.')}
 })();

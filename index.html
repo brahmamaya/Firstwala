@@ -13,9 +13,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07121f">
-  <meta name="description" content="Explore Class 11 and 12 physics with 276 interactive simulations, including 100 in rotatable 3D. Change the variables and see the physics respond. Build your own with the drag-and-drop sandbox.">
+  <meta name="description" content="Explore Class 11 and 12 physics and biology with 376 interactive 3D simulations: 276 physics experiments and 100 NCERT chapter-wise biology models. Change the variables, rotate every model in 3D, and build your own experiments in the drag-and-drop sandbox.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2307121f'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%233bd9c8' stroke-width='3'/%3E%3Cpath d='M13 37c10-22 22-24 38-10M13 37c13-6 26-1 38-10' fill='none' stroke='%23ffc36b' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23fff'/%3E%3C/svg%3E">
-  <title>Physica — Interactive Physics Lab</title>
+  <title>Physica — Interactive Physics &amp; Biology Lab</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./sandbox.css">
   <script src="./theme.js"></script>
@@ -32,6 +32,16 @@
   <script src="./eighth.js" defer></script>
   <script src="./ninth.js" defer></script>
   <script src="./tenth.js" defer></script>
+  <script src="./biokit.js" defer></script>
+  <script src="./bio1.js" defer></script>
+  <script src="./bio2.js" defer></script>
+  <script src="./bio3.js" defer></script>
+  <script src="./bio4.js" defer></script>
+  <script src="./bio5.js" defer></script>
+  <script src="./phys3d-a.js" defer></script>
+  <script src="./phys3d-b.js" defer></script>
+  <script src="./phys3d-c.js" defer></script>
+  <script src="./phys3d-d.js" defer></script>
   <script src="./vendor/matter.min.js" defer></script>
   <script src="./experience.js" defer></script>
   <script src="./app.js" defer></script>
@@ -65,6 +75,10 @@
         <div class="sidebar-top">
           <div class="sidebar-heading"><span>THE LIBRARY</span><span id="library-count">SIMULATIONS</span></div>
           <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">Search simulations</span><input id="search" type="search" placeholder="Find a concept…" autocomplete="off" data-testid="search-input"><kbd>/</kbd></label>
+          <div class="subject-tabs" role="group" aria-label="Choose subject">
+            <button class="subject-tab active" data-subject="physics" type="button" aria-pressed="true" data-testid="subject-physics-tab">⚛ Physics</button>
+            <button class="subject-tab" data-subject="biology" type="button" aria-pressed="false" data-testid="subject-biology-tab">🧬 Biology</button>
+          </div>
           <div class="grade-tabs" role="group" aria-label="Choose class">
             <button class="grade-tab active" data-grade="11" type="button" aria-pressed="true" data-testid="grade-11-tab">Class 11</button>
             <button class="grade-tab" data-grade="12" type="button" aria-pressed="false" data-testid="grade-12-tab">Class 12</button>
@@ -120,6 +134,7 @@
                 <button id="zoom-out" type="button" aria-label="Zoom out" data-testid="zoom-out-btn">−</button>
                 <button id="zoom-in" type="button" aria-label="Zoom in" data-testid="zoom-in-btn">+</button>
                 <button id="view-reset" type="button" data-testid="view-reset-btn" title="Reset the camera (key 0 or double-click)">Reset view</button>
+                <button id="classic-2d" type="button" aria-pressed="false" data-testid="classic-2d-btn" title="Switch between the 3D scene and the original 2D diagram" hidden>▭ 2D diagram</button>
               </div></div>
               <canvas id="simulation" role="img" aria-label="Physics simulation animation" data-testid="simulation-canvas">Your browser does not support canvas animations.</canvas>
               <div class="stage-bottom"><div class="transport"><button id="play" class="play-button" type="button" aria-label="Pause simulation" data-testid="play-btn"><span id="play-icon" aria-hidden="true">Ⅱ</span><span id="play-label">Pause</span></button><button id="restart" class="restart-button" type="button" aria-label="Restart simulation" data-testid="restart-btn"><span aria-hidden="true">↺</span> Restart</button><button id="fullscreen-btn" class="restart-button icon-tool" type="button" aria-label="Full screen (key F)" title="Full screen (key F)" data-testid="fullscreen-btn"><span aria-hidden="true">⛶</span><b>Full screen</b></button><button id="snapshot-btn" class="restart-button icon-tool" type="button" aria-label="Save a snapshot image" title="Save a snapshot image" data-testid="snapshot-btn"><span aria-hidden="true">⤓</span><b>Snapshot</b></button><span class="transport-divider"></span><span class="running-time">TIME <strong id="elapsed">0.0 s</strong></span></div><span class="stage-brand">PHYSICA LAB <span aria-hidden="true">✳</span></span></div>
@@ -187,17 +202,31 @@
     </header>
     <div class="sandbox-body">
       <div class="sandbox-stage-wrap">
+        <div class="sb-templates" id="sb-templates" role="group" aria-label="Start from a template" data-testid="sandbox-templates">
+          <span class="sb-templates-label">QUICK START</span>
+          <button type="button" data-preset="cannon" data-testid="tpl-cannon"><i>🎯</i>Cannon</button>
+          <button type="button" data-preset="challenge" data-testid="tpl-challenge"><i>🏀</i>Basket challenge</button>
+          <button type="button" data-preset="cradle" data-testid="tpl-cradle"><i>⚪</i>Newton’s cradle</button>
+          <button type="button" data-preset="ramp" data-testid="tpl-ramp"><i>⛷</i>Ramp race</button>
+          <button type="button" data-preset="bridge" data-testid="tpl-bridge"><i>🌉</i>Bridge</button>
+          <button type="button" data-preset="domino" data-testid="tpl-domino"><i>🁢</i>Dominoes</button>
+          <button type="button" data-preset="pendulum" data-testid="tpl-pendulum"><i>🕰</i>Pendulums</button>
+          <button type="button" data-preset="orbit" data-testid="tpl-orbit"><i>🪐</i>Orbit</button>
+          <button type="button" data-preset="pit" data-testid="tpl-pit"><i>🫧</i>Ball pit</button>
+        </div>
         <div class="sb-palette" id="sb-palette" data-testid="sandbox-palette" role="toolbar" aria-label="Build tools">
           <button data-tool="move" class="active" type="button" data-testid="tool-move" aria-pressed="true" title="Select, move and throw">↖<b>Move</b></button>
+          <button data-tool="sling" type="button" data-testid="tool-sling" aria-pressed="false" title="Drag backwards from a point, then let go to launch a ball">➶<b>Launch</b></button>
           <button data-tool="ball" type="button" data-testid="tool-ball" draggable="true" aria-pressed="false">●<b>Ball</b></button>
           <button data-tool="box" type="button" data-testid="tool-box" draggable="true" aria-pressed="false">□<b>Box</b></button>
           <button data-tool="wall" type="button" data-testid="tool-wall" draggable="true" aria-pressed="false">▬<b>Wall</b></button>
           <button data-tool="ramp" type="button" data-testid="tool-ramp" draggable="true" aria-pressed="false">∠<b>Ramp</b></button>
-          <button data-tool="spring" type="button" data-testid="tool-spring" aria-pressed="false" title="Connect two objects or connect an object to empty space">≈<b>Spring</b></button>
-          <button data-tool="rope" type="button" data-testid="tool-rope" aria-pressed="false" title="Fixed-length connecting rod">—<b>Rod</b></button>
-          <button data-tool="magnet" type="button" data-testid="tool-magnet" draggable="true" aria-pressed="false">⊕<b>Attractor</b></button>
-          <button data-tool="pan" type="button" data-testid="tool-pan" aria-pressed="false">↔<b>Pan</b></button>
+          <button class="sb-adv" data-tool="spring" type="button" data-testid="tool-spring" aria-pressed="false" title="Connect two objects or connect an object to empty space">≈<b>Spring</b></button>
+          <button class="sb-adv" data-tool="rope" type="button" data-testid="tool-rope" aria-pressed="false" title="Fixed-length connecting rod">—<b>Rod</b></button>
+          <button class="sb-adv" data-tool="magnet" type="button" data-testid="tool-magnet" draggable="true" aria-pressed="false">⊕<b>Attractor</b></button>
+          <button class="sb-adv" data-tool="pan" type="button" data-testid="tool-pan" aria-pressed="false">↔<b>Pan</b></button>
           <button data-tool="erase" type="button" data-testid="tool-erase" aria-pressed="false">×<b>Erase</b></button>
+          <button id="sb-mode" class="sb-mode" type="button" aria-pressed="false" data-testid="sandbox-mode-toggle" title="Show springs, rods, attractors and fine controls">⚙ Advanced tools</button>
         </div>
         <div class="sb-stage-tools">
           <button id="sb-undo" type="button" data-testid="sandbox-undo" title="Undo edit (Ctrl+Z)">Undo</button>
@@ -211,7 +240,7 @@
         <div class="sb-canvas-frame">
           <canvas id="sandbox-canvas" data-testid="sandbox-canvas" tabindex="0" aria-label="Physics world: select a tool then tap or drag to build">Canvas unsupported.</canvas>
         </div>
-        <p class="sb-hint" id="sb-hint" data-testid="sandbox-hint">Tap an object to edit it. Drag to move or throw. Pause for precise building.</p>
+        <p class="sb-hint" id="sb-hint" data-testid="sandbox-hint">Pick a quick-start scene above, or choose ➶ Launch and drag backwards on the stage to fire a ball.</p>
         <p id="sb-status" role="status" aria-live="polite" data-testid="sandbox-status"></p>
       </div>
       <aside class="sandbox-rail" aria-label="World and object controls">
@@ -221,13 +250,20 @@
           <div class="sb-btn-row"><button id="sb-reset" type="button" data-testid="sandbox-reset">Reset run</button><button id="sb-clear" type="button" data-testid="sandbox-clear-btn">Clear all</button></div>
           <label class="sb-field">Simulation speed<select id="sb-speed" data-testid="sandbox-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
         </div>
+        <div class="sb-group" data-testid="sandbox-quick">
+          <div class="sb-group-title">GRAVITY</div>
+          <div class="sb-chips" id="sb-planets"><button type="button" data-g="1" class="on">🌍 Earth</button><button type="button" data-g="0.17">🌙 Moon</button><button type="button" data-g="0.38">🔴 Mars</button><button type="button" data-g="2.5">🟠 Jupiter</button><button type="button" data-g="0">🚀 Space</button></div>
+          <div class="sb-group-title">MATERIAL <span class="sb-mat-note" id="sb-mat-note">(for new objects)</span></div>
+          <div class="sb-chips" id="sb-materials"><button type="button" data-mat="rubber" class="on">🏀 Rubber</button><button type="button" data-mat="wood">🪵 Wood</button><button type="button" data-mat="metal">🔩 Metal</button><button type="button" data-mat="ice">🧊 Ice</button></div>
+          <label class="sb-check"><input id="sb-graph" type="checkbox" checked data-testid="sandbox-graph"> Live graph of the selected object</label>
+        </div>
         <div class="sb-group" id="sb-inspector" data-testid="sandbox-inspector">
           <div class="sb-group-title">SELECTED OBJECT</div>
           <p class="sb-empty" id="sb-selection-empty">Select any object or connection on the canvas, or use the object list below.</p>
           <div id="sb-properties" data-testid="sandbox-properties" hidden></div>
           <div class="sb-btn-row"><button id="sb-duplicate" type="button" data-testid="sandbox-duplicate" disabled>Duplicate</button><button id="sb-delete" type="button" data-testid="sandbox-delete" disabled>Delete</button></div>
         </div>
-        <details class="sb-group" open><summary data-testid="sandbox-world-toggle">World settings</summary>
+        <details class="sb-group sb-adv" open><summary data-testid="sandbox-world-toggle">World settings</summary>
           <label class="sb-slider">Gravity <span id="sb-gravity-val" data-testid="sandbox-gravity-value"></span><input id="sb-gravity" type="range" min="0" max="3" step="0.1" value="1" data-testid="sandbox-gravity"></label>
           <label class="sb-slider">Gravity direction <span id="sb-direction-val" data-testid="sandbox-direction-value"></span><input id="sb-direction" type="range" min="0" max="360" step="15" value="90" data-testid="sandbox-direction"></label>
           <label class="sb-slider">All objects: bounce <span id="sb-bounce-val" data-testid="sandbox-bounce-value"></span><input id="sb-bounce" type="range" min="0" max="1" step="0.05" value="0.6" data-testid="sandbox-bounce"></label>
@@ -240,8 +276,8 @@
           <label class="sb-check"><input id="sb-trails" type="checkbox" data-testid="sandbox-trails"> Show motion trails</label>
           <label class="sb-check"><input id="sb-labels" type="checkbox" checked data-testid="sandbox-labels"> Show object labels</label>
         </details>
-        <details class="sb-group" open><summary data-testid="sandbox-objects-toggle">Objects &amp; connections</summary><div id="sb-objects" data-testid="sandbox-objects"></div></details>
-        <details class="sb-group"><summary data-testid="sandbox-presets-toggle">Start from a scene</summary>
+        <details class="sb-group sb-adv" open><summary data-testid="sandbox-objects-toggle">Objects &amp; connections</summary><div id="sb-objects" data-testid="sandbox-objects"></div></details>
+        <details class="sb-group sb-adv"><summary data-testid="sandbox-presets-toggle">Start from a scene</summary>
           <div class="sb-btn-row"><button id="sb-preset-tower" type="button" data-testid="sandbox-preset-tower">Ball pit</button><button id="sb-preset-newton" type="button" data-testid="sandbox-preset-newton">Pendulum</button></div>
           <div class="sb-btn-row"><button id="sb-preset-domino" type="button" data-testid="sandbox-preset-domino">Domino run</button><button id="sb-preset-orbit" type="button" data-testid="sandbox-preset-orbit">Attraction</button></div>
         </details>
