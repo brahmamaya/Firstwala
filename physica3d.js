@@ -26,6 +26,8 @@ function backdrop(c){if(!enabled)return;const R=raw(c);R.save();const g=R.create
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],mul=(a,k)=>[a[0]*k,a[1]*k,a[2]*k];
 const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot3=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
 const norm=a=>{const m=Math.hypot(...a)||1;return mul(a,1/m)};
+// Rotation by Euler angles [x, y, z] (radians), applied x then y then z.
+function rotator(r){if(!r)return a=>a;const [x,y,z]=r,cx=Math.cos(x),sx=Math.sin(x),cy=Math.cos(y),sy=Math.sin(y),cz=Math.cos(z),sz=Math.sin(z);return([a,b,c])=>{let B=b*cx-c*sx,C=b*sx+c*cx,A=a*cy+C*sy;C=-a*sy+C*cy;return[A*cz-B*sz,A*sz+B*cz,C]}}
 function basis(axis){const n=norm(axis),h=Math.abs(n[1])<.9?[0,1,0]:[1,0,0],u=norm(cross(n,h)),v=cross(n,u);return[n,u,v]}
 
 function scene(c,o={}){
@@ -36,6 +38,7 @@ function scene(c,o={}){
   const view=([x,y,z])=>{const X=x*cyw+z*syw,Z0=-x*syw+z*cyw;return[X,y*cp-Z0*sp,y*sp+Z0*cp]};
   function P(p){const [X,Y,Z]=view(p),f=focal/Math.max(.6,focal-Z);return[cx+X*sc*f,cy-Y*sc*f,Z,f]}
   const facing=n=>{const v=view(n);return v[2]};
+  const LV=view(LIGHT),HV=norm(add(LV,[0,0,1]));
   const push=(z,draw)=>items.push({z,draw});
   const S={P,sc,cam,
     seg(a,b,col='#8ca6b9',w=2,dash=[]){const A=P(a),B=P(b);push((A[2]+B[2])/2,()=>{c.save();c.beginPath();c.setLineDash(dash);c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.stroke();c.restore()});return S},
@@ -46,7 +49,9 @@ function scene(c,o={}){
     ball(p,r,col='#ffc36b',opt={}){const Q=P(p),rr=Math.max(1.2,r*sc*Q[3]);push(Q[2]+(opt.lift||0),()=>{if(opt.glow){const g=c.createRadialGradient(Q[0],Q[1],rr*.5,Q[0],Q[1],rr*3.2);g.addColorStop(0,col+'55');g.addColorStop(1,col+'00');c.fillStyle=g;c.beginPath();c.arc(Q[0],Q[1],rr*3.2,0,TAU);c.fill()}c.beginPath();c.arc(Q[0],Q[1],rr,0,TAU);c.fillStyle=opt.alpha!=null&&/^#[\da-f]{6}$/i.test(col)?col+Math.round(opt.alpha*255).toString(16).padStart(2,'0'):col;if(enabled&&rr>3&&!opt.flat&&opt.alpha==null)shadowFill(c,rr);else c.fill();if(opt.stroke){c.strokeStyle=opt.stroke;c.lineWidth=1.5;c.stroke()}if(!opt.flat)shadeSphere(c,Q[0],Q[1],rr);if(opt.label)S._label(Q[0],Q[1]-rr-12,opt.label,opt.labelColor||'#e9f6ff',13)});return S},
     poly(pts,col,opt={}){const Q=pts.map(P);let n=opt.normal;if(!n&&pts.length>2)n=norm(cross(sub(pts[1],pts[0]),sub(pts[2],pts[0])));if(opt.cull&&n&&facing(n)<-.02)return S;const zz=opt.z??Q.reduce((s,q)=>s+q[2],0)/Q.length+(opt.bias||0);
       const I=n?(opt.cull?Math.max(0,dot3(n,LIGHT)):Math.abs(dot3(n,LIGHT))):.6;
-      push(zz,()=>{c.beginPath();c.moveTo(Q[0][0],Q[0][1]);for(const q of Q.slice(1))c.lineTo(q[0],q[1]);c.closePath();if(col){c.fillStyle=opt.alpha!=null&&opt.alpha<1&&/^#[\da-f]{6}$/i.test(col)?col+Math.round(opt.alpha*255).toString(16).padStart(2,'0'):col;c.fill();if(enabled&&opt.shade!==false){const R=raw(c),k=(1-Math.max(0,Math.min(1,.3+.7*I)))*.62*(opt.alpha??1);if(k>.01){R.fillStyle=`rgba(0,0,0,${k.toFixed(3)})`;R.fill()}if(I>.8){R.fillStyle=`rgba(255,255,255,${((I-.8)*.4*(opt.alpha??1)).toFixed(3)})`;R.fill()}}}if(opt.stroke){c.strokeStyle=opt.stroke;c.lineWidth=opt.lw||1.2;c.stroke()}});return S},
+      if(opt.grow){const mx=Q.reduce((s,q)=>s+q[0],0)/Q.length,my=Q.reduce((s,q)=>s+q[1],0)/Q.length;for(const q of Q){const dx=q[0]-mx,dy=q[1]-my,d=Math.hypot(dx,dy)||1;q[0]+=dx/d*opt.grow;q[1]+=dy/d*opt.grow}}
+      const spec=opt.spec&&n?Math.pow(Math.max(0,dot3(norm(view(n)),HV)),opt.shine||24)*opt.spec:0;
+      push(zz,()=>{c.beginPath();c.moveTo(Q[0][0],Q[0][1]);for(const q of Q.slice(1))c.lineTo(q[0],q[1]);c.closePath();if(col){c.fillStyle=opt.alpha!=null&&opt.alpha<1&&/^#[\da-f]{6}$/i.test(col)?col+Math.round(opt.alpha*255).toString(16).padStart(2,'0'):col;c.fill();if(enabled&&opt.shade!==false){const R=raw(c),k=(1-Math.max(0,Math.min(1,.3+.7*I)))*.62*(opt.alpha??1);if(k>.01){R.fillStyle=`rgba(0,0,0,${k.toFixed(3)})`;R.fill()}if(I>.8){R.fillStyle=`rgba(255,255,255,${((I-.8)*.4*(opt.alpha??1)).toFixed(3)})`;R.fill()}if(spec>.01){R.fillStyle=`rgba(255,255,255,${Math.min(.75,spec*(opt.alpha??1)).toFixed(3)})`;R.fill()}}}if(opt.stroke){c.strokeStyle=opt.stroke;c.lineWidth=opt.lw||1.2;c.stroke()}});return S},
     // Axis-aligned (optionally y-rotated) cuboid centred at p with size [w,h,d].
     box(p,[w,h,d],col='#7baaff',opt={}){const a=opt.rotY||0,ca=Math.cos(a),sa=Math.sin(a),tilt=opt.rotZ||0,ct=Math.cos(tilt),st=Math.sin(tilt);
       const V=(x,y,z)=>{let X=x*ct-y*st,Y=x*st+y*ct;return add(p,[X*ca+z*sa,Y,-X*sa+z*ca])};
@@ -67,6 +72,21 @@ function scene(c,o={}){
     // Coil of `turns` loops along an axis, sorted in chunks so it wraps around what it encloses.
     helix(p,axis,r,len,turns,col='#ffc36b',w=2.5){const [n,u,v]=basis(axis),N=Math.max(24,Math.round(turns*28));const pts=Array.from({length:N+1},(_,i)=>{const s=i/N,t=TAU*turns*s;return add(add(p,mul(n,(s-.5)*len)),add(mul(u,r*Math.cos(t)),mul(v,r*Math.sin(t))))});return S.curve(pts,col,w,4)},
     spring(a,b,coils=10,r=.12,col='#42d9ca',w=2.5){const d=sub(b,a),L=Math.hypot(...d),[,u,v]=basis(d),n=norm(d),N=coils*16;const pts=[a];for(let i=0;i<=N;i++){const s=.08+.84*i/N,t=TAU*coils*i/N;pts.push(add(add(a,mul(n,s*L)),add(mul(u,r*Math.cos(t)),mul(v,r*Math.sin(t)))))}pts.push(b);return S.curve(pts,col,w,8)},
+    // Organic surfaces: a lat-long mesh, optionally deformed, rotated and lit with a specular highlight.
+    // shape(u,v) may return a radial scale factor (u: latitude −π/2..π/2, v: longitude 0..2π).
+    mesh(p,radii,col='#ff857e',opt={}){const [ax,ay,az]=typeof radii==='number'?[radii,radii,radii]:radii,rings=opt.rings||14,segs=opt.segs||22,R=rotator(opt.rot),pts=[];
+      for(let i=0;i<=rings;i++){const u=-Math.PI/2+Math.PI*i/rings,row=[];for(let j=0;j<=segs;j++){const v=TAU*j/segs,k=opt.shape?opt.shape(u,v):1;row.push(add(p,R([ax*k*Math.cos(u)*Math.cos(v),ay*k*Math.sin(u),az*k*Math.cos(u)*Math.sin(v)])))}pts.push(row)}
+      return S._quads(pts,p,col,opt)},
+    // A tube swept along a polyline (vessels, roots, neurons, DNA backbones). r may be a function of 0..1.
+    tube(line,r,col='#ff857e',opt={}){if(line.length<2)return S;const seg=opt.segs||10,rings=[];let prevU=null;
+      for(let i=0;i<line.length;i++){const a=line[Math.max(0,i-1)],b=line[Math.min(line.length-1,i+1)],t=norm(sub(b,a));let u=prevU?norm(sub(prevU,mul(t,dot3(prevU,t)))):basis(t)[1];if(!Number.isFinite(u[0]))u=basis(t)[1];prevU=u;const w=cross(t,u),rr=typeof r==='function'?r(i/(line.length-1)):r;
+        rings.push(Array.from({length:seg+1},(_,j)=>{const q=TAU*j/seg;return add(line[i],add(mul(u,rr*Math.cos(q)),mul(w,rr*Math.sin(q))))}))}
+      return S._quads(rings,null,col,{...opt,axis:line})},
+    // Surface of revolution from a profile of [radius, height] pairs.
+    lathe(p,profile,col='#9fb4c2',opt={}){const segs=opt.segs||24,R=rotator(opt.rot),rows=profile.map(([r,y])=>Array.from({length:segs+1},(_,j)=>{const v=TAU*j/segs;return add(p,R([r*Math.cos(v),y,r*Math.sin(v)]))}));return S._quads(rows,null,col,{...opt,lathe:profile.map(([,y])=>add(p,R([0,y,0])))})},
+    _quads(G,center,col,opt){const cols=typeof col==='function'?col:()=>col;for(let i=0;i<G.length-1;i++)for(let j=0;j<G[i].length-1;j++){const q=[G[i][j],G[i+1][j],G[i+1][j+1],G[i][j+1]],m=mul(q.reduce((s,a)=>add(s,a),[0,0,0]),.25);
+        let n=norm(cross(sub(q[2],q[0]),sub(q[3],q[1])));const ref=center||(opt.axis?opt.axis[Math.min(opt.axis.length-1,i)]:opt.lathe?opt.lathe[i]:m);if(dot3(n,sub(m,ref))<0)n=mul(n,-1);if(opt.inside)n=mul(n,-1);
+        S.poly(q,cols(i/(G.length-1),j/(G[i].length-1)),{cull:opt.cull!==false&&opt.alpha==null,normal:n,alpha:opt.alpha,grow:opt.alpha==null?.7:0,spec:opt.spec??.45,shine:opt.shine,bias:opt.bias})}return S},
     hud(fn){push(2e6,fn);return S},
     render(){items.sort((a,b)=>a.z-b.z);for(const it of items)it.draw();items.length=0}
   };
@@ -75,7 +95,7 @@ function scene(c,o={}){
 
 const listeners=new Set();
 const notify=()=>listeners.forEach(fn=>fn());
-window.Physica3D={scene,shadeSphere,shadeBox,shadowFill,sphereOK,boxOK,backdrop,cam,vec:{add,sub,mul,cross,dot:dot3,norm},
+window.Physica3D={scene,rotator,shadeSphere,shadeBox,shadowFill,sphereOK,boxOK,backdrop,cam,vec:{add,sub,mul,cross,dot:dot3,norm},
   get enabled(){return enabled},
   setEnabled(v){enabled=!!v;try{localStorage.setItem(KEY,enabled?'on':'off')}catch{}notify()},
   rotate(dx,dy){cam.yaw+=dx;cam.pitch=Math.max(-1.2,Math.min(1.35,cam.pitch+dy));notify()},

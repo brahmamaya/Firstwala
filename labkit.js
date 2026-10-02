@@ -6,7 +6,7 @@
 const PI=Math.PI,TAU=2*PI;
 const R=(key,label,min,max,step,initial,unit='',digits=0)=>({key,label,min,max,step,initial,unit,digits});
 const S=(key,label,initial,options)=>({key,label,initial,options});
-const f=(v,n=2)=>{if(!Number.isFinite(v))return'—';if(v===0||Math.abs(v)<1e-40)return'0';const a=Math.abs(v);return a>=1e5||a<1e-3?Number(v).toExponential(Math.max(1,n)):Number(v).toFixed(n)};
+const f=(v,n=2)=>{if(!Number.isFinite(v))return'—';if(v===0||Math.abs(v)<1e-40)return'0';const a=Math.abs(v);if(a>=1e5||a<1e-3){const [m,e]=Number(v).toExponential(Math.max(1,Math.min(n,3))).split('e');const sup=String(Number(e)).replace(/[-0-9]/g,d=>'⁻⁰¹²³⁴⁵⁶⁷⁸⁹'['-0123456789'.indexOf(d)]);return`${m} × 10${sup}`}return Number(v).toFixed(n)};
 const N=(label,v,unit='',n=2)=>({label,value:typeof v==='number'?`${f(v,n)} ${unit}`.trim():String(v)});
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rad=d=>d*PI/180,deg=r=>r*180/PI,cycle=(t,n)=>((t%n)+n)%n;
 const cache=new Map();
@@ -27,6 +27,8 @@ function pack(){
   const entries=[];
   function add(o){
     const s={base:o.base,id:o.id,title:o.title,description:o.description,formula:o.formula,observe:o.observe,try:o.tryText,controls:o.controls,metrics:o.metrics,renderer:o.draw,draw:o.id,view3d:o.flat!==true};
+    // Biology experiments declare their own NCERT chapter instead of extending a physics one.
+    if(o.chapter)Object.assign(s,{subject:o.subject||'biology',grade:o.grade,group:o.group,chapter:o.chapter,chapterNo:o.chapterNo});
     entries.push(s);
     const numeric=o.controls.filter(c=>!c.options),last=numeric[numeric.length-1];
     const presets=(o.presets||[]).map(([label,values])=>({label,values}));
