@@ -66,3 +66,46 @@
 .favourites{margin:4px 20px 14px;padding:15px 0;border-bottom:1px solid var(--line)}#favourites-list{max-height:210px;overflow:auto;margin-top:10px;scrollbar-width:thin}.favourites-empty{font-size:12px;color:var(--muted2);line-height:1.6;margin:0}.favourite-row{display:flex;gap:5px;margin:4px 0}.favourite-row button{background:transparent;border:0;color:var(--muted);text-align:left;min-height:40px;border-radius:6px;font-size:13px;padding:8px;transition:background-color .2s,color .2s}.favourite-row button:first-child{flex:1;min-width:0}.favourite-row button:hover,.favourite-row button.active{background:var(--active);color:var(--mint)}.favourite-row .favourite-remove{color:var(--gold);flex-shrink:0;width:34px;font-size:19px}#favourites-status:empty{display:none}#favourites-status{font-size:12px;color:var(--gold)}
 .exact-value{width:100%;border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:6px;padding:8px 10px;margin-top:9px;min-height:38px}.simulation-playback{margin-top:22px;border-top:1px solid var(--line);padding-top:18px;display:grid;gap:10px;font-size:13px}.simulation-playback select,.simulation-playback button{font:inherit;min-height:38px;background:var(--panel2);color:var(--text);border:1px solid var(--line2);border-radius:6px;padding:8px}.simulation-playback p{color:var(--muted2);line-height:1.5;margin:0}.rail-collapsed .simulation-playback{display:none}.chapter-list{max-height:none}.sidebar{max-height:calc(100vh - 76px);position:sticky;top:0}.sidebar-top,.favourites,.sidebar-bottom{flex-shrink:0}.chapter-list{flex:1;min-height:120px}
 @media(max-width:760px){.topbar{height:auto;min-height:76px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px;gap:12px}.topbar-right{flex-wrap:wrap}.sidebar{position:absolute;top:100%;max-height:calc(100dvh - 110px);height:calc(100dvh - 110px)}.layout{position:relative}.layout .sidebar{top:0}.favourites{margin:0 20px 8px}.sidebar-bottom{display:none}.favourites #favourites-list{max-height:140px}.sidebar-top{padding-top:18px}.search-wrap{margin-top:12px}}
+/* Fine-step controls, 3D view bar, extra tools, help dialog and toast. */
+.range-wrap{display:flex;align-items:center;gap:8px}.range-wrap input[type=range]{flex:1;min-width:0}
+.step-btn{flex:none;width:32px;height:32px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:18px;font-weight:700;line-height:1;display:grid;place-items:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.step-btn:hover{border-color:var(--mint);color:var(--mint)}.step-btn:active{background:var(--active)}
+.simulation-tabs button.is-3d::after{content:'3D';display:inline-block;margin-left:8px;padding:1px 6px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:.6px;vertical-align:2px;color:var(--on-mint);background:var(--mint)}
+.pill-3d{padding:1px 6px;border-radius:5px;font-size:11px;color:var(--on-mint);background:var(--mint)}
+.view3d-bar{position:absolute;top:58px;right:12px;z-index:2;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:calc(100% - 24px)}
+.view3d-bar[hidden]{display:none}
+.view3d-bar button{min-height:34px;padding:6px 11px;border-radius:8px;border:1px solid var(--line2);background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--text);font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+.view3d-bar button:hover{border-color:var(--mint)}.view3d-bar button[aria-pressed=true]{color:var(--mint);border-color:var(--active-line);background:var(--active)}
+.view3d-bar #zoom-in,.view3d-bar #zoom-out{width:34px;padding:0;font-size:17px}
+.icon-tool{padding:0 10px}.icon-tool span{font-size:15px!important;line-height:1!important}.icon-tool b{font-weight:700}
+.stage:fullscreen{display:flex;flex-direction:column;justify-content:center;border-radius:0;background:var(--bg)}
+.stage:fullscreen #simulation{width:min(100%,calc((100vh - 110px)*960/505));margin:0 auto}
+.stage.pseudo-full{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:center;border-radius:0;background:var(--bg)}
+.stage.pseudo-full #simulation{width:min(100%,calc((100dvh - 110px)*960/505));margin:0 auto}
+body.no-scroll{overflow:hidden}
+.help-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:auto;border:1px solid var(--line2);border-radius:14px;background:var(--panel);color:var(--text);padding:0;box-shadow:0 30px 80px var(--shadow)}
+.help-dialog::backdrop{background:#020910b3}
+.help-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}.help-head h2{margin:0;font-size:20px}
+.help-head button{width:38px;height:38px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:22px}
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 26px;padding:16px 22px 22px}.help-grid h3{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mint);margin:6px 0 10px}
+.help-grid ul{margin:0;padding-left:18px;display:grid;gap:8px;color:var(--muted);font-size:14px;line-height:1.45}.help-grid b{color:var(--text)}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:14px}.keys dt{white-space:nowrap}.keys dd{margin:0;color:var(--muted)}
+.keys kbd{display:inline-block;min-width:24px;padding:2px 7px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:6px;background:var(--panel2);font:600 12px/1.4 ui-monospace,monospace;text-align:center;color:var(--text)}
+.toast{position:fixed;left:0;right:0;margin:0 auto;width:fit-content;bottom:24px;z-index:60;max-width:calc(100vw - 32px);padding:12px 18px;border-radius:10px;border:1px solid var(--active-line);background:var(--panel);color:var(--text);font-size:14px;font-weight:600;box-shadow:0 14px 40px var(--shadow);animation:toast-in .25s ease-out}
+.toast[hidden]{display:none}@keyframes toast-in{from{opacity:0;transform:translateY(10px)}}
+@media(max-width:700px){.help-grid{grid-template-columns:1fr}.icon-tool b{display:none}.view3d-bar{position:static;justify-content:center;padding:8px 10px 0;max-width:none}}
+@media(prefers-reduced-motion:reduce){.toast{animation:none}}
+/* One swipeable row of simulation tabs keeps the stage near the top in large chapters. */
+.tabs-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}.tab-count{font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--muted2);text-transform:uppercase}
+.tabs-nav-buttons{display:flex;gap:6px}.tabs-nav button{min-height:32px;padding:5px 11px;border-radius:7px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:12px;font-weight:700}.tabs-nav button:hover{border-color:var(--mint);color:var(--mint)}
+.simulation-tabs{position:relative;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;padding-bottom:8px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.simulation-tabs button{flex:none;white-space:nowrap;scroll-snap-align:start;padding:10px 14px;min-height:42px}
+.lab-tools{margin-bottom:14px}.lab-tools button{min-height:40px;padding:8px 12px;font-size:13px}.lab-tool-buttons{gap:6px}
+.icon-tool{width:36px;padding:0!important}.icon-tool b{display:none}
+.stage-top{height:auto!important;min-height:49px;flex-wrap:wrap;gap:6px 12px;padding:6px 14px 6px 20px!important}
+.view3d-bar{position:static;max-width:none;justify-content:flex-end}.view3d-bar button{min-height:30px;padding:4px 10px;font-size:11.5px}.view3d-bar #zoom-in,.view3d-bar #zoom-out{width:30px}
+.stage-top:has(.view3d-bar:not([hidden])) .stage-hint{display:none}
+@media(max-width:700px){.view3d-bar{padding:0;justify-content:flex-start;width:100%}.stage-top{padding:8px 12px!important}.tab-count{font-size:11px}}
+.tabs-nav button{white-space:nowrap}
+@media(max-width:600px){.lab-tools{flex-direction:column;align-items:stretch}.lab-tool-buttons{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.lab-tool-buttons::-webkit-scrollbar{display:none}.lab-tool-buttons>*{flex:none}.lab-tools .surprise-button{justify-content:center;min-height:40px}.tabs-nav{align-items:flex-end}}
+@media(max-width:600px){.lab-tools,.lab-tool-buttons{min-width:0;max-width:100%}.lab-tools{width:100%}}

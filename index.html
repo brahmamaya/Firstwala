@@ -13,12 +13,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07121f">
-  <meta name="description" content="Explore Class 11 and 12 physics with interactive, animated simulations. Change the variables and see the physics respond. Build your own with the drag-and-drop sandbox.">
+  <meta name="description" content="Explore Class 11 and 12 physics with 276 interactive simulations, including 100 in rotatable 3D. Change the variables and see the physics respond. Build your own with the drag-and-drop sandbox.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2307121f'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%233bd9c8' stroke-width='3'/%3E%3Cpath d='M13 37c10-22 22-24 38-10M13 37c13-6 26-1 38-10' fill='none' stroke='%23ffc36b' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23fff'/%3E%3C/svg%3E">
   <title>Physica — Interactive Physics Lab</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./sandbox.css">
   <script src="./theme.js"></script>
+  <script src="./physica3d.js"></script>
   <script src="./physics.js" defer></script>
   <script src="./extras.js" defer></script>
   <script src="./enhancements.js" defer></script>
@@ -26,6 +27,11 @@
   <script src="./fourth.js" defer></script>
   <script src="./fifth.js" defer></script>
   <script src="./sixth.js" defer></script>
+  <script src="./labkit.js" defer></script>
+  <script src="./seventh.js" defer></script>
+  <script src="./eighth.js" defer></script>
+  <script src="./ninth.js" defer></script>
+  <script src="./tenth.js" defer></script>
   <script src="./vendor/matter.min.js" defer></script>
   <script src="./experience.js" defer></script>
   <script src="./app.js" defer></script>
@@ -83,12 +89,17 @@
           <div class="formula-card"><span>KEY RELATION</span><strong id="formula">R = v² sin(2θ) / g</strong></div>
         </div>
 
+        <div class="tabs-nav"><span id="tab-count" class="tab-count" data-testid="tab-count"></span><span class="tabs-nav-buttons"><button id="tab-prev" type="button" aria-label="Previous simulation (←)" data-testid="tab-prev">‹ Prev</button><button id="tab-next" type="button" aria-label="Next simulation (→)" data-testid="tab-next">Next ›</button></span></div>
         <div id="simulation-tabs" class="simulation-tabs" role="group" aria-label="Choose a simulation in this chapter"></div>
         <div class="lab-tools" aria-label="Teaching and discovery tools">
           <div class="lab-tool-buttons">
             <button id="favourite-toggle" type="button" aria-pressed="false" data-testid="favourite-toggle">☆ Favourite</button>
             <button id="physics-toggle" type="button" aria-pressed="false" aria-controls="physics-panel" data-testid="physics-toggle-btn">Show physics</button>
             <button id="sound-toggle" type="button" aria-pressed="false" aria-describedby="sound-caption" data-testid="sound-toggle-btn">Sound off</button>
+            <button id="randomise-btn" type="button" data-testid="randomise-btn" title="Try random values (key X)">⚄ Randomise</button>
+            <button id="realism-toggle" type="button" aria-pressed="true" data-testid="realism-toggle" title="Realistic lighting, shading and shadows (key 3)">◆ 3D look: On</button>
+            <button id="share-link" type="button" data-testid="share-link-btn" title="Copy a link that opens this experiment with these exact values">⧉ Share setup</button>
+            <button id="help-open" type="button" data-testid="help-open-btn" aria-haspopup="dialog" title="Keyboard shortcuts and tips (key ?)">? Help</button>
             <label id="volume-wrap" class="volume-control" hidden>Volume <input id="volume" type="range" min="0" max="50" step="5" value="25" aria-label="Sound volume"></label>
           </div>
           <button id="surprise-button" class="surprise-button" type="button" data-testid="surprise-btn">Surprise me <span aria-hidden="true">✦</span></button>
@@ -102,9 +113,16 @@
         <div class="lab-layout" id="lab-layout">
           <div class="lab-main">
             <section class="stage" aria-label="Animated physics simulation">
-              <div class="stage-top"><div class="live-label"><span class="live-dot"></span><span id="live-status">LIVE SIMULATION</span></div><div class="stage-hint" id="stage-hint">DRAG THE SLIDERS · OR DRAG ON THE STAGE</div></div>
+              <div class="stage-top"><div class="live-label"><span class="live-dot"></span><span id="live-status">LIVE SIMULATION</span></div><div class="stage-hint" id="stage-hint">DRAG THE SLIDERS · OR DRAG ON THE STAGE</div>
+              <div id="view3d-bar" class="view3d-bar" role="toolbar" aria-label="3D view controls" hidden data-testid="view3d-bar">
+                <button id="drag-mode" type="button" aria-pressed="true" data-testid="drag-mode-btn" title="Choose what dragging the stage does">⟲ Drag: rotate view</button>
+                <button id="auto-spin" type="button" aria-pressed="false" data-testid="auto-spin-btn" title="Slowly orbit the camera">Auto-spin</button>
+                <button id="zoom-out" type="button" aria-label="Zoom out" data-testid="zoom-out-btn">−</button>
+                <button id="zoom-in" type="button" aria-label="Zoom in" data-testid="zoom-in-btn">+</button>
+                <button id="view-reset" type="button" data-testid="view-reset-btn" title="Reset the camera (key 0 or double-click)">Reset view</button>
+              </div></div>
               <canvas id="simulation" role="img" aria-label="Physics simulation animation" data-testid="simulation-canvas">Your browser does not support canvas animations.</canvas>
-              <div class="stage-bottom"><div class="transport"><button id="play" class="play-button" type="button" aria-label="Pause simulation" data-testid="play-btn"><span id="play-icon" aria-hidden="true">Ⅱ</span><span id="play-label">Pause</span></button><button id="restart" class="restart-button" type="button" aria-label="Restart simulation" data-testid="restart-btn"><span aria-hidden="true">↺</span> Restart</button><span class="transport-divider"></span><span class="running-time">TIME <strong id="elapsed">0.0 s</strong></span></div><span class="stage-brand">PHYSICA LAB <span aria-hidden="true">✳</span></span></div>
+              <div class="stage-bottom"><div class="transport"><button id="play" class="play-button" type="button" aria-label="Pause simulation" data-testid="play-btn"><span id="play-icon" aria-hidden="true">Ⅱ</span><span id="play-label">Pause</span></button><button id="restart" class="restart-button" type="button" aria-label="Restart simulation" data-testid="restart-btn"><span aria-hidden="true">↺</span> Restart</button><button id="fullscreen-btn" class="restart-button icon-tool" type="button" aria-label="Full screen (key F)" title="Full screen (key F)" data-testid="fullscreen-btn"><span aria-hidden="true">⛶</span><b>Full screen</b></button><button id="snapshot-btn" class="restart-button icon-tool" type="button" aria-label="Save a snapshot image" title="Save a snapshot image" data-testid="snapshot-btn"><span aria-hidden="true">⤓</span><b>Snapshot</b></button><span class="transport-divider"></span><span class="running-time">TIME <strong id="elapsed">0.0 s</strong></span></div><span class="stage-brand">PHYSICA LAB <span aria-hidden="true">✳</span></span></div>
             </section>
             <section id="physics-panel" class="physics-panel" hidden aria-labelledby="physics-title">
               <div class="physics-heading"><span class="small-index">PHYSICS LENS</span><h2 id="physics-title">Live physics</h2></div>
@@ -117,9 +135,9 @@
               <div id="controls" class="controls-grid"></div>
               <div class="simulation-playback" data-testid="simulation-playback">
                 <label for="simulation-speed">Playback speed</label>
-                <select id="simulation-speed" data-testid="simulation-speed"><option value="0.25">0.25× — study slowly</option><option value="0.5">0.5×</option><option value="1" selected>1× — normal</option><option value="2">2×</option></select>
+                <select id="simulation-speed" data-testid="simulation-speed"><option value="0.1">0.1× — slow motion</option><option value="0.25">0.25× — study slowly</option><option value="0.5">0.5×</option><option value="1" selected>1× — normal</option><option value="2">2×</option><option value="4">4× — fast forward</option></select>
                 <button id="simulation-step" type="button" data-testid="simulation-step">Pause &amp; step 1/30 s</button>
-                <p>Drag a slider or type an exact value. Drag the stage to adjust the first two numeric variables.</p>
+                <p>Drag a slider, tap − / + for fine steps (hold to repeat), or type an exact value. In 2D experiments, dragging the stage adjusts the first two variables; in 3D experiments it rotates the view (switch with “Drag” above the stage).</p>
               </div>
             </section>
           </aside>
@@ -133,6 +151,26 @@
       </main>
     </div>
   </div>
+
+  <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title" data-testid="help-dialog">
+    <div class="help-head"><h2 id="help-title">How to use Physica</h2><button id="help-close" type="button" aria-label="Close help" data-testid="help-close-btn">×</button></div>
+    <div class="help-grid">
+      <section><h3>Explore</h3><ul>
+        <li>Pick a chapter on the left, then a simulation tab. Tabs marked <b class="pill-3d">3D</b> are full 3D scenes.</li>
+        <li>Drag a 3D stage to orbit the camera. Pinch, Ctrl + scroll or the − / + buttons zoom. Double-click to reset.</li>
+        <li>Use <b>− / +</b> beside each slider for fine steps; hold to repeat. Type exact values in the boxes.</li>
+        <li><b>Share setup</b> copies a link that reopens this experiment with your exact values.</li>
+      </ul></section>
+      <section><h3>Keyboard shortcuts</h3><dl class="keys">
+        <dt><kbd>Space</kbd></dt><dd>Play / pause</dd><dt><kbd>R</kbd></dt><dd>Restart time</dd>
+        <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / next simulation</dd><dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Slower / faster playback</dd>
+        <dt><kbd>X</kbd></dt><dd>Randomise values</dd><dt><kbd>F</kbd></dt><dd>Full screen stage</dd>
+        <dt><kbd>3</kbd></dt><dd>Realistic 3D look on / off</dd><dt><kbd>+</kbd> <kbd>−</kbd> <kbd>0</kbd></dt><dd>Zoom in / out / reset 3D view</dd>
+        <dt><kbd>/</kbd></dt><dd>Search simulations</dd><dt><kbd>?</kbd></dt><dd>This help</dd>
+      </dl></section>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden data-testid="toast"></div>
 
   <!-- Make Your Own: local-first physics studio -->
   <section id="sandbox-view" class="sandbox-view" hidden aria-label="Make your own simulation">
