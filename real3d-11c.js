@@ -126,7 +126,7 @@ R['young-modulus']=(c,p,t)=>{const s=P3.scene(c,{scale:46,cy:240,pitch:-.25}),e=
   const lv=[-.45,yR+.05,.12],mc=[.45,yR+.12,.12];s.box([0,yR+.05,.12],[.9,.06,.1],'#7a6a50');s.cyl([0,yR+.11,.12],[1,0,0],.035,.45,GL,{alpha:.35});s.ball([.04*Math.sin(t)*0+clamp(ext*.2,0,.15),yR+.12,.14],.022,'#e9fbe0',{flat:true,lift:1});
   s.cyl([.45,yT+.25,.12],[0,1,0],.025,.5,MT);s.cyl([.45,yT+.55,.12],[0,1,0],.09,.14,'#c3c9cf');for(let i=0;i<12;i++){const a=TAU*i/12;s.seg([.45+.09*Math.cos(a),yT+.49,.12+.09*Math.sin(a)],[.45+.09*Math.cos(a),yT+.61,.12+.09*Math.sin(a)],'#495057',.8)}
   const bR=hanger(s,[-.45,yR-.38,0],2,.17),bT=hanger(s,[.45,yT-.38,0],n,.2,'#8d939a',.05);s.arrow([.85,yT-.45,0],[.85,yT-.45-.2-p.force/1000*.4,0],C.gold,3,10,`F = ${p.force} N`);
-  part(s,[-.45,1.2,0],'reference wire',-40,-10);part(s,[.45,1.2,0],`test wire (A = ${p.area} mm²)`,40,-10);part(s,[0,yR+.11,.12],'spirit level',-60,40);part(s,[.45,yT+.6,.12],'micrometer screw',50,-20);part(s,[.45,bT+.3,.2],'slotted masses',50,30);part(s,[-.45,bR+.2,.2],'dead load',-50,20);
+  part(s,[-.45,1.2,0],'reference wire',-40,-10);part(s,[.45,1.2,0],`test wire (A = ${p.area} mm²)`,40,-10);part(s,[0,yR+.11,.12],'spirit level',-60,40);part(s,[.45,yT+.6,.12],'micrometer screw',50,-20);part(s,[.45,bT+.3,.2],'slotted masses',80,-25);part(s,[-.45,bR+.2,.2],'dead load',-50,20);
   s.render();tag(c,`Extension magnified for visibility · ΔL (1 m wire) = ${f(p.force/(p.area*p.young),3)} mm`,44,98,C.muted,13)};
 
 R['bulk-modulus']=(c,p,t)=>{const s=P3.scene(c,{scale:37,cy:275,cx:300,pitch:-.12}),dv=p.pressure*1e6/(p.bulk*1e9),k=Math.cbrt(Math.max(.2,1-dv*30));

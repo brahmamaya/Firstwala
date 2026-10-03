@@ -112,14 +112,14 @@ R['connected-blocks']=(c,p,t)=>{const s=P3.scene(c,{scale:68,cy:285,cx:330,yaw:.
   s.render();tag(c,`a = F/(m₁ + m₂) = ${f(a,2)} m/s²`,44,98,C.gold,14)};
 
 R['banked-turn']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.08,cy:205}),th=rad(p.angle),v=Math.sqrt(p.radius*G*Math.tan(th)),Rr=2,w=1.15,a=t*.6,y0=-.5,hh=w*Math.tan(th);
-  s.cyl([0,y0-.06,0],[0,1,0],Rr-w/2,.1,'#3d7a3a',{seg:40});s.lathe([0,y0,0],[[Rr-w/2,0],[Rr+w/2,hh]],'#5f656c',{segs:48});s.lathe([0,y0,0],[[Rr+w/2,hh],[Rr+w/2+.06,hh+.08]],'#ced4da',{segs:48});s.lathe([0,y0,0],[[Rr+w/2+.06,hh+.08],[Rr+w/2+.5,-.08]],'#4a7a3c',{segs:48});
+  s.cyl([0,y0-.06,0],[0,1,0],Rr-w/2,.1,'#3d7a3a',{seg:40});s.lathe([0,y0,0],[[Rr-w/2,0],[Rr+w/2,hh]],'#6c727a',{segs:48,cull:false});s.lathe([0,y0,0],[[Rr+w/2,hh],[Rr+w/2+.06,hh+.08]],'#ced4da',{segs:48});s.lathe([0,y0,0],[[Rr+w/2+.06,hh+.08],[Rr+w/2+.28,-.04]],'#3b5f30',{segs:48});
   for(let i=0;i<48;i++){const q=TAU*i/48,q2=TAU*(i+.6)/48;if(i%2)continue;s.seg([Rr*Math.cos(q),y0+hh/2+.01,Rr*Math.sin(q)],[Rr*Math.cos(q2),y0+hh/2+.01,Rr*Math.sin(q2)],'#f1f3f5',2)}
   for(let i=0;i<40;i++){const q=TAU*i/40,q2=TAU*(i+1)/40,r0=Rr-w/2-.01;s.seg([r0*Math.cos(q),y0+.01,r0*Math.sin(q)],[r0*Math.cos(q2),y0+.01,r0*Math.sin(q2)],i%2?'#e03131':'#f8f9fa',4)}
   // car: body, cabin with glass, four wheels, banked with the road
   const cr=Rr,cc=[cr*Math.cos(a),y0+hh/2,cr*Math.sin(a)],X=q=>V.add(cc,ry(rz(q,th),-a));const bx=(q,sz,col,o={})=>s.box(X(q),sz,col,{rotY:-a,rotZ:th,...o});
   bx([0,.2,0],[.46,.16,.95],'#c92a2a');bx([0,.34,-.05],[.42,.14,.48],'#8a1c1c');bx([0,.34,.195],[.38,.11,.01],'#a5d8ff');bx([0,.34,-.295],[.38,.1,.01],'#a5d8ff');for(const sx of[-1,1])bx([sx*.211,.34,-.05],[.01,.1,.4],'#a5d8ff');for(const sx of[-1,1])bx([sx*.15,.2,.476],[.09,.05,.01],'#fff3bf');for(const dx of[-.24,.24])for(const dz of[-.3,.3])s.cyl(X([dx,.1,dz]),ry(rz([1,0,0],th),-a),.1,.08,RUB,{seg:14,cap:'#868e96'});
   const nv=ry(rz([0,1,0],th),-a),top=X([0,.42,0]);s.arrow(top,V.add(top,V.mul(nv,.9/Math.cos(th)*.8)),C.mint,3,10,`N = ${f(1/Math.cos(th),2)} mg`);s.arrow(X([0,.16,0]),V.add(X([0,.16,0]),[0,-.75,0]),C.gold,3,10,'mg');
-  part(s,[-(Rr+w/2)*.7,y0+hh+.1,-(Rr+w/2)*.7],`road banked at ${p.angle}°`,-30,-40);part(s,[0,y0,0],'infield',-60,50);
+  part(s,[-Rr*.7,y0+hh/2,Rr*.7],`road banked at ${p.angle}°`,-40,50);part(s,[0,y0,0],'infield',-60,50);
   s.render();tag(c,`Design speed ≈ ${f(v,1)} m/s`,44,98,C.gold,15)};
 
 R['two-rope-support']=(c,p,t)=>{const s=P3.scene(c,{scale:60,cy:262,yaw:.1}),al=rad(p.left),be=rad(p.right),knot=[0,-.2,0],Lr=2.1,A=[knot[0]-Lr*Math.cos(al),knot[1]+Lr*Math.sin(al),0],B=[knot[0]+Lr*Math.cos(be),knot[1]+Lr*Math.sin(be),0],yb=-2.0;
