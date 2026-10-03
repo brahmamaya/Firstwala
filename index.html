@@ -52,8 +52,30 @@
   <script src="./experience.js" defer></script>
   <script src="./app.js" defer></script>
   <script src="./sandbox-studio.js" defer></script>
+  <script src="./landing.js" defer></script>
 </head>
 <body>
+  <section id="landing" class="landing" aria-labelledby="landing-title" hidden data-testid="landing">
+    <div class="landing-inner">
+      <div class="landing-logo"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">physica<span class="brand-dot">.</span></span></div>
+      <h1 id="landing-title">Welcome to <span class="landing-grad">Physica</span></h1>
+      <p class="landing-sub">Experience concepts through <b class="c2d">2D</b>, <b class="c3d">3D</b> and <b class="cur">Ultra-Realistic</b> simulations</p>
+      <h2 class="landing-step"><span>1</span> Choose your subject</h2>
+      <div class="landing-subjects" role="group" aria-label="Subject">
+        <button type="button" class="land-subject" data-subject="physics" aria-pressed="false" data-testid="land-physics"><i aria-hidden="true">⚛</i><b>Physics</b><small></small></button>
+        <button type="button" class="land-subject" data-subject="chemistry" aria-pressed="false" data-testid="land-chemistry"><i aria-hidden="true">⚗</i><b>Chemistry</b><small></small></button>
+        <button type="button" class="land-subject" data-subject="botany" aria-pressed="false" data-testid="land-botany"><i aria-hidden="true">🌿</i><b>Botany</b><small></small></button>
+        <button type="button" class="land-subject" data-subject="zoology" aria-pressed="false" data-testid="land-zoology"><i aria-hidden="true">🐾</i><b>Zoology</b><small></small></button>
+      </div>
+      <h2 class="landing-step"><span>2</span> Choose your class</h2>
+      <div class="landing-grades" role="group" aria-label="Class">
+        <button type="button" class="land-grade" data-grade="11" aria-pressed="false" data-testid="land-11"><b>Class 11</b><small></small></button>
+        <button type="button" class="land-grade" data-grade="12" aria-pressed="false" data-testid="land-12"><b>Class 12</b><small></small></button>
+      </div>
+      <button type="button" id="landing-go" class="landing-go" disabled data-testid="landing-go">Open simulations →</button>
+      <p class="landing-foot">NCERT Class 11 &amp; 12 · works on phone and computer · no sign-up</p>
+    </div>
+  </section>
   <div class="site-shell">
     <header class="topbar">
       <div class="brand" aria-label="Physica interactive physics lab">

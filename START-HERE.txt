@@ -8,6 +8,8 @@ No build command, backend, database, API keys, or environment variables are need
 The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
+LANDING: the site opens on "Welcome to Physica" where the visitor picks subject and class (landing.js);
+shared links (#sim-id) skip it, and the logo brings it back.
 VIEWS: every simulation has three views - 2D (clean flat diagram or hands-on), 3D (rotate/zoom)
 and Ultra-Realistic (photographic workbench, warm lighting, bloom, vignette and film grain).
 40 rarely used or duplicate physics experiments were retired (list: DROP in app.js).
