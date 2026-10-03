@@ -3,7 +3,7 @@
 (() => {
 'use strict';
 const $=id=>document.getElementById(id),L=$('landing');if(!L)return;
-const sims=window.PhysicaSims||[],KEY='physica-start';
+const sims=window.PhysicaSims||[],KEY='physica-start';if(!sims.length){L.hidden=true;return}
 const count=(sub,g)=>sims.filter(s=>s.subject===sub&&(g==null||s.grade===g)).length;
 let pick={subject:null,grade:null};try{Object.assign(pick,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{}
 const subs=[...L.querySelectorAll('.land-subject')],grades=[...L.querySelectorAll('.land-grade')];
