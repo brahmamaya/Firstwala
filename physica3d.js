@@ -11,12 +11,12 @@ const DEFAULT={yaw:-0.55,pitch:0.36,zoom:1};
 const cam={...DEFAULT,auto:false};
 const LIGHT=(()=>{const v=[-0.45,0.8,0.42],m=Math.hypot(...v);return v.map(x=>x/m)})();
 // Shading is painted on the unthemed context so white highlights and dark shadows stay neutral in every theme.
-const raw=c=>c&&c.canvas&&c.canvas.getContext?c.canvas.getContext('2d'):c;
+const RAW=new WeakMap(),raw=c=>{if(!c||!c.canvas||!c.canvas.getContext)return c;let r=RAW.get(c.canvas);if(!r){r=c.canvas.getContext('2d');RAW.set(c.canvas,r)}return r};
 const light=()=>document.documentElement.style.colorScheme==='light';
 const hexInfo=col=>{const m=typeof col==='string'&&/^#([\da-f]{6})([\da-f]{2})?$/i.exec(col);if(!m)return null;const n=parseInt(m[1],16);return{r:n>>16,g:(n>>8)&255,b:n&255,a:m[2]?parseInt(m[2],16)/255:1}};
 const solid=(col,minA=.8)=>{const h=hexInfo(col);return!!h&&h.a>=minA};
 
-function shadowFill(c,size){const R=raw(c);R.save();R.shadowColor=light()?'rgba(20,30,40,.22)':'rgba(0,0,0,.42)';R.shadowBlur=Math.min(16,3+size*.5);R.shadowOffsetX=Math.min(4,size*.12);R.shadowOffsetY=Math.min(7,1+size*.22);c.fill();R.restore()}
+function shadowFill(c,size){const R=raw(c);R.save();R.shadowColor=light()?'rgba(20,30,40,.22)':'rgba(0,0,0,.42)';R.shadowBlur=Math.min(6,2+size*.25);R.shadowOffsetX=Math.min(3,size*.1);R.shadowOffsetY=Math.min(5,1+size*.18);c.fill();R.restore()}
 function shadeSphere(c,x,y,r){if(!ON()||!(r>=3))return;const R=raw(c);R.save();R.beginPath();R.arc(x,y,r,0,TAU);R.clip();const g=R.createRadialGradient(x-r*.38,y-r*.42,r*.04,x-r*.15,y-r*.18,r*1.12);g.addColorStop(0,'rgba(255,255,255,.62)');g.addColorStop(.2,'rgba(255,255,255,.16)');g.addColorStop(.55,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.5)');R.fillStyle=g;R.fillRect(x-r,y-r,2*r,2*r);R.restore();R.beginPath()}
 function shadeBox(c,x,y,w,h,r=0){if(!ON()||w<4||h<4)return;const R=raw(c);R.save();R.beginPath();R.roundRect(x,y,w,h,r);R.clip();const g=R.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'rgba(255,255,255,.2)');g.addColorStop(.42,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(0,0,0,.3)');R.fillStyle=g;R.fillRect(x,y,w,h);R.fillStyle='rgba(255,255,255,.22)';R.fillRect(x,y,w,Math.min(2,h*.12));R.restore();R.beginPath()}
 // Used by the shared 2D primitives of the original experiments.
@@ -33,14 +33,20 @@ function studio(R){R.save();const w=R.createRadialGradient(340,170,30,340,200,62
   R.strokeStyle='rgba(20,10,4,.35)';R.lineWidth=1;for(let i=-14;i<=14;i++){R.beginPath();R.moveTo(340+i*22,top);R.lineTo(340+i*95,505);R.stroke()}
   const sh=R.createLinearGradient(0,top,0,top+70);sh.addColorStop(0,'rgba(255,220,180,.18)');sh.addColorStop(1,'rgba(255,220,180,0)');R.fillStyle=sh;R.fillRect(0,top,960,70);
   const fade=R.createLinearGradient(0,top-24,0,top+6);fade.addColorStop(0,'rgba(8,7,6,0)');fade.addColorStop(1,'rgba(8,7,6,.55)');R.fillStyle=fade;R.fillRect(0,top-24,960,30);R.restore();R.beginPath()}
-let bloomC=null,grainP=null;
-function finish(ctx){const cv=ctx.canvas,k=cv.width/960,X=0,Y=68,W=680,H=362;ctx.save();ctx.setTransform(1,0,0,1,0,0);
-  if(!bloomC){bloomC=document.createElement('canvas')}const bw=Math.round(W*k/4),bh=Math.round(H*k/4);if(bloomC.width!==bw||bloomC.height!==bh){bloomC.width=bw;bloomC.height=bh}const b=bloomC.getContext('2d');b.clearRect(0,0,bw,bh);b.filter='brightness(1.05) contrast(2.4) blur(3px)';b.drawImage(cv,X*k,Y*k,W*k,H*k,0,0,bw,bh);b.filter='none';
-  ctx.globalCompositeOperation='screen';ctx.globalAlpha=.55;ctx.drawImage(bloomC,0,0,bw,bh,X*k,Y*k,W*k,H*k);ctx.globalAlpha=1;
-  ctx.globalCompositeOperation='soft-light';ctx.fillStyle='rgba(255,176,96,.22)';ctx.fillRect(X*k,Y*k,W*k,H*k);ctx.globalCompositeOperation='source-over';
-  const v=ctx.createRadialGradient((X+W/2)*k,(Y+H*.45)*k,H*.35*k,(X+W/2)*k,(Y+H/2)*k,W*.62*k);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.5)');ctx.fillStyle=v;ctx.fillRect(X*k,Y*k,W*k,H*k);
-  if(!grainP){const g=document.createElement('canvas');g.width=g.height=128;const gx=g.getContext('2d'),im=gx.createImageData(128,128);for(let i=0;i<im.data.length;i+=4){const n=Math.random()*255;im.data[i]=im.data[i+1]=im.data[i+2]=n;im.data[i+3]=255}gx.putImageData(im,0,0);grainP=ctx.createPattern(g,'repeat')}
-  ctx.globalCompositeOperation='overlay';ctx.globalAlpha=.07;ctx.translate(Math.random()*128|0,Math.random()*128|0);ctx.fillStyle=grainP;ctx.fillRect(X*k-128,Y*k-128,W*k,H*k);ctx.restore()}
+// Camera finish, built for speed: the warm grade, vignette and film grain are baked once per size into
+// one overlay; bloom is a tiny copy of the stage (scaled down, then up = free blur) refreshed every few frames.
+let overlayC=null,ovKey='',bloomA=null,bloomB=null,bloomTick=0;
+function finish(ctx){const cv=ctx.canvas,k=cv.width/960,X=0,Y=68,W=680,H=362,x=X*k,y=Y*k,w=W*k,h=H*k;
+  if(!bloomA){bloomA=document.createElement('canvas');bloomB=document.createElement('canvas')}
+  const aw=Math.max(8,Math.round(w/6)),ah=Math.max(8,Math.round(h/6)),bw=Math.max(4,Math.round(aw/2)),bh=Math.max(4,Math.round(ah/2));
+  if(bloomA.width!==aw||bloomA.height!==ah){bloomA.width=aw;bloomA.height=ah;bloomB.width=bw;bloomB.height=bh;bloomTick=0}
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);
+  if(bloomTick++%3===0){const a=bloomA.getContext('2d'),b=bloomB.getContext('2d');a.globalCompositeOperation='copy';a.drawImage(cv,x,y,w,h,0,0,aw,ah);b.globalCompositeOperation='copy';b.drawImage(bloomA,0,0,aw,ah,0,0,bw,bh)}
+  ctx.globalCompositeOperation='screen';ctx.globalAlpha=.42;ctx.imageSmoothingEnabled=true;ctx.drawImage(bloomB,0,0,bw,bh,x,y,w,h);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  const key=cv.width+'x'+cv.height;if(ovKey!==key){ovKey=key;overlayC=document.createElement('canvas');overlayC.width=Math.ceil(w);overlayC.height=Math.ceil(h);const o=overlayC.getContext('2d');
+    o.fillStyle='rgba(255,170,90,.07)';o.fillRect(0,0,w,h);const v=o.createRadialGradient(w/2,h*.45,h*.35,w/2,h/2,w*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.5)');o.fillStyle=v;o.fillRect(0,0,w,h);
+    const g=o.getImageData(0,0,overlayC.width,overlayC.height),d=g.data;for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*18;d[i]=Math.max(0,Math.min(255,d[i]+n));d[i+1]=Math.max(0,Math.min(255,d[i+1]+n));d[i+2]=Math.max(0,Math.min(255,d[i+2]+n));d[i+3]=Math.max(d[i+3],6)}o.putImageData(g,0,0)}
+  ctx.drawImage(overlayC,x,y);ctx.restore()}
 
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],mul=(a,k)=>[a[0]*k,a[1]*k,a[2]*k];
 const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot3=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
@@ -49,6 +55,10 @@ const norm=a=>{const m=Math.hypot(...a)||1;return mul(a,1/m)};
 function rotator(r){if(!r)return a=>a;const [x,y,z]=r,cx=Math.cos(x),sx=Math.sin(x),cy=Math.cos(y),sy=Math.sin(y),cz=Math.cos(z),sz=Math.sin(z);return([a,b,c])=>{let B=b*cx-c*sx,C=b*sx+c*cx,A=a*cy+C*sy;C=-a*sy+C*cy;return[A*cz-B*sz,A*sz+B*cz,C]}}
 function basis(axis){const n=norm(axis),h=Math.abs(n[1])<.9?[0,1,0]:[1,0,0],u=norm(cross(n,h)),v=cross(n,u);return[n,u,v]}
 
+// Pre-shaded colour for a face: darken by k, then lift towards white by highlight + specular - one fill instead of three.
+const SHADE=new Map();
+function shaded(col,k,hl,sp,alpha){const h=hexInfo(col);if(!h)return null;const q=v=>Math.round(v*48)/48,K=q(k),L=q(Math.min(1,hl+sp)),A=alpha!=null&&alpha<1?alpha:h.a,key=col+K+'|'+L+'|'+A;let r=SHADE.get(key);if(r)return r;
+  const f=v=>{let x=v*(1-K);x+=(255-x)*L;return Math.round(x)};const hx=v=>f(v).toString(16).padStart(2,'0');r='#'+hx(h.r)+hx(h.g)+hx(h.b)+(A<1?Math.round(A*255).toString(16).padStart(2,'0'):'');if(SHADE.size>4000)SHADE.clear();SHADE.set(key,r);return r}
 function scene(c,o={}){
   const yaw=FLAT?0:cam.yaw+(o.yaw||0),pitch=FLAT?.3:Math.max(-1.45,Math.min(1.45,cam.pitch+(o.pitch||0)));
   const cx=o.cx??348,cy=o.cy??262,sc=(o.scale??62)*1.15*(FLAT?1:cam.zoom)*(o.boost??window.PhysicaSceneBoost??1),focal=FLAT?600:(o.focal??16);
@@ -71,7 +81,8 @@ function scene(c,o={}){
       const I=n?(opt.cull?Math.max(0,dot3(n,LIGHT)):Math.abs(dot3(n,LIGHT))):.6;
       if(opt.grow){const mx=Q.reduce((s,q)=>s+q[0],0)/Q.length,my=Q.reduce((s,q)=>s+q[1],0)/Q.length;for(const q of Q){const dx=q[0]-mx,dy=q[1]-my,d=Math.hypot(dx,dy)||1;q[0]+=dx/d*opt.grow;q[1]+=dy/d*opt.grow}}
       const spec=opt.spec&&n?Math.pow(Math.max(0,dot3(norm(view(n)),HV)),opt.shine||24)*opt.spec:0;
-      push(zz,()=>{c.beginPath();c.moveTo(Q[0][0],Q[0][1]);for(const q of Q.slice(1))c.lineTo(q[0],q[1]);c.closePath();if(col){c.fillStyle=opt.alpha!=null&&opt.alpha<1&&/^#[\da-f]{6}$/i.test(col)?col+Math.round(opt.alpha*255).toString(16).padStart(2,'0'):col;c.fill();if(ON()&&opt.shade!==false){const R=raw(c),k=(1-Math.max(0,Math.min(1,.3+.7*I)))*.62*(opt.alpha??1);if(k>.01){R.fillStyle=`rgba(0,0,0,${k.toFixed(3)})`;R.fill()}if(I>.8){R.fillStyle=`rgba(255,255,255,${((I-.8)*.4*(opt.alpha??1)).toFixed(3)})`;R.fill()}if(spec>.01){R.fillStyle=`rgba(255,255,255,${Math.min(.75,spec*(opt.alpha??1)).toFixed(3)})`;R.fill()}}}if(opt.stroke){c.strokeStyle=opt.stroke;c.lineWidth=opt.lw||1.2;c.stroke()}});return S},
+      const fast=col&&ON()&&opt.shade!==false?shaded(col,(1-Math.max(0,Math.min(1,.3+.7*I)))*.62,I>.8?(I-.8)*.4:0,spec>.01?Math.min(.75,spec):0,opt.alpha):null;
+      push(zz,()=>{c.beginPath();c.moveTo(Q[0][0],Q[0][1]);for(let i=1;i<Q.length;i++)c.lineTo(Q[i][0],Q[i][1]);c.closePath();if(fast){c.fillStyle=fast;c.fill()}else if(col){c.fillStyle=opt.alpha!=null&&opt.alpha<1&&/^#[\da-f]{6}$/i.test(col)?col+Math.round(opt.alpha*255).toString(16).padStart(2,'0'):col;c.fill();if(ON()&&opt.shade!==false){const R=raw(c),k=(1-Math.max(0,Math.min(1,.3+.7*I)))*.62*(opt.alpha??1);if(k>.01){R.fillStyle=`rgba(0,0,0,${k.toFixed(3)})`;R.fill()}if(I>.8){R.fillStyle=`rgba(255,255,255,${((I-.8)*.4*(opt.alpha??1)).toFixed(3)})`;R.fill()}if(spec>.01){R.fillStyle=`rgba(255,255,255,${Math.min(.75,spec*(opt.alpha??1)).toFixed(3)})`;R.fill()}}}if(opt.stroke){c.strokeStyle=opt.stroke;c.lineWidth=opt.lw||1.2;c.stroke()}});return S},
     // Axis-aligned (optionally y-rotated) cuboid centred at p with size [w,h,d].
     box(p,[w,h,d],col='#7baaff',opt={}){const a=opt.rotY||0,ca=Math.cos(a),sa=Math.sin(a),tilt=opt.rotZ||0,ct=Math.cos(tilt),st=Math.sin(tilt);
       const V=(x,y,z)=>{let X=x*ct-y*st,Y=x*st+y*ct;return add(p,[X*ca+z*sa,Y,-X*sa+z*ca])};
