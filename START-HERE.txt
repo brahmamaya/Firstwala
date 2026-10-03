@@ -80,7 +80,7 @@ Plain HTML, CSS and JavaScript. physica3d.js is a small built-in 3D renderer
 (perspective, depth sorting, lighting, orbit camera) with no external libraries;
 labkit.js and seventh.js to tenth.js hold the 100 newer 3D physics experiments;
 phys3d-a.js to phys3d-d.js give the 176 original physics experiments their 3D scenes
-(phys3d-inst.js: realistic vernier caliper and screw gauge);
+(instruments2d.js: hands-on vernier caliper and screw gauge with drag, contact and magnifier);
 biokit.js and bio1.js to bio5.js hold the 100 biology experiments.
 Matter.js 0.20.0 and its MIT licence are included
 locally in vendor/. No external scripts or CDN dependency. No React build is
