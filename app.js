@@ -39,9 +39,11 @@
     const s={...extra,subject:extra.subject==='chemistry'?'chemistry':bioSubject(extra),draw:extra.id};sims.push(s);if(!chapters.some(c=>sameChapter(c,s)))chapters.push(s)}
   chapters.sort((a,b)=>a.subject===b.subject?(a.chapterNo||0)-(b.chapterNo||0):0);
   // Original 2D experiments that have a true-3D scene (phys3d-*.js) switch to it; the 2D diagram stays available.
+  // Interactive instruments (hands-on drag) can replace a simulation's controls, readouts and drawing.
+  for(const s of sims){const P=window.PhysicaSimPatch?.[s.id];if(P)Object.assign(s,P)}const INT=id=>window.PhysicaInteractive?.[id];
   const R3=window.Physica3DRenderers||{};for(const s of sims)if(R3[s.id]&&!s.view3d)s.r3=R3[s.id];
   let classic2D=false;try{classic2D=localStorage.getItem('physica-classic-2d')==='1'}catch{}
-  const is3D=s=>!!(s.view3d||(s.r3&&!classic2D));
+  const is3D=s=>!INT(s.id)&&!!(s.view3d||(s.r3&&!classic2D));
   // NCERT biology is taught as Botany and Zoology (standard NEET / board split by chapter).
   function bioSubject(e){const Z={11:[4,7,9,14,15,16,17,18,19],12:[2,3,6,7,9,10]};return (Z[e.grade]||[]).includes(e.chapterNo)?'zoology':'botany'}
   function sameChapter(a,b){return a.chapter===b.chapter&&a.grade===b.grade&&a.subject===b.subject}
@@ -127,7 +129,7 @@
   function select(s,scroll=true){if(!s)return;window.PhysicaExperience?.onSelect();current=s;elapsed=0;history.replaceState(null,'',`#${s.id}`);render();if(scroll)window.scrollTo({top:0,behavior:'smooth'})}
   function syncPlay(){$('play-icon').textContent=playing?'Ⅱ':'▶';$('play-label').textContent=playing?'Pause':'Play';$('play').setAttribute('aria-label',playing?'Pause simulation':'Play simulation');$('live-status').textContent=playing?'LIVE SIMULATION':'SIMULATION PAUSED';document.querySelector('.stage').classList.toggle('paused',!playing);window.PhysicaExperience?.update()}
   function resize(){const box=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);if(box.width<1)return;window.PhysicaTextScale=Math.max(1,Math.min(1.55,820/box.width));canvas.width=Math.round(box.width*dpr);canvas.height=Math.round(box.height*dpr);ctx.setTransform(canvas.width/960,0,0,canvas.height/505,0,0);draw()}
-  function draw(){if(!ctx)return;ctx.clearRect(0,0,960,505);window.PhysicaSceneBoost=current.subject==='physics'?1.08:1.2;if(window.__chartSim!==current.id){window.PhysicaChartRects=[];window.__chartSim=current.id}else window.PhysicaChartRects=window.__chartRects||[];window.__chartRects=[];try{const g=window.PhysicaTheme.wrapContext(ctx);if(current.r3&&!classic2D)window.PhysicaRenderExperiment(g,current,saved.get(current.id),elapsed,current.r3);else window.PhysicsDraw.draw(g,current.draw,saved.get(current.id),elapsed)}catch(err){console.error('Simulation drawing error',current.id,err);ctx.fillStyle='#0b2030';ctx.fillRect(0,0,960,505);ctx.fillStyle='#eff8ff';ctx.font='22px system-ui';ctx.fillText('This simulation could not be drawn. Try another chapter.',65,235)}}
+  function draw(){if(!ctx)return;ctx.clearRect(0,0,960,505);window.PhysicaSceneBoost=current.subject==='physics'?1.08:1.2;if(window.__chartSim!==current.id){window.PhysicaChartRects=[];window.__chartSim=current.id}else window.PhysicaChartRects=window.__chartRects||[];window.__chartRects=[];try{const g=window.PhysicaTheme.wrapContext(ctx);if(INT(current.id))window.PhysicaRenderExperiment(g,current,saved.get(current.id),elapsed,INT(current.id).draw);else if(current.r3&&!classic2D)window.PhysicaRenderExperiment(g,current,saved.get(current.id),elapsed,current.r3);else window.PhysicsDraw.draw(g,current.draw,saved.get(current.id),elapsed)}catch(err){console.error('Simulation drawing error',current.id,err);ctx.fillStyle='#0b2030';ctx.fillRect(0,0,960,505);ctx.fillStyle='#eff8ff';ctx.font='22px system-ui';ctx.fillText('This simulation could not be drawn. Try another chapter.',65,235)}}
   window.addEventListener('physica-theme-change',draw);
   function frame(now){let dt=Math.min((now-lastFrame)/1000,.06);lastFrame=now;if(!$('sandbox-view').hidden){requestAnimationFrame(frame);return;}if(playing)elapsed=(elapsed+dt*playbackSpeed)%3600;if(is3D(current))window.Physica3D?.tick(dt);draw();window.PhysicaExperience?.draw();if(now-lastReadout>110){updateReadouts();lastReadout=now}requestAnimationFrame(frame)}
   function closeSidebar(){$('sidebar').classList.remove('open');$('mobile-topics').setAttribute('aria-expanded','false')}
@@ -186,10 +188,11 @@
     const orbiting=()=>is3D(current)&&dragMode==='rotate'&&window.Physica3D;
     const spread=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y)};
     canvas.style.cursor='grab';
-    canvas.addEventListener('pointerdown',e=>{steering=true;canvas.style.cursor='grabbing';pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});try{canvas.setPointerCapture(e.pointerId)}catch{}if(orbiting()){if(pointers.size===2)pinch=spread()}else stageDrag(e)});
-    canvas.addEventListener('pointermove',e=>{if(!steering)return;if(!orbiting()){stageDrag(e);return}const last=pointers.get(e.pointerId);if(!last)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    const logical=e=>{const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)/b.width*960,y:(e.clientY-b.top)/b.height*505}},handOn=(fn,e)=>{const I=INT(current.id);if(!I)return false;I[fn]?.(logical(e),saved.get(current.id));renderControls();updateReadouts();draw();return true};
+  canvas.addEventListener('pointerdown',e=>{if(INT(current.id)){steering=true;try{canvas.setPointerCapture(e.pointerId)}catch{}handOn('down',e);return}steering=true;canvas.style.cursor='grabbing';pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});try{canvas.setPointerCapture(e.pointerId)}catch{}if(orbiting()){if(pointers.size===2)pinch=spread()}else stageDrag(e)});
+    canvas.addEventListener('pointermove',e=>{if(!steering)return;if(handOn('move',e))return;if(!orbiting()){stageDrag(e);return}const last=pointers.get(e.pointerId);if(!last)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
       if(pointers.size>=2){const d=spread();if(pinch)window.Physica3D.zoomBy(d/pinch);pinch=d}else window.Physica3D.rotate((e.clientX-last.x)*.009,(e.clientY-last.y)*.007)});
-    const stopSteer=e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(!pointers.size){steering=false;canvas.style.cursor='grab'}};
+    const stopSteer=e=>{if(steering&&INT(current.id))handOn('up',e);pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(!pointers.size){steering=false;canvas.style.cursor='grab'}};
     canvas.addEventListener('pointerup',stopSteer);canvas.addEventListener('pointercancel',stopSteer);
     canvas.addEventListener('wheel',e=>{if(!orbiting()||!(e.ctrlKey||e.metaKey||document.fullscreenElement))return;e.preventDefault();window.Physica3D.zoomBy(Math.exp(-e.deltaY*.0025))},{passive:false});
     canvas.addEventListener('dblclick',()=>{if(is3D(current))window.Physica3D?.resetView()});
