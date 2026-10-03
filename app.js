@@ -44,6 +44,8 @@
   // Interactive instruments (hands-on drag) can replace a simulation's controls, readouts and drawing.
   for(const s of sims){const P=window.PhysicaSimPatch?.[s.id];if(P)Object.assign(s,P)}const INT=id=>window.PhysicaInteractive?.[id];
   const R3=window.Physica3DRenderers||{};for(const s of sims)if(R3[s.id]&&!s.view3d)s.r3=R3[s.id];
+  // Detailed, realistic 3D apparatus (real3d-*.js) replace the earlier scenes wherever they exist.
+  const RR=window.PhysicaReal3D||{};for(const s of sims)if(RR[s.id]){s.r3=RR[s.id];s.view3d=false}
   // Every experiment has three views: 2D (clean flat diagram / hands-on), 3D (orbit camera) and Ultra-Realistic (photographic bench + camera finish).
   // Hands-on instruments keep their own parameters; map them onto the matching 3D scene.
   const ADAPT={units:p=>({...p,measure:p.jaw/10}),'screw-gauge':p=>{const r=p.gap/p.pitch,n=Math.floor(r);return{...p,turns:n,division:Math.round((r-n)*50)}}};
