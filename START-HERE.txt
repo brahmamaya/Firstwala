@@ -8,6 +8,7 @@ No build command, backend, database, API keys, or environment variables are need
 The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
+MATH: mathtext.js shows _ and ^ as real subscripts/superscripts on the page and in canvas drawings.
 FOCUS: less important panels are compact and have a close (x) button; hidden ones return from the
 "Hidden:" chips; the Focus button shows only the stage and controls (Esc exits) - focus.js.
 LANDING: the site opens on "Welcome to Physica" where the visitor picks subject and class (landing.js);

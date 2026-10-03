@@ -170,3 +170,16 @@ body.focus .topbar,body.focus .sidebar,body.focus .workspace-header,body.focus .
 body.focus .layout{grid-template-columns:minmax(0,1fr)!important;min-height:100vh}body.focus .main{max-width:none;padding-top:12px}
 .focus-exit{position:fixed;top:12px;right:14px;z-index:150;padding:8px 14px;border-radius:999px;border:1px solid var(--mint);background:rgba(7,18,31,.9);color:var(--mint);font-size:12.5px;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.4)}.focus-exit[hidden]{display:none}
 @media(max-width:760px){.focus-exit{top:auto;bottom:max(14px,env(safe-area-inset-bottom));right:50%;transform:translateX(50%)}}
+/* Simple, clear page: one way to do each thing, size follows importance */
+.chapter-nav,.eyebrow,.sidebar-bottom,.observe-card #readouts,.small-index,.favourites.is-empty{display:none!important}
+.breadcrumbs{font-size:11px;letter-spacing:.12em}
+.intro h1{font-size:clamp(26px,2.6vw,36px)!important;font-weight:800;line-height:1.1}#description{font-size:15px;color:var(--muted)}
+.formula-card strong,#formula{font-size:clamp(17px,1.6vw,21px);font-family:'Cambria Math','STIX Two Math','Times New Roman',serif;font-style:italic;font-weight:600;letter-spacing:.01em}
+sub,sup{font-size:.7em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.28em}sup{top:-.5em}
+.section-heading h2,#observe-heading,#controls-heading{font-size:19px}.observation{font-size:16px;line-height:1.55}.try-box p{font-size:14.5px}
+.tab-count{font-size:11px}.simulation-tabs button{font-size:13.5px}
+.lab-tool-buttons button,.more-menu summary{font-size:13px}
+.more-menu{position:relative;display:inline-block}.more-menu summary{list-style:none;cursor:pointer;min-height:40px;display:inline-flex;align-items:center;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:var(--text);font-weight:700}.more-menu summary::-webkit-details-marker{display:none}.more-menu[open] summary{border-color:var(--mint);color:var(--mint)}
+.more-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:30;display:flex;flex-direction:column;gap:6px;min-width:220px;padding:10px;border-radius:12px;border:1px solid var(--line2);background:var(--panel);box-shadow:0 18px 40px rgba(0,0,0,.45)}.more-pop>button,.more-pop>label{width:100%;justify-content:flex-start;text-align:left}.more-pop .surprise-button{margin:0}
+@media(max-width:760px){.more-pop{left:auto;right:0}}
+.sidebar-top>.panel-close{top:2px;right:6px;width:22px;height:22px;font-size:11px}.sidebar-top.closable .sidebar-heading:first-child{padding-right:26px}.intro>.panel-close{top:-10px;right:-10px;width:22px;height:22px}
