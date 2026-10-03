@@ -11,6 +11,8 @@ INCLUDED
 VIEWS: every simulation has three views - 2D (clean flat diagram or hands-on), 3D (rotate/zoom)
 and Ultra-Realistic (photographic workbench, warm lighting, bloom, vignette and film grain).
 40 rarely used or duplicate physics experiments were retired (list: DROP in app.js).
+REALISTIC 3D: all Class 11 physics experiments have detailed lab apparatus in 3D (real3d-11a..e.js,
+registered in window.PhysicaReal3D; they replace the older scenes automatically).
 PHYSICS: 236 adjustable Class 11 and Class 12 physics simulations across all 28
 chapters. Every one is now drawn in rotatable 3D; the original flat drawings remain
 one tap away with the "2D diagram" button (remembered in this browser).
