@@ -210,20 +210,20 @@ R['carnot']=(c,p,t)=>{const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:205,cy:33
   const Pv=leg===0?P(Vv,p.hot):leg===1?P(V2,p.hot)*(V2/Vv)**g:leg===2?P(Vv,p.cold):P(V4,p.cold)*(V4/Vv)**g;
   chart(c,420,96,236,170,{title:'Carnot cycle (P–V)',xl:'V',xmin:0,xmax:V3*1.05,ymin:0,ymax:p.hot/V1*1.1,series:[{pts,col:C.gold}],marker:[Vv,Pv]});tag(c,`η = 1 − Tc/Th = ${f(eta*100,1)} %`,44,98,C.gold,15);tag(c,['1→2 isothermal expansion at T_h','2→3 adiabatic expansion (insulated)','3→4 isothermal compression at T_c','4→1 adiabatic compression (insulated)'][leg],44,120,C.white,13)};
 
-R['adiabatic']=(c,p,t)=>{const s=P3.scene(c,{scale:49,yaw:.3,pitch:.06,cx:215,cy:342}),g=Number(p.gamma),q=Math.min(cycle(t,6)/4,1),r=1+(p.ratio-1)*q,T=p.temperature*Math.pow(r,1-g),h=.25+r*1.05,y0=.3,H=2.55;
+R['adiabatic']=(c,p,t)=>{const s=P3.scene(c,{scale:49,yaw:.3,pitch:.06,cx:250,cy:342}),g=Number(p.gamma),q=Math.min(cycle(t,6)/4,1),r=1+(p.ratio-1)*q,T=p.temperature*Math.pow(r,1-g),h=.25+r*1.05,y0=.3,H=2.55;
   bench(s,0,0,4.4,2.4);const top=pcyl(s,{x:0,y0,R:.7,H,h,gas:mix('#74c0fc','#ff6b3c',clamp((T-200)/500,0,1)),ga:.2});gasIn(s,16,[0,0],.69,y0,h,.2+Math.sqrt(T)*.04,t,'#42d9ca',.055);
   cutaway(s,[0,y0,0],.98,1.22,H,'#efe7d6','#e6dcc6',16);for(let i=1;i<8;i++){const y=y0+H*i/8;for(let j=0;j<16;j++){const a=PI+PI*j/16,b=a+PI/16;s.seg([1.0*Math.cos(a),y,1.0*Math.sin(a)],[1.0*Math.cos(b),y,1.0*Math.sin(b)],'#c9bd9f',1)}}
   readout(s,[1.55,.3,.5],`${f(T,0)} K`);s.tube([[1.07,.3,.5],[.75,.2,.4]],.02,'#212529',{segs:4});s.arrow([.35,top+1.4,0],[.35,top+1.4+(p.ratio<1?-.5:.5),0],C.gold,3.5,11,p.ratio<1?'W on gas':'W by gas');
-  lab(s,[-1.1,y0+1.2,-.3],'insulating lagging (Q = 0)',-40,40);lab(s,[-.3,top-.1,0],'piston',-70,-20);lab(s,[1.55,.5,.5],'thermocouple',40,40);
+  lab(s,[-1.12,y0+.9,-.3],'lagging (Q = 0)',-50,30);lab(s,[-.3,top-.1,0],'piston',-70,-20);lab(s,[1.55,.5,.5],'thermocouple',40,40);
   s.render();chart(c,420,96,236,170,{title:'Adiabat (gold) vs isotherm (grey)',xl:'V/V₀',xmin:.5,xmax:2,ymin:0,ymax:Math.pow(2,g)*1.05,series:[{fn:v=>Math.pow(1/v,g),col:C.gold},{fn:v=>1/v,col:'#8ca6b9',dash:[4,4]}],marker:[r,Math.pow(1/r,g)]});tag(c,`TV^(γ−1) = const → T = ${f(T,1)} K`,44,98,C.gold,15)};
 
 R['first-law']=(c,p,t)=>{const s=P3.scene(c,{scale:44,yaw:.3,pitch:.06,cx:250,cy:345}),dU=p.heat-p.work,h=clamp(1.0+p.work/300,.35,1.7),y0=1.15,X=-.3;
   bench(s,0,0,5,2.4);for(let i=0;i<3;i++){const a=PI/2+i*TAU/3;s.cyl([X+.7*Math.cos(a),.55,.7*Math.sin(a)],[0,1,0],.035,1.1,'#343a40')}band(s,[X,1.08,0],.72,.04,'#343a40');s.box([X,1.11,0],[1.4,.03,1.4],'#adb5bd');
   if(p.heat>0)burner(s,[X,0,0],t,true,.55,.4);else if(p.heat<0){s.box([X,.25,0],[1,.5,.8],'#3b6fb6');for(let i=0;i<4;i++)s.box([X-.3+i*.2,.56,(i%2-.5)*.3],[.18,.1,.18],'#e7f5ff',{alpha:.9})}
   const top=pcyl(s,{x:X,y0,R:.6,H:2.0,h,gas:mix('#74c0fc','#ff6b3c',clamp(.5+dU/300,0,1)),ga:.2,rodL:.5,base:false});s.cyl([X,y0+.02,0],[0,1,0],.66,.06,CU);gasIn(s,12,[X,0],.59,y0,h,.3+clamp(dU,-100,200)/600,t,'#42d9ca',.05);
-  if(p.heat!==0)s.arrow([X+.75,p.heat>0?.45:1.05,.6],[X+.75,p.heat>0?1.05:.45,.6],p.heat>0?C.red:C.blue,5,11,`Q = ${p.heat} J`);if(p.work!==0)s.arrow([X+.25,top+.8,0],[X+.25,top+.8+Math.sign(p.work)*.55,0],C.gold,5,11,`W = ${p.work} J`);
-  const bx=1.7,bh=Math.max(.04,Math.abs(dU)/120);s.box([bx,.03,0],[.6,.06,.6],'#343a40');s.box([bx,(dU>=0?.06+bh/2:.06+bh/2),0],[.35,bh,.35],dU>=0?'#42d9ca':'#ff857e');s.label([bx,-.25,.4],`ΔU = ${dU} J`,dU>=0?C.mint:C.red,13);
-  lab(s,[X,top+.15,0],'piston',-70,-30);lab(s,[X-.55,y0+.4,0],'gas',-60,-10);lab(s,[X-.65,.6,.4],p.heat>=0?'Bunsen burner / tripod':'cold block',-50,40);
+  if(p.heat!==0)s.arrow([X+.75,p.heat>0?.45:1.05,.6],[X+.75,p.heat>0?1.05:.45,.6],p.heat>0?C.red:C.blue,5,11,`Q = ${p.heat} J`);if(p.work!==0)s.arrow([X+.75,top+.15,0],[X+.75,top+.15+Math.sign(p.work)*.55,0],C.gold,5,11,`W = ${p.work} J`);
+  const bx=2.1,bh=Math.max(.04,Math.abs(dU)/120);s.box([bx,.03,0],[.6,.06,.6],'#343a40');s.box([bx,(dU>=0?.06+bh/2:.06+bh/2),0],[.35,bh,.35],dU>=0?'#42d9ca':'#ff857e');s.label([bx,.06+bh+.3,0],`ΔU = ${dU} J`,dU>=0?C.mint:C.red,13);
+  lab(s,[X,top+.15,0],'piston',-70,-30);lab(s,[X-.55,y0+.4,0],'gas',-60,-10);lab(s,[X-.65,.6,.4],p.heat>=0?'Bunsen burner on tripod':'cold block',-70,20);
   s.render();tag(c,`ΔU = Q − W = ${p.heat} − ${p.work} = ${dU} J`,44,98,C.gold,15)};
 
 R['isothermal-entropy']=(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,pitch:.08,cx:270,cy:340}),ph=.5-.5*Math.cos(t*.6),r=1+(p.ratio-1)*ph,h=.3+r*.55,y0=.35,dS=p.moles*8.314*Math.log(Math.max(1e-6,r)),dSf=p.moles*8.314*Math.log(p.ratio),bw=2.6,bd=2.0,bh=1.05;
@@ -232,7 +232,7 @@ R['isothermal-entropy']=(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,pitch:.08,
   const top=pcyl(s,{x:.35,y0,R:.55,H:2.7,h,gas:'#ffa94d',ga:.16,rodL:.6,base:false});s.cyl([.35,y0-.05,0],[0,1,0],.6,.1,CU);gasIn(s,16,[.35,0],.54,y0,h,.4,t,'#42d9ca',.05);
   s.arrow([1.45,.35,.6],[.95,.6,.3],dS>=0?C.red:C.blue,3.5,10,`Q = TΔS = ${f(p.temperature*dS,0)} J`);
   const sx=2.0,sh=Math.max(.03,Math.abs(dS)/12);s.box([sx,.03,.3],[.55,.06,.55],'#343a40');s.box([sx,.06+sh/2,.3],[.3,sh,.3],dS>=0?'#b89dff':'#ff857e');s.label([sx,-.2,.7],`ΔS = ${f(dS,2)} J/K`,C.purple,12);
-  lab(s,[-.95,.45,.7],'heater',-40,40);lab(s,[-1.25,bh+.45,-.75],'thermostat',-50,-30);lab(s,[-1.2,bh*.7,bd/2],'constant-T water bath',-30,70);lab(s,[.35,top+.2,0],'piston',60,-50);
+  lab(s,[-.95,.45,.7],'heater',-40,40);lab(s,[-1.25,bh+.45,-.75],'thermostat',-50,-30);lab(s,[-1.25,bh*.8,bd/2],'constant-T water bath',-50,-20);lab(s,[.35,top+.2,0],'piston',60,-50);
   s.render();tag(c,`ΔS = nR ln(Vf/Vi) = ${f(dSf,2)} J/K at ${p.temperature} K`,44,98,C.gold,15)};
 
 R['isobaric-process']=(c,p,t)=>{const Rg=8.314,ph=.5-.5*Math.cos(t*.9),T=p.T1+(p.T2-p.T1)*ph,V1=p.n*Rg*p.T1/(p.P*1000),V=p.n*Rg*T/(p.P*1000),Vmax=p.n*Rg*800/(p.P*1000),h=.35+2.0*V/Math.max(Vmax,1e-9),s=P3.scene(c,{scale:48,yaw:.3,pitch:.06,cx:205,cy:342}),y0=.62,X=0;
@@ -241,4 +241,53 @@ R['isobaric-process']=(c,p,t)=>{const Rg=8.314,ph=.5-.5*Math.cos(t*.9),T=p.T1+(p
   s.arrow([X+1.2,top+.9,0],[X+1.2,top+.3,0],C.gold,3,10,`${p.P} kPa`);
   lab(s,[X-.38,top+.4,0],'slotted weights',-60,-30);lab(s,[X-.66,y0+h*.5,0],`gas at ${f(T,0)} K`,-50,20);lab(s,[X+.6,.2,.8],'hot plate',50,30);
   s.render();chart(c,420,96,236,170,{title:'P–V diagram',xl:'V (L)',xmin:0,xmax:Math.max(Vmax,V1)*1000*1.1,ymin:0,ymax:p.P*1.4,series:[{pts:[[V1*1000,p.P],[p.n*Rg*p.T2/(p.P*1000)*1000,p.P]],col:C.gold,w:3}],marker:[V*1000,p.P]});tag(c,`W = PΔV = nRΔT = ${f(p.n*Rg*(p.T2-p.T1),0)} J`,44,98,C.gold,15)};
+const along=(pts,u)=>{const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(...V.sub(pts[i],pts[i-1])));const d=u*L[L.length-1];let i=1;while(i<L.length-1&&L[i]<d)i++;const k=(d-L[i-1])/((L[i]-L[i-1])||1);return V.add(pts[i-1],V.mul(V.sub(pts[i],pts[i-1]),k))};
+R['refrigerator']=(c,p,t)=>{const Tc=p.Tc+273.15,Th=Math.max(p.Th+273.15,Tc+1),cop=Tc/(Th-Tc),W=p.Qc/cop,s=P3.scene(c,{scale:48,yaw:.3,pitch:.06,cx:310,cy:338}),kk=x=>clamp(x/400,.15,1.4);
+  const cx=-1.45,w=1.6,h=2.5,d=1.3,yb=.1,tw=.12,WH='#eef2f5',IN='#dbe8f2';bench(s,0,0,6.6,2.4);
+  for(const [x,z] of[[-1,-1],[1,-1],[-1,1],[1,1]])s.cyl([cx+x*(w/2-.1),.05,z*(d/2-.1)],[0,1,0],.05,.1,'#343a40');
+  s.box([cx,yb+h/2,-d/2+tw/2],[w,h,tw],WH);s.box([cx-w/2+tw/2,yb+h/2,0],[tw,h,d],WH);s.box([cx+w/2-tw/2,yb+h/2,0],[tw,h,d],WH);s.box([cx,yb+h-tw/2,0],[w,tw,d],WH);s.box([cx,yb+tw/2,0],[w,tw,d],WH);s.box([cx,yb+h/2,-d/2+tw+.005],[w-2*tw,h-2*tw,.01],IN);
+  const fy=yb+h*.62;s.box([cx,fy,0],[w-2*tw,.06,d-tw],WH);s.box([cx,yb+h*.32,.02],[w-2*tw,.03,d-tw-.1],GLASS,{alpha:.35});
+  s.cyl([cx-.4,yb+h*.32+.32,0],[0,1,0],.11,.6,'#f8f9fa',{cap:'#4dabf7'});s.box([cx+.05,yb+h*.32+.2,-.05],[.4,.35,.3],'#e8590c');s.cyl([cx+.45,yb+tw+.15,.1],[0,1,0],.14,.28,'#c92a2a',{cap:'#f1f3f5'});
+  const ev=[];for(let i=0;i<5;i++){const y=yb+h-tw-.12-i*.15;ev.push([cx+(i%2?.55:-.55),y,-d/2+tw+.06],[cx+(i%2?-.55:.55),y,-d/2+tw+.06])}
+  for(let i=0;i<14;i++)s.ball([cx+(hash(i)-.5)*1.1,yb+h-tw-.12-hash(i+3)*.6,-d/2+tw+.1],.03,'#ffffff',{alpha:.7,flat:true});
+  const a=-1.95,hg=[cx-w/2,yb+h/2,d/2];s.box(V.add(hg,[w/2*Math.cos(a),0,-(w/2)*Math.sin(a)]),[w,h,.12],WH,{rotY:a});s.box(V.add(hg,[w*.85*Math.cos(a)+.08,.1,-(w*.85)*Math.sin(a)]),[.05,.6,.06],'#adb5bd',{rotY:a});
+  // compressor, condenser grid and capillary
+  const K=[.35,0,-.1];s.box([K[0],.04,K[2]],[.9,.08,.7],'#343a40');s.lathe([K[0],.08,K[2]],[[.32,0],[.36,.18],[.33,.42],[.2,.55],[0,.6]],'#25292d',{segs:20});s.tube([[K[0]+.2,.08,K[2]+.3],[K[0]+.5,.05,.7],[K[0]+1.1,.05,.9]],.025,'#111',{segs:4});s.box([K[0]+1.15,.12,.9],[.15,.2,.1],'#f1f3f5');
+  const cnd=[],xa=1.25,xb=2.15,zc=-.35;for(let i=0;i<10;i++){const y=2.35-i*.215;cnd.push([i%2?xb:xa,y,zc],[i%2?xa:xb,y,zc])}for(let i=0;i<=9;i++)s.seg([xa+i*(xb-xa)/9,.25,zc-.03],[xa+i*(xb-xa)/9,2.45,zc-.03],'#868e96',1.2);s.box([(xa+xb)/2,.13,zc],[1.1,.06,.3],'#343a40');for(const x of[xa-.05,xb+.05])s.cyl([x,1.29,zc],[0,1,0],.025,2.3,'#343a40');
+  const last=cnd[cnd.length-1],path=[[K[0]+.12,.66,K[2]],[K[0]+.12,1.0,K[2]],[.9,2.55,zc],[xa,2.35,zc],...cnd,[last[0],.3,zc],[.9,.25,-.5],[cx+w/2+.05,.3,-.6],[cx+w/2+.05,yb+h-.25,-.6],[cx+.55,yb+h-tw-.12,-d/2+tw+.06],...ev.slice(1),[cx+w/2+.05,yb+h*.66,-.62],[cx+w/2+.05,.5,-.62],[K[0]-.15,.5,K[2]-.1],[K[0]-.15,.55,K[2]]];
+  s.tube(path.slice(0,4),.035,'#b87333',{segs:6});s.tube([[xa,2.35,zc],...cnd],.035,'#8a4b3d',{segs:6});s.tube([[last[0],2.35-9*.215,zc],[last[0],.3,zc],[.9,.25,-.5],[cx+w/2+.05,.3,-.6],[cx+w/2+.05,yb+h-.25,-.6]],.014,'#d08a52',{segs:5});s.tube([[cx+.55,yb+h-tw-.12,-d/2+tw+.06],...ev.slice(1)],.03,'#ced4da',{segs:6});s.tube(path.slice(-4),.035,'#b87333',{segs:6});
+  const iHot=cnd.length+4;for(let i=0;i<22;i++){const u=cycle(t*.05+i/22,1),q=along(path,u),idx=Math.floor(u*path.length);s.ball(q,.045,idx<iHot?'#ff6b6b':'#74c0fc',{flat:true})}
+  s.arrow([cx,yb+.55,.3],[cx,fy-.15,.3],'#74c0fc',2+4*kk(p.Qc),11,`Q_c = ${p.Qc} W`);s.arrow([K[0]+.2,.45,1.5],[K[0]+.2,.45,.35],C.gold,2+4*kk(W),11,`W = ${f(W,1)} W`);s.arrow([xb+.1,1.4,zc],[xb+.9,2.0,zc],C.red,2+4*kk(p.Qc+W),11,`Q_h = ${f(p.Qc+W,1)} W`);
+  s.label([cx+.4,yb+.45,.4],`${p.Tc} °C`,C.blue,12);s.label([xb+.6,.5,zc],`room ${p.Th} °C`,C.gold,12);
+  lab(s,[cx-.3,yb+h-.3,-d/2+tw+.06],'evaporator coil',-40,-40);lab(s,[K[0],.5,K[2]+.3],'compressor',-40,60);lab(s,[(xa+xb)/2,2.4,zc],'condenser coils',30,-40);lab(s,[.9,.27,-.5],'capillary (expansion)',60,50);lab(s,[cx-w/2,yb+h*.85,.3],'insulated cabinet',-60,-20);
+  s.render();tag(c,`COP = Tc/(Th − Tc) = ${f(cop,2)}`,44,98,C.gold,15)};
+
+R['rectangle-cycle']=(c,p,t)=>{const P1=Math.min(p.P1,p.P2),P2=Math.max(p.P1,p.P2),V1=Math.min(p.V1,p.V2),V2=Math.max(p.V1,p.V2),ph=cycle(t/2,4),corner=[[V1,P1],[V1,P2],[V2,P2],[V2,P1]],i=Math.floor(ph),fr=ph-i,a=corner[i],b=corner[(i+1)%4],cur=[a[0]+(b[0]-a[0])*fr,a[1]+(b[1]-a[1])*fr];
+  const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:185,cy:342}),heat=i<2,h=.3+cur[0]/10*1.9,y0=.62,X=0,Wn=(P2-P1)*(V2-V1);bench(s,0,0,4,2.2);
+  if(heat)hotplate(s,[X,0,0],1.8,true,t);else{s.box([X,.14,0],[1.8,.28,1.5],'#3b6fb6');s.cyl([X,.3,0],[0,1,0],.65,.05,'#a5d8ff');s.tube([[X-.9,.1,.5],[X-1.3,.05,.8]],.04,'#74c0fc',{segs:4});s.tube([[X+.9,.1,.5],[X+1.3,.05,.8]],.04,'#74c0fc',{segs:4})}
+  const top=pcyl(s,{x:X,y0,R:.62,H:2.4,h,gas:mix('#74c0fc','#ff6b3c',clamp(cur[0]*cur[1]/4000,0,1)),ga:.2,rodL:.12,base:false});s.cyl([X,y0-.04,0],[0,1,0],.68,.08,CU);gasIn(s,14,[X,0],.61,y0,h,.2+Math.sqrt(cur[0]*cur[1])*.012,t,'#42d9ca',.05);
+  s.cyl([X,top+.18,0],[0,1,0],.42,.05,IRON);weights(s,[X,top+.2,0],Math.max(1,Math.round(cur[1]/50)),.36);
+  lab(s,[X-.36,top+.4,0],`weights: P = ${f(cur[1],0)} kPa`,-40,-40);lab(s,[X+.6,.25,.75],heat?'heater (heat in)':'cooling plate (heat out)',40,40);
+  s.render();chart(c,380,96,276,190,{title:'P–V cycle (clockwise)',xl:'V (L)',xmin:0,xmax:10.5,ymin:0,ymax:420,series:[{pts:[...corner,corner[0]],col:C.gold,w:2.5}],marker:[cur[0],cur[1]]});
+  tag(c,`W_net = (P₂ − P₁)(V₂ − V₁) = ${f(Wn,0)} J`,44,98,C.gold,15);tag(c,['heat at constant V: pressure rises','heat at constant P: gas expands','cool at constant V: pressure falls','cool at constant P: gas compressed'][i],44,120,C.white,13)};
+
+R['otto-cycle']=(c,p,t)=>{const s=P3.scene(c,{scale:42,yaw:.35,pitch:.04,cx:215,cy:356}),th=t*p.rpm/60*TAU*.05,cr=.45,rod=1.3,yc=.95,ph=((th%(2*TAU))+2*TAU)%(2*TAU),st=Math.floor(ph/PI),u=ph/PI-st,eta=1-Math.pow(p.r,1-p.g);
+  const pin=[cr*Math.sin(th),yc+cr*Math.cos(th),0],wy=yc+cr*Math.cos(th)+Math.sqrt(rod*rod-(cr*Math.sin(th))**2),ptop=wy+.28,Rb=.5,cb=1.75,ct=3.35,col=['#ff922b','#adb5bd','#a5d8ff','#ffd8a8'][st];
+  bench(s,0,0,3.6,2);s.box([0,.06,0],[2.2,.12,1.4],'#343a40');s.box([0,yc,-1.0],[2.2,1.6,.1],'#3d4349');s.box([0,.25,0],[2.0,.3,1.2],'#495057');s.cyl([0,yc,-.85],[0,0,1],.95,.12,'#8d949b',{cap:'#9aa1a8'});for(let i=0;i<40;i++){const a=TAU*i/40;s.seg([.95*Math.cos(a),yc+.95*Math.sin(a),-.79],[1.0*Math.cos(a),yc+1.0*Math.sin(a),-.79],'#495057',1.5)}
+  // crankshaft: journal, web with counterweight, crank pin
+  s.cyl([0,yc,-.3],[0,0,1],.1,.8,STEEL);const wa=th;s.box([.5*cr*Math.sin(wa),yc+.5*cr*Math.cos(wa),.05],[.3,cr+.3,.1],'#868e96',{rotZ:-wa});s.box([-.3*Math.sin(wa),yc-.3*Math.cos(wa),.05],[.6,.3,.1],'#6c757d',{rotZ:-wa});s.cyl(V.add(pin,[0,0,.1]),[0,0,1],.09,.25,STEEL);
+  const dx=pin[0],dy=wy-pin[1],ang=Math.atan2(dy,-dx);s.box([pin[0]/2,(pin[1]+wy)/2,.2],[rod,.13,.09],'#adb5bd',{rotZ:ang});s.cyl([pin[0],pin[1],.2],[0,0,1],.14,.12,'#adb5bd');s.cyl([0,wy,.2],[0,0,1],.09,.12,'#adb5bd');
+  // cylinder: block cut away to show the liner, piston with rings, gas charge
+  cutaway(s,[0,cb,0],Rb+.02,.82,ct-cb,'#8d949b','#b9bfc5',16);s.box([-.86,(cb+ct)/2,-.1],[.1,ct-cb,1.1],'#8d949b');s.box([.86,(cb+ct)/2,-.1],[.1,ct-cb,1.1],'#8d949b');
+  s.cyl([0,wy+.12,.0],[0,1,0],Rb,.34,'#c3c9cf',{cap:'#d4d9de'});for(const y of[wy+.22,wy+.26])band(s,[0,y,0],Rb+.003,.012,'#343a40');
+  const gh=ct-ptop,spark=st===0&&u<.12;if(gh>.02)s.cyl([0,ptop+gh/2,0],[0,1,0],Rb-.01,gh,spark?'#ffd43b':col,{alpha:st===0?.5-.3*u:.3});
+  // head, valves with springs, spark plug, manifolds
+  s.box([0,ct+.2,0],[1.8,.4,1.3],'#7d848b');s.box([0,ct+.48,0],[1.6,.16,1.1],'#5c636a');const vin=st===2?.14*Math.sin(u*PI):0,vex=st===1?.14*Math.sin(u*PI):0;
+  for(const [x,l] of[[-.27,vin],[.27,vex]]){s.cyl([x,ct-.02-l,0],[0,1,0],.15,.04,'#9aa1a8');s.cyl([x,ct+.45-l,0],[0,1,0],.025,.9,STEEL);s.helix([x,ct+.75,0],[0,1,0],.07,.3,5,'#c3c9cf',2)}
+  s.cyl([0,ct+.62,.0],[0,1,0],.06,.12,'#c3c9cf',{seg:6});s.cyl([0,ct+.8,0],[0,1,0],.05,.25,'#f8f9fa');s.cyl([0,ct+.95,0],[0,1,0],.02,.08,'#adb5bd');if(spark)s.ball([0,ct-.05,0],.1,'#ffe066',{glow:true,flat:true});
+  s.tube([[-.9,ct+.15,0],[-1.25,ct+.1,0],[-1.5,ct-.3,0]],.12,'#868e96',{segs:10});s.tube([[.9,ct+.15,0],[1.25,ct+.1,0],[1.5,ct-.4,0]],.12,'#6b5e55',{segs:10});
+  if(st===2)for(let i=0;i<4;i++){const q=cycle(t*2+i/4,1);s.ball([-1.4+q*1.1,ct+.1-q*.4,0],.04,'#a5d8ff',{flat:true})}if(st===1)for(let i=0;i<4;i++){const q=cycle(t*2+i/4,1);s.ball([.25+q*1.2,ct-.1+q*.3,0],.05,'#868e96',{alpha:.6,flat:true})}
+  lab(s,[0,ct+.9,0],'spark plug',40,-30);lab(s,[-.27,ct+.8,0],'intake valve',-60,10);lab(s,[.27,ct+.8,0],'exhaust valve',60,-10);lab(s,[-Rb,wy+.15,0],'piston',-70,0);lab(s,[pin[0]/2-.05,(pin[1]+wy)/2,.25],'connecting rod',-60,30);lab(s,[-.85,yc-.2,-.8],'flywheel',-50,30);lab(s,[.1,yc,.3],'crankshaft',60,30);
+  s.render();chart(c,420,96,236,150,{title:'Efficiency vs compression ratio',xl:'r',xmin:1,xmax:14,ymin:0,ymax:1,series:[{fn:x=>1-Math.pow(x,1-p.g),col:C.mint}],marker:[p.r,eta]});
+  tag(c,`η = 1 − r^(1−γ) = ${f(eta*100,1)} %`,44,98,C.gold,15);tag(c,['power stroke (spark → expansion)','exhaust stroke','intake stroke','compression stroke'][st],44,120,C.white,13)};
 })();

@@ -112,8 +112,7 @@ R['connected-blocks']=(c,p,t)=>{const s=P3.scene(c,{scale:68,cy:285,cx:330,yaw:.
   s.render();tag(c,`a = F/(m₁ + m₂) = ${f(a,2)} m/s²`,44,98,C.gold,14)};
 
 R['banked-turn']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.08,cy:205}),th=rad(p.angle),v=Math.sqrt(p.radius*G*Math.tan(th)),Rr=2,w=1.15,a=t*.6,y0=-.5,hh=w*Math.tan(th);
-  s.cyl([0,y0-.06,0],[0,1,0],Rr-w/2,.1,'#3d7a3a',{seg:40});s.lathe([0,y0,0],[[Rr-w/2,0],[Rr+w/2,hh]],'#41464c',{segs:48});s.lathe([0,y0,0],[[Rr+w/2,hh],[Rr+w/2+.08,hh+.12]],'#adb5bd',{segs:48});
-  s.lathe([0,y0-.25,0],[[Rr+w/2+.08,0],[Rr+w/2+.08,hh+.37]],'#5c6168',{segs:48});
+  s.cyl([0,y0-.06,0],[0,1,0],Rr-w/2,.1,'#3d7a3a',{seg:40});s.lathe([0,y0,0],[[Rr-w/2,0],[Rr+w/2,hh]],'#5f656c',{segs:48});s.lathe([0,y0,0],[[Rr+w/2,hh],[Rr+w/2+.06,hh+.08]],'#ced4da',{segs:48});s.lathe([0,y0,0],[[Rr+w/2+.06,hh+.08],[Rr+w/2+.5,-.08]],'#4a7a3c',{segs:48});
   for(let i=0;i<48;i++){const q=TAU*i/48,q2=TAU*(i+.6)/48;if(i%2)continue;s.seg([Rr*Math.cos(q),y0+hh/2+.01,Rr*Math.sin(q)],[Rr*Math.cos(q2),y0+hh/2+.01,Rr*Math.sin(q2)],'#f1f3f5',2)}
   for(let i=0;i<40;i++){const q=TAU*i/40,q2=TAU*(i+1)/40,r0=Rr-w/2-.01;s.seg([r0*Math.cos(q),y0+.01,r0*Math.sin(q)],[r0*Math.cos(q2),y0+.01,r0*Math.sin(q2)],i%2?'#e03131':'#f8f9fa',4)}
   // car: body, cabin with glass, four wheels, banked with the road
@@ -189,7 +188,7 @@ R['collision']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.2,yaw:.4,cy:240}),v
   s.box([0,-.25,0],[7.2,.12,.42],'#adb5bd');for(const x of[x0,x3])s.box([x,-.05,0],[.06,.3,.45],'#495057');for(const x of[-2.8,2.8]){s.cyl([x,(yb-.3)/2-.0,0],[0,1,0],.04,-.3-yb,'#5d646b');s.box([x,yb+.03,0],[.45,.06,.3],'#3c4248')}
   s.cyl([x0-.2,-.2,0],[1,0,0],.1,.4,'#343a40');s.label([x0-.2,-.48,0],'air in',C.muted,10);
   const w=m=>.5+m*.08,X1=clamp(x1,-3.3,3.3),X2=clamp(x2+.4,-3.3,3.3);glider(s,X1,w(p.m1),'#3b6fb6',`m₁ = ${p.m1} kg`,1);glider(s,X2,w(p.m2),'#d9822b',`m₂ = ${p.m2} kg`,-1);
-  if(tt<tc)s.arrow([X1,.55,0],[X1+.2+p.u*.1,.55,0],C.gold,3,10,`u = ${p.u} m/s`);else{if(Math.abs(v1)>.05)s.arrow([X1,.75,0],[X1+v1*.1+Math.sign(v1)*.15,.75,0],C.blue,3,10,`v₁ = ${f(v1,2)} m/s`);s.arrow([X2,.75,0],[X2+v2*.1+.15,.75,0],C.gold,3,10,`v₂ = ${f(v2,2)} m/s`)}
+  if(tt<tc)s.arrow([X1,.85,0],[X1+.2+p.u*.1,.85,0],C.gold,3,10,`u = ${p.u} m/s`);else{if(Math.abs(v1)>.05)s.arrow([X1,.75,0],[X1+v1*.1+Math.sign(v1)*.15,.75,0],C.blue,3,10,`v₁ = ${f(v1,2)} m/s`);s.arrow([X2,.75,0],[X2+v2*.1+.15,.75,0],C.gold,3,10,`v₂ = ${f(v2,2)} m/s`)}
   part(s,[-2,-.1,.1],'air track (perforated)',-20,60);part(s,[X1-w(p.m1)/2,-.05,.15],'glider',-50,-50);
   s.render();tag(c,`after: v₁ = ${f(v1,2)} m/s, v₂ = ${f(v2,2)} m/s`,44,98,C.gold,14)};
 
@@ -218,7 +217,7 @@ R['work-angle']=(c,p,t)=>{const s=P3.scene(c,{scale:66,cy:290,cx:320,yaw:.15}),t
   woodBlock(s,[x,.3,0],[.8,.6,.6]);const h=[x+.42,.3,0];eye(s,h,[0,1,0]);const dir=[Math.cos(th),Math.sin(th),0],b=V.add(h,V.mul(dir,1.25));springBalance(s,b,V.add(h,V.mul(dir,.04)),p.force,50);s.tube([b,V.add(b,V.mul(dir,.3))],.012,STR,{segs:5});
   s.path(arc(h,.45,0,th,16),'#ffffffaa',1.5);s.label(V.add(h,[.62*Math.cos(th/2),.62*Math.sin(th/2),0]),`θ = ${p.angle}°`,C.white,11);
   s.arrow(V.add(b,V.mul(dir,.35)),V.add(b,V.mul(dir,.45+p.force*.02)),C.gold,4,11,`F = ${p.force} N at ${p.angle}°`);s.arrow([x-.2,.03,.7],[x-.1+p.force*.025*Math.cos(th),.03,.7],C.mint,3,11,`F cosθ = ${f(p.force*Math.cos(th),1)} N`);
-  part(s,[x-.3,.5,.3],'wooden block',-40,-60);part(s,V.add(h,V.mul(dir,.6)),'spring balance',20,50);
+  part(s,[x-.3,.5,.3],'wooden block',-40,-60);part(s,V.add(h,V.mul(dir,.6)),'spring balance',80,20);
   s.render();tag(c,`W = ${f(W,1)} J`,44,98,C.gold,15)};
 
 R['ballistic-pendulum']=(c,p,t)=>{const s=P3.scene(c,{scale:56,cy:245,yaw:.15}),V2=p.projectile*p.speed/(p.projectile+p.block),h=V2*V2/(2*G),L=2.4,thMax=Math.acos(clamp(1-h/L,-1,1)),tt=cycle(t,5),th=tt<1?0:thMax*Math.sin(Math.min(PI,(tt-1)*1.6)),py=1.9,bob=[L*Math.sin(th),py-L*Math.cos(th),0],yb=-1.4;
@@ -268,5 +267,97 @@ R['variable-force-work']=(c,p,t)=>{const a=Math.min(p.x1,p.x2),b=Math.max(p.x1,p
   s.arrow([X(x)-.3-F*.04,yb+.75,0],[X(x)-.27,yb+.75,0],C.gold,3,11,`F = ${f(F,1)} N`);
   part(s,[-2.4,yb+.05,.37],'aluminium track with metre scale',-20,-110);part(s,V.add(hp,[-.5,.09,0]),'pusher',-40,-50);s.render();
   chart(c,410,92,246,160,{title:'F–x graph (shaded = W)',xl:'x (m)',xmin:0,xmax:4,ymin:0,ymax:p.F0+p.k*4+1,series:[{fn:X=>p.F0+p.k*X,col:C.gold},{pts:[[a,0],[a,p.F0+p.k*a],[b,p.F0+p.k*b],[b,0]],col:C.mint,dash:[3,3]}],marker:[x,F]})};
+
+/* ================= System of Particles and Rotational Motion ================= */
+// Flat ring (annulus) facing ±z at depth c[2]+dz.
+function annulus(s,c,r0,r1,dz,sg,col,N=32){for(let i=0;i<N;i++){const a1=TAU*i/N,a2=TAU*(i+1)/N,z=c[2]+dz,q=(rr,aa)=>[c[0]+rr*Math.cos(aa),c[1]+rr*Math.sin(aa),z];s.poly([q(r0,a1),q(r1,a1),q(r1,a2),q(r0,a2)],col,{cull:true,normal:[0,0,sg]})}}
+// Spoked wheel with a rubber tyre, turning about z by ang.
+function wheel(s,c,Rw,ang,o={}){const w=o.w||.16,ax=[0,0,1];s.cyl(c,ax,Rw,w,RUB,{caps:false,seg:40});for(const sg of[1,-1]){annulus(s,c,Rw*.82,Rw,sg*w/2,sg,'#2b2d31',36);annulus(s,c,Rw*.74,Rw*.82,sg*w*.35,sg,'#c3c9cf',36)}
+  for(let i=0;i<16;i++){const a=ang+TAU*i/16,sg=i%2?1:-1;s.seg(V.add(c,[.07*Math.cos(a),.07*Math.sin(a),sg*w*.3]),V.add(c,[Rw*.75*Math.cos(a+sg*.08),Rw*.75*Math.sin(a+sg*.08),0]),'#dee2e6',1.2)}
+  s.cyl(c,ax,Rw*.1,w*1.1,'#868e96');s.cyl(c,ax,Rw*.04,w*1.6,IRON);s.ball(V.add(c,[Rw*.78*Math.cos(ang),Rw*.78*Math.sin(ang),w/2]),.035,'#e03131',{flat:true})}
+
+R['rotation']=(c,p,t)=>{const s=P3.scene(c,{scale:60,pitch:.25,cy:250}),al=p.force*p.radius/p.inertia,tt=cycle(t,5),ang=.5*al*tt*tt*.5,Rd=1.85,yb=-1.3,rv=.3+p.radius*1.0;
+  bench(s,-2.8,2.8,yb,-2.2,2.2);for(let i=0;i<3;i++){const a=TAU*i/3+1.2;s.tube([[0,-.35,0],[1.1*Math.cos(a),yb,1.1*Math.sin(a)]],.05,'#495057',{segs:8});s.cyl([1.1*Math.cos(a),yb+.03,1.1*Math.sin(a)],[0,1,0],.1,.06,RUB)}
+  s.cyl([0,-.25,0],[0,1,0],.18,.35,'#3c4248',{cap:'#5d646b'});s.cyl([0,0,0],[0,1,0],Rd,.14,'#9aa1a8',{seg:48,cap:'#c3c9cf'});s.cyl([0,.12,0],[0,1,0],.12,.12,'#5d646b');
+  for(let k=1;k<=4;k++)s.ring([0,.072,0],[0,1,0],k*.5,'#6c737a',1);for(let i=0;i<12;i++){const a=ang+TAU*i/12;s.seg([.25*Math.cos(a),.073,.25*Math.sin(a)],[(Rd-.05)*Math.cos(a),.073,(Rd-.05)*Math.sin(a)],i===0?'#e03131':'#6c737a',i===0?2.5:1)}
+  const pt=[rv*Math.cos(ang),.07,rv*Math.sin(ang)];s.cyl(V.add(pt,[0,.15,0]),[0,1,0],.045,.3,BRASS,{seg:12});const pf=V.add(pt,[0,.25,0]);
+  s.arrow(pf,V.add(pf,V.mul([-Math.sin(ang),0,Math.cos(ang)],.3+p.force*.06)),C.gold,4,11,`F = ${p.force} N`);s.seg([0,.25,0],pf,C.mint,1.8,[4,4]);s.label(V.add(V.mul(pf,.5),[0,.18,0]),`r = ${p.radius} m`,C.mint,12);
+  part(s,[-Rd*.98,.0,0],'steel turntable (graduated)',-30,-60);part(s,[0,-.42,.18],'bearing on tripod',-80,70);part(s,V.add(pt,[0,.3,0]),'brass peg',40,-40);
+  s.render();tag(c,`α = rF/I = ${f(al,2)} rad/s²`,44,98,C.gold,15)};
+
+R['rolling']=(c,p,t)=>{const s=P3.scene(c,{scale:60,pitch:.15,yaw:.35,cy:285,cx:330}),Rw=.3+p.radius*1.2,x=-3+cycle(t*p.speed*.4,6),ang=-(x+3)/Rw;
+  bench(s,-3.7,3.7,0,-.9,.9);wheel(s,[x,Rw,0],Rw,ang-PI/2);s.cyl([x,Rw,0],[0,0,1],.03,.5,CHROME);
+  const tr=[];for(let i=0;i<=60;i++){const xx=-3+(x+3)*i/60,a=(xx+3)/Rw;tr.push([xx-Rw*.78*Math.sin(a),Rw-Rw*.78*Math.cos(a),.09])}s.path(tr,C.gold,2);
+  s.arrow([x,2*Rw+.08,.12],[x+.25+p.speed*.25,2*Rw+.08,.12],C.mint,3,11,`top: 2v = ${f(2*p.speed,1)} m/s`);s.arrow([x,Rw,.15],[x+.12+p.speed*.125,Rw,.15],C.blue,3,10,`v = ${p.speed} m/s`);s.ball([x,.01,.1],.05,C.red,{flat:true});s.label([x,-.25,.5],'contact point: v = 0',C.red,11);
+  part(s,[x-Rw*.75,Rw*.4,.08],'rubber tyre',-40,50);part(s,[x,Rw,.1],'hub',-50,-70);
+  s.render();tag(c,'gold: path of a rim point (cycloid) · contact point at rest',44,98,C.muted,13)};
+
+R['angular-momentum']=(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.35,cy:275}),w=p.omega*(p.initialRadius/p.radius)**2,a=t*Math.min(6,w),r=.4+p.radius*1.05,ri=.4+p.initialRadius*1.05,yb=-1.3,h=.6;
+  bench(s,-3,3,yb,-2,2);s.cyl([0,yb+.06,0],[0,1,0],.7,.12,'#3c4248',{seg:28});s.cyl([0,(yb+h)/2,0],[0,1,0],.07,h-yb,CHROME);s.cyl([0,yb+.35,0],[0,1,0],.16,.25,'#5d646b');
+  const u=[Math.cos(a),0,Math.sin(a)];s.cyl([0,h,0],u,.025,2*(.4+2*1.05)+.4,'#adb5bd');s.cyl([0,h,0],[0,1,0],.1,.14,'#495057');
+  for(const sg of[-1,1]){const q=V.add([0,h,0],V.mul(u,sg*r)),mr=.12+p.mass*.03;s.cyl(q,u,mr,.28,'#868e96',{seg:18,cap:'#ced4da'});s.seg([0,h+.04,0],V.add(q,[0,.04,0]),STR,1.2)}
+  s.seg([0,h,0],[0,yb+.6,0],STR,1.2);s.tube(arc([0,yb+.45,0],.12,PI/2,PI*1.6,8).map(q=>[q[0]+.12,q[1],q[2]]),.015,STR,{segs:4});
+  s.ring([0,h,0],[0,1,0],ri,'#42d9ca66',1.2,[4,4]);s.ring([0,h,0],[0,1,0],r,'#ffc36b88',1.2,[4,4]);
+  const L=2*p.mass*p.initialRadius**2*p.omega;s.arrow([0,h+.15,0],[0,h+.6+L*.03,0],C.mint,3,10,`L = ${f(L,2)} kg·m²/s`);s.path(arc([0,0,0],.35,0,PI*1.5,16).map(q=>[q[0],h+.32,q[1]]),C.gold,2);
+  part(s,[2.2*Math.cos(a+.3)*0,h,0],'rotating shaft',-60,-40);part(s,V.add([0,h,0],V.mul(u,r)),'sliding masses',50,-40);part(s,[0,yb+.45,0],'pull string (through axis)',60,30);
+  s.render();tag(c,`ω = ${f(w,2)} rad/s`,44,98,C.gold,15)};
+
+R['rod-pendulum']=(c,p,t)=>{const s=P3.scene(c,{scale:64,cy:250,yaw:.45,pitch:-.1}),T=2*PI*Math.sqrt(2*p.length/(3*G)),th=rad(p.angle)*Math.cos(TAU*t/T),L=.8+p.length*1.1,piv=[0,1.2,0];
+  s.box([0,1.2,-.55],[2.6,.8,.12],'#c9b79c');for(const x of[-1.1,1.1])s.ball([x,1.45,-.48],.04,'#868e96',{flat:true});s.box([0,1.28,-.3],[.34,.14,.5],'#5d646b');s.poly([[-.12,1.19,-.05],[.12,1.19,-.05],[0,1.21,.15]],'#adb5bd',{});
+  s.path(arc(piv,L+.15,-PI/2-rad(p.angle),-PI/2+rad(p.angle),20).map(q=>[q[0],q[1],-.4]),'#ffffff66',1.2,[4,4]);
+  const d=[Math.sin(th),-Math.cos(th),0],rw=.1+p.mass*.02;s.box(V.add(piv,V.mul(d,L/2-.06)),[rw,L,.05],'#d9a066',{rotZ:th});s.cyl(piv,[0,0,1],.05,.3,CHROME);
+  const n=Math.round(L/.1);for(let i=1;i<n;i++){const q=V.add(piv,V.mul(d,i*.1)),side=[Math.cos(th),Math.sin(th),0];s.seg(V.add(q,[0,0,.03]),V.add(V.add(q,V.mul(side,i%5===0?rw*.45:rw*.25)),[0,0,.03]),'#3b2614',1)}
+  const cm=V.add(piv,V.mul(d,L/2)),co=V.add(piv,V.mul(d,L*2/3));s.ball(V.add(cm,[0,0,.04]),.05,C.blue,{flat:true,lift:1});s.ball(V.add(co,[0,0,.04]),.06,C.red,{flat:true,lift:1});s.label(V.add(co,[.3,-.1,0]),'centre of oscillation',C.red,11,'left');s.label(V.add(cm,[.35,0,0]),'CM (L/2)',C.blue,11,'left');
+  s.arrow(V.add(cm,[-.2,0,.1]),V.add(cm,[-.2,-.5-p.mass*.08,.1]),C.gold,2.5,10,`mg = ${f(p.mass*G,1)} N`);
+  part(s,[0,1.25,.1],'knife-edge pivot',70,-20);part(s,V.add(piv,V.mul(d,.45)),'graduated wooden rod',-70,10);part(s,[-1,1.0,-.5],'wall bracket plate',-40,10);
+  s.render();tag(c,`T = 2π√(2L/3g) = ${f(T,2)} s`,44,98,C.gold,15)};
+
+R['inertia-shapes']=(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.15,yaw:.55,cy:270}),Rr=.32+p.radius*.32,a=t*1.2,yb=-1.35,shapes=[['ring',1],['disc',.5],['solid sphere',.4],['hollow sphere',2/3]];
+  bench(s,-3.6,3.6,yb,-.9,.9);shapes.forEach(([n,k],i)=>{const x=-2.55+i*1.7,ctr=[x,.0,0];s.cyl([x,yb+.04,0],[0,1,0],.32,.08,'#3c4248',{seg:20});s.cyl([x,(yb+ctr[1])/2,0],[0,1,0],.03,ctr[1]-yb,CHROME,{seg:10});
+    if(n==='ring'){s.tube(arc([0,0,0],Rr,0,TAU,40).map(q=>[x+q[0],0,q[1]]),.05,'#adb5bd',{segs:8});for(let j=0;j<3;j++){const q=a+TAU*j/3;s.seg(ctr,[x+Rr*Math.cos(q),0,Rr*Math.sin(q)],'#868e96',1.2)}}
+    else if(n==='disc'){s.cyl(ctr,[0,1,0],Rr,.1,BRASS,{seg:36,cap:'#d6b45e'});s.seg([x,.052,0],[x+Rr*.95*Math.cos(a),.052,Rr*.95*Math.sin(a)],'#5c4a1a',2)}
+    else if(n==='solid sphere'){s.ball([x,Rr*.8,0],Rr*.8,'#9aa1a8');s.ring([x,Rr*.8,0],[0,1,0],Rr*.8,'#5d646b',1)}
+    else{s.ball([x,Rr*.8,0],Rr*.8,'#e9ecef',{alpha:.35});s.ring([x,Rr*.8,0],[0,1,0],Rr*.8,'#adb5bd',2);s.path(arc([0,0,0],Rr*.8,0,PI,16).map(q=>[x+q[0],Rr*.8+q[1],0]),'#ced4da',1.5)}
+    s.seg([x,ctr[1]-.05,0],[x,1.05,0],'#ff857e88',1.2,[3,3]);s.label([x,1.5,0],n,C.white,12);s.label([x,1.22,0],`${f(k,2)} mR²`,C.gold,11);s.label([x,yb-.25,.8],`I = ${f(k*p.mass*p.radius**2,2)} kg·m²`,C.gold,11)});
+  part(s,[-2.55,yb+.5,0],'spindle stand',-30,-10);s.render();tag(c,`Same mass ${p.mass} kg and radius ${p.radius} m — mass farther out ⇒ larger I`,44,98,C.muted,13)};
+
+R['parallel-axis']=(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.35,cy:270}),Rd=.4+p.radius*1.4,d=p.offset*1.4,a=t*.8,yb=-1.3,h=.2;
+  bench(s,-2.7,2.7,yb,-1.8,1.8);s.cyl([0,yb+.08,0],[0,1,0],.5,.16,'#3c4248',{seg:24});s.cyl([0,(yb+h+.5)/2,0],[0,1,0],.05,h+.5-yb,'#c92a2a');s.cyl([0,yb+.25,0],[0,1,0],.14,.2,'#5d646b');
+  const ctr=[d*Math.cos(a),h,d*Math.sin(a)];s.cyl(ctr,[0,1,0],Rd,.1,'#9aa1a8',{seg:40,cap:'#c3c9cf'});s.cyl([0,h,0],[0,1,0],.09,.14,'#495057');for(let i=0;i<8;i++){const q=a+TAU*i/8;s.seg(V.add(ctr,[.08*Math.cos(q),.052,.08*Math.sin(q)]),V.add(ctr,[Rd*.92*Math.cos(q),.052,Rd*.92*Math.sin(q)]),'#868e96',1)}
+  s.ball(V.add(ctr,[0,.06,0]),.05,C.white,{flat:true,lift:2});s.seg([0,h+.06,0],[0,h+.6,0],'#c92a2a',6,[],1e5);s.ball([0,h+.6,0],.04,'#e03131',{flat:true,lift:1e5});s.seg([0,h+.07,0],V.add(ctr,[0,.07,0]),C.gold,2,[4,4]);s.label(V.add(V.mul(ctr,.5),[0,.42,0]),`d = ${p.offset} m`,C.gold,13);s.ring([0,h,0],[0,1,0],Math.max(.01,d),'#ffc36b44',1,[4,4]);
+  const I=p.mass*(.5*p.radius**2+p.offset**2);part(s,[0,h+.5,0],'rotation axis (axle)',-50,-50);part(s,V.add(ctr,[Rd*.7,0,Rd*.7]),'uniform steel disc',50,30);part(s,V.add(ctr,[0,.06,0]),'centre C',50,-40);
+  s.render();tag(c,`I = ½mR² + md² = ${f(I,3)} kg·m²  (red: rotation axis · gold: offset d)`,44,98,C.gold,13)};
+
+R['rolling-race']=(c,p,t)=>{const th=rad(p.th),s=P3.scene(c,{scale:50,cy:268,yaw:.25,pitch:.2}),L=6,dir=[Math.cos(th),-Math.sin(th),0],nrm=[Math.sin(th),Math.cos(th),0],o=[-3,1.6*Math.min(1,Math.sin(th)*2.6),0],yb=o[1]-L*Math.sin(th)-.08;
+  bench(s,-3.6,3.9,yb,-2,2);s.box(V.add(o,V.add(V.mul(dir,L/2),V.mul(nrm,-.06))),[L,.12,3.4],WOOD,{rotZ:-th});for(let i=0;i<5;i++)s.box(V.add(o,V.add(V.mul(dir,L/2),[0,0,-1.6+i*.8])).map((v,k)=>k===1?v+.03:v),[L,.06,.04],'#5c3a1e',{rotZ:-th});
+  const bot=V.add(o,V.mul(dir,L));
+  for(const z of[-1.6,1.6]){s.cyl([o[0]+.05,(o[1]+yb)/2,z],[0,1,0],.04,o[1]-yb,'#5d646b')}s.box(V.add(o,V.add(V.mul(dir,.05),V.mul(nrm,.18))),[.05,.3,3.4],'#e03131',{rotZ:-th});
+  for(let k=0;k<8;k++)s.box(V.add(bot,V.add(V.mul(dir,-.1),[0,.01,-1.5+k*3/7*1])),[.12,.02,.4],k%2?'#f8f9fa':'#212529',{rotZ:-th});
+  const shapes=[[.4,'#adb5bd','solid sphere'],[.5,BRASS,'disc'],[2/3,'#e9ecef','hollow sphere'],[1,'#868e96','ring']],tmax=Math.sqrt(2*p.L*2/(G*Math.sin(th)))+1,tt=cycle(t,tmax),rr=.25;
+  shapes.forEach(([b,col,kind],i)=>{const a=G*Math.sin(th)/(1+b),d=Math.min(1,.5*a*tt*tt/p.L),z=-1.2+i*.8,cpos=V.add(V.add(o,V.mul(dir,.3+d*(L-.6))),[nrm[0]*rr,nrm[1]*rr,z]),ang=-d*(L-.6)/rr;
+    if(kind==='disc'){s.cyl(cpos,[0,0,1],rr,.14,col,{seg:28,cap:'#d6b45e'});s.seg(V.add(cpos,[0,0,.072]),V.add(cpos,[rr*.9*Math.cos(ang),rr*.9*Math.sin(ang),.072]),'#5c4a1a',2)}
+    else if(kind==='ring'){s.tube(arc(cpos,rr-.03,0,TAU,32),.03,col,{segs:8});s.ball(V.add(cpos,[(rr-.03)*Math.cos(ang),(rr-.03)*Math.sin(ang),.03]),.03,'#e03131',{flat:true})}
+    else{s.ball(cpos,rr,col,kind==='hollow sphere'?{stroke:'#868e96'}:{});s.ball(V.add(cpos,[rr*.6*Math.cos(ang),rr*.6*Math.sin(ang),rr*.75]),.03,kind==='hollow sphere'?'#4dabf7':'#e03131',{flat:true})}
+    s.label(V.add(bot,[.25,.15,z]),kind,col===IRON?C.white:col,11,'left')});
+  part(s,V.add(o,V.add(V.mul(dir,.05),V.mul(nrm,.3))),'release gate',-40,-30);part(s,V.add(bot,[-.1,.02,1.6]),'finish line',30,40);
+  s.render();tag(c,'Solid sphere (I = ⅖mR²) wins; the ring (I = mR²) is last',44,98,C.gold,14)};
+
+function cm3(p){const M=p.m1+p.m2+p.m3,pts=[[-2,0,-1],[2,0,-1],[0,0,1.8]];return[0,1,2].map(k=>(p.m1*pts[0][k]+p.m2*pts[1][k]+p.m3*pts[2][k])/M)}
+R['centre-of-mass-3d']=(c,p,t)=>{const r=cm3(p),s=P3.scene(c,{scale:62,cy:265}),pts=[[-2,0,-1],[2,0,-1],[0,0,1.8]],py=-.1,yb=-1.3;
+  bench(s,-3,3,yb,-1.8,2.4);const top=pts.map(q=>[q[0],py,q[2]]),bot=pts.map(q=>[q[0],py-.05,q[2]]);for(let i=0;i<3;i++){const j=(i+1)%3;s.poly([top[i],top[j],bot[j],bot[i]],'#adb5bd',{})}s.poly(top,'#ced4da',{normal:[0,1,0],stroke:'#868e96',spec:.3});
+  [p.m1,p.m2,p.m3].forEach((m,i)=>{const h=.12+.07*m**.6,rr=.13+.04*Math.cbrt(m),q=[pts[i][0],py+h/2,pts[i][2]];s.cyl(q,[0,1,0],rr,h,BRASS,{seg:20,cap:'#d6b45e'});s.cyl(V.add(q,[0,h/2+.04,0]),[0,1,0],.04,.08,'#a07c2c');s.label(V.add(q,[0,h/2+.32,0]),'ABC'[i]+' '+m+' kg',['#ff857e','#ffc36b','#42d9ca'][i],12)});
+  s.box([r[0],yb+.04,r[2]],[.6,.08,.6],'#3c4248');s.cyl([r[0],(yb+py-.15)/2+.02,r[2]],[0,1,0],.035,py-.15-yb,CHROME,{seg:10});s.lathe([r[0],py-.2,r[2]],[[.035,0],[.0,.15]],'#868e96',{segs:10});
+  s.ball([r[0],py+.02,r[2]],.07,C.purple,{glow:true,flat:true});s.label([r[0],py+.5,r[2]],'CM',C.purple,14);s.seg([r[0],py+.01,r[2]],[r[0],py+.38,r[2]],C.purple,1.4,[3,3]);
+  part(s,[1.3,py,-.5],'aluminium triangular plate',40,70);part(s,[r[0],(yb+py)/2,r[2]],'pin support',60,40);
+  s.render();tag(c,`r_cm = (${f(r[0],2)}, ${f(r[2],2)}) m — the plate balances on the pin`,44,98,C.gold,14)};
+
+R['topple-or-slide']=(c,p,t)=>{const m=10,Fs=p.mu*m*G,Ft=m*G*p.b/2/(p.hf*p.H),tips=Ft<Fs,ph=cycle(t,4),k=1.5,s=P3.scene(c,{scale:62,cy:272,yaw:.2}),yb=-1.4;
+  bench(s,-3.4,3.4,yb,-1,1);const W=p.b*k,H=p.H*k,prog=clamp((ph-1)/2,0,1);let ang=0,dx=0;if(tips)ang=-prog*Math.min(PI/2,.25+Math.atan2(W,H));else dx=prog*1.6;
+  const pivot=[W/2+dx,yb,0],ctr=[dx,yb+H/2,0],rel=V.sub(ctr,pivot),rot=[rel[0]*Math.cos(ang)-rel[1]*Math.sin(ang),rel[0]*Math.sin(ang)+rel[1]*Math.cos(ang),0];woodBlock(s,V.add(pivot,rot),[W,H,.7],ang);
+  s.seg([pivot[0],yb+.01,-.36],[pivot[0],yb+.01,.36],'#ff6b6b',3);
+  const hp=V.add(pivot,rz([-W,p.hf*H,0],ang)),F=Math.min(Fs,Ft)*Math.min(1,ph/1),ln=.25+F*.012;s.cyl(V.add(hp,[-.04,0,0]),[1,0,0],.05,.08,'#212529');s.cyl(V.add(hp,[-.5,0,0]),[1,0,0],.03,.8,CHROME);s.box(V.add(hp,[-1,0,0]),[.24,.16,.16],'#1c7ed6');s.engrave(V.add(hp,[-1,0,.085]),f(F,0)+' N','#e9f6ff',9);
+  s.arrow([hp[0]-.2-ln,hp[1]+.25,.3],[hp[0]-.05,hp[1]+.25,.3],C.gold,3,11,`F = ${f(F,1)} N`);s.arrow(V.add(V.add(pivot,rot),[0,0,.4]),V.add(V.add(pivot,rot),[0,-.6,.4]),C.mint,2.5,10,'mg');
+  part(s,[pivot[0],yb,.3],'tipping edge',40,40);part(s,V.add(hp,[-1,.08,0]),'force probe',-30,-50);part(s,V.add(pivot,V.add(rot,[0,H*.3,.35])),'wooden block',50,-40);
+  s.render();tag(c,tips?'Tips over its front edge':'Slides along the floor',44,98,tips?C.red:C.mint,16)};
 
 })();

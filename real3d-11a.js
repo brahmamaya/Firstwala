@@ -93,7 +93,7 @@ R['units']=(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.22,yaw:.3,cx:340,cy:222
   s.poly([[hx,-.48,.06],[hx,jy,.06],[hx+.12,jy,.06],[hx+.42,-.48,.06]],'#dfe3e7',{normal:[0,0,1]});s.box([hx+.06,(jy-.48)/2,0],[.12,-.48-jy,.079],'#c9ced3');
   s.poly([[hx,.31,.03],[hx+.22,.31,.03],[hx+.07,.62,.03],[hx,.62,.03]],'#dfe3e7',{normal:[0,0,1]});
   s.cyl([hx+.75,.38,0],[0,1,0],.07,.14,'#868e96',{cap:'#adb5bd'});s.cyl([hx+1.05,-.62,0],[0,0,1],.12,.08,'#868e96');for(let i=0;i<12;i++){const a=TAU*i/12;s.seg([hx+1.05+Math.cos(a)*.12,-.62+Math.sin(a)*.12,.04],[hx+1.05+Math.cos(a)*.12,-.62+Math.sin(a)*.12,-.04],'#3b4046',1)}
-  if(m>0)s.box([3.84+m*k/2,-.2,0],[m*k,.04,.04],CH);
+  if(m>0){const dl=Math.min(m*k,.9);s.box([3.84+dl/2,-.2,0],[dl,.04,.04],CH)}
   // object held between the outside jaws
   const ox=X0+sz/10*k/2,oy=-.98,w=sz/10*k;
   if(obj==='marble')s.ball([ox,oy,0],w/2,'#9fd3f0',{alpha:.75,stroke:'#e9f6ff'});
@@ -102,7 +102,7 @@ R['units']=(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.22,yaw:.3,cx:340,cy:222
   else if(obj==='block')s.box([ox,oy,0],[w,.6,.5],'#b07a46');
   else if(!obj&&m>.03)s.cyl([X0+m*k/2,oy,0],[1,0,0],.22,m*k-.01,CU,{cap:'#d9905a'});
   if(obj&&obj!=='none')callout(s,[ox,oy-.2,.1],'object',-30,50);
-  callout(s,[1.9,.2,.04],'main scale',30,-60);callout(s,[hx+.4,-.4,.07],'vernier scale',60,60);callout(s,[X0-.1,-1.25,.04],'fixed jaw',-50,30);callout(s,[hx+.1,-1.3,.06],'sliding jaw',50,30);callout(s,[hx+1.05,-.62,.04],'thumb wheel',70,20);callout(s,[hx+.75,.45,0],'lock screw',40,-40);callout(s,[3.9+m*k,-.2,0],'depth rod',20,-50);
+  callout(s,[1.9,.2,.04],'main scale',30,-60);callout(s,[hx+.4,-.4,.07],'vernier scale',60,60);callout(s,[X0-.1,-1.25,.04],'fixed jaw',-50,30);callout(s,[hx+.1,-1.3,.06],'sliding jaw',50,30);callout(s,[hx+1.05,-.62,.04],'thumb wheel',70,20);callout(s,[hx+.75,.45,0],'lock screw',40,-40);
   s.render();tag(c,`MSR ${f(msrm/10,1)} cm + VSR ${n} × 0.01 cm`,44,98,C.gold,14)};
 
 // Rectangular metal plate measured with two steel rules; error halos show the largest and smallest possible area.
@@ -135,7 +135,7 @@ R['parallax']=(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.25,yaw:.3,cx:330,cy:
   s.render();tag(c,'mint: true reading · gold: apparent reading',44,98,C.muted,13)};
 
 // Spherometer on a plano-convex lens resting on a glass plate.
-R['spherometer']=(c,p,t)=>{const h=p.turns+p.div*.01,s=P3.scene(c,{scale:60,pitch:.42,yaw:.15,cx:320,cy:262}),hv=Math.min(.8,h*.18),rho=p.legs/40*1.6/Math.sqrt(3),yb=-1.42;
+R['spherometer']=(c,p,t)=>{const h=p.turns+p.div*.01,s=P3.scene(c,{scale:60,pitch:.42,yaw:.15,cx:320,cy:262}),hv=Math.min(.6,h*.15),rho=p.legs/40*1.6/Math.sqrt(3),yb=-1.42;
   bench(s,0,-1.6,6.4,3.6);s.box([0,-1.51,0],[4.4,.18,3.2],GLASS,{alpha:.45,ground:true});
   let ytop,yleg;if(hv>.004){const Rc=(rho*rho+hv*hv)/(2*hv),Rl=Math.min(rho*1.4,Rc*.97),yr=r=>-(Rc-Math.sqrt(Rc*Rc-r*r));ytop=yb+.08-yr(Rl);yleg=ytop-hv;
     const prof=[[0,yb]];prof.push([Rl,yb]);for(let i=10;i>=0;i--){const r=Rl*i/10;prof.push([r,ytop+yr(r)])}s.lathe([0,0,0],prof,'#bfe3f5',{alpha:.5,segs:32});s.ring([0,yb+.08,0],[0,1,0],Rl,'#e9f6ff88',1)}
@@ -263,7 +263,7 @@ R['rain-umbrella']=(c,p,t)=>{const s=P3.scene(c,{scale:52,cy:268,yaw:.35}),th=Ma
   s.tube([hp.shoulder,V.add(hp.hand,[0,0,-.02])],.045,'#3d6fb6',{segs:6});s.ball(hp.hand,.05,'#e0b48a');
   s.tube([V.sub(hp.hand,V.mul(ax,.12)),top],.018,'#2b2f35',{segs:5});s.tube([V.sub(hp.hand,V.mul(ax,.12)),V.sub(hp.hand,V.add(V.mul(ax,.2),[.06,0,0]))],.025,'#5c3a21',{segs:5});
   s.lathe(rim,[[.62,0],[.52,.1],[.3,.19],[0,.24]],'#c92a2a',{rot:[0,0,-th],segs:16,spec:.3});for(let i=0;i<8;i++){const a=TAU*i/8,[n,u,w]=[ax,V.norm(V.cross(ax,[0,0,1])),[0,0,1]],e=V.add(rim,V.add(V.mul(u,.62*Math.cos(a)),V.mul(w,.62*Math.sin(a))));s.ball(e,.018,'#1d1f22',{flat:true})}
-  for(let i=0;i<70;i++){const rx=-3.4+((i*137)%68)/10,rz=-1.6+((i*71)%32)/10,ry=2.4-cycle(t*p.vr*.4+i*.37,4);if(Math.abs(rx-rim[0])<.6&&Math.abs(rz)<.6&&ry<rim[1])continue;s.seg([rx,ry,rz],[rx,ry-.22,rz],C.glass,1.4)}
+  for(let i=0;i<70;i++){const rx=-3.4+((i*137)%68)/10,rz=-1.6+((i*71)%32)/10,ry=2.4-cycle(t*p.vr*.4+i*.37,3.7);if(Math.abs(rx-rim[0])<.6&&Math.abs(rz)<.6&&ry<rim[1])continue;s.seg([rx,ry,rz],[rx,ry-.22,rz],C.glass,1.4)}
   s.shadow([x,g0,0],.35,g0,.4);
   const O=[2.3,1.85,0],vr=p.vr*.12,vm=p.vm*.12;s.arrow(O,[O[0],O[1]-vr,0],C.glass,3,11,`v_rain = ${p.vr} m/s`).arrow(O,[O[0]+vm,O[1],0],C.gold,3,11,`v_you = ${p.vm} m/s`).arrow(O,[O[0]-vm,O[1]-vr,0],C.mint,3,11);s.seg([O[0]-vm,O[1]-vr,0],[O[0],O[1]-vr,0],'#8ca6b9',1,[3,3]);
   s.label([O[0]-vm-.15,O[1]-vr*.45,0],`v_rel = ${f(Math.hypot(p.vr,p.vm),2)} m/s at ${f(deg(th),1)}° to vertical`,C.mint,12,'right');
@@ -278,15 +278,15 @@ function tapeMeasure(s,x0,x1,y,z,step,lab){s.poly([[x0,y+.003,z+.07],[x1,y+.003,
 function target(s,p,r=.3){for(let i=0;i<4;i++)s.cyl([p[0],p[1]+.004+i*.002,p[2]],[0,1,0],r*(1-i*.24),.004,i%2?'#f1f3f5':'#c92a2a',{caps:true})}
 function flag(s,p,col=C.gold,h=.9){s.cyl([p[0],p[1]+h/2,p[2]],[0,1,0],.02,h,ST);s.poly([[p[0],p[1]+h,p[2]],[p[0]+.36,p[1]+h-.1,p[2]],[p[0],p[1]+h-.2,p[2]]],col,{cull:false,normal:[0,0,1]})}
 
-R['projectile']=(c,p,t)=>{const s=P3.scene(c,{scale:44,cy:285,yaw:.3}),th=rad(p.angle),T=2*p.speed*Math.sin(th)/p.gravity,Rn=p.speed**2*Math.sin(2*th)/p.gravity,k=6.4/Math.max(Rn,(p.speed**2/(2*p.gravity))*2,1),g0=-1.5,pos=q=>[-3.2+p.speed*Math.cos(th)*q*k,g0+(p.speed*Math.sin(th)*q-.5*p.gravity*q*q)*k,0];
-  grass(s,-4.4,4.4,-2,1.6,g0);tapeMeasure(s,-3.2,-3.2+Math.ceil(Rn/5)*5*k,g0,.6,5*k,i=>`${i*5} m`);launcher(s,[-3.2,g0-.32*.6,0],th,.6);
+R['projectile']=(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:255,yaw:.45,cx:330}),th=rad(p.angle),T=2*p.speed*Math.sin(th)/p.gravity,Rn=p.speed**2*Math.sin(2*th)/p.gravity,k=6.4/Math.max(Rn,(p.speed**2/(2*p.gravity))*2,1),g0=-1.5,pos=q=>[-3.2+p.speed*Math.cos(th)*q*k,g0+(p.speed*Math.sin(th)*q-.5*p.gravity*q*q)*k,0];
+  grass(s,-4.4,4.4,-2,1.2,g0);const st=Rn>120?25:Rn>60?10:5;tapeMeasure(s,-3.2,-3.2+Math.ceil(Rn/st)*st*k,g0,.6,st*k,i=>`${i*st} m`);launcher(s,[-3.2,g0-.32*.8,0],th,.8);
   s.curve(Array.from({length:41},(_,i)=>pos(T*i/40)),'#42d9ca99',2,8);const tt=Math.min(cycle(t,T+1),T),b=pos(tt);target(s,[-3.2+Rn*k,g0,0]);
   seamBall(s,b,.14,'#d8e04a','#f4f4ee',tt*6);s.shadow(b,.14,g0,.4);const vx=p.speed*Math.cos(th),vy=p.speed*Math.sin(th)-p.gravity*tt;
   if(tt<T)s.arrow(b,V.add(b,[vx*.045,vy*.045,0]),C.gold,2.5,10,`v = ${f(Math.hypot(vx,vy),1)} m/s`);
-  callout(s,[-3.2,g0+.2,.2],'launcher + protractor',-20,-70);callout(s,[-3.2+Rn*k,g0,.2],`range ${f(Rn,1)} m`,30,50);
+  callout(s,[-3.2,g0+.2,.2],'launcher + protractor',-20,-70);callout(s,[-3.2+Rn*k,g0,.2],`range ${f(Rn,1)} m`,40,-50);
   s.render()};
 
-R['circular-motion']=(c,p,t)=>{const s=P3.scene(c,{scale:46,pitch:.5,cy:250}),R0=.4+p.radius*.5,a=p.speed/p.radius*t*.6,b=[R0*Math.cos(a),.17,R0*Math.sin(a)];
+R['circular-motion']=(c,p,t)=>{const s=P3.scene(c,{scale:40,pitch:.45,cy:262}),R0=.4+p.radius*.5,a=p.speed/p.radius*t*.6,b=[R0*Math.cos(a),.17,R0*Math.sin(a)];
   s.cyl([0,-.12,0],[0,1,0],3.1,.24,'#8a5a36',{cap:'#9a6a40'});s.ring([0,.001,0],[0,1,0],3.1,'#d4d9de',2.5);for(let i=1;i<6;i++)s.ring([0,.001,0],[0,1,0],i*.5+.4,'#00000022',1);
   s.ring([0,.005,0],[0,1,0],R0,'#42d9ca66',1.5,[5,5]);s.cyl([0,.05,0],[0,1,0],.25,.1,'#596066');s.cyl([0,.22,0],[0,1,0],.06,.36,CH);s.cyl([0,.17,0],[0,1,0],.1,.06,BRASS);
   s.seg([0,.17,0],b,'#f1ead8',1.8);s.ball(b,.17,'#c9ced3');s.shadow([b[0],0,b[2]],.17,0,.45);
@@ -302,7 +302,7 @@ function boat(s,p,d,k=1){const side=[d[2],0,-d[0]],L=(f0,s0,y)=>V.add(p,V.add(V.
   for(let i=0;i<deck.length;i++){const j=(i+1)%deck.length;s.seg(L(...deck[i],.06),L(...deck[j],.06),'#c92a2a',2)}
   s.poly([L(.08,-.12,.12),L(.08,.12,.12),L(.02,.11,.24),L(.02,-.11,.24)],GLASS,{alpha:.8,spec:.8});s.box(L(-.36,0,.13),[.08*k,.2*k,.08*k],'#1d1f22',{rotY:Math.atan2(-d[2],d[0])});s.cyl(L(-.38,0,-.02),[0,1,0],.02*k,.2*k,'#3b4046')}
 
-R['river-crossing']=(c,p,t)=>{const s=P3.scene(c,{scale:48,pitch:.62,cy:250}),h=rad(p.heading),vx=p.current-p.boat*Math.sin(h),vz=p.boat*Math.cos(h),W=3.4,k=.35,tc=W/Math.max(vz*k,.05),q=Math.min(cycle(t,tc+1),tc),pos=[-1+vx*k*q,0,-W/2+vz*k*q];
+R['river-crossing']=(c,p,t)=>{const s=P3.scene(c,{scale:44,pitch:.5,cy:270}),h=rad(p.heading),vx=p.current-p.boat*Math.sin(h),vz=p.boat*Math.cos(h),W=3.4,k=.35,tc=W/Math.max(vz*k,.05),q=Math.min(cycle(t,tc+1),tc),pos=[-1+vx*k*q,0,-W/2+vz*k*q];
   s.poly([[-4,-.12,W/2],[4,-.12,W/2],[4,-.12,-W/2],[-4,-.12,-W/2]],'#1f5f8b',{normal:[0,1,0],z:-6e5,spec:.4});
   for(let i=0;i<16;i++){const x=-3.8+((t*p.current*.4+i*1.37)%7.6),z=-W/2+.2+(i*.61)%(W-.4);s.seg([x,-.1,z],[x+.35,-.1,z],'#a5d8ff88',1.5,[],-5.9e5)}
   for(const z of[-W/2-.45,W/2+.45]){s.box([0,-.06,z],[8,.24,.9],'#4b8a3c',{ground:true});s.box([0,-.1,z-Math.sign(z)*.47],[8,.16,.06],'#c2a878',{ground:true})}
@@ -316,18 +316,18 @@ R['river-crossing']=(c,p,t)=>{const s=P3.scene(c,{scale:48,pitch:.62,cy:250}),h=
   s.render();tag(c,'dashed: path over ground · mint: ground velocity · gold: heading',44,98,C.muted,13)};
 
 // Force table: degree-scaled top, pulleys clamped at the rim, strings to slotted-mass hangers.
-R['vector-addition']=(c,p,t)=>{const s=P3.scene(c,{scale:46,pitch:.62,cy:228}),th=rad(p.angle),k=.2,A=[p.a*k,0,0],B=[p.b*k*Math.cos(th),0,-p.b*k*Math.sin(th)],Rv=V.add(A,B),Rm=Math.hypot(p.a+p.b*Math.cos(th),p.b*Math.sin(th)),o=[0,.03,0],Rt=2;
+R['vector-addition']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.36,cy:200,cx:320}),th=rad(p.angle),k=.21,A=[p.a*k,0,0],B=[p.b*k*Math.cos(th),0,-p.b*k*Math.sin(th)],Rv=V.add(A,B),Rm=Math.hypot(p.a+p.b*Math.cos(th),p.b*Math.sin(th)),o=[0,.03,0],Rt=2;
   s.cyl([0,-1.1,0],[0,1,0],.08,2.1,ST);for(let i=0;i<3;i++){const q=TAU*i/3+.4;s.tube([[0,-2.1,0],[.9*Math.cos(q),-2.2,.9*Math.sin(q)]],.05,DK,{segs:6})}
-  s.cyl([0,-.05,0],[0,1,0],Rt,.1,'#c3c9cf',{cap:'#dfe3e7'});
-  for(let d=0;d<360;d+=5){const a=rad(d),q=[Rt*Math.cos(a),.001,-Rt*Math.sin(a)];s.seg(q,[(Rt-(d%30?.08:.18))*Math.cos(a),.001,-(Rt-(d%30?.08:.18))*Math.sin(a)],'#1b1f23',d%30?.8:1.3,[],-1e5);if(d%30===0)s.engrave([(Rt-.32)*Math.cos(a),.001,-(Rt-.32)*Math.sin(a)],String(d),'#1b1f23',8,-1e5)}
+  s.cyl([0,-.05,0],[0,1,0],Rt,.1,'#9aa1a8',{cap:'#cfd4d9'});const zt=zf(s,[0,0,0])+.05;
+  for(let d=0;d<360;d+=5){const a=rad(d),q=[Rt*Math.cos(a),.001,-Rt*Math.sin(a)];s.seg(q,[(Rt-(d%30?.08:.18))*Math.cos(a),.001,-(Rt-(d%30?.08:.18))*Math.sin(a)],'#1b1f23',d%30?.8:1.3,[],zt);if(d%30===0)s.engrave([(Rt-.32)*Math.cos(a),.001,-(Rt-.32)*Math.sin(a)],String(d),'#1b1f23',8,zt)}
   s.cyl([0,.03,0],[0,1,0],.1,.03,'#868e96');
   const hang=(ang,mag,col)=>{const u=[Math.cos(ang),0,-Math.sin(ang)],pc=V.add(V.mul(u,Rt+.12),[0,.1,0]);s.box(V.add(V.mul(u,Rt-.02),[0,.02,0]),[.18,.14,.18],'#3b4046',{rotY:ang});s.cyl(pc,[u[2],0,-u[0]],.1,.04,'#2b2f35',{cap:'#868e96'});
     s.seg([0,.04,0],V.add(pc,[0,.1,0]),'#f1ead8',1.3);const dn=V.add(V.mul(u,Rt+.22),[0,.1,0]),hy=-1.1;s.seg(dn,[dn[0],hy,dn[2]],'#f1ead8',1.2);
     const n=Math.max(1,Math.round(mag));s.cyl([dn[0],hy-.12,dn[2]],[0,1,0],.012,.24,CH);for(let i=0;i<n;i++)s.cyl([dn[0],hy-.22+i*.035,dn[2]],[0,1,0],.09,.03,i%2?col:'#868e96')};
   hang(0,p.a,'#2f6db5');hang(th,p.b,'#c9a227');if(Rm>.05)hang(Math.atan2(p.b*Math.sin(th),p.a+p.b*Math.cos(th))+PI,Rm,'#2b8a3e');
-  s.poly([o,V.add(o,A),V.add(o,Rv),V.add(o,B)],'#7baaff',{alpha:.18,cull:false,normal:[0,1,0],z:-1e5+1});
+  s.poly([o,V.add(o,A),V.add(o,Rv),V.add(o,B)],'#7baaff',{alpha:.18,cull:false,normal:[0,1,0],z:zt+.01});
   s.arrow(o,V.add(o,A),C.blue,4,11,`A = ${p.a}`);s.arrow(o,V.add(o,B),C.gold,4,11,`B = ${p.b}, θ = ${p.angle}°`);s.arrow(o,V.add(o,Rv),C.mint,5,11,`R = ${f(Rm,2)}`);s.seg(V.add(o,A),V.add(o,Rv),C.gold,1.2,[4,4]);s.seg(V.add(o,B),V.add(o,Rv),C.blue,1.2,[4,4]);
-  callout(s,[-Rt*.7,0,Rt*.7],'force table (degree scale)',-30,40);if(Rm>.05)callout(s,V.mul([-Math.cos(Math.atan2(p.b*Math.sin(th),p.a+p.b*Math.cos(th))),0,Math.sin(Math.atan2(p.b*Math.sin(th),p.a+p.b*Math.cos(th)))],Rt+.2),'equilibrant hanger',-40,40);
+  callout(s,[-.3,-.1,Rt],'force table (degree scale)',-150,30);
   s.render()};
 
 R['horizontal-launch']=(c,p,t)=>{const s=P3.scene(c,{scale:44,cy:282,yaw:.3}),T=Math.sqrt(2*p.height/G),Rn=p.speed*T,k=4.6/Math.max(Rn,p.height,1),g0=-1.5,H=p.height*k,x0=-2.6,pos=q=>[x0+p.speed*q*k,g0+(p.height-.5*G*q*q)*k+.12,0];
@@ -339,20 +339,20 @@ R['horizontal-launch']=(c,p,t)=>{const s=P3.scene(c,{scale:44,cy:282,yaw:.3}),T=
   callout(s,[x0-1.2,g0+H*.5,.8],'cliff',-40,0);
   s.render()};
 
-R['projectile-incline']=(c,p,t)=>{const s=P3.scene(c,{scale:46,cy:285,yaw:.3}),be=rad(p.slope),th=be+rad(p.above),T=Math.max(0,2*p.speed*(Math.sin(th)-Math.cos(th)*Math.tan(be))/G),pos=q=>[p.speed*Math.cos(th)*q,p.speed*Math.sin(th)*q-.5*G*q*q,0],Ld=pos(T),k=5.5/Math.max(Math.hypot(Ld[0],Ld[1]),8),o=[-3,-1.6,0],Ls=6.6,D=.9;
+R['projectile-incline']=(c,p,t)=>{const s=P3.scene(c,{scale:48,cy:280,yaw:.45}),be=rad(p.slope),th=be+rad(p.above),T=Math.max(0,2*p.speed*(Math.sin(th)-Math.cos(th)*Math.tan(be))/G),pos=q=>[p.speed*Math.cos(th)*q,p.speed*Math.sin(th)*q-.5*G*q*q,0],Ld=pos(T),k=5.5/Math.max(Math.hypot(Ld[0],Ld[1]),8),o=[-3,-1.6,0],Ls=6.6,D=.9;
   grass(s,-4.4,4.4,-2,1.6,o[1]);const top=V.add(o,[Ls*Math.cos(be),Ls*Math.sin(be),0]),foot=[top[0],o[1],0];
   if(be>.001){for(const z of[D,-D])s.poly([V.add(o,[0,0,z]),V.add(foot,[0,0,z]),V.add(top,[0,0,z])],'#7a5a3c',{normal:[0,0,Math.sign(z)]});s.poly([V.add(foot,[0,0,D]),V.add(foot,[0,0,-D]),V.add(top,[0,0,-D]),V.add(top,[0,0,D])],'#6d5038',{normal:[1,0,0]});
     for(let i=1;i<4;i++){const f0=i/4;s.seg(V.add(o,[Ls*Math.cos(be)*f0,0,D+.001]),V.add(o,[Ls*Math.cos(be)*f0,Ls*Math.sin(be)*f0,D+.001]),'#00000025',1)}}
   s.poly([V.add(o,[0,0,D]),V.add(top,[0,0,D]),V.add(top,[0,0,-D]),V.add(o,[0,0,-D])],'#4b8a3c',{normal:[-Math.sin(be),Math.cos(be),0]});
   for(let i=1;i<6;i++){const q=V.add(o,[Ls*Math.cos(be)*i/6,Ls*Math.sin(be)*i/6,0]);s.seg(V.add(q,[0,.003,-D]),V.add(q,[0,.003,D]),'#3f7d3a',1.5)}
-  const ld=V.add(o,V.mul(Ld,k));launcher(s,V.add(o,[0,-.32*.55,0]),th,.55);s.curve(Array.from({length:31},(_,i)=>V.add(o,V.mul(pos(T*i/30),k))),C.mint,2.4,6);
+  const ld=V.add(o,V.mul(Ld,k));launcher(s,V.add(o,[0,-.32*.75,0]),th,.75);s.curve(Array.from({length:31},(_,i)=>V.add(o,V.mul(pos(T*i/30),k))),C.mint,2.4,6);
   const tt=Math.min(cycle(t,T+1),T),b=V.add(V.add(o,V.mul(pos(tt),k)),[0,.13,0]);seamBall(s,b,.13,'#d8e04a','#f4f4ee',tt*6);s.ring(ld,[-Math.sin(be),Math.cos(be),0],.2,C.red,2);flag(s,V.add(ld,[0,0,-.4]),C.red,.6);
   s.arrow(V.add(o,[0,.05,.3]),V.add(o,[Math.cos(th)*.9,.05+Math.sin(th)*.9,.3]),C.gold,2.5,9,`u = ${p.speed} m/s`);
   const arc=[];for(let i=0;i<=12;i++){const a=be*i/12;arc.push(V.add(o,[.8*Math.cos(a),.8*Math.sin(a),D]))}if(be>.01){s.path(arc,C.white,1.2);s.label(V.add(o,[1.15,.2,D]),`β = ${p.slope}°`,C.white,11)}
   callout(s,V.add(top,[-.8,-.1,-.3]),'hillside',30,-30);
   s.render()};
 
-R['air-drag-projectile']=(c,p,t)=>{const r=memo('drag11a'+p.v+p.th+p.k,()=>dragPath(p)),Tv=2*p.v*Math.sin(rad(p.th))/G,rv=p.v**2*Math.sin(2*rad(p.th))/G,k=6/Math.max(rv,r.range,1),s=P3.scene(c,{scale:52,cy:285,yaw:.25}),g0=-1.6,th=rad(p.th);
+R['air-drag-projectile']=(c,p,t)=>{const r=memo('drag11a'+p.v+p.th+p.k,()=>dragPath(p)),Tv=2*p.v*Math.sin(rad(p.th))/G,rv=p.v**2*Math.sin(2*rad(p.th))/G,k=6/Math.max(rv,r.range,1),s=P3.scene(c,{scale:52,cy:285,yaw:.45}),g0=-1.6,th=rad(p.th);
   grass(s,-4.4,4.4,-2,1.8,g0);for(const z of[-.6,.6])launcher(s,[-3,g0-.32*.45,z],th,.45);
   const vac=Array.from({length:61},(_,i)=>{const tt=Tv*i/60;return[-3+p.v*Math.cos(th)*tt*k,g0+(p.v*Math.sin(th)*tt-.5*G*tt*tt)*k,-.6]});s.curve(vac,'#7baaff',2,6);
   const dr=r.pts.map(([x,y])=>[-3+x*k,g0+y*k,.6]);s.curve(dr,C.gold,2.6,6);const i=Math.min(dr.length-1,Math.floor(cycle(t,r.T+1)/r.T*(dr.length-1)));seamBall(s,V.add(dr[i],[0,.12,0]),.12,'#d8e04a','#f4f4ee',t*6);s.shadow(dr[i],.13,g0,.4);
@@ -362,7 +362,7 @@ R['air-drag-projectile']=(c,p,t)=>{const r=memo('drag11a'+p.v+p.th+p.k,()=>dragP
 function dragPath(p){const k=p.k,ux=p.v*Math.cos(rad(p.th)),uy=p.v*Math.sin(rad(p.th)),X=t=>ux/k*(1-Math.exp(-k*t)),Y=t=>(uy/k+G/k/k)*(1-Math.exp(-k*t))-G*t/k;let lo=1e-3,hi=2*uy/G+1;for(let i=0;i<60;i++){const m=(lo+hi)/2;Y(m)>0?lo=m:hi=m}const T=lo;return{T,range:X(T),pts:Array.from({length:81},(_,i)=>[X(T*i/80),Math.max(0,Y(T*i/80))])}}
 
 R['conical-pendulum']=(c,p,t)=>{const ct=Math.cos(rad(p.th)),w=Math.sqrt(G/(p.L*ct)),Ls=.9+p.L*.55,r=Ls*Math.sin(rad(p.th)),h=Ls*ct,py=1.75,piv=[0,py,0],a=w*t,b=[r*Math.cos(a),py-h,r*Math.sin(a)],g0=-1.6;
-  const s=P3.scene(c,{scale:56,cy:248});tiles(s,-3.2,3.2,-2.4,2.2,g0);
+  const s=P3.scene(c,{scale:50,cy:262});tiles(s,-3,3,-2,1.5,g0);
   s.box([0,py+.32,0],[4.6,.3,.4],'#8a5a36');s.box([0,py+.15,0],[.5,.04,.5],'#868e96');for(const dx of[-.18,.18])for(const dz of[-.18,.18])s.cyl([dx,py+.18,dz],[0,1,0],.03,.03,DK);s.cyl([0,py+.07,0],[0,1,0],.05,.12,CH);s.ball(piv,.04,CH);
   s.ring([0,py-h,0],[0,1,0],r,'#42d9ca66',1.5,[5,5]);s.seg(piv,[0,g0,0],'#8ca6b966',1,[4,4]);
   const rb=.08+.08*Math.cbrt(p.m),bc=V.add(b,V.mul(V.norm(V.sub(b,piv)),rb));s.seg(piv,b,'#f1ead8',1.8);s.cyl(b,V.sub(b,piv),.018,.05,ST);s.ball(bc,rb,BRASS);s.shadow([bc[0],g0,bc[2]],rb,g0,.4);
