@@ -109,7 +109,7 @@ R['newton-cooling']=(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.3,pitch:.08,cx:2
   for(let i=0;i<Math.round((T-p.ambient)/7);i++){const u=cycle(t*.45+i*.17,1);s.ball([X+(hash(i)-.5)*.7+.12*Math.sin(t+i),y0+lv+.1+u*1.5,(hash(i+3)-.5)*.5],.06+.07*u,'#e9f6ff',{alpha:.28*(1-u),flat:true})}
   stand(s,[X-1.35,0,-.2],2.5,2.05,[X+.12,2.05,0]);thermometer(s,[X+.12,y0+.35,0],1.65,T/100,{label:`${f(T,1)} °C`});const sy=.07*Math.sin(t*3);s.cyl([X-.28,y0+1.0+sy,.1],[0,1,0],.02,1.6,'#d08a52');s.cyl([X-.28,y0+1.82+sy,.1],[1,0,0],.025,.2,'#d08a52');
   stopwatch(s,[X+1.45,.4,.5],tt,`t = ${f(tt,1)} s`);s.box([X+1.45,.04,.5],[.5,.08,.3],'#2f3438');
-  lab(s,[X-cr,y0+.4,.2],'copper calorimeter',-60,40);lab(s,[X,y0+lv,0],'hot water',-70,-60);lab(s,[X-1.35,1.5,-.32],'clamp stand',-50,-30);lab(s,[X+1.45,.72,.5],'stopwatch',40,-40);lab(s,[X-.28,y0+1.7+sy,.1],'stirrer',-50,-20);
+  lab(s,[X-cr,y0+.9,.2],'copper calorimeter',-70,-25);lab(s,[X-.3,y0+lv,.2],'hot water',-80,10);lab(s,[X-1.35,.7,-.32],'clamp stand',-40,40);lab(s,[X+1.45,.72,.5],'stopwatch',40,-40);lab(s,[X-.28,y0+1.7+sy,.1],'stirrer',-50,-20);
   s.render();chart(c,430,96,226,150,{title:'T vs time',xl:'s',xmin:0,xmax:80,ymin:p.ambient-5,ymax:p.initial+5,series:[{fn:x=>p.ambient+(p.initial-p.ambient)*Math.exp(-p.rate*x),col:C.red},{fn:()=>p.ambient,col:'#8ca6b9',dash:[4,4]}],marker:[tt,T]});tag(c,`room ${p.ambient} °C · T = ${f(T,1)} °C`,44,98,C.gold,14)};
 
 R['heat-conduction']=(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:.35,pitch:.1,cx:320,cy:318}),Lw=.5+p.thickness*8,n=12,H=1.6,D=1.5,yb=.1,rate=p.conductivity*(p.hot-p.cold)/p.thickness;
@@ -333,12 +333,12 @@ R['gay-lussac']=(c,p,t)=>{const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:270,c
 
 R['brownian-motion']=(c,p,t)=>{const kB=1.380649e-23,D=kB*p.T/(6*PI*p.eta*1e-3*p.a*1e-6),step=Math.sqrt(2*D*.2)*1e6,n=Math.min(400,Math.floor(cycle(t,24)*16)),pts=[[0,0]],lim=9.5;
   for(let i=0;i<n;i++){const q=pts[i];pts.push(q.map((v,k)=>clamp(v+step*(hash(i*3+k+1)*2-1)*1.73,-lim,lim)))}
-  const s=P3.scene(c,{scale:60,yaw:.45,pitch:.02,cx:150,cy:340}),M='#c9ced3',A='#f1f3f5';bench(s,0,0,3.4,2.4);
+  const s=P3.scene(c,{scale:56,yaw:.45,pitch:.02,cx:150,cy:352}),M='#c9ced3',A='#f1f3f5';bench(s,0,0,3.4,2.4);
   s.box([0,.08,.1],[1.3,.16,1.5],M);s.box([0,.5,-.45],[.45,.75,.4],M);s.tube([[0,.8,-.5],[0,1.6,-.62],[0,2.3,-.35],[0,2.6,.05]],.17,M,{segs:10});
   s.box([0,1.05,.2],[1.2,.08,1.1],'#23292f');s.box([0,1.11,.25],[.95,.02,.32],GLASS,{alpha:.6});s.box([0,1.125,.25],[.3,.01,.3],GLASS,{alpha:.8});for(const x of[-.35,.35])s.box([x,1.12,.05],[.1,.03,.4],'#adb5bd');
   s.cyl([0,.75,.2],[0,1,.1],.18,.04,'#d4d9de');s.cyl([0,1.5,.22],[0,1,0],.06,.4,'#c3c9cf');s.cyl([0,1.78,.22],[0,1,0],.18,.16,'#868e96');s.cyl([0,2.25,.22],[0,1,0],.14,.8,A);s.cyl([0,2.75,.22],[0,1,0],.09,.3,'#343a40');s.cyl([0,2.95,.22],[0,1,0],.11,.1,'#212529');
   s.cyl([.36,.95,-.45],[1,0,0],.18,.12,'#868e96');s.cyl([.47,.95,-.45],[1,0,0],.11,.1,'#adb5bd');
-  lab(s,[0,2.9,.22],'eyepiece',-50,-20);lab(s,[0,1.55,.22],'objective lens',-70,-10);lab(s,[-.45,1.12,.25],'slide + suspension',-60,30);lab(s,[.47,.95,-.45],'focus knob',50,40);
+  lab(s,[0,2.9,.22],'eyepiece',60,20);lab(s,[0,1.55,.22],'objective lens',-70,-10);lab(s,[-.45,1.12,.25],'slide + suspension',-60,30);lab(s,[.47,.95,-.45],'focus knob',50,40);
   const E=s.P([0,2.98,.22]);s.render();
   const cx0=470,cy0=242,Rr=128,ctx=c,mp=q=>[cx0+q[0]*12,cy0-q[1]*12];ctx.save();ctx.strokeStyle='#8ca6b966';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(E[0],E[1]);ctx.lineTo(cx0-Rr*.7,cy0-Rr*.7);ctx.moveTo(E[0],E[1]);ctx.lineTo(cx0-Rr*.9,cy0+Rr*.3);ctx.stroke();ctx.setLineDash([]);
   ctx.beginPath();ctx.arc(cx0,cy0,Rr,0,TAU);const g=ctx.createRadialGradient(cx0-20,cy0-20,10,cx0,cy0,Rr);g.addColorStop(0,'#f4f1e4');g.addColorStop(.75,'#d8d2bc');g.addColorStop(1,'#6b6656');ctx.fillStyle=g;ctx.fill();ctx.save();ctx.clip();
