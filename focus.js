@@ -30,4 +30,10 @@ function focus(on){body.classList.toggle('focus',on);exit.hidden=!on;fb.setAttri
 fb.addEventListener('click',()=>focus(!body.classList.contains('focus')));exit.addEventListener('click',()=>focus(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&body.classList.contains('focus'))focus(false)});
 paint();
+// Less-used tools go into one "More" menu so the main row stays short and clear.
+const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details');d.className='more-menu';const sm=document.createElement('summary');sm.textContent='More ▾';sm.dataset.testid='more-menu';const pop=document.createElement('div');pop.className='more-pop';
+  for(const id of['sound-toggle','volume-wrap','randomise-btn','realism-toggle','surprise-button','help-open']){const el=document.getElementById(id);if(el)pop.append(el)}
+  d.append(sm,pop);row.append(d);document.addEventListener('click',e=>{if(d.open&&!d.contains(e.target))d.open=false});pop.addEventListener('click',e=>{if(e.target.closest('button'))setTimeout(()=>{d.open=false},150)})}
+// Hide the favourites box until something is starred.
+const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();
