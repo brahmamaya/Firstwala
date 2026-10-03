@@ -36,7 +36,7 @@
   for(const s of sims)s.subject='physics';window.PhysicaSims=sims;
   // Physics packs extend an existing chapter (base); biology packs bring their own NCERT chapters.
   for(const extra of window.ExtraSimulations||[]){const base=extra.base&&chapters.find(s=>s.id===extra.base);if(base){sims.push({...base,...extra,draw:extra.id});continue}
-    const s={...extra,subject:bioSubject(extra),draw:extra.id};sims.push(s);if(!chapters.some(c=>sameChapter(c,s)))chapters.push(s)}
+    const s={...extra,subject:extra.subject==='chemistry'?'chemistry':bioSubject(extra),draw:extra.id};sims.push(s);if(!chapters.some(c=>sameChapter(c,s)))chapters.push(s)}
   chapters.sort((a,b)=>a.subject===b.subject?(a.chapterNo||0)-(b.chapterNo||0):0);
   // Original 2D experiments that have a true-3D scene (phys3d-*.js) switch to it; the 2D diagram stays available.
   const R3=window.Physica3DRenderers||{};for(const s of sims)if(R3[s.id]&&!s.view3d)s.r3=R3[s.id];

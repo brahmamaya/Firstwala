@@ -116,3 +116,5 @@ body.no-scroll{overflow:hidden}
 
 /* Bigger stage on laptop screens: the experiment is the hero, so give it the width. */
 @media(min-width:991px) and (max-width:1500px){.layout{grid-template-columns:248px minmax(0,1fr)}.main{padding-left:22px;padding-right:22px}.lab-layout{grid-template-columns:minmax(0,1fr) 288px;gap:14px}.lab-layout.rail-collapsed{grid-template-columns:minmax(0,1fr) 54px}.sidebar-top{padding-left:14px;padding-right:14px}.chapter-list{padding-left:6px;padding-right:6px}}
+
+.subject-tabs{flex-wrap:wrap}.subject-tab{flex:1 1 calc(50% - 6px);padding:8px 6px;font-size:13px}
