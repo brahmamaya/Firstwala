@@ -13,9 +13,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07121f">
-  <meta name="description" content="Explore Class 11 and 12 physics and biology with 376 interactive 3D simulations: 276 physics experiments and 100 NCERT chapter-wise biology models. Change the variables, rotate every model in 3D, and build your own experiments in the drag-and-drop sandbox.">
+  <meta name="description" content="Explore Class 11 and 12 Physics, Botany and Zoology with 376 interactive 3D simulations: 276 physics experiments and 100 NCERT chapter-wise biology models with labelled parts. Change the variables, rotate every model in 3D, and build your own experiments in the drag-and-drop sandbox.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2307121f'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%233bd9c8' stroke-width='3'/%3E%3Cpath d='M13 37c10-22 22-24 38-10M13 37c13-6 26-1 38-10' fill='none' stroke='%23ffc36b' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23fff'/%3E%3C/svg%3E">
-  <title>Physica — Interactive Physics &amp; Biology Lab</title>
+  <title>Physica — Interactive Physics, Botany &amp; Zoology Lab</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./sandbox.css">
   <script src="./theme.js"></script>
@@ -42,6 +42,7 @@
   <script src="./phys3d-b.js" defer></script>
   <script src="./phys3d-c.js" defer></script>
   <script src="./phys3d-d.js" defer></script>
+  <script src="./phys3d-inst.js" defer></script>
   <script src="./vendor/matter.min.js" defer></script>
   <script src="./experience.js" defer></script>
   <script src="./app.js" defer></script>
@@ -77,7 +78,8 @@
           <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">Search simulations</span><input id="search" type="search" placeholder="Find a concept…" autocomplete="off" data-testid="search-input"><kbd>/</kbd></label>
           <div class="subject-tabs" role="group" aria-label="Choose subject">
             <button class="subject-tab active" data-subject="physics" type="button" aria-pressed="true" data-testid="subject-physics-tab">⚛ Physics</button>
-            <button class="subject-tab" data-subject="biology" type="button" aria-pressed="false" data-testid="subject-biology-tab">🧬 Biology</button>
+            <button class="subject-tab" data-subject="botany" type="button" aria-pressed="false" data-testid="subject-botany-tab">🌿 Botany</button>
+            <button class="subject-tab" data-subject="zoology" type="button" aria-pressed="false" data-testid="subject-zoology-tab">🐾 Zoology</button>
           </div>
           <div class="grade-tabs" role="group" aria-label="Choose class">
             <button class="grade-tab active" data-grade="11" type="button" aria-pressed="true" data-testid="grade-11-tab">Class 11</button>
@@ -231,10 +233,10 @@
         <div class="sb-stage-tools">
           <button id="sb-undo" type="button" data-testid="sandbox-undo" title="Undo edit (Ctrl+Z)">Undo</button>
           <button id="sb-redo" type="button" data-testid="sandbox-redo" title="Redo edit (Ctrl+Shift+Z)">Redo</button>
-          <button id="sb-zoom-out" type="button" data-testid="sandbox-zoom-out" aria-label="Zoom out">−</button>
-          <span id="sb-zoom-label" data-testid="sandbox-zoom-label">100%</span>
-          <button id="sb-zoom-in" type="button" data-testid="sandbox-zoom-in" aria-label="Zoom in">+</button>
-          <button id="sb-fit" type="button" data-testid="sandbox-fit">Fit world</button>
+          <button id="sb-zoom-out" class="sb-adv" type="button" data-testid="sandbox-zoom-out" aria-label="Zoom out">−</button>
+          <span id="sb-zoom-label" class="sb-adv" data-testid="sandbox-zoom-label">100%</span>
+          <button id="sb-zoom-in" class="sb-adv" type="button" data-testid="sandbox-zoom-in" aria-label="Zoom in">+</button>
+          <button id="sb-fit" class="sb-adv" type="button" data-testid="sandbox-fit">Fit world</button>
           <span id="sb-stats" data-testid="sandbox-stats"></span>
         </div>
         <div class="sb-canvas-frame">
@@ -246,9 +248,10 @@
       <aside class="sandbox-rail" aria-label="World and object controls">
         <div class="sb-group">
           <div class="sb-group-title">PLAY &amp; BUILD</div>
-          <div class="sb-btn-row"><button id="sb-play" type="button" class="sb-primary" data-testid="sandbox-play-btn">Play</button><button id="sb-step" type="button" data-testid="sandbox-step">Step 1/60 s</button></div>
+          <ol class="sb-steps"><li>Tap a <b>Quick start</b> scene</li><li>Press <b>Play</b></li><li>Choose <b>➶ Launch</b>, pull back and let go</li></ol>
+          <div class="sb-btn-row"><button id="sb-play" type="button" class="sb-primary" data-testid="sandbox-play-btn">Play</button><button id="sb-step" class="sb-adv" type="button" data-testid="sandbox-step">Step 1/60 s</button></div>
           <div class="sb-btn-row"><button id="sb-reset" type="button" data-testid="sandbox-reset">Reset run</button><button id="sb-clear" type="button" data-testid="sandbox-clear-btn">Clear all</button></div>
-          <label class="sb-field">Simulation speed<select id="sb-speed" data-testid="sandbox-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+          <label class="sb-field sb-adv">Simulation speed<select id="sb-speed" data-testid="sandbox-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
         </div>
         <div class="sb-group" data-testid="sandbox-quick">
           <div class="sb-group-title">GRAVITY</div>

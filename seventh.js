@@ -84,7 +84,7 @@ add({base:'kinematics',id:'rain-umbrella',title:'Rain and the tilted umbrella',
   for(let i=0;i<70;i++){const rx=-3.4+((i*137)%68)/10,rz=-1.6+((i*71)%32)/10,ry=3-cycle(t*p.vr*.4+i*.37,4.4);s.seg([rx,ry,rz],[rx,ry-.22,rz],C.glass,1.4)}
   s.shadow([x,-1.5,0],.35,-1.5,.4);s.cyl([x,-.9,0],[0,1,0],.18,1.2,'#3d8fd1');s.ball([x,-.08,0],.17,'#e0b48a');
   const top=[x+1.25*Math.sin(th),-.2+1.25*Math.cos(th),0];s.seg([x+.1,-.6,0],top,C.white,2.5);const ax=[Math.sin(th),Math.cos(th),0];s.cyl(V.sub(top,V.mul(ax,.1)),ax,.85,.08,C.red,{cap:'#ff9a90'});
-  s.arrow([x+1.6,1.8,0],[x+1.6,1.8-p.vr*.15,0],C.glass,3).arrow([x+1.6,1.8,0],[x+1.6+p.vm*.15,1.8,0],C.gold,3).arrow([x+1.6,1.8,0],[x+1.6-p.vm*.15,1.8-p.vr*.15,0],C.mint,3);s.render();
+  s.arrow([x+1.6,1.8,0],[x+1.6,1.8-p.vr*.15,0],C.glass,3,11,`v_rain = ${p.vr} m/s`).arrow([x+1.6,1.8,0],[x+1.6+p.vm*.15,1.8,0],C.gold,3,11,`v_you = ${p.vm} m/s`).arrow([x+1.6,1.8,0],[x+1.6-p.vm*.15,1.8-p.vr*.15,0],C.mint,3,11,`v_rel = ${f(Math.hypot(p.vr,p.vm),2)} m/s at ${f(Math.atan2(p.vm,p.vr)*180/Math.PI,1)}° to vertical`);s.render();
   tag(c,'blue: rain (ground)   gold: you   mint: rain relative to you',44,98,C.muted,13);tag(c,`θ = ${f(deg(th),1)}°`,44,124,C.gold,17)},
  assumption:'Rain falls vertically at constant speed with no wind; the umbrella is tilted along the relative velocity.'});
 
@@ -154,7 +154,7 @@ add({base:'projectile',id:'conical-pendulum',title:'Conical pendulum',
  draw:(c,p,t)=>{const ct=Math.cos(rad(p.th)),w=Math.sqrt(G/(p.L*ct)),Ls=.9+p.L*.55,r=Ls*Math.sin(rad(p.th)),h=Ls*ct,piv=[0,1.9,0],a=w*t,b=[r*Math.cos(a),1.9-h,r*Math.sin(a)];
   const s=P3.scene(c,{scale:62,cy:250});s.floor(3,.5,-1.9);s.box([0,2,0],[1.2,.1,1.2],'#5d7b8f');s.ring([0,1.9-h,0],[0,1,0],r,'#42d9ca66',1.5,[5,5]);
   for(let i=0;i<12;i++){const q=TAU*i/12;s.seg(piv,[r*Math.cos(q),1.9-h,r*Math.sin(q)],'#42d9ca22',1)}s.seg(piv,[0,1.9-h,0],C.muted,1,[4,4]);
-  s.seg(piv,b,C.white,2);s.ball(b,.08+.08*Math.cbrt(p.m),C.gold);s.shadow(b,.14,-1.9,.4);const cen=V.mul([-Math.cos(a),0,-Math.sin(a)],.6);s.arrow(b,V.add(b,cen),C.red,2.5);s.arrow(b,[b[0],b[1]-.6,b[2]],C.blue,2.5);s.render();
+  s.seg(piv,b,C.white,2);s.ball(b,.08+.08*Math.cbrt(p.m),C.gold);s.shadow(b,.14,-1.9,.4);const cen=V.mul([-Math.cos(a),0,-Math.sin(a)],.6);s.arrow(b,V.add(b,cen),C.red,2.5,11,`F_c = mg tanθ = ${f(p.m*9.8*Math.tan(p.th*Math.PI/180),2)} N`);s.arrow(b,[b[0],b[1]-.6,b[2]],C.blue,2.5,11,`W = ${f(p.m*9.8,2)} N`);s.render();
   tag(c,'red: centripetal (net) force   blue: weight',44,98,C.muted,13)},
  assumption:'Light inextensible string, steady circular motion, no air resistance.'});
 
@@ -197,7 +197,7 @@ add({base:'forces',id:'gun-recoil',title:'Recoil of a gun',
  draw:(c,p,t)=>{const m=p.m/1000,V=m*p.v/p.M,tt=cycle(t,3),s=P3.scene(c,{scale:60,cy:290,yaw:.35}),gx=-.5-Math.min(2,V*tt*.5);s.floor(4,.5,-1);
   s.box([gx,-.75,0],[1.6,.2,.8],'#5d7b8f');for(const dx of [-.55,.55])for(const dz of [-.4,.4])s.cyl([gx+dx,-.92,dz],[0,0,1],.1,.06,'#1a2a36');
   s.box([gx-.2,-.4,0],[.9,.4,.3],'#3b2b20');s.cyl([gx+.7,-.3,0],[1,0,0],.07,1.1,'#2f3d48');const bx=gx+1.3+Math.min(6,tt*p.v*.02);if(bx<4)s.ball([bx,-.3,0],.06,C.gold,{glow:tt<.2});
-  s.arrow([gx,.2,0],[gx-V*.6-.1,.2,0],C.red,3);s.label([gx-.3,.45,0],`V = ${f(V,2)} m/s`,C.red,13);s.render()},
+  s.arrow([gx,.2,0],[gx-V*.6-.1,.2,0],C.red,3,11,`V_recoil = ${f(V,2)} m/s`);s.render()},
  assumption:'Frictionless cart, gas momentum ignored, bullet leaves along the barrel axis.'});
 
 add({base:'forces',id:'angle-of-repose',title:'Angle of repose',
@@ -210,7 +210,7 @@ add({base:'forces',id:'angle-of-repose',title:'Angle of repose',
  draw:(c,p,t)=>{const th=rad(p.th),mk=.8*p.mus,slide=Math.tan(th)>p.mus,a=slide?G*(Math.sin(th)-mk*Math.cos(th)):0,s=P3.scene(c,{scale:60,cy:300});s.floor(3.5,.5,-1.5);
   const L=4.4,ox=-2.2,oy=-1.4,dir=[Math.cos(th),Math.sin(th),0],nrm=[-Math.sin(th),Math.cos(th),0];s.box(V.add([ox,oy,0],V.add(V.mul(dir,L/2),V.mul(nrm,-.05))),[L,.1,1.6],'#7d5a3c',{rotZ:th});
   s.cyl([ox,oy-.05,0],[0,0,1],.07,1.8,C.steel);const u=clamp(.78-(slide?.5*a*cycle(t,2.5)**2*.12:0),.1,.78),bp=V.add([ox,oy,0],V.add(V.mul(dir,u*L),V.mul(nrm,.25)));s.box(bp,[.5,.4,.6],'#3d8fd1',{rotZ:th});
-  s.arrow(bp,V.add(bp,V.mul(dir,-.7)),C.mint,2.5);s.arrow(bp,[bp[0],bp[1]-.8,bp[2]],C.gold,2.5);s.arrow(bp,V.add(bp,V.mul(dir,.4+.4*Math.min(1,Math.tan(th)))),C.red,2.5);s.render();
+  s.arrow(bp,V.add(bp,V.mul(dir,-.7)),C.mint,2.5,11,`mg sinθ = ${f(Math.sin(th),2)} mg`);s.arrow(bp,[bp[0],bp[1]-.8,bp[2]],C.gold,2.5,11,'W = mg');s.arrow(bp,V.add(bp,V.mul(dir,.4+.4*Math.min(1,Math.tan(th)))),C.red,2.5,11,`f = ${f(slide?.8*p.mus*Math.cos(th):Math.sin(th),2)} mg`);s.render();
   tag(c,slide?'Sliding — kinetic friction (μk = 0.8 μs)':'Static friction holds the block',44,98,slide?C.gold:C.mint,15);tag(c,'mint: down-slope pull   red: friction   gold: weight',44,124,C.muted,13)},
  assumption:'Kinetic friction is taken as 0.8 μs; the block does not tip.'});
 
@@ -279,7 +279,7 @@ add({base:'energy',id:'variable-force-work',title:'Work done by a variable force
  controls:[R('F0','Initial force F₀',0,20,.5,5,'N',1),R('k','Force gradient k',0,20,.5,6,'N/m',1),R('x1','Start x₁',0,2,.1,.5,'m',1),R('x2','End x₂',.5,4,.1,3,'m',1)],
  metrics:p=>{const a=Math.min(p.x1,p.x2),b=Math.max(p.x1,p.x2),W=p.F0*(b-a)+.5*p.k*(b*b-a*a);return[N('Work done',W,'J'),N('Average force',W/Math.max(b-a,1e-9),'N'),N('Force at end',p.F0+p.k*b,'N',1)]},
  draw:(c,p,t)=>{const a=Math.min(p.x1,p.x2),b=Math.max(p.x1,p.x2),x=a+(b-a)*(.5-.5*Math.cos(t*1.4)),F=p.F0+p.k*x,s=P3.scene(c,{scale:56,cy:330,cx:300,pitch:.25}),X=v=>-3+v*1.3;
-  s.box([-.3,-.6,0],[6,.1,1.2],'#3b5566');for(let i=0;i<=4;i++)s.label([X(i),-.6,.85],i+' m',C.muted,11);s.box([X(x),-.3,0],[.5,.5,.5],'#3d8fd1');s.arrow([X(x)-.3-F*.05,-.3,0],[X(x)-.27,-.3,0],C.gold,3);s.render();
+  s.box([-.3,-.6,0],[6,.1,1.2],'#3b5566');for(let i=0;i<=4;i++)s.label([X(i),-.6,.85],i+' m',C.muted,11);s.box([X(x),-.3,0],[.5,.5,.5],'#3d8fd1');s.arrow([X(x)-.3-F*.05,-.3,0],[X(x)-.27,-.3,0],C.gold,3,11,`F = ${f(F,1)} N`);s.render();
   chart(c,410,92,246,160,{title:'F–x graph (shaded = W)',xl:'x (m)',xmin:0,xmax:4,ymin:0,ymax:p.F0+p.k*4+1,series:[{fn:X=>p.F0+p.k*X,col:C.gold},{pts:[[a,0],[a,p.F0+p.k*a],[b,p.F0+p.k*b],[b,0]],col:C.mint,dash:[3,3]}],marker:[x,F]})},
  assumption:'Force along the displacement; frictionless track.'});
 
@@ -308,7 +308,7 @@ add({base:'rotation',id:'gyroscope',title:'Gyroscope precession',
  draw:(c,p,t)=>{const I=.5*p.m*p.Rw**2,w=p.rpm*TAU/60,W=p.m*G*p.r/(I*w),phi=W*t,s=P3.scene(c,{scale:66,cy:270}),ax=[Math.cos(phi),0,Math.sin(phi)],arm=.8+p.r*6,top=[0,.9,0],wc=V.add(top,V.mul(ax,arm));s.floor(3,.5,-1.6);
   s.cyl([0,-.35,0],[0,1,0],.05,2.5,C.steel);s.cyl([0,-1.55,0],[0,1,0],.5,.1,'#5d7b8f');s.ball(top,.07,C.white);s.seg(top,V.add(top,V.mul(ax,arm+.2)),'#d7e2ea',3);
   const Rw=.3+p.Rw*3;s.cyl(wc,ax,Rw,.14,'#d9844a',{cap:'#e7a073'});const spin=t*Math.min(30,w*.02),[n,u,v]=[ax,[0,1,0],V.cross(ax,[0,1,0])];for(let i=0;i<3;i++){const a=spin+i*TAU/3;s.seg(V.add(wc,V.mul(ax,.08)),V.add(V.add(wc,V.mul(ax,.08)),V.add(V.mul(u,Rw*.9*Math.cos(a)),V.mul(v,Rw*.9*Math.sin(a)))),'#3b2b20',2)}
-  s.arrow(wc,V.add(wc,V.mul(ax,.9)),C.mint,3);s.label(V.add(wc,V.mul(ax,1.05)),'L',C.mint,14);s.arrow(top,V.add(top,V.mul(V.cross([0,1,0],ax),-.7)),C.gold,3);s.label(V.add(top,V.mul(V.cross([0,1,0],ax),-.85)),'τ',C.gold,14);s.ring([0,.9,0],[0,1,0],arm,'#42d9ca44',1.2,[4,5]);s.render()},
+  s.arrow(wc,V.add(wc,V.mul(ax,.9)),C.mint,3,11,`L = Iω = ${f(.5*p.m*p.Rw**2*p.rpm*TAU/60,3)} kg·m²/s`);s.arrow(top,V.add(top,V.mul(V.cross([0,1,0],ax),-.7)),C.gold,3,11,`τ = mgr = ${f(p.m*9.8*p.r,2)} N·m`);s.ring([0,.9,0],[0,1,0],arm,'#42d9ca44',1.2,[4,5]);s.render()},
  assumption:'Fast-top approximation (spin angular momentum ≫ precession angular momentum); thin uniform disc; no nutation or friction.'});
 
 add({base:'rotation',id:'yo-yo',title:'Yo-yo: rolling down a string',
@@ -347,7 +347,7 @@ add({base:'rotation',id:'topple-or-slide',title:'Topple or slide?',
  draw:(c,p,t)=>{const m=10,Fs=p.mu*m*G,Ft=m*G*p.b/2/(p.hf*p.H),tips=Ft<Fs,ph=cycle(t,4),k=1.5,s=P3.scene(c,{scale:60,cy:310});s.floor(3.5,.5,-1.6);
   const W=p.b*k,H=p.H*k,prog=clamp((ph-1)/2,0,1);let ang=0,dx=0;if(tips)ang=-prog*Math.min(PI/2,.25+Math.atan2(W,H));else dx=prog*1.6;
   const pivot=[W/2+dx,-1.6,0],ctr=[dx,-1.6+H/2,0],rel=V.sub(ctr,pivot),rot=[rel[0]*Math.cos(ang)-rel[1]*Math.sin(ang),rel[0]*Math.sin(ang)+rel[1]*Math.cos(ang),0];s.box(V.add(pivot,rot),[W,H,.7],'#3d8fd1',{rotZ:ang});
-  const hp=[-W/2+dx-.05,-1.6+p.hf*H,0],F=Math.min(Fs,Ft)*Math.min(1,ph/1);s.arrow([hp[0]-.2-F*.012,hp[1],0],[hp[0],hp[1],0],C.gold,3);s.render();tag(c,tips?'Tips over its front edge':'Slides along the floor',44,98,tips?C.red:C.mint,16)},
+  const hp=[-W/2+dx-.05,-1.6+p.hf*H,0],F=Math.min(Fs,Ft)*Math.min(1,ph/1);s.arrow([hp[0]-.2-F*.012,hp[1],0],[hp[0],hp[1],0],C.gold,3,11,`F = ${f(F,1)} N`);s.render();tag(c,tips?'Tips over its front edge':'Slides along the floor',44,98,tips?C.red:C.mint,16)},
  assumption:'Rigid uniform block of mass 10 kg; horizontal push; static friction μ; tipping about the front lower edge.'});
 
 /* ---------- Gravitation ---------- */

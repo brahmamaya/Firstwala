@@ -31,7 +31,12 @@ function soil(s,y=-1.6,w=4,d=2.4){s.box([0,y-.25,0],[w*2,.5,d*2],BC.soil,{ground
 // Stylised but anatomically sensible organism models, facing +x, standing on y = p[1].
 function critter(s,kind,p,k=1,t=0){const A=(x,y,z)=>V.add(p,[x*k,y*k,z*k]),skin='#e0b48a';
   switch(kind){
-  case'human':for(const z of[-.12,.12]){capsule(s,A(0,.05,z),A(0,.75,z),.08*k,'#34568b')}capsule(s,A(0,.9,0),A(0,1.45,0),.2*k,'#2f9e8f');for(const z of[-.3,.3])capsule(s,A(0,1.4,z),A(.05,.85,z*1.15),.06*k,skin);s.ball(A(0,1.72,0),.17*k,skin);break;
+  case'human':{const pants='#2f4b7c',shirt='#2f9e8f',hair='#3b2a1a',sw=.06*Math.sin(t*2);
+    for(const z of[-1,1]){s.tube([A(0,.95,z*.1),A(.02,.52,z*.1),A(0,.1,z*.1)],u=>(.075-.02*u)*k,pants,{segs:10});s.mesh(A(.05,.04,z*.1),[.12*k,.045*k,.06*k],'#2b2b2b')}
+    s.mesh(A(0,1.0,0),[.12*k,.1*k,.17*k],pants);s.mesh(A(0,1.27,0),[.12*k,.27*k,.2*k],shirt,{shape:(u)=>.88+.14*Math.sin(u)});
+    for(const z of[-1,1]){const sh=A(0,1.46,z*.23),el=A(z*sw,1.2,z*.27),wr=A(.05+z*sw*1.5,.95,z*.28);s.tube([sh,el],.055*k,shirt,{segs:8});s.tube([el,wr],.045*k,skin,{segs:8});s.ball(wr,.045*k,skin,{flat:true})}
+    s.tube([A(0,1.52,0),A(0,1.6,0)],.045*k,skin,{segs:8});s.mesh(A(0,1.72,0),[.1*k,.125*k,.095*k],skin);s.mesh(A(-.018,1.775,0),[.1*k,.09*k,.1*k],hair,{shape:(u,v)=>Math.cos(v)>.35&&u<.5?.85:1});
+    for(const z of[-1,1])s.ball(A(.092,1.735,z*.035),.012*k,'#1b1b1b',{flat:true,lift:.5});break}
   case'insect':case'cockroach':{const col=kind==='cockroach'?'#7a3e1d':'#2f3640';s.mesh(A(.55,.35,0),[.13*k,.12*k,.13*k],col);s.mesh(A(.25,.35,0),[.2*k,.14*k,.17*k],col);s.mesh(A(-.3,.32,0),[.42*k,.13*k,.22*k],kind==='cockroach'?'#8b4513':'#3d4a57',{shape:(u,v)=>1+.04*Math.sin(v*8)});
     for(const sx of[.4,.25,.1])for(const z of[-1,1]){const kn=A(sx-.05,.42,z*.32);s.tube([A(sx,.32,z*.12),kn,A(sx-.12,0,z*.5)],.022*k,'#3b2a1a',{segs:6})}
     for(const z of[-1,1])s.tube([A(.65,.42,z*.05),A(.95,.7,z*.25),A(1.25,.75,z*.5)],.012*k,'#3b2a1a',{segs:5});
@@ -59,5 +64,15 @@ function critter(s,kind,p,k=1,t=0){const A=(x,y,z)=>V.add(p,[x*k,y*k,z*k]),skin=
   case'pine':s.cyl(A(0,.35,0),[0,1,0],.06*k,.7*k,'#6d4c2f');for(let i=0;i<4;i++)s.lathe(A(0,.45+i*.22,0),[[.42-i*.08,0],[.0,.4-i*.03]],'#2b8a3e',{segs:14});s.mesh(A(.25,.6,.1),[.05*k,.09*k,.05*k],'#8b5a2b');break;
   case'algae':for(let f=0;f<3;f++){const pts=Array.from({length:16},(_,i)=>A(-.2+f*.2+.08*Math.sin(i*.5+t+f),i*.07,.05*f));s.tube(pts,.035*k,'#69db7c',{alpha:.6,segs:8});s.helix(A(-.2+f*.2,.55,.05*f),[0,1,0],.025*k,1.0*k,5,'#2b8a3e',1.5)}break;
   }return s}
-window.PhysicaBio={BC,hash,capsule,chromosome,helix,cell,leaf,petal,soil,critter};
+// Anatomical heart seen from the front (+z toward the viewer, +x = patient's left). aS/vS: atrial and ventricular squeeze 0..1.
+// Textbook colours: right side (deoxygenated) blue, left side (oxygenated) red.
+function heart(s,p,k=1,o={}){const ry=o.rotY||0,cy=Math.cos(ry),sy=Math.sin(ry),A=(x,y,z)=>V.add(p,[(x*cy+z*sy)*k,y*k,(-x*sy+z*cy)*k]),aS=o.aS||0,vS=o.vS||0,ra=1-.14*aS,rv=1-.13*vS,red='#d6336c',blue='#5c7cfa',dk='#b02a5b',db='#3b5bdb';
+  s.mesh(A(.08,-.32,0),[.72*k*rv,.82*k*(1-.06*vS),.58*k*rv],(u,v)=>Math.cos(v*TAU)>-.15?red:blue,{rot:[0,0,.42],rot2:ry?[0,ry,0]:null,rings:14,segs:22,shape:(u)=>1-.42*Math.max(0,-Math.sin(u))**1.6,spec:.5});
+  s.mesh(A(-.55,.5,.08),[.36*k*ra,.32*k*ra,.34*k*ra],blue,{rings:10,segs:14});s.mesh(A(.5,.56,-.28),[.32*k*ra,.27*k*ra,.3*k*ra],red,{rings:10,segs:14});
+  s.tube([A(.05,.3,.02),A(.1,1.05,.02),A(.0,1.5,-.15),A(-.35,1.45,-.45),A(-.42,.9,-.6),A(-.42,.2,-.62)],.17*k,'#e03131',{segs:12});
+  for(const [x,z] of[[.12,-.05],[-.08,-.2],[-.28,-.38]])s.tube([A(x,1.4,z),A(x*1.4,1.85,z)],.055*k,'#e03131',{segs:8});
+  s.tube([A(-.18,.25,.38),A(-.12,.95,.4),A(.05,1.1,.25)],.15*k,db,{segs:12});for(const sg of[-1,1])s.tube([A(.05,1.1,.25),A(.55*sg+.05,1.12,.05)],.1*k,db,{segs:10});
+  s.tube([A(-.68,1.55,-.05),A(-.62,.75,.02)],.14*k,db,{segs:10});s.tube([A(-.6,-.05,-.15),A(-.6,-.9,-.15)],.15*k,db,{segs:10});
+  for(const y of[.48,.66])s.tube([A(1.0,y,-.3),A(.72,y,-.28)],.07*k,dk,{segs:8});return s}
+window.PhysicaBio={BC,hash,capsule,chromosome,helix,cell,leaf,petal,soil,critter,heart};
 })();

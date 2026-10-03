@@ -74,12 +74,13 @@ function renderObjects(){
 }
 function field(host,key,label,value,options={}){
   const wrap=document.createElement('label');wrap.className='sb-field';wrap.textContent=label;
-  const input=document.createElement('input');input.type=options.type||'number';input.id='sb-prop-'+key;input.dataset.testid='object-'+key;
+  const input=document.createElement('input');input.type=options.type||(simple?'range':'number');input.id='sb-prop-'+key;input.dataset.testid='object-'+key;
   if(input.type==='checkbox'){wrap.className='sb-check';input.checked=value;}else input.value=value;
-  if(input.type==='number'){input.min=options.min;input.max=options.max;input.step=options.step??.1;}
+  if(input.type==='number'||input.type==='range'){input.min=options.min;input.max=options.max;input.step=options.step??.1;}
+  if(input.type==='range'){input.value=value;const out=document.createElement('b');out.className='sb-val';out.textContent=' '+value;wrap.firstChild.after(out);input.oninput=()=>{out.textContent=' '+input.value};}
   if(input.type==='text')input.maxLength=40;
-  input.onchange=()=>{if(input.type==='number'&&(input.value===''||!input.checkValidity()||!Number.isFinite(input.valueAsNumber))){status(`Enter ${label.toLowerCase()} between ${options.min} and ${options.max}.`);renderInspector();return;}
-    checkpoint();setRunning(false);const v=input.type==='checkbox'?input.checked:input.type==='number'?input.valueAsNumber:input.value;editProperty(key,v);renderInspector();renderObjects();status('Property updated. Press Play when ready.');};
+  input.onchange=()=>{if((input.type==='number'||input.type==='range')&&(input.value===''||!input.checkValidity()||!Number.isFinite(input.valueAsNumber))){status(`Enter ${label.toLowerCase()} between ${options.min} and ${options.max}.`);renderInspector();return;}
+    checkpoint();setRunning(false);const v=input.type==='checkbox'?input.checked:(input.type==='number'||input.type==='range')?Number(input.value):input.value;editProperty(key,v);renderInspector();renderObjects();status('Property updated. Press Play when ready.');};
   wrap.append(input);host.append(wrap);
 }
 function renderInspector(){
@@ -92,6 +93,10 @@ function renderInspector(){
     for(const side of ['A','B'])if(!s['body'+side]){F('anchor'+side+'x',`Anchor ${side} x (m)`,s['point'+side].x/100,{min:-50,max:50});F('anchor'+side+'y',`Anchor ${side} y (m)`,s['point'+side].y/100,{min:-50,max:50});}return;
   }
   const b=selected,m=b.plugin.studio,v=Body.getVelocity(b);
+  if(simple){
+    if(m.t==='ball'||m.t==='magnet')F('r','Size: radius (cm)',m.r,{min:5,max:100,step:1});else F('w','Size: length (cm)',m.w,{min:10,max:1000,step:1});
+    if(!m.fixed)F('m','Mass (kg)',m.mass,{min:.1,max:100,step:.1});F('bounce','Bounciness (0–1)',b.restitution,{min:0,max:1,step:.05});F('fixed','Pin in place',m.fixed,{type:'checkbox'});
+    const info=document.createElement('p');info.className='sb-tip';info.textContent='Drag it to move or throw. Tap a material above to change what it is made of. Advanced tools show every property.';host.append(info);return}
   F('label','Object name',m.label,{type:'text'});F('color','Object colour',m.color,{type:'color'});
   F('x','Position x (m)',round(b.position.x/100),{min:-50,max:50});F('y','Position y (m)',round(b.position.y/100),{min:-50,max:50});
   F('m','Mass (kg)',m.mass,{min:.1,max:100,step:.1});
@@ -131,7 +136,7 @@ function syncWorld(){
 function syncMaterialNote(){const b=selectedIsBody()&&!selected.plugin.studio.fixed?selected:null;$('sb-mat-note').textContent=b?'(tap to apply to '+b.plugin.studio.label+')':'(for new balls & boxes)';
   for(const c of $('sb-materials').querySelectorAll('[data-mat]')){const on=c.dataset.mat===material;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));}}
 function setMode(isSimple,save=true){simple=isSimple;$('sandbox-view').classList.toggle('sb-simple',simple);$('sb-mode').setAttribute('aria-pressed',String(!simple));$('sb-mode').textContent=simple?'⚙ Advanced tools':'✓ Simple mode';
-  if(simple&&['spring','rope','magnet','pan'].includes(tool))setTool('move');if(save)try{localStorage.setItem(MODE_KEY,simple?'simple':'advanced');}catch{}}
+  if(simple&&['spring','rope','magnet','pan'].includes(tool))setTool('move');if(simple&&canvas)fit();if(canvas)renderInspector();if(save)try{localStorage.setItem(MODE_KEY,simple?'simple':'advanced');}catch{}}
 function setTool(t){if(simple&&['spring','rope','magnet','pan'].includes(t))t='move';tool=t;linkPick=null;build=null;for(const b of $('sb-palette').querySelectorAll('button')){const on=b.dataset.tool===t;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));}
   canvas.style.cursor=t==='move'?'grab':t==='pan'?'move':'crosshair';$('sb-hint').textContent=t==='sling'?'Press on the stage, pull backwards like a catapult and let go. The dotted curve predicts the flight; a longer pull launches faster.':['spring','rope'].includes(t)?'Tap two objects, or an object and empty space to create a fixed anchor. Select a connection to edit it.':t==='wall'||t==='ramp'?'Drag to draw an obstacle, or tap for a default one. Select it to rotate or resize.':t==='pan'?'Drag to pan. Use Fit world to return to the whole scene.':'Tap to add or select. Drag to move and throw; pause for precise building.';
 }

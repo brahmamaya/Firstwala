@@ -113,3 +113,6 @@ body.no-scroll{overflow:hidden}
 .subject-tabs{display:flex;gap:6px;margin-top:16px}.subject-tabs+.grade-tabs{margin-top:10px}
 .subject-tab{flex:1;border:1px solid var(--line2);border-radius:9px;background:var(--panel2);color:var(--muted);font-size:14px;font-weight:750;padding:10px 6px;transition:background .2s,color .2s,border-color .2s}
 .subject-tab:hover{border-color:var(--mint);color:var(--text)}.subject-tab.active{background:var(--active);border-color:var(--active-line);color:var(--mint)}
+
+/* Bigger stage on laptop screens: the experiment is the hero, so give it the width. */
+@media(min-width:991px) and (max-width:1500px){.layout{grid-template-columns:248px minmax(0,1fr)}.main{padding-left:22px;padding-right:22px}.lab-layout{grid-template-columns:minmax(0,1fr) 288px;gap:14px}.lab-layout.rail-collapsed{grid-template-columns:minmax(0,1fr) 54px}.sidebar-top{padding-left:14px;padding-right:14px}.chapter-list{padding-left:6px;padding-right:6px}}

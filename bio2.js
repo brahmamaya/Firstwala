@@ -26,7 +26,16 @@ add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-explorer',title:'3D cell 
   for(let i=0;i<4;i++){const q=[(pl?-.5:.6)+(i%2)*.7,-.6+Math.floor(i/2)*.9,(i%2?.6:-.5)];s.mesh(q,[.32,.13,.15],g('mito',BC.mito),{rot:[0,i,.3],rings:8,segs:12})}
   for(let k=0;k<4;k++){const pts=Array.from({length:14},(_,i)=>[nx+.7+i*.06,.6-k*.14+.05*Math.sin(i*1.3+k),-.6+.08*k]);s.tube(pts,.035,g('er',BC.er),{segs:6})}
   for(let k=0;k<4;k++)s.mesh([pl?-.3:.2,-1+k*.12+(pl?.2:0),.75],[.4-k*.04,.035,.18],g('golgi',BC.golgi),{rings:4,segs:12,shape:(u,v)=>1+.15*Math.cos(v)});
-  for(let i=0;i<40;i++)s.ball([(hash(i)-.5)*3,(hash(i+40)-.5)*2,(hash(i+80)-.5)*2].map((v,k)=>v*(pl?.85:.8)),.035,g('ribo',BC.ribosome),{flat:true});s.render();
+  for(let i=0;i<40;i++)s.ball([(hash(i)-.5)*3,(hash(i+40)-.5)*2,(hash(i+80)-.5)*2].map((v,k)=>v*(pl?.85:.8)),.035,g('ribo',BC.ribosome),{flat:true});
+  for(let i=0;i<18;i++){const a=TAU*i/18,b=(i%3-1)*.6;s.ball([nx+.63*Math.cos(b)*Math.cos(a),.1+.63*Math.sin(b),.63*Math.cos(b)*Math.sin(a)],.03,'#3b2a6b',{flat:true})}
+  if(!pl)s.mesh([0,0,0],[2.05,1.47,1.47],BC.cytoplasm,{alpha:.1,shape:(u,v)=>1+.05*Math.sin(3*v+u*2)});
+  const L=(k,q,txt)=>{if((k==='chloro'||k==='wall')&&!pl||k==='centro'&&pl||k==='lyso'&&pl)return;s.part(q,txt,hi(k)?'#ffe066':'#dbe7f0',hi(k)?13:11,[nx*.4,0,0])};
+  L('nucleus',[nx-.3,.6,.2],'nucleus (nuclear envelope with pores)');s.part([nx+.15,.25,.35],'nucleolus','#c9b6ff',11,[nx,-.4,0],50);
+  L('mito',[(pl?-.5:.6),-.6,-.5],'mitochondrion');L('er',[nx+1.1,.62,-.6],'endoplasmic reticulum');L('golgi',[pl?-.3:.2,-.64+(pl?.2:0),.75],'Golgi apparatus');
+  {const rp=[(hash(3)-.5)*3,(hash(43)-.5)*2,(hash(83)-.5)*2].map(v=>v*(pl?.85:.8));L('ribo',rp,'ribosomes')}
+  if(pl){L('wall',[2.3,1.45,1.0],'cell wall (cellulose)');s.part([0,1.32,.3],'plasma membrane','#f2a7b5',11,[0,0,0]);L('vacuole',[1.3,.55,.4],'central vacuole (tonoplast)');L('chloro',[1.35,0,.76],'chloroplast')}
+  else{s.part([0,1.55,.3],'plasma membrane','#f2a7b5',11,[0,0,0]);L('centro',[.9,1.0,.4],'centrosome (2 centrioles)');L('lyso',[-1+hash(0)*.6,-.6+hash(2)*.4,.8*hash(5)],'lysosome')}
+  s.render();
   tag(c,'yellow: highlighted organelle',44,98,'#ffe066',13)},
  assumption:'Organelles enlarged and simplified for visibility; numbers and positions vary greatly between cells.'});
 
@@ -64,7 +73,7 @@ add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-sizes',title:'How big are
  metrics:p=>[N('Mycoplasma',.3,'μm',1),N('Bacteria','3–5 μm'),N('Human RBC',7,'μm',1),N('RBC ÷ Mycoplasma',7/.3,'×',0),N('Largest isolated cell','Ostrich egg')],
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.25}),su=6/p.zoom,gap=.35,W=.3*su+4*su+7*su+2*gap,x0=-W/2;s.ball([x0+.15*su,0,0],Math.max(.02,.15*su),'#82c91e');const bx=x0+.3*su+gap;capsule(s,[bx+.5*su,0,0],[bx+3.5*su,0,0],.5*su,'#94d82d');
   s.mesh([bx+4*su+gap+3.5*su,0,0],[3.5*su,.9*su,3.5*su],'#e03131',{rot:[PI/2,0,0],shape:(u,v)=>1-.25*Math.exp(-(u*u)*4),rings:14,segs:24});s.render();
-  const pxPerUm=su*56*1.15*P3.cam.zoom;c.save();c.strokeStyle='#e9f6ff';c.lineWidth=2;c.beginPath();c.moveTo(80,400);c.lineTo(80+pxPerUm,400);c.stroke();c.restore();tag(c,'1 μm',80+pxPerUm/2,388,C.white,12,'center');tag(c,'left: Mycoplasma · centre: bacterium · right: RBC',44,98,C.muted,13)},
+  const pxPerUm=Math.hypot(s.P([su,0,0])[0]-s.P([0,0,0])[0],s.P([su,0,0])[1]-s.P([0,0,0])[1]);c.save();c.strokeStyle='#e9f6ff';c.lineWidth=2;c.beginPath();c.moveTo(80,400);c.lineTo(80+pxPerUm,400);c.stroke();c.restore();tag(c,'1 μm',80+pxPerUm/2,388,C.white,12,'center');tag(c,'left: Mycoplasma · centre: bacterium · right: RBC',44,98,C.muted,13)},
  assumption:'Sizes from NCERT Chapter 8; the RBC is drawn as a flattened disc and the bacterium as a 4 μm rod.'});
 
 /* ---------- Chapter 9: Biomolecules ---------- */
@@ -77,7 +86,7 @@ add({...ch(9,'Biomolecules',U3),id:'bio-enzyme-kinetics',title:'Enzyme action an
  metrics:p=>{const Ka=p.Km*(1+p.I/2),v=p.Vmax*p.S/(Ka+p.S);return[N('Reaction rate v',v,'μmol/min',1),N('Fraction of V_max',v/p.Vmax*100,'%',0),N('Apparent K_m',Ka,'mM',1),N('Example','Malonate inhibits succinic dehydrogenase')]},
  draw:(c,p,t)=>{const Ka=p.Km*(1+p.I/2),v=p.Vmax*p.S/(Ka+p.S),s=P3.scene(c,{scale:58,cx:230}),ph=cycle(t*v/p.Vmax*1.2+.1,1);s.mesh([0,0,0],[1.1,.9,.9],'#748ffc',{shape:(u,v2)=>1-.45*Math.exp(-((u-1.1)**2*3+(v2-PI/2)**2*2))});
   const occ=p.I>0&&hash(Math.floor(t))<p.I/(p.I+p.S+1e-9);s.ball([0,.65-(occ?0:.25*Math.min(1,ph*3)),.2],.22,occ?'#fa5252':'#ffd43b');if(!occ&&ph>.5){s.ball([.6+ph,.9+ph*.6,.2],.15,'#69db7c');s.ball([-.6-ph,.9+ph*.6,.2],.15,'#69db7c')}
-  for(let i=0;i<Math.min(24,Math.round(p.S/2));i++)s.ball([-2.2+hash(i)*4.4,-1.2+hash(i+5)*2.6,-1+hash(i+9)*.6],.12,'#ffd43b');for(let i=0;i<Math.round(p.I/2);i++)s.ball([-2.2+hash(i+50)*4.4,-1.2+hash(i+55)*2.6,-1+hash(i+59)*.6],.12,'#fa5252');s.render();
+  for(let i=0;i<Math.min(24,Math.round(p.S/2));i++)s.ball([-2.2+hash(i)*4.4,-1.2+hash(i+5)*2.6,-1+hash(i+9)*.6],.12,'#ffd43b');for(let i=0;i<Math.round(p.I/2);i++)s.ball([-2.2+hash(i+50)*4.4,-1.2+hash(i+55)*2.6,-1+hash(i+59)*.6],.12,'#fa5252');s.part([-.8,-.5,.6],'enzyme','#91a7ff',12,[0,.6,0]);s.callout([0,.62,.5],'active site','#ffe066',-70,-55);s.callout([0,.65-(occ?0:.25*Math.min(1,ph*3)),.42],occ?'inhibitor blocks the site':'substrate binds (E–S complex)',occ?'#ff8787':'#ffd43b',70,-60);s.render();
   chart(c,420,96,236,170,{title:'v vs [S]',xl:'[S] (mM)',xmin:0,xmax:50,ymin:0,ymax:p.Vmax*1.05,series:[{fn:S=>p.Vmax*S/(p.Km+S),col:'#8ca6b9',dash:[4,4]},{fn:S=>p.Vmax*S/(Ka+S),col:C.gold}],marker:[p.S,v]});tag(c,'yellow: substrate · red: inhibitor · green: products',44,98,C.muted,13)},
  assumption:'Michaelis–Menten kinetics with K_i = 2 mM; dashed curve = without inhibitor.'});
 
@@ -89,7 +98,7 @@ add({...ch(9,'Biomolecules',U3),id:'bio-enzyme-conditions',title:'Temperature an
  tryText:'Find the pH where pepsin works best and compare it with trypsin.',
  controls:[S('enz','Enzyme','amylase',Object.entries(ENZ).map(([k,v])=>[k,v[1]])),R('T','Temperature',0,70,1,37,'°C'),R('pH','pH',1,12,.1,6.8,'',1)],
  metrics:p=>{const a=enzAct(p);return[N('Relative activity',a*100,'%',0),N('Optimum pH',ENZ[p.enz][0],'',1),N('Optimum temperature',37,'°C',0),N('State',p.T>50?'Denatured (irreversible)':p.T<10?'Inactive (reversible)':'Active')]},
- draw:(c,p,t)=>{const a=enzAct(p),s=P3.scene(c,{scale:60,cx:220}),wob=p.T>50?.35:0;s.mesh([0,0,0],[1.1,.9,.9],'#748ffc',{shape:(u,v)=>1+wob*Math.sin(5*v+t*3)*Math.cos(3*u)-(p.T<=50?.45*Math.exp(-((u-1.1)**2*3+(v-PI/2)**2*2)):0)});for(let i=0;i<Math.round(a*8);i++){const q=cycle(t*.6+i/8,1);s.ball([1.2+q*1.4,.4+.3*Math.sin(i),.2],.12,'#69db7c')}s.render();
+ draw:(c,p,t)=>{const a=enzAct(p),s=P3.scene(c,{scale:60,cx:220}),wob=p.T>50?.35:0;s.mesh([0,0,0],[1.1,.9,.9],'#748ffc',{shape:(u,v)=>1+wob*Math.sin(5*v+t*3)*Math.cos(3*u)-(p.T<=50?.45*Math.exp(-((u-1.1)**2*3+(v-PI/2)**2*2)):0)});for(let i=0;i<Math.round(a*8);i++){const q=cycle(t*.6+i/8,1);s.ball([1.2+q*1.4,.4+.3*Math.sin(i),.2],.12,'#69db7c')}s.part([-.7,-.6,.5],p.T>50?'enzyme denatured (shape lost)':p.T<10?'enzyme inactive (cold)':'enzyme (protein)','#91a7ff',12,[0,0,0]);if(p.T<=50)s.callout([0,.62,.5],'active site','#ffe066',-60,-55);if(a>.05)s.callout([1.9,.45,.2],'products formed','#69db7c',40,-50);s.render();
   chart(c,420,96,236,80,{title:'Activity vs temperature',xmin:0,xmax:70,ymin:0,ymax:1.05,series:[{fn:T=>enzAct({...p,T}),col:C.gold}],marker:[p.T,a]});chart(c,420,186,236,80,{title:'Activity vs pH',xmin:1,xmax:12,ymin:0,ymax:1.05,series:[{fn:x=>enzAct({...p,pH:x}),col:C.mint}],marker:[p.pH,a]})},
  assumption:'Bell-shaped teaching curves: temperature optimum 37 °C with denaturation above ~50 °C; pH optima are typical textbook values.'});
 function enzAct(p){const T=p.T,tf=T<=37?Math.exp(-(((T-37)/18)**2)):Math.exp(-(((T-37)/9)**2)),pf=Math.exp(-(((p.pH-ENZ[p.enz][0])/1.4)**2));return tf*pf}
@@ -103,9 +112,9 @@ add({...ch(9,'Biomolecules',U3),id:'bio-protein-structure',title:'Levels of prot
  controls:[S('lvl','Structure level','secondary',[['primary','Primary'],['secondary','Secondary (α-helix)'],['tertiary','Tertiary'],['quaternary','Quaternary']])],
  metrics:p=>PLEV[p.lvl].map((v,i)=>N(['What it is','Held by / example','Note'][i],v)),
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:t*.2}),cols=['#ff6b6b','#ffd43b','#69db7c','#4dabf7','#9775fa','#f783ac'];
-  if(p.lvl==='primary'){for(let i=0;i<20;i++){const x=-3+i*.32;s.ball([x,.2*Math.sin(i*.8),0],.14,cols[i%6]);if(i)s.seg([x-.32,.2*Math.sin((i-1)*.8),0],[x,.2*Math.sin(i*.8),0],'#dee2e6',2)}s.label([-3,.5,0],'N',C.white,14);s.label([3.1,.5,0],'C',C.white,14)}
-  else if(p.lvl==='secondary'){const pts=Array.from({length:120},(_,i)=>[-2.6+i*.045,.45*Math.cos(i*.42),.45*Math.sin(i*.42)]);s.tube(pts,.1,'#ff8787',{segs:8});for(let i=0;i<120;i+=6)s.ball(pts[i],.07,cols[(i/6)%6],{flat:true})}
-  else{const blob=(o,col,seed)=>{const pts=[];for(let i=0;i<160;i++){const a=i*.21+seed,b=i*.083+seed*2;pts.push(V.add(o,[.75*Math.sin(b)*Math.cos(a),.75*Math.cos(b),.75*Math.sin(b)*Math.sin(a)]))}s.tube(pts,.09,col,{segs:6})};if(p.lvl==='tertiary')blob([0,0,0],'#ff8787',0);else{blob([-.8,.8,0],'#ff8787',0);blob([.8,.8,0],'#ff8787',1);blob([-.8,-.8,0],'#74c0fc',2);blob([.8,-.8,0],'#74c0fc',3);for(const q of[[-.8,.8,.5],[.8,.8,.5],[-.8,-.8,.5],[.8,-.8,.5]])s.ball(q,.12,'#e03131',{glow:true,lift:2});s.label([-2,1.8,0],'α',C.red,15);s.label([-2,-1.8,0],'β',C.blue,15)}}s.render()},
+  if(p.lvl==='primary'){for(let i=0;i<20;i++){const x=-3+i*.32;s.ball([x,.2*Math.sin(i*.8),0],.14,cols[i%6]);if(i)s.seg([x-.32,.2*Math.sin((i-1)*.8),0],[x,.2*Math.sin(i*.8),0],'#dee2e6',2)}s.callout([-3,0,0],'N-terminal (–NH₂)',C.white,-10,-55);s.callout([3.08,.2*Math.sin(19*.8),0],'C-terminal (–COOH)',C.white,-10,55);s.callout([-1.24,.2*Math.sin(4*.8)+.07,0],'peptide bond','#dee2e6',30,-60);s.callout([-.4,.2*Math.sin(8*.8),0],'amino acid','#4dabf7',40,55)}
+  else if(p.lvl==='secondary'){const pts=Array.from({length:120},(_,i)=>[-2.6+i*.045,.45*Math.cos(i*.42),.45*Math.sin(i*.42)]);s.tube(pts,.1,'#ff8787',{segs:8});for(let i=0;i<120;i+=6)s.ball(pts[i],.07,cols[(i/6)%6],{flat:true});s.callout(pts[30],'α-helix (right-handed)','#ff8787',40,-60);s.callout(pts[70],'H-bonds hold each turn','#dee2e6',40,60)}
+  else{const blob=(o,col,seed)=>{const pts=[];for(let i=0;i<160;i++){const a=i*.21+seed,b=i*.083+seed*2;pts.push(V.add(o,[.75*Math.sin(b)*Math.cos(a),.75*Math.cos(b),.75*Math.sin(b)*Math.sin(a)]))}s.tube(pts,.09,col,{segs:6})};if(p.lvl==='tertiary'){blob([0,0,0],'#ff8787',0);s.callout([.7,.2,.2],'3D globular fold (tertiary)','#ff8787',50,-60)}else{blob([-.8,.8,0],'#ff8787',0);blob([.8,.8,0],'#ff8787',1);blob([-.8,-.8,0],'#74c0fc',2);blob([.8,-.8,0],'#74c0fc',3);for(const q of[[-.8,.8,.5],[.8,.8,.5],[-.8,-.8,.5],[.8,-.8,.5]])s.ball(q,.12,'#e03131',{glow:true,lift:2});s.callout([-1.5,1.2,0],'α subunits (×2)','#ff8787',-30,-40);s.callout([-1.5,-1.2,0],'β subunits (×2)','#74c0fc',-30,40);s.callout([.8,.8,.5],'haem group (Fe²⁺)','#e03131',60,-50)}}s.render()},
  assumption:'Schematic backbone; side chains are shown as coloured beads. Red discs in haemoglobin mark the haem groups.'});
 
 /* ---------- Chapter 10: Cell Cycle and Cell Division ---------- */
@@ -121,9 +130,17 @@ add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-mitosis',title:'Mitosis
   s.mesh([0,0,0],[2.4+.5*split,1.5,1.5],BC.membrane,{alpha:.18,shape:(u,v)=>1-.6*split*Math.exp(-((Math.cos(v)*Math.cos(u))**2)*12)});
   if(k===0){s.mesh([0,0,0],.9,BC.nucleus,{alpha:.4});for(let i=0;i<8;i++)s.path(Array.from({length:12},(_,j)=>[(hash(i)-.5)*1.2+.2*Math.sin(j+i),(hash(i+3)-.5)*1.2+.2*Math.cos(j*1.3),(hash(i+6)-.5)*.8]),'#ff8787',1.5)}
   const cols=['#ff6b6b','#4dabf7','#ffd43b','#69db7c','#9775fa','#f783ac','#ffa94d','#38d9a9'];
-  for(let i=0;i<p.n;i++){const L=.35+.12*(i%(p.n/2)),col=cols[i%cols.length],home=[(hash(i)-.5)*1.1,(hash(i+20)-.5)*1.1,(hash(i+40)-.5)*.8],plate=[0,-1+2*(i+.5)/p.n,0];
-   if(k===1)chromosome(s,V.add(home,[0,0,0]),L*(.4+.6*f2),col,hash(i)*PI);else if(k===2)chromosome(s,V.add(V.mul(home,1-f2),V.mul(plate,f2)),L,col,PI/2);
-   else if(k>=3){const d=k===3?f2*1.6:1.6+(k>=5?.6*split:0);for(const sg of[-1,1])chromosome(s,V.add(plate,[sg*d,0,0]),L,col,PI/2,false)}}
+  const CO={r:.1};for(let i=0;i<p.n;i++){const L=(.35+.12*(i%(p.n/2)))*1.35,col=cols[i%cols.length],home=[(hash(i)-.5)*1.1,(hash(i+20)-.5)*1.1,(hash(i+40)-.5)*.8],plate=[0,-1.1+2.2*(i+.5)/p.n,0];
+   if(k===1)chromosome(s,V.add(home,[0,0,0]),L*(.4+.6*f2),col,hash(i)*PI,true,CO);else if(k===2)chromosome(s,V.add(V.mul(home,1-f2),V.mul(plate,f2)),L,col,PI/2,true,CO);
+   else if(k>=3){const d=k===3?f2*1.6:1.6+(k>=5?.6*split:0);for(const sg of[-1,1])chromosome(s,V.add(plate,[sg*d,0,0]),L,col,PI/2,false,CO)}}
+  if(k>=1&&k<=3)for(const sg of[-1,1]){s.cyl([sg*2.15,0,0],[1,0,0],.05,.2,'#ced4da');s.cyl([sg*2.15,0,0],[0,1,0],.05,.2,'#ced4da')}
+  const LB=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);
+  if(k===0){LB([.5,.6,.5],'nucleus: chromatin (DNA already doubled)','#c9b6ff',60,-60);LB([2.3,.4,0],'cell membrane','#f2a7b5',30,50)}
+  if(k===1){const h=[(hash(0)-.5)*1.1,(hash(20)-.5)*1.1,(hash(40)-.5)*.8];LB(h,'chromosome condenses: 2 sister chromatids','#ff8787',-60,-60);LB([2.15,0,0],'centriole (spindle pole)','#ced4da',30,-60)}
+  if(k===2){LB([0,-1.1+2.2*.5/p.n,0],'metaphase plate','#e9f6ff',-80,60);LB([1.1,.5,0],'spindle fibres','#adb5bd',60,-60);LB([0,-1.1+2.2*(p.n-.5)/p.n,0],'centromere','#e9f6ff',60,-40)}
+  if(k===3)LB([1.6*f2,-1.1+2.2*.5/p.n,0],'sister chromatids pulled to poles','#ffd43b',60,60);
+  if(k===4)LB([1.6,.75,0],'nuclear envelope re-forms','#c9b6ff',60,-50);
+  if(k===5)LB([0,1.2*(1-.5*split),.6],'cleavage furrow (cytokinesis)','#f2a7b5',60,-50);
   if(k>=1&&k<=3)for(let i=0;i<p.n;i++){const y=-1+2*(i+.5)/p.n;s.seg([-2.1,0,0],[k===3?-1.6*f2:0,y,0],'#adb5bd55',1);s.seg([2.1,0,0],[k===3?1.6*f2:0,y,0],'#adb5bd55',1)}
   if(k>=4)for(const sg of[-1,1])s.mesh([sg*(1.6+.6*split),0,0],.75,BC.nucleus,{alpha:.25*Math.min(1,f2*2+(k>4?1:0))});s.render();tag(c,MIT[k][0],44,98,C.gold,16)},
  assumption:'Animal cell, small chromosome number for clarity; time compressed — a human cell spends only about 1 h of a 24 h cycle in M phase.'});
@@ -139,8 +156,8 @@ add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-meiosis',title:'Meiosis
  draw:(c,p,t)=>{const T=cycle(t*p.speed,18),k=Math.floor(T/3),f2=(T%3)/3,s=P3.scene(c,{scale:52});const pairs=[[.45,'#ff6b6b','#4dabf7'],[.3,'#ffd43b','#69db7c']];
   if(k<=3){const sp=k===3?f2:0;s.mesh([0,0,0],[2.6+sp,1.5,1.5],BC.membrane,{alpha:.16,shape:(u,v)=>1-.6*sp*Math.exp(-((Math.cos(v)*Math.cos(u))**2)*12)});
    pairs.forEach(([L,c1,c2],i)=>{const y=i?-.5:.5;let x1,x2;if(k===0){x1=-.18*(1-f2)-.1;x2=.18*(1-f2)+.1}else if(k===1){x1=-.12;x2=.12}else{const d=k===2?f2*1.6:1.6+sp*.5;x1=-.12-d;x2=.12+d}
-    const cross=k>=1||f2>.6;chromosome(s,[x1,y,0],L,c1,0);chromosome(s,[x2,y,0],L,c2,0);if(cross){s.tube([[x1+.07,y-L*.45,0],[x1+.07,y-L*.15,0]],.075,c2,{segs:8});s.tube([[x2-.07,y-L*.45,0],[x2-.07,y-L*.15,0]],.075,c1,{segs:8})}})}
-  else{const cells=[[-1.6,.9],[-1.6,-.9],[1.6,.9],[1.6,-.9]];cells.forEach(([x,y],i)=>{const g=k===4?f2:1;s.mesh([x,y*g,0],.75,BC.membrane,{alpha:.18});pairs.forEach(([L,c1,c2],j)=>{chromosome(s,[x+(j?.25:-.25),y*g,0],L*.8,(i+j)%2?c1:c2,0,false)})})}s.render();tag(c,MEI[k][0],44,98,C.gold,16)},
+    L*=1.4;const cross=k>=1||f2>.6;chromosome(s,[x1,y,0],L,c1,0,true,{r:.1});chromosome(s,[x2,y,0],L,c2,0,true,{r:.1});if(i===0){if(k<=1)s.callout([x2+.1,y+L*.4,0],'homologous pair (bivalent, 4 chromatids)','#e9f6ff',60,-55);if(cross&&k<=1)s.callout([x1+.07,y-L*.3,0],'chiasma: crossing over swaps segments','#ffd43b',-70,60);if(k===2)s.callout([x2,y,0],'homologues separate (2n → n)','#e9f6ff',60,-55)}if(cross){s.tube([[x1+.07,y-L*.45,0],[x1+.07,y-L*.15,0]],.075,c2,{segs:8});s.tube([[x2-.07,y-L*.45,0],[x2-.07,y-L*.15,0]],.075,c1,{segs:8})}})}
+  else{const cells=[[-1.6,.9],[-1.6,-.9],[1.6,.9],[1.6,-.9]];cells.forEach(([x,y],i)=>{const g=k===4?f2:1;s.mesh([x,y*g,0],.75,BC.membrane,{alpha:.18});pairs.forEach(([L,c1,c2],j)=>{chromosome(s,[x+(j?.3:-.3),y*g,0],L*1.1,(i+j)%2?c1:c2,0,false,{r:.1})})});s.callout([1.6+.75,.9,0],'4 haploid (n) cells, each different','#f2a7b5',20,-50)}s.render();tag(c,MEI[k][0],44,98,C.gold,16)},
  assumption:'Two homologous pairs shown (2n = 4); a single crossover drawn on each pair.'});
 
 add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-cell-cycle',title:'The cell cycle clock',
@@ -168,7 +185,7 @@ add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-limiting-factors',ti
  draw:(c,p,t)=>{const r=photo(p),s=P3.scene(c,{scale:56,cx:220,cy:280});s.cyl([0,-.3,0],[0,1,0],1.1,2.6,'#ffffff',{alpha:.12,caps:false});s.cyl([0,-.55,0],[0,1,0],1.05,2,'#4dabf7',{alpha:.25});
   for(let i=0;i<5;i++){const pts=Array.from({length:10},(_,j)=>[(i-2)*.15+.1*Math.sin(j+i),-1.5+j*.17,.1*Math.cos(i)]);s.tube(pts,.03,'#2b8a3e',{segs:5});for(let j=2;j<10;j+=2)for(const sg of[-1,1])leaf(s,pts[j],[sg,.4,.2*sg],.22,.05,'#40c057')}
   const n=Math.round(r.rate*14);for(let i=0;i<n;i++){const q=cycle(t*(.3+r.rate)+i/n,1);s.ball([(hash(i)-.5)*.6,0+q*1.3,(hash(i+4)-.5)*.4],.05+.02*hash(i),'#e7f5ff',{alpha:.7})}
-  const lx=-2.6+(1-p.L/100)*.8;s.ball([lx,.6,0],.3,p.L>0?'#fff3bf':'#495057',{glow:p.L>0,flat:true});s.cyl([lx-.35,.6,0],[1,0,0],.32,.3,'#868e96');s.render();
+  const lx=-2.6+(1-p.L/100)*.8;s.ball([lx,.6,0],.3,p.L>0?'#fff3bf':'#495057',{glow:p.L>0,flat:true});s.cyl([lx-.35,.6,0],[1,0,0],.32,.3,'#868e96');s.callout([lx,.9,0],`lamp: light ${p.L}%`,'#fff3bf',-20,-55);s.callout([.3,-.9,.1],'Hydrilla (water plant)','#69db7c',70,50);if(n>0)s.callout([0,.9,0],'O₂ bubbles (rate of photosynthesis)','#e7f5ff',50,-60);s.callout([1.05,-1.2,0],'water with dissolved CO₂','#74c0fc',60,40);s.render();
   chart(c,420,96,236,170,{title:'Rate vs light (gold) at current CO₂',xl:'light %',xmin:0,xmax:100,ymin:0,ymax:1.05,series:[{fn:L=>photo({...p,L}).rate,col:C.gold},{fn:L=>photo({...p,L,co2:.06}).rate,col:'#8ca6b9',dash:[4,4]}],marker:[p.L,r.rate]})},
  assumption:'Blackman-type model: rate = min(light term, CO₂ term) × temperature factor (C₃ optimum ~25–30 °C). Dashed curve: 0.06 % CO₂.'});
 function photo(p){const lt=p.L/60,ct=p.co2/.05,tf=Math.exp(-(((p.T-28)/11)**2)),rate=Math.min(1,lt,ct)*tf;const lim=lt<ct&&lt<1?'Light':ct<=lt&&ct<1?'CO₂':tf<.9?'Temperature':'None (saturated)';return{rate,lim}}
@@ -238,7 +255,7 @@ add({...ch(12,'Respiration in Plants',U4),id:'bio-respiratory-quotient',title:'R
  controls:[S('sub','Respiratory substrate','carb',[['carb','Carbohydrate (glucose)'],['fat','Fat (tripalmitin)'],['protein','Protein'],['acid','Organic acid (malic)']])],
  metrics:p=>{const d=RQS[p.sub],rq=d[1]/d[2];return[N('RQ',rq,'',2),N('Equation',d[0]),N('Interpretation',rq>1.01?'More CO₂ than O₂':rq<.99?'More O₂ used than CO₂ given out':'Equal volumes')]},
  draw:(c,p,t)=>{const d=RQS[p.sub],rq=d[1]/d[2],s=P3.scene(c,{scale:56,cy:290,cx:250});s.lathe([-1,-1.2,0],[[.05,0],[.8,.1],[.85,.8],[.6,1.2],[.25,1.5],[.25,1.9]],'#e9f6ff',{alpha:.18});for(let i=0;i<12;i++)s.mesh([-1+(hash(i)-.5)*1,-1.0+hash(i+3)*.4,(hash(i+6)-.5)*.8],[.12,.08,.09],'#d9a441',{rot:[0,i,.5],rings:6,segs:10});
-  s.tube([[-1,.7,0],[-1,1.2,0],[1,1.2,0],[1,-.6,0],[1.6,-.6,0],[1.6,1,0]],.05,'#e9f6ff',{alpha:.3});const lvl=clamp((1-rq)*1.2,-.5,.5)*Math.min(1,cycle(t,8)/4);s.tube([[1,-.6,0],[1.6,-.6,0]],.045,'#4dabf7');s.tube([[1,-.6,0],[1,-.2+lvl,0]],.045,'#4dabf7');s.tube([[1.6,-.6,0],[1.6,-.2-lvl,0]],.045,'#4dabf7');s.label([-1,-1.5,0],'germinating seeds',C.muted,12);s.render();tag(c,`RQ = ${f(rq,2)}`,44,98,C.gold,17)},
+  s.tube([[-1,.7,0],[-1,1.2,0],[1,1.2,0],[1,-.6,0],[1.6,-.6,0],[1.6,1,0]],.05,'#e9f6ff',{alpha:.3});const lvl=clamp((1-rq)*1.2,-.5,.5)*Math.min(1,cycle(t,8)/4);s.tube([[1,-.6,0],[1.6,-.6,0]],.045,'#4dabf7');s.tube([[1,-.6,0],[1,-.2+lvl,0]],.045,'#4dabf7');s.tube([[1.6,-.6,0],[1.6,-.2-lvl,0]],.045,'#4dabf7');s.callout([-1,-.9,.3],'germinating seeds','#d9a441',-50,40);s.callout([-1,1.2,0],'KOH tube absorbs CO₂','#e9f6ff',-50,-50);s.callout([1.3,-.6,0],'manometer: level shows O₂ used − CO₂ given out','#4dabf7',40,50);s.render();tag(c,`RQ = ${f(rq,2)}`,44,98,C.gold,17)},
  assumption:'Ganong’s respirometer idea: the manometer shift reflects the difference between CO₂ released and O₂ taken up (no KOH).'});
 
 add({...ch(12,'Respiration in Plants',U4),id:'bio-electron-transport',title:'Electron transport and ATP synthase',
@@ -262,7 +279,7 @@ add({...ch(13,'Plant Growth and Development',U4),id:'bio-growth-curves',title:'A
  tryText:'Compare the two growth types at the same rate r.',
  controls:[S('type','Growth','geo',[['arith','Arithmetic (root elongation)'],['geo','Geometric → sigmoid (cell number)']]),R('r','Growth rate r',.05,.5,.01,.2,'per day',2),R('day','Day',0,40,1,20,'day')],
  metrics:p=>{const v=growth(p,p.day);return[N(p.type==='arith'?'Length':'Size (relative)',v,p.type==='arith'?'cm':'',2),N('Phase',p.type==='arith'?'Constant rate':p.day<8?'Lag phase':v<.9*20?'Log (exponential) phase':'Stationary phase'),N('Equation',p.type==='arith'?'L = L₀ + rt':'Logistic (sigmoid) curve')]},
- draw:(c,p,t)=>{const v=growth(p,p.day),s=P3.scene(c,{scale:54,cx:220,cy:240});s.box([0,-1.5,0],[3,2.6,2],'#6d4c2f',{alpha:.25});const L=p.type==='arith'?v*.25:v*.12;s.tube([[0,-.2,0],[0,-.2-L,0]],u=>.07*(1-u)+.02,BC.root,{segs:8});critter(s,'plant',[0,-.2,0],.4+.8*(p.type==='arith'?p.day/40:v/20),t);s.render();
+ draw:(c,p,t)=>{const v=growth(p,p.day),s=P3.scene(c,{scale:54,cx:220,cy:240});s.box([0,-1.5,0],[3,2.6,2],'#6d4c2f',{alpha:.25});const L=p.type==='arith'?v*.25:v*.12;s.tube([[0,-.2,0],[0,-.2-L,0]],u=>.07*(1-u)+.02,BC.root,{segs:8});critter(s,'plant',[0,-.2,0],.4+.8*(p.type==='arith'?p.day/40:v/20),t);s.callout([0,-.2-L*.6,0],'root','#c2a26b',50,30);s.callout([0,.1,0],`day ${p.day}`,'#e9f6ff',-60,-40);s.render();
   chart(c,420,96,236,170,{title:'Growth curve',xl:'days',xmin:0,xmax:40,ymin:0,series:[{fn:d=>growth(p,d),col:C.gold}],marker:[p.day,v]})},
  assumption:'Arithmetic: L₀ = 1 cm. Geometric phase modelled with a logistic curve (maximum size 20 relative units).'});
 function growth(p,d){if(p.type==='arith')return 1+p.r*d*5;const K=20,W0=.2;return K/(1+(K/W0-1)*Math.exp(-p.r*d))}
@@ -276,7 +293,7 @@ add({...ch(13,'Plant Growth and Development',U4),id:'bio-phototropism',title:'Ph
  metrics:p=>{const b=bendAng(p);return[N('Bending',Math.abs(b),'°',0),N('Towards',b===0?'—':b>0?'Right':'Left'),N('Auxin on shaded side',p.tip==='open'&&p.ang!==0?'≈ 65%':'≈ 50% (even)'),N('Hormone','Auxin (IAA)')]},
  draw:(c,p,t)=>{const b=rad(bendAng(p)),s=P3.scene(c,{scale:60,cy:300}),L=2.4,pts=[];for(let i=0;i<=12;i++){const k=i/12,a=b*k*k;pts.push([L/12*Array.from({length:i},(_,j)=>Math.sin(b*(j/12)**2)).reduce((x,y)=>x+y,0),-1.2+L/12*Array.from({length:i},(_,j)=>Math.cos(b*(j/12)**2)).reduce((x,y)=>x+y,0),0])}
   s.box([0,-1.45,0],[1.2,.5,1.2],'#6d4c2f');if(p.tip==='cut')pts.pop();s.tube(pts,.11,(u)=>p.tip==='open'?`#${Math.round(150+60*u).toString(16)}e08a`.slice(0,7):'#a9e08a',{segs:10});const top=pts[pts.length-1];if(p.tip==='covered')s.mesh(V.add(top,[0,.05,0]),[.14,.2,.14],'#343a40');
-  const la=rad(p.ang),src=[3*Math.sin(la),.8+2*Math.cos(la)*.5,0];s.ball(src,.3,'#fff3bf',{glow:true,flat:true});for(let i=0;i<5;i++)s.seg(V.add(src,[0,-.3+i*.15,0]),V.add(top,[0,-.6+i*.25,0]),'#fff3bf55',2);for(let i=0;i<8;i++){const q=cycle(t*.5+i/8,1),side=p.ang>=0?-1:1;if(p.tip==='open'&&p.ang!==0)s.ball(V.add(pts[Math.floor(q*11)],[side*.12,0,.1]),.04,'#f783ac',{flat:true})}s.render();tag(c,'pink dots: auxin moving down the shaded side',44,98,C.muted,13)},
+  const la=rad(p.ang),src=[3*Math.sin(la),.8+2*Math.cos(la)*.5,0];s.ball(src,.3,'#fff3bf',{glow:true,flat:true});for(let i=0;i<5;i++)s.seg(V.add(src,[0,-.3+i*.15,0]),V.add(top,[0,-.6+i*.25,0]),'#fff3bf55',2);for(let i=0;i<8;i++){const q=cycle(t*.5+i/8,1),side=p.ang>=0?-1:1;if(p.tip==='open'&&p.ang!==0)s.ball(V.add(pts[Math.floor(q*11)],[side*.12,0,.1]),.04,'#f783ac',{flat:true})}s.callout(top,p.tip==='open'?'coleoptile tip senses light':p.tip==='covered'?'tip covered: no bending':'tip cut off: no auxin source','#d8f5a2',-70,-40);s.callout(src,'light','#fff3bf',20,-40);if(p.tip==='open'&&p.ang!==0)s.callout(V.add(pts[6],[(p.ang>=0?-1:1)*.12,0,.1]),'auxin moves to shaded side → cells elongate','#f783ac',p.ang>=0?-70:70,40);s.render();tag(c,'pink dots: auxin moving down the shaded side',44,98,C.muted,13)},
  assumption:'Bending grows with time up to ~45°; the 65:35 auxin split is a typical illustrative value.'});
 function bendAng(p){if(p.tip!=='open'||p.ang===0)return 0;return Math.sign(p.ang)*Math.min(45,Math.abs(Math.sin(rad(p.ang)))*p.hrs*6)}
 

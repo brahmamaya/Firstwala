@@ -14,7 +14,7 @@ function memo(key,fn){if(cache.has(key))return cache.get(key);if(cache.size>60)c
 
 function tag(c,s,x,y,col='#e9f6ff',size=15,align='left',weight='600'){c.save();c.font=`${weight} ${size}px system-ui, sans-serif`;c.textAlign=align;c.textBaseline='middle';c.lineWidth=3;c.strokeStyle='#081624bb';c.strokeText(String(s),x,y);c.fillStyle=col;c.fillText(String(s),x,y);c.restore()}
 // A compact HUD graph: series = [{fn|pts, col, dash}], with an optional marker.
-function chart(c,x,y,w,h,o){const {xmin,xmax,series=[],marker,title,xl,yl}=o;const pts=series.map(s=>s.pts||Array.from({length:121},(_,i)=>{const X=xmin+(xmax-xmin)*i/120;return[X,s.fn(X)]}));
+function chart(c,x,y,w,h,o){(window.__chartRects||(window.__chartRects=[])).push([x-4,y-4,x+w+4,y+h+4]);const {xmin,xmax,series=[],marker,title,xl,yl}=o;const pts=series.map(s=>s.pts||Array.from({length:121},(_,i)=>{const X=xmin+(xmax-xmin)*i/120;return[X,s.fn(X)]}));
   const ys=pts.flat().map(p=>p[1]).filter(Number.isFinite);let lo=o.ymin??Math.min(0,...ys),hi=o.ymax??Math.max(...ys,lo+1e-9);if(hi-lo<1e-12)hi=lo+1;
   const X=v=>x+8+(v-xmin)/(xmax-xmin)*(w-16),Y=v=>y+h-8-(clamp(v,lo,hi)-lo)/(hi-lo)*(h-30);
   c.save();c.beginPath();c.roundRect(x,y,w,h,8);c.fillStyle='#0d2132e6';c.fill();c.strokeStyle='#294358';c.lineWidth=1;c.stroke();
