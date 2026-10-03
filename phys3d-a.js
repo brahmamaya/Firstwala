@@ -17,9 +17,21 @@ reg('units',(c,p,t)=>{const s=P3.scene(c,{scale:60,pitch:.5,yaw:.15}),k=.6,x=p.m
   s.cyl([-1.6+x/2,-.65,0],[1,0,0],.3,Math.max(.05,x-.02),'#d9844a');s.render();tag(c,`MSR ${f(msr,1)} cm + VSR ${vs%10} × 0.01 cm`,44,98,C.gold,14)});
 reg('uncertainty',(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.75}),L=p.length*.18,W=p.width*.18,e=p.error*.18;s.box([0,-.06,0],[L+2*e,.08,W+2*e],'#ffc36b',{alpha:.25});s.box([0,0,0],[L,.1,W],'#7baaff');s.box([0,.06,0],[Math.max(.02,L-2*e),.04,Math.max(.02,W-2*e)],'#42d9ca',{alpha:.4});
   s.label([0,.3,W/2+.4],`L = ${p.length} ± ${p.error} cm`,C.gold,13);s.label([L/2+.5,.3,0],`W = ${p.width} ± ${p.error}`,C.gold,13,'left');s.render();tag(c,'gold halo: largest possible area · inner: smallest',44,98,C.muted,13)});
-reg('screw-gauge',(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.3,yaw:.3}),Lr=p.turns*p.pitch+p.division*p.pitch/50,tip=-1.2+Lr*.25,ang=TAU*p.division/50;s.tube([[-1.6,0,0],[-2.2,0,0],[-2.3,-1.4,0],[1.5,-1.4,0],[1.5,-.4,0]],.16,'#54768b',{segs:10});s.cyl([-1.6,0,0],[1,0,0],.14,.3,'#adb5bd');
-  s.cyl([(tip+1.5)/2,0,0],[1,0,0],.1,1.5-tip+.3,'#ced4da');s.cyl([1.5,0,0],[1,0,0],.24,.9,'#7795a8');s.cyl([2.2,0,0],[1,0,0],.32,.8,'#a5794b');for(let i=0;i<25;i++){const a=ang+TAU*i/25;s.seg([1.82,.32*Math.cos(a),.32*Math.sin(a)],[1.95,.32*Math.cos(a),.32*Math.sin(a)],'#1a2a36',1)}
-  s.cyl([(-1.45+tip)/2,0,0],[1,0,0],.05,Math.max(.02,tip+1.45),'#d9844a');s.label([2.2,.6,0],`${p.division} div`,C.gold,13);s.render();tag(c,`Reading = ${f(Lr,3)} mm`,44,98,C.gold,15)});
+reg('screw-gauge',(c,p,t)=>{const s=P3.scene(c,{scale:72,pitch:.26,yaw:.3,cx:320,cy:250}),Lr=p.turns*p.pitch+p.division*p.pitch/50,k=.12,xa=-1.45,tip=xa+Lr*k,xe=1.55+Lr*k,ang=TAU*p.division/50,CH='#d4d9de',
+  sc=(a,r)=>[Math.cos(a)*r,Math.sin(a)*r];
+  // heavy C-frame (hammer-tone grey) with a heat-insulating plate
+  s.tube([[-1.55,0,0],[-2.3,0,0],[-2.55,-.35,0],[-2.55,-1.5,0],[-2.2,-1.85,0],[.95,-1.85,0],[1.3,-1.5,0],[1.3,-.25,0]],.32,'#596066',{segs:18});s.box([-.6,-1.85,.3],[2.2,.5,.05],'#3b6fb6');
+  s.cyl([xa-.25,0,0],[1,0,0],.17,.5,CH);s.cyl([(tip+1.3)/2,0,0],[1,0,0],.135,1.3-tip,CH);s.cyl([.95,.34,0],[0,1,0],.12,.2,'#868e96');
+  // sleeve with main scale (mm above, half-mm below the reading line)
+  s.cyl([1.3+(xe-1.3)/2+.05,0,0],[1,0,0],.28,xe-1.3+.1,'#c3c9cf');const la=.95,[ly,lz]=sc(la,.285);s.seg([1.32,ly,lz],[xe,ly,lz],'#1b1f23',1.4);
+  for(let m=0;m*k+1.4<xe;m+=.5){const x=1.4+m*k,full=m%1===0,[y2,z2]=sc(la+(full?.3:-.27),.285);s.seg([x,ly,lz],[x,y2,z2],'#1b1f23',full?1.3:1);if(full&&m%5===0)s.label([x,y2+.1,z2],String(m),'#f8f9fa',11)}
+  // thimble: bevelled scale edge, 50 divisions turning with the spindle, knurled grip and ratchet
+  s.cyl([xe+.3,0,0],[1,0,0],.42,.6,'#c9ced3');s.cyl([xe+.9,0,0],[1,0,0],.4,.6,'#9aa1a8');
+  for(let j=0;j<50;j++){const a=la+TAU*(j-p.division)/50,[y,z]=sc(a,.425),L=j%5===0?.2:.11;if(z<-.05)continue;s.seg([xe,y,z],[xe+L,y,z],'#1b1f23',j%5===0?1.4:1);if(j%5===0&&Math.abs(a-la)<.75){const [y2,z2]=sc(a,.43);s.label([xe+.3,y2,z2],String(j),'#f8f9fa',11,'left')}}
+  for(let q=0;q<36;q++){const a=TAU*q/36+ang,[y,z]=sc(a,.405);if(z<-.05)continue;s.seg([xe+.62,y,z],[xe+1.18,y,z],'#4a5056',1)}
+  s.cyl([xe+1.4,0,0],[1,0,0],.19,.42,'#b9bfc5');s.cyl([xe+1.66,0,0],[1,0,0],.15,.12,'#8f969d');
+  s.label([xe+.7,.8,0],'thimble',C.mint,11);s.label([1.75,-.58,0],'sleeve',C.mint,11);s.label([xa-.2,.42,0],'anvil',C.mint,11);s.label([(tip+1.3)/2,.38,0],'spindle',C.mint,11);s.label([xe+1.5,.5,0],'ratchet',C.mint,11);
+  s.render();tag(c,`Reading = ${f(Lr,2)} mm  (${p.turns*p.pitch} + ${p.division} × ${f(p.pitch/50,3)})`,44,98,C.gold,15)});
 reg('parallax',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.25,yaw:.3}),x=-2.5+p.truePosition*.7,h=p.height*.6,a=rad(p.angle),app=x+h*Math.tan(a)*.9;s.box([0,-.05,0],[7,.1,.8],'#e9d8a6');for(let i=0;i<=10;i++)s.seg([-2.5+i*.7,.01,.4],[-2.5+i*.7,.01,.2],'#1a2a36',1.5);
   s.tube([[x,h,0],[x,h,-1.5]],.03,'#ff857e',{segs:6});s.ball([x,h,-1.6],.08,'#495057');const eye=[x-1.6*Math.sin(a)*1.5,h+2.3,0];s.ball(eye,.16,'#f4f4ee',{label:'eye'});s.seg(eye,[app,0,0],C.gold,1.5,[5,4]);s.ball([app,.02,0],.07,C.gold);s.ball([x,.02,0],.07,C.mint);s.render();tag(c,'mint: true reading · gold: apparent reading',44,98,C.muted,13)});
 reg('speed-uncertainty',(c,p,t)=>{const s=P3.scene(c,{scale:44,pitch:.3}),L=6,T=p.time,q=cycle(t,T+1)/T,x=-3+L*Math.min(1,q);s.box([0,-.05,0],[L+.6,.1,1.2],'#c2554a',{ground:true});for(const X of[-3,3]){s.cyl([X,.6,-.6],[0,1,0],.04,1.2,'#e9f6ff');s.cyl([X,.6,.6],[0,1,0],.04,1.2,'#e9f6ff');s.seg([X,1.1,-.6],[X,1.1,.6],C.red,2)}
