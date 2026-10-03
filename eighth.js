@@ -30,7 +30,7 @@ add({base:'gravity',id:'earth-tunnel',title:'Falling through a tunnel in the Ear
  metrics:p=>{const rho=5514*p.rho,w=Math.sqrt(4/3*PI*6.674e-11*rho),Rp=6.371e6,A=Rp*Math.sqrt(1-p.d*p.d);return[N('Period',TAU/w/60,'min',1),N('One-way trip',PI/w/60,'min',1),N('Top speed',w*A/1000,'km/s',2),N('Tunnel length',2*A/1000,'km',0)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.25}),Rs=2,A=Rs*Math.sqrt(1-p.d*p.d),y0=-p.d*Rs,x=A*Math.cos(t*1.2);s.ball([0,0,0],Rs,'#2f6db0',{flat:true});
   s.cyl([0,y0,0],[1,0,0],.09,2*A,'#ffc36b',{alpha:.55});s.ball([x,y0,0],.12,C.red,{lift:5});s.seg([0,0,0],[0,y0,0],C.muted,1,[3,3]);s.ball([0,0,0],.05,C.white,{flat:true,lift:5});
-  s.arrow([x,y0+.35,0],[x-x*.35,y0+.35,0],C.mint,2.5);s.render();tag(c,'mint: restoring force ∝ distance from tunnel centre',44,98,C.muted,13)},
+  s.arrow([x,y0+.35,0],[x-x*.35,y0+.35,0],C.mint,2.5,11,'F ∝ −x');s.render();tag(c,'mint: restoring force ∝ distance from tunnel centre',44,98,C.muted,13)},
  assumption:'Uniform-density, non-rotating planet; frictionless, evacuated tunnel. Only gravity along the tunnel acts.'});
 
 /* ---------- Mechanical Properties of Solids ---------- */
@@ -42,7 +42,7 @@ add({base:'hooke',id:'poisson-ratio',title:'Poisson’s ratio: stretch and thin'
  controls:[R('F','Tension F',0,2000,10,800,'N'),R('d','Wire diameter',.5,3,.1,1,'mm',1),R('Y','Young’s modulus',50,210,5,200,'GPa'),R('sg','Poisson’s ratio σ',0,.5,.01,.3,'',2)],
  metrics:p=>{const A=PI*(p.d/2000)**2,e=p.F/(A*p.Y*1e9);return[N('Longitudinal strain',e,'',5),N('Lateral strain',-p.sg*e,'',5),N('Diameter change',-p.sg*e*p.d*1000,'μm',3),N('Volume strain',e*(1-2*p.sg),'',5)]},
  draw:(c,p,t)=>{const A=PI*(p.d/2000)**2,e=p.F/(A*p.Y*1e9),k=clamp(e*80,0,1.2),s=P3.scene(c,{scale:60,cy:240}),L=2.6*(1+k*.5),r=.25*(1-p.sg*k*.5);s.floor(3,.5,-1.8);
-  s.box([0,2,0],[1.4,.15,.8],'#5d7b8f');s.cyl([0,2-L/2-.08,0],[0,1,0],r,L,'#c4ccd2');s.cyl([0,2-.08-2.6/2,.0],[0,1,0],.25,2.6,'#ffffff',{alpha:.12,caps:false});s.box([0,2-L-.3,0],[.8,.45,.8],'#d9844a');s.arrow([0,2-L-.55,0],[0,2-L-.55-p.F/2000,0],C.gold,3);s.render();
+  s.box([0,2,0],[1.4,.15,.8],'#5d7b8f');s.cyl([0,2-L/2-.08,0],[0,1,0],r,L,'#c4ccd2');s.cyl([0,2-.08-2.6/2,.0],[0,1,0],.25,2.6,'#ffffff',{alpha:.12,caps:false});s.box([0,2-L-.3,0],[.8,.45,.8],'#d9844a');s.arrow([0,2-L-.55,0],[0,2-L-.55-p.F/2000,0],C.gold,3,11,`F = ${p.F} N`);s.render();
   tag(c,'Deformation exaggerated; ghost shows the unstretched wire',44,98,C.muted,13)},
  assumption:'Linear elastic, isotropic wire; small strains. Visual strain is magnified about 400×.'});
 
@@ -67,7 +67,7 @@ add({base:'hooke',id:'thermal-stress',title:'Thermal stress in a clamped rod',
  metrics:p=>{const m={steel:[200e9,12e-6],copper:[117e9,17e-6],aluminium:[70e9,23e-6]}[p.mat],st=m[0]*m[1]*p.dT;return[N('Thermal stress',st/1e6,'MPa',1),N('Force on walls',st*p.A*1e-4/1000,'kN',1),N('Free expansion per metre',m[1]*p.dT*1000,'mm',3)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,cy:290}),heat=p.dT/100,col={steel:'#9fb4c2',copper:'#d9844a',aluminium:'#c9d3da'}[p.mat];s.floor(3.5,.5,-1.2);
   for(const x of [-2.6,2.6])s.box([x,0,0],[.4,2.4,1.6],'#5d7b8f');const r=.15+Math.sqrt(p.A)*.06;s.cyl([0,0,0],[1,0,0],r,4.8,col);s.cyl([0,0,0],[1,0,0],r*1.04,4.8*heat,'#ff5a3c',{alpha:.35*heat+.05,caps:false});
-  for(let i=0;i<6;i++){const x=-1.8+i*.72;s.ball([x,-.9,0],.1+.06*Math.sin(t*6+i),'#ff9a3c',{glow:true,flat:true})}s.arrow([-1.9,.9,0],[-2.3-heat*.3,.9,0],C.red,3);s.arrow([1.9,.9,0],[2.3+heat*.3,.9,0],C.red,3);s.label([0,1.1,0],'rod pushes on the walls',C.red,13);s.render()},
+  for(let i=0;i<6;i++){const x=-1.8+i*.72;s.ball([x,-.9,0],.1+.06*Math.sin(t*6+i),'#ff9a3c',{glow:true,flat:true})}{const m={steel:[200e9,12e-6],copper:[117e9,17e-6],aluminium:[70e9,23e-6]}[p.mat],Fk=`F = ${f(m[0]*m[1]*p.dT*p.A*1e-4/1000,1)} kN`;s.arrow([-1.9,.9,0],[-2.3-heat*.3,.9,0],C.red,3,11,Fk);s.arrow([1.9,.9,0],[2.3+heat*.3,.9,0],C.red,3,11,Fk)}s.label([0,1.25,0],'rod pushes on the walls',C.red,13);s.render()},
  assumption:'Perfectly rigid walls; uniform temperature; linear elasticity with Y and α constant over the range.'});
 
 /* ---------- Mechanical Properties of Fluids ---------- */
@@ -95,7 +95,7 @@ add({base:'buoyancy',id:'pressure-depth',title:'Pressure at depth in a tank',
  metrics:p=>{const rho=Number(p.fluid),d=p.h*p.H,P=101325+rho*G*d;return[N('Probe depth',d,'m'),N('Gauge pressure',rho*G*d/1000,'kPa',1),N('Absolute pressure',P/1000,'kPa',1),N('Force on side wall',.5*rho*G*p.H**2*p.W/1000,'kN',1)]},
  draw:(c,p,t)=>{const rho=Number(p.fluid),col=rho>2000?'#b8c2cc':rho<900?'#d9a441':'#3fa7d6',s=P3.scene(c,{scale:56,cy:300,yaw:.2}),Hs=.6+p.H*.55,W=1+p.W*.4;s.floor(3.5,.5,-1.5);
   s.box([0,-1.5+Hs/2,0],[W,Hs,1.6],col,{alpha:.55});s.box([0,-1.5+1.7,0],[W+.05,3.4,1.65],'#ffffff',{alpha:.07});const yp=-1.5+Hs-p.h*Hs;s.seg([0,2,0],[0,yp,0],C.white,1.5);s.ball([0,yp,0],.12,C.red,{lift:3});
-  for(let i=1;i<=5;i++){const y=-1.5+Hs-i*Hs/5,L=i*.12;s.arrow([W/2+.05,y,0],[W/2+.05+L,y,0],C.gold,2,7)}s.label([0,yp+.35,0],`${f(rho*G*p.h*p.H/1000,1)} kPa gauge`,C.white,13);s.render();
+  for(let i=1;i<=5;i++){const y=-1.5+Hs-i*Hs/5,L=i*.12;s.arrow([W/2+.05,y,0],[W/2+.05+L,y,0],C.gold,2,7,`P = ${f(rho*G*p.H*i/5/1000,1)} kPa`)}s.label([0,yp+.35,0],`${f(rho*G*p.h*p.H/1000,1)} kPa gauge`,C.white,13);s.render();
   tag(c,'gold arrows: wall pressure grows linearly with depth',44,98,C.muted,13)},
  assumption:'Liquid at rest, incompressible; atmospheric pressure P₀ = 101.3 kPa at the surface.'});
 
@@ -108,7 +108,7 @@ add({base:'buoyancy',id:'drop-bubble-pressure',title:'Pressure inside drops and 
  metrics:p=>{const k=p.kind==='bubble'?4:2,dP=k*p.T/(p.r/1000);return[N('Surfaces',p.kind==='bubble'?'2 (inner + outer)':'1'),N('Excess pressure',dP,'Pa',1),N('In atmospheres',dP/101325,'atm',5)]},
  draw:(c,p,t)=>{const k=p.kind==='bubble'?4:2,s=P3.scene(c,{scale:60,cx:220}),r=.4+Math.log10(p.r*10+1)*.55,col=p.kind==='drop'?'#3fa7d6':'#b89dff';
   if(p.kind==='air')s.box([0,0,0],[3.6,3.6,3.6],'#3fa7d6',{alpha:.12});s.ball([0,0,0],r,col,p.kind==='drop'?{}:{stroke:'#ffffff'});
-  for(let i=0;i<10;i++){const a=TAU*i/10+t*.2,dir=[Math.cos(a),Math.sin(a)*.8,Math.sin(a)*.6],n=V.norm(dir);s.arrow(V.mul(n,r+.6),V.mul(n,r+.12),C.gold,2,7)}s.render();
+  for(let i=0;i<10;i++){const a=TAU*i/10+t*.2,dir=[Math.cos(a),Math.sin(a)*.8,Math.sin(a)*.6],n=V.norm(dir);s.arrow(V.mul(n,r+.6),V.mul(n,r+.12),C.gold,2,7,i===0?`ΔP = ${f(k*p.T/(p.r/1000),1)} Pa`:'')}s.render();
   chart(c,430,96,226,150,{title:'ΔP vs radius',xl:'r (mm)',xmin:.1,xmax:10,series:[{fn:x=>k*p.T/(x/1000),col:C.gold}],marker:[Math.min(10,p.r),k*p.T/(Math.min(10,p.r)/1000)],ymax:k*p.T/(.5/1000)})},
  assumption:'Static spherical surfaces; T for water ≈ 0.072 N/m, soap solution ≈ 0.025–0.03 N/m.'});
 
@@ -123,7 +123,7 @@ add({base:'buoyancy',id:'aerofoil-lift',title:'Lift on an aerofoil',
   for(const z of [-span,span])s.poly(prof.map(([x,y])=>[x,y,z]),'#c9d3da',{stroke:'#00000033'});for(let i=0;i<prof.length;i++){const a=prof[i],b=prof[(i+1)%prof.length];s.poly([[a[0],a[1],-span],[b[0],b[1],-span],[b[0],b[1],span],[a[0],a[1],span]],'#c9d3da',{cull:false})}
   for(let j=0;j<5;j++){const z=-span+j*span/2,top=[],bot=[];for(let i=0;i<=30;i++){const x=-3+i*.2,bump=Math.exp(-x*x*1.2);top.push([x,.55+bump*.25,z]);bot.push([x,-.35-bump*.05,z])}s.path(top,'#42d9ca88',1.5);s.path(bot,'#7baaff88',1.5);
    const xt=-3+cycle(t*p.v*p.k*.03+j,6),xb=-3+cycle(t*p.v*.03+j,6);s.ball([xt,.55+Math.exp(-xt*xt*1.2)*.25,z],.05,C.mint,{flat:true});s.ball([xb,-.35-Math.exp(-xb*xb*1.2)*.05,z],.05,C.blue,{flat:true})}
-  const L=.5*p.rho*(p.v**2*(p.k**2-1))*p.A;s.arrow([0,.4,0],[0,.4+clamp(L/2e5,.1,1.8),0],C.gold,4);s.label([0,.6+clamp(L/2e5,.1,1.8),0],'lift',C.gold,14);s.render()},
+  const L=.5*p.rho*(p.v**2*(p.k**2-1))*p.A;s.arrow([0,.4,0],[0,.4+clamp(L/2e5,.1,1.8),0],C.gold,4,11,`lift = ${f(L/1000,1)} kN`);s.render()},
  assumption:'Idealised Bernoulli model with uniform speeds above and below; real wings also rely on downwash and angle of attack.'});
 
 add({base:'buoyancy',id:'hydrometer',title:'Hydrometer',
@@ -205,8 +205,7 @@ add({base:'thermo',id:'refrigerator',title:'Refrigerator and heat pump',
  metrics:p=>{const Tc=p.Tc+273.15,Th=Math.max(p.Th+273.15,Tc+1),cop=Tc/(Th-Tc),W=p.Qc/cop;return[N('Ideal COP',cop,'',2),N('Power input (ideal)',W,'W',1),N('Heat rejected to room',p.Qc+W,'W',1),N('Heat-pump COP',Th/(Th-Tc),'',2)]},
  draw:(c,p,t)=>{const Tc=p.Tc+273.15,Th=Math.max(p.Th+273.15,Tc+1),cop=Tc/(Th-Tc),W=p.Qc/cop,s=P3.scene(c,{scale:56,yaw:.4,cy:280});s.floor(3,.5,-1.7);
   s.box([0,0,0],[1.6,3.4,1.4],'#e9f6ff');s.box([.82,.6,0],[.04,1.8,1.3],'#c9d3da');s.box([.85,0,.5],[.06,.6,.06],'#5d7b8f');s.box([0,-.2,0],[1.3,2,.9],'#7fc8e8',{alpha:.5});s.helix([-.95,0,0],[0,1,0],.18,2.6,8,C.red,2);
-  const k=x=>clamp(x/400,.15,1.4);s.arrow([0,-.2,0],[0,1.2,0],'#7fc8e8',2+4*k(p.Qc));s.arrow([-2.4,-1,0],[-1,-1,0],C.gold,2+4*k(W));s.arrow([-1,.8,0],[-2.6,1.6,0],C.red,2+4*k(p.Qc+W));
-  s.label([0,-.6,.7],'Q_c',C.blue,14);s.label([-2.4,-.7,0],'W',C.gold,14);s.label([-2.6,1.9,0],'Q_h = Q_c + W',C.red,13);s.render()},
+  const k=x=>clamp(x/400,.15,1.4);s.arrow([0,-.2,0],[0,1.2,0],'#7fc8e8',2+4*k(p.Qc),11,`Q_c = ${p.Qc} W`);s.arrow([-2.4,-1,0],[-1,-1,0],C.gold,2+4*k(W),11,`W = ${f(W,1)} W`);s.arrow([-1,.8,0],[-2.6,1.6,0],C.red,2+4*k(p.Qc+W),11,`Q_h = ${f(p.Qc+W,1)} W`);s.render()},
  assumption:'Ideal (Carnot) refrigerator — real units achieve roughly 40–60 % of this COP.'});
 
 add({base:'thermo',id:'rectangle-cycle',title:'Work from a rectangular P–V cycle',

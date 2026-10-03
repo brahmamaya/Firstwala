@@ -25,7 +25,7 @@ add({base:'electrostatic',id:'flux-cube',title:'Gauss’s law: charge and a cube
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:62}),a=1.3,q=p.q,col=q>=0?C.red:C.blue,o={centre:[0,0,0],face:[0,0,a],edge:[a,0,a],corner:[a,a,a]}[p.pos];
   s.box([0,0,0],[2*a,2*a,2*a],'#7baaff',{alpha:.12});for(const [x,y,z] of [[1,1,0],[1,-1,0],[-1,1,0],[-1,-1,0]]){s.seg([x*a,y*a,-a],[x*a,y*a,a],'#7baaff88',1.2);s.seg([x*a,-a,y*a],[x*a,a,y*a],'#7baaff88',1.2);s.seg([-a,x*a,y*a],[a,x*a,y*a],'#7baaff88',1.2)}
   const n=26;for(let i=0;i<n;i++){const u=hash(i)*2-1,ph=TAU*hash(i+40),r=Math.sqrt(1-u*u),dir=[r*Math.cos(ph),u,r*Math.sin(ph)],end=V.add(o,V.mul(dir,2.4)),inside=Math.max(...V.add(o,V.mul(dir,.4)).map(Math.abs))<a-.001;const pul=.5+.5*Math.sin(t*3-i);
-   q>=0?s.arrow(V.add(o,V.mul(dir,.25)),end,inside?col:'#8ca6b966',inside?2:1.2,7):s.arrow(end,V.add(o,V.mul(dir,.25)),inside?col:'#8ca6b966',inside?2:1.2,7)}
+   q>=0?s.arrow(V.add(o,V.mul(dir,.25)),end,inside?col:'#8ca6b966',inside?2:1.2,7,i===0?'E':''):s.arrow(end,V.add(o,V.mul(dir,.25)),inside?col:'#8ca6b966',inside?2:1.2,7,i===0?'E':'')}
   s.ball(o,.16,col,{glow:true,label:(q>=0?'+':'')+q+' nC'});s.render();tag(c,'bright lines pass through the cube; faint ones miss it',44,98,C.muted,13)},
  assumption:'Point charge; the cube is an imaginary closed Gaussian surface. Field lines shown are a representative sample.'});
 
@@ -37,7 +37,7 @@ add({base:'electrostatic',id:'charged-sphere-field',title:'Field of a charged sp
  controls:[S('type','Sphere','conductor',[['conductor','Conducting shell'],['insulator','Uniformly charged insulator']]),R('Q','Charge Q',1,50,1,10,'nC'),R('Rs','Sphere radius R',2,20,.5,10,'cm',1),R('r','Probe distance r',0,40,.5,15,'cm',1)],
  metrics:p=>{const Q=p.Q*1e-9,R0=p.Rs/100,r=p.r/100,E=r>=R0?k*Q/(r*r||1e-9):p.type==='conductor'?0:k*Q*r/R0**3,Vp=r>=R0?k*Q/Math.max(r,1e-9):p.type==='conductor'?k*Q/R0:k*Q*(3*R0*R0-r*r)/(2*R0**3);return[N('Field at probe',E,'N/C',0),N('Potential at probe',Vp,'V',0),N('Probe is',r>=R0?'Outside':'Inside')]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cx:230}),Rv=.3+p.Rs*.07,rp=p.r/p.Rs*Rv;s.ball([0,0,0],Rv,p.type==='conductor'?'#c9d3da':'#ff857e',{stroke:'#ffffff'});
-  for(let i=0;i<14;i++){const u=hash(i)*2-1,ph=TAU*hash(i+30),r=Math.sqrt(1-u*u),d=[r*Math.cos(ph),u,r*Math.sin(ph)];s.arrow(V.mul(d,Rv+.1),V.mul(d,Rv+.9),'#ff857e',1.6,7)}
+  for(let i=0;i<14;i++){const u=hash(i)*2-1,ph=TAU*hash(i+30),r=Math.sqrt(1-u*u),d=[r*Math.cos(ph),u,r*Math.sin(ph)];s.arrow(V.mul(d,Rv+.1),V.mul(d,Rv+.9),'#ff857e',1.6,7,i===0?(()=>{const rr=p.r/100,R=p.Rs/100,E=rr>=R?8.99*p.Q/rr**2:p.type==='conductor'?0:8.99*p.Q*rr/R**3;return `E(probe) = ${f(Math.abs(E),2)} N/C`})():'')}
   s.ball([Math.min(rp,3.2),0,0],.08,C.gold,{lift:3,label:'probe'});s.render();const Q=p.Q*1e-9,R0=p.Rs/100,Ef=x=>{const r=x/100;return r>=R0?k*Q/(r*r):p.type==='conductor'?0:k*Q*r/R0**3};
   chart(c,420,96,236,170,{title:'E vs r',xl:'r (cm)',xmin:0,xmax:40,ymin:0,ymax:Ef(p.Rs)*1.15,series:[{fn:Ef,col:C.gold}],marker:[p.r,Ef(p.r)]})},
  assumption:'Isolated sphere in vacuum, charge Q; the conductor’s charge sits on its surface.'});
@@ -77,7 +77,7 @@ add({base:'capacitor',id:'spherical-capacitor',title:'Spherical capacitor',
  tryText:'Make b very large. Compare with the isolated-sphere result 4πε₀a.',
  controls:[R('a','Inner radius a',1,20,.5,5,'cm',1),R('b','Outer radius b',2,40,.5,8,'cm',1),R('kap','Dielectric constant κ',1,10,.1,1,'',1),R('Vv','Voltage',10,1000,10,100,'V')],
  metrics:p=>{if(p.b<=p.a)return[N('Capacitance','Outer radius must exceed inner')];const a=p.a/100,b=p.b/100,Cp=4*PI*eps0*p.kap*a*b/(b-a);return[N('Capacitance',Cp*1e12,'pF',2),N('Charge',Cp*p.Vv*1e9,'nC',2),N('Energy stored',.5*Cp*p.Vv**2*1e6,'μJ',3),N('Isolated sphere (radius a)',4*PI*eps0*a*1e12,'pF',2)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cx:300}),b=Math.max(p.b,p.a+.5),sc=2.2/40,ra=.2+p.a*sc*1.7,rb=Math.min(2.6,.2+b*sc*1.7);s.ball([0,0,0],rb,'#7baaff',{alpha:.18,stroke:'#ffffff',lift:-10});if(p.kap>1)s.ball([0,0,0],rb*.98,'#b89dff',{alpha:.18,flat:true,lift:-9});s.ball([0,0,0],ra,'#ff857e');s.ring([0,0,0],[0,1,0],rb,'#7baaff',1.5);for(let i=0;i<12;i++){const u=hash(i)*2-1,ph=TAU*hash(i+20),r=Math.sqrt(1-u*u),d=[r*Math.cos(ph),u,r*Math.sin(ph)];s.arrow(V.mul(d,ra+.05),V.mul(d,rb-.05),C.gold,1.5,6)}s.render();
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cx:300}),b=Math.max(p.b,p.a+.5),sc=2.2/40,ra=.2+p.a*sc*1.7,rb=Math.min(2.6,.2+b*sc*1.7);s.ball([0,0,0],rb,'#7baaff',{alpha:.18,stroke:'#ffffff',lift:-10});if(p.kap>1)s.ball([0,0,0],rb*.98,'#b89dff',{alpha:.18,flat:true,lift:-9});s.ball([0,0,0],ra,'#ff857e');s.ring([0,0,0],[0,1,0],rb,'#7baaff',1.5);for(let i=0;i<12;i++){const u=hash(i)*2-1,ph=TAU*hash(i+20),r=Math.sqrt(1-u*u),d=[r*Math.cos(ph),u,r*Math.sin(ph)];s.arrow(V.mul(d,ra+.05),V.mul(d,rb-.05),C.gold,1.5,6,i===0?'E':'')}s.render();
   tag(c,'Cut-away view: field lines run from the inner sphere to the outer',44,98,C.muted,13)},
  assumption:'Ideal concentric spheres, inner at +Q, outer at −Q; uniform linear dielectric filling the gap.'});
 
@@ -89,7 +89,7 @@ add({base:'capacitor',id:'dielectric-slab',title:'Partially filled capacitor',
  controls:[R('A','Plate area',50,500,10,200,'cm²'),R('d','Plate separation d',1,10,.1,4,'mm',1),R('t','Slab thickness t',0,10,.1,2,'mm',1),R('kap','Dielectric constant κ',1,10,.1,4,'',1)],
  metrics:p=>{const A=p.A*1e-4,d=p.d/1000,t=Math.min(p.t,p.d)/1000,C0=eps0*A/d,C1=eps0*A/(d-t+t/p.kap);return[N('Air capacitor C₀',C0*1e12,'pF',2),N('With slab',C1*1e12,'pF',2),N('C / C₀',C1/C0,'',3),N('Effective air gap',(d-t+t/p.kap)*1000,'mm',2)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cy:262}),gap=.3+p.d*.25,tt=Math.min(p.t,p.d)/p.d*gap,w=1.2+Math.sqrt(p.A)*.12;s.box([0,gap/2+.05,0],[w,.1,w],C.red);s.box([0,-gap/2-.05,0],[w,.1,w],C.blue);
-  if(tt>0)s.box([0,-gap/2+tt/2,0],[w*.96,tt,w*.96],'#b89dff',{alpha:.7});for(let i=0;i<5;i++)for(let j=0;j<3;j++){const x=-w/2+.2+i*(w-.4)/4,z=-w/2+.3+j*(w-.6)/2;s.arrow([x,gap/2,z],[x,-gap/2,z],'#ffc36b88',1.2,6)}
+  if(tt>0)s.box([0,-gap/2+tt/2,0],[w*.96,tt,w*.96],'#b89dff',{alpha:.7});for(let i=0;i<5;i++)for(let j=0;j<3;j++){const x=-w/2+.2+i*(w-.4)/4,z=-w/2+.3+j*(w-.6)/2;s.arrow([x,gap/2,z],[x,-gap/2,z],'#ffc36b88',1.2,6,i===4&&j===1?'E₀ (E₀/κ in slab)':'')}
   s.label([0,gap/2+.4,0],'+Q',C.red,14);s.label([0,-gap/2-.4,0],'−Q',C.blue,14);s.render();if(p.t>p.d)tag(c,'Slab limited to the plate gap',44,98,C.red,13)},
  assumption:'Parallel plates with negligible edge effects; slab parallel to the plates and covering their full area.'});
 
@@ -168,7 +168,7 @@ add({base:'lorentz',id:'moving-coil-galvanometer',title:'Moving-coil galvanomete
  metrics:p=>{const th=p.N*p.A*1e-4*p.B*p.I*1e-6/(p.kk*1e-6);return[N('Deflection',deg(Math.min(th,PI/2)),'°',1),N('Current sensitivity',deg(p.N*p.A*1e-4*p.B/(p.kk*1e-6))*1e-6,'°/μA',3),N('Status',th>PI/2?'Off scale!':'On scale')]},
  draw:(c,p,t)=>{const th=Math.min(p.N*p.A*1e-4*p.B*p.I*1e-6/(p.kk*1e-6),PI/2),s=P3.scene(c,{scale:62,cy:280});s.floor(3,.5,-1.5);
   s.box([-1.4,0,0],[.7,1.6,1.2],C.red);s.box([1.4,0,0],[.7,1.6,1.2],C.blue);s.label([-1.4,1.05,0],'N',C.white,15);s.label([1.4,1.05,0],'S',C.white,15);s.cyl([0,0,0],[0,1,0],.45,1.4,'#5d7b8f');
-  const a=th-PI/4,w=.62,cor=[[w,.7],[w,-.7],[-w,-.7],[-w,.7]].map(([u,y])=>[u*Math.cos(a),y,u*Math.sin(a)]);s.path([...cor,cor[0]],C.copper,4);for(let i=0;i<5;i++){const ang=PI*(.1+.8*i/4);s.arrow([-1.05,-.5+i*.25,0],[-.5,-.5+i*.25,0],'#ffc36b77',1.2,6)}
+  const a=th-PI/4,w=.62,cor=[[w,.7],[w,-.7],[-w,-.7],[-w,.7]].map(([u,y])=>[u*Math.cos(a),y,u*Math.sin(a)]);s.path([...cor,cor[0]],C.copper,4);for(let i=0;i<5;i++){const ang=PI*(.1+.8*i/4);s.arrow([-1.05,-.5+i*.25,0],[-.5,-.5+i*.25,0],'#ffc36b77',1.2,6,i===4?`B = ${p.B} T`:'')}
   s.seg([0,.7,0],[0,1.4,0],C.steel,2);const arc=[];for(let i=0;i<=12;i++){const q=-PI/4+PI/2*i/12;arc.push([1.2*Math.sin(q),1.4+1.2*Math.cos(q),0])}s.path(arc,C.muted,2);s.seg([0,1.4,0],[1.15*Math.sin(th-PI/4),1.4+1.15*Math.cos(th-PI/4),0],C.red,2.5);s.helix([0,1.05,0],[0,1,0],.08,.25,4,C.muted,1.5);s.render();
   tag(c,`θ = ${f(deg(th),1)}°`,44,98,C.gold,16)},
  assumption:'Uniform radial field of magnitude B over the coil; ideal torsion spring; coil inertia and damping ignored.'});
@@ -208,7 +208,7 @@ add({base:'lorentz',id:'loop-axis-field',title:'Magnetic field on the axis of a 
  metrics:p=>{const Rm=p.Rl/100,x=p.x/100,B=mu0*p.N*p.I*Rm*Rm/(2*(Rm*Rm+x*x)**1.5),B0=mu0*p.N*p.I/(2*Rm);return[N('Field at probe',B*1e6,'μT',1),N('Field at centre',B0*1e6,'μT',1),N('B / B_centre',B/B0,'',3)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cx:240,yaw:.7}),Rv=.5+p.Rl*.08,xs=p.x*.09;s.ring([0,0,0],[1,0,0],Rv,C.copper,5);s.ring([.06,0,0],[1,0,0],Rv,C.copper,5);
   for(const sg of [-1,1])for(let i=1;i<=3;i++){const pts=[];for(let j=0;j<=40;j++){const a=PI*j/40,w=.35*i;pts.push([-(1+i*.6)*Math.cos(a)*1.4,sg*(Rv*.5+w*Math.sin(a)*1.6),0])}s.path(pts,'#7baaff66',1.3)}
-  s.arrow([-2.8,0,0],[2.8,0,0],'#7baaff',2);const Rm=p.Rl/100,Bf=x=>mu0*p.N*p.I*Rm*Rm/(2*(Rm*Rm+(x/100)**2)**1.5);s.ball([xs,0,0],.08,C.gold,{label:'probe',lift:3});s.arrow([xs,0,0],[xs+clamp(Bf(p.x)/Bf(0),0,1)*1.2,0,0],C.gold,3);
+  s.arrow([-2.8,0,0],[2.8,0,0],'#7baaff',2);const Rm=p.Rl/100,Bf=x=>mu0*p.N*p.I*Rm*Rm/(2*(Rm*Rm+(x/100)**2)**1.5);s.ball([xs,0,0],.08,C.gold,{label:'probe',lift:3});s.arrow([xs,0,0],[xs+clamp(Bf(p.x)/Bf(0),0,1)*1.2,0,0],C.gold,3,11,`B = ${f(Bf(p.x)*1e6,2)} µT`);
   for(let i=0;i<8;i++){const a=TAU*i/8+t*2;s.ball([0,Rv*Math.cos(a),Rv*Math.sin(a)],.05,C.gold,{flat:true})}s.render();
   chart(c,450,96,206,150,{title:'B along axis',xl:'x (cm)',xmin:-30,xmax:30,ymin:0,series:[{fn:Bf,col:C.gold}],marker:[p.x,Bf(p.x)]})},
  assumption:'Thin circular coil of N turns; field lines drawn schematically.'});
@@ -233,7 +233,7 @@ add({base:'magnet',id:'curie-law',title:'Paramagnetism and Curie’s law',
  tryText:'Halve the absolute temperature. What happens to the magnetisation?',
  controls:[R('T','Temperature',4,400,1,300,'K'),R('Cc','Curie constant C',.01,1,.01,.1,'K',2),R('H','Applied field H',1,100,1,50,'kA/m')],
  metrics:p=>{const chi=p.Cc/p.T;return[N('Susceptibility χ',chi,'',5),N('Magnetisation M',chi*p.H*1e3,'A/m',1),N('Relative permeability',1+chi,'',6)]},
- draw:(c,p,t)=>{const chi=p.Cc/p.T,align=clamp(Math.sqrt(chi*400),0,1),s=P3.scene(c,{scale:56});s.box([0,0,0],[4.2,2.6,2.6],'#b89dff',{alpha:.07});for(let i=0;i<4;i++)s.arrow([-3.2,-1+i*.65,-1.6],[3.2,-1+i*.65,-1.6],'#7baaff55',1.5,8);
+ draw:(c,p,t)=>{const chi=p.Cc/p.T,align=clamp(Math.sqrt(chi*400),0,1),s=P3.scene(c,{scale:56});s.box([0,0,0],[4.2,2.6,2.6],'#b89dff',{alpha:.07});for(let i=0;i<4;i++)s.arrow([-3.2,-1+i*.65,-1.6],[3.2,-1+i*.65,-1.6],'#7baaff55',1.5,8,i===3?`H = ${p.H} kA/m`:'');
   for(let i=0;i<5;i++)for(let j=0;j<3;j++)for(let q=0;q<3;q++){const id=i*9+j*3+q,jit=1-align,ph=t*(1+p.T/100)*1.5+id,a=jit*(hash(id)*TAU+Math.sin(ph)*.6),b=jit*(hash(id+50)*PI-PI/2+Math.cos(ph)*.4),d=[Math.cos(a)*Math.cos(b),Math.sin(b),Math.sin(a)*Math.cos(b)],o=[-1.7+i*.85,-.9+j*.9,-.9+q*.9];s.arrow(V.sub(o,V.mul(d,.25)),V.add(o,V.mul(d,.25)),C.gold,2,6)}s.render();
   tag(c,`alignment shown: ${f(align*100,0)} % (illustrative)`,44,98,C.muted,13)},
  assumption:'Ideal paramagnet in the weak-field limit (Curie law); arrow alignment is a qualitative illustration.'});
@@ -247,7 +247,7 @@ add({base:'induction',id:'rotating-rod',title:'EMF of a rotating rod',
  controls:[R('B','Magnetic field',.1,2,.05,.5,'T',2),R('L','Rod length',.2,2,.05,1,'m',2),R('rpm','Rotation rate',10,3000,10,600,'rpm')],
  metrics:p=>{const w=p.rpm*TAU/60;return[N('Angular speed',w,'rad/s',1),N('Tip speed',w*p.L,'m/s',1),N('Induced EMF',.5*p.B*w*p.L**2,'V',3)]},
  draw:(c,p,t)=>{const w=p.rpm*TAU/60,s=P3.scene(c,{scale:60,pitch:.55,cy:280}),Ls=1+p.L*1.1,a=t*Math.min(6,w*.05);s.ring([0,0,0],[0,1,0],Ls,C.copper,5);s.cyl([0,-.3,0],[0,1,0],.08,.6,C.steel);
-  const tip=[Ls*Math.cos(a),0,Ls*Math.sin(a)];s.seg([0,0,0],tip,'#c9d3da',7);for(let i=-3;i<=3;i++)for(let j=-3;j<=3;j++)if(Math.hypot(i,j)<3.5)s.arrow([i*.7,-.8,j*.7],[i*.7,1,j*.7],'#7baaff33',1,6);
+  const tip=[Ls*Math.cos(a),0,Ls*Math.sin(a)];s.seg([0,0,0],tip,'#c9d3da',7);for(let i=-3;i<=3;i++)for(let j=-3;j<=3;j++)if(Math.hypot(i,j)<3.5)s.arrow([i*.7,-.8,j*.7],[i*.7,1,j*.7],'#7baaff33',1,6,i===3&&j===0?`B = ${p.B} T`:'');
   for(let i=1;i<=4;i++){const q=V.mul(tip,i/5);s.ball(V.add(q,V.mul(tip,.05*Math.sin(t*5+i))),.05,C.blue,{flat:true})}s.label(V.add(tip,[0,.35,0]),'−',C.blue,16);s.label([0,.4,0],'+',C.red,16);s.render();tag(c,'B points up (blue)',44,98,C.blue,13)},
  assumption:'Uniform field perpendicular to the plane of rotation; rod rotates about one end; visual rotation rate capped.'});
 
@@ -259,7 +259,7 @@ add({base:'induction',id:'solenoid-inductance',title:'Self-inductance of a solen
  controls:[R('N','Turns N',50,2000,50,500),R('l','Length l',5,50,1,20,'cm'),R('r','Radius r',.5,5,.1,2,'cm',1),R('mur','Core μᵣ',1,1000,1,1),R('I','Current I',.1,5,.1,1,'A',1)],
  metrics:p=>{const A=PI*(p.r/100)**2,L=mu0*p.mur*p.N**2*A/(p.l/100);return[N('Inductance',L*1000,'mH',3),N('Stored energy',.5*L*p.I**2*1000,'mJ',3),N('Field inside',mu0*p.mur*p.N*p.I/(p.l/100)*1000,'mT',2)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.45}),len=1.5+p.l*.07,rr=.35+p.r*.14;if(p.mur>1)s.cyl([0,0,0],[1,0,0],rr*.8,len+.6,'#6b7b88');s.helix([0,0,0],[1,0,0],rr,len,clamp(p.N/40,6,30),C.copper,2.5);
-  for(let i=-1;i<=1;i++)s.arrow([-len/2-.4,i*rr*.4,0],[len/2+.6,i*rr*.4,0],'#7baaff'+(p.mur>1?'cc':'66'),1.6,8);for(let i=0;i<6;i++){const a=TAU*i/6+t*2;s.ball([-len/2+cycle(t*.4+i*.17,1)*len,rr*Math.cos(a),rr*Math.sin(a)],.04,C.gold,{flat:true})}s.render()},
+  for(let i=-1;i<=1;i++)s.arrow([-len/2-.4,i*rr*.4,0],[len/2+.6,i*rr*.4,0],'#7baaff'+(p.mur>1?'cc':'66'),1.6,8,i===1?`B = ${f(4e-7*PI*p.mur*p.N*p.I/(p.l/100)*1000,2)} mT`:'');for(let i=0;i<6;i++){const a=TAU*i/6+t*2;s.ball([-len/2+cycle(t*.4+i*.17,1)*len,rr*Math.cos(a),rr*Math.sin(a)],.04,C.gold,{flat:true})}s.render()},
  assumption:'Long solenoid (l ≫ r), uniform field inside, linear core of constant μᵣ.'});
 
 add({base:'induction',id:'flux-angle',title:'Magnetic flux through a tilted coil',
@@ -270,8 +270,8 @@ add({base:'induction',id:'flux-angle',title:'Magnetic flux through a tilted coil
  controls:[R('B','Magnetic field',.1,1,.05,.4,'T',2),R('A','Coil area',10,400,10,100,'cm²'),R('N','Turns',1,200,1,50),R('th','Tilt angle θ',0,180,1,30,'°'),S('spin','Coil','fixed',[['fixed','Held at angle θ'],['spin','Rotating at 1 rev/s']])],
  metrics:(p,t)=>{const th=p.spin==='spin'?TAU*t:rad(p.th),A=p.A*1e-4,Phi=p.N*p.B*A*Math.cos(th);return[N('Flux linkage NΦ',Phi*1000,'mWb',2),N('θ now',deg(th)%360,'°',0),N('EMF if rotating at 1 rev/s',p.spin==='spin'?p.N*p.B*A*TAU*Math.sin(th):'—','V',3)]},
  draw:(c,p,t)=>{const th=p.spin==='spin'?TAU*t*.25:rad(p.th),s=P3.scene(c,{scale:60,cx:240}),w=.5+Math.sqrt(p.A)*.07,n=[Math.sin(th),Math.cos(th),0];
-  for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)s.arrow([i*.6,-1.8,j*.6],[i*.6,1.8,j*.6],'#7baaff55',1.2,7);const u=[Math.cos(th),-Math.sin(th),0],v=[0,0,1],cor=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>V.add(V.mul(u,a*w),V.mul(v,b*w)));
-  s.poly(cor,'#ffc36b',{alpha:.25,cull:false,stroke:C.copper,lw:4});s.arrow([0,0,0],V.mul(n,1.2),C.mint,3);s.label(V.mul(n,1.4),'n̂',C.mint,14);s.render();const A=p.A*1e-4;
+  for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)s.arrow([i*.6,-1.8,j*.6],[i*.6,1.8,j*.6],'#7baaff55',1.2,7,i===2&&j===-2?`B = ${p.B} T`:'');const u=[Math.cos(th),-Math.sin(th),0],v=[0,0,1],cor=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>V.add(V.mul(u,a*w),V.mul(v,b*w)));
+  s.poly(cor,'#ffc36b',{alpha:.25,cull:false,stroke:C.copper,lw:4});s.arrow([0,0,0],V.mul(n,1.2),C.mint,3,11,`n̂ (θ = ${f(deg(th)%360,0)}°)`);s.render();const A=p.A*1e-4;
   chart(c,440,96,216,150,{title:'Flux vs θ',xl:'θ (°)',xmin:0,xmax:360,ymin:-p.N*p.B*A*1000*1.1,ymax:p.N*p.B*A*1000*1.1,series:[{fn:x=>p.N*p.B*A*Math.cos(rad(x))*1000,col:C.gold}],marker:[deg(th)%360,p.N*p.B*A*Math.cos(th)*1000]})},
  assumption:'Uniform field; flat coil; rotation (if chosen) is about an axis perpendicular to B.'});
 
@@ -284,7 +284,7 @@ add({base:'ac',id:'lr-phasor',title:'LR circuit: phasors and phase lag',
  controls:[R('Vr','Supply voltage (rms)',1,240,1,12,'V'),R('f','Frequency',10,1000,5,50,'Hz'),R('L','Inductance',1,500,1,100,'mH'),R('Rr','Resistance',1,200,1,20,'Ω')],
  metrics:p=>{const XL=TAU*p.f*p.L/1000,Z=Math.hypot(p.Rr,XL);return[N('Inductive reactance',XL,'Ω',2),N('Impedance',Z,'Ω',2),N('Current (rms)',p.Vr/Z,'A',3),N('Phase lag φ',deg(Math.atan2(XL,p.Rr)),'°',1)]},
  draw:(c,p,t)=>{const XL=TAU*p.f*p.L/1000,Z=Math.hypot(p.Rr,XL),phi=Math.atan2(XL,p.Rr),w=t*1.6,s=P3.scene(c,{scale:62,cx:220,pitch:.15,yaw:.2});s.cyl([0,0,-.05],[0,0,1],1.9,.06,'#143144',{alpha:.7});s.ring([0,0,0],[0,0,1],1.6,'#29475b',1);
-  const Vv=[1.6*Math.cos(w),1.6*Math.sin(w),.05],Iv=[1.2*Math.cos(w-phi),1.2*Math.sin(w-phi),.05];s.arrow([0,0,.05],Vv,C.gold,3.5);s.arrow([0,0,.05],Iv,C.mint,3.5);s.label(V.mul(Vv,1.15),'V',C.gold,14);s.label(V.mul(Iv,1.2),'I',C.mint,14);s.render();
+  const Vv=[1.6*Math.cos(w),1.6*Math.sin(w),.05],Iv=[1.2*Math.cos(w-phi),1.2*Math.sin(w-phi),.05];s.arrow([0,0,.05],Vv,C.gold,3.5,11,`V = ${p.Vr} V`);s.arrow([0,0,.05],Iv,C.mint,3.5,11,`I = ${f(p.Vr/Z,3)} A, lags ${f(deg(phi),1)}°`);s.render();
   chart(c,400,96,256,170,{title:'v(t) and i(t)',xl:'t',xmin:0,xmax:2*TAU,ymin:-1.1,ymax:1.1,series:[{fn:x=>Math.sin(x),col:C.gold},{fn:x=>.75*Math.sin(x-phi),col:C.mint}],marker:[cycle(w,2*TAU),Math.sin(cycle(w,2*TAU))]})},
  assumption:'Ideal inductor and resistor in series with a sinusoidal supply; phasors rotate at a slowed visual rate.'});
 

@@ -84,6 +84,11 @@ window.PhysicaRenderExperiment=(c,s,p,t,renderer)=>{c.save();let bg=c.createLine
 const lineCount=(str,size)=>{c.font=`500 ${size}px system-ui`;let n=1,row='';for(const w of String(str).split(' ')){if(c.measureText(row+w).width>199&&row){n++;row=''}row+=w+' '}return n};
 const fits=([lab,val,gap,head])=>ms.reduce((h,m)=>h+head+lineCount(m.value,val)*val*1.5+gap-val*1.5,0)<=262;
 const [lab,val,gap,head]=[[13,21,43,28],[12,17,31,21],[11,15,27,18],[11,13,24,16],[10,12,21,14]].find(fits)||[10,12,21,14];
-let yy=146;for(let metric of ms){text(c,metric.label,709,yy,C.muted,lab);let bottom=wrap(c,metric.value,709,yy+head,199,val,C.white);yy=bottom+gap}c.save();c.beginPath();c.rect(28,76,640,345);c.clip();renderer(c,p,t);c.restore();line(c,35,431,925,431,C.line,1);wrap(c,s.observe,39,457,875,15,C.muted);c.restore()};
+let yy=146;for(let metric of ms){text(c,metric.label,709,yy,C.muted,lab);let bottom=wrap(c,metric.value,709,yy+head,199,val,C.white);yy=bottom+gap}c.save();c.beginPath();c.rect(28,76,640,345);c.clip();renderer(c,p,t);c.restore();
+// Current settings written on the stage, so every control's value is visible in the picture itself.
+{const parts=(s.controls||[]).map(k=>{const v=p[k.key];let val;if(k.options){const o=k.options.find(([x])=>String(x)===String(v));val=o?o[1]:v}else val=typeof v==='number'?(Math.abs(v)>=1e4||(Math.abs(v)<1e-3&&v!==0)?v.toExponential(2):+v.toFixed(Math.max(0,k.digits??(Math.abs(v)<10?2:1))))+(k.unit?' '+k.unit:''):String(v);return `${k.label}: ${val}`});
+ if(parts.length){c.save();let size=11,str=parts.join('   ·   ');c.font=`600 ${size}px system-ui`;while(c.measureText(str).width>600&&size>8.5){size-=.5;c.font=`600 ${size}px system-ui`}if(c.measureText(str).width>600){while(parts.length>1&&c.measureText(parts.join('   ·   ')+' …').width>600)parts.pop();str=parts.join('   ·   ')+' …'}
+  c.fillStyle='#081624cc';const w=c.measureText(str).width;c.fillRect(34,404,w+16,20);c.fillStyle='#9fd8cf';c.textBaseline='middle';c.fillText(str,42,414.5);c.restore()}}
+line(c,35,431,925,431,C.line,1);wrap(c,s.observe,39,457,875,15,C.muted);c.restore()};
 window.PhysicsDraw.draw=(c,id,p,t)=>{let s=defs.get(id);if(!s)return previous(c,id,p,t);window.PhysicaRenderExperiment(c,s,p,t,scene[id])};
 })();

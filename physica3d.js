@@ -4,7 +4,7 @@
    orbit camera that the stage controls rotate and zoom. */
 (() => {
 'use strict';
-const TAU=Math.PI*2,KEY='physica-realism';
+const TAU=Math.PI*2,KEY='physica-realism',DIRS=['→','↗','↑','↖','←','↙','↓','↘'];
 let enabled=true;try{enabled=localStorage.getItem(KEY)!=='off'}catch{}
 const DEFAULT={yaw:-0.55,pitch:0.36,zoom:1};
 const cam={...DEFAULT,auto:false};
@@ -32,7 +32,7 @@ function basis(axis){const n=norm(axis),h=Math.abs(n[1])<.9?[0,1,0]:[1,0,0],u=no
 
 function scene(c,o={}){
   const yaw=cam.yaw+(o.yaw||0),pitch=Math.max(-1.45,Math.min(1.45,cam.pitch+(o.pitch||0)));
-  const cx=o.cx??348,cy=o.cy??262,sc=(o.scale??62)*1.15*cam.zoom,focal=o.focal??16;
+  const cx=o.cx??348,cy=o.cy??262,sc=(o.scale??62)*1.15*cam.zoom*(o.boost??window.PhysicaSceneBoost??1),focal=o.focal??16;
   const cyw=Math.cos(yaw),syw=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
   const items=[];
   const view=([x,y,z])=>{const X=x*cyw+z*syw,Z0=-x*syw+z*cyw;return[X,y*cp-Z0*sp,y*sp+Z0*cp]};
@@ -41,11 +41,12 @@ function scene(c,o={}){
   const LV=view(LIGHT),HV=norm(add(LV,[0,0,1]));
   const push=(z,draw)=>items.push({z,draw});
   const S={P,sc,cam,
-    seg(a,b,col='#8ca6b9',w=2,dash=[]){const A=P(a),B=P(b);push((A[2]+B[2])/2,()=>{c.save();c.beginPath();c.setLineDash(dash);c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.stroke();c.restore()});return S},
+    seg(a,b,col='#8ca6b9',w=2,dash=[],zo){const A=P(a),B=P(b);push(zo??(A[2]+B[2])/2,()=>{c.save();c.beginPath();c.setLineDash(dash);c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.stroke();c.restore()});return S},
     path(pts,col='#42d9ca',w=2.5,dash=[],z){if(pts.length<2)return S;const Q=pts.map(P),zz=z??Q.reduce((s,q)=>s+q[2],0)/Q.length;push(zz,()=>{c.save();c.beginPath();c.setLineDash(dash);c.moveTo(Q[0][0],Q[0][1]);for(const q of Q.slice(1))c.lineTo(q[0],q[1]);c.strokeStyle=col;c.lineWidth=w;c.lineJoin='round';c.lineCap='round';c.stroke();c.restore()});return S},
     // Long curves sorted piecewise so they weave correctly in front of and behind solids.
     curve(pts,col='#42d9ca',w=2.5,chunk=6){for(let i=0;i<pts.length-1;i+=chunk)S.path(pts.slice(i,Math.min(pts.length,i+chunk+1)),col,w);return S},
-    arrow(a,b,col='#42d9ca',w=3,head=11){const A=P(a),B=P(b);push(Math.max(A[2],B[2])+.01,()=>{const ang=Math.atan2(B[1]-A[1],B[0]-A[0]),L=Math.hypot(B[0]-A[0],B[1]-A[1]);c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0]-Math.cos(ang)*Math.min(head*.6,L*.4),B[1]-Math.sin(ang)*Math.min(head*.6,L*.4));c.stroke();if(L>3){c.beginPath();c.moveTo(B[0],B[1]);c.lineTo(B[0]-head*Math.cos(ang-.42),B[1]-head*Math.sin(ang-.42));c.lineTo(B[0]-head*Math.cos(ang+.42),B[1]-head*Math.sin(ang+.42));c.closePath();c.fill()}c.restore()});return S},
+    // lab: optional 'name = value unit'; a screen-direction glyph is appended automatically.
+    arrow(a,b,col='#42d9ca',w=3,head=11,lab){const A=P(a),B=P(b);if(lab!=null&&lab!==''){const ang=Math.atan2(B[1]-A[1],B[0]-A[0]),L=Math.hypot(B[0]-A[0],B[1]-A[1]),g=L<2?'':' '+DIRS[((Math.round(-ang/(Math.PI/4))%8)+8)%8],k=window.PhysicaTextScale||1,ox=Math.cos(ang),oy=Math.sin(ang),al=Math.abs(ox)<.35?'center':ox>0?'left':'right';push(1e6-1,()=>S._label(B[0]+ox*(10+6*k),B[1]+oy*(10+8*k)+(Math.abs(ox)<.35?0:-2),String(lab)+g,col,12,al))}push(Math.max(A[2],B[2])+.01,()=>{const ang=Math.atan2(B[1]-A[1],B[0]-A[0]),L=Math.hypot(B[0]-A[0],B[1]-A[1]);c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0]-Math.cos(ang)*Math.min(head*.6,L*.4),B[1]-Math.sin(ang)*Math.min(head*.6,L*.4));c.stroke();if(L>3){c.beginPath();c.moveTo(B[0],B[1]);c.lineTo(B[0]-head*Math.cos(ang-.42),B[1]-head*Math.sin(ang-.42));c.lineTo(B[0]-head*Math.cos(ang+.42),B[1]-head*Math.sin(ang+.42));c.closePath();c.fill()}c.restore()});return S},
     ball(p,r,col='#ffc36b',opt={}){const Q=P(p),rr=Math.max(1.2,r*sc*Q[3]);push(Q[2]+(opt.lift||0),()=>{if(opt.glow){const g=c.createRadialGradient(Q[0],Q[1],rr*.5,Q[0],Q[1],rr*3.2);g.addColorStop(0,col+'55');g.addColorStop(1,col+'00');c.fillStyle=g;c.beginPath();c.arc(Q[0],Q[1],rr*3.2,0,TAU);c.fill()}c.beginPath();c.arc(Q[0],Q[1],rr,0,TAU);c.fillStyle=opt.alpha!=null&&/^#[\da-f]{6}$/i.test(col)?col+Math.round(opt.alpha*255).toString(16).padStart(2,'0'):col;if(enabled&&rr>3&&!opt.flat&&opt.alpha==null)shadowFill(c,rr);else c.fill();if(opt.stroke){c.strokeStyle=opt.stroke;c.lineWidth=1.5;c.stroke()}if(!opt.flat)shadeSphere(c,Q[0],Q[1],rr);if(opt.label)S._label(Q[0],Q[1]-rr-12,opt.label,opt.labelColor||'#e9f6ff',13)});return S},
     poly(pts,col,opt={}){const Q=pts.map(P);let n=opt.normal;if(!n&&pts.length>2)n=norm(cross(sub(pts[1],pts[0]),sub(pts[2],pts[0])));if(opt.cull&&n&&facing(n)<-.02)return S;const zz=opt.z??Q.reduce((s,q)=>s+q[2],0)/Q.length+(opt.bias||0);
       const I=n?(opt.cull?Math.max(0,dot3(n,LIGHT)):Math.abs(dot3(n,LIGHT))):.6;
@@ -66,15 +67,30 @@ function scene(c,o={}){
     floor(size=4,step=.5,y=0,col='#29475b'){const n=Math.round(size/step);for(let i=-n;i<=n;i++){S.seg([i*step,y,-size],[i*step,y,size],col,1,[]),S.seg([-size,y,i*step],[size,y,i*step],col,1,[])}items.slice(-(4*n+2)).forEach(it=>it.z=-1e6);return S},
     plate(p,[w,d],col='#143144',y){const yy=y??p[1];S.poly([[p[0]-w/2,yy,p[2]-d/2],[p[0]+w/2,yy,p[2]-d/2],[p[0]+w/2,yy,p[2]+d/2],[p[0]-w/2,yy,p[2]+d/2]].reverse(),col,{normal:[0,1,0],z:-1e6+1,stroke:'#42d9ca33'});return S},
     shadow(p,r,y=0,k=.35){const Q=P([p[0],y,p[2]]),E=P([p[0]+r,y,p[2]]),F=P([p[0],y,p[2]+r]);const rx=Math.max(2,Math.hypot(E[0]-Q[0],E[1]-Q[1])),ry=Math.max(1,Math.abs(F[1]-Q[1])+rx*.15);const lift=Math.max(.15,1-(p[1]-y)*.18);push(-1e5,()=>{if(!enabled)return;const R=raw(c);R.save();R.translate(Q[0],Q[1]);R.scale(1,ry/rx);const g=R.createRadialGradient(0,0,0,0,0,rx*1.25);g.addColorStop(0,`rgba(0,0,0,${(k*lift).toFixed(3)})`);g.addColorStop(1,'rgba(0,0,0,0)');R.fillStyle=g;R.beginPath();R.arc(0,0,rx*1.25,0,TAU);R.fill();R.restore();R.beginPath()});return S},
+    // Name a part: a thin leader line from the 3D point to a screen offset (dx, dy) with the label at its end.
+    callout(p,text,col='#e9f6ff',dx=40,dy=-30,size=12){const Q=P(p);push(1e6-2,()=>{const k=window.PhysicaTextScale||1,L=9,X0=34,X1=656;c.save();c.font=`700 ${Math.round(size*k)}px system-ui, sans-serif`;const tw=c.measureText(String(text)).width;c.restore();
+      let right=dx>=0,x=Q[0]+dx*k,y=Math.max(112,Math.min(396,Q[1]+dy*k));
+      // Keep every label inside the stage (left edge and the live-measurements panel on the right).
+      if(right&&x+L+tw>X1){const alt=Q[0]-Math.abs(dx)*k;if(alt-L-tw>=X0){right=false;x=alt}else x=X1-L-tw}
+      if(!right&&x-L-tw<X0){const alt=Q[0]+Math.abs(dx)*k;if(alt+L+tw<=X1){right=true;x=alt}else x=X0+L+tw}
+      // Nudge the label vertically until it no longer overlaps an earlier label in this frame.
+      const h=size*k+4,box=yy=>right?[x+L-2,yy-h/2,x+L+tw+2,yy+h/2]:[x-L-tw-2,yy-h/2,x-L+2,yy+h/2],hit=b=>S._rects.some(r=>b[0]<r[2]&&b[2]>r[0]&&b[1]<r[3]&&b[3]>r[1]);
+      const tryY=()=>{if(!hit(box(y)))return true;for(let i=1;i<16;i++){const yy=y+(i%2?1:-1)*Math.ceil(i/2)*h;if(yy>=112&&yy<=396&&!hit(box(yy))){y=yy;return true}}return false};
+      if(!tryY()){const alt=right?Q[0]-Math.abs(dx)*k:Q[0]+Math.abs(dx)*k,ok=right?alt-L-tw>=X0:alt+L+tw<=X1;if(ok){right=!right;x=alt;y=Math.max(112,Math.min(396,Q[1]+dy*k));tryY()}}S._rects.push(box(y));
+      c.save();c.strokeStyle=col;c.globalAlpha=.85;c.lineWidth=1.2;c.beginPath();c.moveTo(Q[0],Q[1]);c.lineTo(x,y);c.lineTo(x+(right?6:-6),y);c.stroke();c.globalAlpha=1;c.fillStyle=col;c.beginPath();c.arc(Q[0],Q[1],2.4,0,TAU);c.fill();c.restore();S._label(x+(right?L:-L),y,text,col,size,right?'left':'right')});return S},
+    // Callout pushed radially away from a centre point, so labels fan out around a model.
+    part(p,text,col='#dbe7f0',size=11,center,len=72){const Q=P(p),C0=center?P(center):[cx,cy];let dx=Q[0]-C0[0],dy=Q[1]-C0[1];const m=Math.hypot(dx,dy);if(m<1){dx=1;dy=-1}const n=Math.hypot(dx,dy);return S.callout(p,text,col,dx/n*len,dy/n*len*.8,size)},
+    // Engraved / printed text on a surface: no halo, depth-sorted with the part it sits on.
+    engrave(p,txt,col='#1b2129',size=10,zo){const Q=P(p);push(zo??Q[2]+.02,()=>{const k=window.PhysicaTextScale||1;c.save();c.font=`700 ${Math.round(size*Q[3]*k)}px system-ui, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillStyle=col;c.fillText(String(txt),Q[0],Q[1]);c.restore()});return S},
     label(p,s,col='#e9f6ff',size=14,align='center'){const Q=P(p);push(1e6,()=>S._label(Q[0],Q[1],s,col,size,align));return S},
-    _label(x,y,s,col,size,align='center'){c.save();c.font=`600 ${size}px system-ui, sans-serif`;c.textAlign=align;c.textBaseline='middle';c.lineWidth=3;c.strokeStyle='#081624cc';c.strokeText(String(s),x,y);c.fillStyle=col;c.fillText(String(s),x,y);c.restore()},
+    _label(x,y,s,col,size,align='center'){size=Math.round(size*(window.PhysicaTextScale||1));c.save();c.font=`700 ${size}px system-ui, sans-serif`;c.textAlign=align;c.textBaseline='middle';c.lineJoin='round';c.lineWidth=Math.max(3,size*.28);c.strokeStyle='#081624e6';c.strokeText(String(s),x,y);c.fillStyle=col;c.fillText(String(s),x,y);c.restore()},
     axes(len=1,o=[0,0,0]){S.arrow(o,add(o,[len,0,0]),'#ff857e',2,8).arrow(o,add(o,[0,len,0]),'#42d9ca',2,8).arrow(o,add(o,[0,0,len]),'#7baaff',2,8);S.label(add(o,[len*1.12,0,0]),'x','#ff857e',12).label(add(o,[0,len*1.12,0]),'y','#42d9ca',12).label(add(o,[0,0,len*1.12]),'z','#7baaff',12);return S},
     // Coil of `turns` loops along an axis, sorted in chunks so it wraps around what it encloses.
     helix(p,axis,r,len,turns,col='#ffc36b',w=2.5){const [n,u,v]=basis(axis),N=Math.max(24,Math.round(turns*28));const pts=Array.from({length:N+1},(_,i)=>{const s=i/N,t=TAU*turns*s;return add(add(p,mul(n,(s-.5)*len)),add(mul(u,r*Math.cos(t)),mul(v,r*Math.sin(t))))});return S.curve(pts,col,w,4)},
     spring(a,b,coils=10,r=.12,col='#42d9ca',w=2.5){const d=sub(b,a),L=Math.hypot(...d),[,u,v]=basis(d),n=norm(d),N=coils*16;const pts=[a];for(let i=0;i<=N;i++){const s=.08+.84*i/N,t=TAU*coils*i/N;pts.push(add(add(a,mul(n,s*L)),add(mul(u,r*Math.cos(t)),mul(v,r*Math.sin(t)))))}pts.push(b);return S.curve(pts,col,w,8)},
     // Organic surfaces: a lat-long mesh, optionally deformed, rotated and lit with a specular highlight.
     // shape(u,v) may return a radial scale factor (u: latitude −π/2..π/2, v: longitude 0..2π).
-    mesh(p,radii,col='#ff857e',opt={}){const [ax,ay,az]=typeof radii==='number'?[radii,radii,radii]:radii,rings=opt.rings||14,segs=opt.segs||22,R=rotator(opt.rot),pts=[];
+    mesh(p,radii,col='#ff857e',opt={}){const [ax,ay,az]=typeof radii==='number'?[radii,radii,radii]:radii,rings=opt.rings||14,segs=opt.segs||22,R1=rotator(opt.rot),R2=rotator(opt.rot2),R=q=>R2(R1(q)),pts=[];
       for(let i=0;i<=rings;i++){const u=-Math.PI/2+Math.PI*i/rings,row=[];for(let j=0;j<=segs;j++){const v=TAU*j/segs,k=opt.shape?opt.shape(u,v):1;row.push(add(p,R([ax*k*Math.cos(u)*Math.cos(v),ay*k*Math.sin(u),az*k*Math.cos(u)*Math.sin(v)])))}pts.push(row)}
       return S._quads(pts,p,col,opt)},
     // A tube swept along a polyline (vessels, roots, neurons, DNA backbones). r may be a function of 0..1.
@@ -88,7 +104,8 @@ function scene(c,o={}){
         let n=norm(cross(sub(q[2],q[0]),sub(q[3],q[1])));const ref=center||(opt.axis?opt.axis[Math.min(opt.axis.length-1,i)]:opt.lathe?opt.lathe[i]:m);if(dot3(n,sub(m,ref))<0)n=mul(n,-1);if(opt.inside)n=mul(n,-1);
         S.poly(q,cols(i/(G.length-1),j/(G[i].length-1)),{cull:opt.cull!==false&&opt.alpha==null,normal:n,alpha:opt.alpha,grow:opt.alpha==null?.7:0,spec:opt.spec??.45,shine:opt.shine,bias:opt.bias})}return S},
     hud(fn){push(2e6,fn);return S},
-    render(){items.sort((a,b)=>a.z-b.z);for(const it of items)it.draw();items.length=0}
+    _rects:[],
+    render(){items.sort((a,b)=>a.z-b.z);S._rects=(window.PhysicaChartRects||[]).slice();for(const it of items)it.draw();items.length=0}
   };
   return S;
 }

@@ -24,7 +24,7 @@ add({base:'emwave',id:'em-wave-medium',title:'Light entering a medium (3D fields
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.65,pitch:.25}),col=spectral(p.lam),a=rad(p.pol),eD=[0,Math.cos(a),Math.sin(a)],bD=[0,-Math.sin(a),Math.cos(a)],k0=TAU/1.6,w=3;
   s.box([1.9,0,0],[3.4,2.6,2.6],'#7fc8e8',{alpha:.13});const E=[],B=[];for(let i=0;i<=90;i++){const x=-3.4+6.8*i/90,ph=x<.2?k0*(x+3.4):k0*3.6+k0*p.n*(x-.2),val=Math.sin(ph-w*t);E.push(V.add([x,0,0],V.mul(eD,val)));B.push(V.add([x,0,0],V.mul(bD,val*.75)))
    if(i%3===0){s.seg([x,0,0],V.add([x,0,0],V.mul(eD,val)),col+'99',1.3);s.seg([x,0,0],V.add([x,0,0],V.mul(bD,val*.75)),'#7baaff66',1.1)}}
-  s.curve(E,col,2.6,6);s.curve(B,'#7baaff',2,6);s.arrow([-3.4,0,0],[3.6,0,0],'#8ca6b9',1.5);s.label([3.8,.3,0],'c',C.muted,13);s.label(V.add([-3,0,0],V.mul(eD,1.3)),'E',col,14);s.label(V.add([-3,0,0],V.mul(bD,1.1)),'B',C.blue,14);s.label([1.9,1.6,0],`n = ${p.n}`,C.white,13);s.render()},
+  s.curve(E,col,2.6,6);s.curve(B,'#7baaff',2,6);s.arrow([-3.4,0,0],[3.6,0,0],'#8ca6b9',1.5,11,`v = c/n = ${f(3/p.n,2)}×10⁸ m/s`);s.label(V.add([-3,0,0],V.mul(eD,1.3)),'E',col,14);s.label(V.add([-3,0,0],V.mul(bD,1.1)),'B',C.blue,14);s.label([1.9,1.6,0],`n = ${p.n}`,C.white,13);s.render()},
  assumption:'Plane monochromatic wave at normal incidence on a non-magnetic, non-absorbing medium; reflection at the boundary not drawn.'});
 
 add({base:'emwave',id:'dipole-antenna',title:'Radiation from a dipole antenna',
@@ -203,7 +203,7 @@ add({base:'bohr',id:'hydrogen-like-ions',title:'Spectral lines of hydrogen-like 
  controls:[R('Z','Nuclear charge Z',1,10,1,1),R('n1','Lower level n₁',1,4,1,2),R('n2','Upper level n₂',2,8,1,3)],
  metrics:p=>{if(p.n2<=p.n1)return[N('Transition','Choose n₂ > n₁')];const E=13.6*p.Z**2*(1/p.n1**2-1/p.n2**2),lam=1239.84/E;return[N('Photon energy',E,'eV',3),N('Wavelength',lam,'nm',1),N('Region',band(lam)),N('Ionisation energy (from n = 1)',13.6*p.Z**2,'eV',1)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4,pitch:.15,cx:250}),Emin=-13.6*p.Z**2,y=n=>-2+3.8*(1-(-13.6*p.Z**2/n**2)/Emin);for(let n=1;n<=8;n++){const sel=n===p.n1||n===p.n2;s.box([0,y(n),0],[3,.04,1.2],sel?'#42d9ca':'#29475b',{alpha:sel?.9:.6});if(n<=4||sel)s.label([-1.9,y(n),0],`n=${n}`,sel?C.mint:C.muted,12)}
-  if(p.n2>p.n1){const E=13.6*p.Z**2*(1/p.n1**2-1/p.n2**2),lam=1239.84/E,col=lam>=380&&lam<=780?spectral(lam):'#b89dff',q=cycle(t*.7,1),ey=y(p.n2)+(y(p.n1)-y(p.n2))*Math.min(1,q*2);s.arrow([.6,y(p.n2),0],[.6,y(p.n1),0],col,3);s.ball([.6,ey,0],.1,C.blue,{glow:true});
+  if(p.n2>p.n1){const E=13.6*p.Z**2*(1/p.n1**2-1/p.n2**2),lam=1239.84/E,col=lam>=380&&lam<=780?spectral(lam):'#b89dff',q=cycle(t*.7,1),ey=y(p.n2)+(y(p.n1)-y(p.n2))*Math.min(1,q*2);s.arrow([.6,y(p.n2),0],[.6,y(p.n1),0],col,3,11,`λ = ${f(lam,1)} nm`);s.ball([.6,ey,0],.1,C.blue,{glow:true});
    if(q>.5){const pts=[];for(let i=0;i<=40;i++){const x=.8+(q-.5)*2*3*i/40;pts.push([x,y(p.n1)+.15*Math.sin(i*1.2),0])}s.path(pts,col,2)}}s.render()},
  assumption:'Bohr energy levels with reduced-mass correction ignored; R = 1.097 × 10⁷ m⁻¹; levels spaced by energy.'});
 
