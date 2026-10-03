@@ -328,12 +328,12 @@ R['gay-lussac']=(c,p,t)=>{const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:270,c
   s.ball(B,.55,GLASS,{alpha:.18});s.ring(B,[0,1,0],.55,'#ffffff55',1,[],30);gas(s,14,[.32,.32,.32],Math.sqrt(p.temperature)*.03,t,'#42d9ca',.05,0,B);
   s.cyl([X,B[1]+1.0,0],[0,1,0],.04,1.0,GLASS,{alpha:.4});s.tube([[X,B[1]+1.5,0],[X,B[1]+1.75,0],[X+1.8,B[1]+1.75,0],[X+1.8,B[1]+1.55,0]],.035,BRASS,{segs:6});gauge(s,[X+1.8,B[1]+1.0,0],P/(p.p0*2.3),`${f(P,0)} kPa`,.42);
   stand(s,[X+1.8,0,-.25],2.6,1.6,[X+.6,1.6,-.05]);thermometer(s,[X+.55,yb+.25,.2],1.8,(p.temperature-100)/500,{label:`${p.temperature} K`});
-  lab(s,V.add(B,[-.4,.2,.3]),'sealed glass bulb (fixed V)',-50,-40);lab(s,[X-br,yb+.5,.3],'heating bath',-50,30);lab(s,[X+1.8+.4,B[1]+1.0,0],'pressure gauge',40,10);
+  lab(s,V.add(B,[-.4,.2,.3]),'sealed glass bulb (fixed V)',-60,-60);lab(s,[X-br,yb+.5,.3],'heating bath',-50,30);lab(s,[X+1.8+.4,B[1]+1.0,0],'pressure gauge',40,10);
   s.render();tag(c,`P/T = constant → P = ${p.p0} × ${p.temperature}/300 = ${f(P,0)} kPa`,44,98,C.gold,15)};
 
 R['brownian-motion']=(c,p,t)=>{const kB=1.380649e-23,D=kB*p.T/(6*PI*p.eta*1e-3*p.a*1e-6),step=Math.sqrt(2*D*.2)*1e6,n=Math.min(400,Math.floor(cycle(t,24)*16)),pts=[[0,0]],lim=9.5;
   for(let i=0;i<n;i++){const q=pts[i];pts.push(q.map((v,k)=>clamp(v+step*(hash(i*3+k+1)*2-1)*1.73,-lim,lim)))}
-  const s=P3.scene(c,{scale:50,yaw:.45,pitch:.02,cx:165,cy:340}),M='#2f3a44',A='#e9ecef';bench(s,0,0,3.4,2.4);
+  const s=P3.scene(c,{scale:60,yaw:.45,pitch:.02,cx:150,cy:340}),M='#c9ced3',A='#f1f3f5';bench(s,0,0,3.4,2.4);
   s.box([0,.08,.1],[1.3,.16,1.5],M);s.box([0,.5,-.45],[.45,.75,.4],M);s.tube([[0,.8,-.5],[0,1.6,-.62],[0,2.3,-.35],[0,2.6,.05]],.17,M,{segs:10});
   s.box([0,1.05,.2],[1.2,.08,1.1],'#23292f');s.box([0,1.11,.25],[.95,.02,.32],GLASS,{alpha:.6});s.box([0,1.125,.25],[.3,.01,.3],GLASS,{alpha:.8});for(const x of[-.35,.35])s.box([x,1.12,.05],[.1,.03,.4],'#adb5bd');
   s.cyl([0,.75,.2],[0,1,.1],.18,.04,'#d4d9de');s.cyl([0,1.5,.22],[0,1,0],.06,.4,'#c3c9cf');s.cyl([0,1.78,.22],[0,1,0],.18,.16,'#868e96');s.cyl([0,2.25,.22],[0,1,0],.14,.8,A);s.cyl([0,2.75,.22],[0,1,0],.09,.3,'#343a40');s.cyl([0,2.95,.22],[0,1,0],.11,.1,'#212529');
