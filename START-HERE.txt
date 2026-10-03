@@ -8,6 +8,8 @@ No build command, backend, database, API keys, or environment variables are need
 The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
+FOCUS: less important panels are compact and have a close (x) button; hidden ones return from the
+"Hidden:" chips; the Focus button shows only the stage and controls (Esc exits) - focus.js.
 LANDING: the site opens on "Welcome to Physica" where the visitor picks subject and class (landing.js);
 shared links (#sim-id) skip it, and the logo brings it back.
 VIEWS: every simulation has three views - 2D (clean flat diagram or hands-on), 3D (rotate/zoom)
