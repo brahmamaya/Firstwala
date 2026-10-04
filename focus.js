@@ -68,6 +68,14 @@ for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelec
 {const rail=$('#side-rail'),layout=$('#lab-layout'),main=$('.lab-main'),stage=$('.stage');const mq=window.matchMedia('(max-width: 900px)');
   const place=()=>{if(!rail||!layout||!main||!stage)return;if(mq.matches){if(rail.parentElement!==main)stage.after(rail)}else if(rail.parentElement!==layout)layout.append(rail)};
   place();mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place)}
+// Minimise / restore the controls panel (works in normal and focus mode, remembered). Collapsed on desktop it
+// becomes a slim glass tab labelled CONTROLS beside the stage - tap it to open again; on phones only its header stays.
+{const rt=$('#rail-toggle'),lay=$('#lab-layout'),rail=$('#side-rail');if(rt&&lay){
+  const set=(c,save=true)=>{lay.classList.toggle('rail-collapsed',c);rt.textContent=c?'⤢':'—';rt.title=c?'Show the controls':'Minimise the controls';rt.setAttribute('aria-label',rt.title);rt.setAttribute('aria-expanded',String(!c));
+    if(save)try{localStorage.setItem('physica-rail',c?'1':'0')}catch{}window.dispatchEvent(new Event('resize'))};
+  rt.addEventListener('click',e=>{e.stopPropagation();set(!lay.classList.contains('rail-collapsed'))});
+  rail?.addEventListener('click',e=>{if(lay.classList.contains('rail-collapsed')&&!e.target.closest('#defaults'))set(false)});
+  let c=false;try{c=localStorage.getItem('physica-rail')==='1'}catch{}set(c,false)}}
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();
