@@ -310,3 +310,18 @@ body{background:radial-gradient(900px 520px at 78% -6%,rgba(110,92,255,.20),tran
   .stage .view3d-bar{flex-wrap:nowrap!important;width:auto!important;overflow:visible}.stage .view3d-bar>*,.stage .stage-top>*{flex:0 0 auto}
   .stage .stage-top button,.stage .view3d-bar button{min-height:32px!important;padding:4px 10px!important;font-size:12px!important}
   .stage .mode-switch button{padding:4px 12px!important}}
+/* selected option stays visible even before the glass pill is placed */
+.glass-host>button[aria-pressed=true],.glass-host>button.active{background:rgba(255,255,255,.12)!important;border-radius:inherit}
+.glass-host>.glass-thumb{z-index:0}.glass-host:has(.glass-thumb[style*="opacity: 1"])>button[aria-pressed=true]{background:transparent!important}
+/* phones/tablets: keep the look, drop the expensive live blurs (they made scrolling and animation stutter) */
+@media (hover:none),(max-width:900px){
+  .topbar,.stage,.controls-card,.observe-card,.formula-card,.physics-panel,.more-pop,.sidebar,.lab-tool-buttons button,.more-menu summary,.view3d-bar button,.transport .restart-button,.focus-btn,.restore-chip,.simulation-tabs button,.tabs-nav button,#prev,#next,.rec-quality,.step-btn,.toast{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .topbar,.sidebar,.stage,.controls-card,.observe-card,.formula-card,.physics-panel,.more-pop{background:#1a1e26!important}
+  .lab-tool-buttons button,.more-menu summary,.view3d-bar button,.transport .restart-button,.focus-btn,.restore-chip,.simulation-tabs button,.tabs-nav button,#prev,#next,.rec-quality,.step-btn{background:#232833!important}
+  .toast{background:#232833!important}
+  .glass-thumb{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.12))!important}
+  .main>*{animation:none!important}
+  .stage:before{display:none}}
+/* the More menu must float above the stage */
+.lab-tools{position:relative;z-index:40}.more-pop{z-index:60}
+@media(max-width:760px){.lab-tool-buttons{flex-wrap:wrap!important;overflow:visible!important}}

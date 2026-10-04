@@ -54,7 +54,10 @@ function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.cl
     const hb=host.getBoundingClientRect(),bb=on.getBoundingClientRect(),x=bb.left-hb.left+host.scrollLeft,y=bb.top-hb.top;
     if(!first&&th.style.left&&parseFloat(th.style.left)!==x){th.classList.remove('flow');void th.offsetWidth;th.classList.add('flow')}
     Object.assign(th.style,{left:x+'px',top:y+'px',width:bb.width+'px',height:bb.height+'px',opacity:'1'});first=false};
-  new MutationObserver(place).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',place);requestAnimationFrame(place);setTimeout(place,300)}
+  const soon=()=>requestAnimationFrame(place);new MutationObserver(soon).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',soon);
+  // re-place whenever the control becomes visible or changes size (e.g. the phone library drawer opens)
+  if(window.ResizeObserver)new ResizeObserver(soon).observe(host);if(window.IntersectionObserver)new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting))soon()}).observe(host);
+  document.addEventListener('transitionend',e=>{if(e.target.contains&&e.target.contains(host))soon()},true);soon();setTimeout(place,300)}
 for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelectorAll(s).forEach(glass);
 // Phones/tablets: put the controls right under the stage and keep the stage pinned while they scroll,
 // so changing a variable never means scrolling the simulation out of view. Desktop keeps the side column.
