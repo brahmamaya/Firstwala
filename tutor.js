@@ -178,9 +178,9 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   const TALK=[[/^(bye|by|tata|alvida|chalta|chalti|see you|cya|बाय|अलविदा)(?=$|[\s!.,?])/,()=>bot(L(PH.bye),{lang:prof.lang})],
     [/^(good ?night|gn|shubh ratri|शुभ रात्रि)(?=$|[\s!.,?])/,()=>bot(L(PH.night),{lang:prof.lang})],
     [/^(hi+|hello+|hey+|helo|namaste|namaskar|good (morning|afternoon|evening)|gm|नमस्ते|नमस्कार|सुप्रभात|हेलो|हाय)(?=$|[\s!.,?])/,t=>bot(`${L(PH.greet[(t.match(/morning|afternoon|evening/)||[])[0]||dayPart()])} ${L(PH.greetBack)}`,{lang:prof.lang,acts:moodActs()})],
-    [/(kaise|kaisi|kese|kesi) ho|how are (you|u)[\s?!.]*$|how r u|kya haal|कैसे हो|कैसी हो|क्या हाल/,()=>bot(L(PH.howMe),{lang:prof.lang,acts:moodActs()})],
+    [/(kaise|kaisi|kese|kesi) ho(?=$|[\s?!.,])|how are (you|u)[\s?!.]*$|how r u|kya haal|कैसे हो|कैसी हो|क्या हाल/,()=>bot(L(PH.howMe),{lang:prof.lang,acts:moodActs()})],
     [/khana kha|khaana kha|kha liya|did you eat|have you eaten|had (your )?(lunch|dinner|breakfast)|खाना खा|नाश्ता/,()=>bot(L(PH.food),{lang:prof.lang,acts:menuActs()})],
-    [/(kahan|kaha|kidhar) ho|where are (you|u)|कहाँ हो|कहां हो/,()=>bot(L(PH.where),{lang:prof.lang,acts:menuActs()})],
+    [/(kahan|kaha|kidhar) ho(?=$|[\s?!.,])|where are (you|u)|कहाँ हो|कहां हो/,()=>bot(L(PH.where),{lang:prof.lang,acts:menuActs()})],
     [/kya kar rah[eia]|what are (you|u) doing|wyd|क्या कर रह/,()=>bot(L(PH.doing),{lang:prof.lang,acts:menuActs()})],
     [/kaisa lag (raha|rha)|how do you feel|how('?s| is) your day|कैसा लग रहा/,()=>bot(L(PH.feel),{lang:prof.lang,acts:moodActs()})],
     [/(tum|aap) kaun|who are (you|u)|your name|(tumhara|aapka) naam|तुम कौन|आप कौन|तुम्हारा नाम/,()=>bot(L(PH.who),{lang:prof.lang,acts:menuActs()})],
@@ -188,7 +188,7 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   const LOOSE=[[/interesting|fun fact|kuch naya batao|amazing fact|rochak|दिलचस्प|रोचक|मज़ेदार बात|mazedaar baat/,()=>fact()],
     [/(kuch |something )?easy (padh|sikha|topic|se|one)|aasaan|asaan|something easy|आसान/,()=>easy()]];
   function findConcept(q){if(!lesson)return null;const s=normQ(q),raw=q.toLowerCase();let best=null,sc=0;
-    for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.includes(' ')?3:k.length>4?2:1;for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n&&c===cur)n+=.5;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
+    for(const c of lesson.concepts){let n=0;for(const k0 of c.k){const k=normQ(k0).trim();if(k&&(s.includes(' '+k+' ')||(k.length>4&&s.includes(k))))n+=k.includes(' ')?3:k.length>4?2:1}for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n&&c===cur)n+=.5;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
   const lessonActs=c=>[[L(PH.ex),()=>bot(`${L(PH.example)} ${L(c.example)}`,{lang:prof.lang,acts:[[L(PH.an),()=>another(c)],[L(PH.quiz),()=>checkC(c)]]})],
     [L(PH.an),()=>another(c)],[curLvl==='basic'?L(PH.deeper):L(PH.more),()=>teach(c,curLvl==='basic'?up(curLvl):down(curLvl))],[L(PH.quiz),()=>checkC(c)]];
   function another(c){bot(`${L(PH.analogy)} ${L(c.analogy)} ${L(PH.mistake)} ${L(c.mistake)}`,{lang:prof.lang,acts:[[L(PH.quiz),()=>checkC(c)],[L(PH.practice),()=>practice()]]})}
