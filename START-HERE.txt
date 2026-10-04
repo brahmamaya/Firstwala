@@ -18,7 +18,9 @@ FOCUS: less important panels are compact and have a close (x) button; hidden one
 "Hidden:" chips; the Focus button shows only the stage and controls (Esc exits) - focus.js.
 TUTOR: Normal / Student / Teacher modes, chosen as step 3 on the landing page (tutor.js). Normal: unchanged. Teacher: projector view.
 Student: an "AI Tutor" switch in the top bar turns the tutor on. It covers every physics chapter (tutor-chapters.js) plus automatic
-"what does this control do" answers and demos built from each simulation. Ask by typing or voice, answers read aloud, Predict → Show me demos, spoken quiz (browser speech; no AI service).
+"what does this control do" answers and demos built from each simulation. Chat (tutor-speech.js + tutor.js): a conversation with typing bubbles; the tutor asks back (predict first, quick checks);
+numbers in a question are calculated with the simulation ("what if angle is 60"), "increase/double X" is worked out, other
+questions are matched across all chapters with "did you mean"; female voice, physics read naturally. Ask by typing or voice, answers read aloud, Predict → Show me demos, spoken quiz (browser speech; no AI service).
 LANDING: the site opens on "Welcome to Physica" where the visitor picks subject and class (landing.js);
 shared links (#sim-id) skip it, and the logo brings it back.
 VIEWS: every simulation has three views - 2D (clean flat diagram or hands-on), 3D (rotate/zoom)

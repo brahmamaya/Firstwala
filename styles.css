@@ -584,3 +584,27 @@ body.mode-teacher .tutor-say{font-size:17px}
 @media(max-width:620px){.tutor-switch-ic{display:none}.tutor-switch{padding:0 5px;gap:0}#theme-select{max-width:96px}.topbar-right{gap:6px!important}}
 @media(max-width:420px){body.mode-student .topbar .brand-word{font-size:17px!important}body.mode-student .topbar .brand{gap:6px}body.mode-student #theme-select{max-width:80px;padding:0 3px 0 6px;font-size:11px}body.mode-student .topbar-right{gap:5px!important}body.mode-student .topbar{padding-left:10px!important;padding-right:10px!important}}
 @media(max-width:620px){.tutor-switch:before{content:'AI';font-size:11px;font-weight:900;letter-spacing:.04em;margin:0 5px 0 4px}}
+/* ===== Tutor chat ===== */
+.tutor-chat{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding:4px 2px 8px;margin-bottom:10px;scroll-behavior:smooth}
+.bub{max-width:86%;padding:11px 14px;border-radius:18px;font-size:14.5px;line-height:1.55;animation:bubIn .28s cubic-bezier(.2,.9,.3,1.2) both}
+.bub p{margin:0}
+.bub.bot{align-self:flex-start;border-bottom-left-radius:6px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.bub.me{align-self:flex-end;border-bottom-right-radius:6px;background:linear-gradient(180deg,#fff,#d9d9d9);color:#000;font-weight:700}
+.bub.typing{display:flex;gap:5px;padding:14px 16px}
+.bub.typing i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.75);animation:dot 1s infinite}
+.bub.typing i:nth-child(2){animation-delay:.15s}.bub.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+@keyframes bubIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.bub-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.bub-acts .tutor-chip{padding:7px 12px;font-size:12.5px}
+.bub-opts{display:grid;gap:6px;margin-top:10px}.bub-opts .tutor-opt{padding:9px 12px;font-size:13.5px}.bub-opts .tutor-opt:disabled{cursor:default}
+.bub .tutor-mini{margin-top:10px}
+.tutor-card.talking .tutor-bot{animation:talk .9s ease-in-out infinite;box-shadow:0 0 0 4px rgba(255,255,255,.12),0 0 22px rgba(255,255,255,.5)}
+@keyframes talk{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+/* ===== Top bar: smaller theme and feedback, AI Tutor switch the same height ===== */
+@media(min-width:621px){
+  .topbar-right{gap:10px!important}
+  .theme-picker>span{font-size:9.5px;letter-spacing:.14em}
+  .theme-picker select{min-height:32px!important;height:32px;width:108px!important;font-size:12px!important;border-radius:999px!important;padding:0 10px!important}
+  .feedback-btn{height:32px!important;padding:0 12px!important;font-size:12px!important;gap:6px!important}
+  .tutor-switch{height:32px!important;font-size:12px!important;padding:0 5px 0 11px!important}
+  .tutor-switch-knob{width:30px;height:20px}.tutor-switch-knob:after{width:14px;height:14px}.tutor-switch[aria-pressed=true] .tutor-switch-knob:after{transform:translateX(10px)}}
