@@ -48,6 +48,14 @@ const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details
   const ib=document.createElement('button');ib.type='button';ib.className='focus-btn info-btn';ib.dataset.testid='info-btn';ib.title='Show or hide the text and values drawn inside the simulation';
   const set=v=>{clean=v;window.PhysicaClean=v;ib.textContent=v?'◨ Show info':'◧ Hide info';ib.setAttribute('aria-pressed',String(v));try{localStorage.setItem('physica-clean',v?'1':'0')}catch{}window.dispatchEvent(new Event('physica-theme-change'))};
   ib.addEventListener('click',()=>set(!clean));fb.after(ib);set(clean)}
+// Liquid-glass segmented controls: one glass pill sits behind the selected option and flows to the new one.
+function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.classList.add('glass-host');const th=document.createElement('span');th.className='glass-thumb';th.setAttribute('aria-hidden','true');host.prepend(th);let first=true;
+  const place=()=>{const on=[...host.querySelectorAll('button')].find(b=>b.getAttribute('aria-pressed')==='true'||b.classList.contains('active'));if(!on||!on.offsetWidth){th.style.opacity='0';return}
+    const hb=host.getBoundingClientRect(),bb=on.getBoundingClientRect(),x=bb.left-hb.left+host.scrollLeft,y=bb.top-hb.top;
+    if(!first&&th.style.left&&parseFloat(th.style.left)!==x){th.classList.remove('flow');void th.offsetWidth;th.classList.add('flow')}
+    Object.assign(th.style,{left:x+'px',top:y+'px',width:bb.width+'px',height:bb.height+'px',opacity:'1'});first=false};
+  new MutationObserver(place).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',place);requestAnimationFrame(place);setTimeout(place,300)}
+for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelectorAll(s).forEach(glass);
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();

@@ -14,7 +14,7 @@ function poly(c,pts,tone='steel',vertical=false){const xs=pts.map(p=>p[0]),ys=pt
   const g=vertical?c.createLinearGradient(x0,0,x1,0):c.createLinearGradient(0,y0,0,y1),T=tone==='steel'?['#eef2f5','#c4cdd3','#8e9aa3']:['#c3ccd2','#949fa7','#5d6870'];g.addColorStop(0,T[0]);g.addColorStop(.5,T[1]);g.addColorStop(1,T[2]);c.fillStyle=g;c.fill();c.shadowColor='transparent';c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=1;c.stroke();c.restore()}
 function text(c,s,x,y,col='#e9f6ff',size=11,align='left',w=600){c.save();c.font=`${w} ${size}px system-ui, sans-serif`;c.fillStyle=col;c.textAlign=align;c.textBaseline='middle';c.fillText(s,x,y);c.restore()}
 function line(c,x0,y0,x1,y1,col=INK,w=1){c.save();c.strokeStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.restore()}
-function button(c,b,label,on){c.save();c.fillStyle=on?'#42d9ca':'#0f2a3a';c.strokeStyle='#42d9ca';c.lineWidth=1.5;c.beginPath();c.roundRect(b.x,b.y,b.w,b.h,7);c.fill();c.stroke();c.restore();text(c,label,b.x+b.w/2,b.y+b.h/2,on?'#062026':'#42d9ca',12,'center',700)}
+function button(c,b,label,on){c.save();c.shadowColor='rgba(66,217,202,.55)';c.shadowBlur=14;const g=c.createLinearGradient(0,b.y,0,b.y+b.h);g.addColorStop(0,'#6ff0e2');g.addColorStop(1,'#1fb5a6');c.fillStyle=g;c.beginPath();c.roundRect(b.x,b.y,b.w,b.h,b.h/2);c.fill();c.shadowColor='transparent';c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=1.2;c.stroke();c.fillStyle='rgba(255,255,255,.28)';c.beginPath();c.roundRect(b.x+3,b.y+2,b.w-6,b.h*.42,b.h/3);c.fill();c.restore();text(c,'⇥ '+label,b.x+b.w/2,b.y+b.h/2+.5,'#03211e',14,'center',800)}
 function handle(c,x,y,vertical){c.save();c.strokeStyle='#42d9ca';c.setLineDash([3,3]);c.lineWidth=1.5;c.beginPath();c.arc(x,y,11,0,Math.PI*2);c.stroke();c.setLineDash([]);c.fillStyle='#42d9ca';c.beginPath();if(vertical){c.moveTo(x,y-7);c.lineTo(x-4,y-2);c.lineTo(x+4,y-2);c.moveTo(x,y+7);c.lineTo(x-4,y+2);c.lineTo(x+4,y+2)}else{c.moveTo(x-7,y);c.lineTo(x-2,y-4);c.lineTo(x-2,y+4);c.moveTo(x+7,y);c.lineTo(x+2,y-4);c.lineTo(x+2,y+4)}c.fill();c.restore()}
 function object(c,kind,x0,x1,cy,h){const w=x1-x0,g=c.createRadialGradient(x0+w*.35,cy-h*.25,2,x0+w/2,cy,Math.max(w,h)*.7);c.save();c.shadowColor='rgba(0,0,0,.5)';c.shadowBlur=12;c.shadowOffsetY=6;
   if(kind==='block'){const lg=c.createLinearGradient(0,cy-h/2,0,cy+h/2);lg.addColorStop(0,'#e3b778');lg.addColorStop(1,'#9c6a32');c.fillStyle=lg;c.fillRect(x0,cy-h/2,w,h);c.shadowColor='transparent';c.strokeStyle='#6d4520';for(let i=1;i<5;i++){c.beginPath();c.moveTo(x0,cy-h/2+i*h/5+Math.sin(i)*2);c.bezierCurveTo(x0+w*.3,cy-h/2+i*h/5-3,x0+w*.7,cy-h/2+i*h/5+3,x1,cy-h/2+i*h/5);c.stroke()}}
@@ -56,7 +56,7 @@ INT.units={
   // labels
   text(c,'fixed jaw',X0-62,bot+108,'#8ca6b9',9.5,'left',600);text(c,'inside jaws',X0-14,top-34,'#8ca6b9',9.5,'right',600);text(c,'main scale / mm',beamR-6,top-10,'#8ca6b9',9.5,'right',600);text(c,'vernier',xj+124,bot+18,'#8ca6b9',9.5,'left',600);
   // close-to-contact button
-  INT.units.btn={x:520,y:104,w:136,h:26};button(c,INT.units.btn,sz?'Close to contact':'Close the jaws',false);
+  INT.units.btn={x:492,y:98,w:168,h:34};button(c,INT.units.btn,sz?'Close to contact':'Close the jaws',false);
   // magnifier
   const mx=40,my=338,mw=420,mh=62,K=15,cx=mx+mw/2,X=v=>cx+(v-r.Rr)*K;c.save();c.fillStyle='#0b1a26f2';c.strokeStyle='#29475b';c.beginPath();c.roundRect(mx,my,mw,mh,8);c.fill();c.stroke();c.beginPath();c.roundRect(mx,my,mw,mh,8);c.clip();
   c.fillStyle='#d9e0e5';c.fillRect(mx,my+14,mw,22);c.fillStyle='#c3ccd2';c.fillRect(mx,my+36,mw,24);const yb=my+36;
@@ -100,7 +100,7 @@ INT['screw-gauge']={
   metal(c,xt+tw,A-15,30,30,{tone:'dark',r:3});for(let k=0;k<8;k++)line(c,xt+tw+4+k*3.4,A-15,xt+tw+4+k*3.4,A+15,'rgba(0,0,0,.35)',1);metal(c,xt+tw+30,A-9,10,18,{tone:'steel',r:2});
   metal(c,372,A-34,22,10,{tone:'dark',r:2});handle(c,xt+40,A-th-18,true);text(c,'turn thimble',xt+40,A-th-36,'#42d9ca',10,'center',700);
   text(c,'anvil',170,A-26,'#8ca6b9',9.5,'center',600);text(c,'spindle',(xs+392)/2,A-22,'#8ca6b9',9.5,'center',600);text(c,'sleeve',xz+8,A+28,'#8ca6b9',9.5,'left',600);text(c,'ratchet',xt+tw+18,A+30,'#8ca6b9',9.5,'center',600);text(c,'lock',383,A-42,'#8ca6b9',9,'center',600);
-  INT['screw-gauge'].btn={x:520,y:104,w:136,h:26};button(c,INT['screw-gauge'].btn,sz?'Ratchet to contact':'Close the gap',false);
+  INT['screw-gauge'].btn={x:492,y:98,w:168,h:34};button(c,INT['screw-gauge'].btn,sz?'Ratchet to contact':'Close the gap',false);
   // magnifier: sleeve + thimble scales
   const mx=40,my=338,mw=420,mh=62,KK=40,sh=Math.max(0,r.Rr-5.5),X=v=>mx+20+(v-sh)*KK,te=X(r.Rr),yb=my+36;c.save();c.fillStyle='#0b1a26f2';c.strokeStyle='#29475b';c.beginPath();c.roundRect(mx,my,mw,mh,8);c.fill();c.stroke();c.beginPath();c.roundRect(mx,my,mw,mh,8);c.clip();
   c.fillStyle='#cfd8de';c.fillRect(mx,my+16,mw,40);line(c,mx,yb,te,yb,INK,1.2);for(let v=0;v<=r.Rr+1e-9;v+=.5){const x=X(v);if(x<mx)continue;const whole=Math.abs(v-Math.round(v))<1e-6;line(c,x,yb,x,whole?yb-10:yb+10,INK,1);if(whole)text(c,String(Math.round(v)),x,yb-15,'#33414c',8.5,'center',700)}

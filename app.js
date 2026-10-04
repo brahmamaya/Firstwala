@@ -158,7 +158,7 @@
   function syncView3d(){const is3d=is3D(current),P3=window.Physica3D;$('view3d-bar').hidden=false;for(const m of['2d','3d','ultra'])$('mode-'+m).setAttribute('aria-pressed',String(mode===m));for(const id of['drag-mode','auto-spin','zoom-in','zoom-out','view-reset'])$(id).hidden=!is3d;$('drag-mode').textContent=dragMode==='rotate'?'⟲ Drag: rotate view':'⇆ Drag: adjust values';$('drag-mode').setAttribute('aria-pressed',String(dragMode==='rotate'));
     $('auto-spin').setAttribute('aria-pressed',String(!!P3?.cam.auto));$('stage-hint').textContent=is3d?(dragMode==='rotate'?'3D · DRAG TO ROTATE · PINCH TO ZOOM':'3D · DRAG TO ADJUST VALUES'):'DRAG THE SLIDERS · OR DRAG ON THE STAGE';
     const on=P3?P3.enabled:true;$('realism-toggle').textContent=`◆ 3D look: ${on?'On':'Off'}`;$('realism-toggle').setAttribute('aria-pressed',String(on))}
-  for(const m of['2d','3d','ultra'])$('mode-'+m).onclick=()=>{mode=m;try{localStorage.setItem('physica-mode',m)}catch{}syncView3d();renderSimulationTabs();renderControls();updateReadouts();draw();toast(m==='2d'?'2D: clean flat diagram':m==='3d'?'3D: drag to rotate, pinch to zoom':'Ultra-Realistic: real bench, lighting and camera finish')};
+  for(const m of['2d','3d','ultra'])$('mode-'+m).onclick=()=>{mode=m;try{localStorage.setItem('physica-mode',m)}catch{}syncView3d();renderSimulationTabs();renderControls();updateReadouts();draw();toast(m==='2d'?'2D view':m==='3d'?'3D · drag to rotate':'Ultra-Realistic')};
   $('drag-mode').onclick=()=>{dragMode=dragMode==='rotate'?'values':'rotate';syncView3d()};
   $('auto-spin').onclick=()=>{window.Physica3D?.setAuto(!window.Physica3D.cam.auto);syncView3d()};
   $('zoom-in').onclick=()=>window.Physica3D?.zoomBy(1.15);$('zoom-out').onclick=()=>window.Physica3D?.zoomBy(1/1.15);
