@@ -396,8 +396,11 @@ body.focus .stage .canvas-wrap .focus-btn.focus-special{display:inline-flex!impo
 .landing{overflow-x:hidden}
 
 /* Landing exit: the camera falls into the black hole first; the page fades only at the end */
-.landing.leaving{animation:landOut2 1.1s linear forwards!important}
-@keyframes landOut2{0%,72%{opacity:1}100%{opacity:0}}
+.landing.leaving{animation:landOut2 1.5s linear forwards!important}
+@keyframes landOut2{0%,90%{opacity:1}100%{opacity:0}}
+.landing.leaving .landing-inner{transition:transform .6s cubic-bezier(.5,0,.75,0),opacity .45s ease-in,filter .5s!important;transform:scale(1.35)!important;opacity:0!important;filter:blur(10px)}
+@keyframes appIn2{from{opacity:0;transform:scale(1.05);filter:blur(12px) brightness(1.8)}to{opacity:1;transform:none;filter:none}}
+body.app-reveal .site-shell{animation:appIn2 .75s cubic-bezier(.2,.8,.2,1) both!important}
 /* ===== 3D liquid glass (v3): thicker lens with specular rim, caustic underglow and depth ===== */
 .glass-thumb{background:radial-gradient(120% 90% at 50% 125%,rgba(255,255,255,.22),transparent 58%),linear-gradient(180deg,rgba(255,255,255,.36) 0%,rgba(255,255,255,.12) 45%,rgba(255,255,255,.05) 55%,rgba(255,255,255,.14) 100%)!important;
   -webkit-backdrop-filter:blur(3px) saturate(190%) brightness(1.22)!important;backdrop-filter:blur(3px) saturate(190%) brightness(1.22)!important;
@@ -446,3 +449,4 @@ body.focus .stage .canvas-wrap .focus-btn.focus-special{display:inline-flex!impo
 .topbar .subject-tabs.in-topbar .glass-thumb{border-radius:999px!important}
 @media(max-width:1180px){.topbar .subject-tabs.in-topbar .subject-tab{padding:8px 13px;font-size:13px}}
 button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!important;min-height:0!important;max-height:26px!important;width:26px!important;max-width:26px!important;align-self:center}
+@media(prefers-reduced-motion:reduce){body.app-reveal .site-shell{animation:none!important}.landing.leaving .landing-inner{transition:none!important;filter:none}}
