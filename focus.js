@@ -56,6 +56,11 @@ function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.cl
     Object.assign(th.style,{left:x+'px',top:y+'px',width:bb.width+'px',height:bb.height+'px',opacity:'1'});first=false};
   new MutationObserver(place).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',place);requestAnimationFrame(place);setTimeout(place,300)}
 for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelectorAll(s).forEach(glass);
+// Phones/tablets: put the controls right under the stage and keep the stage pinned while they scroll,
+// so changing a variable never means scrolling the simulation out of view. Desktop keeps the side column.
+{const rail=$('#side-rail'),layout=$('#lab-layout'),main=$('.lab-main'),stage=$('.stage');const mq=window.matchMedia('(max-width: 900px)');
+  const place=()=>{if(!rail||!layout||!main||!stage)return;if(mq.matches){if(rail.parentElement!==main)stage.after(rail)}else if(rail.parentElement!==layout)layout.append(rail)};
+  place();mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place)}
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();
