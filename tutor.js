@@ -123,7 +123,7 @@ function logQ(q,p){try{const t=q.trim().replace(/\s+/g,' ').slice(0,200);if(t.le
   const day=new Date().toISOString().slice(0,10),st=JSON.parse(localStorage.getItem('physica-qlog')||'{}'),now=Date.now();
   if(st.d!==day){st.d=day;st.n=0}if(st.n>=20||now-(st.t||0)<20000)return;st.n++;st.t=now;
   localStorage.setItem('physica-qlog',JSON.stringify(st));seen.push(key);sessionStorage.setItem('physica-asked',JSON.stringify(seen.slice(-50)));
-  window.PhysicaSendFeedback('Tutor question','-',`[${simId()}|${p?.lang||'en'}|${p?.level||'-'}] ${t}`).catch(()=>{})}catch{}}
+  const sm=simObj();window.PhysicaSendFeedback('Tutor question',[sm?.subject||'physics',sm?.chapter||'-',simId(),p?.lang||'en',p?.level||'-'].join(' | '),t).catch(()=>{})}catch{}}
 function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div','tutor-chips');let asked=new Set();
   const scroll=()=>{thread.scrollTop=thread.scrollHeight};
   const me=t=>{const b=el('div','bub me',t);thread.append(b);scroll()};
