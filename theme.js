@@ -2,11 +2,9 @@
 (() => {
   const themes = {
     midnight: {scheme:'dark',bg:'#07121f',start:'#0a1d2d',end:'#081624',surface:'#102638',line:'#29475b',text:'#e9f6ff',muted:'#8ca6b9',mint:'#42d9ca',gold:'#ffc36b',blue:'#7baaff',red:'#ff857e',purple:'#b89dff'},
-    daylight: {scheme:'light',bg:'#f3f7fb',start:'#f8fcff',end:'#edf4fa',surface:'#e2edf5',line:'#9bb4c6',text:'#16334a',muted:'#48677e',mint:'#007c73',gold:'#a85f00',blue:'#275fc5',red:'#c83c43',purple:'#7543b8'},
     violet: {scheme:'dark',bg:'#120e22',start:'#211637',end:'#160f2a',surface:'#302044',line:'#53406c',text:'#f3edff',muted:'#b2a3c8',mint:'#c6a1ff',gold:'#ffcd83',blue:'#8dbaff',red:'#ff91af',purple:'#8fe3d8'},
     chalkboard: {scheme:'dark',bg:'#0b1b17',start:'#143127',end:'#0d231d',surface:'#1b3b30',line:'#385e4c',text:'#eff6e8',muted:'#a3bca7',mint:'#a9dfa0',gold:'#f4d381',blue:'#96cbdc',red:'#ed9b93',purple:'#c9b8e4'},
     ink: {scheme:'dark',bg:'#0a0a0a',start:'#151515',end:'#0b0b0b',surface:'#1c1c1c',line:'#3a3a3a',text:'#f6f6f6',muted:'#9a9a9a',mint:'#ffffff',gold:'#d8d8d8',blue:'#cfcfcf',red:'#f0f0f0',purple:'#b6b6b6'},
-    paper: {scheme:'light',bg:'#ffffff',start:'#fafafa',end:'#f0f0f0',surface:'#ffffff',line:'#c9c9c9',text:'#101010',muted:'#565656',mint:'#111111',gold:'#3a3a3a',blue:'#4a4a4a',red:'#000000',purple:'#585858'}
   };
   const key='physica-theme';
   let selected='midnight',colours=new Map();
