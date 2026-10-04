@@ -467,3 +467,26 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 @keyframes recBlink{0%{opacity:1}50%{opacity:.15}}
 @keyframes recGlow{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 3px rgba(255,59,48,.25),0 0 14px rgba(255,59,48,.45)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 5px rgba(255,59,48,.18),0 0 24px rgba(255,59,48,.8)}}
 @media(max-width:900px){.sidebar{z-index:90!important}}
+/* Feedback button + glass form */
+.fb-entry{display:flex;align-items:center;gap:12px;width:calc(100% - 24px);margin:14px 12px 6px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.14);color:#fff;text-align:left;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 6px 16px rgba(0,0,0,.45)}
+.fb-entry>span:first-child{font-size:20px}.fb-entry-t{display:flex;flex-direction:column;gap:2px}.fb-entry-t b{font-size:13.5px;font-weight:800}.fb-entry-t small{font-size:11.5px;color:rgba(255,255,255,.55)}
+.fb-entry:hover{border-color:rgba(255,255,255,.32);background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05))}
+.fb-backdrop{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .22s}
+.fb-backdrop.on{opacity:1}.fb-backdrop[hidden]{display:none}
+.fb-card{position:relative;width:min(440px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:26px 22px 22px;border-radius:24px;color:#fff;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),#05070b;border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 30px 80px rgba(0,0,0,.7);transform:translateY(14px) scale(.97);transition:transform .3s cubic-bezier(.2,.9,.3,1.2)}
+.fb-backdrop.on .fb-card{transform:none}
+.fb-card h2{margin:0 0 6px;font-family:'Orbitron',sans-serif;font-size:20px;letter-spacing:.03em}
+.fb-sub{margin:0 0 16px;color:rgba(255,255,255,.65);font-size:13.5px;line-height:1.45}
+.fb-field{display:block;margin-bottom:12px}.fb-field span{display:block;margin-bottom:6px;font-size:13px;font-weight:700;color:rgba(255,255,255,.85)}
+.fb-field input,.fb-field textarea{width:100%;box-sizing:border-box;padding:11px 13px;border-radius:14px;border:1px solid rgba(255,255,255,.16);color:#fff;font:inherit;font-size:15px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));box-shadow:inset 0 1px 2px rgba(0,0,0,.5);resize:vertical}
+.fb-field input:focus,.fb-field textarea:focus{outline:none;border-color:rgba(255,255,255,.55);box-shadow:inset 0 1px 2px rgba(0,0,0,.5),0 0 0 3px rgba(255,255,255,.12)}
+.fb-trap{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
+.fb-send{width:100%;height:46px;margin-top:4px;border-radius:999px;border:0;cursor:pointer;font-weight:900;font-size:15px;letter-spacing:.03em;color:#000;
+  background:linear-gradient(180deg,#fff,#cfcfcf);box-shadow:inset 0 1px 0 #fff,0 8px 22px rgba(255,255,255,.18)}
+.fb-send:disabled{opacity:.6;cursor:wait}
+.fb-msg{min-height:18px;margin:2px 0 8px;font-size:13px;font-weight:700}.fb-msg.ok{color:#7dffb0}.fb-msg.err{color:#ff8a80}
+.fb-close{position:absolute!important;top:12px;right:12px}
