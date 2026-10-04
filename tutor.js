@@ -161,7 +161,7 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   const LV=['basic','average','advanced'],down=l=>LV[Math.max(0,LV.indexOf(l||'average')-1)],up=l=>LV[Math.min(2,LV.indexOf(l||'average')+1)];
   let cur=null,curLvl=null,prob=null,hintN=0,crossN=0;
   function findConcept(q){if(!lesson)return null;const s=normQ(q),raw=q.toLowerCase();let best=null,sc=0;
-    for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.includes(' ')?3:k.length>4?2:1;for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
+    for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.includes(' ')?3:k.length>4?2:1;for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n&&c===cur)n+=.5;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
   const lessonActs=c=>[[L(PH.ex),()=>bot(`${L(PH.example)} ${L(c.example)}`,{lang:prof.lang,acts:[[L(PH.an),()=>another(c)],[L(PH.quiz),()=>checkC(c)]]})],
     [L(PH.an),()=>another(c)],[curLvl==='basic'?L(PH.deeper):L(PH.more),()=>teach(c,curLvl==='basic'?up(curLvl):down(curLvl))],[L(PH.quiz),()=>checkC(c)]];
   function another(c){bot(`${L(PH.analogy)} ${L(c.analogy)} ${L(PH.mistake)} ${L(c.mistake)}`,{lang:prof.lang,acts:[[L(PH.quiz),()=>checkC(c)],[L(PH.practice),()=>practice()]]})}
