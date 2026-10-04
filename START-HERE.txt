@@ -9,7 +9,8 @@ The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
 RECORD: recorder.js adds Record + quality (720p/1080p/2K/4K) under the stage; MP4 (or WebM) with the Physica logo top-right.
-BUILD: index.html loads two bundles - physica-core.min.js (sync) and physica.min.js (defer) - built
+BUILD: index.html loads physica-core.min.js (sync) and physica.min.js (defer); physica-3d.min.js (detailed
+3D scenes + Ultra scenes) is fetched after the page is up (lazy.js), and sw.js caches files for instant repeat visits.
 from the readable source files by: node tools/build.js  (needs esbuild). Edit the sources, then rebuild.
 ULTRA SCENES: ultra3d.js holds hand-built Ultra-Realistic scenes (window.PhysicaUltraScenes[id]); first: gravity-depth.
 MATH: mathtext.js shows _ and ^ as real subscripts/superscripts on the page and in canvas drawings.
@@ -57,17 +58,6 @@ that reopen an experiment with exact values, Snapshot (PNG), Full screen stage,
 0.1×–4× playback, previous / next navigation and keyboard shortcuts (press ?).
 Favourites pinned above the chapter library, stored in the current browser.
 Precise numeric inputs, sliders, stage dragging, playback speed and stepping.
-MAKE YOUR OWN: a simple physics sandbox (simple mode shows only the essentials and
-slider controls; "Advanced tools" reveals everything). One-tap quick-start scenes (Cannon,
-Basket challenge with a goal, Newton's cradle, Ramp race, Bridge, Dominoes,
-Pendulums, Orbit, Ball pit); a Launch tool - pull back and let go, with a predicted
-flight path; gravity chips (Earth, Moon, Mars, Jupiter, Space); material chips
-(rubber, wood, metal, ice); a live graph of speed, height and kinetic / potential
-energy for the selected object; shaded 3D-look objects. "Advanced tools" reveals
-springs, rods, attractors, pan, world settings and the object list; rotatable rigid
-bodies, collisions, toy charges, editable mass/size/velocity, undo/redo, saved
-worlds, pan/zoom and touch support remain available.
-Original Midnight theme plus Daylight, Violet, Chalkboard, Ink and Paper themes.
 
 SHARING AND STORAGE
 Save stores up to 30 worlds in your current browser, not in a cloud account.

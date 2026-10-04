@@ -9,14 +9,13 @@
   <link rel="preload" href="./fonts/exo2.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./fonts/orbitron.woff2" as="font" type="font/woff2" crossorigin>
   <script src="./physica-core.min.js?v=2a31cfee"></script>
-  <script src="./physica.min.js?v=00017e94" defer></script>
+  <script src="./physica.min.js?v=ef940c8d" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07121f">
-  <meta name="description" content="Explore Class 11 and 12 Physics, Chemistry, Botany and Zoology with 426 interactive 3D simulations: 276 physics experiments and 100 NCERT chapter-wise biology models with labelled parts. Change the variables, rotate every model in 3D, and build your own experiments in the drag-and-drop sandbox.">
+  <meta name="description" content="Explore Class 11 and 12 Physics, Chemistry, Botany and Zoology with 386 interactive simulations: physics, chemistry, botany and zoology experiments in 2D, 3D and Ultra-Realistic views.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2307121f'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%233bd9c8' stroke-width='3'/%3E%3Cpath d='M13 37c10-22 22-24 38-10M13 37c13-6 26-1 38-10' fill='none' stroke='%23ffc36b' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23fff'/%3E%3C/svg%3E">
   <title>Physica — Interactive Physics, Chemistry &amp; Biology Lab</title>
   <link rel="stylesheet" href="./styles.css?v=c3be8364">
-  <link rel="stylesheet" href="./sandbox.css?v=8ae2db35">
 </head>
 <body>
   <section id="landing" class="landing" aria-labelledby="landing-title" data-testid="landing">
@@ -50,7 +49,6 @@
         <span class="brand-sub">INTERACTIVE LAB</span>
       </div>
       <div class="topbar-right">
-        <button class="build-btn" id="sandbox-open" type="button" data-testid="open-sandbox-btn">✚ Make your own</button>
         <label class="theme-picker" for="theme-select"><span>THEME</span><select id="theme-select" aria-label="Website colour theme" data-testid="theme-select">
           <option value="midnight">Midnight</option>
           <option value="daylight">Daylight</option>
@@ -111,7 +109,6 @@
             <button id="help-open" type="button" data-testid="help-open-btn" aria-haspopup="dialog" title="Keyboard shortcuts and tips (key ?)">? Help</button>
             <label id="volume-wrap" class="volume-control" hidden>Volume <input id="volume" type="range" min="0" max="50" step="5" value="25" aria-label="Sound volume"></label>
           </div>
-          <button id="surprise-button" class="surprise-button" type="button" data-testid="surprise-btn">Surprise me <span aria-hidden="true">✦</span></button>
           <span id="sound-caption" class="sound-caption" hidden>Gentle control sounds</span>
         </div>
         <section id="wonder-card" class="wonder-card" hidden aria-labelledby="wonder-title">
@@ -183,112 +180,5 @@
   <div id="toast" class="toast" role="status" aria-live="polite" hidden data-testid="toast"></div>
 
   <!-- Make Your Own: local-first physics studio -->
-  <section id="sandbox-view" class="sandbox-view" hidden aria-label="Make your own simulation">
-    <header class="sandbox-bar">
-      <div class="sb-title">MAKE YOUR OWN <span>· your personal physics studio</span></div>
-      <div class="sb-actions">
-        <input id="sb-name" placeholder="Name your creation…" maxlength="80" aria-label="World name" autocomplete="off" data-testid="sandbox-name-input">
-        <button id="sb-save" type="button" data-testid="sandbox-save-btn">Save</button>
-        <button id="sb-share" type="button" data-testid="sandbox-share-btn">Share / Export</button>
-        <button id="sb-import" type="button" data-testid="sandbox-import-btn">Import file</button>
-        <input id="sb-file" type="file" accept=".json,application/json" hidden data-testid="sandbox-import-file">
-        <button id="sandbox-close" type="button" class="sb-back" data-testid="sandbox-close-btn">← Library</button>
-      </div>
-    </header>
-    <div class="sandbox-body">
-      <div class="sandbox-stage-wrap">
-        <div class="sb-templates" id="sb-templates" role="group" aria-label="Start from a template" data-testid="sandbox-templates">
-          <span class="sb-templates-label">QUICK START</span>
-          <button type="button" data-preset="cannon" data-testid="tpl-cannon"><i>🎯</i>Cannon</button>
-          <button type="button" data-preset="challenge" data-testid="tpl-challenge"><i>🏀</i>Basket challenge</button>
-          <button type="button" data-preset="cradle" data-testid="tpl-cradle"><i>⚪</i>Newton’s cradle</button>
-          <button type="button" data-preset="ramp" data-testid="tpl-ramp"><i>⛷</i>Ramp race</button>
-          <button type="button" data-preset="bridge" data-testid="tpl-bridge"><i>🌉</i>Bridge</button>
-          <button type="button" data-preset="domino" data-testid="tpl-domino"><i>🁢</i>Dominoes</button>
-          <button type="button" data-preset="pendulum" data-testid="tpl-pendulum"><i>🕰</i>Pendulums</button>
-          <button type="button" data-preset="orbit" data-testid="tpl-orbit"><i>🪐</i>Orbit</button>
-          <button type="button" data-preset="pit" data-testid="tpl-pit"><i>🫧</i>Ball pit</button>
-        </div>
-        <div class="sb-palette" id="sb-palette" data-testid="sandbox-palette" role="toolbar" aria-label="Build tools">
-          <button data-tool="move" class="active" type="button" data-testid="tool-move" aria-pressed="true" title="Select, move and throw">↖<b>Move</b></button>
-          <button data-tool="sling" type="button" data-testid="tool-sling" aria-pressed="false" title="Drag backwards from a point, then let go to launch a ball">➶<b>Launch</b></button>
-          <button data-tool="ball" type="button" data-testid="tool-ball" draggable="true" aria-pressed="false">●<b>Ball</b></button>
-          <button data-tool="box" type="button" data-testid="tool-box" draggable="true" aria-pressed="false">□<b>Box</b></button>
-          <button data-tool="wall" type="button" data-testid="tool-wall" draggable="true" aria-pressed="false">▬<b>Wall</b></button>
-          <button data-tool="ramp" type="button" data-testid="tool-ramp" draggable="true" aria-pressed="false">∠<b>Ramp</b></button>
-          <button class="sb-adv" data-tool="spring" type="button" data-testid="tool-spring" aria-pressed="false" title="Connect two objects or connect an object to empty space">≈<b>Spring</b></button>
-          <button class="sb-adv" data-tool="rope" type="button" data-testid="tool-rope" aria-pressed="false" title="Fixed-length connecting rod">—<b>Rod</b></button>
-          <button class="sb-adv" data-tool="magnet" type="button" data-testid="tool-magnet" draggable="true" aria-pressed="false">⊕<b>Attractor</b></button>
-          <button class="sb-adv" data-tool="pan" type="button" data-testid="tool-pan" aria-pressed="false">↔<b>Pan</b></button>
-          <button data-tool="erase" type="button" data-testid="tool-erase" aria-pressed="false">×<b>Erase</b></button>
-          <button id="sb-mode" class="sb-mode" type="button" aria-pressed="false" data-testid="sandbox-mode-toggle" title="Show springs, rods, attractors and fine controls">⚙ Advanced tools</button>
-        </div>
-        <div class="sb-stage-tools">
-          <button id="sb-undo" type="button" data-testid="sandbox-undo" title="Undo edit (Ctrl+Z)">Undo</button>
-          <button id="sb-redo" type="button" data-testid="sandbox-redo" title="Redo edit (Ctrl+Shift+Z)">Redo</button>
-          <button id="sb-zoom-out" class="sb-adv" type="button" data-testid="sandbox-zoom-out" aria-label="Zoom out">−</button>
-          <span id="sb-zoom-label" class="sb-adv" data-testid="sandbox-zoom-label">100%</span>
-          <button id="sb-zoom-in" class="sb-adv" type="button" data-testid="sandbox-zoom-in" aria-label="Zoom in">+</button>
-          <button id="sb-fit" class="sb-adv" type="button" data-testid="sandbox-fit">Fit world</button>
-          <span id="sb-stats" data-testid="sandbox-stats"></span>
-        </div>
-        <div class="sb-canvas-frame">
-          <canvas id="sandbox-canvas" data-testid="sandbox-canvas" tabindex="0" aria-label="Physics world: select a tool then tap or drag to build">Canvas unsupported.</canvas>
-        </div>
-        <p class="sb-hint" id="sb-hint" data-testid="sandbox-hint">Pick a quick-start scene above, or choose ➶ Launch and drag backwards on the stage to fire a ball.</p>
-        <p id="sb-status" role="status" aria-live="polite" data-testid="sandbox-status"></p>
-      </div>
-      <aside class="sandbox-rail" aria-label="World and object controls">
-        <div class="sb-group">
-          <div class="sb-group-title">PLAY &amp; BUILD</div>
-          <ol class="sb-steps"><li>Tap a <b>Quick start</b> scene</li><li>Press <b>Play</b></li><li>Choose <b>➶ Launch</b>, pull back and let go</li></ol>
-          <div class="sb-btn-row"><button id="sb-play" type="button" class="sb-primary" data-testid="sandbox-play-btn">Play</button><button id="sb-step" class="sb-adv" type="button" data-testid="sandbox-step">Step 1/60 s</button></div>
-          <div class="sb-btn-row"><button id="sb-reset" type="button" data-testid="sandbox-reset">Reset run</button><button id="sb-clear" type="button" data-testid="sandbox-clear-btn">Clear all</button></div>
-          <label class="sb-field sb-adv">Simulation speed<select id="sb-speed" data-testid="sandbox-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
-        </div>
-        <div class="sb-group" data-testid="sandbox-quick">
-          <div class="sb-group-title">GRAVITY</div>
-          <div class="sb-chips" id="sb-planets"><button type="button" data-g="1" class="on">🌍 Earth</button><button type="button" data-g="0.17">🌙 Moon</button><button type="button" data-g="0.38">🔴 Mars</button><button type="button" data-g="2.5">🟠 Jupiter</button><button type="button" data-g="0">🚀 Space</button></div>
-          <div class="sb-group-title">MATERIAL <span class="sb-mat-note" id="sb-mat-note">(for new objects)</span></div>
-          <div class="sb-chips" id="sb-materials"><button type="button" data-mat="rubber" class="on">🏀 Rubber</button><button type="button" data-mat="wood">🪵 Wood</button><button type="button" data-mat="metal">🔩 Metal</button><button type="button" data-mat="ice">🧊 Ice</button></div>
-          <label class="sb-check"><input id="sb-graph" type="checkbox" checked data-testid="sandbox-graph"> Live graph of the selected object</label>
-        </div>
-        <div class="sb-group" id="sb-inspector" data-testid="sandbox-inspector">
-          <div class="sb-group-title">SELECTED OBJECT</div>
-          <p class="sb-empty" id="sb-selection-empty">Select any object or connection on the canvas, or use the object list below.</p>
-          <div id="sb-properties" data-testid="sandbox-properties" hidden></div>
-          <div class="sb-btn-row"><button id="sb-duplicate" type="button" data-testid="sandbox-duplicate" disabled>Duplicate</button><button id="sb-delete" type="button" data-testid="sandbox-delete" disabled>Delete</button></div>
-        </div>
-        <details class="sb-group sb-adv" open><summary data-testid="sandbox-world-toggle">World settings</summary>
-          <label class="sb-slider">Gravity <span id="sb-gravity-val" data-testid="sandbox-gravity-value"></span><input id="sb-gravity" type="range" min="0" max="3" step="0.1" value="1" data-testid="sandbox-gravity"></label>
-          <label class="sb-slider">Gravity direction <span id="sb-direction-val" data-testid="sandbox-direction-value"></span><input id="sb-direction" type="range" min="0" max="360" step="15" value="90" data-testid="sandbox-direction"></label>
-          <label class="sb-slider">All objects: bounce <span id="sb-bounce-val" data-testid="sandbox-bounce-value"></span><input id="sb-bounce" type="range" min="0" max="1" step="0.05" value="0.6" data-testid="sandbox-bounce"></label>
-          <label class="sb-slider">Air drag <span id="sb-friction-val" data-testid="sandbox-friction-value"></span><input id="sb-friction" type="range" min="0" max="0.1" step="0.005" value="0.01" data-testid="sandbox-friction"></label>
-          <label class="sb-slider">Wind acceleration <span id="sb-wind-val" data-testid="sandbox-wind-value"></span><input id="sb-wind" type="range" min="-10" max="10" step="0.5" value="0" data-testid="sandbox-wind"></label>
-          <label class="sb-check"><input id="sb-boundaries" type="checkbox" checked data-testid="sandbox-boundaries"> Contain objects in world</label>
-          <label class="sb-check"><input id="sb-grid" type="checkbox" checked data-testid="sandbox-grid"> Show grid (0.4 m)</label>
-          <label class="sb-check"><input id="sb-snap" type="checkbox" data-testid="sandbox-snap"> Snap placement to grid</label>
-          <label class="sb-check"><input id="sb-vectors" type="checkbox" data-testid="sandbox-vectors"> Show velocity arrows</label>
-          <label class="sb-check"><input id="sb-trails" type="checkbox" data-testid="sandbox-trails"> Show motion trails</label>
-          <label class="sb-check"><input id="sb-labels" type="checkbox" checked data-testid="sandbox-labels"> Show object labels</label>
-        </details>
-        <details class="sb-group sb-adv" open><summary data-testid="sandbox-objects-toggle">Objects &amp; connections</summary><div id="sb-objects" data-testid="sandbox-objects"></div></details>
-        <details class="sb-group sb-adv"><summary data-testid="sandbox-presets-toggle">Start from a scene</summary>
-          <div class="sb-btn-row"><button id="sb-preset-tower" type="button" data-testid="sandbox-preset-tower">Ball pit</button><button id="sb-preset-newton" type="button" data-testid="sandbox-preset-newton">Pendulum</button></div>
-          <div class="sb-btn-row"><button id="sb-preset-domino" type="button" data-testid="sandbox-preset-domino">Domino run</button><button id="sb-preset-orbit" type="button" data-testid="sandbox-preset-orbit">Attraction</button></div>
-        </details>
-        <div class="sb-group"><div class="sb-group-title">SAVED CREATIONS · THIS BROWSER</div><div id="sb-saves" class="sb-saves" data-testid="sandbox-saves"></div></div>
-        <p class="sb-tip">100 world pixels = 1 metre. This is a 2D rigid-body playground, not an engineering solver. Springs use solver stiffness; rods keep two endpoints at a fixed distance. Export a file to keep a backup.</p>
-      </aside>
-    </div>
-  </section>
-  <dialog id="sb-share-dialog" class="sb-dialog" data-testid="sandbox-share-dialog" aria-labelledby="sb-share-title">
-    <div class="sb-dialog-heading"><h2 id="sb-share-title">Share your experiment</h2><button id="sb-share-close" type="button" data-testid="sandbox-share-close" aria-label="Close sharing">×</button></div>
-    <p>Send a snapshot of this world. Friends can open the link or import the JSON file. Your browser saves stay private.</p>
-    <label class="sb-field">Share link<textarea id="sb-share-link" readonly rows="3" data-testid="sandbox-share-link"></textarea></label>
-    <div class="sb-btn-row"><button id="sb-copy-link" type="button" data-testid="sandbox-copy-link">Copy link</button><button id="sb-download" type="button" class="sb-primary" data-testid="sandbox-download">Download world file</button></div>
-    <p id="sb-share-status" role="status" data-testid="sandbox-share-status"></p>
-    <p class="sb-tip">Links include the world itself, not an account. Large worlds should be shared as a file. Links use this website’s address; create them on your Netlify site after publishing.</p>
-  </dialog>
 </body>
 </html>
