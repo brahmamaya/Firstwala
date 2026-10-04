@@ -38,6 +38,16 @@ const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details
 {const main=$('.lab-main'),below=$('.below-stage');if(main&&below)main.append(below)}
 // A short fade/slide whenever another experiment opens, so changes feel smooth rather than jumpy.
 {const stage=$('.stage');let last=location.hash;window.addEventListener('hashchange',()=>{if(location.hash===last||!stage)return;last=location.hash;stage.classList.remove('swap');void stage.offsetWidth;stage.classList.add('swap')})}
+// "Hide info": the experiment's own title, measurement panel and settings strip are optional - without them the
+// simulation itself is scaled up to fill the whole stage (pointer input is mapped back, so dragging still works).
+{let clean=false;try{clean=localStorage.getItem('physica-clean')==='1'}catch{}window.PhysicaClean=clean;
+  const S=640,s=Math.min(960/S,505/345),V=window.PhysicaView={s,ox:(960-S*s)/2-28*s,oy:(505-345*s)/2-76*s};
+  const orig=window.PhysicaRenderExperiment;if(orig)window.PhysicaRenderExperiment=(c,sim,p,t,renderer)=>{if(!window.PhysicaClean)return orig(c,sim,p,t,renderer);
+    c.save();const bg=c.createLinearGradient(0,0,960,505);bg.addColorStop(0,'#0a1d2d');bg.addColorStop(1,'#081624');c.fillStyle=bg;c.fillRect(0,0,960,505);window.Physica3D?.backdrop(c);
+    c.translate(V.ox,V.oy);c.scale(V.s,V.s);c.beginPath();c.rect(28,76,640,345);c.clip();renderer(c,p,t);c.restore()};
+  const ib=document.createElement('button');ib.type='button';ib.className='focus-btn info-btn';ib.dataset.testid='info-btn';ib.title='Show or hide the text and values drawn inside the simulation';
+  const set=v=>{clean=v;window.PhysicaClean=v;ib.textContent=v?'◨ Show info':'◧ Hide info';ib.setAttribute('aria-pressed',String(v));try{localStorage.setItem('physica-clean',v?'1':'0')}catch{}window.dispatchEvent(new Event('physica-theme-change'))};
+  ib.addEventListener('click',()=>set(!clean));fb.after(ib);set(clean)}
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();
