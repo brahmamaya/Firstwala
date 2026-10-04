@@ -393,3 +393,9 @@ body.focus .stage .canvas-wrap .focus-btn.focus-special{display:inline-flex!impo
   .rail-collapsed .controls-card .section-heading{margin:0!important}.rail-collapsed #defaults{display:none!important}}
 .side-rail,.lab-layout{transition:grid-template-columns .35s cubic-bezier(.3,1,.4,1)}
 @media(max-width:900px){.lab-layout.rail-collapsed,body.focus .lab-layout.rail-collapsed,body.focus .lab-layout{grid-template-columns:minmax(0,1fr)!important}}
+/* Landing signature: writes itself in the empty space beside the class cards */
+.landing:not([hidden]) .landing-inner>.landing-sig{animation:none}
+.landing-sig{position:absolute;left:calc(50% + 262px);width:clamp(120px,calc(50vw - 290px),300px);height:auto;z-index:1;pointer-events:none;overflow:visible;fill:none;stroke:#f5f5f5;stroke-width:17;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px rgba(255,255,255,.35))}
+.landing.leaving .landing-sig{transition:opacity .45s;opacity:0}
+@media(max-width:819px){.landing-sig{position:relative;left:auto;top:auto!important;display:block;width:130px;margin:0 6px 10px auto}}
+.landing{overflow-x:hidden}
