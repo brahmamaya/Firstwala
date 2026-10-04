@@ -19,7 +19,7 @@ const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.h
 const VS='attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
 // 1) the scene: every pixel follows a bent light ray past the hole (Schwarzschild, leapfrog steps)
 const SCENE=`precision highp float;varying vec2 v;
-uniform vec2 res;uniform float t,dist,fov,yaw,inc,roll;uniform vec2 look;
+uniform vec2 res,jit,shift;uniform float t,dist,fov,yaw,inc,roll;
 #define STEPS ${weak?120:190}
 float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
 float h31(vec3 p){p=fract(p*.1031);p+=dot(p,p.zyx+31.32);return fract((p.x+p.y)*p.z);}
@@ -37,8 +37,8 @@ vec3 sky(vec3 d){vec3 c=vec3(0.);
       c+=vec3(smoothstep(.14,0.,r)*br*(k==0?1.6:k==1?.9:.5+band*.6));}}
   return c;}
 void main(){
-  vec2 uv=(gl_FragCoord.xy-.5*res)/min(res.x,res.y);
-  float yw=yaw+look.x*.12,ic=inc+look.y*.05;
+  vec2 uv=(gl_FragCoord.xy+jit-.5*res)/min(res.x,res.y)-shift;
+  float yw=yaw,ic=inc;
   vec3 cam=vec3(sin(yw)*cos(ic),sin(ic),-cos(yw)*cos(ic))*dist;
   vec3 fw=normalize(-cam),rt=normalize(cross(vec3(0,1,0),fw)),up=cross(fw,rt);
   vec2 ruv=mat2(cos(roll),-sin(roll),sin(roll),cos(roll))*uv;
@@ -66,6 +66,8 @@ void main(){
   if(!hit)col+=sky(normalize(vel))*(1.-alpha);
   col+=vec3(glow*.5)*(1.-alpha*.6);
   gl_FragColor=vec4(1.-exp(-col*1.3),1.);}`;
+// temporal anti-aliasing: each frame is jittered by a sub-pixel and blended with the history
+const ACC=`precision mediump float;varying vec2 v;uniform sampler2D s,h;uniform float k;void main(){gl_FragColor=vec4(mix(texture2D(h,v).rgb,texture2D(s,v).rgb,k),1.);}`;
 // 2) bloom: bright-pass/downsample and a separable blur at quarter resolution
 const DOWN=`precision mediump float;varying vec2 v;uniform sampler2D s;uniform vec2 px;
 void main(){vec3 c=vec3(0.);for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++)c+=texture2D(s,v+vec2(x,y)*px).rgb;c/=9.;float l=dot(c,vec3(.333));gl_FragColor=vec4(c*smoothstep(.3,.9,l),1.);}`;
@@ -85,47 +87,49 @@ void main(){vec2 d=v-.5;vec3 c=vec3(0.);
 const sh=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return gl.getShaderParameter(s,gl.COMPILE_STATUS)?s:null};
 const vs=sh(gl.VERTEX_SHADER,VS);if(!vs)return null;
 const prog=(src,names)=>{const f=sh(gl.FRAGMENT_SHADER,src);if(!f)return null;const p=gl.createProgram();gl.attachShader(p,vs);gl.attachShader(p,f);gl.bindAttribLocation(p,0,'p');gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))return null;const u={};for(const n of names)u[n]=gl.getUniformLocation(p,n);return{p,u}};
-const P1=prog(SCENE,['res','t','dist','fov','yaw','inc','roll','look']),P2=prog(DOWN,['s','px']),P3=prog(BLUR,['s','dir']),P4=prog(COMP,['s','b','t','warp','flash','fade','res']);
-if(!P1||!P2||!P3||!P4)return null;
+const P1=prog(SCENE,['res','jit','shift','t','dist','fov','yaw','inc','roll']),P5=prog(ACC,['s','h','k']),P2=prog(DOWN,['s','px']),P3=prog(BLUR,['s','dir']),P4=prog(COMP,['s','b','t','warp','flash','fade','res']);
+if(!P1||!P2||!P3||!P4||!P5)return null;
 const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
 const target=(w,h)=>{const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
   for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);
   const fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tx,0);return{tx,fb,w,h}};
-let A=null,B1=null,B2=null,sceneW=0,sceneH=0;
+let A=null,B1=null,B2=null,H0=null,H1=null,sceneW=0,sceneH=0,fresh=true,shiftX=0,shiftY=0,diveT=0,frameN=0;
 let scale=weak?.6:.85,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
 const free=o=>{if(o){gl.deleteTexture(o.tx);gl.deleteFramebuffer(o.fb)}};
 function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(1.5,window.devicePixelRatio||1);
   cv.width=Math.max(2,Math.round(W*k));cv.height=Math.max(2,Math.round(H*k));
   sceneW=Math.max(2,Math.round(W*k*scale));sceneH=Math.max(2,Math.round(H*k*scale));
-  free(A);free(B1);free(B2);A=target(sceneW,sceneH);const bw=Math.max(2,sceneW>>2),bh=Math.max(2,sceneH>>2);B1=target(bw,bh);B2=target(bw,bh);gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
+  free(A);free(B1);free(B2);free(H0);free(H1);A=target(sceneW,sceneH);H0=target(sceneW,sceneH);H1=target(sceneW,sceneH);fresh=true;const bw=Math.max(2,sceneW>>2),bh=Math.max(2,sceneH>>2);B1=target(bw,bh);B2=target(bw,bh);gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
 const pass=(P,o)=>{gl.bindFramebuffer(gl.FRAMEBUFFER,o?o.fb:null);gl.viewport(0,0,o?o.w:cv.width,o?o.h:cv.height);gl.useProgram(P.p)};
 const ease=x=>x*x*x*(x*(x*6-15)+10);
-function draw(now){const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
-  if(dv>0)dv=Math.min(1,dv+dt/1.45);tx+=(mx-tx)*.04;ty+=(my-ty)*.04;
-  const e=dv,fall=Math.pow(Math.min(1,e/.88),2.2),narrow=W<H,T=(now-t0)/1000;
-  // the fall: rise a little above the disk, spiral round the hole, accelerate in and widen the lens
-  pass(P1,A);const u=P1.u;gl.uniform2f(u.res,sceneW,sceneH);gl.uniform1f(u.t,T);
+function draw(now){const dt=Math.min(.1,last?(now-last)/1000:.016);last=now;
+  // the fall runs on the clock, not on frames, so it lasts 1.45 s on every device
+  if(dv>0)dv=Math.max(.001,Math.min(1,(now-diveT)/1450));
+  const e=dv,fall=Math.pow(Math.min(1,e/.88),2.2),narrow=W<H,T=(now-t0)/1000;frameN++;
+  const still=e===0,ji=frameN%8,jx=still?(((ji*5)%8)/8-.4375):0,jy=still?(((ji*3)%8)/8-.4375):0;
+  pass(P1,A);const u=P1.u;gl.uniform2f(u.res,sceneW,sceneH);gl.uniform2f(u.jit,jx,jy);gl.uniform2f(u.shift,0,0);gl.uniform1f(u.t,T);
   gl.uniform1f(u.dist,(narrow?20:27)*(1-.94*fall));gl.uniform1f(u.fov,.62*(1+.7*fall*fall));
-  gl.uniform1f(u.yaw,2.3*ease(e));gl.uniform1f(u.inc,.105+.3*Math.sin(Math.PI*Math.min(1,e*1.15))*.8);gl.uniform1f(u.roll,-.09+.7*fall);gl.uniform2f(u.look,tx,ty);
-  gl.drawArrays(gl.TRIANGLES,0,3);
-  gl.activeTexture(gl.TEXTURE0);
-  pass(P2,B1);gl.bindTexture(gl.TEXTURE_2D,A.tx);gl.uniform1i(P2.u.s,0);gl.uniform2f(P2.u.px,1/sceneW,1/sceneH);gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.uniform1f(u.yaw,2.3*ease(e));gl.uniform1f(u.inc,.105+.24*Math.sin(Math.PI*Math.min(1,e*1.15)));gl.uniform1f(u.roll,.7*fall);
+  gl.drawArrays(gl.TRIANGLES,0,3);gl.activeTexture(gl.TEXTURE0);
+  // blend with the history (anti-aliasing while still; straight through while falling)
+  pass(P5,H1);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,A.tx);gl.uniform1i(P5.u.s,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,H0.tx);gl.uniform1i(P5.u.h,1);
+  gl.uniform1f(P5.u.k,fresh||!still?1:.2);gl.drawArrays(gl.TRIANGLES,0,3);fresh=false;const S=H1;H1=H0;H0=S;gl.activeTexture(gl.TEXTURE0);
+  pass(P2,B1);gl.bindTexture(gl.TEXTURE_2D,H0.tx);gl.uniform1i(P2.u.s,0);gl.uniform2f(P2.u.px,1/sceneW,1/sceneH);gl.drawArrays(gl.TRIANGLES,0,3);
   for(let i=0;i<2;i++){pass(P3,B2);gl.bindTexture(gl.TEXTURE_2D,B1.tx);gl.uniform1i(P3.u.s,0);gl.uniform2f(P3.u.dir,(1+i)/B1.w,0);gl.drawArrays(gl.TRIANGLES,0,3);
     pass(P3,B1);gl.bindTexture(gl.TEXTURE_2D,B2.tx);gl.uniform1i(P3.u.s,0);gl.uniform2f(P3.u.dir,0,(1+i)/B1.h);gl.drawArrays(gl.TRIANGLES,0,3)}
-  pass(P4,null);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,A.tx);gl.uniform1i(P4.u.s,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,B1.tx);gl.uniform1i(P4.u.b,1);
+  pass(P4,null);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,H0.tx);gl.uniform1i(P4.u.s,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,B1.tx);gl.uniform1i(P4.u.b,1);
   const flash=e>.88?Math.min(1,(e-.88)/.04)*(1-Math.min(1,Math.max(0,(e-.93)/.07))):0;
   gl.uniform1f(P4.u.t,T%10);gl.uniform1f(P4.u.warp,e<.9?fall:0.);gl.uniform1f(P4.u.flash,flash);gl.uniform1f(P4.u.fade,Math.min(1,T*1.2));gl.uniform2f(P4.u.res,cv.width,cv.height);
   gl.drawArrays(gl.TRIANGLES,0,3);gl.activeTexture(gl.TEXTURE0);
-  // keep it smooth: drop the resolution on devices that cannot hold ~50 fps
-  if(running&&!dv){frames++;if(dt>.024)slow++;if(frames>=40){if(slow>14&&scale>.35){scale=Math.max(.35,scale-.12);size()}frames=slow=0}}
+  // keep it smooth: drop the resolution on devices that cannot hold ~50 fps (checked only while idle)
+  if(running&&still){frames++;if(dt>.024)slow++;if(frames>=40){if(slow>14&&scale>.35){scale=Math.max(.35,scale-.12);size()}frames=slow=0}}
   if(running)raf=requestAnimationFrame(draw)}
 function start(){size();dv=0;last=0;t0=performance.now();if(reduce){t0-=1e4;draw(performance.now());return}if(!running){running=true;raf=requestAnimationFrame(draw)}}
 function stop(){running=false;cancelAnimationFrame(raf)}
 let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!W)return;size();if(!running)draw(performance.now())},120)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running){stop();running='paused'}}else if(running==='paused'){running=false;raf=requestAnimationFrame(draw);running=true}});
-addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!W)return;mx=e.clientX/W-.5;my=e.clientY/H-.5},{passive:true});
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();stop()});
-return{start,stop,dive(){dv=.001},resize:size};
+return{start,stop,dive(){dv=.001;diveT=performance.now()},resize:size};
 })();
 if(GL){window.PhysicaLandingBG=GL;return}
 const cv=document.getElementById('landing-bg');if(!cv||!cv.getContext)return;
