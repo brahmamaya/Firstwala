@@ -8,6 +8,7 @@ No build command, backend, database, API keys, or environment variables are need
 The ZIP itself can also be used by deployment tools that accept ZIP archives.
 
 INCLUDED
+RECORD: recorder.js adds Record + quality (720p/1080p/2K/4K) under the stage; MP4 (or WebM) with the Physica logo top-right.
 BUILD: index.html loads two bundles - physica-core.min.js (sync) and physica.min.js (defer) - built
 from the readable source files by: node tools/build.js  (needs esbuild). Edit the sources, then rebuild.
 ULTRA SCENES: ultra3d.js holds hand-built Ultra-Realistic scenes (window.PhysicaUltraScenes[id]); first: gravity-depth.

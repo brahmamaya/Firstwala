@@ -237,3 +237,8 @@ body.focus .lab-layout{grid-template-columns:minmax(0,1fr) 300px!important}body.
 body.focus .below-stage{display:none!important}
 .info-btn{margin-left:6px}
 .focus-exit{top:auto!important;bottom:max(16px,env(safe-area-inset-bottom));right:18px}@media(max-width:760px){.focus-exit{right:50%!important}}
+.rec-group{display:inline-flex;align-items:center;gap:6px}.rec-quality{min-height:36px;padding:0 8px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);color:var(--text);font-size:12px;font-weight:700}
+.rec-btn.recording{color:#fff;background:#d6336c!important;border-color:#ff6b9a!important;box-shadow:0 0 0 0 rgba(255,80,130,.6);animation:recPulse 1.4s ease-out infinite}
+@keyframes recPulse{0%{box-shadow:0 0 0 0 rgba(255,80,130,.55)}100%{box-shadow:0 0 0 12px rgba(255,80,130,0)}}
+@media(max-width:760px){.rec-quality{max-width:110px}}
+.rec-btn span{color:#ff5c8a}.rec-btn.recording span{color:#fff}@media(max-width:760px){.rec-btn.recording b{display:inline!important;margin-left:4px}}
