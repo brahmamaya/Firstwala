@@ -188,7 +188,7 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   const LOOSE=[[/interesting|fun fact|kuch naya batao|amazing fact|rochak|दिलचस्प|रोचक|मज़ेदार बात|mazedaar baat/,()=>fact()],
     [/(kuch |something )?easy (padh|sikha|topic|se|one)|aasaan|asaan|something easy|आसान/,()=>easy()]];
   function findConcept(q){if(!lesson)return null;const s=normQ(q),raw=q.toLowerCase();let best=null,sc=0;
-    for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.includes(' ')?3:k.length>4?2:1;for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n&&c===cur)n+=.5;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
+    for(const c of lesson.concepts){let n=0;for(const k0 of c.k){const k=normQ(k0).trim();if(k&&(s.includes(' '+k+' ')||(k.length>4&&s.includes(k))))n+=k.includes(' ')?3:k.length>4?2:1}for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n&&c===cur)n+=.5;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
   const lessonActs=c=>[[L(PH.ex),()=>bot(`${L(PH.example)} ${L(c.example)}`,{lang:prof.lang,acts:[[L(PH.an),()=>another(c)],[L(PH.quiz),()=>checkC(c)]]})],
     [L(PH.an),()=>another(c)],[curLvl==='basic'?L(PH.deeper):L(PH.more),()=>teach(c,curLvl==='basic'?up(curLvl):down(curLvl))],[L(PH.quiz),()=>checkC(c)]];
   function another(c){bot(`${L(PH.analogy)} ${L(c.analogy)} ${L(PH.mistake)} ${L(c.mistake)}`,{lang:prof.lang,acts:[[L(PH.quiz),()=>checkC(c)],[L(PH.practice),()=>practice()]]})}
