@@ -76,6 +76,10 @@ for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelec
   rt.addEventListener('click',e=>{e.stopPropagation();set(!lay.classList.contains('rail-collapsed'))});
   rail?.addEventListener('click',e=>{if(lay.classList.contains('rail-collapsed')&&!e.target.closest('#defaults'))set(false)});
   let c=false;try{c=localStorage.getItem('physica-rail')==='1'}catch{}set(c,false)}}
+// Wide screens: the subject switch sits in the empty middle of the top bar, beside "Interactive lab".
+{const st=$('.subject-tabs'),tb=$('.topbar');if(st&&tb&&window.matchMedia){const home=st.parentNode,nx=st.nextSibling,mq=window.matchMedia('(min-width: 1000px)');
+  const put=()=>{const up=mq.matches;if(up&&st.parentNode!==tb)tb.insertBefore(st,tb.querySelector('.topbar-right'));else if(!up&&st.parentNode===tb)home.insertBefore(st,nx);st.classList.toggle('in-topbar',up);window.dispatchEvent(new Event('resize'))};
+  mq.addEventListener?.('change',put);put()}}
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();

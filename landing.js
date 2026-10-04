@@ -16,7 +16,7 @@ for(const b of grades)b.addEventListener('click',()=>{pick.grade=Number(b.datase
 const step2=L.querySelector('.landing-step2'),calm=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;let leaving=0;
 function show(){clearTimeout(leaving);document.documentElement.classList.remove('deep');paint();L.classList.remove('leaving');L.hidden=false;document.body.classList.add('landing-open');document.body.classList.remove('app-reveal');window.scrollTo(0,0);window.PhysicaLandingBG?.start()}
 function hide(){if(calm){L.hidden=true;document.body.classList.remove('landing-open');window.PhysicaLandingBG?.stop();return}
-  window.PhysicaLandingBG?.dive();L.classList.add('leaving');leaving=setTimeout(()=>{L.hidden=true;L.classList.remove('leaving');document.body.classList.remove('landing-open');document.body.classList.add('app-reveal');window.PhysicaLandingBG?.stop()},760)}
+  window.PhysicaLandingBG?.dive();L.classList.add('leaving');leaving=setTimeout(()=>{L.hidden=true;L.classList.remove('leaving');document.body.classList.remove('landing-open');document.body.classList.add('app-reveal');window.PhysicaLandingBG?.stop()},1100)}
 $('landing-go').addEventListener('click',()=>{if(!(pick.subject&&pick.grade))return;try{localStorage.setItem(KEY,JSON.stringify(pick))}catch{}
   document.querySelector(`.subject-tab[data-subject="${pick.subject}"]`)?.click();document.querySelector(`.grade-tab[data-grade="${pick.grade}"]`)?.click();hide();window.scrollTo(0,0)});
 // The logo brings the chooser back.

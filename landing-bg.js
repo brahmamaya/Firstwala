@@ -5,6 +5,86 @@
    Glows are pre-rendered once per size and the particle count adapts to the device. */
 (() => {
 'use strict';
+/* GPU path: a ray-traced Schwarzschild black hole. Every pixel follows a bent light ray past
+   the hole, so the far side of the thin accretion disk is lensed over the top and under the
+   bottom exactly as in Interstellar; Doppler beaming brightens the side that comes towards us.
+   Black and white, rendered at a reduced resolution that adapts to the device. The 2D canvas
+   version below is the fallback when WebGL is not available. */
+const GL=(()=>{
+const cv=document.getElementById('landing-bg');if(!cv)return null;
+let gl=null;try{gl=cv.getContext('webgl',{antialias:false,alpha:false,depth:false,powerPreference:'high-performance',preserveDrawingBuffer:false})}catch{}
+if(!gl)return null;
+const reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500;
+const VS='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+const FS=`precision highp float;
+uniform vec2 res;uniform float t,dist,fov,dive;uniform vec2 look;
+#define STEPS ${weak?110:170}
+float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}
+float h31(vec3 p){p=fract(p*.1031);p+=dot(p,p.zyx+31.32);return fract((p.x+p.y)*p.z);}
+vec3 sky(vec3 d){vec3 c=vec3(0.);
+  for(int k=0;k<2;k++){float sc=k==0?38.:80.;vec3 g=d*sc,id=floor(g),f=fract(g)-.5;float h=h31(id+float(k)*17.);
+    if(h>.93){vec3 o=vec3(h31(id+3.1),h31(id+7.7),h31(id+1.3))-.5;float r=length(f-o*.5);float b=(h-.93)/.07;c+=vec3(smoothstep(.13,0.,r)*b*(k==0?1.3:.8));}}
+  return c;}
+void main(){
+  vec2 uv=(gl_FragCoord.xy-.5*res)/min(res.x,res.y);
+  float inc=.105+look.y*.05,yaw=look.x*.12+dive*.6;
+  vec3 cam=vec3(sin(yaw)*cos(inc),sin(inc),-cos(yaw)*cos(inc))*dist;
+  vec3 fw=normalize(-cam),rt=normalize(cross(vec3(0,1,0),fw)),up=cross(fw,rt);
+  float roll=-.09+dive*.5;vec2 ruv=mat2(cos(roll),-sin(roll),sin(roll),cos(roll))*uv;
+  vec3 dir=normalize(fw+(ruv.x*rt+ruv.y*up)*fov);
+  vec3 pos=cam,vel=dir;vec3 hc=cross(pos,vel);float h2=dot(hc,hc);
+  vec3 col=vec3(0.);float alpha=0.,glow=0.;bool hit=false;
+  for(int i=0;i<STEPS;i++){
+    float r2=dot(pos,pos),r=sqrt(r2);
+    if(r<1.){hit=true;break;}
+    float dt=clamp(.075*r,.04,1.1);
+    vec3 op=pos;vel+=-1.5*h2*pos/(r2*r2*r)*dt;pos+=vel*dt;
+    glow+=dt*.006/(r2*.35+.04);
+    if(op.y*pos.y<0.){float f=op.y/(op.y-pos.y);vec3 q=mix(op,pos,f);float rr=length(q.xz);
+      if(rr>2.6&&rr<13.){float ang=atan(q.z,q.x);float om=pow(rr,-1.5)*1.6;
+        float tex=fbm(vec2(rr*3.2,(ang+t*om)*5.))*.75+fbm(vec2(rr*11.,(ang+t*om)*13.))*.45;
+        float prof=pow(3./rr,2.3)*smoothstep(2.6,3.4,rr)*smoothstep(13.,8.,rr);
+        float v=sqrt(.5/(rr-1.));vec3 vd=normalize(vec3(-q.z,0.,q.x))*v;float gam=1./sqrt(1.-v*v);
+        float dop=1./(gam*(1.+dot(vd,normalize(vel))));dop=clamp(dop,.25,2.4);
+        float I=prof*tex*pow(dop,3.)*sqrt(1.-1./rr)*2.6;
+        float a=clamp(.55+.45*tex,0.,1.)*(1.-alpha)*smoothstep(13.,9.,rr);
+        col+=vec3(I)*a;alpha+=a*.92;if(alpha>.98)break;}}
+    if(r>dist*1.6&&dot(pos,vel)>0.)break;}
+  if(!hit)col+=sky(normalize(vel))*(1.-alpha);
+  col+=vec3(glow*.55)*(1.-alpha*.6);
+  col=1.-exp(-col*1.25);
+  float vg=smoothstep(1.25,.25,length(uv));col*=mix(.55,1.,vg);
+  col*=1.-smoothstep(.8,1.,dive);
+  gl_FragColor=vec4(col,1.);}`;
+const sh=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return gl.getShaderParameter(s,gl.COMPILE_STATUS)?s:null};
+const v=sh(gl.VERTEX_SHADER,VS),f=sh(gl.FRAGMENT_SHADER,FS);if(!v||!f)return null;
+const pr=gl.createProgram();gl.attachShader(pr,v);gl.attachShader(pr,f);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return null;
+gl.useProgram(pr);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+const U={};for(const n of['res','t','dist','fov','dive','look'])U[n]=gl.getUniformLocation(pr,n);
+let scale=weak?.5:.72,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
+function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(1.5,window.devicePixelRatio||1)*scale;cv.width=Math.max(2,Math.round(W*k));cv.height=Math.max(2,Math.round(H*k));gl.viewport(0,0,cv.width,cv.height)}
+function draw(now){const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
+  if(dv>0)dv=Math.min(1,dv+dt*.95);tx+=(mx-tx)*.04;ty+=(my-ty)*.04;
+  const e=dv*dv*(3-2*dv),narrow=W<H;
+  gl.uniform2f(U.res,cv.width,cv.height);gl.uniform1f(U.t,(now-t0)/1000);gl.uniform1f(U.dist,(narrow?20:27)*(1-e*.93));
+  gl.uniform1f(U.fov,.62*(1+e*1.6));gl.uniform1f(U.dive,e);gl.uniform2f(U.look,tx,ty);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  // keep it smooth: drop the resolution on devices that cannot hold ~50 fps
+  if(running&&!dv){frames++;if(dt>.024)slow++;if(frames>=40){if(slow>14&&scale>.3){scale=Math.max(.3,scale-.12);size()}frames=slow=0}}
+  if(running)raf=requestAnimationFrame(draw)}
+function start(){size();dv=0;last=0;if(reduce){draw(performance.now());return}if(!running){running=true;raf=requestAnimationFrame(draw)}}
+function stop(){running=false;cancelAnimationFrame(raf)}
+let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!W)return;size();if(!running)draw(performance.now())},120)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running){stop();running='paused'}}else if(running==='paused'){running=false;start()}});
+addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!W)return;mx=e.clientX/W-.5;my=e.clientY/H-.5},{passive:true});
+cv.addEventListener('webglcontextlost',e=>{e.preventDefault();stop()});
+return{start,stop,dive(){dv=.001},resize:size};
+})();
+if(GL){window.PhysicaLandingBG=GL;return}
 const cv=document.getElementById('landing-bg');if(!cv||!cv.getContext)return;
 const g=cv.getContext('2d'),TAU=Math.PI*2,reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500;
