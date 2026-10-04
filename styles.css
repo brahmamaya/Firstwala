@@ -569,3 +569,18 @@ body.mode-teacher .tutor-say{font-size:17px}
 .tutor-mic{width:42px;height:42px;flex:none;font-size:18px}
 .tutor-mic.on{background:radial-gradient(circle,#ff5a4f,#c4180e);border-color:#ff8f87;color:#fff;animation:recGlow 1.4s ease-in-out infinite}
 .tutor-read{width:28px;height:28px;font-size:13px;vertical-align:middle;margin-left:4px}
+/* AI Tutor switch (top bar, Student mode only) */
+.tutor-switch{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);color:#fff;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04));box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.tutor-switch[hidden]{display:none}
+.tutor-switch-ic{font-size:14px}
+.tutor-switch-knob{position:relative;width:34px;height:22px;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);transition:background .25s}
+.tutor-switch-knob:after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#fff,#bdbdbd);box-shadow:0 2px 6px rgba(0,0,0,.5);transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
+.tutor-switch[aria-pressed=true]{border-color:rgba(89,224,143,.6)}
+.tutor-switch[aria-pressed=true] .tutor-switch-knob{background:#2fbf71}
+.tutor-switch[aria-pressed=true] .tutor-switch-knob:after{transform:translateX(12px)}
+@media(max-width:620px){.tutor-switch b{display:none}.tutor-switch{padding:0 5px 0 9px;gap:6px}}
+.tutor-cta[hidden]{display:none!important}
+@media(max-width:620px){.tutor-switch-ic{display:none}.tutor-switch{padding:0 5px;gap:0}#theme-select{max-width:96px}.topbar-right{gap:6px!important}}
+@media(max-width:420px){body.mode-student .topbar .brand-word{font-size:17px!important}body.mode-student .topbar .brand{gap:6px}body.mode-student #theme-select{max-width:80px;padding:0 3px 0 6px;font-size:11px}body.mode-student .topbar-right{gap:5px!important}body.mode-student .topbar{padding-left:10px!important;padding-right:10px!important}}
+@media(max-width:620px){.tutor-switch:before{content:'AI';font-size:11px;font-weight:900;letter-spacing:.04em;margin:0 5px 0 4px}}
