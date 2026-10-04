@@ -21,5 +21,5 @@ $('landing-go').addEventListener('click',()=>{if(!(pick.subject&&pick.grade))ret
   document.querySelector(`.subject-tab[data-subject="${pick.subject}"]`)?.click();document.querySelector(`.grade-tab[data-grade="${pick.grade}"]`)?.click();hide();window.scrollTo(0,0)});
 // The logo brings the chooser back.
 const brand=document.querySelector('.topbar .brand');if(brand){brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Change subject or class';brand.style.cursor='pointer';brand.addEventListener('click',show);brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})}
-const hash=decodeURIComponent(location.hash.slice(1));if(!(hash&&sims.some(s=>s.id===hash)))show();
+const hash=decodeURIComponent(location.hash.slice(1));if(hash&&sims.some(s=>s.id===hash))L.hidden=true;else{document.documentElement.classList.remove('deep');show()}
 })();

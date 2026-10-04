@@ -15,7 +15,7 @@ for(const p of document.querySelectorAll('.controls-card p'))if(/^Drag a slider/
 let hidden=new Set(['tips']);try{const v=localStorage.getItem(KEY);if(v)hidden=new Set(JSON.parse(v))}catch{}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify([...hidden]))}catch{}};
 const bar=document.createElement('div');bar.className='restore-bar';bar.setAttribute('role','group');bar.setAttribute('aria-label','Show hidden panels');
-const head=$('.workspace-header');head?.after(bar);
+const head=$('.workspace-header'),crumbs=$('.breadcrumbs');if(crumbs)crumbs.after(bar);else head?.after(bar);
 function paint(){for(const p of PANELS)body.classList.toggle('hide-'+p.key,hidden.has(p.key));bar.replaceChildren();
   const shown=PANELS.filter(p=>hidden.has(p.key)&&$(p.sel));if(!shown.length){bar.hidden=true;return}bar.hidden=false;
   const lab=document.createElement('span');lab.className='restore-label';lab.textContent='Hidden:';bar.append(lab);
@@ -34,6 +34,10 @@ paint();
 const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details');d.className='more-menu';const sm=document.createElement('summary');sm.textContent='More ▾';sm.dataset.testid='more-menu';const pop=document.createElement('div');pop.className='more-pop';
   for(const id of['sound-toggle','volume-wrap','randomise-btn','realism-toggle','surprise-button','help-open']){const el=document.getElementById(id);if(el)pop.append(el)}
   d.append(sm,pop);row.append(d);document.addEventListener('click',e=>{if(d.open&&!d.contains(e.target))d.open=false});pop.addEventListener('click',e=>{if(e.target.closest('button'))setTimeout(()=>{d.open=false},150)})}
+// Fill the column under the stage with "What to notice" instead of leaving it empty beside a tall controls panel.
+{const main=$('.lab-main'),below=$('.below-stage');if(main&&below)main.append(below)}
+// A short fade/slide whenever another experiment opens, so changes feel smooth rather than jumpy.
+{const stage=$('.stage');let last=location.hash;window.addEventListener('hashchange',()=>{if(location.hash===last||!stage)return;last=location.hash;stage.classList.remove('swap');void stage.offsetWidth;stage.classList.add('swap')})}
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();
