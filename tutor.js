@@ -16,7 +16,7 @@ const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group'
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
 for(const [id,label] of MODES){const b=btn('land-grade land-mode',null,()=>setMode(id));b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
 const step2=document.querySelector('.landing-step2');
-if(step2){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','3'),document.createTextNode(' Choose your mode'));st.append(h,sw);step2.after(st)}
+if(step2){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','2'),document.createTextNode(' Choose your mode'));st.append(h,sw);step2.after(st)}
 
 // ---- live simulation access (through the real controls, so everything stays in sync)
 const simId=()=>decodeURIComponent(location.hash.slice(1))||'';
