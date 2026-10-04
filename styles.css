@@ -242,3 +242,25 @@ body.focus .below-stage{display:none!important}
 @keyframes recPulse{0%{box-shadow:0 0 0 0 rgba(255,80,130,.55)}100%{box-shadow:0 0 0 12px rgba(255,80,130,0)}}
 @media(max-width:760px){.rec-quality{max-width:110px}}
 .rec-btn span{color:#ff5c8a}.rec-btn.recording span{color:#fff}@media(max-width:760px){.rec-btn.recording b{display:inline!important;margin-left:4px}}
+/* ===== Liquid glass ===== */
+.glass-host{position:relative!important;isolation:isolate}
+.glass-host>button{position:relative;z-index:1;background:transparent!important;box-shadow:none!important}
+.glass-thumb{position:absolute;z-index:0;left:0;top:0;border-radius:999px;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.07) 55%,rgba(255,255,255,.12));
+  -webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -6px 14px rgba(120,220,255,.10),0 6px 18px rgba(0,0,0,.35),0 0 20px -6px var(--neon);
+  transition:left .5s cubic-bezier(.34,1.45,.45,1),top .5s cubic-bezier(.34,1.45,.45,1),width .5s cubic-bezier(.34,1.45,.45,1),height .5s cubic-bezier(.34,1.45,.45,1),opacity .25s}
+.glass-thumb.flow{animation:liquid .55s cubic-bezier(.3,1.3,.5,1)}
+@keyframes liquid{0%{transform:scale(1,1)}30%{transform:scale(1.14,.86)}60%{transform:scale(.96,1.05)}100%{transform:scale(1,1)}}
+.subject-tabs .glass-thumb,.grade-tabs .glass-thumb{border-radius:10px}
+.mode-switch{overflow:visible!important;padding:2px;background:rgba(255,255,255,.04)}
+.mode-switch button{border-radius:999px!important;border:0!important}.mode-switch button+button{border-left:0!important}
+#mode-ultra[aria-pressed=true]{color:#ffb070!important}
+/* glass sheen on every button press / hover */
+.lab-tool-buttons button,.more-menu summary,.view3d-bar button,.transport button,.focus-btn,.restore-chip,.simulation-tabs button,.rec-quality,.landing-go,.land-subject,.land-grade,.tabs-nav button,#prev,#next{position:relative;overflow:hidden}
+.lab-tool-buttons button:after,.more-menu summary:after,.view3d-bar button:not(.glass-host button):after,.transport button:after,.focus-btn:after,.simulation-tabs button:after,.landing-go:after,.land-subject:after,.land-grade:after,.tabs-nav button:after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 48%,rgba(255,255,255,.08) 55%,transparent 70%);transform:translateX(-120%);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.lab-tool-buttons button:hover:after,.more-menu summary:hover:after,.view3d-bar button:hover:after,.transport button:hover:after,.focus-btn:hover:after,.simulation-tabs button:hover:after,.landing-go:hover:after,.land-subject:hover:after,.land-grade:hover:after,.tabs-nav button:hover:after,.lab-tool-buttons button:active:after,.transport button:active:after,.view3d-bar button:active:after{transform:translateX(120%)}
+.lab-tool-buttons button,.view3d-bar button,.transport .restart-button,.focus-btn,.simulation-tabs button{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);background-image:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0))}
+@media(prefers-reduced-motion:reduce){.glass-thumb{transition:none}.glass-thumb.flow{animation:none}}
+.toast{padding:8px 16px!important;border-radius:999px!important;font-size:13px!important;background:rgba(10,22,36,.72)!important;-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 30px rgba(0,0,0,.4)!important;animation:toastGlass .35s cubic-bezier(.3,1.3,.5,1)!important}@keyframes toastGlass{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
