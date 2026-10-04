@@ -4,10 +4,13 @@
 'use strict';
 const FORM='https://docs.google.com/forms/d/e/1FAIpQLSe0_6Z2gxTf1uxjnfLx4l7pkhyqiM5677GsGgmhVhWrbXHGjg/formResponse';
 const F={name:'entry.1574339962',country:'entry.15669348',text:'entry.658520155'};
-const right=document.querySelector('.topbar-right');if(!right||!window.fetch)return;
+if(!window.fetch)return;
 const el=(tag,props={},kids=[])=>{const e=document.createElement(tag);for(const [k,v] of Object.entries(props)){if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else e.setAttribute(k,v)}for(const c of kids)e.append(c);return e};
-const open=el('button',{type:'button',class:'feedback-btn','aria-haspopup':'dialog','data-testid':'feedback-btn',title:'Send feedback'},[el('span',{'aria-hidden':'true',text:'💬'}),el('b',{text:'Feedback'})]);
-right.prepend(open);
+// Two quiet entry points: the foot of the chapter library (desktop sidebar and phone drawer) and the "More" menu.
+const opens=[];const foot=document.querySelector('.sidebar-bottom');
+if(foot){const b=el('button',{type:'button',class:'fb-entry','aria-haspopup':'dialog','data-testid':'feedback-btn'},[el('span',{'aria-hidden':'true',text:'💬'}),el('span',{class:'fb-entry-t'},[el('b',{text:'Share your feedback'}),el('small',{text:'Tell us what to improve'})])]);foot.before(b);opens.push(b)}
+const pop=document.querySelector('.more-pop');if(pop){const b=el('button',{type:'button','aria-haspopup':'dialog','data-testid':'feedback-more'},[el('span',{'aria-hidden':'true',text:'💬 '}),document.createTextNode('Feedback')]);pop.append(b);opens.push(b)}
+if(!opens.length)return;
 const dlg=el('div',{class:'fb-backdrop',hidden:'',role:'presentation'});
 const box=el('form',{class:'fb-card',role:'dialog','aria-modal':'true','aria-labelledby':'fb-title',novalidate:''});
 const close=el('button',{type:'button',class:'panel-close fb-close','aria-label':'Close feedback',text:'✕'});
@@ -25,7 +28,7 @@ let last=null;
 function show(){last=document.activeElement;dlg.hidden=false;requestAnimationFrame(()=>dlg.classList.add('on'));msg.textContent='';msg.className='fb-msg';send.disabled=false;box.classList.remove('done');setTimeout(()=>name.focus(),60)}
 function hide(){dlg.classList.remove('on');setTimeout(()=>{dlg.hidden=true},220);last?.focus?.()}
 box.addEventListener('input',()=>{if(msg.classList.contains('err')){msg.textContent='';msg.className='fb-msg'}});
-open.addEventListener('click',show);close.addEventListener('click',hide);
+for(const b of opens)b.addEventListener('click',show);close.addEventListener('click',hide);
 dlg.addEventListener('click',e=>{if(e.target===dlg)hide()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!dlg.hidden)hide()});
 box.addEventListener('submit',async e=>{e.preventDefault();
