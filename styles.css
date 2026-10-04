@@ -508,3 +508,10 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 .fb-contact{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
 .fb-contact>span{font-size:22px;line-height:1.2}.fb-contact p{margin:0;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.75)}.fb-contact b{color:#fff}
 .fb-contact a{color:#fff;font-weight:800;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+/* Landing: contact for schools and coaching institutes, right under "Open simulations" */
+.landing-schools{margin:16px auto 0;max-width:520px;padding:10px 16px;border-radius:999px;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.72);
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.landing-schools a{color:#fff;font-weight:800;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+@media(max-width:560px){.landing-schools{border-radius:18px;font-size:13px}}
+.landing-inner>:nth-child(9){animation-delay:.66s!important}
+.landing-inner>:nth-child(10){animation-delay:.74s!important}
