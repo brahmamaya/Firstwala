@@ -462,3 +462,9 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
   .controls-card #defaults:before{content:'↺';font-size:17px;font-weight:900;line-height:1}
   .controls-card #defaults.spin:before{display:inline-block;animation:resetTurn .5s cubic-bezier(.3,1.2,.5,1)}}
 @keyframes resetTurn{from{transform:rotate(0)}to{transform:rotate(-360deg)}}
+/* Recording: the button turns solid red with a blinking dot and a running timer */
+.transport .rec-btn.recording,.rec-btn.recording{background:linear-gradient(180deg,#ff5a4f,#e0241a)!important;border-color:#ff8f87!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 3px rgba(255,59,48,.25),0 0 18px rgba(255,59,48,.6)!important;animation:recGlow 1.6s ease-in-out infinite!important;width:auto!important;min-width:0!important;padding:0 14px 0 12px!important;gap:7px}
+.rec-btn.recording span{color:#fff!important;font-size:10px;animation:recBlink 1s steps(1) infinite}
+.transport .rec-btn.recording b,.rec-btn.recording b{display:inline!important;position:static!important;width:auto!important;height:auto!important;clip:auto!important;overflow:visible!important;margin:0!important;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.03em;white-space:nowrap}
+@keyframes recBlink{0%{opacity:1}50%{opacity:.15}}
+@keyframes recGlow{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 3px rgba(255,59,48,.25),0 0 14px rgba(255,59,48,.45)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 5px rgba(255,59,48,.18),0 0 24px rgba(255,59,48,.8)}}
