@@ -93,7 +93,7 @@ const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.
 const target=(w,h)=>{const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
   for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);
   const fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tx,0);return{tx,fb,w,h}};
-let A=null,B1=null,B2=null,H0=null,H1=null,sceneW=0,sceneH=0,fresh=true,shiftX=0,shiftY=0,diveT=0,frameN=0;
+let starve=0,A=null,B1=null,B2=null,H0=null,H1=null,sceneW=0,sceneH=0,fresh=true,shiftX=0,shiftY=0,diveT=0,frameN=0;
 let scale=weak?.6:.85,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
 const free=o=>{if(o){gl.deleteTexture(o.tx);gl.deleteFramebuffer(o.fb)}};
 function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(1.5,window.devicePixelRatio||1);
@@ -122,10 +122,15 @@ function draw(now){const dt=Math.min(.1,last?(now-last)/1000:.016);last=now;
   gl.uniform1f(P4.u.t,T%10);gl.uniform1f(P4.u.warp,e<.9?fall:0.);gl.uniform1f(P4.u.flash,flash);gl.uniform1f(P4.u.fade,Math.min(1,T*1.2));gl.uniform2f(P4.u.res,cv.width,cv.height);
   gl.drawArrays(gl.TRIANGLES,0,3);gl.activeTexture(gl.TEXTURE0);
   // keep it smooth: drop the resolution on devices that cannot hold ~50 fps (checked only while idle)
-  if(running&&still){frames++;if(dt>.024)slow++;if(frames>=40){if(slow>14&&scale>.35){scale=Math.max(.35,scale-.12);size()}frames=slow=0}}
-  if(running)raf=requestAnimationFrame(draw)}
+  if(running&&still){frames++;if(dt>.024)slow++;
+    // very slow device: step down at once instead of waiting 40 frames; below the floor, render fewer frames
+    if(frames>3&&dt>.06&&scale>.3){scale=Math.max(.3,scale*.72);size();frames=slow=0}
+    else if(frames>=40){if(slow>14&&scale>.35){scale=Math.max(.35,scale-.12);size()}frames=slow=0}
+    if(scale<=.3&&dt>.06)starve++;else if(dt<.04)starve=0}
+  // a device without a usable GPU: keep the page responsive by drawing only a few frames a second
+  if(running)raf=starve>8&&!dv?setTimeout(()=>{raf=requestAnimationFrame(draw)},400):requestAnimationFrame(draw)}
 function start(){size();dv=0;last=0;t0=performance.now();if(reduce){t0-=1e4;draw(performance.now());return}if(!running){running=true;raf=requestAnimationFrame(draw)}}
-function stop(){running=false;cancelAnimationFrame(raf)}
+function stop(){running=false;cancelAnimationFrame(raf);clearTimeout(raf)}
 let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!W)return;size();if(!running)draw(performance.now())},120)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running){stop();running='paused'}}else if(running==='paused'){running=false;raf=requestAnimationFrame(draw);running=true}});
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();stop()});
