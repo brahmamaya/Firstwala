@@ -1,5 +1,5 @@
 /* Physica Tutor voice helpers: turn physics text into natural speech ("R = v² sin(2θ) / g" → "R equals v squared,
-   sine of 2 theta, divided by g") and pick a female English voice (Indian English first) from the device. */
+   sine of 2 theta, divided by g") and pick the most natural female voice on the device. */
 (() => {
 'use strict';
 const SUP={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'minus ','ⁿ':'n'};
@@ -11,7 +11,7 @@ const AFTER={m:'metres',cm:'centimetres',mm:'millimetres',km:'kilometres',kg:'ki
   nm:'nanometres',fm:'femtometres',Å:'angstroms',µF:'microfarads',μF:'microfarads',F:'farads',Pa:'pascals',T:'tesla',C:'coulombs',D:'dioptres',H:'henry',mA:'milliamps',kV:'kilovolts',MeV:'mega electron volts',u:'atomic mass units'};
 const sup=s=>[...s].map(c=>SUP[c]??c).join('');
 function speakable(t){t=String(t||'');
-  t=t.replace(/[“”"«»]/g,'').replace(/e\.g\./g,'for example').replace(/i\.e\./g,'that is').replace(/\betc\./g,'and so on').replace(/🎉|⭐|✓|✦/g,'');
+  t=t.replace(/\p{Extended_Pictographic}|\uFE0F|\u200D/gu,'').replace(/[“”"«»]/g,'').replace(/e\.g\./g,'for example').replace(/i\.e\./g,'that is').replace(/\betc\./g,'and so on').replace(/🎉|⭐|✓|✦/g,'');
   t=t.replace(/(\d)\s*×\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g,(m,a,e)=>`${a} times 10 to the power ${sup(e)}`);
   for(const [r,w] of UNITS)t=t.replace(r,w);
   t=t.replace(/(\d)\s?(MeV|eV|kV|mA|µF|μF|nm|fm|cm|mm|km|kg|ms|Hz|Pa|m|s|N|J|W|V|A|K|Å|F|T|C|D|H|u)\b/g,(m,n,u)=>`${n} ${AFTER[u]||u}`).replace(/(\d)\s?Ω/g,'$1 ohms');
@@ -25,9 +25,13 @@ function speakable(t){t=String(t||'');
   t=t.replace(/\s=\s|=/g,' equals ').replace(/\s?×\s?|·/g,' times ').replace(/±/g,' plus or minus ').replace(/≈/g,' approximately ').replace(/∝/g,' is proportional to ').replace(/→/g,' to ').replace(/−/g,' minus ').replace(/\s\+\s/g,' plus ');
   t=t.replace(/_/g,' ').replace(/\s+/g,' ').replace(/(\w)\s*\/\s*(\w)/g,'$1 divided by $2').replace(/[()[\]{}]/g,' ').replace(/\s-\s/g,', ').replace(/\s+/g,' ').trim();
   return t}
-const FEMALE=/female|woman|samantha|victoria|karen|moira|tessa|fiona|veena|lekha|heera|neerja|swara|kalpana|aditi|raveena|zira|aria|jenny|emma|sonia|libby|natasha|serena|allison|ava|susan|catherine|kate|google uk english female|google us english/i,MALE=/\bmale\b|daniel|alex|fred|rishi|ravi|prabhat|david|mark|george|guy|ryan|thomas/i;
-function pickVoice(list,lang){if(lang==='hi'){const hi=list.filter(v=>/^hi/i.test(v.lang));return hi.find(v=>/swara|kalpana|lekha|female|google/i.test(v.name)&&!/madhur|hemant|male\b/i.test(v.name))||hi.find(v=>!/madhur|hemant|male\b/i.test(v.name))||hi[0]||null}
-  const en=list.filter(v=>/^en/i.test(v.lang)),fem=en.filter(v=>FEMALE.test(v.name)&&!MALE.test(v.name.replace(/female/i,'')));
-  return fem.find(v=>/en-IN/i.test(v.lang))||fem.find(v=>/en-GB/i.test(v.lang))||fem[0]||en.find(v=>/en-IN/i.test(v.lang)&&!MALE.test(v.name))||en.find(v=>!MALE.test(v.name))||en[0]||null}
+// the most human-sounding female voice on the device: neural / "Natural" voices first (Edge, Windows 11, Safari premium),
+// Indian voices next. The voice is the device's own - nothing is recorded or shipped with the site.
+const FEMALE=/female|woman|samantha|victoria|karen|moira|tessa|fiona|veena|lekha|heera|neerja|swara|kalpana|aditi|raveena|isha|aarohi|ananya|zira|aria|jenny|emma|sonia|libby|natasha|serena|allison|\bava\b|susan|catherine|kate|michelle|google uk english female|google us english/i,
+  MALE=/\bmale\b|daniel|alex|fred|rishi|ravi|prabhat|madhur|hemant|kunal|arjun|david|mark|george|guy|ryan|thomas|andrew|brian|christopher|eric|roger|steffan|william|liam/i,
+  NAT=/natural|neural|online|premium|enhanced/i;
+const score=(v,lang)=>(NAT.test(v.name)?6:0)+(lang==='hi'?(/swara|kalpana|lekha|aarohi|ananya/i.test(v.name)?3:0)+(/google/i.test(v.name)?1:0):(/en-IN/i.test(v.lang)?3:/en-GB/i.test(v.lang)?1:0))+(FEMALE.test(v.name)?2:0)+(v.localService===false?0:.5);
+function pickVoice(list,lang){const ok=list.filter(v=>(lang==='hi'?/^hi/i:/^en/i).test(v.lang)&&!MALE.test(v.name.replace(/female/i,'')));
+  return ok.sort((a,b)=>score(b,lang)-score(a,lang))[0]||list.find(v=>(lang==='hi'?/^hi/i:/^en/i).test(v.lang))||null}
 window.PhysicaSpeech={speakable,pickVoice};
 })();

@@ -55,11 +55,17 @@ const SP=window.PhysicaSpeech||{speakable:t=>t,pickVoice:l=>l[0]||null};
 const synth=window.SpeechSynthesisUtterance?window.speechSynthesis:null,Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
 let voiceOn=true;try{voiceOn=localStorage.getItem('physica-voice')!=='0'}catch{}
 let voice=null,voiceHi=null;const pickVoice=()=>{try{const l=synth?.getVoices()||[];voice=SP.pickVoice(l);voiceHi=SP.pickVoice(l,'hi')}catch{voice=null}};if(synth){pickVoice();synth.addEventListener?.('voiceschanged',pickVoice)}
+// one short phrase per utterance with human-like pauses between them (longer after a question), soft pitch and pace
+let sayTk=0;
+function phrasesOf(t){const out=[];for(const sen of t.split(/(?<=[.!?।])\s+/).filter(Boolean))for(const p of (sen.length>140?sen.split(/(?<=[,;:])\s+/):sen.split(/(?<=[;:])\s+/)))out.push([p,/\?$/.test(p)?520:/[.!।]$/.test(p)?380:/[,;:]$/.test(p)?200:300]);return out}
 function speak(text,then,lang){if(!synth||!voiceOn||mode!=='student'){then?.();return}const dev=(String(text).match(/[\u0900-\u097F]/g)||[]).length,lat=(String(text).match(/[a-z]/gi)||[]).length,hi=lang==='hi'||dev>lat,vv=hi&&voiceHi?voiceHi:voice;
-  const parts=SP.speakable(text).split(/(?<=[.!?।])\s+/).filter(Boolean);if(!parts.length){then?.();return}
-  parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p);u.lang=hi?'hi-IN':'en-IN';if(vv)try{u.voice=vv;u.lang=vv.lang}catch{}u.rate=.97;u.pitch=1.12;
-    u.onstart=()=>card.classList.add('talking');if(k===parts.length-1)u.onend=()=>{card.classList.remove('talking');then?.()};synth.speak(u)})}
-const hush=()=>{try{synth?.cancel()}catch{}card?.classList.remove('talking')};
+  const parts=phrasesOf(SP.speakable(text));if(!parts.length){then?.();return}
+  const tk=++sayTk,nat=/natural|neural|online|premium|enhanced/i.test(vv?.name||'');let k=0;
+  const next=()=>{if(tk!==sayTk)return;if(k>=parts.length){card.classList.remove('talking');then?.();return}
+    const [p,gap]=parts[k++],u=new SpeechSynthesisUtterance(p);u.lang=hi?'hi-IN':'en-IN';if(vv)try{u.voice=vv;u.lang=vv.lang}catch{}
+    u.rate=nat?.96:.92;u.pitch=nat?1:1.04;u.volume=.92;u.onstart=()=>card.classList.add('talking');u.onend=()=>setTimeout(next,gap);u.onerror=()=>setTimeout(next,0);synth.speak(u)};
+  setTimeout(next,120)}
+const hush=()=>{sayTk++;try{synth?.cancel()}catch{}card?.classList.remove('talking')};
 
 // ---- the tutor card (Student mode only)
 const card=el('section','tutor-card');card.setAttribute('aria-label','Physica Tutor');card.hidden=true;stage.after(card);
@@ -151,21 +157,42 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   let prof={level:null,lang:'en'};try{Object.assign(prof,JSON.parse(localStorage.getItem('physica-learner')||'{}'))}catch{}
   const saveProf=()=>{try{localStorage.setItem('physica-learner',JSON.stringify(prof))}catch{}};
   const L=o=>o?(o[prof.lang]||o.en):'';
-  const HL=/\b(hai|hain|kya|kyun|kyu|kaise|nahi|nhi|samajh|samjh|mein|toh|karo|batao|bataiye|hota|hoti|aur|yeh|ye|kitna|kitni|mujhe|kar|wala|wali|kab|kaun|accha|achha|thik|theek|sawaal|sawal|dikhao|do)\b/i;
+  const HL=/\b(hai|hain|kya|kyun|kyu|kaise|nahi|nhi|samajh|samjh|mein|toh|karo|batao|bataiye|hota|hoti|aur|yeh|ye|kitna|kitni|mujhe|kar|wala|wali|kab|kaun|accha|achha|thik|theek|sawaal|sawal|dikhao|do|ho|hoon|hu|khana|khaya|kahan|kaha|raha|rahe|rahi|padhein|bataun)\b/i;
   // the reply language follows the student; very short messages ("hint", "ok") keep the current language
   const langOf=q=>/[\u0900-\u097F]/.test(q)?'hi':HL.test(q)?'hl':q.trim().split(/\s+/).length>=3?'en':prof.lang;
   const MOOD={confused:/samajh nahi|samjh nahi|samjh nhi|samajh nhi|nahi samajh|nhi samajh|samajh me nahi|confus|don'?t understand|didn'?t understand|did not understand|not clear|phir se|dobara|again|समझ नहीं|फिर से|दोबारा/i,
-    tired:/\bbor(ed|ing)?\b|boring|too hard|very hard|difficult|mushkil|tired|\bthak|\bhate\b|irritat|\bugh\b|😭|😢|😩|बोर|मुश्किल|(?:^|\s)थक/i,
+    tired:/\bbor(e|ed|ing)?\b|boring|too hard|very hard|difficult|mushkil|tired|\bthak|\bhate\b|irritat|\bugh\b|😭|😢|😩|बोर|मुश्किल|(?:^|\s)थक/i,
     happy:/thank|got it|samajh gaya|samajh gayi|samajh aa gaya|samjh gaya|samjh gayi|\bnice\b|awesome|\bwow\b|maza|mazaa|समझ गया|समझ गई|धन्यवाद/i};
   const HIK={vectors:['सदिश','परिणामी'],components:['घटक'],projectile:['प्रक्षेप्य','परवलय','फेंक'],range:['परास','दूर'],'height-time':['ऊँचाई','उड़ान','समय'],horizontal:['क्षैतिज','छत','चट्टान'],circular:['वृत्त','अभिकेंद्र','घूम'],river:['नदी','नाव','तैर','बारिश']};
   const LV=['basic','average','advanced'],down=l=>LV[Math.max(0,LV.indexOf(l||'average')-1)],up=l=>LV[Math.min(2,LV.indexOf(l||'average')+1)];
-  let cur=null,curLvl=null,prob=null,hintN=0,crossN=0;
+  let cur=null,curLvl=null,prob=null,hintN=0,crossN=0,teachN=0;const factsSeen=new Set(),taught=new Set();
+  const dayPart=()=>{const h=new Date().getHours();return h<5?'night':h<12?'morning':h<17?'afternoon':h<21?'evening':'night'};
+  // "Did you know?" - a chapter fact first, then a general one; never the same twice in a session
+  function fact(){const F=TC.facts||{},pool=[...(F[sim.chapter]||[]),...(F.general||[])],left=pool.filter(f=>!factsSeen.has(f)),f=pickOne(left.length?left:pool);if(!f)return check();factsSeen.add(f);
+    bot(`${L(PH.didYouKnow)} ${L(f)}`,{lang:prof.lang,acts:[[L(PH.oneMore),()=>fact()],[L(PH.backStudy),()=>cur?teach(cur,curLvl||prof.level||'basic'):easy()]]})}
+  function easy(){if(!lesson)return check();const c=lesson.concepts.find(x=>!taught.has(x))||lesson.concepts[0];teach(c,'basic',L(PH.easyIntro))}
+  const menuActs=()=>[...(lesson?[['📚 '+L(PH.topicsBtn),()=>topics()],['✍️ '+L(PH.practice),()=>{prof.level?practice():askLevel(()=>practice())}]]:[]),['✓ '+L(PH.quiz),()=>check()],[L(PH.interestingBtn),()=>fact()],[L(PH.easyBtn),()=>easy()],[L(PH.askBtn),()=>inp.focus()]];
+  const moodActs=()=>['great','ok','tired'].map(m=>[L(PH.moodBtn[m]),()=>{me(L(PH.moodBtn[m]));if(m==='tired')prof.level=prof.level||'basic';
+    bot(`${L(PH.moodReply[m])} ${lesson?`${L(PH.todayWe)} ${prof.lang==='en'?sim.title.toLowerCase():sim.title}.`:''}`,{lang:prof.lang,acts:m==='great'?menuActs():[[L(PH.easyBtn),()=>easy()],[L(PH.interestingBtn),()=>fact()],...menuActs().slice(0,2)]})}]);
+  // everyday chat between lessons (greetings, "kaise ho", "khana khaya"...), only for short messages
+  const TALK=[[/^(bye|by|tata|alvida|chalta|chalti|see you|cya|बाय|अलविदा)(?=$|[\s!.,?])/,()=>bot(L(PH.bye),{lang:prof.lang})],
+    [/^(good ?night|gn|shubh ratri|शुभ रात्रि)(?=$|[\s!.,?])/,()=>bot(L(PH.night),{lang:prof.lang})],
+    [/^(hi+|hello+|hey+|helo|namaste|namaskar|good (morning|afternoon|evening)|gm|नमस्ते|नमस्कार|सुप्रभात|हेलो|हाय)(?=$|[\s!.,?])/,t=>bot(`${L(PH.greet[(t.match(/morning|afternoon|evening/)||[])[0]||dayPart()])} ${L(PH.greetBack)}`,{lang:prof.lang,acts:moodActs()})],
+    [/(kaise|kaisi|kese|kesi) ho|how are (you|u)[\s?!.]*$|how r u|kya haal|कैसे हो|कैसी हो|क्या हाल/,()=>bot(L(PH.howMe),{lang:prof.lang,acts:moodActs()})],
+    [/khana kha|khaana kha|kha liya|did you eat|have you eaten|had (your )?(lunch|dinner|breakfast)|खाना खा|नाश्ता/,()=>bot(L(PH.food),{lang:prof.lang,acts:menuActs()})],
+    [/(kahan|kaha|kidhar) ho|where are (you|u)|कहाँ हो|कहां हो/,()=>bot(L(PH.where),{lang:prof.lang,acts:menuActs()})],
+    [/kya kar rah[eia]|what are (you|u) doing|wyd|क्या कर रह/,()=>bot(L(PH.doing),{lang:prof.lang,acts:menuActs()})],
+    [/kaisa lag (raha|rha)|how do you feel|how('?s| is) your day|कैसा लग रहा/,()=>bot(L(PH.feel),{lang:prof.lang,acts:moodActs()})],
+    [/(tum|aap) kaun|who are (you|u)|your name|(tumhara|aapka) naam|तुम कौन|आप कौन|तुम्हारा नाम/,()=>bot(L(PH.who),{lang:prof.lang,acts:menuActs()})],
+    [/^(i'?m |i am |main |mai |me )?(good|fine|great|ok|okay|achha|accha|acha|badhiya|mast|theek|thik|बढ़िया|अच्छा|ठीक|मस्त)( hoon| hu| hun| हूँ| हूं| hai| हैं)?[!. ]*$/,()=>bot(L(PH.fine),{lang:prof.lang,acts:menuActs()})]];
+  const LOOSE=[[/interesting|fun fact|kuch naya batao|amazing fact|rochak|दिलचस्प|रोचक|मज़ेदार बात|mazedaar baat/,()=>fact()],
+    [/(kuch |something )?easy (padh|sikha|topic|se|one)|aasaan|asaan|something easy|आसान/,()=>easy()]];
   function findConcept(q){if(!lesson)return null;const s=normQ(q),raw=q.toLowerCase();let best=null,sc=0;
     for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.includes(' ')?3:k.length>4?2:1;for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n&&c===cur)n+=.5;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
   const lessonActs=c=>[[L(PH.ex),()=>bot(`${L(PH.example)} ${L(c.example)}`,{lang:prof.lang,acts:[[L(PH.an),()=>another(c)],[L(PH.quiz),()=>checkC(c)]]})],
     [L(PH.an),()=>another(c)],[curLvl==='basic'?L(PH.deeper):L(PH.more),()=>teach(c,curLvl==='basic'?up(curLvl):down(curLvl))],[L(PH.quiz),()=>checkC(c)]];
   function another(c){bot(`${L(PH.analogy)} ${L(c.analogy)} ${L(PH.mistake)} ${L(c.mistake)}`,{lang:prof.lang,acts:[[L(PH.quiz),()=>checkC(c)],[L(PH.practice),()=>practice()]]})}
-  function teach(c,lvl,pre=''){cur=c;curLvl=lvl;crossN=0;bot(`${pre?pre+' ':''}${L(c.title)} - ${L(c.levels[lvl])}`,{lang:prof.lang,acts:lessonActs(c)})}
+  function teach(c,lvl,pre=''){cur=c;curLvl=lvl;crossN=0;taught.add(c);const acts=lessonActs(c);if(++teachN%3===0)acts.push([L(PH.interestingBtn),()=>fact()]);bot(`${pre?pre+' ':''}${L(c.title)} - ${L(c.levels[lvl])}`,{lang:prof.lang,acts})}
   function askLevel(then){bot(`${L(PH.askLevel)}`,{lang:prof.lang,acts:LV.map(l=>[L(PH.lvlOpts[l]),()=>{prof.level=l;saveProf();me(L(PH.lvlOpts[l]));bot(L(PH.lvlSet[l]),{lang:prof.lang,wait:500}).then(()=>then?.())}])})}
   async function checkC(c){const k=c.check,d=await bot(`${L(PH.checkIntro)} ${L(k.q)}`,{lang:prof.lang});if(!d)return;const row=el('div','bub-opts');
     k.o.forEach((o,i)=>row.append(btn('tutor-opt',o,()=>{hush();for(const b of row.children)b.disabled=true;row.children[k.c].classList.add('right');if(i!==k.c)row.children[i].classList.add('wrong');me(o);
@@ -181,11 +208,14 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   function teacher(q){prof.lang=langOf(q);saveProf();const s=normQ(q),raw=q.toLowerCase();
     if(prob&&/hint|sanket|संकेत|clue|help/.test(raw)){hint();return true}
     if(prob&&/answer|solution|jawab|उत्तर|हल/.test(raw)){reveal();return true}
+    const words=raw.trim().split(/\s+/).length,t=raw.trim();
+    if(words<=8)for(const [re,fn] of TALK)if(re.test(t)){fn(t);return true}
+    if(words<=10&&!/(question|sawaal|sawal|problem|practice|प्रश्न|सवाल)/.test(raw))for(const [re,fn] of LOOSE)if(re.test(t)){fn();return true}
     // a question with values, or "what if I change X", is calculated by the simulation instead
     if(Object.keys(numbersFor(sim,q)).length||(mentioned(sim,q)&&/\s(increase|raise|more|bigger|higher|larger|double|triple|decrease|reduce|lower|less|smaller|half)\s/.test(s)))return false;
     const c=findConcept(q);
     if(MOOD.confused.test(q)){const t=c||cur;if(t){prof.level=down(prof.level);saveProf();teach(t,down(curLvl||prof.level),L(PH.confused))}else{bot(L(PH.confused),{lang:prof.lang,wait:400}).then(()=>topics())}return true}
-    if(MOOD.tired.test(q)){bot(L(PH.tired),{lang:prof.lang,acts:[[L(PH.practice),()=>{prof.level='basic';practice()}],...(lesson?[['📚 '+L(PH.topicsBtn),()=>topics()]]:[])]});return true}
+    if(MOOD.tired.test(q)){bot(L(PH.tired),{lang:prof.lang,wait:500}).then(d=>{if(d)fact()});return true}
     if(MOOD.happy.test(q)&&!c){bot(L(PH.happy),{lang:prof.lang,acts:[[L(PH.practice),()=>practice()],[L(PH.quiz),()=>check()]]});return true}
     if(lesson&&/(question|sawaal|sawal|problem|practice|numerical|प्रश्न|सवाल)/.test(raw)&&/(give|de|do|chahiye|dijiye|try|दो|दीजिए|चाहिए)/.test(raw)){practice();return true}
     if(lesson&&/(topic|topics|syllabus|kya seekh|what can i learn|कौन से|विषय)/.test(raw)){topics();return true}
@@ -228,9 +258,9 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   body.append(thread,f,sugg);paintSugg();
   // greeting: the tutor starts the conversation and asks the student what they want to do
   const r0=readings(sim,params())[0];
-  if(lesson)bot(`${L(PH.hello)} ${prof.lang==='hi'?`आज हम ${sim.title} पढ़ेंगे।`:prof.lang==='hl'?`Aaj hum ${sim.title.toLowerCase()} padhenge.`:`Today we’re exploring ${sim.title.toLowerCase()}.`} ${prof.lang==='hi'?'तुम मुझसे हिंदी, English या Hinglish में कुछ भी पूछ सकते हो।':prof.lang==='hl'?'Mujhse Hindi, English ya Hinglish - kisi bhi bhasha mein poochho.':'Ask me in English, Hinglish or हिंदी.'}`,
-    {lang:prof.lang,wait:500,acts:[['📚 '+L(PH.topicsBtn),()=>topics()],['✍️ '+L(PH.practice),()=>{prof.level?practice():askLevel(()=>practice())}],['✓ '+L(PH.quiz),()=>check()],['💬 '+(prof.lang==='en'?'I’ll ask':prof.lang==='hl'?'Main poochunga':'मैं पूछूँगा'),()=>inp.focus()]]});
-  else bot(`Hi! I’m Physica, your physics tutor. We’re exploring ${sim.title.toLowerCase()}.${r0?` Right now ${r0.label.toLowerCase()} is ${r0.value}.`:''} What would you like - shall I quiz you, or will you ask me something?`,
+  let fresh=true;try{const d=new Date().toDateString();fresh=localStorage.getItem('physica-checkin')!==d;localStorage.setItem('physica-checkin',d)}catch{}
+  if(lesson)bot(`${L(PH.greet[dayPart()])} ${L(PH.hello)} ${fresh?L(PH.howToday):`${L(PH.todayWe)} ${prof.lang==='en'?sim.title.toLowerCase():sim.title}. ${L(PH.anyLang)}`}`,{lang:prof.lang,wait:500,acts:fresh?moodActs():menuActs()});
+  else bot(`${L(PH.greet[dayPart()])} I’m Physica, your physics tutor. We’re exploring ${sim.title.toLowerCase()}.${r0?` Right now ${r0.label.toLowerCase()} is ${r0.value}.`:''} What would you like - shall I quiz you, or will you ask me something?`,
     {acts:[['✓ Quiz me',()=>check()],['💬 I’ll ask',()=>inp.focus()],['▶ Show me something',()=>{tab='show';render()}]],wait:500})}
 // Show me: the tutor asks the student to predict (aloud), then moves the sliders itself and replays the stage.
 function show(c){const grid=el('div','tutor-demos');c.demos.forEach((d,i)=>grid.append(btn('tutor-demo',`${i+1}. ${d.title}`,()=>demo(d))));body.append(grid)}
