@@ -183,3 +183,12 @@ sub,sup{font-size:.7em;line-height:0;position:relative;vertical-align:baseline}s
 .more-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:30;display:flex;flex-direction:column;gap:6px;min-width:220px;padding:10px;border-radius:12px;border:1px solid var(--line2);background:var(--panel);box-shadow:0 18px 40px rgba(0,0,0,.45)}.more-pop>button,.more-pop>label{width:100%;justify-content:flex-start;text-align:left}.more-pop .surprise-button{margin:0}
 @media(max-width:760px){.more-pop{left:auto;right:0}}
 .sidebar-top>.panel-close{top:2px;right:6px;width:22px;height:22px;font-size:11px}.sidebar-top.closable .sidebar-heading:first-child{padding-right:26px}.intro>.panel-close{top:-10px;right:-10px;width:22px;height:22px}
+/* Clear futuristic type across the site + smooth buttons */
+body,button,input,select,textarea{font-family:'Exo 2',system-ui,sans-serif}
+#title{font-family:'Orbitron','Exo 2',sans-serif!important;letter-spacing:.02em!important;font-weight:800!important;font-size:clamp(22px,2.3vw,32px)!important}
+.brand-word{font-family:'Orbitron','Exo 2',sans-serif;letter-spacing:.04em}
+.section-heading h2,#observe-heading,#controls-heading{font-family:'Exo 2',system-ui,sans-serif;font-weight:800;letter-spacing:.01em}
+button,summary,.restore-chip,.land-subject,.land-grade,select,input[type=range]{transition:background-color .22s ease,color .22s ease,border-color .22s ease,box-shadow .25s ease,transform .18s cubic-bezier(.2,.8,.2,1),opacity .2s ease}
+button:not(:disabled):active,summary:active{transform:scale(.96)}
+button:focus-visible,summary:focus-visible{box-shadow:0 0 0 3px rgba(66,217,202,.35)}
+@media(prefers-reduced-motion:reduce){button,summary{transition:none!important}}

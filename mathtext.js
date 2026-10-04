@@ -14,6 +14,9 @@ function parse(s){const out=[];let buf='';const push=(t,k)=>{if(!t)return;const 
     buf+=ch}
   push(buf,'n');return out}
 window.PhysicaMath={parse,has:s=>HAS.test(s)};
+// Clear, futuristic type in every canvas drawing: 'system-ui' text uses Exo 2 (falls back to system-ui until loaded).
+{const C=window.CanvasRenderingContext2D,d=C&&Object.getOwnPropertyDescriptor(C.prototype,'font');if(d&&d.set){Object.defineProperty(C.prototype,'font',{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,typeof v==='string'&&v.includes('system-ui')&&!v.includes('Exo 2')?v.replace('system-ui',"'Exo 2', system-ui"):v)}})}
+ try{document.fonts&&document.fonts.load("600 12px 'Exo 2'")}catch{}}
 // ---------- canvas ----------
 const C2=window.CanvasRenderingContext2D;
 if(C2){const P=C2.prototype,fill=P.fillText,stroke=P.strokeText,measure=P.measureText;
