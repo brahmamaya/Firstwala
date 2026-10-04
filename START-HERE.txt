@@ -16,6 +16,9 @@ ULTRA SCENES: ultra3d.js holds hand-built Ultra-Realistic scenes (window.Physica
 MATH: mathtext.js shows _ and ^ as real subscripts/superscripts on the page and in canvas drawings.
 FOCUS: less important panels are compact and have a close (x) button; hidden ones return from the
 "Hidden:" chips; the Focus button shows only the stage and controls (Esc exits) - focus.js.
+TEACHER (tutor-teacher-content.js): offline adaptive teacher - replies in English, Hinglish or Hindi (follows the student),
+asks the student's level (basic / average / JEE-NEET) and explains at that level, notices confusion / boredom / happiness,
+answers follow-up questions with analogies and examples, and gives practice problems with hints. Pilot chapter: Motion in a Plane.
 TUTOR: Normal / Student / Teacher modes, chosen as step 3 on the landing page (tutor.js). Normal: unchanged. Teacher: projector view.
 Student: an "AI Tutor" switch in the top bar turns the tutor on. It covers every physics chapter (tutor-chapters.js) plus automatic
 "what does this control do" answers and demos built from each simulation. Chat (tutor-speech.js + tutor.js): a conversation with typing bubbles; the tutor asks back (predict first, quick checks);

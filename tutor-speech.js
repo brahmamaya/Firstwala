@@ -26,7 +26,8 @@ function speakable(t){t=String(t||'');
   t=t.replace(/_/g,' ').replace(/\s+/g,' ').replace(/(\w)\s*\/\s*(\w)/g,'$1 divided by $2').replace(/[()[\]{}]/g,' ').replace(/\s-\s/g,', ').replace(/\s+/g,' ').trim();
   return t}
 const FEMALE=/female|woman|samantha|victoria|karen|moira|tessa|fiona|veena|lekha|heera|neerja|swara|kalpana|aditi|raveena|zira|aria|jenny|emma|sonia|libby|natasha|serena|allison|ava|susan|catherine|kate|google uk english female|google us english/i,MALE=/\bmale\b|daniel|alex|fred|rishi|ravi|prabhat|david|mark|george|guy|ryan|thomas/i;
-function pickVoice(list){const en=list.filter(v=>/^en/i.test(v.lang)),fem=en.filter(v=>FEMALE.test(v.name)&&!MALE.test(v.name.replace(/female/i,'')));
+function pickVoice(list,lang){if(lang==='hi'){const hi=list.filter(v=>/^hi/i.test(v.lang));return hi.find(v=>/swara|kalpana|lekha|female|google/i.test(v.name)&&!/madhur|hemant|male\b/i.test(v.name))||hi.find(v=>!/madhur|hemant|male\b/i.test(v.name))||hi[0]||null}
+  const en=list.filter(v=>/^en/i.test(v.lang)),fem=en.filter(v=>FEMALE.test(v.name)&&!MALE.test(v.name.replace(/female/i,'')));
   return fem.find(v=>/en-IN/i.test(v.lang))||fem.find(v=>/en-GB/i.test(v.lang))||fem[0]||en.find(v=>/en-IN/i.test(v.lang)&&!MALE.test(v.name))||en.find(v=>!MALE.test(v.name))||en[0]||null}
 window.PhysicaSpeech={speakable,pickVoice};
 })();
