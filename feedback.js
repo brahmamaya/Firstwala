@@ -6,8 +6,12 @@ const FORM='https://docs.google.com/forms/d/e/1FAIpQLSe0_6Z2gxTf1uxjnfLx4l7pkhyq
 const F={name:'entry.1574339962',country:'entry.15669348',text:'entry.658520155'};
 if(!window.fetch)return;
 const el=(tag,props={},kids=[])=>{const e=document.createElement(tag);for(const [k,v] of Object.entries(props)){if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else e.setAttribute(k,v)}for(const c of kids)e.append(c);return e};
-// Two quiet entry points: the foot of the chapter library (desktop sidebar and phone drawer) and the "More" menu.
-const opens=[];const foot=document.querySelector('.sidebar-bottom');
+// Entry points: the top bar, the foot of the chapter library (sidebar and phone drawer) and the "More" menu.
+const opens=[];const right=document.querySelector('.topbar-right');
+// Top bar: a compact glass pill at the far right, next to the theme picker (icon only on phones).
+if(right){const b=el('button',{type:'button',class:'feedback-btn','aria-haspopup':'dialog','data-testid':'feedback-top',title:'Send feedback'},[el('span',{'aria-hidden':'true',text:'💬'}),el('b',{text:'Feedback'})]);
+  const menu=right.querySelector('#mobile-topics');menu?right.insertBefore(b,menu):right.append(b);opens.push(b)}
+const foot=document.querySelector('.sidebar-bottom');
 if(foot){const b=el('button',{type:'button',class:'fb-entry','aria-haspopup':'dialog','data-testid':'feedback-btn'},[el('span',{'aria-hidden':'true',text:'💬'}),el('span',{class:'fb-entry-t'},[el('b',{text:'Share your feedback'}),el('small',{text:'Tell us what to improve'})])]);foot.before(b);opens.push(b)}
 const pop=document.querySelector('.more-pop');if(pop){const b=el('button',{type:'button','aria-haspopup':'dialog','data-testid':'feedback-more'},[el('span',{'aria-hidden':'true',text:'💬 '}),document.createTextNode('Feedback')]);pop.append(b);opens.push(b)}
 if(!opens.length)return;
