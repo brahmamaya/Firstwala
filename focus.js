@@ -24,9 +24,12 @@ function paint(){for(const p of PANELS)body.classList.toggle('hide-'+p.key,hidde
 for(const p of PANELS){const host=$(p.where);if(!host)continue;const x=document.createElement('button');x.type='button';x.className='panel-close'+(p.desk?' desk-only':'');x.textContent='✕';x.title='Hide';x.setAttribute('aria-label','Hide '+p.label.replace(/^\S+\s/,''));x.dataset.testid='hide-'+p.key;
   x.addEventListener('click',e=>{e.stopPropagation();hidden.add(p.key);save();paint()});host.classList.add('closable');host.append(x)}
 // Focus mode
-const top=$('.stage-top .live-label');const fb=document.createElement('button');fb.type='button';fb.id='focus-btn';fb.className='focus-btn';fb.textContent='⛶ Focus';fb.title='Show only the simulation and its controls (Esc to exit)';fb.dataset.testid='focus-btn';top?.after(fb);
+// Focus lives on the simulation itself (top-right corner, an empty area of every experiment) as a special glass button.
+const cvs=document.getElementById('simulation');let wrap=null;if(cvs){wrap=document.createElement('div');wrap.className='canvas-wrap';cvs.before(wrap);wrap.append(cvs)}
+const fb=document.createElement('button');fb.type='button';fb.id='focus-btn';fb.className='focus-btn focus-special';fb.title='Show only the simulation and its controls (Esc to exit)';fb.dataset.testid='focus-btn';
+const fbi=document.createElement('span');fbi.className='fs-ic';fbi.setAttribute('aria-hidden','true');fbi.textContent='⛶';const fbl=document.createElement('span');fbl.className='fs-lb';fbl.textContent='Focus';fb.append(fbi,fbl);(wrap||$('.stage-top'))?.append(fb);
 const exit=document.createElement('button');exit.type='button';exit.className='focus-exit';exit.textContent='✕ Exit focus';exit.dataset.testid='focus-exit';exit.hidden=true;body.append(exit);
-function focus(on){body.classList.toggle('focus',on);exit.hidden=!on;fb.setAttribute('aria-pressed',String(on));if(on)$('.stage')?.scrollIntoView({block:'start'});window.dispatchEvent(new Event('resize'))}
+function focus(on){body.classList.toggle('focus',on);exit.hidden=!on;fb.setAttribute('aria-pressed',String(on));fbi.textContent=on?'⤡':'⛶';fbl.textContent=on?'Exit':'Focus';fb.title=on?'Exit focus (Esc)':'Show only the simulation and its controls (Esc to exit)';if(on)$('.stage')?.scrollIntoView({block:'start'});window.dispatchEvent(new Event('resize'))}
 fb.addEventListener('click',()=>focus(!body.classList.contains('focus')));exit.addEventListener('click',()=>focus(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&body.classList.contains('focus'))focus(false)});
 paint();
@@ -47,7 +50,7 @@ const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details
     c.translate(V.ox,V.oy);c.scale(V.s,V.s);c.beginPath();c.rect(28,76,640,345);c.clip();renderer(c,p,t);c.restore()};
   const ib=document.createElement('button');ib.type='button';ib.className='focus-btn info-btn';ib.dataset.testid='info-btn';ib.title='Show or hide the text and values drawn inside the simulation';
   const set=v=>{clean=v;window.PhysicaClean=v;ib.textContent=v?'◨ Show info':'◧ Hide info';ib.setAttribute('aria-pressed',String(v));try{localStorage.setItem('physica-clean',v?'1':'0')}catch{}window.dispatchEvent(new Event('physica-theme-change'))};
-  ib.addEventListener('click',()=>set(!clean));fb.after(ib);set(clean)}
+  ib.addEventListener('click',()=>set(!clean));const tr=$('.transport');(tr||$('.stage-top'))?.append(ib);set(clean)}
 // Liquid-glass segmented controls: one glass pill sits behind the selected option and flows to the new one.
 function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.classList.add('glass-host');const th=document.createElement('span');th.className='glass-thumb';th.setAttribute('aria-hidden','true');host.prepend(th);
   // Spring-driven liquid glass: the pill glides with real momentum, stretches along its motion and settles (like iPadOS).
