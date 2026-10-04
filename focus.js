@@ -12,7 +12,7 @@ const PANELS=[
   {key:'tips',sel:'.controls-tip',label:'💡 Tips',where:'.controls-tip'}];
 // mark the long controls hint so it can be hidden
 for(const p of document.querySelectorAll('.controls-card p'))if(/^Drag a slider/.test(p.textContent.trim()))p.classList.add('controls-tip');
-let hidden=new Set();try{hidden=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'))}catch{}
+let hidden=new Set(['tips']);try{const v=localStorage.getItem(KEY);if(v)hidden=new Set(JSON.parse(v))}catch{}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify([...hidden]))}catch{}};
 const bar=document.createElement('div');bar.className='restore-bar';bar.setAttribute('role','group');bar.setAttribute('aria-label','Show hidden panels');
 const head=$('.workspace-header');head?.after(bar);
