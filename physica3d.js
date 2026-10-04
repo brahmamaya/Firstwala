@@ -36,14 +36,14 @@ function studio(R){R.save();const w=R.createRadialGradient(340,170,30,340,200,62
 // Camera finish, built for speed: the warm grade, vignette and film grain are baked once per size into
 // one overlay; bloom is a tiny copy of the stage (scaled down, then up = free blur) refreshed every few frames.
 let overlayC=null,ovKey='',bloomA=null,bloomB=null,bloomTick=0;
-function finish(ctx){const cv=ctx.canvas,k=cv.width/960,X=0,Y=68,W=680,H=362,x=X*k,y=Y*k,w=W*k,h=H*k;
+function finish(ctx){const cv=ctx.canvas,k=cv.width/960,full=!!window.PhysicaClean,X=0,Y=full?0:68,W=full?960:680,H=full?505:362,x=X*k,y=Y*k,w=W*k,h=H*k;
   if(!bloomA){bloomA=document.createElement('canvas');bloomB=document.createElement('canvas')}
   const aw=Math.max(8,Math.round(w/6)),ah=Math.max(8,Math.round(h/6)),bw=Math.max(4,Math.round(aw/2)),bh=Math.max(4,Math.round(ah/2));
   if(bloomA.width!==aw||bloomA.height!==ah){bloomA.width=aw;bloomA.height=ah;bloomB.width=bw;bloomB.height=bh;bloomTick=0}
   ctx.save();ctx.setTransform(1,0,0,1,0,0);
   if(bloomTick++%3===0){const a=bloomA.getContext('2d'),b=bloomB.getContext('2d');a.globalCompositeOperation='copy';a.drawImage(cv,x,y,w,h,0,0,aw,ah);b.globalCompositeOperation='copy';b.drawImage(bloomA,0,0,aw,ah,0,0,bw,bh)}
   ctx.globalCompositeOperation='screen';ctx.globalAlpha=.42;ctx.imageSmoothingEnabled=true;ctx.drawImage(bloomB,0,0,bw,bh,x,y,w,h);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-  const key=cv.width+'x'+cv.height;if(ovKey!==key){ovKey=key;overlayC=document.createElement('canvas');overlayC.width=Math.ceil(w);overlayC.height=Math.ceil(h);const o=overlayC.getContext('2d');
+  const key=cv.width+'x'+cv.height+(full?'f':'');if(ovKey!==key){ovKey=key;overlayC=document.createElement('canvas');overlayC.width=Math.ceil(w);overlayC.height=Math.ceil(h);const o=overlayC.getContext('2d');
     o.fillStyle='rgba(255,170,90,.07)';o.fillRect(0,0,w,h);const v=o.createRadialGradient(w/2,h*.45,h*.35,w/2,h/2,w*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.5)');o.fillStyle=v;o.fillRect(0,0,w,h);
     const g=o.getImageData(0,0,overlayC.width,overlayC.height),d=g.data;for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*18;d[i]=Math.max(0,Math.min(255,d[i]+n));d[i+1]=Math.max(0,Math.min(255,d[i+1]+n));d[i+2]=Math.max(0,Math.min(255,d[i+2]+n));d[i+3]=Math.max(d[i+3],6)}o.putImageData(g,0,0)}
   ctx.drawImage(overlayC,x,y);ctx.restore()}

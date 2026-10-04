@@ -180,7 +180,7 @@
     if(k==='r'||k==='R'){elapsed=0;updateReadouts();draw()}else if(k==='f'||k==='F')toggleFullscreen();else if(k==='x'||k==='X')randomise();else if(k==='3')$('realism-toggle').click();else if(k==='?'){e.preventDefault();$('help-dialog').showModal()}
     else if(k==='ArrowRight'||k==='ArrowLeft'){if(tag==='BUTTON'&&document.activeElement.closest('.simulation-tabs'))return;e.preventDefault();stepSimulation(k==='ArrowRight'?1:-1)}else if(k===']')setSpeed(1);else if(k==='[')setSpeed(-1);
     else if(is3D(current)&&(k==='+'||k==='='))window.Physica3D?.zoomBy(1.15);else if(is3D(current)&&(k==='-'||k==='_'))window.Physica3D?.zoomBy(1/1.15);else if(is3D(current)&&k==='0')window.Physica3D?.resetView()}
-  try{if(!localStorage.getItem('physica-welcome-bz')){setTimeout(()=>toast(`New: Botany & Zoology! ${sims.filter(s=>s.subject!=='physics').length} NCERT biology and ${sims.filter(s=>s.subject==='physics').length} physics experiments, all in 3D`),1200);localStorage.setItem('physica-welcome-bz','1')}}catch{}
+  
   // Optional browser agent controls share the exact same state and rendering path as the UI.
   if(document.modelContext?.registerTool){
     const lifecycle=new AbortController();
@@ -199,7 +199,7 @@
     const orbiting=()=>is3D(current)&&dragMode==='rotate'&&window.Physica3D;
     const spread=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y)};
     canvas.style.cursor='grab';
-    const logical=e=>{const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)/b.width*960,y:(e.clientY-b.top)/b.height*505}},handOn=(fn,e)=>{const I=HAND();if(!I)return false;I[fn]?.(logical(e),saved.get(current.id));renderControls();updateReadouts();draw();return true};
+    const logical=e=>{const b=canvas.getBoundingClientRect(),x=(e.clientX-b.left)/b.width*960,y=(e.clientY-b.top)/b.height*505,V=window.PhysicaClean&&window.PhysicaView;return V?{x:(x-V.ox)/V.s,y:(y-V.oy)/V.s}:{x,y}},handOn=(fn,e)=>{const I=HAND();if(!I)return false;I[fn]?.(logical(e),saved.get(current.id));renderControls();updateReadouts();draw();return true};
   canvas.addEventListener('pointerdown',e=>{if(HAND()){steering=true;try{canvas.setPointerCapture(e.pointerId)}catch{}handOn('down',e);return}steering=true;canvas.style.cursor='grabbing';pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});try{canvas.setPointerCapture(e.pointerId)}catch{}if(orbiting()){if(pointers.size===2)pinch=spread()}else stageDrag(e)});
     canvas.addEventListener('pointermove',e=>{if(!steering)return;if(handOn('move',e))return;if(!orbiting()){stageDrag(e);return}const last=pointers.get(e.pointerId);if(!last)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
       if(pointers.size>=2){const d=spread();if(pinch)window.Physica3D.zoomBy(d/pinch);pinch=d}else window.Physica3D.rotate((e.clientX-last.x)*.009,(e.clientY-last.y)*.007)});
