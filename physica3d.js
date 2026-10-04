@@ -30,31 +30,26 @@ const BOKEH=[[70,110,26,'255,190,110'],[150,86,14,'255,214,150'],[232,128,34,'12
 // kept soft (out of focus, like a camera's depth of field) and a satin black epoxy bench with a reflection.
 let studioC=null,studioKey='';
 function studio(R){const cv=R.canvas,key=cv.width+'x'+cv.height;if(studioKey!==key){studioKey=key;studioC=bakeStudio(cv.width,cv.height)}R.save();R.setTransform(1,0,0,1,0,0);R.drawImage(studioC,0,0);R.restore();R.beginPath()}
-function bakeStudio(PW,PH){const out=document.createElement('canvas');out.width=PW;out.height=PH;const o=out.getContext('2d'),k=PW/960;o.scale(k,PH/505);
-  // wall
-  let w=o.createLinearGradient(0,0,0,330);w.addColorStop(0,'#3a3d40');w.addColorStop(1,'#25282b');o.fillStyle=w;o.fillRect(0,0,960,330);
-  // window light from the upper left
-  let win=o.createRadialGradient(150,40,20,180,120,620);win.addColorStop(0,'rgba(255,236,205,.30)');win.addColorStop(.4,'rgba(255,230,190,.10)');win.addColorStop(1,'rgba(0,0,0,0)');o.fillStyle=win;o.fillRect(0,0,960,330);
-  o.save();o.globalCompositeOperation='lighter';o.fillStyle='rgba(255,240,215,.07)';o.beginPath();o.moveTo(60,0);o.lineTo(230,0);o.lineTo(470,330);o.lineTo(250,330);o.fill();o.beginPath();o.moveTo(260,0);o.lineTo(330,0);o.lineTo(560,330);o.lineTo(480,330);o.fill();o.restore();
-  // plaster texture
-  const tx=document.createElement('canvas');tx.width=240;tx.height=120;const t=tx.getContext('2d'),im=t.createImageData(240,120);for(let i=0;i<im.data.length;i+=4){const n=128+(Math.random()-.5)*60;im.data[i]=im.data[i+1]=im.data[i+2]=n;im.data[i+3]=26}t.putImageData(im,0,0);o.globalCompositeOperation='overlay';o.drawImage(tx,0,0,960,330);o.globalCompositeOperation='source-over';
-  // shelves with glassware, drawn small then enlarged = soft focus
-  const sh=document.createElement('canvas');sh.width=240;sh.height=84;const g=sh.getContext('2d');g.scale(.25,.25);
-  const shelf=y=>{let s=g.createLinearGradient(0,y,0,y+12);s.addColorStop(0,'#6b4a30');s.addColorStop(1,'#3a271a');g.fillStyle=s;g.fillRect(380,y,560,12);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(380,y+12,560,10)};
-  const flask=(x,y,h,col)=>{g.fillStyle='rgba(210,230,240,.35)';g.beginPath();g.moveTo(x-4,y-h);g.lineTo(x+4,y-h);g.lineTo(x+4,y-h*.55);g.lineTo(x+h*.42,y);g.lineTo(x-h*.42,y);g.lineTo(x-4,y-h*.55);g.fill();g.fillStyle=col;g.beginPath();g.moveTo(x-h*.3,y-h*.18);g.lineTo(x+h*.3,y-h*.18);g.lineTo(x+h*.42,y);g.lineTo(x-h*.42,y);g.fill()};
-  const beaker=(x,y,w,h,col)=>{g.fillStyle='rgba(210,230,240,.3)';g.fillRect(x,y-h,w,h);g.fillStyle=col;g.fillRect(x+2,y-h*.45,w-4,h*.45-2);g.fillStyle='rgba(255,255,255,.45)';g.fillRect(x+3,y-h+3,3,h-6)};
-  const bottle=(x,y,h,col)=>{g.fillStyle=col;g.fillRect(x-9,y-h,18,h);g.fillRect(x-4,y-h-10,8,10);g.fillStyle='#222';g.fillRect(x-5,y-h-16,10,7);g.fillStyle='rgba(255,255,255,.5)';g.fillRect(x-6,y-h+6,8,10)};
-  shelf(140);shelf(240);
-  flask(430,140,46,'rgba(80,170,255,.7)');beaker(470,140,26,34,'rgba(120,220,140,.6)');bottle(520,140,40,'#8a4b12');bottle(548,140,34,'#2b5d8a');flask(600,140,38,'rgba(255,120,90,.6)');beaker(640,140,30,40,'rgba(255,210,90,.55)');bottle(700,140,44,'#5b3a12');flask(760,140,50,'rgba(160,120,255,.6)');beaker(810,140,24,30,'rgba(90,200,230,.55)');bottle(860,140,38,'#2f6b3a');bottle(890,140,30,'#8a4b12');
-  beaker(420,240,34,44,'rgba(90,180,255,.5)');flask(490,240,44,'rgba(120,220,140,.6)');bottle(540,240,46,'#2b5d8a');bottle(570,240,38,'#7a3b10');beaker(610,240,28,36,'rgba(255,140,120,.5)');flask(680,240,52,'rgba(255,210,90,.6)');bottle(740,240,42,'#3d3d3d');beaker(780,240,40,50,'rgba(150,220,255,.4)');flask(860,240,40,'rgba(80,170,255,.6)');
-  o.save();o.globalAlpha=.85;o.imageSmoothingQuality='high';o.drawImage(sh,0,0,960,330);o.restore();
-  // satin black epoxy bench with a soft reflection of the window
-  let b=o.createLinearGradient(0,318,0,505);b.addColorStop(0,'#2b2e31');b.addColorStop(.08,'#1a1c1e');b.addColorStop(1,'#0b0c0d');o.fillStyle=b;o.fillRect(0,318,960,187);
-  o.fillStyle='rgba(255,255,255,.18)';o.fillRect(0,318,960,1.5);
-  let ref=o.createRadialGradient(330,380,10,330,380,420);ref.addColorStop(0,'rgba(255,240,220,.13)');ref.addColorStop(1,'rgba(255,240,220,0)');o.save();o.translate(0,380);o.scale(1,.25);o.fillStyle=ref;o.beginPath();o.arc(330,0,420,0,Math.PI*2);o.fill();o.restore();
-  let shade=o.createLinearGradient(0,300,0,330);shade.addColorStop(0,'rgba(0,0,0,0)');shade.addColorStop(1,'rgba(0,0,0,.35)');o.fillStyle=shade;o.fillRect(0,300,960,30);
-  // camera vignette
-  const v=o.createRadialGradient(480,250,180,480,260,620);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.55)');o.fillStyle=v;o.fillRect(0,0,960,505);
+function bakeStudio(PW,PH){const out=document.createElement('canvas');out.width=PW;out.height=PH;const o=out.getContext('2d');o.scale(PW/960,PH/505);
+  // graphite studio sweep (dark, never pure black)
+  let w=o.createLinearGradient(0,0,0,330);w.addColorStop(0,'#24272d');w.addColorStop(1,'#1a1d22');o.fillStyle=w;o.fillRect(0,0,960,330);
+  // overhead key light and soft coloured rim lights
+  const glow=(x,y,r,c,a)=>{const g=o.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);o.fillStyle=g;o.fillRect(0,0,960,505)};
+  glow(420,-60,520,'255,244,228',.22);glow(-40,240,420,'90,150,255',.10);glow(1000,200,420,'255,170,110',.08);
+  // a few shelves of glassware far behind, heavily out of focus and dimmed
+  const sh=document.createElement('canvas');sh.width=160;sh.height=56;const g=sh.getContext('2d');g.scale(1/6,1/6);
+  const shelf=y=>{g.fillStyle='#4a3a2c';g.fillRect(400,y,520,12)};const item=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y-h,w,h)};
+  shelf(150);shelf(250);for(let i=0;i<10;i++){item(420+i*50,150,18+(i%3)*6,30+(i*7)%26,['#5f8fbf','#b8743a','#6fae86','#c9a45a','#8a7bd0'][i%5])}for(let i=0;i<9;i++){item(440+i*52,250,20+(i%2)*8,34+(i*5)%22,['#c9a45a','#5f8fbf','#8a7bd0','#6fae86'][i%4])}
+  o.save();o.globalAlpha=.32;o.imageSmoothingQuality='high';o.drawImage(sh,0,0,960,336);o.restore();
+  // fine grain so gradients look photographic
+  const tx=document.createElement('canvas');tx.width=200;tx.height=106;const t=tx.getContext('2d'),im=t.createImageData(200,106);for(let i=0;i<im.data.length;i+=4){const n=128+(Math.random()-.5)*40;im.data[i]=im.data[i+1]=im.data[i+2]=n;im.data[i+3]=18}t.putImageData(im,0,0);o.globalCompositeOperation='overlay';o.drawImage(tx,0,0,960,505);o.globalCompositeOperation='source-over';
+  // glossy dark bench: soft horizon, edge highlight, key-light pool and reflection streak
+  let b=o.createLinearGradient(0,318,0,505);b.addColorStop(0,'#2a2e34');b.addColorStop(.12,'#1c1f24');b.addColorStop(1,'#111317');o.fillStyle=b;o.fillRect(0,318,960,187);
+  let hz=o.createLinearGradient(0,300,0,322);hz.addColorStop(0,'rgba(0,0,0,0)');hz.addColorStop(1,'rgba(0,0,0,.28)');o.fillStyle=hz;o.fillRect(0,300,960,22);
+  let edge=o.createLinearGradient(0,0,960,0);edge.addColorStop(0,'rgba(255,255,255,0)');edge.addColorStop(.45,'rgba(255,255,255,.28)');edge.addColorStop(1,'rgba(255,255,255,0)');o.fillStyle=edge;o.fillRect(0,318,960,1.2);
+  o.save();o.translate(0,372);o.scale(1,.22);const pool=o.createRadialGradient(400,0,0,400,0,460);pool.addColorStop(0,'rgba(255,244,228,.16)');pool.addColorStop(1,'rgba(255,244,228,0)');o.fillStyle=pool;o.beginPath();o.arc(400,0,460,0,Math.PI*2);o.fill();o.restore();
+  // gentle vignette (lifts the subject without crushing the corners to black)
+  const v=o.createRadialGradient(470,250,200,480,260,640);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(8,9,12,.45)');o.fillStyle=v;o.fillRect(0,0,960,505);
   return out}
 // Camera finish, built for speed: the warm grade, vignette and film grain are baked once per size into
 // one overlay; bloom is a tiny copy of the stage (scaled down, then up = free blur) refreshed every few frames.
@@ -67,7 +62,7 @@ function finish(ctx){const cv=ctx.canvas,k=cv.width/960,full=!!window.PhysicaCle
   if(bloomTick++%3===0){const a=bloomA.getContext('2d'),b=bloomB.getContext('2d');a.globalCompositeOperation='copy';a.drawImage(cv,x,y,w,h,0,0,aw,ah);b.globalCompositeOperation='copy';b.drawImage(bloomA,0,0,aw,ah,0,0,bw,bh)}
   ctx.globalCompositeOperation='screen';ctx.globalAlpha=.22;ctx.imageSmoothingEnabled=true;ctx.drawImage(bloomB,0,0,bw,bh,x,y,w,h);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
   const key=cv.width+'x'+cv.height+(full?'f':'');if(ovKey!==key){ovKey=key;overlayC=document.createElement('canvas');overlayC.width=Math.ceil(w);overlayC.height=Math.ceil(h);const o=overlayC.getContext('2d');
-    o.fillStyle='rgba(255,170,90,.035)';o.fillRect(0,0,w,h);const v=o.createRadialGradient(w/2,h*.45,h*.35,w/2,h/2,w*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.5)');o.fillStyle=v;o.fillRect(0,0,w,h);
+    o.fillStyle='rgba(255,236,210,.02)';o.fillRect(0,0,w,h);const v=o.createRadialGradient(w/2,h*.45,h*.35,w/2,h/2,w*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(6,7,10,.32)');o.fillStyle=v;o.fillRect(0,0,w,h);
     const g=o.getImageData(0,0,overlayC.width,overlayC.height),d=g.data;for(let i=0;i<d.length;i+=4){const n=(Math.random()-.5)*18;d[i]=Math.max(0,Math.min(255,d[i]+n));d[i+1]=Math.max(0,Math.min(255,d[i+1]+n));d[i+2]=Math.max(0,Math.min(255,d[i+2]+n));d[i+3]=Math.max(d[i+3],6)}o.putImageData(g,0,0)}
   ctx.drawImage(overlayC,x,y);ctx.restore()}
 

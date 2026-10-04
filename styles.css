@@ -264,3 +264,49 @@ body.focus .below-stage{display:none!important}
 .lab-tool-buttons button,.view3d-bar button,.transport .restart-button,.focus-btn,.simulation-tabs button{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);background-image:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0))}
 @media(prefers-reduced-motion:reduce){.glass-thumb{transition:none}.glass-thumb.flow{animation:none}}
 .toast{padding:8px 16px!important;border-radius:999px!important;font-size:13px!important;background:rgba(10,22,36,.72)!important;-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 30px rgba(0,0,0,.4)!important;animation:toastGlass .35s cubic-bezier(.3,1.3,.5,1)!important}@keyframes toastGlass{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
+/* ===== Compact controls: name + value on one line, − slider + and exact value on the next ===== */
+.control-row{display:grid!important;grid-template-columns:minmax(0,1fr) 62px;grid-template-areas:"lab lab" "rng num";gap:6px 8px;align-items:center}
+.control-row>.control-label{grid-area:lab;margin:0!important;font-size:13.5px}.control-row>.range-wrap{grid-area:rng;margin:0!important}
+.control-row>.exact-value{grid-area:num;height:32px!important;min-height:0!important;padding:0 6px!important;font-size:13px;text-align:center;border-radius:9px}
+.control-row>.control-extents{display:none!important}.control-row>select{grid-column:1/-1}
+.range-wrap .step-btn{width:28px!important;height:28px!important;min-width:0!important;font-size:15px}
+#controls{display:flex;flex-direction:column;gap:14px!important}
+.controls-card .section-heading{margin-bottom:10px!important}
+.simulation-playback{margin-top:12px!important;padding-top:12px!important}
+/* desktop: the controls column stays in view beside the stage */
+@media(min-width:901px){.side-rail{position:sticky!important;top:88px;max-height:calc(100vh - 100px);overflow-y:auto;scrollbar-width:thin;overscroll-behavior:contain}}
+/* phones/tablets: stage pinned at the top, controls scroll right beneath it */
+@media(max-width:900px){.lab-main>.stage{position:sticky;top:0;z-index:20;box-shadow:0 14px 30px -12px rgba(0,0,0,.75)}
+  .lab-main>.side-rail{position:static!important;max-height:none;margin-top:12px}
+  .stage .stage-top{padding:8px 10px!important;gap:6px!important}.stage-bottom{padding:6px 10px!important}
+  .topbar{position:relative!important}}
+/* ===== iPadOS-style glass material ===== */
+:root{--g-bg:rgba(44,48,58,.42);--g-bg2:rgba(255,255,255,.06);--g-line:rgba(255,255,255,.14);--g-hi:rgba(255,255,255,.22);--g-blur:blur(26px) saturate(180%)}
+body{background:radial-gradient(900px 520px at 78% -6%,rgba(110,92,255,.20),transparent 62%),radial-gradient(800px 480px at -8% 28%,rgba(40,200,190,.14),transparent 60%),radial-gradient(900px 600px at 50% 110%,rgba(255,140,80,.08),transparent 60%),linear-gradient(180deg,#141821,#0d1016)!important}
+.topbar,.stage,.controls-card,.observe-card,.formula-card,.physics-panel,.more-pop,.sidebar{background:var(--g-bg)!important;-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:1px solid var(--g-line)!important;box-shadow:inset 0 1px 0 var(--g-hi),0 20px 50px -24px rgba(0,0,0,.75)!important}
+.sidebar{border-width:0 1px 0 0!important}
+.stage:before{opacity:.55}
+/* capsule glass buttons */
+.lab-tool-buttons button,.more-menu summary,.view3d-bar button:not(.mode-switch button),.transport .restart-button,.focus-btn,.restore-chip,.simulation-tabs button,.tabs-nav button,#prev,#next,.rec-quality,.step-btn{background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.13)!important;-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 4px 14px -6px rgba(0,0,0,.6)!important;color:var(--text)}
+.lab-tool-buttons button:hover,.view3d-bar button:not(.mode-switch button):hover,.transport .restart-button:hover,.focus-btn:hover,.simulation-tabs button:hover,.step-btn:hover{background:rgba(255,255,255,.13)!important;border-color:rgba(255,255,255,.26)!important}
+.simulation-tabs button.selected{background:rgba(255,255,255,.16)!important;border-color:rgba(255,255,255,.34)!important;color:#fff!important}
+.play-button{background:linear-gradient(180deg,#5ff0de,#22b8a8)!important;border:1px solid rgba(255,255,255,.4)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 8px 24px -8px rgba(66,217,202,.8)!important}
+/* iOS segmented control: tinted track, glass thumb with specular rim */
+.mode-switch,.subject-tabs,.grade-tabs{background:rgba(118,118,128,.24)!important;border:0!important;border-radius:999px!important;padding:3px!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.35)}
+.subject-tabs,.grade-tabs{border-radius:14px!important}
+.glass-thumb{background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.14))!important;border:0!important;-webkit-backdrop-filter:blur(14px) saturate(200%) brightness(1.15);backdrop-filter:blur(14px) saturate(200%) brightness(1.15);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -1px 1px rgba(255,255,255,.18),inset 1px 0 1px rgba(255,255,255,.22),inset -1px 0 1px rgba(255,255,255,.22),0 3px 10px rgba(0,0,0,.32),0 1px 2px rgba(0,0,0,.25)!important}
+.glass-thumb:after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 80% at 50% -20%,rgba(255,255,255,.55),transparent 55%);opacity:.55;pointer-events:none}
+.glass-thumb.flow{animation:liquidLens .55s cubic-bezier(.3,1.3,.5,1)!important}
+@keyframes liquidLens{0%{transform:scale(1)}35%{transform:scale(1.12,.9);filter:brightness(1.25)}65%{transform:scale(.97,1.04)}100%{transform:scale(1)}}
+.subject-tabs .glass-thumb,.grade-tabs .glass-thumb{border-radius:11px!important}
+.mode-switch button[aria-pressed=true],.subject-tab[aria-pressed=true],.grade-tab[aria-pressed=true]{color:#fff!important;text-shadow:none!important}
+#mode-ultra[aria-pressed=true]{color:#ffd2a8!important}
+.toast{background:rgba(44,48,58,.55)!important}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.topbar,.stage,.controls-card,.observe-card,.formula-card,.sidebar{background:#1b1f27!important}}
+@media(max-width:900px){.lab-main>.stage{background:linear-gradient(180deg,#1b2029,#151920)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .stage .live-label{display:none!important}
+  .stage .stage-top{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none}.stage .stage-top::-webkit-scrollbar{display:none}
+  .stage .view3d-bar{flex-wrap:nowrap!important;width:auto!important;overflow:visible}.stage .view3d-bar>*,.stage .stage-top>*{flex:0 0 auto}
+  .stage .stage-top button,.stage .view3d-bar button{min-height:32px!important;padding:4px 10px!important;font-size:12px!important}
+  .stage .mode-switch button{padding:4px 12px!important}}
