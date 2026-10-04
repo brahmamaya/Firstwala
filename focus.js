@@ -80,6 +80,8 @@ for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelec
 {const st=$('.subject-tabs'),tb=$('.topbar');if(st&&tb&&window.matchMedia){const home=st.parentNode,nx=st.nextSibling,mq=window.matchMedia('(min-width: 1000px)');
   const put=()=>{const up=mq.matches;if(up&&st.parentNode!==tb)tb.insertBefore(st,tb.querySelector('.topbar-right'));else if(!up&&st.parentNode===tb)home.insertBefore(st,nx);st.classList.toggle('in-topbar',up);window.dispatchEvent(new Event('resize'))};
   mq.addEventListener?.('change',put);put()}}
+// Reset gives a small glass pulse so the press is felt.
+{const d=document.getElementById('defaults');if(d){d.title='Reset all values';d.setAttribute('aria-label','Reset all values')}d?.addEventListener('click',()=>{d.classList.remove('spin');void d.offsetWidth;d.classList.add('spin')});d?.addEventListener('animationend',()=>d.classList.remove('spin'))}
 // Hide the favourites box until something is starred.
 const fc=document.getElementById('favourites-count'),fav=$('.favourites');if(fc&&fav){const f=()=>fav.classList.toggle('is-empty',fc.textContent.trim()==='0');f();new MutationObserver(f).observe(fc,{childList:true,characterData:true,subtree:true})}
 })();

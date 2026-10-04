@@ -450,3 +450,15 @@ body.app-reveal .site-shell{animation:appIn2 .75s cubic-bezier(.2,.8,.2,1) both!
 @media(max-width:1180px){.topbar .subject-tabs.in-topbar .subject-tab{padding:8px 13px;font-size:13px}}
 button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!important;min-height:0!important;max-height:26px!important;width:26px!important;max-width:26px!important;align-self:center}
 @media(prefers-reduced-motion:reduce){body.app-reveal .site-shell{animation:none!important}.landing.leaving .landing-inner{transition:none!important;filter:none}}
+/* Reset (controls header): roomy glass pill, same height as the minimise disc, icon spins on press */
+.controls-card .rail-buttons{display:flex;align-items:center;gap:8px}
+.controls-card #defaults{display:inline-flex;align-items:center;gap:6px;height:32px!important;min-width:0;padding:0 12px!important;font-size:12.5px!important;font-weight:800;letter-spacing:.02em;white-space:nowrap;line-height:1}
+.controls-card .rail-buttons .rail-toggle{width:32px!important;height:32px!important;padding:0!important}
+.controls-card #defaults.spin{animation:resetPulse .5s cubic-bezier(.3,1.4,.5,1)}
+@keyframes resetPulse{0%{transform:scale(.9)}60%{transform:scale(1.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 18px rgba(255,255,255,.45)}100%{transform:none}}
+.controls-card .section-heading h2{white-space:nowrap;font-size:clamp(15px,1.2vw,18px)!important}.controls-card .section-heading{gap:8px}
+/* Side rail (tablet/desktop): Reset becomes a round glass icon next to minimise so the title keeps its room */
+@media(min-width:901px){.controls-card #defaults{width:32px!important;padding:0!important;justify-content:center;font-size:0!important;gap:0}
+  .controls-card #defaults:before{content:'↺';font-size:17px;font-weight:900;line-height:1}
+  .controls-card #defaults.spin:before{display:inline-block;animation:resetTurn .5s cubic-bezier(.3,1.2,.5,1)}}
+@keyframes resetTurn{from{transform:rotate(0)}to{transform:rotate(-360deg)}}
