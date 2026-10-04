@@ -394,3 +394,55 @@ body.focus .stage .canvas-wrap .focus-btn.focus-special{display:inline-flex!impo
 .side-rail,.lab-layout{transition:grid-template-columns .35s cubic-bezier(.3,1,.4,1)}
 @media(max-width:900px){.lab-layout.rail-collapsed,body.focus .lab-layout.rail-collapsed,body.focus .lab-layout{grid-template-columns:minmax(0,1fr)!important}}
 .landing{overflow-x:hidden}
+
+/* Landing exit: the camera falls into the black hole first; the page fades only at the end */
+.landing.leaving{animation:landOut2 1.1s linear forwards!important}
+@keyframes landOut2{0%,72%{opacity:1}100%{opacity:0}}
+/* ===== 3D liquid glass (v3): thicker lens with specular rim, caustic underglow and depth ===== */
+.glass-thumb{background:radial-gradient(120% 90% at 50% 125%,rgba(255,255,255,.22),transparent 58%),linear-gradient(180deg,rgba(255,255,255,.36) 0%,rgba(255,255,255,.12) 45%,rgba(255,255,255,.05) 55%,rgba(255,255,255,.14) 100%)!important;
+  -webkit-backdrop-filter:blur(3px) saturate(190%) brightness(1.22)!important;backdrop-filter:blur(3px) saturate(190%) brightness(1.22)!important;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9),inset 0 -1.5px 0 rgba(255,255,255,.38),inset 1px 0 0 rgba(255,255,255,.28),inset -1px 0 0 rgba(255,255,255,.28),inset 0 -9px 14px -7px rgba(255,255,255,.32),inset 0 9px 12px -9px rgba(0,0,0,.4),0 8px 18px rgba(0,0,0,.6),0 2px 4px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.4)!important}
+.glass-thumb:after{background:radial-gradient(75% 55% at var(--glint,50%) 4%,rgba(255,255,255,.85),rgba(255,255,255,.12) 45%,transparent 62%)!important;opacity:.75!important}
+.glass-thumb:before{background:linear-gradient(90deg,rgba(140,210,255,.38),transparent 16%,transparent 84%,rgba(255,180,140,.32)),linear-gradient(100deg,transparent 35%,rgba(255,255,255,.2) 50%,transparent 65%)!important;background-size:100% 100%,220% 100%!important;background-position:0 0,var(--glint,50%) 0!important;
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask-composite:xor;mask-composite:exclude;padding:1.5px}
+.glass-host>button[aria-pressed=true],.glass-host>button.active{color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.6),0 0 12px rgba(255,255,255,.35)}
+
+/* ===== Change the variables: liquid glass controls ===== */
+.controls-card .control-row input[type=range]{height:9px;border-radius:99px;background:linear-gradient(to right,rgba(255,255,255,.92) 0 var(--fill),rgba(255,255,255,.1) var(--fill) 100%);box-shadow:inset 0 1px 2px rgba(0,0,0,.7),inset 0 -1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(255,255,255,.08)}
+.controls-card .control-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border:0;border-radius:50%;
+  background:radial-gradient(60% 45% at 50% 22%,rgba(255,255,255,.95),rgba(255,255,255,.25) 60%,transparent 70%),radial-gradient(circle at 50% 70%,rgba(255,255,255,.35),rgba(255,255,255,.08) 70%);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);box-shadow:inset 0 1px 0 #fff,inset 0 -2px 4px rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.55),0 4px 10px rgba(0,0,0,.65),0 0 14px rgba(255,255,255,.25);transition:transform .18s cubic-bezier(.3,1.4,.5,1)}
+.controls-card .control-row input[type=range]:active::-webkit-slider-thumb{transform:scale(1.28)}
+.controls-card .control-row input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:radial-gradient(60% 45% at 50% 22%,#fff,rgba(255,255,255,.3) 60%,rgba(255,255,255,.12));box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 4px 10px rgba(0,0,0,.65)}
+.controls-card .step-btn,.controls-card .rail-buttons button,.controls-card .simulation-playback button,.controls-card select,.controls-card input.exact-value{
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 50%,rgba(255,255,255,.09))!important;border:1px solid rgba(255,255,255,.18)!important;color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.08),0 3px 8px rgba(0,0,0,.5)!important;-webkit-backdrop-filter:blur(6px) saturate(160%);backdrop-filter:blur(6px) saturate(160%)}
+.controls-card .step-btn,.controls-card .rail-buttons button{border-radius:999px!important}
+.controls-card select,.controls-card input.exact-value,.controls-card .simulation-playback button{border-radius:12px!important}
+.controls-card .step-btn:hover,.controls-card .rail-buttons button:hover,.controls-card .simulation-playback button:hover,.controls-card select:hover{background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.09) 50%,rgba(255,255,255,.14))!important;border-color:rgba(255,255,255,.35)!important}
+.controls-card .step-btn:active,.controls-card .rail-buttons button:active,.controls-card .simulation-playback button:active{transform:scale(.92)}
+.controls-card input.exact-value:focus{outline:none;border-color:rgba(255,255,255,.6)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 0 3px rgba(255,255,255,.14)!important}
+.controls-card .control-value{color:#fff!important;text-shadow:0 0 10px rgba(255,255,255,.35)}
+.controls-card .control-row{padding:10px 12px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 0 0 1px rgba(255,255,255,.05)}
+/* toggle buttons on the stage (Auto-spin, Hide info, 2D diagram ...) get the same glass */
+.stage button[aria-pressed],.stage-tools button,.lab-tools button{-webkit-backdrop-filter:blur(6px) saturate(160%);backdrop-filter:blur(6px) saturate(160%)}
+.stage button[aria-pressed=true]{background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.1) 50%,rgba(255,255,255,.18))!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -1px 0 rgba(255,255,255,.25),0 4px 12px rgba(0,0,0,.55)!important}
+/* glass scrollbars */
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{border-radius:99px;border:3px solid transparent;background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,.16)) padding-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.3)) padding-box}
+
+/* ===== Close (x) buttons: clearly visible glass discs that turn red on hover ===== */
+.panel-close,.wonder-close,.help-close,[aria-label="Close help"]{display:inline-grid;place-items:center;width:26px!important;height:26px!important;min-width:0!important;padding:0!important;border-radius:50%!important;
+  background:radial-gradient(70% 55% at 50% 20%,rgba(255,255,255,.5),rgba(255,255,255,.14) 70%)!important;border:1px solid rgba(255,255,255,.55)!important;color:#fff!important;font-weight:900!important;font-size:13px!important;line-height:1!important;opacity:1!important;
+  box-shadow:inset 0 1px 0 #fff,0 0 0 3px rgba(255,255,255,.08),0 3px 10px rgba(0,0,0,.6),0 0 12px rgba(255,255,255,.18)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:transform .18s cubic-bezier(.3,1.4,.5,1),background .2s,box-shadow .2s!important}
+.panel-close:hover,.wonder-close:hover,.help-close:hover,[aria-label="Close help"]:hover,.panel-close:focus-visible{background:radial-gradient(70% 55% at 50% 20%,#ff8a80,#ff3b30 70%)!important;border-color:#ffb4ae!important;transform:scale(1.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 0 0 3px rgba(255,59,48,.25),0 0 16px rgba(255,59,48,.65)!important}
+.panel-close:active,.wonder-close:active{transform:scale(.9)}
+/* Subject switch in the top bar (wide screens) */
+.topbar .subject-tabs.in-topbar{flex:0 1 auto;flex-wrap:nowrap;margin:0 auto;gap:2px;padding:5px;border-radius:999px!important;background:#000!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.6)!important}
+.topbar .subject-tabs.in-topbar .subject-tab{flex:0 0 auto;padding:9px 20px;font-size:14px;letter-spacing:.02em;border:0!important;border-radius:999px!important;color:rgba(255,255,255,.62)}
+.topbar .subject-tabs.in-topbar .subject-tab:hover{color:#fff}
+.topbar .subject-tabs.in-topbar .glass-thumb{border-radius:999px!important}
+@media(max-width:1180px){.topbar .subject-tabs.in-topbar .subject-tab{padding:8px 13px;font-size:13px}}
+button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!important;min-height:0!important;max-height:26px!important;width:26px!important;max-width:26px!important;align-self:center}
