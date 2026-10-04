@@ -31,6 +31,8 @@ box.append(close,el('h2',{id:'fb-title',text:'Share your feedback'}),el('p',{cla
 function contact(){const mail='sahubrahmamaya@gmail.com',a=el('a',{href:`mailto:${mail}?subject=${encodeURIComponent('Physica for our school / coaching')}`,text:mail});
   return el('div',{class:'fb-contact'},[el('span',{'aria-hidden':'true',text:'🏫'}),el('p',{},[el('b',{text:'School or coaching owner?'}),document.createElement('br'),document.createTextNode('Contact us at:'),document.createElement('br'),a])])}
 dlg.append(box);document.body.append(dlg);
+// Also used by the tutor to pass on questions it cannot answer yet.
+window.PhysicaSendFeedback=(n,c,t)=>{const b=new URLSearchParams();b.append(F.name,n);b.append(F.country,c);b.append(F.text,t);return fetch(FORM,{method:'POST',mode:'no-cors',body:b})};
 let last=null;
 function show(){last=document.activeElement;dlg.hidden=false;requestAnimationFrame(()=>dlg.classList.add('on'));msg.textContent='';msg.className='fb-msg';send.disabled=false;box.classList.remove('done');setTimeout(()=>name.focus(),60)}
 function hide(){dlg.classList.remove('on');setTimeout(()=>{dlg.hidden=true},220);last?.focus?.()}

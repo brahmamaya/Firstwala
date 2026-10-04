@@ -62,6 +62,7 @@ function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.cl
     if(!ready||calm){Object.assign(S,T,{vx:0,vy:0,vw:0,vh:0});paint();ready=true;return}if(!raf)raf=requestAnimationFrame(step)};
   const soon=()=>requestAnimationFrame(place);new MutationObserver(soon).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',()=>{ready=false;soon()});
   if(window.ResizeObserver)new ResizeObserver(()=>{ready=false;soon()}).observe(host);if(window.IntersectionObserver)new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){ready=false;soon()}}).observe(host);soon();setTimeout(()=>{ready=false;place()},300)}
+window.PhysicaGlass=glass;
 for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelectorAll(s).forEach(glass);
 // Phones/tablets: put the controls right under the stage and keep the stage pinned while they scroll,
 // so changing a variable never means scrolling the simulation out of view. Desktop keeps the side column.
