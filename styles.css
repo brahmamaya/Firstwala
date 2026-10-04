@@ -325,3 +325,18 @@ body{background:radial-gradient(900px 520px at 78% -6%,rgba(110,92,255,.20),tran
 /* the More menu must float above the stage */
 .lab-tools{position:relative;z-index:40}.more-pop{z-index:60}
 @media(max-width:760px){.lab-tool-buttons{flex-wrap:wrap!important;overflow:visible!important}}
+/* black chrome so the liquid glass reads beautifully */
+.topbar{background:#000!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom-color:rgba(255,255,255,.08)!important}
+.sidebar{background:#000!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-right:1px solid rgba(255,255,255,.07)!important}
+.sidebar .chapter-list,.sidebar-top{background:transparent!important}
+/* spring-driven glass pill: JS sets transform/size; give it a moving glint */
+.glass-thumb{transition:opacity .25s!important;will-change:transform,width;transform-origin:center}
+.glass-thumb.flow{animation:none!important}
+.glass-thumb:after{background:radial-gradient(90% 70% at var(--glint,50%) -10%,rgba(255,255,255,.6),transparent 55%)!important}
+.glass-thumb:before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%);background-size:220% 100%;background-position:var(--glint,50%) 0;pointer-events:none}
+/* compact "What to notice / Try this" */
+.observe-card{padding:14px 18px!important}.observe-card .section-heading{margin-bottom:6px!important}.observe-card h2{font-size:15px!important}
+.observation{font-size:14px!important;line-height:1.45!important;margin:0 0 8px!important}
+.try-box{margin:0!important;padding:8px 0 0!important;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px;align-items:baseline}
+.try-box strong{font-size:10.5px!important;letter-spacing:.12em;white-space:nowrap}.try-box p{display:inline;margin:0!important;font-size:13.5px!important}.try-box>div{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.observe-card>.panel-close{top:10px!important;right:10px!important;width:22px;height:22px}

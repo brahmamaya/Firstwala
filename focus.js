@@ -49,15 +49,16 @@ const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details
   const set=v=>{clean=v;window.PhysicaClean=v;ib.textContent=v?'◨ Show info':'◧ Hide info';ib.setAttribute('aria-pressed',String(v));try{localStorage.setItem('physica-clean',v?'1':'0')}catch{}window.dispatchEvent(new Event('physica-theme-change'))};
   ib.addEventListener('click',()=>set(!clean));fb.after(ib);set(clean)}
 // Liquid-glass segmented controls: one glass pill sits behind the selected option and flows to the new one.
-function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.classList.add('glass-host');const th=document.createElement('span');th.className='glass-thumb';th.setAttribute('aria-hidden','true');host.prepend(th);let first=true;
+function glass(host){if(!host||host.querySelector('.glass-thumb'))return;host.classList.add('glass-host');const th=document.createElement('span');th.className='glass-thumb';th.setAttribute('aria-hidden','true');host.prepend(th);
+  // Spring-driven liquid glass: the pill glides with real momentum, stretches along its motion and settles (like iPadOS).
+  const S={x:0,y:0,w:0,h:0,vx:0,vy:0,vw:0,vh:0},T={x:0,y:0,w:0,h:0};let raf=0,ready=false,calm=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const paint=()=>{const sp=Math.min(.22,Math.abs(S.vx)/2600),sx=1+sp,sy=1-sp*.7;th.style.transform=`translate(${S.x}px,${S.y}px) scale(${sx},${sy})`;th.style.width=S.w+'px';th.style.height=S.h+'px';th.style.setProperty('--glint',`${50+Math.max(-30,Math.min(30,S.vx/40))}%`)};
+  const step=()=>{const k=210,d=24,dt=1/60;let moving=false;for(const a of['x','y','w','h']){const v='v'+a,f=-k*(S[a]-T[a])-d*S[v];S[v]+=f*dt;S[a]+=S[v]*dt;if(Math.abs(S[a]-T[a])>.2||Math.abs(S[v])>2)moving=true}paint();if(moving)raf=requestAnimationFrame(step);else{Object.assign(S,T,{vx:0,vy:0,vw:0,vh:0});paint();raf=0}};
   const place=()=>{const on=[...host.querySelectorAll('button')].find(b=>b.getAttribute('aria-pressed')==='true'||b.classList.contains('active'));if(!on||!on.offsetWidth){th.style.opacity='0';return}
-    const hb=host.getBoundingClientRect(),bb=on.getBoundingClientRect(),x=bb.left-hb.left+host.scrollLeft,y=bb.top-hb.top;
-    if(!first&&th.style.left&&parseFloat(th.style.left)!==x){th.classList.remove('flow');void th.offsetWidth;th.classList.add('flow')}
-    Object.assign(th.style,{left:x+'px',top:y+'px',width:bb.width+'px',height:bb.height+'px',opacity:'1'});first=false};
-  const soon=()=>requestAnimationFrame(place);new MutationObserver(soon).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',soon);
-  // re-place whenever the control becomes visible or changes size (e.g. the phone library drawer opens)
-  if(window.ResizeObserver)new ResizeObserver(soon).observe(host);if(window.IntersectionObserver)new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting))soon()}).observe(host);
-  document.addEventListener('transitionend',e=>{if(e.target.contains&&e.target.contains(host))soon()},true);soon();setTimeout(place,300)}
+    const hb=host.getBoundingClientRect(),bb=on.getBoundingClientRect();Object.assign(T,{x:bb.left-hb.left+host.scrollLeft,y:bb.top-hb.top,w:bb.width,h:bb.height});th.style.opacity='1';
+    if(!ready||calm){Object.assign(S,T,{vx:0,vy:0,vw:0,vh:0});paint();ready=true;return}if(!raf)raf=requestAnimationFrame(step)};
+  const soon=()=>requestAnimationFrame(place);new MutationObserver(soon).observe(host,{subtree:true,attributes:true,attributeFilter:['aria-pressed','class']});window.addEventListener('resize',()=>{ready=false;soon()});
+  if(window.ResizeObserver)new ResizeObserver(()=>{ready=false;soon()}).observe(host);if(window.IntersectionObserver)new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){ready=false;soon()}}).observe(host);soon();setTimeout(()=>{ready=false;place()},300)}
 for(const s of['.mode-switch','.subject-tabs','.grade-tabs'])document.querySelectorAll(s).forEach(glass);
 // Phones/tablets: put the controls right under the stage and keep the stage pinned while they scroll,
 // so changing a variable never means scrolling the simulation out of view. Desktop keeps the side column.
