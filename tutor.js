@@ -117,6 +117,13 @@ function search(c,q){const qt=new Set(toks(q)),s=normQ(q),sim=simObj(),pool=[...
   const N=pool.length,scored=pool.map(({x,w})=>{let n=0,hit=0,tm=0;for(const k of x.k)if(s.includes(' '+k.toLowerCase()+' ')||(k.length>5&&s.includes(k.toLowerCase()))){n+=k.length>4?3:1.5;hit++}
     for(const t of new Set(toks(x.q+' '+x.k.join(' '))))if(qt.has(t)){n+=Math.log(1+N/(df[t]||1))*.9;tm++}return{x,n:n*w,sure:hit>0||tm>=2}}).sort((a,b)=>b.n-a.n);
   return scored}
+// questions the tutor could not answer go (anonymously, rate-limited) to the Physica team, who add answers to tutor-learned.js
+function logQ(q,p){try{const t=q.trim().replace(/\s+/g,' ').slice(0,200);if(t.length<6||!/\p{L}{2}/u.test(t)||!window.PhysicaSendFeedback)return;
+  const seen=JSON.parse(sessionStorage.getItem('physica-asked')||'[]'),key=t.toLowerCase();if(seen.includes(key))return;
+  const day=new Date().toISOString().slice(0,10),st=JSON.parse(localStorage.getItem('physica-qlog')||'{}'),now=Date.now();
+  if(st.d!==day){st.d=day;st.n=0}if(st.n>=20||now-(st.t||0)<20000)return;st.n++;st.t=now;
+  localStorage.setItem('physica-qlog',JSON.stringify(st));seen.push(key);sessionStorage.setItem('physica-asked',JSON.stringify(seen.slice(-50)));
+  window.PhysicaSendFeedback('Tutor question','-',`[${simId()}|${p?.lang||'en'}|${p?.level||'-'}] ${t}`).catch(()=>{})}catch{}}
 function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div','tutor-chips');let asked=new Set();
   const scroll=()=>{thread.scrollTop=thread.scrollHeight};
   const me=t=>{const b=el('div','bub me',t);thread.append(b);scroll()};
@@ -148,13 +155,13 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   // the reply language follows the student; very short messages ("hint", "ok") keep the current language
   const langOf=q=>/[\u0900-\u097F]/.test(q)?'hi':HL.test(q)?'hl':q.trim().split(/\s+/).length>=3?'en':prof.lang;
   const MOOD={confused:/samajh nahi|samjh nahi|samjh nhi|samajh nhi|nahi samajh|nhi samajh|samajh me nahi|confus|don'?t understand|didn'?t understand|did not understand|not clear|phir se|dobara|again|समझ नहीं|फिर से|दोबारा/i,
-    tired:/\bbor(ed|ing)?\b|boring|too hard|very hard|difficult|mushkil|tired|thak|hate|irritat|ugh|😭|😢|😩|बोर|मुश्किल|थक/i,
+    tired:/\bbor(ed|ing)?\b|boring|too hard|very hard|difficult|mushkil|tired|\bthak|\bhate\b|irritat|\bugh\b|😭|😢|😩|बोर|मुश्किल|(?:^|\s)थक/i,
     happy:/thank|got it|samajh gaya|samajh gayi|samajh aa gaya|samjh gaya|samjh gayi|\bnice\b|awesome|\bwow\b|maza|mazaa|समझ गया|समझ गई|धन्यवाद/i};
   const HIK={vectors:['सदिश','परिणामी'],components:['घटक'],projectile:['प्रक्षेप्य','परवलय','फेंक'],range:['परास','दूर'],'height-time':['ऊँचाई','उड़ान','समय'],horizontal:['क्षैतिज','छत','चट्टान'],circular:['वृत्त','अभिकेंद्र','घूम'],river:['नदी','नाव','तैर','बारिश']};
   const LV=['basic','average','advanced'],down=l=>LV[Math.max(0,LV.indexOf(l||'average')-1)],up=l=>LV[Math.min(2,LV.indexOf(l||'average')+1)];
   let cur=null,curLvl=null,prob=null,hintN=0,crossN=0;
   function findConcept(q){if(!lesson)return null;const s=normQ(q),raw=q.toLowerCase();let best=null,sc=0;
-    for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.length>4?2:1;for(const k of HIK[c.id]||[])if(raw.includes(k))n+=2;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
+    for(const c of lesson.concepts){let n=0;for(const k of c.k)if(s.includes(' '+k+' ')||(k.length>4&&s.includes(k)))n+=k.includes(' ')?3:k.length>4?2:1;for(const k of c.hk||HIK[c.id]||[])if(raw.includes(k))n+=2;if(n>sc){sc=n;best=c}}return sc>=2?best:null}
   const lessonActs=c=>[[L(PH.ex),()=>bot(`${L(PH.example)} ${L(c.example)}`,{lang:prof.lang,acts:[[L(PH.an),()=>another(c)],[L(PH.quiz),()=>checkC(c)]]})],
     [L(PH.an),()=>another(c)],[curLvl==='basic'?L(PH.deeper):L(PH.more),()=>teach(c,curLvl==='basic'?up(curLvl):down(curLvl))],[L(PH.quiz),()=>checkC(c)]];
   function another(c){bot(`${L(PH.analogy)} ${L(c.analogy)} ${L(PH.mistake)} ${L(c.mistake)}`,{lang:prof.lang,acts:[[L(PH.quiz),()=>checkC(c)],[L(PH.practice),()=>practice()]]})}
@@ -186,7 +193,9 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
     if(cur&&/(deeper|more detail|advanced|aur detail|गहराई)/.test(raw)&&!c){teach(cur,up(curLvl));return true}
     if(c){if(!prof.level){askLevel(()=>teach(c,prof.level));return true}teach(c,prof.level);return true}
     // cross question on the concept just taught: answer from a new angle (analogy, then example, then the usual mistake)
-    if(cur&&/^\s*(but|why|how|lekin|par|pr|kyun|kyu|kaise|to|toh|so|फिर|लेकिन|पर|क्यों|कैसे)\b/i.test(q)&&!Object.keys(numbersFor(sim,q)).length){
+    // (only when it is about that concept - a brand-new topic goes on to the notes, or to the team)
+    const tq=toks(q),about=tq.length<=3||tq.some(t=>t.length>4&&JSON.stringify(cur||'').toLowerCase().includes(t));
+    if(cur&&about&&/^\s*(but|why|how|lekin|par|pr|kyun|kyu|kaise|to|toh|so|फिर|लेकिन|पर|क्यों|कैसे)\b/i.test(q)&&!Object.keys(numbersFor(sim,q)).length){
       const step=crossN++%3,t=step===0?`${L(PH.analogy)} ${L(cur.analogy)}`:step===1?`${L(PH.example)} ${L(cur.example)}`:`${L(PH.mistake)} ${L(cur.mistake)}`;
       bot(`${L(PH.cross)} ${t}`,{lang:prof.lang,acts:lessonActs(cur)});return true}
     return false}
@@ -206,9 +215,8 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
     const res=search(c,q),best=res[0];
     if(best&&best.sure&&best.n>=2.4&&(best.n>=4||best.n>res[1].n*1.12)){const a=best.x.a(params());await bot(`${pickOne(OPEN)} ${a}`,{acts:[['Quiz me on this',()=>check()],['Ask another',()=>inp.focus()]]});return}
     const near=res.filter(r=>r.n>.8).slice(0,3).map(r=>r.x);
-    if(near.length){bot('Hmm, I’m not completely sure I understood. Did you mean one of these?',{acts:near.map(x=>[x.q,()=>{me(x.q);bot(`${pickOne(OPEN)} ${x.a(params())}`,{acts:[['Quiz me on this',()=>check()]]})}])});return}
-    const d=await bot('That one is new to me - I don’t want to guess and tell you something wrong. I can pass it to the Physica team so I learn it.');
-    if(d&&window.PhysicaSendFeedback){const b=btn('tutor-mini','Send it to the team',async()=>{b.disabled=true;b.textContent='Sending…';try{await window.PhysicaSendFeedback('Tutor question','-',`[${simId()}] ${q}`);b.textContent='Sent - thank you!'}catch{b.textContent='Could not send'}});d.append(b)}}
+    if(near.length){logQ(q,prof);bot('Hmm, I’m not completely sure I understood. Did you mean one of these?',{acts:near.map(x=>[x.q,()=>{me(x.q);bot(`${pickOne(OPEN)} ${x.a(params())}`,{acts:[['Quiz me on this',()=>check()]]})}])});return}
+    logQ(q,prof);bot('That one is new to me - I don’t want to guess and tell you something wrong. I have noted it (anonymously) for the Physica team, so I can learn it soon. Meanwhile, try asking it in a different way!')}
   // input bar (type or speak)
   const f=el('form','tutor-ask'),inp=el('input');inp.type='text';inp.maxLength=200;inp.placeholder='Ask me anything… e.g. what if angle is 60?';inp.setAttribute('aria-label','Ask the tutor');
   const go=btn('tutor-go','Ask');go.type='submit';f.append(inp);
