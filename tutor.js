@@ -1,20 +1,22 @@
-/* Modes (Normal / Student / Teacher) and the Physica Tutor.
+/* Modes (Normal / Student / Teacher, chosen on the landing page) and the Physica Tutor.
    Student: ask questions (pre-written answers built from the live values), "Predict → Show me" demos that move the
    sliders by themselves, and a quick quiz. Teacher: a projector view with bigger text and controls, plus the same
    demos and quiz run as a class activity (predict first, then reveal). No AI service is called. */
 (() => {
 'use strict';
-const C=window.PhysicaTutor||{},head=document.querySelector('.workspace-header'),stage=document.querySelector('.stage'),titleEl=document.getElementById('title');
-if(!head||!stage||!titleEl)return;
+const C=window.PhysicaTutor||{},stage=document.querySelector('.stage'),titleEl=document.getElementById('title');
+if(!stage||!titleEl)return;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 const btn=(cls,text,fn)=>{const b=el('button',cls,text);b.type='button';if(fn)b.addEventListener('click',fn);return b};
 const KEY='physica-mode',MODES=[['normal','Normal'],['student','🎓 Student'],['teacher','👩‍🏫 Teacher']];
 let mode='normal';try{mode=localStorage.getItem(KEY)||'normal'}catch{}if(!MODES.some(m=>m[0]===mode))mode='normal';
 
-// ---- mode switch (glass segmented control in the lab header)
-const sw=el('div','mode-pick');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
-for(const [id,label] of MODES){const b=btn('',label,()=>setMode(id));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
-head.insertBefore(sw,head.querySelector('.chapter-nav'));window.PhysicaGlass?.(sw);
+// ---- mode choice: step 3 on the landing page (the logo brings the landing page back to change it)
+const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
+const SUB={normal:'Explore freely',student:'Tutor, demos and quiz',teacher:'Projector view for class'};
+for(const [id,label] of MODES){const b=btn('land-grade land-mode',null,()=>setMode(id));b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
+const step2=document.querySelector('.landing-step2');
+if(step2){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','3'),document.createTextNode(' Choose your mode'));st.append(h,sw);step2.after(st)}
 
 // ---- live simulation access (through the real controls, so everything stays in sync)
 const simId=()=>decodeURIComponent(location.hash.slice(1))||'';

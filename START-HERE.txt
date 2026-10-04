@@ -16,7 +16,7 @@ ULTRA SCENES: ultra3d.js holds hand-built Ultra-Realistic scenes (window.Physica
 MATH: mathtext.js shows _ and ^ as real subscripts/superscripts on the page and in canvas drawings.
 FOCUS: less important panels are compact and have a close (x) button; hidden ones return from the
 "Hidden:" chips; the Focus button shows only the stage and controls (Esc exits) - focus.js.
-TUTOR: Normal / Student / Teacher modes (tutor.js). Student: Ask (pre-written answers using live values), Predict → Show me demos, Quiz.
+TUTOR: Normal / Student / Teacher modes, chosen as step 3 on the landing page (tutor.js). Student: Ask (pre-written answers using live values), Predict → Show me demos, Quiz.
 Teacher: projector view + class demos and quiz. Content lives in tutor-content.js (keyed by simulation id; Projectile motion first). No AI service is called.
 LANDING: the site opens on "Welcome to Physica" where the visitor picks subject and class (landing.js);
 shared links (#sim-id) skip it, and the logo brings it back.
