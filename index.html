@@ -6,6 +6,10 @@
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z1BGVQBEJ6"></script>
 <script src="./ga.js"></script>
+  <link rel="preload" href="./fonts/exo2.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/orbitron.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="./physica-core.min.js"></script>
+  <script src="./physica.min.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07121f">
   <meta name="description" content="Explore Class 11 and 12 Physics, Chemistry, Botany and Zoology with 426 interactive 3D simulations: 276 physics experiments and 100 NCERT chapter-wise biology models with labelled parts. Change the variables, rotate every model in 3D, and build your own experiments in the drag-and-drop sandbox.">
@@ -13,54 +17,9 @@
   <title>Physica — Interactive Physics, Chemistry &amp; Biology Lab</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./sandbox.css">
-  <script src="./compat.js"></script>
-  <script src="./mathtext.js"></script>
-  <script src="./theme.js"></script>
-  <script src="./physica3d.js"></script>
-  <script src="./physics.js" defer></script>
-  <script src="./extras.js" defer></script>
-  <script src="./enhancements.js" defer></script>
-  <script src="./third.js" defer></script>
-  <script src="./fourth.js" defer></script>
-  <script src="./fifth.js" defer></script>
-  <script src="./sixth.js" defer></script>
-  <script src="./labkit.js" defer></script>
-  <script src="./seventh.js" defer></script>
-  <script src="./eighth.js" defer></script>
-  <script src="./ninth.js" defer></script>
-  <script src="./tenth.js" defer></script>
-  <script src="./biokit.js" defer></script>
-  <script src="./bio1.js" defer></script>
-  <script src="./bio2.js" defer></script>
-  <script src="./bio3.js" defer></script>
-  <script src="./bio4.js" defer></script>
-  <script src="./bio5.js" defer></script>
-  <script src="./chem1.js" defer></script>
-  <script src="./chem2.js" defer></script>
-  <script src="./chem3.js" defer></script>
-  <script src="./chem4.js" defer></script>
-  <script src="./phys3d-a.js" defer></script>
-  <script src="./phys3d-b.js" defer></script>
-  <script src="./phys3d-c.js" defer></script>
-  <script src="./phys3d-d.js" defer></script>
-  <script src="./real3d-11a.js" defer></script>
-  <script src="./real3d-11b.js" defer></script>
-  <script src="./real3d-11c.js" defer></script>
-  <script src="./real3d-11d.js" defer></script>
-  <script src="./real3d-11e.js" defer></script>
-  <script src="./instruments2d.js" defer></script>
-  <script src="./optics2d.js" defer></script>
-  <script src="./vendor/matter.min.js" defer></script>
-  <script src="./experience.js" defer></script>
-  <script src="./app.js" defer></script>
-  <script src="./sandbox-studio.js" defer></script>
-  <script src="./ultra3d.js" defer></script>
-  <script src="./focus.js" defer></script>
-  <script src="./landing-bg.js" defer></script>
-  <script src="./landing.js" defer></script>
 </head>
 <body>
-  <section id="landing" class="landing" aria-labelledby="landing-title" hidden data-testid="landing">
+  <section id="landing" class="landing" aria-labelledby="landing-title" data-testid="landing">
     <canvas id="landing-bg" class="landing-bg" aria-hidden="true"></canvas>
     <div class="landing-inner">
       <div class="landing-logo"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">physica<span class="brand-dot">.</span></span></div>
@@ -68,10 +27,10 @@
       <p class="landing-sub">Experience concepts through <b class="c2d">2D</b>, <b class="c3d">3D</b> and <b class="cur">Ultra-Realistic</b> simulations</p>
       <h2 class="landing-step"><span>1</span> Choose your subject</h2>
       <div class="landing-subjects" role="group" aria-label="Subject">
-        <button type="button" class="land-subject" data-subject="physics" aria-pressed="false" data-testid="land-physics"><i aria-hidden="true">⚛</i><b>Physics</b><small></small></button>
-        <button type="button" class="land-subject" data-subject="chemistry" aria-pressed="false" data-testid="land-chemistry"><i aria-hidden="true">⚗</i><b>Chemistry</b><small></small></button>
-        <button type="button" class="land-subject" data-subject="botany" aria-pressed="false" data-testid="land-botany"><i aria-hidden="true">🌿</i><b>Botany</b><small></small></button>
-        <button type="button" class="land-subject" data-subject="zoology" aria-pressed="false" data-testid="land-zoology"><i aria-hidden="true">🐾</i><b>Zoology</b><small></small></button>
+        <button type="button" class="land-subject" data-subject="physics" aria-pressed="false" data-testid="land-physics"><i aria-hidden="true">⚛</i><b>Physics</b><small>236 simulations</small></button>
+        <button type="button" class="land-subject" data-subject="chemistry" aria-pressed="false" data-testid="land-chemistry"><i aria-hidden="true">⚗</i><b>Chemistry</b><small>50 simulations</small></button>
+        <button type="button" class="land-subject" data-subject="botany" aria-pressed="false" data-testid="land-botany"><i aria-hidden="true">🌿</i><b>Botany</b><small>55 simulations</small></button>
+        <button type="button" class="land-subject" data-subject="zoology" aria-pressed="false" data-testid="land-zoology"><i aria-hidden="true">🐾</i><b>Zoology</b><small>45 simulations</small></button>
       </div>
       <div class="landing-step2"><h2 class="landing-step"><span>2</span> Choose your class</h2>
       <div class="landing-grades" role="group" aria-label="Class">

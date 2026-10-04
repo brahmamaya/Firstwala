@@ -192,3 +192,40 @@ button,summary,.restore-chip,.land-subject,.land-grade,select,input[type=range]{
 button:not(:disabled):active,summary:active{transform:scale(.96)}
 button:focus-visible,summary:focus-visible{box-shadow:0 0 0 3px rgba(66,217,202,.35)}
 @media(prefers-reduced-motion:reduce){button,summary{transition:none!important}}
+html.deep #landing{display:none!important}body:has(#landing:not([hidden])){overflow:hidden}
+/* ===== Futuristic pass: glass panels, neon edges, size by importance, smooth motion ===== */
+:root{--neon:var(--mint);--neon2:var(--purple)}
+body{background:radial-gradient(1200px 600px at 70% -10%,color-mix(in srgb,var(--neon2) 10%,transparent),transparent 60%),radial-gradient(900px 500px at -10% 30%,color-mix(in srgb,var(--neon) 8%,transparent),transparent 60%),var(--bg)}
+.topbar{background:color-mix(in srgb,var(--chrome) 78%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid color-mix(in srgb,var(--neon) 22%,var(--line));position:sticky;top:0}
+.topbar:after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--neon),var(--neon2),transparent);opacity:.55}
+.sidebar{background:color-mix(in srgb,var(--chrome) 88%,transparent)}
+.stage,.controls-card,.observe-card,.formula-card,.physics-panel{background:linear-gradient(180deg,color-mix(in srgb,var(--panel) 92%,transparent),color-mix(in srgb,var(--panel) 80%,transparent));border:1px solid color-mix(in srgb,var(--neon) 18%,var(--line));box-shadow:0 0 0 1px rgba(255,255,255,.02) inset,0 18px 40px -24px rgba(0,0,0,.7)}
+.stage{position:relative;border-radius:16px;overflow:hidden}.stage:before{content:'';position:absolute;inset:0;border-radius:16px;padding:1px;background:linear-gradient(135deg,color-mix(in srgb,var(--neon) 55%,transparent),transparent 35%,transparent 65%,color-mix(in srgb,var(--neon2) 55%,transparent));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:2}
+.stage.swap #simulation{animation:simSwap .38s cubic-bezier(.2,.8,.2,1)}@keyframes simSwap{from{opacity:.25;transform:scale(.985)}to{opacity:1;transform:none}}
+/* size by importance: stage wide, controls compact */
+.lab-layout{grid-template-columns:minmax(0,1fr) 312px!important;gap:16px}
+@media(max-width:1180px){.lab-layout{grid-template-columns:minmax(0,1fr) 280px!important}}
+@media(max-width:900px){.lab-layout{grid-template-columns:1fr!important}}
+.lab-main{display:flex;flex-direction:column;gap:14px;min-width:0}.lab-main .below-stage{margin:0}
+.controls-card{padding:18px 18px 16px!important}.controls-card h2{font-size:17px!important}
+.breadcrumbs{font-size:10.5px!important;opacity:.85}.tab-count{font-size:10.5px!important;opacity:.85}
+.simulation-tabs button{font-size:12.5px!important;padding-top:7px!important;padding-bottom:7px!important;border-radius:999px!important}
+.simulation-tabs button.selected{background:linear-gradient(90deg,color-mix(in srgb,var(--neon) 22%,var(--panel)),color-mix(in srgb,var(--neon2) 18%,var(--panel)))!important;border-color:var(--neon)!important;box-shadow:0 0 18px -6px var(--neon)}
+.lab-tool-buttons button,.more-menu summary{border-radius:999px!important}
+.lab-tool-buttons button:hover,.more-menu summary:hover,.view3d-bar button:hover,.restore-chip:hover,.focus-btn:hover{box-shadow:0 0 0 1px var(--neon),0 0 16px -4px var(--neon);border-color:var(--neon)}
+.mode-switch{border-radius:999px!important;border-color:color-mix(in srgb,var(--neon) 35%,var(--line2))!important}.mode-switch button[aria-pressed=true]{background:linear-gradient(90deg,color-mix(in srgb,var(--neon) 24%,transparent),color-mix(in srgb,var(--neon2) 24%,transparent))!important;text-shadow:0 0 10px currentColor}
+.play-button{box-shadow:0 0 22px -6px var(--neon)}
+input[type=range]::-webkit-slider-thumb{box-shadow:0 0 0 4px color-mix(in srgb,var(--neon) 25%,transparent),0 0 14px var(--neon)}
+.live-dot{box-shadow:0 0 10px var(--neon)}
+#title{background:linear-gradient(90deg,var(--text),color-mix(in srgb,var(--neon) 70%,var(--text)));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sidebar .chapter-link,.sidebar button{transition:background-color .2s,color .2s,transform .2s}
+.sidebar [aria-current=page],.sidebar .active{box-shadow:inset 3px 0 0 var(--neon)}
+main,.side-rail,.stage,.sidebar{animation:none}
+.main>*{animation:fadeUp .45s cubic-bezier(.2,.8,.2,1) both}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.main>*,.stage.swap #simulation{animation:none!important}}
+/* no dead space: sticky full-height library, inline restore chips, tools close inside its row */
+@media(min-width:761px){.sidebar{position:sticky;top:76px;height:calc(100vh - 76px);min-height:0!important;overflow-y:auto;scrollbar-width:thin}}
+.workspace-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.workspace-header .restore-bar{margin:0}
+.lab-tools{position:relative}.lab-tools>.panel-close{position:absolute!important;right:0;top:50%;transform:translateY(-50%);margin:0}.lab-tool-buttons{padding-right:36px}
+@media(max-width:760px){.lab-tool-buttons{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lab-tool-buttons::-webkit-scrollbar{display:none}}
+@media(max-width:760px){.lab-tools>.panel-close{display:none}.lab-tool-buttons{padding-right:0}}
