@@ -8,8 +8,8 @@ const C=()=>window.PhysicaTutor||{},stage=document.querySelector('.stage'),title
 if(!stage||!titleEl)return;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 const btn=(cls,text,fn)=>{const b=el('button',cls,text);b.type='button';if(fn)b.addEventListener('click',fn);return b};
-const KEY='physica-mode',MODES=[['normal','Normal'],['student','🎓 Student'],['teacher','👩‍🏫 Teacher']];
-let mode='normal';try{mode=localStorage.getItem(KEY)||'normal'}catch{}if(!MODES.some(m=>m[0]===mode))mode='normal';
+const KEY='physica-learn-mode',MODES=[['normal','Normal'],['student','🎓 Student'],['teacher','👩‍🏫 Teacher']];
+let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('physica-mode')||'normal'}catch{}if(!MODES.some(m=>m[0]===mode))mode='normal';
 
 // ---- mode choice: step 3 on the landing page (the logo brings the landing page back to change it)
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');

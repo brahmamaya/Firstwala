@@ -52,7 +52,7 @@
   const ADAPT={units:p=>({...p,measure:p.jaw/10}),'screw-gauge':p=>{const r=p.gap/p.pitch,n=Math.floor(r);return{...p,turns:n,division:Math.round((r-n)*50)}}};
   for(const s of sims)if(window.PhysicaSimPatch?.[s.id]&&s.r3){const f=s.r3,ad=ADAPT[s.id];s.r3=ad?(c,p,t)=>f(c,ad(p),t):null}
   window.PhysicaApplyReal3D=()=>{applyReal3D();const RR=window.PhysicaReal3D||{};for(const s of sims)if(window.PhysicaSimPatch?.[s.id]&&RR[s.id]&&s.__rr!==RR[s.id]){const f=RR[s.id],ad=ADAPT[s.id];s.__rr=f;s.r3=ad?(c,p,t)=>f(c,ad(p),t):f}try{syncView3d();renderSimulationTabs();draw()}catch{}};
-  let mode='3d';try{mode=localStorage.getItem('physica-mode')||(localStorage.getItem('physica-classic-2d')==='1'?'2d':'3d')}catch{}if(!['2d','3d','ultra'].includes(mode))mode='3d';
+  let mode='3d';try{const v=localStorage.getItem('physica-mode');mode=localStorage.getItem('physica-view')||(['2d','3d','ultra'].includes(v)?v:(localStorage.getItem('physica-classic-2d')==='1'?'2d':'3d'))}catch{}if(!['2d','3d','ultra'].includes(mode))mode='3d';
   const HAND=()=>(mode!=='3d'||!current.r3)&&INT(current.id);
   const is3D=s=>mode!=='2d'&&!(mode==='ultra'&&(INT(s.id)||window.PhysicaUltraScenes?.[s.id]))&&!!(s.view3d||s.r3);
   // NCERT biology is taught as Botany and Zoology (standard NEET / board split by chapter).
@@ -181,7 +181,7 @@
   function syncView3d(){const is3d=is3D(current),P3=window.Physica3D;$('view3d-bar').hidden=false;for(const m of['2d','3d','ultra'])$('mode-'+m).setAttribute('aria-pressed',String(mode===m));for(const id of['drag-mode','auto-spin','zoom-in','zoom-out','view-reset'])$(id).hidden=!is3d;$('drag-mode').textContent=dragMode==='rotate'?'⟲ Drag: rotate view':'⇆ Drag: adjust values';$('drag-mode').setAttribute('aria-pressed',String(dragMode==='rotate'));
     $('auto-spin').setAttribute('aria-pressed',String(!!P3?.cam.auto));$('stage-hint').textContent=is3d?(dragMode==='rotate'?'3D · DRAG TO ROTATE · PINCH TO ZOOM':'3D · DRAG TO ADJUST VALUES'):'DRAG THE SLIDERS · OR DRAG ON THE STAGE';
     const on=P3?P3.enabled:true;$('realism-toggle').textContent=`◆ 3D look: ${on?'On':'Off'}`;$('realism-toggle').setAttribute('aria-pressed',String(on))}
-  for(const m of['2d','3d','ultra'])$('mode-'+m).onclick=()=>{mode=m;try{localStorage.setItem('physica-mode',m)}catch{}syncView3d();renderSimulationTabs();renderControls();updateReadouts();draw();toast(m==='2d'?'2D view':m==='3d'?'3D · drag to rotate':'Ultra-Realistic')};
+  for(const m of['2d','3d','ultra'])$('mode-'+m).onclick=()=>{mode=m;try{localStorage.setItem('physica-view',m)}catch{}syncView3d();renderSimulationTabs();renderControls();updateReadouts();draw();toast(m==='2d'?'2D view':m==='3d'?'3D · drag to rotate':'Ultra-Realistic')};
   $('drag-mode').onclick=()=>{dragMode=dragMode==='rotate'?'values':'rotate';syncView3d()};
   $('auto-spin').onclick=()=>{window.Physica3D?.setAuto(!window.Physica3D.cam.auto);syncView3d()};
   $('zoom-in').onclick=()=>window.Physica3D?.zoomBy(1.15);$('zoom-out').onclick=()=>window.Physica3D?.zoomBy(1/1.15);
