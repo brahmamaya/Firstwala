@@ -89,7 +89,7 @@
   $('simulation-speed').onchange=e=>{playbackSpeed=Number(e.target.value);};
   $('simulation-step').onclick=()=>{playing=false;elapsed+=1/30;syncPlay();updateReadouts();draw();};
   let grade=current.grade,elapsed=0,playing=!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,lastFrame=performance.now(),lastReadout=0;
-  const fmt=c=>`${typeof saved.get(current.id)[c.key]==='number'?saved.get(current.id)[c.key].toFixed(c.digits||0):saved.get(current.id)[c.key]}${c.unit?' '+c.unit:''}`;
+  const fmt=c=>c.show?c.show(saved.get(current.id)[c.key]):`${typeof saved.get(current.id)[c.key]==='number'?saved.get(current.id)[c.key].toFixed(c.digits||0):saved.get(current.id)[c.key]}${c.unit?' '+c.unit:''}`;
   function renderSidebar(){
     const search=$('search').value.trim().toLowerCase();
     const entries=chapters.filter(s=>inScope(s)&&(!search||sims.some(x=>sameChapter(x,s)&&`${x.chapter} ${x.title} ${x.description}`.toLowerCase().includes(search))));
@@ -121,7 +121,7 @@
         const sync=()=>{input.value=p[c.key];number.value=p[c.key];display.textContent=fmt(c);input.setAttribute('aria-valuetext',fmt(c));input.style.setProperty('--fill',`${(p[c.key]-c.min)/(c.max-c.min)*100}%`);updateReadouts();draw();};
         input.oninput=()=>{p[c.key]=Number(input.value);sync();};
         number.onchange=()=>{if(number.value!==''&&Number.isFinite(number.valueAsNumber)){const v=Math.max(c.min,Math.min(c.max,number.valueAsNumber));p[c.key]=Number(Math.min(c.max,c.min+Math.round((v-c.min)/c.step)*c.step).toFixed(8));}sync();};
-        const ends=document.createElement('div');ends.className='control-extents';ends.textContent=`${c.min} — ${c.max}${c.unit?' '+c.unit:''}`;
+        const ends=document.createElement('div');ends.className='control-extents';ends.textContent=c.show?`${c.show(c.min)} — ${c.show(c.max)}`:`${c.min} — ${c.max}${c.unit?' '+c.unit:''}`;
         // − / + steppers: one step per tap, repeating while held.
         const nudge=d=>{const v=Math.min(c.max,Math.max(c.min,p[c.key]+d*c.step));p[c.key]=Number(Math.min(c.max,c.min+Math.round((v-c.min)/c.step)*c.step).toFixed(8));sync()};
         const stepper=(label,d)=>{const b=document.createElement('button');b.type='button';b.className='step-btn';b.textContent=d<0?'−':'+';b.setAttribute('aria-label',`${label} ${c.label}`);b.dataset.testid=`${d<0?'dec':'inc'}-${c.key}`;let timer=0;const stop=()=>{clearTimeout(timer);clearInterval(timer);timer=0};
