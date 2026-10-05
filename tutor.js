@@ -341,7 +341,10 @@ function quiz(c){let score=0,done=0;const out=el('p','tutor-score'),qs=[];
     qq.options.forEach((o,i)=>opts.append(btn('tutor-opt',`${i+1}. ${o}`,()=>reveal(i))));body.append(q)});
   body.append(out);read(0)}
 
-function setMode(m){mode=m;try{localStorage.setItem(KEY,m)}catch{}tab='ask';render();window.dispatchEvent(new Event('resize'))}
+// students get the tutor pack fetched quietly in the background, so turning the tutor on is instant
+const prefetchTutor=()=>{if(mode==='student'&&!window.PhysicaTeacher)(window.requestIdleCallback||setTimeout)(()=>loadTutorPack().catch(()=>{}),{timeout:2500})};
+function setMode(m){mode=m;try{localStorage.setItem(KEY,m)}catch{}tab='ask';render();prefetchTutor();window.dispatchEvent(new Event('resize'))}
+prefetchTutor();
 new MutationObserver(()=>{if(mode==='student'&&tutorOn)render()}).observe(titleEl,{childList:true,characterData:true,subtree:true});
 render();
 })();
