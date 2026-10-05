@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' https://docs.google.com; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Get help with Physica: frequently asked questions and a form to send your query to the Physica team.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="info.css">
+  <title>Help & queries — Physica</title>
+</head>
+<body>
+<header class="ihead"><a class="brand" href="./"><img src="icons/icon-192.png" alt="">PHYSICA</a><a class="open" href="./">Open the lab →</a></header>
+<main>
+<h1>Help &amp; queries</h1>
+<p class="date">We usually reply within 2-3 working days.</p>
+<h2>Frequently asked questions</h2>
+<details><summary>Is Physica free to use?</summary><p>You can open and use the simulations and the tutor directly in your browser. If anything about access changes in future, it will be announced on this site.</p></details>
+<details><summary>Which classes and exams does it cover?</summary><p>Class 11 and Class 12 Physics (all NCERT chapters) with simulations, and Chemistry, Botany and Zoology simulations. The AI Tutor is useful for school exams, Boards, JEE and NEET preparation.</p></details>
+<details><summary>How do I use the AI Tutor?</summary><p>On the first page choose <b>Student mode</b>, open any simulation and switch on <b>AI Tutor</b> at the top. You can type or speak in English, Hinglish or Hindi, and choose the language from the 🌐 menu.</p></details>
+<details><summary>The tutor’s voice is not working or sounds robotic.</summary><p>The voice comes from your own phone or browser. Turn up the volume and make sure the 🔊 button in the tutor is on. For the most natural voice, use Microsoft Edge or a recent Chrome; on phones, install a Hindi/English voice in your device’s text-to-speech settings.</p></details>
+<details><summary>The simulation is slow or blurry on a big smart board.</summary><p>Choose <b>Teacher mode</b> on the first page and press <b>Focus</b> on the simulation for a full-screen view. Physica automatically keeps motion smooth on large 4K boards. If it is still slow, tell us the board’s brand and model below.</p></details>
+<details><summary>Can I install Physica like an app?</summary><p>Yes. Use the <b>Install</b> option on the first page, or your browser’s menu → “Install app” / “Add to Home screen”.</p></details>
+<details><summary>Do you store my name or chats?</summary><p>The name you give the tutor, your stars and settings are saved only in your own browser. See our <a href="privacy.html">Privacy Policy</a> for details.</p></details>
+<details><summary>I found a wrong answer or a bug.</summary><p>Thank you! Please send it using the form below with the simulation or chapter name, and we will fix it.</p></details>
+<h2>Send us your query</h2>
+<p>Students, parents, teachers and schools - ask anything about Physica. Please don’t share passwords, phone numbers or other private details.</p>
+<form id="qform" class="qform" novalidate>
+<label>Your name<input id="qname" maxlength="80" autocomplete="name" required></label>
+<label>Email (optional - only if you want a reply)<input id="qmail" type="email" maxlength="120" autocomplete="email"></label>
+<label>About<select id="qtype"><option>Student doubt / help</option><option>Teacher or school</option><option>Problem or bug</option><option>Suggestion</option><option>Privacy or data request</option><option>Other</option></select></label>
+<label>Your query<textarea id="qtext" rows="5" maxlength="2000" required></textarea></label>
+<input id="qtrap" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+<p id="qmsg" class="qmsg" role="status" aria-live="polite"></p>
+<button type="submit">Send query</button>
+</form>
+<p class="note">Prefer email? Write to <a href="mailto:sahubrahmamaya@gmail.com">sahubrahmamaya@gmail.com</a>.</p>
+</main>
+<footer class="ifoot"><a href="about.html">About</a><a href="help.html">Help &amp; queries</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><br>© 2026 Physica · physica.in</footer>
+<script src="help.js"></script>
+</body>
+</html>

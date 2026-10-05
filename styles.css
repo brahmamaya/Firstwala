@@ -521,6 +521,8 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
   background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .landing-schools a{color:#fff;font-weight:800;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
 @media(max-width:560px){.landing-schools{border-radius:18px;font-size:13px}}
+.landing-links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;margin:14px auto 0;font-size:13px}.landing-links a{color:rgba(255,255,255,.62);text-decoration:none}.landing-links a:hover,.landing-links a:focus-visible{color:#fff;text-decoration:underline}
+.fb-links{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;margin-top:10px;font-size:12.5px}.fb-links a{color:inherit;opacity:.7}
 .landing-inner>:nth-child(9){animation-delay:.66s!important}
 .landing-inner>:nth-child(10){animation-delay:.74s!important}
 /* ===== Modes + Physica Tutor ===== */
@@ -617,3 +619,4 @@ body.mode-teacher .tutor-say{font-size:17px}
   .feedback-btn{height:32px!important;padding:0 12px!important;font-size:12px!important;gap:6px!important}
   .tutor-switch{height:32px!important;font-size:12px!important;padding:0 5px 0 11px!important}
   .tutor-switch-knob{width:30px;height:20px}.tutor-switch-knob:after{width:14px;height:14px}.tutor-switch[aria-pressed=true] .tutor-switch-knob:after{transform:translateX(10px)}}
+.more-pop a.more-help{display:block;padding:9px 12px;border-radius:10px;color:inherit;text-decoration:none;font-weight:600;font-size:14px}.more-pop a.more-help:hover,.more-pop a.more-help:focus-visible{background:rgba(255,255,255,.08)}
