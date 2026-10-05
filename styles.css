@@ -706,3 +706,47 @@ html.lite .subject-tabs .glass-thumb{-webkit-backdrop-filter:none!important;back
 html{--vtx:-28px;--vtx2:28px}html[data-vt=prev]{--vtx:28px;--vtx2:-28px}
 @keyframes vtOut{to{opacity:0;transform:translateX(var(--vtx)) scale(.985);filter:blur(4px)}}
 @keyframes vtIn{from{opacity:0;transform:translateX(var(--vtx2)) scale(.985);filter:blur(4px)}}
+/* ===== Polish round: silver titles, highlighted key relation, 3D selected chip, crisp close buttons,
+   compact comparison panel, topbar that never overlaps ===== */
+/* simulation title: brushed silver on every simulation */
+#title{background:linear-gradient(180deg,#ffffff 0%,#e4e8ee 38%,#9ea6b2 52%,#d7dce4 70%,#f6f8fb 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.6)) drop-shadow(0 6px 18px rgba(200,210,225,.12))}
+/* key relation: smaller, calmer, highlighted */
+.formula-card{padding:10px 14px!important;min-width:0!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(255,195,107,.07),rgba(0,0,0,.6))!important;
+  border:1px solid rgba(255,195,107,.35)!important;box-shadow:inset 3px 0 0 #ffc36b,0 0 22px -8px rgba(255,195,107,.45),inset 0 1px 0 rgba(255,255,255,.06)!important}
+.formula-card span{font-size:9.5px!important;color:#ffc36b!important;opacity:.85;letter-spacing:.16em!important}
+.formula-card strong{font-size:15px!important;margin-top:5px!important;line-height:1.45;text-shadow:0 0 14px rgba(255,195,107,.35)}
+/* simulations of this chapter: bigger text, the open one lifted in 3D */
+.simulation-tabs button{font-size:13.5px!important;padding:9px 16px!important;transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s,background .25s,color .25s!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.35)!important}
+.simulation-tabs button:hover{transform:translateY(-2px)}
+.simulation-tabs button.selected,.simulation-tabs button[aria-pressed=true]{color:#000!important;font-weight:800!important;
+  background:linear-gradient(180deg,#ffffff 0%,#e9edf3 45%,#b9c1cc 100%)!important;border-color:#fff!important;transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 #fff,inset 0 -3px 0 rgba(0,0,0,.18),0 6px 0 -1px #6b7380,0 10px 22px rgba(0,0,0,.55),0 0 20px rgba(255,255,255,.18)!important}
+/* close buttons: crisp glass discs with a drawn ×, turning red on hover */
+button.panel-close,button.wonder-close,.fb-close{display:grid!important;place-items:center;font-size:0!important;color:transparent!important;border-radius:50%!important;padding:0!important;
+  background:radial-gradient(80% 70% at 50% 18%,rgba(255,255,255,.28),rgba(255,255,255,.06) 60%),#111!important;border:1px solid rgba(255,255,255,.28)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 4px 12px rgba(0,0,0,.5)!important;transition:transform .2s cubic-bezier(.3,1.5,.5,1),background .2s,border-color .2s!important}
+button.panel-close::before,button.panel-close::after,button.wonder-close::before,button.wonder-close::after,.fb-close::before,.fb-close::after{content:'';grid-area:1/1;width:11px;height:2px;border-radius:2px;background:#fff;transform:rotate(45deg);transition:transform .25s}
+button.panel-close::after,button.wonder-close::after,.fb-close::after{transform:rotate(-45deg)}
+button.panel-close:hover,button.wonder-close:hover,.fb-close:hover,button.panel-close:focus-visible{background:radial-gradient(80% 70% at 50% 18%,#ff9a92,#e5372c 70%)!important;border-color:#ffb4ae!important;transform:scale(1.1) rotate(90deg)}
+/* "Try a comparison": compact, black, smooth */
+.lesson-section{padding:14px 16px!important;border-radius:16px!important;background:#000!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important}
+.lesson-top{gap:10px!important;align-items:center!important}.lesson-top h2,.lesson-top h3{font-size:16px!important;margin:0!important}
+.preset-buttons{gap:6px!important}.preset-buttons button{font-size:12.5px!important;padding:6px 12px!important;min-height:0!important;border-radius:999px!important;background:#111!important;border:1px solid rgba(66,217,202,.4)!important;transition:background .2s,transform .2s}
+.preset-buttons button:hover{background:rgba(66,217,202,.15)!important;transform:translateY(-1px)}
+.lesson-grid{margin-top:10px!important;padding-top:10px!important;gap:12px 20px!important;font-size:13.5px}
+.lesson-grid h3,.lesson-grid h4,.lesson-grid .eyebrow-small,.lesson-grid span:first-child{font-size:10px!important;margin:0 0 4px!important}
+.lesson-grid p{margin:0!important;line-height:1.5!important;font-size:13.5px!important}
+/* playback row: the help line spans the card; the speed menu never truncates */
+.simulation-playback{grid-template-columns:repeat(auto-fit,minmax(128px,1fr))!important}
+.simulation-playback>label,.simulation-playback>p{grid-column:1/-1!important}
+/* top bar between 1000 and 1400 px: shed labels so subjects and the AI switch never overlap */
+.topbar{gap:12px}.topbar .subject-tabs.in-topbar{min-width:0}
+@media(max-width:1400px){.topbar .brand-sub,.topbar .brand-divider,.topbar .theme-picker>span{display:none!important}}
+@media(max-width:1280px){.topbar .subject-tabs.in-topbar .subject-tab{padding:8px 12px!important;font-size:13px!important}.feedback-btn b{display:none!important}.feedback-btn{padding:0 10px!important}}
+@media(max-width:1160px){.topbar .subject-tabs.in-topbar .subject-tab{padding:7px 9px!important;font-size:12.5px!important}.topbar .brand-word{font-size:24px!important}
+  .tutor-switch b{display:none}.tutor-switch{padding:0 4px 0 9px!important}#theme-select{width:96px!important}}
+button.panel-close,button.wonder-close,.fb-close{position:relative!important}
+button.panel-close::before,button.panel-close::after,button.wonder-close::before,button.wonder-close::after,.fb-close::before,.fb-close::after{position:absolute;left:50%;top:50%;margin:-1px 0 0 -5.5px}
+#title{background:linear-gradient(180deg,#ffffff 0%,#dfe4ea 30%,#8a929e 50%,#c9cfd8 66%,#f3f5f8 100%)!important;-webkit-background-clip:text!important;background-clip:text!important}
