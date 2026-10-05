@@ -14,9 +14,36 @@ const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-
 
 /* ---------- Electromagnetic Waves ---------- */
 reg('emwave',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.65,pitch:.25}),k=TAU/(.6+p.wavelength*.6),E=[],B=[];for(let i=0;i<=90;i++){const x=-3.4+6.8*i/90,v=Math.sin(k*x-t*3)*.6*p.amplitude;E.push([x,v,0]);B.push([x,0,v*.8]);if(i%3===0){s.seg([x,0,0],[x,v,0],'#ffc36b88',1.2);s.seg([x,0,0],[x,0,v*.8],'#7baaff66',1.1)}}s.curve(E,C.gold,2.6,6);s.curve(B,C.blue,2,6);s.arrow([-3.4,0,0],[3.6,0,0],C.muted,1.5,11,'travel at c = 3×10⁸ m/s');s.label([-3,1.4*p.amplitude*.6+.3,0],'E',C.gold,14);s.label([-3,0,1.2*p.amplitude*.6+.2],'B',C.blue,14);s.render()});
-reg('spectrum',(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.35}),bands=[[-12,-11,'Gamma','#be4bdb'],[-11,-8,'X-ray','#7950f2'],[-8,-6.6,'UV','#4c6ef5'],[-6.6,-6.1,'Visible',''],[-6.1,-3,'Infrared','#e8590c'],[-3,-1,'Microwave','#f08c00'],[-1,3,'Radio','#fab005']],X=e=>-3.4+6.8*(e+12)/15;
-  bands.forEach(([a,b,n,col])=>{if(n==='Visible'){const w=(X(b)-X(a))/8;for(let i=0;i<8;i++)s.box([X(a)+w*(i+.5),0,0],[w,.4,.8],spec(380+400*i/8))}else s.box([(X(a)+X(b))/2,0,0],[X(b)-X(a),.4,.8],col);s.label([(X(a)+X(b))/2,.55,.4],n,C.white,11)});
-  const x=X(p.exponent),lam=Math.pow(10,p.exponent),k=TAU/clamp(.15+(p.exponent+12)*.08,.15,1.4);s.arrow([x,1.6,0],[x,.35,0],C.red,3);s.curve(Array.from({length:61},(_,i)=>{const xx=-3+6*i/60;return[xx,-1.2+.35*Math.sin(k*xx-t*3),0]}),C.gold,2);s.render();tag(c,`λ = ${lam.toExponential(2)} m`,44,98,C.gold,15)});
+// EM spectrum: a source emits the selected radiation in 3D; λ in ångström and f in hertz. Entering visible light the
+// camera zooms into the 7 colours (VIBGYOR) with their names and wavelength / frequency ranges.
+const EMB=[[-14,-11,'Gamma rays','#be4bdb'],[-11,-8,'X-rays','#7950f2'],[-8,-6.42,'Ultraviolet','#4c6ef5'],[-6.42,-6.12,'Visible light',''],[-6.12,-3,'Infrared','#e8590c'],[-3,-1,'Microwaves','#f08c00'],[-1,3,'Radio waves','#fab005']],
+  VIB=[['Violet',380,420],['Indigo',420,450],['Blue',450,495],['Green',495,570],['Yellow',570,590],['Orange',590,620],['Red',620,760]],
+  SUPD='⁰¹²³⁴⁵⁶⁷⁸⁹',sci=(x,d=2)=>{const e=Math.floor(Math.log10(x)),m=x/10**e;return`${m.toFixed(d)} × 10${String(e).replace('-','⁻').replace(/\d/g,q=>SUPD[q])}`},
+  ang=m=>{const a=m*1e10;return a>=.1&&a<1e6?`${a>=100?Math.round(a).toLocaleString('en-IN'):+a.toPrecision(3)} Å`:`${sci(a)} Å`},
+  emBand=e=>EMB.find(([a,b])=>e>=a&&e<b)||EMB[EMB.length-1];
+let emZoom=0;
+// position along the bar: log-scale across the whole spectrum, or (zoomed) 7 equal boxes for the visible colours
+const emXv=e=>{const nm=10**e*1e9;if(nm<380)return -3.5-(-6.42-e)*40;if(nm>=760)return 3.5+(e+6.12)*40;const i=VIB.findIndex(([,a,b])=>nm>=a&&nm<b),[,a,b]=VIB[i<0?6:i];return -3.5+7*((i<0?6:i)+(nm-a)/(b-a))/7};
+reg('spectrum',(c,p,t)=>{const e=p.exponent,lam=10**e,nm=lam*1e9,vis=nm>=380&&nm<=760,band=emBand(e);emZoom+=((vis?1:0)-emZoom)*.12;if(Math.abs((vis?1:0)-emZoom)<.002)emZoom=vis?1:0;const z=emZoom*emZoom*(3-2*emZoom);
+  const s=P3.scene(c,{scale:50,pitch:-.18,yaw:.5,cx:330,cy:250}),Xf=q=>-3.5+7*(q+12)/15,X=q=>Xf(q)+(emXv(q)-Xf(q))*z,cl=x=>clamp(x,-3.8,3.8),Y=.55;
+  const col=vis?spec(nm):band[3];
+  EMB.forEach(([a,b,n,bc],bi)=>{const x0=cl(X(Math.max(a,-12))),x1=cl(X(b));if(x1-x0<.01)return;
+    if(n==='Visible light'){VIB.forEach(([vn,l0,l1],vi)=>{const v0=cl(X(Math.log10(l0*1e-9))),v1=cl(X(Math.log10(l1*1e-9)-1e-9));if(v1-v0<.005)return;s.box([(v0+v1)/2,Y,0],[v1-v0,.5,.8],spec((l0+l1)/2));
+        if(z>.6){s.label([(v0+v1)/2,Y+.55,.4],vn,C.white,13);s.label([(v0+v1)/2,Y-(vi%2?.75:.5),.4],`${l0*10}–${l1*10} Å`,'#c9d6e6',10)}});
+      if(z<.4)s.label([(x0+x1)/2,Y-.55,.4],'Visible',C.white,11)}
+    else{s.box([(x0+x1)/2,Y,0],[x1-x0,.5,.8],bc,{alpha:1-.6*z});if(z<.4)s.label([(x0+x1)/2,Y+(bi%2?-.55:.55),.4],n,C.white,11)}});
+  const xp=cl(X(e));s.arrow([xp,Y+1.25,0],[xp,Y+.32,0],C.white,3);
+  // the source glows in the colour of the chosen radiation and sends out a 3D wave (E up-down, B across) with photons
+  const L=clamp(.25+(e+12)*.085,.25,1.5),k=TAU/L,sx=-3.3,sy=-1.35,pulse=.12+.04*Math.sin(t*6);
+  s.ball([sx,sy,0],.24,col,{glow:true});s.ball([sx,sy,0],pulse,'#ffffff',{flat:true,glow:true});
+  const E=[],B=[];for(let i=0;i<=120;i++){const x=sx+.3+6.6*i/120,v=Math.sin(k*(x-sx)-t*4)*.5,w=v*.8;E.push([x,sy+v,0]);B.push([x,sy,w]);if(i%4===0)s.seg([x,sy,0],[x,sy+v,0],col+'55',1)}
+  s.curve(B,col+'77',1.6,6);s.curve(E,col,3,6);s.seg([sx+.2,sy,0],[3.6,sy,0],'#8ca6b955',1);
+  for(let i=0;i<5;i++){const q=cycle(t*.35+i/5,1);s.ball([sx+.3+6.4*q,sy,0],.05,col,{glow:true,flat:true})}
+  s.render();
+  tag(c,band[2],44,58,col,22,'left','800');tag(c,`λ = ${ang(lam)}`,44,88,C.gold,17);tag(c,`f = ${sci(3e8/lam)} Hz`,250,88,C.gold,17);
+  if(vis){const v=VIB.find(([,a,b])=>nm>=a&&nm<b)||VIB[6];tag(c,`${v[0]}: ${v[1]*10}–${v[2]*10} Å  ·  ${(3e17/v[2]/1e14).toFixed(2)}–${(3e17/v[1]/1e14).toFixed(2)} × 10¹⁴ Hz`,44,114,col,15,'left','800');
+    tag(c,`Visible light: 3800–7600 Å  ·  3.95–7.89 × 10¹⁴ Hz`,44,138,C.white,14,'left','700')}
+  else tag(c,`Range: ${ang(10**Math.max(band[0],-12))} – ${ang(10**band[1])}`,44,114,'#c9d6e6',14)});
 reg('radiation-pressure',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.5}),mir=p.surface==='mirror',Pr=(mir?2:1)*p.intensity/3e8,a=.5+Math.sqrt(p.area)*4;s.box([1.6,0,0],[.1,a,a],mir?'#e9f6ff':'#212529');for(let i=0;i<8;i++){const y=(hash(i)-.5)*a*.8,z=(hash(i+3)-.5)*a*.8,q=cycle(t*.8+i/8,1);s.ball([-3+4.5*Math.min(q*1.2,1),y,z],.05,'#ffd43b',{glow:true,flat:true});if(mir&&q>.83)s.ball([1.5-(q-.83)*8,y,z],.05,'#ffd43b',{flat:true})}for(let i=0;i<5;i++)s.seg([-3,(i-2)*.3,0],[1.55,(i-2)*.3,0],'#ffd43b44',2);s.arrow([1.7,0,0],[1.7+.3+Pr*2e5,0,0],C.red,4,11,`F = ${f(Pr*p.area,3)} N`);s.render();tag(c,mir?'Mirror: momentum reverses → twice the push':'Absorber: photons stop → push',44,98,C.gold,14)});
 reg('displacement-current',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4}),ph=Math.sin(TAU*p.frequency*t*.5),a=.4+Math.sqrt(p.area)*3;for(const x of[-.3,.3])s.cyl([x,0,0],[1,0,0],a,.06,x<0?'#ff857e':'#7baaff');s.cyl([-1.9,0,0],[1,0,0],.04,3.2,'#d9844a');s.cyl([1.9,0,0],[1,0,0],.04,3.2,'#d9844a');for(let i=0;i<4;i++){const y=(i-1.5)*.25;s.arrow([-.25,y,0],[-.25+.5*Math.abs(ph)+.01,y,0],'#ffc36b'+Math.round(80+170*Math.abs(ph)).toString(16).padStart(2,'0'),1.5,6,i===3?`I_d = ${f(p.current*Math.abs(ph),2)} nA`:'')}for(const x of[-1.6,0,1.6])s.ring([x,0,0],[1,0,0],a*.6+.2,'#42d9ca'+Math.round(60+180*Math.abs(Math.cos(TAU*p.frequency*t*.5))).toString(16).padStart(2,'0'),2);s.render();tag(c,'mint rings: B field — present around the wire AND around the gap',44,98,C.muted,13)});
 reg('photon-energy',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.5,pitch:.2}),fq=Math.pow(10,p.exponent),lam=3e8/fq*1e9,col=lam>=380&&lam<=780?spec(lam):lam<380?'#be4bdb':'#e8590c',k=TAU/clamp(4-(p.exponent-6)*.25,.2,4),x0=-3+cycle(t*.6,1)*4;s.curve(Array.from({length:81},(_,i)=>{const x=-3.4+6.8*i/80;return[x,.6*Math.exp(-((x-x0)**2)/.8)*Math.sin(k*x-t*6),0]}),col,2.6,8);s.render();tag(c,`f = ${fq.toExponential(2)} Hz`,44,98,C.gold,15)});

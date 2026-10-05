@@ -39,7 +39,7 @@ const span=c=>{const st=c.step||1,r=v=>Math.round(v/st)*st,d=(c.max-c.min)*.15;r
 function effect(sim,c){const p=params(),[lo,hi]=span(c),a=readings(sim,{...p,[c.key]:lo}),b=readings(sim,{...p,[c.key]:hi});let best=-1,ch=0;
   a.forEach((m,i)=>{const x=m.n,y=b[i]?.n;if(!isFinite(x)||!isFinite(y))return;const r=Math.abs(y-x)/Math.max(Math.abs(x),Math.abs(y),1e-12);if(r>ch){ch=r;best=i}});
   return{lo,hi,a,b,i:best,dir:best<0||ch<.01?0:Math.sign(b[best].n-a[best].n)}}
-const fmtC=(c,v)=>`${v}${c.unit?(/^[°%]/.test(c.unit)?'':' ')+c.unit:''}`;
+const fmtC=(c,v)=>c.show?c.show(v):`${v}${c.unit?(/^[°%]/.test(c.unit)?'':' ')+c.unit:''}`;
 function content(){const id=simId(),sim=simObj();if(!sim||sim.subject!=='physics')return null;const own=C[id]||{},chap=CH[sim.chapter]||{qa:[],quiz:[]},rc=ranges(sim);
   const autoQ=rc.map(c=>({q:`What does ${c.label.toLowerCase()} do here?`,k:[c.label.toLowerCase(),...c.label.toLowerCase().split(/\s+/).filter(w=>w.length>3)],
     a:()=>{const e=effect(sim,c);if(e.i<0)return`${c.label} sets up the experiment; watch the stage as you move it.`;const m=e.a[e.i];
