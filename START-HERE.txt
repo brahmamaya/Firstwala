@@ -101,3 +101,15 @@ biokit.js and bio1.js to bio5.js hold the 100 biology experiments.
 Matter.js 0.20.0 and its MIT licence are included
 locally in vendor/. No external scripts or CDN dependency. No React build is
 needed for this archive. Use a current Chrome, Safari, Firefox or Edge browser.
+
+LEAN BUILD (node tools/build.js does all of this every time):
+1. tools/optimize-css.js - cascade-aware dead-code eliminator for styles.css. A declaration is removed only when,
+   for every selector in its rule, a later declaration of the same property for the exact same selector exists
+   with equal or higher !important, in a context that is always active when the earlier one is (top level or the
+   same @media/@supports chain). Same selector = same specificity, later wins, so the earlier one can never apply.
+   Intra-rule fallbacks and anything overridden by color-mix()/dvh values are kept; duplicate @keyframes keep the last.
+   Running it twice changes nothing. Verified by comparing every element's computed style before/after in 62 states.
+2. styles.css is then minified to styles.min.css (that is what index.html loads).
+3. The AI Tutor's lessons and notes (tutor-content, tutor-chapters, tutor-teacher-content, tutor-learned) are a
+   separate physica-tutor.min.js, downloaded only when a student turns the tutor on (tutor.js loadTutorPack()).
+   Normal and Teacher mode never download it. The 3D pack (physica-3d.min.js) loads on idle as before.
