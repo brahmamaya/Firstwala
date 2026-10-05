@@ -46,6 +46,7 @@
         methods.set(property,fn);return fn;
       },
       set(target,property,value){
+        if(property==='shadowBlur'&&window.PhysicaLite)value=Math.min(value,2); // big boards: soft glows are the costliest canvas effect
         if(['fillStyle','strokeStyle','shadowColor'].includes(property))value=typeof value==='string'?colour(value):(gradientTargets.get(value)||value);
         return Reflect.set(target,property,value,target);
       }
