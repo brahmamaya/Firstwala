@@ -30,6 +30,9 @@ box.append(close,el('h2',{id:'fb-title',text:'Share your feedback'}),el('p',{cla
 // Schools and coaching institutes can write directly.
 function contact(){const mail='sahubrahmamaya@gmail.com',a=el('a',{href:`mailto:${mail}?subject=${encodeURIComponent('Physica for our school / coaching')}`,text:mail});
   return el('div',{class:'fb-contact'},[el('span',{'aria-hidden':'true',text:'🏫'}),el('p',{},[el('b',{text:'School or coaching owner?'}),document.createElement('br'),document.createTextNode('Contact us at:'),document.createElement('br'),a])])}
+// Help, About, Terms and Privacy pages: from the feedback card and the More menu.
+const links=el('nav',{class:'fb-links','aria-label':'About Physica'},[['about.html','About'],['help.html','Help & queries'],['terms.html','Terms'],['privacy.html','Privacy']].map(([h,t])=>el('a',{href:h,text:t})));box.append(links);
+if(pop)pop.append(el('a',{href:'help.html',role:'menuitem','data-testid':'help-more',class:'more-help'},[el('span',{'aria-hidden':'true',text:'❓ '}),document.createTextNode('Help & queries')]));
 dlg.append(box);document.body.append(dlg);
 // Also used by the tutor to pass on questions it cannot answer yet.
 window.PhysicaSendFeedback=(n,c,t)=>{const b=new URLSearchParams();b.append(F.name,n);b.append(F.country,c);b.append(F.text,t);return fetch(FORM,{method:'POST',mode:'no-cors',body:b})};
