@@ -747,6 +747,14 @@ button.panel-close:hover,button.wonder-close:hover,.fb-close:hover,button.panel-
 @media(max-width:1280px){.topbar .subject-tabs.in-topbar .subject-tab{padding:8px 12px!important;font-size:13px!important}.feedback-btn b{display:none!important}.feedback-btn{padding:0 10px!important}}
 @media(max-width:1160px){.topbar .subject-tabs.in-topbar .subject-tab{padding:7px 9px!important;font-size:12.5px!important}.topbar .brand-word{font-size:24px!important}
   .tutor-switch b{display:none}.tutor-switch{padding:0 4px 0 9px!important}#theme-select{width:96px!important}}
-button.panel-close,button.wonder-close,.fb-close{position:relative!important}
-button.panel-close::before,button.panel-close::after,button.wonder-close::before,button.wonder-close::after,.fb-close::before,.fb-close::after{position:absolute;left:50%;top:50%;margin:-1px 0 0 -5.5px}
+button.panel-close,button.wonder-close,.fb-close{grid-template-rows:1fr!important;grid-template-columns:1fr!important;grid-auto-rows:0!important;grid-auto-columns:0!important;line-height:0!important}
 #title{background:linear-gradient(180deg,#ffffff 0%,#dfe4ea 30%,#8a929e 50%,#c9cfd8 66%,#f3f5f8 100%)!important;-webkit-background-clip:text!important;background-clip:text!important}
+/* close buttons never squeeze in a crowded row */
+button.panel-close,button.wonder-close,.fb-close{flex:0 0 26px!important;min-width:26px!important;width:26px!important;height:26px!important;aspect-ratio:1}
+/* the open simulation stays a readable silver key everywhere (lite mode, touch screens, every theme) */
+html body .simulation-tabs button.selected,html body .simulation-tabs button[aria-pressed=true]{color:#05070a!important;font-weight:800!important;
+  background:linear-gradient(180deg,#ffffff 0%,#e9edf3 45%,#b9c1cc 100%)!important;border-color:#fff!important;text-shadow:0 1px 0 rgba(255,255,255,.6)!important}
+/* intro row: the text always keeps room; the key-relation card sits beside it when there is space, below it otherwise */
+.intro{flex-wrap:wrap!important}
+.intro>.intro-text{flex:1 1 360px!important;min-width:min(100%,320px)!important}
+.intro>.formula-card{flex:0 1 auto!important;max-width:min(100%,520px)!important}
