@@ -4,7 +4,7 @@
    move the sliders by themselves, and a spoken quiz. Voice uses the browser's own speech features; no AI service. */
 (() => {
 'use strict';
-const C=window.PhysicaTutor||{},stage=document.querySelector('.stage'),titleEl=document.getElementById('title');
+const C=()=>window.PhysicaTutor||{},stage=document.querySelector('.stage'),titleEl=document.getElementById('title');
 if(!stage||!titleEl)return;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 const btn=(cls,text,fn)=>{const b=el('button',cls,text);b.type='button';if(fn)b.addEventListener('click',fn);return b};
@@ -30,7 +30,10 @@ async function glide(to,ms,token){const from=params(),t0=performance.now();if(!m
 
 // ---- content for the open simulation: its own notes (if any) + automatic demos/answers built from the simulation
 //      itself (what each control does, read from its live measurements) + the chapter notes.
-const CH=window.PhysicaTutorChapters||{};
+const CH=()=>window.PhysicaTutorChapters||{};
+// the tutor's lessons and notes (~290 KB) live in their own file, downloaded only when a student turns the tutor on
+let packWait=null;function loadTutorPack(){if(window.PhysicaTeacher)return Promise.resolve();
+  return packWait||(packWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__TUTOR_URL__';s.async=true;s.onload=ok;s.onerror=()=>{packWait=null;no()};document.head.append(s)}))}
 const simObj=()=>(window.PhysicaSims||[]).find(x=>x.id===simId());
 const num=v=>{const m=String(v).replace(/−/g,'-').match(/-?\d+(\.\d+)?(e-?\d+)?/i);return m?Number(m[0]):NaN};
 const readings=(sim,p)=>{try{return(sim.metrics?.(p,0)||[]).map(m=>({label:m.label,value:m.value,n:num(m.value)}))}catch{return[]}};
@@ -40,7 +43,7 @@ function effect(sim,c){const p=params(),[lo,hi]=span(c),a=readings(sim,{...p,[c.
   a.forEach((m,i)=>{const x=m.n,y=b[i]?.n;if(!isFinite(x)||!isFinite(y))return;const r=Math.abs(y-x)/Math.max(Math.abs(x),Math.abs(y),1e-12);if(r>ch){ch=r;best=i}});
   return{lo,hi,a,b,i:best,dir:best<0||ch<.01?0:Math.sign(b[best].n-a[best].n)}}
 const fmtC=(c,v)=>c.show?c.show(v):`${v}${c.unit?(/^[°%]/.test(c.unit)?'':' ')+c.unit:''}`;
-function content(){const id=simId(),sim=simObj();if(!sim||sim.subject!=='physics')return null;const own=C[id]||{},chap=CH[sim.chapter]||{qa:[],quiz:[]},rc=ranges(sim);
+function content(){const id=simId(),sim=simObj();if(!sim||sim.subject!=='physics')return null;const own=C()[id]||{},chap=CH()[sim.chapter]||{qa:[],quiz:[]},rc=ranges(sim);
   const autoQ=rc.map(c=>({q:`What does ${c.label.toLowerCase()} do here?`,k:[c.label.toLowerCase(),...c.label.toLowerCase().split(/\s+/).filter(w=>w.length>3)],
     a:()=>{const e=effect(sim,c);if(e.i<0)return`${c.label} sets up the experiment; watch the stage as you move it.`;const m=e.a[e.i];
       return`Raising ${c.label.toLowerCase()} from ${fmtC(c,e.lo)} to ${fmtC(c,e.hi)} changes ${m.label.toLowerCase()} from ${m.value} to ${e.b[e.i].value}`+(e.dir?` - it ${e.dir>0?'increases':'decreases'}.`:' - hardly at all.')}}));
@@ -84,6 +87,7 @@ document.querySelector('.topbar-right')?.prepend(tbtn);
 function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tbtn.hidden=mode!=='student';tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-teacher',mode==='teacher');document.body.classList.toggle('mode-student',on);
   for(const b of sw.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
+  if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
   if(!c){body.append(el('p','tutor-note','The AI Tutor covers every physics chapter. Chemistry, Botany and Zoology are coming soon.'));return}
   for(const [id,label] of [['ask','💬 Chat'],['show','▶ Show me'],['quiz','✓ Quiz']]){const b=btn('',label,()=>{tab=id;render()});b.setAttribute('aria-pressed',String(id===tab));tabs.append(b)}
   window.PhysicaGlass?.(tabs);
@@ -122,7 +126,7 @@ function numbersFor(sim,q){const s=normQ(q),rc=ranges(sim),out={};let bare=s;for
 function mentioned(sim,q){const s=normQ(q);let best=null,len=0;for(const c of ranges(sim))for(const a of aliases(c,sim))if(s.includes(' '+a+' ')&&a.length>len){best=c;len=a.length}return best}
 const clampC=(c,v)=>{const st=c.step||1;return Math.min(c.max,Math.max(c.min,Math.round(v/st)*st))};
 function search(c,q){const qt=new Set(toks(q)),s=normQ(q),sim=simObj(),pool=[...c.qa.map(x=>({x,w:1}))];
-  for(const [name,ch] of Object.entries(CH))if(name!==sim?.chapter)for(const x of ch.qa)pool.push({x,w:.75});
+  for(const [name,ch] of Object.entries(CH()))if(name!==sim?.chapter)for(const x of ch.qa)pool.push({x,w:.75});
   const df={};for(const {x} of pool)for(const t of new Set(toks(x.q+' '+x.k.join(' '))))df[t]=(df[t]||0)+1;
   const N=pool.length,scored=pool.map(({x,w})=>{let n=0,hit=0,tm=0;for(const k of x.k)if(s.includes(' '+k.toLowerCase()+' ')||(k.length>5&&s.includes(k.toLowerCase()))){n+=k.length>4?3:1.5;hit++}
     for(const t of new Set(toks(x.q+' '+x.k.join(' '))))if(qt.has(t)){n+=Math.log(1+N/(df[t]||1))*.9;tm++}return{x,n:n*w,sure:hit>0||tm>=2}}).sort((a,b)=>b.n-a.n);
@@ -337,7 +341,10 @@ function quiz(c){let score=0,done=0;const out=el('p','tutor-score'),qs=[];
     qq.options.forEach((o,i)=>opts.append(btn('tutor-opt',`${i+1}. ${o}`,()=>reveal(i))));body.append(q)});
   body.append(out);read(0)}
 
-function setMode(m){mode=m;try{localStorage.setItem(KEY,m)}catch{}tab='ask';render();window.dispatchEvent(new Event('resize'))}
+// students get the tutor pack fetched quietly in the background, so turning the tutor on is instant
+const prefetchTutor=()=>{if(mode==='student'&&!window.PhysicaTeacher)(window.requestIdleCallback||setTimeout)(()=>loadTutorPack().catch(()=>{}),{timeout:2500})};
+function setMode(m){mode=m;try{localStorage.setItem(KEY,m)}catch{}tab='ask';render();prefetchTutor();window.dispatchEvent(new Event('resize'))}
+prefetchTutor();
 new MutationObserver(()=>{if(mode==='student'&&tutorOn)render()}).observe(titleEl,{childList:true,characterData:true,subtree:true});
 render();
 })();
