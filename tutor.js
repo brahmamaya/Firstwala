@@ -55,16 +55,17 @@ const SP=window.PhysicaSpeech||{speakable:t=>t,pickVoice:l=>l[0]||null};
 const synth=window.SpeechSynthesisUtterance?window.speechSynthesis:null,Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
 let voiceOn=true;try{voiceOn=localStorage.getItem('physica-voice')!=='0'}catch{}
 let voice=null,voiceHi=null;const pickVoice=()=>{try{const l=synth?.getVoices()||[];voice=SP.pickVoice(l);voiceHi=SP.pickVoice(l,'hi')}catch{voice=null}};if(synth){pickVoice();synth.addEventListener?.('voiceschanged',pickVoice)}
-// one short phrase per utterance with human-like pauses between them (longer after a question), soft pitch and pace
+// sentences grouped into a few natural-length chunks and queued back to back: no gaps added by us, so the voice flows
+// and only pauses where a person would (the engine pauses at commas and full stops by itself); normal pace and pitch
 let sayTk=0;
-function phrasesOf(t){const out=[];for(const sen of t.split(/(?<=[.!?।])\s+/).filter(Boolean))for(const p of (sen.length>140?sen.split(/(?<=[,;:])\s+/):sen.split(/(?<=[;:])\s+/)))out.push([p,/\?$/.test(p)?520:/[.!।]$/.test(p)?380:/[,;:]$/.test(p)?200:300]);return out}
+function chunksOf(t){const out=[];let cur='';for(const sen of t.split(/(?<=[.!?।])\s+/).filter(Boolean)){if(cur&&(cur+' '+sen).length>220){out.push(cur);cur=sen}else cur=cur?cur+' '+sen:sen}if(cur)out.push(cur);
+  return out.flatMap(c=>c.length>280?c.split(/(?<=[,;:])\s+/):[c])}
 function speak(text,then,lang){if(!synth||!voiceOn||mode!=='student'){then?.();return}const dev=(String(text).match(/[\u0900-\u097F]/g)||[]).length,lat=(String(text).match(/[a-z]/gi)||[]).length,hi=lang==='hi'||dev>lat,vv=hi&&voiceHi?voiceHi:voice;
-  const parts=phrasesOf(SP.speakable(text));if(!parts.length){then?.();return}
-  const tk=++sayTk,nat=/natural|neural|online|premium|enhanced/i.test(vv?.name||'');let k=0;
-  const next=()=>{if(tk!==sayTk)return;if(k>=parts.length){card.classList.remove('talking');then?.();return}
-    const [p,gap]=parts[k++],u=new SpeechSynthesisUtterance(p);u.lang=hi?'hi-IN':'en-IN';if(vv)try{u.voice=vv;u.lang=vv.lang}catch{}
-    u.rate=nat?.96:.92;u.pitch=nat?1:1.04;u.volume=.92;u.onstart=()=>card.classList.add('talking');u.onend=()=>setTimeout(next,gap);u.onerror=()=>setTimeout(next,0);synth.speak(u)};
-  setTimeout(next,120)}
+  const parts=chunksOf(SP.speakable(text));if(!parts.length){then?.();return}
+  const tk=++sayTk,nat=/natural|neural|online|premium|enhanced/i.test(vv?.name||'');try{if(synth.paused)synth.resume()}catch{}
+  parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p);u.lang=hi?'hi-IN':'en-IN';if(vv)try{u.voice=vv;u.lang=vv.lang}catch{}
+    u.rate=nat?1:.98;u.pitch=nat?1:1.02;u.volume=.95;if(k===0)u.onstart=()=>card.classList.add('talking');
+    if(k===parts.length-1)u.onend=u.onerror=()=>{if(tk===sayTk){card.classList.remove('talking');then?.()}};synth.speak(u)})}
 const hush=()=>{sayTk++;try{synth?.cancel()}catch{}card?.classList.remove('talking')};
 
 // ---- the tutor card (Student mode only)
@@ -134,7 +135,7 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   const scroll=()=>{thread.scrollTop=thread.scrollHeight};
   const me=t=>{const b=el('div','bub me',t);thread.append(b);scroll()};
   const typing=()=>{const d=el('div','bub bot typing');d.append(el('i'),el('i'),el('i'));thread.append(d);scroll();return d};
-  async function bot(text,{acts=[],speakIt=true,wait,lang}={}){const tk=run,d=typing();await sleep(wait??Math.min(1100,380+text.length*6));if(tk!==run)return null;
+  async function bot(text,{acts=[],speakIt=true,wait,lang}={}){const tk=run,d=typing();await sleep(wait??Math.min(650,250+text.length*3));if(tk!==run)return null;
     d.className='bub bot';d.replaceChildren(el('p','',text));if(acts.length){const row=el('div','bub-acts');for(const [label,fn] of acts)row.append(btn('tutor-chip',label,e=>{row.remove();fn(e)}));d.append(row)}
     scroll();if(speakIt)speak(text,null,lang);return d}
   // the tutor asks back: a quick check from the chapter quiz
