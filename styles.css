@@ -545,7 +545,7 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 .tutor-go,.tutor-cta{border:0;border-radius:999px;padding:0 18px;height:42px;font-weight:900;color:#000;background:linear-gradient(180deg,#fff,#cfcfcf);cursor:pointer;box-shadow:inset 0 1px 0 #fff,0 6px 18px rgba(255,255,255,.14)}
 .tutor-cta{display:block;margin:4px 0 12px}.tutor-cta:disabled{opacity:.55;cursor:wait}
 .tutor-chips{display:flex;flex-wrap:wrap;gap:8px}
-.tutor-langbar{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:-2px 0 6px;font-size:13px}.tutor-lang{font:inherit;font-size:13px;padding:4px 8px;border-radius:999px;border:1px solid var(--line,#2b4458);background:transparent;color:inherit;cursor:pointer}.tutor-lang option{color:#000}
+.tutor-stars{margin-right:auto;font-weight:700;font-size:13px;letter-spacing:.3px}.tutor-langbar{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:-2px 0 6px;font-size:13px}.tutor-lang{font:inherit;font-size:13px;padding:4px 8px;border-radius:999px;border:1px solid var(--line,#2b4458);background:transparent;color:inherit;cursor:pointer}.tutor-lang option{color:#000}
 .tutor-chip,.tutor-demo,.tutor-opt,.tutor-mini{border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;cursor:pointer;font-weight:700;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
 .tutor-chip{padding:8px 13px;font-size:13px;text-align:left}
 .tutor-chip:hover,.tutor-demo:hover,.tutor-opt:hover{border-color:rgba(255,255,255,.4)}
