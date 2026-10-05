@@ -118,7 +118,7 @@
         const input=document.createElement('input'),number=document.createElement('input');
         for(const [el,type] of [[input,'range'],[number,'number']]){el.type=type;el.min=c.min;el.max=c.max;el.step=c.step;el.value=p[c.key];el.id=`${type==='range'?'control':'exact'}-${c.key}`;el.dataset.testid=el.id;el.setAttribute('aria-label',c.label+(type==='number'?' exact value':''));}
         number.className='exact-value';
-        const sync=()=>{input.value=p[c.key];number.value=p[c.key];display.textContent=fmt(c);input.setAttribute('aria-valuetext',fmt(c));input.style.setProperty('--fill',`${(p[c.key]-c.min)/(c.max-c.min)*100}%`);updateReadouts();draw();};
+        const sync=()=>{input.value=p[c.key];number.value=p[c.key];display.textContent=fmt(c);input.setAttribute('aria-valuetext',fmt(c));input.style.setProperty('--fill',(q=>`calc(${q}% + ${(12-q*.24).toFixed(2)}px)`)((p[c.key]-c.min)/(c.max-c.min)*100));updateReadouts();draw();};
         input.oninput=()=>{p[c.key]=Number(input.value);sync();};
         number.onchange=()=>{if(number.value!==''&&Number.isFinite(number.valueAsNumber)){const v=Math.max(c.min,Math.min(c.max,number.valueAsNumber));p[c.key]=Number(Math.min(c.max,c.min+Math.round((v-c.min)/c.step)*c.step).toFixed(8));}sync();};
         const ends=document.createElement('div');ends.className='control-extents';ends.textContent=c.show?`${c.show(c.min)} — ${c.show(c.max)}`:`${c.min} — ${c.max}${c.unit?' '+c.unit:''}`;
@@ -127,7 +127,12 @@
         const stepper=(label,d)=>{const b=document.createElement('button');b.type='button';b.className='step-btn';b.textContent=d<0?'−':'+';b.setAttribute('aria-label',`${label} ${c.label}`);b.dataset.testid=`${d<0?'dec':'inc'}-${c.key}`;let timer=0;const stop=()=>{clearTimeout(timer);clearInterval(timer);timer=0};
           b.addEventListener('pointerdown',e=>{e.preventDefault();nudge(d);timer=setTimeout(()=>{timer=setInterval(()=>nudge(d),70)},380)});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,stop));b.addEventListener('click',e=>{if(e.detail===0)nudge(d)});return b};
         const slider=document.createElement('div');slider.className='range-wrap';slider.append(stepper('Decrease',-1),input,stepper('Increase',1));row.append(slider,ends,number);
-        input.setAttribute('aria-valuetext',fmt(c));input.style.setProperty('--fill',`${(p[c.key]-c.min)/(c.max-c.min)*100}%`);
+        // tap the value to type an exact number in place (keeps each control to two compact lines)
+        display.tabIndex=0;display.setAttribute('role','button');display.title='Tap to type an exact value';display.setAttribute('aria-label',`Type an exact value for ${c.label}`);
+        const edit=e=>{e.preventDefault();e.stopPropagation();row.classList.add('editing');number.focus();number.select?.()};
+        display.addEventListener('click',edit);display.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')edit(e)});
+        number.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();number.blur()}});number.addEventListener('blur',()=>{number.onchange?.();row.classList.remove('editing')});
+        input.setAttribute('aria-valuetext',fmt(c));input.style.setProperty('--fill',(q=>`calc(${q}% + ${(12-q*.24).toFixed(2)}px)`)((p[c.key]-c.min)/(c.max-c.min)*100));
       }
       host.append(row);
     }
@@ -154,7 +159,13 @@
   $('mobile-topics').addEventListener('click',()=>{let open=$('sidebar').classList.toggle('open');$('mobile-topics').setAttribute('aria-expanded',String(open));if(open)$('search').focus()});
   $('search').addEventListener('input',renderSidebar);
   document.querySelectorAll('.grade-tab').forEach(b=>b.addEventListener('click',()=>{const g=Number(b.dataset.grade);if(g!==grade)select(sims.find(s=>s.grade===g&&s.subject===subject));else renderSidebar()}));
-  document.querySelectorAll('.subject-tab').forEach(b=>b.addEventListener('click',()=>{const sub=b.dataset.subject;if(sub!==subject)select(sims.find(s=>s.subject===sub&&s.grade===grade)||sims.find(s=>s.subject===sub));else renderSidebar()}));
+  // switching subject: the page glides out and the new subject glides in from the side of the tab you picked
+  // (View Transitions where supported; an instant switch elsewhere, on big boards and with reduced motion)
+  const SUBJ=['physics','botany','zoology','chemistry'];
+  document.querySelectorAll('.subject-tab').forEach(b=>b.addEventListener('click',()=>{const sub=b.dataset.subject;if(sub===subject){renderSidebar();return}
+    const go=()=>select(sims.find(s=>s.subject===sub&&s.grade===grade)||sims.find(s=>s.subject===sub)),root=document.documentElement;
+    root.dataset.vt=SUBJ.indexOf(sub)>SUBJ.indexOf(subject)?'next':'prev';
+    if(document.startViewTransition&&!root.classList.contains('lite')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.startViewTransition(go);else go()}));
   $('prev').addEventListener('click',()=>{let l=chapters.filter(inScope);select(l[l.findIndex(s=>sameChapter(s,current))-1])});$('next').addEventListener('click',()=>{let l=chapters.filter(inScope);select(l[l.findIndex(s=>sameChapter(s,current))+1])});
   $('play').addEventListener('click',()=>{playing=!playing;syncPlay()});$('restart').addEventListener('click',()=>{elapsed=0;updateReadouts();draw()});$('defaults').addEventListener('click',()=>{saved.set(current.id,defaultFor(current));elapsed=0;renderControls();updateReadouts(true);draw()});
   document.addEventListener('keydown',e=>{if($('help-dialog').open)return;shortcut(e);if(e.key==='Escape'){closeSidebar();document.activeElement?.blur()}if(e.key==='/'&&!['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();if(innerWidth<=760){$('sidebar').classList.add('open');$('mobile-topics').setAttribute('aria-expanded','true')}$('search').focus()}if(e.code==='Space'&&!['INPUT','SELECT','TEXTAREA','BUTTON'].includes(document.activeElement?.tagName)){e.preventDefault();playing=!playing;syncPlay()}});
