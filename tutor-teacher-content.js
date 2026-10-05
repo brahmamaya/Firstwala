@@ -622,7 +622,14 @@ phrases:{
  oneMore:T('✨ One more','✨ Ek aur','✨ एक और'),backStudy:T('📚 Back to study','📚 Chalo padhte hain','📚 चलो पढ़ते हैं'),
  interestingBtn:T('✨ Tell me something interesting','✨ Kuch interesting batao','✨ कुछ दिलचस्प बताओ'),easyBtn:T('🌱 Something easy today','🌱 Aaj kuch easy padhein','🌱 आज कुछ आसान पढ़ें'),
  easyIntro:T('Sure - let’s start with an easy one.','Bilkul - chalo ek easy topic se shuru karte hain.','बिल्कुल - चलो एक आसान टॉपिक से शुरू करते हैं।'),
- askBtn:T('💬 I’ll ask','💬 Main poochhunga','💬 मैं पूछूँगा')
+ askBtn:T('💬 I’ll ask','💬 Main poochhunga','💬 मैं पूछूँगा'),
+ askName:T('Before we begin - what should I call you? Type your name or a nickname.','Shuru karne se pehle - main tumhe kis naam se bulaun? Apna naam ya nickname likho.','शुरू करने से पहले - मैं तुम्हें किस नाम से बुलाऊँ? अपना नाम या निकनेम लिखो।'),
+ skipName:T('Skip','Abhi nahi','अभी नहीं'),
+ niceName:T('{n}! What a lovely name. 😊','{n}! Kitna pyaara naam hai. 😊','{n}! कितना प्यारा नाम है। 😊'),
+ langSet:T('Okay! From now on I’ll speak in English.','Theek hai! Ab main Hinglish mein baat karungi.','ठीक है! अब मैं हिंदी में बात करूँगी।'),
+ langAuto:T('Okay! I’ll reply in whichever language you write in.','Theek hai! Tum jis bhasha mein likhoge, main usi mein jawab dungi.','ठीक है! तुम जिस भाषा में लिखोगे, मैं उसी में जवाब दूँगी।'),
+ unsure:T('Hmm, I’m not completely sure I understood. Did you mean one of these?','Hmm, mujhe poora pakka nahi samajh aaya. Kya tum inme se kuch poochh rahe the?','हम्म, मुझे पूरा पक्का समझ नहीं आया। क्या तुम इनमें से कुछ पूछ रहे थे?'),
+ unknown:T('That one is new to me - I don’t want to guess and tell you something wrong. I’ve noted it (anonymously) for the Physica team so I can learn it soon. Meanwhile, try asking it another way!','Ye sawaal mere liye naya hai - main andaaza lagakar galat nahi batana chahti. Maine ise Physica team ke liye (bina naam ke) note kar liya hai, taaki jaldi seekh loon. Tab tak ise doosre tareeke se poochh ke dekho!','यह सवाल मेरे लिए नया है - मैं अंदाज़ा लगाकर ग़लत नहीं बताना चाहती। मैंने इसे Physica टीम के लिए (बिना नाम के) नोट कर लिया है, ताकि जल्दी सीख लूँ। तब तक इसे दूसरे तरीक़े से पूछकर देखो!')
 },
 facts:{
 general:[
