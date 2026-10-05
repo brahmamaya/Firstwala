@@ -94,9 +94,9 @@ const target=(w,h)=>{const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx
   for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);
   const fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tx,0);return{tx,fb,w,h}};
 let starve=0,A=null,B1=null,B2=null,H0=null,H1=null,sceneW=0,sceneH=0,fresh=true,shiftX=0,shiftY=0,diveT=0,frameN=0;
-let scale=weak?.6:.85,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
+let scale=weak?.6:1,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
 const free=o=>{if(o){gl.deleteTexture(o.tx);gl.deleteFramebuffer(o.fb)}};
-function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(1.5,window.devicePixelRatio||1);
+function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(matchMedia('(pointer:coarse)').matches?1.5:2,window.devicePixelRatio||1); // sharper: full resolution, up to 2x on computers
   cv.width=Math.max(2,Math.round(W*k));cv.height=Math.max(2,Math.round(H*k));
   sceneW=Math.max(2,Math.round(W*k*scale));sceneH=Math.max(2,Math.round(H*k*scale));
   free(A);free(B1);free(B2);free(H0);free(H1);A=target(sceneW,sceneH);H0=target(sceneW,sceneH);H1=target(sceneW,sceneH);fresh=true;const bw=Math.max(2,sceneW>>2),bh=Math.max(2,sceneH>>2);B1=target(bw,bh);B2=target(bw,bh);gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
