@@ -320,6 +320,14 @@ body{background:radial-gradient(900px 520px at 78% -6%,rgba(110,92,255,.20),tran
   .glass-thumb{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.12))!important}
   .main>*{animation:none!important}
   .stage:before{display:none}}
+/* big classroom boards (4K panels) and Teacher mode: same lighter look, no live blur over the moving stage */
+html.lite .topbar,html.lite .stage,html.lite .controls-card,html.lite .observe-card,html.lite .formula-card,html.lite .physics-panel,html.lite .more-pop,html.lite .sidebar,html.lite .lab-tool-buttons button,html.lite .more-menu summary,html.lite .view3d-bar button,html.lite .transport .restart-button,html.lite .focus-btn,html.lite .restore-chip,html.lite .simulation-tabs button,html.lite .tabs-nav button,html.lite #prev,html.lite #next,html.lite .rec-quality,html.lite .step-btn,html.lite .toast{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.lite .topbar,html.lite .sidebar,html.lite .stage,html.lite .controls-card,html.lite .observe-card,html.lite .formula-card,html.lite .physics-panel,html.lite .more-pop{background:#1a1e26!important}
+html.lite .lab-tool-buttons button,html.lite .more-menu summary,html.lite .view3d-bar button,html.lite .transport .restart-button,html.lite .focus-btn,html.lite .restore-chip,html.lite .simulation-tabs button,html.lite .tabs-nav button,html.lite #prev,html.lite #next,html.lite .rec-quality,html.lite .step-btn{background:#232833!important}
+html.lite .toast{background:#232833!important}
+html.lite .glass-thumb{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.12))!important}
+html.lite .main>*{animation:none!important}
+html.lite .stage:before{display:none}
 /* the More menu must float above the stage */
 .lab-tools{position:relative;z-index:40}.more-pop{z-index:60}
 @media(max-width:760px){.lab-tool-buttons{flex-wrap:wrap!important;overflow:visible!important}}
