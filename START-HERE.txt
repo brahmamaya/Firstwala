@@ -126,7 +126,9 @@ LEAN BUILD (node tools/build.js does all of this every time):
    canvas glows. They still draw at 60 fps; the stage resolution follows the measured frame time (GPU included),
    changes (on non-4K screens) only after a slowdown or headroom that lasts a few seconds, and backs off if it keeps flipping. 30 fps is
    only the last resort. On 4K boards (BIG) sharpness comes first: a slow frame never lowers the stage resolution
-   there (30 fps is the fallback instead), and the canvas uses the full device pixel ratio up to 3x.
+   there (30 fps is the fallback instead), and the canvas uses the device pixel ratio up to 2x.
+   The landing black hole ray-traces at about 4.2 MP on 4K-size screens and frees its GPU memory once the landing
+   page closes (big GPU allocations can leave parts of the page unpainted on tablets/boards).
 
 WORK LOG (for the next session - read this first)
 How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; no APIs or
