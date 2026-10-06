@@ -124,9 +124,9 @@ LEAN BUILD (node tools/build.js does all of this every time):
    drawing never runs faster than ~60 fps, and it stops while the stage is off-screen.
 6. Big boards (75-86 inch, 4K) and Teacher mode use the "lite" look: same colours, but no glass blur and softer
    canvas glows. They still draw at 60 fps; the stage resolution follows the measured frame time (GPU included),
-   changes only after a slowdown or headroom that lasts a few seconds, and backs off if it keeps flipping. 30 fps is
-   only the last resort, when even the lowest resolution cannot keep up. The landing black hole ray-traces at about
-   4.2 megapixels on 4K-size screens (the final image is full resolution).
+   changes (on non-4K screens) only after a slowdown or headroom that lasts a few seconds, and backs off if it keeps flipping. 30 fps is
+   only the last resort. On 4K boards (BIG) sharpness comes first: a slow frame never lowers the stage resolution
+   there (30 fps is the fallback instead), and the canvas uses the full device pixel ratio up to 3x.
 
 WORK LOG (for the next session - read this first)
 How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; no APIs or
