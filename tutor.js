@@ -294,8 +294,10 @@ function chat(c){const sim=simObj(),thread=el('div','tutor-chat'),sugg=el('div',
   // input bar (type or speak)
   const f=el('form','tutor-ask'),inp=el('input');inp.type='text';inp.maxLength=200;inp.placeholder='Ask me anything… e.g. what if angle is 60?';inp.setAttribute('aria-label','Ask the tutor');
   const go=btn('tutor-go','Ask');go.type='submit';f.append(inp);
-  if(Rec){const mic=btn('tutor-mic','🎤',()=>{hush();const r=new Rec();r.lang='en-IN';r.interimResults=false;r.maxAlternatives=1;mic.classList.add('on');mic.textContent='●';
-      r.onresult=e=>{inp.value=e.results[0][0].transcript;f.requestSubmit()};r.onend=()=>{mic.classList.remove('on');mic.textContent='🎤'};r.onerror=()=>{inp.placeholder='I couldn’t hear you - please type it'};try{r.start()}catch{}});
+  if(Rec){let rec=null;const idle=()=>{rec=null;mic.classList.remove('on');mic.textContent='🎤';mic.setAttribute('aria-pressed','false')};
+    // one tap starts listening, a second tap stops it (it also stops by itself when the student stops speaking)
+    const mic=btn('tutor-mic','🎤',()=>{if(rec){const r=rec;idle();try{r.abort()}catch{}return}hush();const r=new Rec();rec=r;r.lang='en-IN';r.interimResults=false;r.maxAlternatives=1;mic.classList.add('on');mic.textContent='●';mic.setAttribute('aria-pressed','true');
+      r.onresult=e=>{if(rec!==r)return;inp.value=e.results[0][0].transcript;f.requestSubmit()};r.onend=()=>{if(rec===r)idle()};r.onerror=e=>{if(rec===r){idle();if(e?.error!=='aborted')inp.placeholder='I couldn’t hear you - please type it'}};try{r.start()}catch{idle()}});
     mic.title='Ask by voice';mic.setAttribute('aria-label','Ask by voice');f.append(mic)}
   f.append(go);f.addEventListener('submit',e=>{e.preventDefault();const q=inp.value.trim();if(!q)return;inp.value='';answer(q);paintSugg()});
   const paintSugg=()=>{sugg.replaceChildren();const pool=c.qa.slice(0,14);for(const x of [...pool].sort(()=>Math.random()-.5).slice(0,3))sugg.append(btn('tutor-chip',x.q,()=>{me(x.q);hush();bot(`${pickOne(OPENS[prof.lang]||OPEN)} ${ansOf(x)}`,{acts:[['✓ '+L(PH.quiz),()=>check()],[L(PH.askBtn),()=>inp.focus()]]});paintSugg()}))};
