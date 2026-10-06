@@ -118,9 +118,9 @@ function panel(c,s){const x=716,y=56,w=228,h=430;c.fillStyle='#0b0c0f';c.strokeS
   row('Position',s.img);
   row('Image distance',s.iInf?'v = ∞':`v = ${fmt(s.v,2)} cm`,s.real?COL.real:COL.virt);
   row('Magnification',s.iInf?'m = ∞ (very large)':s.oInf?'m ≈ 0 (point-sized)':`m = ${fmt(s.m,2)}`);
-  row('Nature',s.real?'Real · inverted':'Virtual · erect',s.real?COL.real:COL.virt);yy-=4;
+  row('Nature',`${s.real?'Real · inverted':'Virtual · erect'} · ${s.size.split(' (')[0].toLowerCase()}`,s.real?COL.real:COL.virt);yy-=4;
   lines(s.iInf?'Reflected rays come out parallel: they meet only at infinity (a real, inverted image very far away).':s.real?'Reflected rays really meet: the image can be caught on a screen.':'Reflected rays only seem to come from behind the mirror: it cannot be caught on a screen.',COL.muted,12,600,4);yy+=10;
-  row('Size',s.size,'#ffd43b',15);
+  row('Size',s.size+(s.oInf||s.iInf||s.size.startsWith('Same')?'':` · ${f(Math.abs(s.m),2)}× the object`),'#ffd43b',15);
   c.strokeStyle='#23262c';c.beginPath();c.moveTo(x+16,yy-6);c.lineTo(x+w-16,yy-6);c.stroke();yy+=12;
   txt(c,'OBJECT',x+16,yy,COL.obj,13,'left',900);yy+=22;
   txt(c,s.oInf?'u = −∞':`u = ${fmt(-s.U)} cm`,x+16,yy,COL.text,15,'left',800);yy+=20;lines(s.obj,COL.muted,13,700);
@@ -146,7 +146,7 @@ add({base:'lens',id:ID,title:'Spherical mirrors: ray diagram',
   observe:'A concave mirror gives a real, inverted image until the object comes inside F; then the image is virtual, erect and magnified. A convex mirror always gives a virtual, erect, diminished image between P and F.',
   tryText:'Concave: drag the object from infinity towards the mirror and watch the image travel from F past C to infinity, then appear behind the mirror.',
   controls:[S('type','Mirror','concave',[['concave','Concave'],['convex','Convex']]),S('obj','Object','arrow',[['arrow','Arrow'],['candle','Candle'],['tree','Tree']]),uCtl,R('f','Focal length |f|',5,20,1,12,'cm'),R('h','Object height',1,10,.5,5,'cm',1)],
-  metrics:p=>{const s=solve(p);return[N('Image position',s.img),N('Image distance v',s.iInf?'∞':`${fmt(s.v,2)} cm`),N('Magnification m',s.iInf?'∞':s.oInf?'≈ 0':f(s.m,2)),N('Nature',s.real?'Real':'Virtual'),N('Orientation',s.erect?'Erect':'Inverted'),N('Size',s.size)]},
+  metrics:p=>{const s=solve(p);return[N('Image position',s.img),N('Image distance v',s.iInf?'∞':`${fmt(s.v,2)} cm`),N('Magnification m',s.iInf?'∞':s.oInf?'≈ 0':f(s.m,2)),N('Nature',s.real?'Real':'Virtual'),N('Orientation',s.erect?'Erect':'Inverted'),N('Size',s.size.startsWith('Same')?s.size:s.size.replace(/^(\S+)/,'$1')+(s.oInf||s.iInf?'':` (${f(Math.abs(s.m),2)}× the object)`))]},
   assumption:'Paraxial rays: the reflected rays are drawn through the image given by the mirror formula, as in textbook ray diagrams. Cartesian sign convention, distances from the pole P.',
   presets:[['Concave · object at infinity',{type:'concave',u:INF,f:12}],['Concave · object beyond C',{type:'concave',u:34,f:12}],['Concave · object at C',{type:'concave',u:24,f:12}],['Concave · object between C and F',{type:'concave',u:18,f:12}],['Concave · object at F (image at infinity)',{type:'concave',u:12,f:12}],['Concave · object between P and F',{type:'concave',u:7,f:12}],['Convex · object at infinity',{type:'convex',u:INF,f:12}],['Convex · object in front',{type:'convex',u:24,f:12}]],
   draw:stage,flat:true});
