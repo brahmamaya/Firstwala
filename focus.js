@@ -27,9 +27,9 @@ for(const p of PANELS){const host=$(p.where);if(!host)continue;const x=document.
 // Focus lives on the simulation itself (top-right corner, an empty area of every experiment) as a special glass button.
 const cvs=document.getElementById('simulation');let wrap=null;if(cvs){wrap=document.createElement('div');wrap.className='canvas-wrap';cvs.before(wrap);wrap.append(cvs)}
 const fb=document.createElement('button');fb.type='button';fb.id='focus-btn';fb.className='focus-btn focus-special';fb.title='Show only the simulation and its controls (Esc to exit)';fb.dataset.testid='focus-btn';
-const fbi=document.createElement('span');fbi.className='fs-ic';fbi.setAttribute('aria-hidden','true');fbi.textContent='⛶';const fbl=document.createElement('span');fbl.className='fs-lb';fbl.textContent='Focus';fb.append(fbi,fbl);(wrap||$('.stage-top'))?.append(fb);
+const fbi=document.createElement('span');fbi.className='fs-ic';fbi.setAttribute('aria-hidden','true');fbi.textContent='⛶';const fbl=document.createElement('span');fbl.className='fs-lb';fbl.textContent='Focus mode';fb.append(fbi,fbl);(wrap||$('.stage-top'))?.append(fb);
 const exit=document.createElement('button');exit.type='button';exit.className='focus-exit';exit.textContent='✕ Exit focus';exit.dataset.testid='focus-exit';exit.hidden=true;body.append(exit);
-function focus(on){body.classList.toggle('focus',on);exit.hidden=!on;fb.setAttribute('aria-pressed',String(on));fbi.textContent=on?'⤡':'⛶';fbl.textContent=on?'Exit':'Focus';fb.title=on?'Exit focus (Esc)':'Show only the simulation and its controls (Esc to exit)';if(on)$('.stage')?.scrollIntoView({block:'start'});window.dispatchEvent(new Event('resize'))}
+function focus(on){body.classList.toggle('focus',on);exit.hidden=!on;fb.setAttribute('aria-pressed',String(on));fbi.textContent=on?'⤡':'⛶';fbl.textContent=on?'Exit focus':'Focus mode';fb.title=on?'Exit focus (Esc)':'Show only the simulation and its controls (Esc to exit)';if(on)$('.stage')?.scrollIntoView({block:'start'});window.dispatchEvent(new Event('resize'))}
 fb.addEventListener('click',()=>focus(!body.classList.contains('focus')));exit.addEventListener('click',()=>focus(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&body.classList.contains('focus'))focus(false)});
 paint();

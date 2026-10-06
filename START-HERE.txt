@@ -127,3 +127,22 @@ LEAN BUILD (node tools/build.js does all of this every time):
    changes only after a slowdown or headroom that lasts a few seconds, and backs off if it keeps flipping. 30 fps is
    only the last resort, when even the lowest resolution cannot keep up. The landing black hole ray-traces at about
    4.2 megapixels on 4K-size screens (the final image is full resolution).
+
+WORK LOG (for the next session - read this first)
+How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; no APIs or
+keys anywhere (offline tutor, no external services); no innerHTML; CSP script-src 'self'; ask before every
+merge ("merge kar doon?"); test everything (all buttons, tutor, mobile/tablet/4K) before a PR.
+Done recently (PRs #66-#73):
+- Lean build (CSS optimiser, minified CSS, lazy tutor pack); Botany/Zoology/Chemistry as lazy packs.
+- Smoothness: no redraw while paused, 60 fps cap, fewer blur layers, lazy black hole; 86-inch/4K boards at
+  60 fps with resolution following the real frame time; premium black look kept in lite mode.
+- AI Tutor kept after switching 2D/3D/Ultra (separate storage keys physica-view / physica-learn-mode).
+- "Spherical mirrors: ray diagram" (mirrors2d.js): true spherical arc, concave/convex, arrow/candle/tree
+  object, drag object (to infinity), tip and F; full black stage via window.PhysicaFullStage.
+- Hinglish spoken by the Hindi female voice (tools/hinglish-voice.js builds the word map).
+- Tutor mic stops on a second tap; logo all white; "Focus mode" liquid-glass button.
+Still to do / ideas:
+- Owner to set up the Google Form + Apps Script (tools/tutor-questions.gs) for unanswered questions.
+- Next tutor chapter: Work, Energy and Power.
+- Owner will test on the real 86-inch board and report anything blurry or slow; owner may report Hinglish
+  words the voice says oddly (add them to SPOKEN in tools/hinglish-voice.js).
