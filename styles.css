@@ -724,6 +724,12 @@ html body .simulation-tabs button.selected,html body .simulation-tabs button[ari
 @media(prefers-reduced-motion:reduce){.stage .live-dot::after{animation:none!important}}
 /* ===== Premium black background: a deep graphite canvas, clearly lifted from the pure-black top bar and chapter list ===== */
 html,body{background:#0b0c0f}
-body{background:radial-gradient(1100px 560px at 62% -12%,rgba(255,255,255,.075),transparent 62%),radial-gradient(900px 700px at 50% 115%,rgba(255,255,255,.035),transparent 60%),linear-gradient(180deg,#121317 0%,#0c0d10 45%,#0a0b0d 100%)!important;background-attachment:fixed!important}
+/* the gradient lives on its own fixed layer: scrolling moves the page over it without repainting it */
+body{background:transparent!important}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(1100px 560px at 62% -12%,rgba(255,255,255,.075),transparent 62%),radial-gradient(900px 700px at 50% 115%,rgba(255,255,255,.035),transparent 60%),linear-gradient(180deg,#121317 0%,#0c0d10 45%,#0a0b0d 100%)}
 .topbar{background:#000!important;border-bottom:1px solid rgba(255,255,255,.09)!important;box-shadow:0 1px 0 rgba(0,0,0,.9),0 10px 30px rgba(0,0,0,.55)!important}
 .sidebar{background:#000!important;border-right:1px solid rgba(255,255,255,.09)!important;box-shadow:1px 0 0 rgba(0,0,0,.9),12px 0 32px rgba(0,0,0,.45)!important}
+/* glass blur only where it shows: over the solid dark page these blurs paint nothing visible (pixel-compared),
+   yet each one is an extra GPU pass every frame - the subject lens, menus and mobile overlays keep theirs */
+#tab-prev,#tab-next,.simulation-tabs button,.more-menu>summary,.observe-card,.restore-chip,.formula-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media(min-width:1000px){.stage,.rail-buttons button,.simulation-playback select,.simulation-playback button{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}

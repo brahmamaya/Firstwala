@@ -158,5 +158,6 @@ window.Physica3D={scene,finish,set flat(v){FLAT=!!v},get flat(){return FLAT},set
   resetView(){Object.assign(cam,DEFAULT);notify()},
   setAuto(v){cam.auto=!!v;notify()},
   tick(dt){if(cam.auto)cam.yaw+=dt*.35},
+  get spinning(){return enabled&&cam.auto},
   onChange(fn){listeners.add(fn)}};
 })();

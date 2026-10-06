@@ -5,6 +5,9 @@
    Glows are pre-rendered once per size and the particle count adapts to the device. */
 (() => {
 'use strict';
+/* Built on first use: a visit that opens straight into a simulation never pays for the WebGL
+   context and shader compile (the landing page asks for it the moment it is shown). */
+function build(){
 /* GPU path: a ray-traced Schwarzschild black hole. Every pixel follows a bent light ray past
    the hole, so the far side of the thin accretion disk is lensed over the top and under the
    bottom exactly as in Interstellar; Doppler beaming brightens the side that comes towards us.
@@ -136,8 +139,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();stop()});
 return{start,stop,dive(){dv=.001;diveT=performance.now()},resize:size};
 })();
-if(GL){window.PhysicaLandingBG=GL;return}
-const cv=document.getElementById('landing-bg');if(!cv||!cv.getContext)return;
+if(GL)return GL;
+const cv=document.getElementById('landing-bg');if(!cv||!cv.getContext)return null;
 const g=cv.getContext('2d'),TAU=Math.PI*2,reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500;
 let W=0,H=0,dpr=1,raf=0,running=false,last=0,dive=0,mx=0,my=0,tx=0,ty=0,glowC=null,cx=0,cy=0,R=0;
@@ -191,5 +194,8 @@ function stop(){running=false;cancelAnimationFrame(raf)}
 let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!running&&!W)return;size();if(!running)frame(performance.now())},120)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running){stop();running='paused'}}else if(running==='paused'){running=false;start()}});
 window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!W)return;mx=e.clientX/W-.5;my=e.clientY/H-.5},{passive:true});
-window.PhysicaLandingBG={start,stop,dive(){dive=.001},resize:size};
+return{start,stop,dive(){dive=.001},resize:size};
+}
+let api;const get=()=>api===undefined?(api=build()||null):api;
+window.PhysicaLandingBG={start(){get()?.start()},stop(){api?.stop()},dive(){get()?.dive()},resize(){api?.resize()}};
 })();
