@@ -1,1 +1,8 @@
 .build.tmp.js
+
+# never commit secrets
+.env
+.env.*
+*.key
+*.pem
+secrets*

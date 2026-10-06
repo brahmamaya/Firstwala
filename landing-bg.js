@@ -101,7 +101,8 @@ let scale=weak?.6:1,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0
 const free=o=>{if(o){gl.deleteTexture(o.tx);gl.deleteFramebuffer(o.fb)}};
 function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(matchMedia('(pointer:coarse)').matches?1.5:2,window.devicePixelRatio||1); // sharper: full resolution, up to 2x on computers
   cv.width=Math.max(2,Math.round(W*k));cv.height=Math.max(2,Math.round(H*k));
-  sceneW=Math.max(2,Math.round(W*k*scale));sceneH=Math.max(2,Math.round(H*k*scale));
+  // on 4K-size screens the ray-traced scene stays near 4.2 megapixels (the final image is full resolution)
+  const px=W*k*H*k,cap=px>6e6?Math.sqrt(4.2e6/px):1;sceneW=Math.max(2,Math.round(W*k*scale*cap));sceneH=Math.max(2,Math.round(H*k*scale*cap));
   free(A);free(B1);free(B2);free(H0);free(H1);A=target(sceneW,sceneH);H0=target(sceneW,sceneH);H1=target(sceneW,sceneH);fresh=true;const bw=Math.max(2,sceneW>>2),bh=Math.max(2,sceneH>>2);B1=target(bw,bh);B2=target(bw,bh);gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
 const pass=(P,o)=>{gl.bindFramebuffer(gl.FRAMEBUFFER,o?o.fb:null);gl.viewport(0,0,o?o.w:cv.width,o?o.h:cv.height);gl.useProgram(P.p)};
 const ease=x=>x*x*x*(x*(x*6-15)+10);
@@ -134,10 +135,12 @@ function draw(now){const dt=Math.min(.1,last?(now-last)/1000:.016);last=now;
   if(running)raf=starve>8&&!dv?setTimeout(()=>{raf=requestAnimationFrame(draw)},400):requestAnimationFrame(draw)}
 function start(){size();dv=0;last=0;t0=performance.now();if(reduce){t0-=1e4;draw(performance.now());return}if(!running){running=true;raf=requestAnimationFrame(draw)}}
 function stop(){running=false;cancelAnimationFrame(raf);clearTimeout(raf)}
+// once the landing page is closed, hand its GPU memory back (the five render targets are large on a 4K screen)
+function release(){stop();free(A);free(B1);free(B2);free(H0);free(H1);A=B1=B2=H0=H1=null;W=0;cv.width=cv.height=1}
 let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!W)return;size();if(!running)draw(performance.now())},120)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running){stop();running='paused'}}else if(running==='paused'){running=false;raf=requestAnimationFrame(draw);running=true}});
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();stop()});
-return{start,stop,dive(){dv=.001;diveT=performance.now()},resize:size};
+return{start,stop:release,dive(){dv=.001;diveT=performance.now()},resize:size};
 })();
 if(GL)return GL;
 const cv=document.getElementById('landing-bg');if(!cv||!cv.getContext)return null;

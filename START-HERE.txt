@@ -126,11 +126,16 @@ LEAN BUILD (node tools/build.js does all of this every time):
    canvas glows. They still draw at 60 fps; the stage resolution follows the measured frame time (GPU included),
    changes (on non-4K screens) only after a slowdown or headroom that lasts a few seconds, and backs off if it keeps flipping. 30 fps is
    only the last resort. On 4K boards (BIG) sharpness comes first: a slow frame never lowers the stage resolution
-   there (30 fps is the fallback instead), and the canvas uses the full device pixel ratio up to 3x.
+   there (30 fps is the fallback instead), and the canvas uses the device pixel ratio up to 2x.
+   The landing black hole ray-traces at about 4.2 MP on 4K-size screens and frees its GPU memory once the landing
+   page closes (big GPU allocations can leave parts of the page unpainted on tablets/boards).
+   iPhone/iPad (WebKit) get html.noblur: no live backdrop blur anywhere (Safari left parts of the sidebar and the
+   controls card unpainted with many blur layers); same colours, solid glass backing for what floats over content.
 
 WORK LOG (for the next session - read this first)
-How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; no APIs or
-keys anywhere (offline tutor, no external services); no innerHTML; CSP script-src 'self'; ask before every
+How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; NO APIs or
+keys anywhere, ever (offline tutor, no external services; tools/secret-guard.js stops the build if anything
+key-like appears; only public IDs are used: the Google Analytics tag and the public Google Form link); no innerHTML; CSP script-src 'self'; ask before every
 merge ("merge kar doon?"); test everything (all buttons, tutor, mobile/tablet/4K) before a PR.
 Done recently (PRs #66-#73):
 - Lean build (CSS optimiser, minified CSS, lazy tutor pack); Botany/Zoology/Chemistry as lazy packs.
