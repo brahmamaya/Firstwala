@@ -63,12 +63,15 @@ let voice=null,voiceHi=null;const pickVoice=()=>{try{const l=synth?.getVoices()|
 let sayTk=0;
 function chunksOf(t){const out=[];let cur='';for(const sen of t.split(/(?<=[.!?।])\s+/).filter(Boolean)){if(cur&&(cur+' '+sen).length>220){out.push(cur);cur=sen}else cur=cur?cur+' '+sen:sen}if(cur)out.push(cur);
   return out.flatMap(c=>c.length>280?c.split(/(?<=[,;:])\s+/):[c])}
-function speak(text,then,lang,mood){if(!synth||!voiceOn||mode!=='student'){then?.();return}const dev=(String(text).match(/[\u0900-\u097F]/g)||[]).length,lat=(String(text).match(/[a-z]/gi)||[]).length,hi=lang==='hi'||dev>lat,vv=hi&&voiceHi?voiceHi:voice;
-  const parts=chunksOf(SP.speakable(text));if(!parts.length){then?.();return}
+function speak(text,then,lang,mood){if(!synth||!voiceOn||mode!=='student'){then?.();return}const dev=(String(text).match(/[\u0900-\u097F]/g)||[]).length,lat=(String(text).match(/[a-z]/gi)||[]).length,hi=lang==='hi'||dev>lat,
+    // Hinglish is read by the same Hindi voice, its Hindi words in Devanagari (tools/hinglish-voice.js) so the accent stays natural
+    HV=window.PhysicaHinglishVoice,hl=!hi&&lang==='hl'&&!!voiceHi&&!!HV,vv=(hi||hl)&&voiceHi?voiceHi:voice;
+  let parts=chunksOf(SP.speakable(text));if(!parts.length){then?.();return}
+  if(hl)parts=parts.map(p=>p.replace(/[A-Za-z]+(?:'[A-Za-z]+)?/g,w=>w==='Hi'||w==='HI'?w:HV[w.toLowerCase()]||w)); /* "Hi!" is the English greeting, not ही */
   if(mood==='happy'){const m=parts[0].match(/^(.{1,28}?[!?।])\s+(.+)$/);if(m)parts.splice(0,1,m[1],m[2])}
   const [P0,R0,V0]=mood==='happy'?[1.06,1.03,1]:mood==='soft'?[.95,.9,.85]:[1,.98,.95];
   const tk=++sayTk,nat=/natural|neural|online|premium|enhanced/i.test(vv?.name||'');try{if(synth.paused)synth.resume()}catch{}
-  parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p);u.lang=hi?'hi-IN':'en-IN';if(vv)try{u.voice=vv;u.lang=vv.lang}catch{}
+  parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p);u.lang=hi||hl?'hi-IN':'en-IN';if(vv)try{u.voice=vv;u.lang=vv.lang}catch{}
     const lift=mood==='happy'&&k===0&&parts.length>1?.04:0;u.rate=(nat?1:.98)*R0;u.pitch=(nat?1:1.02)*P0+lift;u.volume=V0;if(k===0)u.onstart=()=>card.classList.add('talking');
     if(k===parts.length-1)u.onend=u.onerror=()=>{if(tk===sayTk){card.classList.remove('talking');then?.()}};synth.speak(u)})}
 const hush=()=>{sayTk++;try{synth?.cancel()}catch{}card?.classList.remove('talking')};
