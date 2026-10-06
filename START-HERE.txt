@@ -113,3 +113,12 @@ LEAN BUILD (node tools/build.js does all of this every time):
 3. The AI Tutor's lessons and notes (tutor-content, tutor-chapters, tutor-teacher-content, tutor-learned) are a
    separate physica-tutor.min.js, downloaded only when a student turns the tutor on (tutor.js loadTutorPack()).
    Normal and Teacher mode never download it. The 3D pack (physica-3d.min.js) loads on idle as before.
+4. Botany/Zoology (bio1-5.js) and Chemistry (chem1-4.js) are their own packs: physica-bio.min.js and
+   physica-chem.min.js. tools/subject-manifest.js runs those files once at build time in a sandbox and keeps only
+   their plain data (id, title, description, chapter, controls) as a small index inside physica.min.js, so the
+   library, search, counts and shared links work before the packs arrive. The packs load on idle after the page is
+   up, at once when a subject tab is pressed, or immediately for a direct link; until then the stage says
+   "Loading…". When a pack lands, labkit.js pack().done() fills in the placeholders and fires 'physica-pack'.
+   biokit.js stays in the main bundle because some physics scenes draw its human figure.
+5. Smoothness rules in app.js: a paused simulation is redrawn only while something can change it (window.PhysicaWake),
+   drawing never runs faster than ~60 fps, and it stops while the stage is off-screen.
