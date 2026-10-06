@@ -2,6 +2,7 @@
 // Usage: node tools/build.js   (needs esbuild: npm i -g esbuild, or run with npx)
 const fs=require('fs'),path=require('path'),{execFileSync}=require('child_process');
 const root=path.join(__dirname,'..'),ESB=process.env.ESBUILD||'esbuild';
+require('./secret-guard.js')(root); // no API keys or tokens may ever ship
 const CORE=['compat.js','mathtext.js','theme.js','physica3d.js'];
 const MAIN=['physics.js','extras.js','enhancements.js','third.js','fourth.js','fifth.js','sixth.js','labkit.js','seventh.js','eighth.js','ninth.js','tenth.js','biokit.js','.subjects.tmp.js','phys3d-a.js','phys3d-b.js','phys3d-c.js','phys3d-d.js','instruments2d.js','optics2d.js','mirrors2d.js','experience.js','app.js','focus.js','recorder.js','landing-bg.js','landing.js','feedback.js','install.js','tutor-speech.js','tutor.js','lazy.js'];
 const TUTOR=['tutor-content.js','tutor-chapters.js','tutor-teacher-content.js','tutor-learned.js']; // loaded only when a student opens the AI Tutor

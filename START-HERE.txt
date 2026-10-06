@@ -131,8 +131,9 @@ LEAN BUILD (node tools/build.js does all of this every time):
    page closes (big GPU allocations can leave parts of the page unpainted on tablets/boards).
 
 WORK LOG (for the next session - read this first)
-How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; no APIs or
-keys anywhere (offline tutor, no external services); no innerHTML; CSP script-src 'self'; ask before every
+How the owner works: writes in Hinglish; wants minimum-credit methods with no drop in quality; NO APIs or
+keys anywhere, ever (offline tutor, no external services; tools/secret-guard.js stops the build if anything
+key-like appears; only public IDs are used: the Google Analytics tag and the public Google Form link); no innerHTML; CSP script-src 'self'; ask before every
 merge ("merge kar doon?"); test everything (all buttons, tutor, mobile/tablet/4K) before a PR.
 Done recently (PRs #66-#73):
 - Lean build (CSS optimiser, minified CSS, lazy tutor pack); Botany/Zoology/Chemistry as lazy packs.
