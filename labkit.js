@@ -41,6 +41,10 @@ function pack(){
     const previous=window.PhysicsDraw.draw,byId=new Map(entries.map(s=>[s.id,s]));
     window.PhysicsDraw.draw=(c,id,p,t)=>{const s=byId.get(id);if(!s)return previous(c,id,p,t);window.PhysicaRenderExperiment(c,s,p,t,s.renderer)};
     window.PhysicsDraw.available.push(...byId.keys());
+    // a subject pack that arrives after the library is built fills in the placeholders it listed
+    const lib=window.PhysicaSims;if(!lib)return;const index=new Map(lib.map(s=>[s.id,s]));
+    for(const e of entries){const s=index.get(e.id);if(!s)continue;const {subject,draw,...rest}=e;Object.assign(s,rest);delete s.lazy}
+    window.dispatchEvent(new CustomEvent('physica-pack',{detail:[...byId.keys()]}));
   }
   return{add,done};
 }
