@@ -752,3 +752,7 @@ html.lite .focus-btn.focus-special{-webkit-backdrop-filter:none!important;backdr
 .chapter-list .chapter-link{position:relative}
 .chapter-list .chapter-link:after{content:'';position:absolute;left:44px;right:12px;bottom:-1px;height:1px;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.085),rgba(255,255,255,.045) 65%,transparent)}
 .chapter-list .chapter-link:last-child:after,.chapter-list .chapter-link.active:after,.chapter-list .chapter-link:hover:after,.chapter-list .chapter-link:has(+ .chapter-group):after,.chapter-list .chapter-link:has(+ .chapter-link.active):after{opacity:0}
+/* iPhone / iPad: no live blur anywhere (see app.js); what floats over moving content gets a solid glass backing */
+html.noblur *,html.noblur *::before,html.noblur *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.noblur .more-pop,html.noblur .toast{background:#16181d!important}
+html.noblur .focus-btn.focus-special{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.07) 47%,rgba(255,255,255,.03) 53%,rgba(255,255,255,.1) 100%),#16181d!important}

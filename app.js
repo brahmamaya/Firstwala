@@ -148,6 +148,9 @@
   // paced at 30 per second so motion stays even. Resolution adapts to how long drawing really takes (not to the
   // screen's refresh rate), between the screen's own pixels and full sharpness (devicePixelRatio, max 2).
   const BIG=Math.max(screen.width||0,screen.height||0)*(devicePixelRatio||1)>=3000;
+  // iPhone / iPad (WebKit): live glass blur over large, scrolling panels can leave parts of the page unpainted there,
+  // so those devices get the same look without the blur (pixel-compared: the blur shows nothing over the dark page)
+  const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);document.documentElement.classList.toggle('noblur',IOS);
   // auto-lite only for a device that is truly struggling: judged after the first 8 s, only while a simulation plays,
   // needs ~7 s of slow frames AND slow drawing, and switches back once drawing is easy again (never sticky)
   const T0=performance.now();let autoLite=false,slowN=0,fastN=0,lastLite=0,gapAvg=16.7,prevT=0,rafAvg=16.7,lastRaf=0;const lite=()=>BIG||autoLite||document.body.classList.contains('mode-teacher');let lastDraw=0;
