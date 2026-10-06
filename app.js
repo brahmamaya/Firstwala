@@ -164,6 +164,8 @@
   for(const t of['pointerdown','pointerup','keydown','input','change','click','touchstart','hashchange','resize','focus','fullscreenchange','physica-theme-change'])window.addEventListener(t,wake,{capture:true,passive:true});
   const stageEl=canvas.closest('.stage')||canvas;for(const t of['pointermove','wheel'])stageEl.addEventListener(t,wake,{passive:true});
   document.addEventListener('visibilitychange',wake);document.fonts?.addEventListener?.('loadingdone',wake);window.Physica3D?.onChange?.(wake);
+  // Botany, Zoology and Chemistry arrive as separate packs: show the real experiment the moment its pack lands
+  window.addEventListener('physica-pack',e=>{wake();if(e.detail?.includes(current.id))render()});
   let onScreen=true;if(window.IntersectionObserver)new IntersectionObserver(es=>{onScreen=es[es.length-1].isIntersecting;wake()}).observe(stageEl);
   function frame(now){const rec=window.PhysicaRecordWidth;if((!onScreen&&!rec&&!document.fullscreenElement)||(!playing&&!rec&&!window.Physica3D?.spinning&&now-wakeT>1500)||now-lastDraw<(lite()?31:9.5)){requestAnimationFrame(frame);return}lastDraw=now;let dt=Math.min((now-lastFrame)/1000,.06);lastFrame=now;if(playing)elapsed=(elapsed+dt*playbackSpeed)%3600;if(is3D(current))window.Physica3D?.tick(dt);const t0=performance.now();draw();adapt(performance.now()-t0,now);window.PhysicaExperience?.draw();if(now-lastReadout>110){updateReadouts();lastReadout=now}requestAnimationFrame(frame)}
   function closeSidebar(){$('sidebar').classList.remove('open');$('mobile-topics').setAttribute('aria-expanded','false')}
@@ -173,6 +175,7 @@
   // switching subject: the page glides out and the new subject glides in from the side of the tab you picked
   // (View Transitions where supported; an instant switch elsewhere, on big boards and with reduced motion)
   const SUBJ=['physics','botany','zoology','chemistry'];
+  document.querySelectorAll('.subject-tab').forEach(b=>b.addEventListener('pointerdown',()=>window.PhysicaLoadSubject?.(b.dataset.subject==='chemistry'?'chem':b.dataset.subject==='physics'?'':'bio'),{passive:true}));
   document.querySelectorAll('.subject-tab').forEach(b=>b.addEventListener('click',()=>{const sub=b.dataset.subject;if(sub===subject){renderSidebar();return}
     const go=()=>select(sims.find(s=>s.subject===sub&&s.grade===grade)||sims.find(s=>s.subject===sub)),root=document.documentElement;
     root.dataset.vt=SUBJ.indexOf(sub)>SUBJ.indexOf(subject)?'next':'prev';
