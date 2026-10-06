@@ -10,7 +10,10 @@ const SUBJECTS={bio:['bio1.js','bio2.js','bio3.js','bio4.js','bio5.js'],chem:['c
 const PACK=['real3d-11a.js','real3d-11b.js','real3d-11c.js','real3d-11d.js','real3d-11e.js','ultra3d.js'];
 function bundle(list,out){const src=list.map(f=>f.startsWith('vendor/')?fs.readFileSync(path.join(root,f),'utf8')+'\n;':`;(function(){${fs.readFileSync(path.join(root,f),'utf8')}\n})();`).join('\n');
   const tmp=path.join(root,'.build.tmp.js');fs.writeFileSync(tmp,src);execFileSync(ESB,[tmp,'--minify','--target=es2018','--legal-comments=none','--outfile='+path.join(root,out)],{stdio:'inherit'});fs.unlinkSync(tmp)}
-bundle(CORE,'physica-core.min.js');bundle(PACK,'physica-3d.min.js');bundle(TUTOR,'physica-tutor.min.js');
+bundle(CORE,'physica-core.min.js');bundle(PACK,'physica-3d.min.js');
+// the Hinglish pronunciation map (tools/hinglish-voice.js) rides in the tutor pack
+fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js')(root,TUTOR).js);
+try{bundle([...TUTOR,'.hlvoice.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'))}
 const crypto0=require('crypto'),packV=crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-3d.min.js'))).digest('hex').slice(0,8);
 const hashOf=f=>crypto0.createHash('md5').update(fs.readFileSync(path.join(root,f))).digest('hex').slice(0,8);
 for(const k of Object.keys(SUBJECTS))bundle(SUBJECTS[k],'physica-'+k+'.min.js');
