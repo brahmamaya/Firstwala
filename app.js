@@ -233,7 +233,7 @@
     const orbiting=()=>is3D(current)&&dragMode==='rotate'&&window.Physica3D;
     const spread=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y)};
     canvas.style.cursor='grab';
-    const logical=e=>{const b=canvas.getBoundingClientRect(),x=(e.clientX-b.left)/b.width*960,y=(e.clientY-b.top)/b.height*505,V=window.PhysicaClean&&window.PhysicaView;return V?{x:(x-V.ox)/V.s,y:(y-V.oy)/V.s}:{x,y}},handOn=(fn,e)=>{const I=HAND();if(!I)return false;I[fn]?.(logical(e),saved.get(current.id));renderControls();updateReadouts();draw();return true};
+    const logical=e=>{const b=canvas.getBoundingClientRect(),x=(e.clientX-b.left)/b.width*960,y=(e.clientY-b.top)/b.height*505,V=window.PhysicaClean&&window.PhysicaView&&!window.PhysicaFullStage?.[current.id];return V?{x:(x-V.ox)/V.s,y:(y-V.oy)/V.s}:{x,y}},handOn=(fn,e)=>{const I=HAND();if(!I)return false;I[fn]?.(logical(e),saved.get(current.id));renderControls();updateReadouts();draw();return true};
   canvas.addEventListener('pointerdown',e=>{if(HAND()){steering=true;try{canvas.setPointerCapture(e.pointerId)}catch{}handOn('down',e);return}steering=true;canvas.style.cursor='grabbing';pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});try{canvas.setPointerCapture(e.pointerId)}catch{}if(orbiting()){if(pointers.size===2)pinch=spread()}else stageDrag(e)});
     canvas.addEventListener('pointermove',e=>{if(!steering)return;if(handOn('move',e))return;if(!orbiting()){stageDrag(e);return}const last=pointers.get(e.pointerId);if(!last)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
       if(pointers.size>=2){const d=spread();if(pinch)window.Physica3D.zoomBy(d/pinch);pinch=d}else window.Physica3D.rotate((e.clientX-last.x)*.009,(e.clientY-last.y)*.007)});
