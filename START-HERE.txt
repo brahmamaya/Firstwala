@@ -122,3 +122,8 @@ LEAN BUILD (node tools/build.js does all of this every time):
    biokit.js stays in the main bundle because some physics scenes draw its human figure.
 5. Smoothness rules in app.js: a paused simulation is redrawn only while something can change it (window.PhysicaWake),
    drawing never runs faster than ~60 fps, and it stops while the stage is off-screen.
+6. Big boards (75-86 inch, 4K) and Teacher mode use the "lite" look: same colours, but no glass blur and softer
+   canvas glows. They still draw at 60 fps; the stage resolution follows the measured frame time (GPU included),
+   changes only after a slowdown or headroom that lasts a few seconds, and backs off if it keeps flipping. 30 fps is
+   only the last resort, when even the lowest resolution cannot keep up. The landing black hole ray-traces at about
+   4.2 megapixels on 4K-size screens (the final image is full resolution).
