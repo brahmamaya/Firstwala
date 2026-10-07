@@ -2,7 +2,8 @@
    While a test runs, the whole tab shows only the paper and the timer: no tutor, no hints, no voice. The test submits
    itself when the time is up (the student may submit earlier) and only then shows the result: score, topic-wise
    performance and every question with its solution. The report can be saved as a PDF with the student's name.
-   Everything stays on this device; a running test survives a page reload. */
+   Everything stays on this device; a running test survives a page reload. The questions (tutor-exam.js) are a separate
+   pack, fetched by PhysicaLoadExam only when they are needed. */
 (() => {
 'use strict';
 const LIVE='physica-mock-live',SAVED='physica-mock',PAT={jee:{name:'JEE Main',per:2.4},neet:{name:'NEET',per:1}};
@@ -82,5 +83,7 @@ function report(r){const set=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch
 
 window.PhysicaMockTest={start:intro,open:report,past:(ch,k)=>get(SAVED,[]).filter(r=>r.ch===ch&&r.k===k),info:(ch,k)=>{const set=bank(ch,k);return set&&{name:PAT[k].name,n:set.length,min:mins(k,set.length)}}};
 // a test that was running when the page closed carries on (or submits, if its time ran out meanwhile)
-if(get(LIVE,null))test();
+let examWait=null;
+window.PhysicaLoadExam=()=>window.PhysicaExam?Promise.resolve():examWait||(examWait=new Promise((ok,no)=>{const s=el('script');s.src='__EXAM_URL__';s.async=true;s.onload=ok;s.onerror=()=>{examWait=null;s.remove();no()};document.head.append(s)}));
+if(get(LIVE,null))window.PhysicaLoadExam().then(test,()=>{});
 })();
