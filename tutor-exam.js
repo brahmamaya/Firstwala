@@ -552,6 +552,33 @@ window.PhysicaExam={
   {t:'neet',q:'Self-inductance in electricity plays a role like that of:',o:['force','inertia (mass)','velocity','energy'],c:1,a:'It opposes changes in current, as mass opposes changes in velocity.'},
   {t:'neet',sim:'eddy-brake',q:'Transformer cores are laminated to:',o:['increase eddy currents','reduce eddy currents','increase the flux','reduce the weight only'],c:1,a:'Thin insulated sheets break up the eddy current paths and cut heating.'},
   {t:'neet',q:'The energy stored in an inductor L carrying current I is:',o:['LI','½LI²','LI²','½L²I'],c:1,a:'U = ½LI².'}
+],
+'Alternating Current':[
+  {t:'1',sim:'rms-waveforms',q:'How is the rms value of an alternating current related to its peak value?',a:'I(rms) = I₀/√2 ≈ 0.707 I₀ for a sine wave.'},
+  {t:'1',sim:'reactance-frequency',q:'Why does a capacitor block steady DC?',a:'Its reactance X(C) = 1/(ωC) becomes infinite when ω = 0.'},
+  {t:'1',sim:'ac-power',q:'Define power factor.',a:'cos φ, where φ is the phase difference between voltage and current. Average power = V(rms)I(rms) cos φ.'},
+  {t:'1',q:'What is wattless current?',a:'Current that is 90° out of phase with the voltage (in a pure L or C), so the average power used is zero.'},
+  {t:'1',sim:'transformer',q:'Why can a transformer not work on DC?',a:'It works by mutual induction, which needs a changing flux; steady DC gives no change.'},
+  {t:'3',sim:'lr-phasor',q:'Show that in a purely inductive AC circuit the current lags the voltage by π/2, and find the inductive reactance.',a:'v = V₀ sin ωt = L dI/dt, so I = −(V₀/ωL) cos ωt = (V₀/ωL) sin(ωt − π/2).\nThe current reaches its peak a quarter cycle after the voltage: it lags by π/2.\nReactance X(L) = ωL (it grows with frequency).'},
+  {t:'3',sim:'rms-waveforms',q:'The mains supply in India is 220 V. What is its peak voltage, and what does "220 V" mean?',a:'220 V is the rms value: the DC voltage that would give the same heating.\nPeak V₀ = √2 × 220 ≈ 311 V.'},
+  {t:'3',q:'A series LCR circuit has R = 30 Ω, X(L) = 80 Ω and X(C) = 40 Ω on a 220 V supply. Find the impedance, the current and the phase angle.',a:'Z = √(R² + (X(L) − X(C))²) = √(900 + 1600) = 50 Ω.\nI = 220/50 = 4.4 A.\ntan φ = (80 − 40)/30 = 4/3, so φ ≈ 53°, current lagging (inductive circuit).'},
+  {t:'3',sim:'rlc-resonance',q:'Find the resonant frequency of a series LCR circuit with L = 0.1 H and C = 10 μF.',a:'ω₀ = 1/√(LC) = 1/√(10⁻⁶) = 1000 rad/s.\nf₀ = ω₀/2π ≈ 159 Hz.'},
+  {t:'3',sim:'ac-power',q:'Show that the average power in an AC circuit is V(rms)I(rms) cos φ.',a:'p = vi = V₀ sin ωt × I₀ sin(ωt − φ).\nUsing 2 sin A sin B = cos(A − B) − cos(A + B): p = ½V₀I₀[cos φ − cos(2ωt − φ)].\nThe second term averages to zero over a cycle, so P = ½V₀I₀ cos φ = V(rms)I(rms) cos φ.'},
+  {t:'3',sim:'transformer',q:'A transformer steps 220 V down to 11 V and its primary has 2000 turns. How many turns does the secondary have?',a:'V(s)/V(p) = N(s)/N(p): N(s) = 2000 × 11/220 = 100 turns.'},
+  {t:'5',sim:'rlc-resonance',q:'Using a phasor diagram, derive the impedance and phase of a series LCR circuit. Explain resonance and its sharpness.',a:'The same current I flows through all. V(R) is in phase with I, V(L) leads by 90°, V(C) lags by 90°.\nV² = V(R)² + (V(L) − V(C))², so Z = √(R² + (X(L) − X(C))²) and tan φ = (X(L) − X(C))/R.\nResonance: X(L) = X(C), so ω₀ = 1/√(LC). Then Z = R (smallest), the current is largest and in phase with V.\nSharpness (quality factor) Q = ω₀L/R: smaller R gives a taller, narrower peak. Used to tune radios.'},
+  {t:'5',sim:'lc-energy-cycle',q:'Explain LC oscillations and find their frequency. Compare them with a mass on a spring.',a:'A charged capacitor discharges through the inductor; the current builds a magnetic field; the field then drives charge onto the other plate, and so on.\nEnergy swaps between the electric field (q²/2C) and the magnetic field (½LI²); the total stays constant (no resistance).\nL d²q/dt² + q/C = 0: SHM with ω = 1/√(LC).\nAnalogy: L ↔ mass, 1/C ↔ spring constant, q ↔ displacement, I ↔ velocity.'},
+  {t:'5',sim:'transformer',q:'Describe the working of a transformer, its energy losses, and why electricity is sent over long distances at high voltage.',a:'Two coils on a laminated soft-iron core. AC in the primary makes a changing flux that links the secondary (mutual induction): V(s)/V(p) = N(s)/N(p) = I(p)/I(s) (ideal).\nLosses: copper (I²R in the windings), eddy currents (reduced by laminations), hysteresis (soft iron), and flux leakage.\nPower P = VI; at high voltage the same power needs a small current, so the line loss I²R is much smaller. Step-down transformers then lower the voltage for homes.'},
+  {t:'jee',sim:'rms-waveforms',q:'A square wave voltage switches between +V₀ and −V₀ for equal times. Its rms value is:',o:['V₀/√2','V₀','V₀/2','√2 V₀'],c:1,a:'v² = V₀² at every moment, so the mean of v² is V₀² and v(rms) = V₀.'},
+  {t:'jee',sim:'rlc-resonance',q:'Show that at resonance the voltage across L (or C) in a series LCR circuit can be much larger than the supply voltage.',a:'At resonance I = V/R. V(L) = IX(L) = Vω₀L/R = QV.\nWith small R, Q can be large (say 10 or more), so V(L) = V(C) ≫ V. They are opposite in phase, so they cancel in the loop.'},
+  {t:'jee',sim:'ac-power',q:'An LR circuit has R = 30 Ω and X(L) = 40 Ω. Its power factor is:',o:['0.8','0.6','0.75','1'],c:1,a:'Z = 50 Ω, cos φ = R/Z = 0.6.'},
+  {t:'jee',sim:'lr-phasor',q:'Why is a choke coil better than a resistor for reducing an AC current?',a:'Both can lower the current, but a resistor wastes power as heat (I²R).\nAn ideal choke (pure inductor) has power factor cos 90° = 0, so it uses almost no power while it limits the current with its reactance ωL.'},
+  {t:'jee',sim:'lc-energy-cycle',q:'A charged capacitor is connected to an inductor at t = 0. The energy is first shared equally between them at:',o:['T/4','T/8','T/2','T/6'],c:1,a:'q = Q₀ cos ωt. Equal sharing when q²/2C = Q₀²/4C, so cos ωt = 1/√2, ωt = π/4, t = T/8.'},
+  {t:'neet',q:'The frequency of the household AC supply in India is:',o:['60 Hz','50 Hz','100 Hz','220 Hz'],c:1,a:'50 Hz.'},
+  {t:'neet',sim:'reactance-frequency',q:'The reactance of an inductor is proportional to:',o:['1/f','f','f²','it does not depend on f'],c:1,a:'X(L) = 2πfL.'},
+  {t:'neet',sim:'reactance-frequency',q:'The reactance of a capacitor is proportional to:',o:['f','1/f','f²','√f'],c:1,a:'X(C) = 1/(2πfC).'},
+  {t:'neet',sim:'rlc-resonance',q:'At resonance, the power factor of a series LCR circuit is:',o:['0','0.5','1','0.707'],c:2,a:'Z = R, so the current is in phase with the voltage.'},
+  {t:'neet',sim:'transformer',q:'A step-up transformer:',o:['increases voltage and current','increases voltage and decreases current','decreases voltage and increases current','increases power'],c:1,a:'Power stays (ideally) the same: VI is constant.'},
+  {t:'neet',sim:'rms-waveforms',q:'An AC ammeter reads the:',o:['peak value','rms value','average value over a cycle','instantaneous value'],c:1,a:'AC meters are calibrated in rms values.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1374,6 +1401,47 @@ window.PhysicaMockBank={
     {tp:'apps',q:'Which uses eddy currents?',o:['an electric bell','electromagnetic braking','a bar magnet','a dry cell'],c:1,s:'Eddy currents oppose the motion of the wheel.'},
     {tp:'apps',q:'An AC generator works on the principle of:',o:['electromagnetic induction','the heating effect','electrolysis','photoelectric effect'],c:0,s:'A rotating coil has a changing flux.'},
     {tp:'apps',q:'The time constant of an RL circuit is:',o:['RL','L/R','R/L','1/(RL)'],c:1,s:'τ = L/R.'}
+  ]},
+'Alternating Current':{
+  topics:{rms:'AC values and rms',react:'Reactance and phase',rlc:'LCR circuits and resonance',power:'Power, LC oscillations and transformers'},
+  jee:[
+    {tp:'rms',q:'The peak value of a 220 V (rms) supply is about:',o:['220 V','311 V','156 V','440 V'],c:1,s:'V₀ = √2 × 220.'},
+    {tp:'rms',q:'A square wave switching between +V₀ and −V₀ has an rms value of:',o:['V₀/√2','V₀','V₀/2','zero'],c:1,s:'v² is always V₀².'},
+    {tp:'react',q:'If the AC frequency is doubled, X(L) and X(C) become:',o:['both double','X(L) doubles, X(C) halves','X(L) halves, X(C) doubles','both halve'],c:1,s:'X(L) ∝ f, X(C) ∝ 1/f.'},
+    {tp:'rlc',q:'A series LCR circuit has R = 30 Ω, X(L) = 80 Ω, X(C) = 40 Ω. Its impedance is:',o:['150 Ω','50 Ω','70 Ω','30 Ω'],c:1,s:'√(30² + 40²).'},
+    {tp:'rlc',q:'If the capacitance in an LC circuit is made 4 times, its resonant frequency becomes:',o:['4 times','2 times','half','one quarter'],c:2,s:'f ∝ 1/√C.'},
+    {tp:'power',q:'An LR circuit has R = 30 Ω and X(L) = 40 Ω. Its power factor is:',o:['0.8','0.75','0.6','1'],c:2,s:'cos φ = R/Z = 30/50.'},
+    {tp:'power',q:'In LC oscillations starting with a fully charged capacitor, the energy is first shared equally at:',o:['T/4','T/8','T/2','T/6'],c:1,s:'cos ωt = 1/√2.'},
+    {tp:'rlc',q:'At resonance in a series LCR circuit:',o:['the impedance is largest','the current is largest and Z = R','the current is zero','the power factor is zero'],c:1,s:'X(L) and X(C) cancel.'},
+    {tp:'power',q:'A current is called wattless when the phase angle between it and the voltage is:',o:['0°','45°','90°','180°'],c:2,s:'cos 90° = 0.'},
+    {tp:'power',q:'An ideal transformer steps 2200 V down to 220 V and gives 10 A from its secondary. The primary current is:',o:['100 A','10 A','1 A','0.1 A'],c:2,s:'V(p)I(p) = V(s)I(s).'},
+    {tp:'rlc',q:'A series circuit has R = 6 Ω, X(L) = 12 Ω and X(C) = 4 Ω. Find its impedance in ohms.',n:10,s:'√(36 + 64) = 10 Ω.'},
+    {tp:'react',q:'Find the reactance, in ohms, of a 0.2 H inductor at ω = 250 rad/s.',n:50,s:'X(L) = ωL = 50 Ω.'},
+    {tp:'rlc',q:'Find the resonant angular frequency, in rad/s, of a circuit with L = 0.1 H and C = 10 μF.',n:1000,s:'ω₀ = 1/√(10⁻⁶) = 1000 rad/s.'},
+    {tp:'power',q:'An AC circuit has V(rms) = 200 V, I(rms) = 5 A and power factor 0.8. Find the average power in watts.',n:800,s:'P = 200 × 5 × 0.8 = 800 W.'},
+    {tp:'power',q:'A transformer steps 220 V down to 11 V; the primary has 2000 turns. Find the number of secondary turns.',n:100,s:'N(s) = 2000 × 11/220.'}
+  ],
+  neet:[
+    {tp:'rms',q:'The frequency of AC mains in India is:',o:['50 Hz','60 Hz','100 Hz','25 Hz'],c:0,s:'50 Hz.'},
+    {tp:'rms',q:'The rms value of a sinusoidal current of peak I₀ is:',o:['I₀','I₀/2','I₀/√2','√2 I₀'],c:2,s:'I(rms) = I₀/√2.'},
+    {tp:'rms',q:'AC voltmeters and ammeters read:',o:['peak values','rms values','average values','instantaneous values'],c:1,s:'They are calibrated in rms.'},
+    {tp:'rms',q:'The average value of a sinusoidal AC over a full cycle is:',o:['I₀','I₀/√2','zero','2I₀/π'],c:2,s:'Positive and negative halves cancel.'},
+    {tp:'rms',q:'A 220 V (rms) supply has a peak voltage of about:',o:['220 V','311 V','110 V','440 V'],c:1,s:'√2 × 220.'},
+    {tp:'react',q:'In a pure inductor, the current:',o:['leads the voltage by 90°','lags the voltage by 90°','is in phase with it','lags by 180°'],c:1,s:'The inductor opposes changes in current.'},
+    {tp:'react',q:'In a pure capacitor, the current:',o:['leads the voltage by 90°','lags the voltage by 90°','is in phase','leads by 180°'],c:0,s:'Charge must flow before the voltage builds up.'},
+    {tp:'react',q:'The inductive reactance is:',o:['ωL','1/(ωL)','L/ω','ω/L'],c:0,s:'X(L) = ωL.'},
+    {tp:'react',q:'The capacitive reactance is:',o:['ωC','1/(ωC)','C/ω','ω/C'],c:1,s:'X(C) = 1/(ωC).'},
+    {tp:'react',q:'A capacitor in a circuit:',o:['blocks AC and passes DC','blocks DC and passes AC','blocks both','passes both equally'],c:1,s:'X(C) is infinite for DC.'},
+    {tp:'rlc',q:'The impedance of a series LCR circuit is:',o:['R + X(L) + X(C)','√(R² + (X(L) − X(C))²)','√(R² + X(L)² + X(C)²)','R'],c:1,s:'Phasor addition.'},
+    {tp:'rlc',q:'Series resonance happens when:',o:['R = X(L)','X(L) = X(C)','R = 0','X(C) = 0'],c:1,s:'Then they cancel.'},
+    {tp:'rlc',q:'The resonant frequency of an LC circuit is:',o:['2π√(LC)','1/(2π√(LC))','√(L/C)','LC/2π'],c:1,s:'f₀ = 1/(2π√(LC)).'},
+    {tp:'rlc',q:'At resonance, the power factor of a series LCR circuit is:',o:['zero','1','0.5','infinite'],c:1,s:'Z = R.'},
+    {tp:'rlc',q:'The sharpness of resonance increases when:',o:['R increases','R decreases','C increases','f decreases'],c:1,s:'Q = ω₀L/R.'},
+    {tp:'power',q:'The average power in an AC circuit is:',o:['V(rms)I(rms)','V(rms)I(rms) cos φ','V₀I₀','V(rms)I(rms) sin φ'],c:1,s:'Only the in-phase part does work.'},
+    {tp:'power',q:'The power used in a pure inductor or pure capacitor is:',o:['maximum','zero','VI','V²/R'],c:1,s:'cos 90° = 0.'},
+    {tp:'power',q:'A transformer works on the principle of:',o:['self-induction','mutual induction','eddy currents','the photoelectric effect'],c:1,s:'Changing flux from one coil links the other.'},
+    {tp:'power',q:'A step-up transformer has:',o:['fewer turns in the secondary','more turns in the secondary','equal turns','no secondary'],c:1,s:'V(s)/V(p) = N(s)/N(p) > 1.'},
+    {tp:'power',q:'The frequency of LC oscillations is:',o:['1/(2π√(LC))','2π√(LC)','√(LC)','L/C'],c:0,s:'ω = 1/√(LC).'}
   ]}
 };
 })();
