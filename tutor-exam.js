@@ -228,6 +228,33 @@ window.PhysicaExam={
   {t:'neet',sim:'elastic-energy',q:'The elastic energy stored per unit volume of a stretched wire is:',o:['stress × strain','½ × stress × strain','stress/strain','2 × stress × strain'],c:1,a:'u = ½ × stress × strain.'},
   {t:'neet',sim:'bulk-modulus',q:'For a gas at constant temperature, the bulk modulus equals:',o:['zero','its pressure','γ × pressure','its volume'],c:1,a:'PV = constant gives −V dP/dV = P.'},
   {t:'neet',sim:'poisson-ratio',q:'The theoretical limits of Poisson\'s ratio are:',o:['0 to 1','−1 to 0.5','0 to ∞','−∞ to 1'],c:1,a:'Energy considerations limit σ to between −1 and 0.5.'}
+],
+'Mechanical Properties of Fluids':[
+  {t:'1',sim:'hydraulic-lift',q:'State Pascal\'s law.',a:'A change in pressure applied to an enclosed fluid is passed on equally to every part of the fluid and to the walls of its container.'},
+  {t:'1',sim:'drop-bubble-pressure',q:'Why are small liquid drops spherical?',a:'Surface tension pulls the surface to the smallest possible area, and for a given volume a sphere has the least area.'},
+  {t:'1',q:'What is the SI unit of the coefficient of viscosity?',a:'Pa·s (N·s/m²). In CGS it is the poise; 1 Pa·s = 10 poise.'},
+  {t:'1',sim:'continuity',q:'What happens to the speed of water when a pipe becomes narrower?',a:'It increases, because Av stays constant (equation of continuity).'},
+  {t:'1',sim:'terminal-speed',q:'Define terminal velocity.',a:'The steady speed of a body falling through a fluid when the viscous drag plus buoyancy balance its weight, so its acceleration becomes zero.'},
+  {t:'3',sim:'pressure-depth',q:'Show that the pressure at depth h in a liquid is P = P₀ + ρgh. Find it 10 m below a water surface (P₀ = 10⁵ Pa, g = 10 m/s²).',a:'Take a column of area A and height h. Its weight ρAhg is held up by the extra pressure: (P − P₀)A = ρAhg.\nSo P = P₀ + ρgh.\nAt 10 m: P = 10⁵ + 1000 × 10 × 10 = 2 × 10⁵ Pa (about 2 atm).'},
+  {t:'3',sim:'hydraulic-lift',q:'In a hydraulic lift the small piston has area 0.01 m² and the large one 1 m². What load can a 100 N force on the small piston lift?',a:'Pascal\'s law: the pressure is the same, F₁/A₁ = F₂/A₂.\nF₂ = 100 × 1/0.01 = 10⁴ N (about a 1000 kg car).'},
+  {t:'3',sim:'torricelli',q:'Using Bernoulli\'s theorem, derive the speed of water flowing out of a small hole at depth h below the surface of an open tank.',a:'Top surface: pressure P₀, speed ≈ 0 (wide tank), height h. Hole: pressure P₀, speed v, height 0.\nP₀ + ρgh = P₀ + ½ρv².\nv = √(2gh), the same as falling freely through h (Torricelli\'s law).'},
+  {t:'3',sim:'capillary-rise',q:'Write the formula for capillary rise and find the rise of water in a tube of radius 0.5 mm (T = 0.073 N/m, θ = 0°, g = 9.8 m/s²).',a:'h = 2T cos θ/(rρg).\nh = 2 × 0.073/(5 × 10⁻⁴ × 1000 × 9.8) ≈ 0.03 m = 3 cm.\n(A thinner tube gives a larger rise.)'},
+  {t:'3',sim:'drop-bubble-pressure',q:'Why is the excess pressure inside a soap bubble 4T/R, but inside a liquid drop only 2T/R?',a:'A drop has one surface: excess pressure 2T/R.\nA soap bubble is a thin film with two surfaces (inside and outside), so the excess pressure doubles: 4T/R.'},
+  {t:'3',sim:'aerofoil-lift',q:'Explain how an aeroplane wing gets lift.',a:'The wing\'s shape and tilt make air flow faster over the top than below.\nBy Bernoulli\'s theorem, faster air has lower pressure.\nThe higher pressure below pushes the wing up: this pressure difference × wing area is the lift.'},
+  {t:'5',q:'State and derive Bernoulli\'s theorem for streamline flow.',a:'For an ideal fluid in steady flow, P + ½ρv² + ρgh is the same at every point of a streamline.\nTake fluid moving from section 1 (P₁, A₁, v₁, h₁) to section 2 (P₂, A₂, v₂, h₂). In time Δt a volume ΔV = A₁v₁Δt = A₂v₂Δt moves.\nWork done by pressure: (P₁ − P₂)ΔV.\nGain in KE: ½ρΔV(v₂² − v₁²). Gain in PE: ρΔVg(h₂ − h₁).\nWork = gain in energy: P₁ + ½ρv₁² + ρgh₁ = P₂ + ½ρv₂² + ρgh₂.'},
+  {t:'5',sim:'terminal-speed',q:'State Stokes\' law and derive the terminal velocity of a sphere falling through a viscous liquid.',a:'Stokes\' law: drag on a sphere F = 6πηrv.\nAt terminal speed: weight = buoyancy + drag.\n(4/3)πr³ρg = (4/3)πr³σg + 6πηrv(t), where ρ = sphere density, σ = liquid density.\nv(t) = 2r²(ρ − σ)g/(9η).\nSo v(t) ∝ r²; if ρ < σ (an air bubble) it rises instead.'},
+  {t:'5',sim:'venturimeter',q:'Explain the venturimeter and derive the speed of flow in the wide part.',a:'A tube with a narrow throat; a manometer measures the pressure difference ΔP = P₁ − P₂ between the wide part (A₁) and the throat (A₂).\nContinuity: v₂ = v₁A₁/A₂.\nBernoulli (same height): P₁ − P₂ = ½ρ(v₂² − v₁²) = ½ρv₁²[(A₁/A₂)² − 1].\nv₁ = √{2ΔP / (ρ[(A₁/A₂)² − 1])}.\nUsed to measure flow, and in carburettors and sprayers.'},
+  {t:'jee',sim:'buoyancy',q:'A block floats in water with 2/3 of its volume submerged. Its density is:',o:['333 kg/m³','667 kg/m³','1500 kg/m³','500 kg/m³'],c:1,a:'Floating: ρ(block) V g = ρ(water) (2V/3) g, so ρ = 2/3 × 1000 ≈ 667 kg/m³.'},
+  {t:'jee',sim:'torricelli',q:'Water stands H high in a tank on the ground. A small hole is made at depth h below the surface. Where does the jet land, and for what h is this farthest?',a:'Speed v = √(2gh). The hole is (H − h) above the ground: fall time t = √(2(H − h)/g).\nRange x = vt = 2√(h(H − h)).\nThis is largest when h = H/2, giving x(max) = H.'},
+  {t:'jee',sim:'drop-bubble-pressure',q:'1000 tiny drops of radius r merge into one big drop. How much surface energy is released (surface tension T)?',a:'Volume: 1000 × (4/3)πr³ = (4/3)πR³, so R = 10r.\nArea before: 1000 × 4πr² = 4000πr². After: 4π(10r)² = 400πr².\nEnergy released = T × (4000 − 400)πr² = 3600πr²T.'},
+  {t:'jee',sim:'terminal-speed',q:'Two raindrops of radii r and 2r fall through air. The ratio of their terminal speeds is:',o:['1 : 2','1 : 4','2 : 1','1 : 8'],c:1,a:'v(t) ∝ r²: 1 : 4.'},
+  {t:'jee',sim:'drop-bubble-pressure',q:'If the radius of a soap bubble is doubled, the excess pressure inside it becomes:',o:['double','half','four times','one quarter'],c:1,a:'ΔP = 4T/R ∝ 1/R.'},
+  {t:'neet',sim:'pressure-depth',q:'The pressure at the same depth in a liquid at rest:',o:['depends on the shape of the vessel','is the same at all points','is greatest at the walls','is zero'],c:1,a:'P = P₀ + ρgh depends only on the depth.'},
+  {t:'neet',sim:'hydraulic-lift',q:'A hydraulic press works on:',o:['Archimedes\' principle','Pascal\'s law','Bernoulli\'s theorem','Stokes\' law'],c:1,a:'The pressure applied is passed on equally (Pascal).'},
+  {t:'neet',q:'Bernoulli\'s theorem is based on the conservation of:',o:['mass','momentum','energy','angular momentum'],c:2,a:'It is the work-energy principle for a flowing fluid.'},
+  {t:'neet',q:'When the temperature of a liquid rises, its viscosity:',o:['increases','decreases','stays the same','first rises then falls'],c:1,a:'Liquids flow more easily when hot (gases become more viscous).'},
+  {t:'neet',sim:'capillary-rise',q:'Water rises higher in a:',o:['wider capillary tube','narrower capillary tube','longer tube','shorter tube'],c:1,a:'h = 2T cos θ/(rρg) ∝ 1/r.'},
+  {t:'neet',sim:'drop-bubble-pressure',q:'The excess pressure inside a soap bubble of radius R is:',o:['T/R','2T/R','4T/R','8T/R'],c:2,a:'A bubble has two surfaces: 4T/R.'}
 ]};
 
 window.PhysicaMockBank={
@@ -558,6 +585,47 @@ window.PhysicaMockBank={
     {tp:'energy',q:'The work done in stretching a wire by Δl with a final force F is:',o:['FΔl','½FΔl','2FΔl','F/Δl'],c:1,s:'The force rises from 0 to F, so the average force is F/2.'},
     {tp:'energy',q:'If the extension of a wire is doubled (within the limit), its stored energy becomes:',o:['2 times','4 times','half','the same'],c:1,s:'U ∝ (extension)².'},
     {tp:'energy',q:'The thermal stress in a rod clamped at both ends and heated by ΔT is:',o:['αΔT','YαΔT','Y/αΔT','YΔT'],c:1,s:'Strain = αΔT, so stress = YαΔT.'}
+  ]},
+'Mechanical Properties of Fluids':{
+  topics:{press:'Pressure and Pascal\'s law',buoy:'Buoyancy and floating',flow:'Continuity and Bernoulli',visc:'Viscosity and terminal speed',surf:'Surface tension'},
+  jee:[
+    {tp:'press',q:'The pressure at the bottom of a lake is 3 times atmospheric pressure (P₀ = 10⁵ Pa, ρg = 10⁴ N/m³). The depth is:',o:['10 m','20 m','30 m','40 m'],c:1,s:'P₀ + ρgh = 3P₀, so ρgh = 2 × 10⁵ and h = 20 m.'},
+    {tp:'buoy',q:'A body weighs 60 N in air and 40 N fully under water. Its relative density is:',o:['1.5','2','3','4'],c:2,s:'Loss of weight = 20 N = weight of equal volume of water. Relative density = 60/20 = 3.'},
+    {tp:'buoy',q:'An ice cube floats in a glass of water. When it melts, the water level:',o:['rises','falls','stays the same','first rises then falls'],c:2,s:'Floating ice displaces exactly its own weight of water, which is the water it becomes.'},
+    {tp:'flow',q:'Water flows through a pipe whose diameter halves. The speed in the narrow part becomes:',o:['2 times','half','4 times','the same'],c:2,s:'Av is constant; area ∝ d², so it falls to 1/4 and the speed is 4 times.'},
+    {tp:'flow',q:'Water flows along a horizontal pipe at 2 m/s where the pressure is 4 × 10⁴ Pa. In a narrower part the speed is 4 m/s. The pressure there is:',o:['3.4 × 10⁴ Pa','4.6 × 10⁴ Pa','2 × 10⁴ Pa','3.8 × 10⁴ Pa'],c:0,s:'P₂ = P₁ − ½ρ(v₂² − v₁²) = 4 × 10⁴ − 500 × 12 = 3.4 × 10⁴ Pa.'},
+    {tp:'visc',q:'If the radius of a falling sphere is doubled, its terminal speed becomes:',o:['2 times','half','4 times','8 times'],c:2,s:'v(t) ∝ r².'},
+    {tp:'visc',q:'Eight identical raindrops, each falling at terminal speed v, merge into one drop. Its terminal speed is:',o:['2v','8v','16v','4v'],c:3,s:'Volume 8 times, so R = 2r. v(t) ∝ R², so 4v.'},
+    {tp:'surf',q:'The excess pressure inside a soap bubble of radius 1 cm (T = 0.03 N/m) is:',o:['3 Pa','6 Pa','12 Pa','24 Pa'],c:2,s:'4T/R = 4 × 0.03/0.01 = 12 Pa.'},
+    {tp:'surf',q:'The work needed to blow a soap bubble of radius R (surface tension T) is:',o:['4πR²T','8πR²T','2πR²T','16πR²T'],c:1,s:'Two surfaces, each of area 4πR²: W = T × 8πR².'},
+    {tp:'surf',q:'A capillary tube is shorter than the height water would normally rise in it. The water:',o:['overflows like a fountain','rises to the top and stops there','does not rise at all','rises half way'],c:1,s:'The surface simply curves less (larger radius of curvature), so it never overflows.'},
+    {tp:'press',q:'A hydraulic lift has pistons of 2 cm² and 400 cm². A 50 N force on the small piston can lift what mass, in kg (g = 10 m/s²)?',n:1000,s:'F₂ = 50 × 400/2 = 10 000 N, so m = 1000 kg.'},
+    {tp:'flow',q:'Water flows out of a small hole 5 m below the surface of an open tank. Find its speed in m/s (g = 10 m/s²).',n:10,s:'v = √(2gh) = √100 = 10 m/s.'},
+    {tp:'buoy',q:'Wood of density 600 kg/m³ floats in water. What percentage of its volume is under water?',n:60,s:'Fraction submerged = ρ(wood)/ρ(water) = 0.6, so 60%.'},
+    {tp:'visc',q:'A sphere of radius 1 mm falls through a liquid of viscosity 1 Pa·s; the difference between the sphere\'s and the liquid\'s densities is 9000 kg/m³. Find its terminal speed in mm/s (g = 10 m/s²).',n:20,s:'v = 2r²(Δρ)g/(9η) = 2 × 10⁻⁶ × 9000 × 10/9 = 0.02 m/s = 20 mm/s.'},
+    {tp:'surf',q:'Water (T = 0.07 N/m, contact angle 0°) rises in a capillary of radius 0.1 mm. Find the rise in cm (g = 10 m/s²).',n:14,s:'h = 2T/(rρg) = 0.14/(10⁻⁴ × 1000 × 10) = 0.14 m = 14 cm.'}
+  ],
+  neet:[
+    {tp:'press',q:'The SI unit of pressure is:',o:['N','pascal (N/m²)','N·m','atm only'],c:1,s:'P = F/A.'},
+    {tp:'press',q:'The pressure at depth h in a liquid of density ρ open to the air is:',o:['ρgh','P₀ − ρgh','P₀ + ρgh','P₀'],c:2,s:'Atmospheric pressure plus the weight of the column above.'},
+    {tp:'press',q:'The principle behind hydraulic brakes is:',o:['Pascal\'s law','Archimedes\' principle','Bernoulli\'s theorem','Hooke\'s law'],c:0,s:'Pressure applied at the pedal is passed on equally to all wheels.'},
+    {tp:'press',q:'Normal atmospheric pressure is about:',o:['1.01 × 10³ Pa','1.01 × 10⁵ Pa','1.01 × 10⁷ Pa','76 Pa'],c:1,s:'1 atm ≈ 1.013 × 10⁵ Pa (76 cm of mercury).'},
+    {tp:'buoy',q:'Archimedes\' principle says the upthrust on an immersed body equals:',o:['its own weight','the weight of the fluid it displaces','its volume','the pressure at its bottom'],c:1,s:'Buoyant force = weight of displaced fluid.'},
+    {tp:'buoy',q:'A body floats when:',o:['upthrust is less than its weight','upthrust equals its weight','it has no weight','it is fully under the surface'],c:1,s:'For floating, weight = buoyant force.'},
+    {tp:'buoy',q:'The loss of weight of a body in water equals:',o:['its weight','the weight of water it displaces','its mass','zero'],c:1,s:'The upthrust reduces the apparent weight by exactly that amount.'},
+    {tp:'buoy',q:'A steel ship floats because:',o:['steel is lighter than water','its average density (with the air inside) is less than water','water pushes it sideways','of surface tension'],c:1,s:'The hollow hull displaces a lot of water, enough to equal the ship\'s weight.'},
+    {tp:'flow',q:'The equation of continuity (A₁v₁ = A₂v₂) comes from the conservation of:',o:['energy','momentum','mass','charge'],c:2,s:'The same mass of fluid passes each section per second.'},
+    {tp:'flow',q:'Bernoulli\'s theorem is a statement of the conservation of:',o:['mass','energy','momentum','volume'],c:1,s:'P + ½ρv² + ρgh = constant.'},
+    {tp:'flow',q:'The lift on an aeroplane wing is explained by:',o:['Pascal\'s law','Archimedes\' principle','Bernoulli\'s theorem','Stokes\' law'],c:2,s:'Faster air above means lower pressure above.'},
+    {tp:'flow',q:'Flow becomes turbulent when the Reynolds number is:',o:['very small','large','zero','negative'],c:1,s:'Above about 2000 the flow becomes turbulent.'},
+    {tp:'visc',q:'The SI unit of viscosity is:',o:['N/m','Pa·s','N·m','kg/m³'],c:1,s:'η = stress/(velocity gradient): Pa·s.'},
+    {tp:'visc',q:'Stokes\' law for the drag on a sphere is:',o:['F = 6πηrv','F = 6πηr²v','F = 4πηrv','F = πηrv'],c:0,s:'F = 6πηrv.'},
+    {tp:'visc',q:'The terminal speed of a sphere falling through a liquid is proportional to:',o:['r','r²','1/r','r³'],c:1,s:'v(t) = 2r²(ρ − σ)g/(9η).'},
+    {tp:'visc',q:'When the temperature rises, the viscosity of a liquid:',o:['increases','decreases','stays the same','becomes zero'],c:1,s:'Liquids become runnier when heated.'},
+    {tp:'surf',q:'The SI unit of surface tension is:',o:['N/m²','N/m','N·m','J'],c:1,s:'Force per unit length (or energy per unit area).'},
+    {tp:'surf',q:'The excess pressure inside a liquid drop of radius R is:',o:['T/R','2T/R','4T/R','T/2R'],c:1,s:'A drop has one surface: 2T/R.'},
+    {tp:'surf',q:'Mercury in a glass capillary:',o:['rises above the outside level','falls below the outside level','stays level','boils'],c:1,s:'Its contact angle is more than 90°, so cos θ < 0 and it is pushed down.'},
+    {tp:'surf',q:'Detergents clean better because they:',o:['raise the surface tension of water','lower the surface tension of water','raise its viscosity','raise its density'],c:1,s:'Lower surface tension lets water wet fabric and reach the dirt.'}
   ]}
 };
 })();
