@@ -3,7 +3,7 @@
    those exams. a = step-by-step answer; o = options and c = the correct one for MCQs; sim = the experiment to try it in.
    window.PhysicaMockBank = the timed mock tests (JEE Main and NEET pattern), separate from the practice questions so a
    student never meets a mock question beforehand. tp = topic (for the topic-wise report), o + c = MCQ, n = numerical
-   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements. */
+   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line. */
 (() => {
 'use strict';
 window.PhysicaExam={
@@ -39,6 +39,33 @@ window.PhysicaExam={
   {t:'jee',q:'The mass and the speed of a body are each measured with a 2% error. Find the maximum percentage error in its kinetic energy.',a:'K = ½mv², so ΔK/K = Δm/m + 2Δv/v = 2% + 2 × 2% = 6%.'},
   {t:'jee',q:'A stopwatch has a least count of 0.2 s. The time for 20 oscillations of a pendulum is 25 s. Find the percentage error in the time period.',o:['0.8%','1.8%','8%','0.2%'],c:0,a:'T = t/20, so ΔT/T = Δt/t = 0.2/25 = 0.008 = 0.8%.\n(Timing many oscillations keeps the error small.)'},
   {t:'jee',sim:'dimensional-analysis',q:'In P = (α/β) e^(−αz/kθ), P is pressure, z is distance, k is Boltzmann\'s constant and θ is temperature. Find the dimensions of β.',a:'The power of e has no dimensions, so α = kθ/z.\n[kθ] = energy = [ML²T⁻²], so [α] = [ML²T⁻²]/[L] = [MLT⁻²].\nP = α/β gives [β] = [α]/[P] = [MLT⁻²]/[ML⁻¹T⁻²] = [L²].'}
+],
+'Motion in a Straight Line':[
+  {t:'1',sim:'vertical-throw',q:'Can a body have zero velocity and still be accelerating? Give an example.',a:'Yes. At the top of a vertical throw the velocity is zero, but the acceleration is still g, downwards.'},
+  {t:'1',sim:'kinematics',q:'What does the slope of a position-time graph give?',a:'The velocity of the body.'},
+  {t:'1',sim:'vt-area',q:'What does the area under a velocity-time graph give?',a:'The displacement of the body in that time interval.'},
+  {t:'1',q:'When is the average speed equal to the magnitude of the average velocity?',a:'When the body moves along a straight line without turning back (distance = magnitude of displacement).'},
+  {t:'1',sim:'kinematics',q:'What does a position-time graph parallel to the time axis show?',a:'The body is at rest: its position does not change with time.'},
+  {t:'3',sim:'vt-area',q:'Derive v = u + at from the velocity-time graph.',a:'For uniform acceleration the v-t graph is a straight line from u (at t = 0) to v (at time t).\nIts slope is the acceleration: a = (v − u)/t.\nSo v = u + at.'},
+  {t:'3',sim:'vt-area',q:'Derive s = ut + ½at² using the area under the velocity-time graph.',a:'Displacement = area under the v-t graph from 0 to t.\nArea = rectangle (u × t) + triangle (½ × t × (v − u)).\nSince v − u = at: s = ut + ½ × t × at = ut + ½at².'},
+  {t:'3',sim:'braking',q:'A car moving at 72 km/h is brought to rest in 4 s. Find its retardation and the stopping distance.',a:'u = 72 km/h = 20 m/s, v = 0, t = 4 s.\na = (v − u)/t = −20/4 = −5 m/s² (retardation 5 m/s²).\ns = (u + v)t/2 = (20 + 0) × 4/2 = 40 m.'},
+  {t:'3',sim:'vertical-throw',q:'A ball is thrown straight up at 20 m/s. Find the maximum height and the time to come back (g = 10 m/s²).',a:'At the top v = 0: H = u²/2g = 400/20 = 20 m.\nTime to the top = u/g = 2 s, so the total time = 2u/g = 4 s.'},
+  {t:'3',sim:'average-instant',q:'Distinguish between average velocity and instantaneous velocity.',a:'Average velocity = total displacement / total time, over an interval.\nInstantaneous velocity = velocity at one instant: v = dx/dt, the slope of the x-t graph at that point.\nIn uniform motion both are equal.'},
+  {t:'3',sim:'relative-motion',q:'Trains A and B move on parallel tracks at 54 km/h and 90 km/h. Find the velocity of B relative to A when they move (a) in the same direction (b) in opposite directions.',a:'54 km/h = 15 m/s, 90 km/h = 25 m/s.\n(a) Same direction: v(BA) = 25 − 15 = 10 m/s.\n(b) Opposite directions: v(BA) = 25 − (−15) = 40 m/s.'},
+  {t:'5',sim:'vt-area',q:'Derive the three equations of motion for uniform acceleration using the velocity-time graph.',a:'The v-t graph is a straight line from (0, u) to (t, v).\n1. Slope = acceleration: a = (v − u)/t, so v = u + at.\n2. Area under the graph = displacement: s = ut + ½(v − u)t = ut + ½at².\n3. The area is also a trapezium: s = ½(u + v)t. Put t = (v − u)/a: s = (v + u)(v − u)/2a, so v² = u² + 2as.'},
+  {t:'5',q:'Show that the distance travelled in the nth second of uniformly accelerated motion is sₙ = u + (a/2)(2n − 1).',a:'Distance in n seconds: s(n) = un + ½an².\nDistance in (n − 1) seconds: s(n − 1) = u(n − 1) + ½a(n − 1)².\nsₙ = s(n) − s(n − 1) = u + ½a[n² − (n − 1)²] = u + ½a(2n − 1).\n(Its unit looks like m/s, but it is the distance covered in one second.)'},
+  {t:'5',sim:'vertical-throw',q:'A ball is dropped from a 45 m tall tower (g = 10 m/s²). Find (a) the time to reach the ground (b) its speed on reaching the ground (c) the distance covered in the last second.',a:'(a) h = ½gt²: 45 = 5t², so t = 3 s.\n(b) v = gt = 10 × 3 = 30 m/s.\n(c) Distance in the 3rd second = ½g(2n − 1) = 5 × 5 = 25 m.\n(Check: in 2 s it falls 20 m, so the last second covers 45 − 20 = 25 m.)'},
+  {t:'jee',q:'The position of a particle is x = 2t³ − 6t² + 4 (x in m, t in s). Find its velocity and acceleration at t = 2 s, and when it is momentarily at rest.',a:'v = dx/dt = 6t² − 12t; a = dv/dt = 12t − 12.\nAt t = 2 s: v = 24 − 24 = 0, a = 24 − 12 = 12 m/s².\nv = 6t(t − 2) = 0 at t = 0 and t = 2 s.'},
+  {t:'jee',q:'A particle starts from rest with uniform acceleration. The distances covered in the 1st, 2nd and 3rd seconds are in the ratio:',o:['1 : 2 : 3','1 : 3 : 5','1 : 4 : 9','1 : 1 : 1'],c:1,a:'With u = 0, sₙ = (a/2)(2n − 1): a/2, 3a/2, 5a/2, so 1 : 3 : 5 (Galileo\'s law of odd numbers).'},
+  {t:'jee',q:'A particle with initial speed v₀ slows down with a retardation proportional to its speed, a = −kv. How far does it go before stopping?',a:'Write a = v dv/dx = −kv, so dv/dx = −k.\nIntegrate from v₀ to 0: 0 − v₀ = −kx.\nSo x = v₀/k. (It needs infinite time, but the distance is finite.)'},
+  {t:'jee',q:'A ball is dropped from a height h. At the same moment another ball is thrown straight up from the ground below it with speed u. They meet after a time:',o:['h/u','u/g','√(2h/g)','2h/u'],c:0,a:'Both have the same acceleration g, so relative to each other there is no acceleration.\nThey approach at relative speed u and must close the gap h, so t = h/u.'},
+  {t:'jee',sim:'catch-up',q:'Car A starts from rest with acceleration 2 m/s² just as car B passes it at a steady 20 m/s. When and where does A catch B?',a:'Same distance when ½ × 2 × t² = 20t, so t² = 20t, t = 20 s.\nDistance = 20 × 20 = 400 m.\n(A\'s speed then is 40 m/s, twice B\'s.)'},
+  {t:'neet',sim:'vertical-throw',q:'A body is thrown up at 30 m/s. The time to reach the highest point is (g = 10 m/s²):',o:['1.5 s','3 s','6 s','9 s'],c:1,a:'At the top v = 0: t = u/g = 30/10 = 3 s.'},
+  {t:'neet',sim:'vt-area',q:'The slope of a velocity-time graph gives:',o:['displacement','speed','acceleration','distance'],c:2,a:'Slope of v-t = dv/dt = acceleration. (The area under it gives displacement.)'},
+  {t:'neet',q:'A car starts from rest and accelerates at 2 m/s² for 10 s. The distance covered is:',o:['50 m','200 m','20 m','100 m'],c:3,a:'s = ½at² = ½ × 2 × 100 = 100 m.'},
+  {t:'neet',q:'A stone is dropped from rest. The distance it falls in the first 2 s is (g = 10 m/s²):',o:['20 m','10 m','40 m','5 m'],c:0,a:'s = ½gt² = ½ × 10 × 4 = 20 m.'},
+  {t:'neet',sim:'rain-umbrella',q:'Rain falls vertically at 30 m/s. A man runs east at 10 m/s. He should hold his umbrella:',o:['vertically','at tan⁻¹(1/3) to the vertical, towards the east','at tan⁻¹(3) to the vertical, towards the east','at tan⁻¹(1/3) to the vertical, towards the west'],c:1,a:'Rain relative to the man = rain − man: 30 m/s down and 10 m/s towards the west.\nIt comes at tan θ = 10/30 = 1/3 to the vertical, from the east, so the umbrella is tilted forward (towards the east).'},
+  {t:'neet',sim:'kinematics',q:'A position-time graph that is a straight line parallel to the time axis means the body is:',o:['moving with uniform velocity','accelerating','at rest','moving with uniform speed in a circle'],c:2,a:'The position does not change with time, so the velocity is zero: the body is at rest.'}
 ]};
 
 window.PhysicaMockBank={
@@ -82,6 +109,47 @@ window.PhysicaMockBank={
     {tp:'inst',q:'In a vernier caliper, 1 MSD = 0.5 mm and 10 vernier divisions equal 9 main scale divisions. Its least count is:',o:['0.5 mm','0.1 mm','0.05 mm','0.01 mm'],c:2,s:'LC = 1 MSD / number of VSD = 0.5/10 = 0.05 mm.'},
     {tp:'inst',q:'A screw gauge has pitch 0.5 mm and 50 circular divisions. The main scale reads 4 mm and the 12th circular division is on the line. The reading is:',o:['4.12 mm','4.06 mm','4.24 mm','4.012 mm'],c:0,s:'LC = 0.5/50 = 0.01 mm. Reading = 4 + 12 × 0.01 = 4.12 mm.'},
     {tp:'inst',q:'A vernier caliper has a positive zero error of 0.02 cm. A rod reads 3.25 cm. Its true length is:',o:['3.27 cm','3.25 cm','3.21 cm','3.23 cm'],c:3,s:'True = observed − zero error = 3.25 − 0.02 = 3.23 cm.'}
+  ]},
+'Motion in a Straight Line':{
+  topics:{kin:'Displacement, speed and velocity',eq:'Equations of motion',grav:'Free fall and vertical motion',graph:'Motion graphs',rel:'Relative velocity'},
+  jee:[
+    {tp:'kin',q:'The position of a particle is x = 3t² − t³ (x in m, t in s). Its maximum velocity in the +x direction is:',o:['3 m/s','6 m/s','1 m/s','9 m/s'],c:0,s:'v = 6t − 3t². dv/dt = 6 − 6t = 0 at t = 1 s, so v(max) = 6 − 3 = 3 m/s.'},
+    {tp:'kin',q:'A particle covers half the distance at 3 m/s. For the other half, it moves at 4.5 m/s for half the time and at 7.5 m/s for the other half of that time. Its average speed is:',o:['5 m/s','4 m/s','4.5 m/s','5.25 m/s'],c:1,s:'Second half: equal times at 4.5 and 7.5 m/s, so its average = 6 m/s.\nEqual distances at 3 and 6 m/s: average = 2 × 3 × 6/(3 + 6) = 4 m/s.'},
+    {tp:'eq',q:'A uniformly accelerated body covers 20 m in the 2nd second and 40 m in the 4th second. The distance it covers in the 6th second is:',o:['50 m','70 m','60 m','80 m'],c:2,s:'sₙ = u + (a/2)(2n − 1): u + 1.5a = 20 and u + 3.5a = 40, so a = 10 m/s², u = 5 m/s.\ns₆ = 5 + 5.5 × 10 = 60 m.'},
+    {tp:'eq',q:'A bullet loses 1/20 of its speed in passing through one plank. How many such planks are needed to stop it (same resistance in each)?',o:['10','20','11','19'],c:2,s:'Each plank removes the same kinetic energy: u² − (19u/20)² = 39u²/400.\nPlanks needed = u² ÷ (39u²/400) = 400/39 ≈ 10.3, so 11 planks.'},
+    {tp:'grav',q:'A ball dropped from the top of a tower covers 9/25 of the tower\'s height in the last second. The height of the tower is (g = 10 m/s²):',o:['100 m','125 m','80 m','150 m'],c:1,s:'Total height ½gn²; last second ½g(2n − 1).\n(2n − 1) = (9/25)n², so 9n² − 50n + 25 = 0, n = 5 s (the other root, 5/9 s, is too short).\nHeight = ½ × 10 × 25 = 125 m.'},
+    {tp:'grav',q:'A ball is thrown up at 10 m/s from the top of a 40 m high tower. It hits the ground after (g = 10 m/s²):',o:['2 s','3 s','5 s','4 s'],c:3,s:'Take up as positive: −40 = 10t − 5t², so t² − 2t − 8 = 0, (t − 4)(t + 2) = 0, t = 4 s.'},
+    {tp:'graph',q:'The position-time graph of a particle is the parabola x = kt² (k > 0). The particle has:',o:['zero acceleration','uniform positive acceleration','uniform negative acceleration','acceleration that increases with time'],c:1,s:'v = 2kt and a = 2k: a constant, positive acceleration.'},
+    {tp:'graph',q:'The velocity of a particle is v = 4 − 2t (m/s). The distance it travels in the first 4 s is:',o:['0 m','4 m','16 m','8 m'],c:3,s:'v = 0 at t = 2 s, so it turns back.\n0 to 2 s: area = ½ × 2 × 4 = 4 m. 2 to 4 s: another 4 m backwards.\nDistance = 8 m (displacement = 0).'},
+    {tp:'rel',q:'Two cars 700 m apart move towards each other at 54 km/h and 72 km/h. They meet after:',o:['20 s','10 s','35 s','40 s'],c:0,s:'15 m/s and 20 m/s towards each other: relative speed = 35 m/s.\nt = 700/35 = 20 s.'},
+    {tp:'rel',q:'Two trains, each 50 m long, move in opposite directions at 10 m/s and 15 m/s. The time they take to cross each other is:',o:['2 s','4 s','10 s','5 s'],c:1,s:'Relative speed = 25 m/s; distance to clear = 50 + 50 = 100 m. t = 100/25 = 4 s.'},
+    {tp:'eq',q:'A car starts from rest, accelerates at 4 m/s² for 5 s and then slows down uniformly to rest in 10 s. Find the total distance in metres.',n:150,s:'After 5 s: v = 20 m/s, distance = ½ × 4 × 25 = 50 m.\nSlowing down: average speed 10 m/s for 10 s = 100 m.\nTotal = 150 m.'},
+    {tp:'grav',q:'A stone thrown straight up comes back to the thrower after 6 s. Find its maximum height in metres (g = 10 m/s²).',n:45,s:'Time up = 3 s, so u = g × 3 = 30 m/s.\nH = u²/2g = 900/20 = 45 m.'},
+    {tp:'kin',q:'The position of a particle is x = t³ − 6t² + 9t (x in m, t in s). Find the distance (not displacement) it travels in the first 3 s, in metres.',n:8,s:'v = 3t² − 12t + 9 = 3(t − 1)(t − 3): it turns back at t = 1 s.\nx(0) = 0, x(1) = 4, x(3) = 0.\nDistance = 4 + 4 = 8 m.'},
+    {tp:'rel',q:'Car A at 20 m/s is 100 m behind car B, which moves at 15 m/s in the same direction. After how many seconds does A catch B?',n:20,s:'Relative speed = 20 − 15 = 5 m/s. t = 100/5 = 20 s.'},
+    {tp:'graph',q:'A body\'s speed rises uniformly from 0 to 12 m/s in 4 s, stays at 12 m/s for 6 s, then falls uniformly to 0 in 2 s. Find the total displacement in metres.',n:108,s:'Area under the v-t graph: ½ × 4 × 12 + 6 × 12 + ½ × 2 × 12 = 24 + 72 + 12 = 108 m.'}
+  ],
+  neet:[
+    {tp:'kin',q:'A car covers the first half of a distance at 40 km/h and the second half at 60 km/h. Its average speed is:',o:['50 km/h','48 km/h','45 km/h','52 km/h'],c:1,s:'For equal distances: average = 2v₁v₂/(v₁ + v₂) = 2 × 40 × 60/100 = 48 km/h.'},
+    {tp:'kin',q:'A particle goes half way round a circle of radius r. Its displacement and distance are:',o:['2r and πr','πr and 2r','0 and 2πr','2r and 2πr'],c:0,s:'Displacement = diameter = 2r; distance = half the circumference = πr.'},
+    {tp:'kin',q:'Instantaneous velocity is given by the slope of the:',o:['velocity-time graph','acceleration-time graph','position-time graph','speed-distance graph'],c:2,s:'v = dx/dt: the slope of the position-time graph.'},
+    {tp:'kin',q:'x = 5 + 3t + 2t² (x in m, t in s). The velocity at t = 2 s is:',o:['7 m/s','11 m/s','15 m/s','19 m/s'],c:1,s:'v = dx/dt = 3 + 4t = 3 + 8 = 11 m/s.'},
+    {tp:'eq',q:'A body starts from rest with acceleration 4 m/s². Its speed after covering 50 m is:',o:['10 m/s','40 m/s','20 m/s','200 m/s'],c:2,s:'v² = 2as = 2 × 4 × 50 = 400, so v = 20 m/s.'},
+    {tp:'eq',q:'A car at 20 m/s brakes with a retardation of 5 m/s². Its stopping distance is:',o:['40 m','20 m','80 m','4 m'],c:0,s:'s = u²/2a = 400/10 = 40 m.'},
+    {tp:'eq',q:'With the same brakes, if a car\'s speed is doubled, its stopping distance becomes:',o:['the same','2 times','8 times','4 times'],c:3,s:'s = u²/2a, so the distance grows as u²: 2² = 4 times.'},
+    {tp:'eq',q:'A body starts from rest with acceleration 2 m/s². The distance it covers in the 5th second is:',o:['25 m','10 m','9 m','16 m'],c:2,s:'sₙ = (a/2)(2n − 1) = 1 × 9 = 9 m.'},
+    {tp:'eq',q:'A body with initial velocity 10 m/s and acceleration 2 m/s² covers, in 5 s:',o:['75 m','50 m','100 m','25 m'],c:0,s:'s = ut + ½at² = 50 + 25 = 75 m.'},
+    {tp:'grav',q:'At the highest point of a ball thrown straight up:',o:['v = 0 and a = 0','v = 0 and a = g downwards','v = g and a = 0','v and a are both maximum'],c:1,s:'The ball stops for an instant, but gravity still acts: a = g downwards.'},
+    {tp:'grav',q:'A stone is dropped from a height of 80 m. It reaches the ground after (g = 10 m/s²):',o:['8 s','16 s','2 s','4 s'],c:3,s:'h = ½gt²: 80 = 5t², t = 4 s.'},
+    {tp:'grav',q:'A ball thrown up at 20 m/s comes back to the hand after (g = 10 m/s²):',o:['2 s','4 s','1 s','8 s'],c:1,s:'Total time = 2u/g = 40/10 = 4 s.'},
+    {tp:'grav',q:'In free fall from rest, the distances covered in successive seconds are in the ratio:',o:['1 : 2 : 3','1 : 4 : 9','1 : 3 : 5','1 : 1 : 1'],c:2,s:'sₙ = (g/2)(2n − 1): g/2, 3g/2, 5g/2, so 1 : 3 : 5.'},
+    {tp:'grav',q:'Two balls are dropped from heights h and 4h. The ratio of their times of fall is:',o:['1 : 2','1 : 4','1 : 16','2 : 1'],c:0,s:'t = √(2h/g) ∝ √h: √1 : √4 = 1 : 2.'},
+    {tp:'graph',q:'The area under an acceleration-time graph gives:',o:['displacement','change in velocity','distance','jerk'],c:1,s:'∫a dt = change in velocity.'},
+    {tp:'graph',q:'A velocity-time graph that is a horizontal line above the time axis shows:',o:['uniform acceleration','a body at rest','uniform retardation','uniform velocity'],c:3,s:'v does not change, so a = 0: uniform velocity.'},
+    {tp:'graph',q:'For a body moving with uniform acceleration from rest, the position-time graph is:',o:['a straight line','a parabola','a hyperbola','a circle'],c:1,s:'x = ½at²: x is proportional to t², a parabola.'},
+    {tp:'rel',q:'Two cars move in the same direction at 60 km/h and 40 km/h. The velocity of the faster car relative to the slower one is:',o:['100 km/h','20 km/h','50 km/h','0'],c:1,s:'Same direction: v(AB) = 60 − 40 = 20 km/h.'},
+    {tp:'rel',q:'A man walks at 5 km/h towards the back of a train moving at 45 km/h. His velocity relative to the ground is:',o:['50 km/h forwards','45 km/h forwards','5 km/h backwards','40 km/h forwards'],c:3,s:'Velocity relative to the ground = 45 − 5 = 40 km/h in the train\'s direction.'},
+    {tp:'rel',q:'Rain falls vertically at 10 m/s and a cyclist rides at 10 m/s. To keep dry, the umbrella should be tilted:',o:['45° to the vertical, forwards','45° to the vertical, backwards','30° to the vertical, forwards','vertically'],c:0,s:'Rain relative to the cyclist: 10 m/s down and 10 m/s backwards, so it comes at tan θ = 1, θ = 45° from the front.\nTilt the umbrella forwards at 45°.'}
   ]}
 };
 })();
