@@ -3,7 +3,7 @@
    those exams. a = step-by-step answer; o = options and c = the correct one for MCQs; sim = the experiment to try it in.
    window.PhysicaMockBank = the timed mock tests (JEE Main and NEET pattern), separate from the practice questions so a
    student never meets a mock question beforehand. tp = topic (for the topic-wise report), o + c = MCQ, n = numerical
-   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line. */
+   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line, Motion in a Plane. */
 (() => {
 'use strict';
 window.PhysicaExam={
@@ -66,6 +66,33 @@ window.PhysicaExam={
   {t:'neet',q:'A stone is dropped from rest. The distance it falls in the first 2 s is (g = 10 m/s²):',o:['20 m','10 m','40 m','5 m'],c:0,a:'s = ½gt² = ½ × 10 × 4 = 20 m.'},
   {t:'neet',sim:'rain-umbrella',q:'Rain falls vertically at 30 m/s. A man runs east at 10 m/s. He should hold his umbrella:',o:['vertically','at tan⁻¹(1/3) to the vertical, towards the east','at tan⁻¹(3) to the vertical, towards the east','at tan⁻¹(1/3) to the vertical, towards the west'],c:1,a:'Rain relative to the man = rain − man: 30 m/s down and 10 m/s towards the west.\nIt comes at tan θ = 10/30 = 1/3 to the vertical, from the east, so the umbrella is tilted forward (towards the east).'},
   {t:'neet',sim:'kinematics',q:'A position-time graph that is a straight line parallel to the time axis means the body is:',o:['moving with uniform velocity','accelerating','at rest','moving with uniform speed in a circle'],c:2,a:'The position does not change with time, so the velocity is zero: the body is at rest.'}
+],
+'Motion in a Plane':[
+  {t:'1',sim:'projectile',q:'What is the angle between the velocity and the acceleration at the highest point of a projectile\'s path?',a:'90°. The velocity is horizontal there and the acceleration (g) is vertically downwards.'},
+  {t:'1',sim:'vector-addition',q:'Is the resultant of two vectors always bigger than each of them? Explain.',a:'No. Two equal and opposite vectors give a zero resultant; in general the resultant lies between |A − B| and A + B.'},
+  {t:'1',sim:'circular-motion',q:'What is the direction of the acceleration in uniform circular motion?',a:'Towards the centre of the circle (centripetal acceleration).'},
+  {t:'1',sim:'projectile',q:'At what angle of projection is the horizontal range maximum (no air resistance)?',a:'45°, because R = u² sin 2θ / g is largest when sin 2θ = 1.'},
+  {t:'1',q:'Can the sum of two unit vectors be a unit vector?',a:'Yes, when the angle between them is 120°: R² = 1 + 1 + 2cos 120° = 1.'},
+  {t:'3',sim:'projectile',q:'Show that the path of a projectile is a parabola.',a:'x = (u cos θ)t and y = (u sin θ)t − ½gt².\nPut t = x/(u cos θ): y = x tan θ − gx²/(2u² cos² θ).\nThis has the form y = ax − bx², a parabola.'},
+  {t:'3',sim:'projectile',q:'For a projectile thrown at speed u and angle θ, derive the time of flight, the maximum height and the horizontal range.',a:'Vertical: u sin θ upwards, acceleration −g.\nTime of flight: y = 0 again when T = 2u sin θ / g.\nMaximum height (vertical velocity 0): H = u² sin² θ / 2g.\nRange: R = (u cos θ) × T = u² sin 2θ / g.'},
+  {t:'3',sim:'vector-addition',q:'Forces of 3 N and 4 N act on a body at right angles. Find the magnitude and direction of the resultant.',a:'R = √(3² + 4²) = 5 N.\nDirection: tan α = 4/3, so α ≈ 53° from the 3 N force.'},
+  {t:'3',sim:'projectile',q:'Show that the horizontal ranges for angles θ and (90° − θ) are equal.',a:'R(θ) = u² sin 2θ / g.\nR(90° − θ) = u² sin(180° − 2θ) / g = u² sin 2θ / g.\nSo the two ranges are equal (for example 30° and 60°).'},
+  {t:'3',sim:'circular-motion',q:'A stone tied to a 0.5 m string is whirled in a horizontal circle at 2 revolutions per second. Find its angular speed, speed and centripetal acceleration.',a:'ω = 2π × 2 = 4π ≈ 12.6 rad/s.\nv = ωr = 4π × 0.5 = 2π ≈ 6.3 m/s.\na = ω²r = 16π² × 0.5 = 8π² ≈ 79 m/s², towards the centre.'},
+  {t:'3',sim:'river-crossing',q:'A river 400 m wide flows at 3 m/s. A boat moves at 5 m/s relative to the water. Find (a) the shortest crossing time and the drift (b) the time to cross straight across.',a:'(a) Head straight across: t = 400/5 = 80 s; drift = 3 × 80 = 240 m downstream.\n(b) Head upstream so the drift cancels: sin α = 3/5, across speed = √(5² − 3²) = 4 m/s, t = 400/4 = 100 s.'},
+  {t:'5',sim:'circular-motion',q:'Derive the expression for the centripetal acceleration of a body in uniform circular motion.',a:'In a small time Δt the radius turns through Δθ, and the velocity (always perpendicular to the radius) turns through the same Δθ.\nThe change in velocity: |Δv| = v Δθ, directed towards the centre.\nThe arc covered: v Δt = r Δθ, so Δt = r Δθ / v.\na = |Δv| / Δt = v Δθ × v / (r Δθ) = v²/r = ω²r, directed towards the centre.'},
+  {t:'5',sim:'horizontal-launch',q:'A ball is thrown horizontally at 20 m/s from the top of a 45 m high cliff (g = 10 m/s²). Find the time of flight, the horizontal distance and the velocity on landing.',a:'Vertical: 45 = ½ × 10 × t², so t = 3 s.\nHorizontal distance = 20 × 3 = 60 m.\nOn landing: vx = 20 m/s, vy = gt = 30 m/s.\nv = √(400 + 900) ≈ 36 m/s, at tan⁻¹(30/20) ≈ 56° below the horizontal.'},
+  {t:'5',sim:'vector-addition',q:'State the parallelogram law of vector addition and find the magnitude and direction of the resultant.',a:'If two vectors A and B are the adjacent sides of a parallelogram from one point, the diagonal from that point is their resultant R.\nWith angle θ between them, drop a perpendicular from the far corner:\nR² = (A + B cos θ)² + (B sin θ)², so R = √(A² + B² + 2AB cos θ).\nDirection from A: tan α = B sin θ / (A + B cos θ).'},
+  {t:'jee',sim:'projectile',q:'The horizontal range of a projectile is four times its maximum height. The angle of projection is:',o:['30°','45°','60°','tan⁻¹ 2'],c:1,a:'R/H = (u² sin 2θ / g) / (u² sin² θ / 2g) = 4 cot θ.\nR = 4H gives cot θ = 1, so θ = 45°.'},
+  {t:'jee',sim:'projectile-incline',q:'A particle is projected at speed u, at angle θ to the horizontal, up an incline of angle α. For what θ is the range along the incline maximum?',a:'Range up the incline: R = 2u² cos θ sin(θ − α) / (g cos² α).\n2 cos θ sin(θ − α) = sin(2θ − α) − sin α, largest when 2θ − α = 90°.\nSo θ = 45° + α/2, and R(max) = u² / [g(1 + sin α)].'},
+  {t:'jee',q:'If |A + B| = |A − B|, the angle between A and B is:',o:['0°','60°','90°','180°'],c:2,a:'Square both sides: A² + B² + 2A·B = A² + B² − 2A·B, so A·B = 0 and the vectors are perpendicular.'},
+  {t:'jee',sim:'rain-umbrella',q:'A man walking at 3 km/h finds the rain falling vertically. When he walks at 6 km/h, the rain seems to fall at 45° to the vertical. Find the actual velocity of the rain.',a:'Let the rain be (a, −b), with a along his walk.\nAt 3 km/h the relative velocity (a − 3, −b) is vertical, so a = 3.\nAt 6 km/h it is (−3, −b) at 45°, so b = 3.\nRain speed = √(3² + 3²) = 3√2 km/h, at 45° to the vertical, moving in his direction of walking.'},
+  {t:'jee',sim:'conical-pendulum',q:'A conical pendulum has string length L and makes angle θ with the vertical. Find its time period.',a:'T cos θ = mg and T sin θ = mω²r, with r = L sin θ.\nDivide: tan θ = ω² L sin θ / g, so ω² = g / (L cos θ).\nPeriod = 2π/ω = 2π√(L cos θ / g).'},
+  {t:'neet',sim:'projectile',q:'During projectile motion (no air resistance), which quantity stays constant?',o:['vertical velocity','horizontal velocity','speed','kinetic energy'],c:1,a:'There is no horizontal force, so the horizontal velocity u cos θ never changes.'},
+  {t:'neet',sim:'projectile',q:'The maximum horizontal range of a projectile thrown at 20 m/s is (g = 10 m/s²):',o:['20 m','40 m','80 m','10 m'],c:1,a:'R(max) = u²/g = 400/10 = 40 m (at 45°).'},
+  {t:'neet',q:'The angle between A = î + ĵ and B = î − ĵ is:',o:['45°','0°','90°','180°'],c:2,a:'A·B = 1 − 1 = 0, so they are perpendicular.'},
+  {t:'neet',sim:'circular-motion',q:'In uniform circular motion:',o:['speed and velocity are both constant','speed is constant but velocity changes','velocity is constant but speed changes','acceleration is zero'],c:1,a:'The size of the velocity stays the same but its direction keeps turning, so there is an acceleration.'},
+  {t:'neet',q:'The unit vector along 3î + 4ĵ is:',o:['3î + 4ĵ','(3î + 4ĵ)/7','(3î + 4ĵ)/5','(3î + 4ĵ)/25'],c:2,a:'|3î + 4ĵ| = 5, so the unit vector is (3î + 4ĵ)/5.'},
+  {t:'neet',sim:'river-crossing',q:'A boat heads straight across a 1 km wide river at 5 km/h; the river flows at 3 km/h. The time to cross is:',o:['12 min','15 min','20 min','10 min'],c:0,a:'Only the across-component matters: t = 1/5 h = 12 min. (The current only carries it downstream.)'}
 ]};
 
 window.PhysicaMockBank={
@@ -150,6 +177,47 @@ window.PhysicaMockBank={
     {tp:'rel',q:'Two cars move in the same direction at 60 km/h and 40 km/h. The velocity of the faster car relative to the slower one is:',o:['100 km/h','20 km/h','50 km/h','0'],c:1,s:'Same direction: v(AB) = 60 − 40 = 20 km/h.'},
     {tp:'rel',q:'A man walks at 5 km/h towards the back of a train moving at 45 km/h. His velocity relative to the ground is:',o:['50 km/h forwards','45 km/h forwards','5 km/h backwards','40 km/h forwards'],c:3,s:'Velocity relative to the ground = 45 − 5 = 40 km/h in the train\'s direction.'},
     {tp:'rel',q:'Rain falls vertically at 10 m/s and a cyclist rides at 10 m/s. To keep dry, the umbrella should be tilted:',o:['45° to the vertical, forwards','45° to the vertical, backwards','30° to the vertical, forwards','vertically'],c:0,s:'Rain relative to the cyclist: 10 m/s down and 10 m/s backwards, so it comes at tan θ = 1, θ = 45° from the front.\nTilt the umbrella forwards at 45°.'}
+  ]},
+'Motion in a Plane':{
+  topics:{vec:'Vectors',proj:'Projectile motion',circ:'Circular motion',rel:'Relative velocity in a plane'},
+  jee:[
+    {tp:'vec',q:'If |A × B| = A·B, the angle between A and B is:',o:['30°','45°','60°','90°'],c:1,s:'AB sin θ = AB cos θ, so tan θ = 1 and θ = 45°.'},
+    {tp:'vec',q:'Two forces of equal size F have a resultant of size F. The angle between them is:',o:['60°','90°','150°','120°'],c:3,s:'R² = F² + F² + 2F² cos θ = F², so cos θ = −½ and θ = 120°.'},
+    {tp:'proj',q:'Two balls are projected at 30° and 60° with the same speed. The ratio of their maximum heights is:',o:['1 : √3','1 : 3','1 : 2','3 : 1'],c:1,s:'H ∝ sin² θ: sin² 30° : sin² 60° = ¼ : ¾ = 1 : 3.'},
+    {tp:'proj',q:'The path of a projectile is y = √3 x − 5x² (SI units, g = 10 m/s²). Its angle and speed of projection are:',o:['30° and 2 m/s','60° and 1 m/s','60° and 2 m/s','45° and √2 m/s'],c:2,s:'Compare with y = x tan θ − gx²/(2u² cos² θ): tan θ = √3, so θ = 60°.\n10/(2u² cos² θ) = 5 gives u cos θ = 1, so u = 1/cos 60° = 2 m/s.'},
+    {tp:'proj',q:'At the highest point, the speed of a projectile is half its speed of projection. The angle of projection is:',o:['30°','45°','60°','75°'],c:2,s:'At the top only u cos θ remains: u cos θ = u/2, so θ = 60°.'},
+    {tp:'proj',q:'From the top of a tower one ball is thrown horizontally and another is dropped at the same moment. Which reaches the ground first?',o:['the dropped ball','the thrown ball','both together','it depends on the throwing speed'],c:2,s:'Both start with zero vertical velocity and have the same vertical acceleration g, so they land together.'},
+    {tp:'circ',q:'A particle moves on a circle of radius 2 m. At one instant its speed is 4 m/s and its speed increases at 6 m/s². Its total acceleration then is:',o:['8 m/s²','6 m/s²','14 m/s²','10 m/s²'],c:3,s:'Centripetal = v²/r = 16/2 = 8 m/s²; tangential = 6 m/s², at right angles.\nTotal = √(64 + 36) = 10 m/s².'},
+    {tp:'circ',q:'A particle moves on a circle at constant speed v. The change in its velocity over half a revolution has magnitude:',o:['0','v','√2 v','2v'],c:3,s:'After half a revolution the velocity is reversed: |v − (−v)| = 2v.'},
+    {tp:'rel',q:'A boat moves at 5 km/h in still water. The river is 1 km wide and flows at 4 km/h. The time to cross along the shortest path is:',o:['12 min','15 min','20 min','25 min'],c:2,s:'For the shortest path the resultant goes straight across: √(5² − 4²) = 3 km/h.\nt = 1/3 h = 20 min.'},
+    {tp:'rel',q:'A moves east at 10 m/s and B moves north at 10 m/s. The velocity of B relative to A is:',o:['10√2 m/s, north-east','10√2 m/s, north-west','20 m/s, north','zero'],c:1,s:'v(BA) = v(B) − v(A) = 10 north + 10 west, so 10√2 m/s towards the north-west.'},
+    {tp:'proj',q:'A ball is projected at 20 m/s at 30° above the horizontal. Find its time of flight in seconds (g = 10 m/s²).',n:2,s:'T = 2u sin θ / g = 2 × 20 × 0.5 / 10 = 2 s.'},
+    {tp:'proj',q:'A stone is thrown horizontally at 15 m/s from a height of 80 m. How far from the foot of the tower does it land, in metres (g = 10 m/s²)?',n:60,s:'80 = 5t², so t = 4 s. Distance = 15 × 4 = 60 m.'},
+    {tp:'circ',q:'A car goes round a circular track of radius 100 m at 72 km/h. Find its centripetal acceleration in m/s².',n:4,s:'72 km/h = 20 m/s. a = v²/r = 400/100 = 4 m/s².'},
+    {tp:'vec',q:'|A| = 3, |B| = 4 and |A + B| = √37. Find A·B.',n:6,s:'|A + B|² = A² + B² + 2A·B: 37 = 9 + 16 + 2A·B, so A·B = 6.'},
+    {tp:'proj',q:'A projectile reaches a maximum height of 20 m and has a range of 80 m. Find the angle of projection in degrees.',n:45,s:'R/H = 4 cot θ: 80/20 = 4 cot θ, so cot θ = 1 and θ = 45°.'}
+  ],
+  neet:[
+    {tp:'vec',q:'Which of these is a vector quantity?',o:['speed','distance','displacement','mass'],c:2,s:'Displacement has both size and direction.'},
+    {tp:'vec',q:'The magnitude of 3î − 4ĵ is:',o:['1','5','7','25'],c:1,s:'√(3² + 4²) = 5.'},
+    {tp:'vec',q:'Forces of 6 N and 8 N act on a body. Their resultant can NOT be:',o:['2 N','10 N','14 N','1 N'],c:3,s:'The resultant lies between 8 − 6 = 2 N and 8 + 6 = 14 N.'},
+    {tp:'vec',q:'If A·B = 0 (both non-zero), then A and B are:',o:['parallel','anti-parallel','perpendicular','equal'],c:2,s:'AB cos θ = 0 means θ = 90°.'},
+    {tp:'vec',q:'The angle between î + ĵ and î is:',o:['0°','45°','60°','90°'],c:1,s:'cos θ = 1/√2, so θ = 45°.'},
+    {tp:'proj',q:'At the highest point of a projectile\'s path, which is zero?',o:['the horizontal velocity','the vertical velocity','the acceleration','the speed'],c:1,s:'Only the vertical velocity becomes zero; the horizontal velocity and g remain.'},
+    {tp:'proj',q:'For a given speed, the horizontal range is maximum at an angle of:',o:['30°','60°','45°','90°'],c:2,s:'R = u² sin 2θ / g is largest when 2θ = 90°.'},
+    {tp:'proj',q:'A ball is thrown at 20 m/s at 30° to the horizontal. Its maximum height is (g = 10 m/s²):',o:['5 m','10 m','20 m','2.5 m'],c:0,s:'H = u² sin² θ / 2g = 400 × ¼ / 20 = 5 m.'},
+    {tp:'proj',q:'A ball is thrown at 10 m/s at 30° to the horizontal. Its time of flight is (g = 10 m/s²):',o:['2 s','0.5 s','1.5 s','1 s'],c:3,s:'T = 2u sin θ / g = 2 × 10 × 0.5 / 10 = 1 s.'},
+    {tp:'proj',q:'For the same speed, the range at angle θ equals the range at:',o:['90° − θ','90° + θ','2θ','180° − θ'],c:0,s:'sin 2θ = sin(180° − 2θ) = sin 2(90° − θ).'},
+    {tp:'proj',q:'A ball is thrown horizontally from a height of 20 m. It reaches the ground after (g = 10 m/s²):',o:['1 s','4 s','2 s','√2 s'],c:2,s:'20 = 5t², t = 2 s (the horizontal speed does not matter).'},
+    {tp:'proj',q:'The path of a projectile (no air resistance) is a:',o:['straight line','circle','hyperbola','parabola'],c:3,s:'y = x tan θ − gx²/(2u² cos² θ) is a parabola.'},
+    {tp:'circ',q:'In uniform circular motion, which stays constant?',o:['velocity','speed','acceleration','displacement'],c:1,s:'Only the speed; the directions of the velocity and acceleration keep changing.'},
+    {tp:'circ',q:'A body moves at 10 m/s on a circle of radius 5 m. Its centripetal acceleration is:',o:['2 m/s²','50 m/s²','20 m/s²','10 m/s²'],c:2,s:'a = v²/r = 100/5 = 20 m/s².'},
+    {tp:'circ',q:'The angular speed of the seconds hand of a clock is:',o:['π/30 rad/s','π/60 rad/s','2π rad/s','π rad/s'],c:0,s:'One turn (2π) in 60 s: ω = 2π/60 = π/30 rad/s.'},
+    {tp:'circ',q:'The work done by the centripetal force in uniform circular motion is:',o:['positive','negative','mv²','zero'],c:3,s:'The force is always perpendicular to the displacement, so W = 0.'},
+    {tp:'circ',q:'If the speed on a circle of fixed radius is doubled, the centripetal acceleration becomes:',o:['2 times','4 times','half','the same'],c:1,s:'a = v²/r, so doubling v gives 4 times a.'},
+    {tp:'rel',q:'A boat moving at 4 m/s heads straight across a river flowing at 3 m/s. Its speed relative to the bank is:',o:['7 m/s','1 m/s','5 m/s','3.5 m/s'],c:2,s:'√(4² + 3²) = 5 m/s.'},
+    {tp:'rel',q:'The same boat (4 m/s, heading straight across) crosses a 100 m wide river in:',o:['20 s','25 s','33 s','100 s'],c:1,s:'Only the across speed counts: t = 100/4 = 25 s.'},
+    {tp:'rel',q:'Rain falls vertically at 10√3 m/s and a man walks at 10 m/s. He should tilt his umbrella forwards at:',o:['60° to the vertical','45° to the vertical','90° to the vertical','30° to the vertical'],c:3,s:'tan θ = 10 / (10√3) = 1/√3, so θ = 30° to the vertical.'}
   ]}
 };
 })();
