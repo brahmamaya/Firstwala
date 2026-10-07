@@ -160,6 +160,8 @@ Exam practice (Student mode, inside the AI Tutor - nothing new in Normal mode):
 - To add a chapter: add its practice to PhysicaExam and its mock to PhysicaMockBank - the tab and tests appear by themselves.
 
 Still to do / ideas:
+- Every physics chapter's JEE and NEET mock has 45 questions (JEE 36 MCQ + 9 numerical, 108 min; NEET 45 MCQ, 45 min),
+  each with at least 5 diagram questions. Diagrams are data ({w,h,alt,d:[items]}) drawn by PhysicaFig in tutor-mock.js.
 - Exam + mock tests are done for all 28 physics chapters (Class 11 and 12). Board questions follow the current CBSE
   syllabus (radioactivity, logic gates and special diodes are only in the JEE/NEET sets). Next ideas: exam-date study
   plan inside the tutor; a visible "install for offline" button; full-syllabus mock tests mixing chapters.
