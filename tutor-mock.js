@@ -7,7 +7,8 @@
 (() => {
 'use strict';
 const LIVE='physica-mock-live',SAVED='physica-mock',PAT={jee:{name:'JEE Main',per:2.4},neet:{name:'NEET',per:1}};
-const bank=(ch,k)=>window.PhysicaMockBank?.[ch]?.[k];
+// JEE papers put the MCQs (section A) before the numerical questions (section B)
+const bank=(ch,k)=>{const q=window.PhysicaMockBank?.[ch]?.[k];return q&&(k==='jee'?[...q.filter(x=>x.o),...q.filter(x=>!x.o)]:q)};
 const get=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const put=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
@@ -16,6 +17,27 @@ const mins=(k,n)=>Math.round(n*PAT[k].per);
 const mmss=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};
 // options appear in a fresh order in every attempt, so an answer key cannot be learnt by position
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+// Diagrams are small drawings kept as data: {w,h,alt,d:[item...]} with items
+//   ['l',x1,y1,x2,y2,opt] line   ['p',pathData,opt] path   ['c',cx,cy,r,opt] circle   ['r',x,y,w,h,opt] box
+//   ['t',x,y,text,opt] label.   opt letters: d dashed, a arrow at the end, b arrows at both ends, f light fill,
+//   F solid fill, B thick, m centred text, e right-aligned text, s small text. Drawn with DOM calls (no HTML strings).
+const SVG='http://www.w3.org/2000/svg',num=v=>typeof v==='number'&&isFinite(v),PATH=/^[MLHVCSQTAZmlhvcsqtaz0-9.,\s-]+$/;let figN=0;
+function fig(f){if(!f||!Array.isArray(f.d))return null;
+  const mk=(t,o)=>{const e=document.createElementNS(SVG,t);for(const k in o)e.setAttribute(k,o[k]);return e},w=num(f.w)?f.w:240,h=num(f.h)?f.h:140,id='pf'+(++figN);
+  const s=mk('svg',{viewBox:`0 0 ${w} ${h}`,class:'fig',role:'img','aria-label':String(f.alt||'Diagram')}),defs=mk('defs',{}),m=mk('marker',{id,viewBox:'0 0 10 10',refX:'9',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto-start-reverse'});
+  m.append(mk('path',{d:'M0 0L10 5L0 10z',fill:'currentColor',stroke:'none'}));defs.append(m);s.append(defs);
+  for(const it of f.d){if(!Array.isArray(it))continue;const [t,...a]=it,n={l:4,c:3,r:4,t:2,p:0}[t];if(n===undefined||!a.slice(0,n).every(num))continue;
+    const opt=String(a[t==='p'?1:t==='t'?3:n]||''),st={stroke:'currentColor',fill:opt.includes('F')?'currentColor':opt.includes('f')?'currentColor':'none','stroke-width':opt.includes('B')?'2.6':'1.6','stroke-linecap':'round','stroke-linejoin':'round'};
+    if(opt.includes('f'))st['fill-opacity']='.16';if(opt.includes('d'))st['stroke-dasharray']='5 4';if(opt.includes('a')||opt.includes('b'))st['marker-end']=`url(#${id})`;if(opt.includes('b'))st['marker-start']=`url(#${id})`;
+    let e;
+    if(t==='l')e=mk('line',{x1:a[0],y1:a[1],x2:a[2],y2:a[3],...st});
+    else if(t==='c')e=mk('circle',{cx:a[0],cy:a[1],r:a[2],...st});
+    else if(t==='r')e=mk('rect',{x:a[0],y:a[1],width:a[2],height:a[3],...st});
+    else if(t==='p'){if(typeof a[0]!=='string'||!PATH.test(a[0]))continue;e=mk('path',{d:a[0],...st})}
+    else{e=mk('text',{x:a[0],y:a[1],fill:'currentColor',stroke:'none','font-size':opt.includes('s')?'10':'12','text-anchor':opt.includes('m')?'middle':opt.includes('e')?'end':'start'});e.textContent=String(a[2]??'')}
+    s.append(e)}
+  return s}
+window.PhysicaFig=fig;
 let box=null,tick=0;
 
 // the test covers the whole tab; keys typed in it never reach the experiment's shortcuts
@@ -44,7 +66,7 @@ function test(){const S=get(LIVE,null),set=S&&bank(S.ch,S.k);if(!set||!Array.isA
     btn('mock-go','Yes, submit',()=>submit(S)),btn('mock-nav','Back to the test',()=>{ask.hidden=true}));ask.hidden=false}));
   const paint=()=>{pal.replaceChildren();set.forEach((_,j)=>{const x=btn('mock-pn'+(S.ans[j]!=null?' done':'')+(j===S.cur?' cur':''),String(j+1),()=>show(j));x.setAttribute('aria-label',`${'Question'} ${j+1}${S.ans[j]!=null?' ✓':''}`);pal.append(x)})};
   const show=i=>{S.cur=i;save();const q=set[i];main.replaceChildren();
-    main.append(el('p','mock-num',`${'Question'} ${i+1} / ${set.length}${S.k==='jee'?` · ${q.o?'Section A · MCQ':'Section B · Numerical'}`:''}`),el('p','mock-text',q.q));
+    main.append(el('p','mock-num',`${'Question'} ${i+1} / ${set.length}${S.k==='jee'?` · ${q.o?'Section A · MCQ':'Section B · Numerical'}`:''}`),el('p','mock-text',q.q));{const g=fig(q.fig);if(g)main.append(g)}
     if(q.o){const opts=el('div','mock-opts');(S.order?.[i]||q.o.map((_,j)=>j)).forEach((j,pos)=>{const x=btn('mock-opt',`(${pos+1}) ${q.o[j]}`,()=>{S.ans[i]=j;save();show(i)});x.setAttribute('aria-pressed',String(S.ans[i]===j));opts.append(x)});main.append(opts)}
     else{const inp=el('input','mock-in');inp.inputMode='decimal';inp.placeholder='Type your answer (a number)';inp.setAttribute('aria-label',inp.placeholder);inp.value=S.ans[i]??'';
       inp.addEventListener('input',()=>{inp.value=inp.value.replace(/[^0-9.\-]/g,'');const v=inp.value;S.ans[i]=v===''?null:v;save();paint()});main.append(inp)}
@@ -59,12 +81,15 @@ function submit(S){clearInterval(tick);const set=bank(S.ch,S.k);put(LIVE,null);i
   const r={ch:S.ch,k:S.k,name:S.name,at:Date.now(),used:Math.min(Date.now(),S.end)-S.start,ans:S.ans,res};
   put(SAVED,[r,...get(SAVED,[])].slice(0,20));report(r)}
 
-function report(r){const set=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch]?.topics||{};if(!set)return;
+function report(r){const now=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch]?.topics||{};if(!now)return;
+  // a report from before the question set grew keeps its score; its question-by-question part cannot be rebuilt
+  const same=now.length===r.res.length,set=same?now:r.res.map(()=>({}));
   const b=shell();b.dataset.k=r.k;const p=el('div','mock-paper mock-report'),n=x=>r.res.filter(y=>y===x).length,c=n('c'),w=n('w'),s=n('s');
   p.append(el('p','mock-brand',`Physica · ${'Mock test report'}`),el('h2','',r.name),
     el('p','mock-sub',`${PAT[r.k].name} ${'mock'} · ${r.ch} · ${new Date(r.at).toLocaleString()} · ${'Time taken'} ${mmss(r.used)}`));
   const stats=el('div','mock-stats');
   for(const [t,v] of [['Score',`${4*c-w} / ${4*set.length}`],['Correct',c],['Wrong',w],['Skipped',s],['Accuracy',c+w?`${Math.round(100*c/(c+w))}%`:'-']]){const d=el('div','');d.append(el('b','',String(v)),el('span','',t));stats.append(d)}
+  if(!same){p.append(stats,el('p','mock-weak','This test was taken with an earlier, shorter question set, so the topic-wise table and question review are not available.'));const row=el('div','mock-row mock-noprint');row.append(btn('mock-nav','Close',close));p.append(row);b.append(p);return}
   // topic-wise: marks per topic, and the topics below half marks to revise
   const tab=el('table','mock-table'),hr=el('tr'),weak=[];
   for(const h of ['Topic','Correct','Wrong','Skipped','Marks'])hr.append(el('th','',h));tab.append(hr);
@@ -76,7 +101,7 @@ function report(r){const set=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch
     el('h3','','Question review'));
   const fmt=(q,a)=>a==null||a===''?'not answered':q.o?q.o[a]:String(a);
   set.forEach((q,i)=>{const res=r.res[i],d=el('div','mock-rv '+res);
-    d.append(el('p','mock-text',`${i+1}. ${res==='c'?'✓':res==='w'?'✗':'–'} ${q.q}`),el('p','',`${'Your answer'}: ${fmt(q,r.ans[i])} · ${'Correct'}: ${fmt(q,q.o?q.c:q.n)}`),el('p','mock-sol',q.s));p.append(d)});
+    d.append(el('p','mock-text',`${i+1}. ${res==='c'?'✓':res==='w'?'✗':'–'} ${q.q}`),...[fig(q.fig)].filter(Boolean),el('p','',`${'Your answer'}: ${fmt(q,r.ans[i])} · ${'Correct'}: ${fmt(q,q.o?q.c:q.n)}`),el('p','mock-sol',q.s));p.append(d)});
   const row=el('div','mock-row mock-noprint');
   row.append(btn('mock-go','⬇ '+'Download PDF',()=>{const t=document.title;document.title=`Physica ${PAT[r.k].name} report - ${r.name} - ${r.ch}`;addEventListener('afterprint',()=>{document.title=t},{once:true});window.print()}),btn('mock-nav','Close',close));
   p.append(row);b.append(p)}
