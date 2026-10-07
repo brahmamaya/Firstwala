@@ -13,6 +13,8 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';b.addEventListener('click',f);return b};
 const mins=(k,n)=>Math.round(n*PAT[k].per);
 const mmss=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};
+// options appear in a fresh order in every attempt, so an answer key cannot be learnt by position
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 let box=null,tick=0;
 
 // the test covers the whole tab; keys typed in it never reach the experiment's shortcuts
@@ -28,7 +30,7 @@ function intro(ch,k){const set=bank(ch,k);if(!set)return;const b=shell();b.datas
     'The test submits itself when the time is up. You can also submit earlier.'])rules.append(el('li','',t));
   const name=el('input','mock-name');name.maxLength=40;name.autocomplete='name';name.value=get('physica-learner',{}).name||'';name.placeholder='Your name';name.setAttribute('aria-label',name.placeholder);
   const start=()=>{const nm=name.value.trim();if(!nm){name.classList.add('need');name.focus();return}const pr=get('physica-learner',{});pr.name=nm;put('physica-learner',pr);
-    const now=Date.now();put(LIVE,{ch,k,name:nm,start:now,end:now+mins(k,n)*60000,ans:Array(n).fill(null),cur:0});test()};
+    const now=Date.now();put(LIVE,{ch,k,name:nm,start:now,end:now+mins(k,n)*60000,ans:Array(n).fill(null),cur:0,order:set.map(q=>q.o&&shuffle(q.o.map((_,j)=>j)))});test()};
   name.addEventListener('keydown',e=>{if(e.key==='Enter')start()});
   const row=el('div','mock-row');row.append(btn('mock-go','Start test',start),btn('mock-nav','Cancel',close));
   p.append(el('h2','',`${PAT[k].name} ${'mock test'}`),el('p','mock-sub',ch),rules,el('label','mock-lbl','Your name (printed on the report)'),name,row);b.append(p);name.focus()}
@@ -42,7 +44,7 @@ function test(){const S=get(LIVE,null),set=S&&bank(S.ch,S.k);if(!set||!Array.isA
   const paint=()=>{pal.replaceChildren();set.forEach((_,j)=>{const x=btn('mock-pn'+(S.ans[j]!=null?' done':'')+(j===S.cur?' cur':''),String(j+1),()=>show(j));x.setAttribute('aria-label',`${'Question'} ${j+1}${S.ans[j]!=null?' ✓':''}`);pal.append(x)})};
   const show=i=>{S.cur=i;save();const q=set[i];main.replaceChildren();
     main.append(el('p','mock-num',`${'Question'} ${i+1} / ${set.length}${S.k==='jee'?` · ${q.o?'Section A · MCQ':'Section B · Numerical'}`:''}`),el('p','mock-text',q.q));
-    if(q.o){const opts=el('div','mock-opts');q.o.forEach((o,j)=>{const x=btn('mock-opt',`(${j+1}) ${o}`,()=>{S.ans[i]=j;save();show(i)});x.setAttribute('aria-pressed',String(S.ans[i]===j));opts.append(x)});main.append(opts)}
+    if(q.o){const opts=el('div','mock-opts');(S.order?.[i]||q.o.map((_,j)=>j)).forEach((j,pos)=>{const x=btn('mock-opt',`(${pos+1}) ${q.o[j]}`,()=>{S.ans[i]=j;save();show(i)});x.setAttribute('aria-pressed',String(S.ans[i]===j));opts.append(x)});main.append(opts)}
     else{const inp=el('input','mock-in');inp.inputMode='decimal';inp.placeholder='Type your answer (a number)';inp.setAttribute('aria-label',inp.placeholder);inp.value=S.ans[i]??'';
       inp.addEventListener('input',()=>{inp.value=inp.value.replace(/[^0-9.\-]/g,'');const v=inp.value;S.ans[i]=v===''?null:v;save();paint()});main.append(inp)}
     if(S.ans[i]!=null)main.append(btn('mock-clear','Clear answer',()=>{S.ans[i]=null;save();show(i)}));
@@ -71,7 +73,7 @@ function report(r){const set=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch
   p.append(stats,el('h3','','Topic-wise performance'),tab,
     el('p','mock-weak',weak.length?`Revise: ${weak.join(', ')}`:'Well done - no weak topic in this test.'),
     el('h3','','Question review'));
-  const fmt=(q,a)=>a==null||a===''?'not answered':q.o?`(${a+1}) ${q.o[a]}`:String(a);
+  const fmt=(q,a)=>a==null||a===''?'not answered':q.o?q.o[a]:String(a);
   set.forEach((q,i)=>{const res=r.res[i],d=el('div','mock-rv '+res);
     d.append(el('p','mock-text',`${i+1}. ${res==='c'?'✓':res==='w'?'✗':'–'} ${q.q}`),el('p','',`${'Your answer'}: ${fmt(q,r.ans[i])} · ${'Correct'}: ${fmt(q,q.o?q.c:q.n)}`),el('p','mock-sol',q.s));p.append(d)});
   const row=el('div','mock-row mock-noprint');

@@ -153,14 +153,14 @@ Exam practice (Student mode, inside the AI Tutor - nothing new in Normal mode):
 - The "🎯 Exam" tab has Board / JEE / NEET kept apart; it appears only for chapters with questions (now: Units and
   Measurements). Practice progress is saved under physica-exam.
 - tutor-mock.js runs a mock: name -> full-tab paper with timer (JEE 2.4 min, NEET 1 min per question, +4/-1), no hints,
-  auto-submit at 0, early submit allowed, result only after submit. Report = score, topic-wise table, weak topics,
+  auto-submit at 0, early submit allowed, result only after submit. MCQ options are shuffled in every attempt. Report = score, topic-wise table, weak topics,
   every question with solution; "Download PDF" prints only the report. Last 20 reports under physica-mock; a running
   test is kept under physica-mock-live and resumes after a reload.
 - To add a chapter: add its practice to PhysicaExam and its mock to PhysicaMockBank - the tab and tests appear by themselves.
 
 Still to do / ideas:
 - Exam-date study plan inside the tutor; a visible "install for offline" button (install.js exists).
-- Exam + mock tests for the remaining chapters, one by one (done: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion, Work, Energy and Power; next: the rest of Class 11 in NCERT order).
+- Exam + mock tests for the remaining chapters, one by one (done: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion, Work, Energy and Power, System of Particles and Rotational Motion; next: Gravitation, then the rest in NCERT order).
 - Owner to set up the Google Form + Apps Script (tools/tutor-questions.gs) for unanswered questions.
 - Next tutor chapter: Work, Energy and Power.
 - Owner will test on the real 86-inch board and report anything blurry or slow; owner may report Hinglish
