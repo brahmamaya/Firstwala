@@ -244,6 +244,12 @@ const is3D=s=>mode!=='2d'&&!INT(s.id)?.allViews&&!(mode==='ultra'&&(INT(s.id)||w
       if(pointers.size>=2){const d=spread();if(pinch)window.Physica3D.zoomBy(d/pinch);pinch=d}else window.Physica3D.rotate((e.clientX-last.x)*.009,(e.clientY-last.y)*.007)});
     const stopSteer=e=>{if(steering&&HAND())handOn('up',e);pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(!pointers.size){steering=false;canvas.style.cursor='grab'}};
     canvas.addEventListener('pointerup',stopSteer);canvas.addEventListener('pointercancel',stopSteer);
+    // touch backup for hands-on instruments: if a tablet sends this canvas touch events but no pointer events,
+    // the vernier, screw gauge and other hands-on stages are still driven by the finger
+    let lastPtr=-1e9,touchHand=false;canvas.addEventListener('pointerdown',()=>{lastPtr=performance.now()},true);
+    canvas.addEventListener('touchstart',e=>{if(!HAND()||performance.now()-lastPtr<400||e.touches.length!==1)return;touchHand=true;e.preventDefault();handOn('down',e.touches[0])},{passive:false});
+    canvas.addEventListener('touchmove',e=>{if(!touchHand)return;e.preventDefault();handOn('move',e.touches[0])},{passive:false});
+    const touchUp=e=>{if(!touchHand)return;touchHand=false;handOn('up',e.changedTouches[0]||{})};canvas.addEventListener('touchend',touchUp);canvas.addEventListener('touchcancel',touchUp);
     canvas.addEventListener('wheel',e=>{if(!orbiting()||!(e.ctrlKey||e.metaKey||document.fullscreenElement))return;e.preventDefault();window.Physica3D.zoomBy(Math.exp(-e.deltaY*.0025))},{passive:false});
     canvas.addEventListener('dblclick',()=>{if(is3D(current))window.Physica3D?.resetView()});
     requestAnimationFrame(frame)}
