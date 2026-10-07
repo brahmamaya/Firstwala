@@ -714,6 +714,33 @@ window.PhysicaExam={
   {t:'neet',sim:'bohr-orbits-3d',q:'The radius of the first Bohr orbit of hydrogen is about:',o:['0.53 Å','5.3 Å','0.053 Å','53 Å'],c:0,a:'a₀ = 0.53 × 10⁻¹⁰ m.'},
   {t:'neet',sim:'bohr',q:'In Bohr\'s model, the angular momentum of an electron is quantised in units of:',o:['h','h/2π','2πh','h²'],c:1,a:'mvr = nh/2π.'},
   {t:'neet',sim:'energy-levels',q:'As n increases, the energy levels of hydrogen:',o:['get further apart','get closer together','stay equally spaced','disappear'],c:1,a:'E ∝ −1/n².'}
+],
+'Nuclei':[
+  {t:'1',q:'What are isotopes? Give an example.',a:'Nuclei of the same element (same Z) with different numbers of neutrons (different A), e.g. ¹²C and ¹⁴C.'},
+  {t:'1',sim:'nuclear-size',q:'How does the radius of a nucleus depend on its mass number?',a:'R = R₀A^(1/3), with R₀ ≈ 1.2 fm.'},
+  {t:'1',q:'What is the energy equivalent of 1 atomic mass unit?',a:'1 u = 931.5 MeV.'},
+  {t:'1',sim:'binding-curve',q:'Which nuclei are the most stable?',a:'Those near iron (A ≈ 56), which have the highest binding energy per nucleon, about 8.8 MeV.'},
+  {t:'1',q:'Write two properties of nuclear forces.',a:'They are the strongest known forces, and they act only over very short distances (a few fm). (They are also nearly the same between any pair of nucleons.)'},
+  {t:'3',sim:'nuclear-size',q:'Show that the density of nuclear matter is the same for all nuclei.',a:'Mass ≈ A × m(u). Volume = (4/3)πR³ = (4/3)πR₀³A.\nDensity = A m(u)/((4/3)πR₀³A) = 3m(u)/(4πR₀³), with no A in it.\nIt is about 2.3 × 10¹⁷ kg/m³, enormously dense.'},
+  {t:'3',sim:'mass-defect',q:'A helium-4 nucleus has a mass defect of 0.0304 u. Find its binding energy and the binding energy per nucleon.',a:'BE = 0.0304 × 931.5 ≈ 28.3 MeV.\nPer nucleon: 28.3/4 ≈ 7.1 MeV.'},
+  {t:'3',sim:'binding-curve',q:'Draw the binding energy per nucleon curve and use it to explain why fission and fusion both release energy.',a:'BE/A rises steeply for light nuclei, peaks near A = 56 (≈ 8.8 MeV) and falls slowly to about 7.6 MeV for uranium.\nFission: a heavy nucleus splits into two middle-sized nuclei with higher BE/A, so energy is released.\nFusion: light nuclei join into a heavier one with higher BE/A, so energy is released.'},
+  {t:'3',sim:'fission-chain',q:'Explain nuclear fission of uranium-235 and how a chain reaction happens.',a:'A slow neutron is absorbed by ²³⁵U, which splits into two middle-sized nuclei and gives out 2 or 3 fast neutrons and about 200 MeV.\nThose neutrons (after being slowed) can split more ²³⁵U nuclei, and so on: a chain reaction.\nIt is self-sustaining when at least one neutron per fission causes another fission (the mass must exceed the critical mass).'},
+  {t:'3',sim:'fusion-energy',q:'What is nuclear fusion? Why does it need very high temperatures?',a:'Light nuclei (such as hydrogen isotopes) join to form a heavier nucleus, releasing energy; it powers the Sun and stars.\nThe nuclei are positively charged and repel each other; only at millions of kelvin do they move fast enough to get close enough for the nuclear force to act.'},
+  {t:'3',q:'Define isotopes, isobars and isotones with one example each.',a:'Isotopes: same Z, different A, e.g. ¹H, ²H, ³H.\nIsobars: same A, different Z, e.g. ³H and ³He.\nIsotones: same number of neutrons, e.g. ¹⁹⁸Hg and ¹⁹⁷Au (118 neutrons each).'},
+  {t:'5',sim:'binding-curve',q:'Describe the main properties of the nuclear force and explain the binding energy per nucleon curve.',a:'Nuclear force: strongest of all forces; very short range (attractive up to about 2-3 fm, strongly repulsive below about 0.8 fm); nearly the same for p-p, n-n and n-p; saturates (each nucleon pulls only its neighbours).\nCurve: BE/A is small for light nuclei, rises to a peak near A = 56, then falls slowly.\nThe nearly constant middle part shows saturation. The fall for heavy nuclei comes from growing proton-proton repulsion. Energy can be released by fission of heavy nuclei and fusion of light ones.'},
+  {t:'5',q:'Explain the working of a nuclear reactor with its main parts.',a:'Fuel: enriched uranium (²³⁵U) rods where fission happens.\nModerator: heavy water or graphite slows fast neutrons so they can cause more fissions.\nControl rods: cadmium or boron absorb neutrons to keep the chain reaction steady (k = 1).\nCoolant: water or liquid sodium carries away the heat to make steam, which drives turbines.\nShielding: thick concrete stops dangerous radiation.'},
+  {t:'5',sim:'fission-chain',q:'In the fission ²³⁵U + n → ¹⁴¹Ba + ⁹²Kr + 3n, the products are about 0.215 u lighter than the reactants. Find the energy released per fission and the energy from 1 g of ²³⁵U.',a:'Q = 0.215 × 931.5 ≈ 200 MeV per fission.\nNumber of nuclei in 1 g = 6.02 × 10²³/235 ≈ 2.56 × 10²¹.\nEnergy ≈ 2.56 × 10²¹ × 200 MeV ≈ 5.1 × 10²³ MeV ≈ 8.2 × 10¹⁰ J, about the energy from burning 2-3 tonnes of coal.'},
+  {t:'jee',sim:'activity-sample',q:'After three half-lives, the fraction of a radioactive sample left is:',o:['1/3','1/6','1/8','1/9'],c:2,a:'(1/2)³ = 1/8.'},
+  {t:'jee',sim:'alpha-recoil',q:'A nucleus at rest (mass number A) emits an alpha particle, releasing energy Q. How is Q shared?',a:'Momentum: the alpha particle and the daughter move apart with equal and opposite momenta.\nK = p²/2m, so the kinetic energies are in inverse ratio of the masses.\nK(alpha) = Q(A − 4)/A and K(daughter) = 4Q/A: the alpha particle takes almost all of it.'},
+  {t:'jee',sim:'radiometric-dating',q:'Write the radioactive decay law and relate the half-life and mean life to the decay constant.',a:'N = N₀e^(−λt); activity R = λN.\nHalf-life: N = N₀/2 when T(½) = ln 2/λ ≈ 0.693/λ.\nMean life: τ = 1/λ = T(½)/0.693.\nDating: from the fraction left, t = (1/λ) ln(N₀/N).'},
+  {t:'jee',sim:'nuclear-size',q:'The ratio of the radii of nuclei with A = 27 and A = 125 is:',o:['27 : 125','3 : 5','9 : 25','1 : 1'],c:1,a:'R ∝ A^(1/3): 3 : 5.'},
+  {t:'jee',sim:'fusion-energy',q:'In a fusion reaction the products are 0.02 u lighter than the reactants. The energy released is about:',o:['1.86 MeV','18.6 MeV','186 MeV','0.02 MeV'],c:1,a:'0.02 × 931.5 ≈ 18.6 MeV.'},
+  {t:'neet',sim:'nuclear-size',q:'The radius of a nucleus is proportional to:',o:['A','A²','A^(1/3)','A^(2/3)'],c:2,a:'R = R₀A^(1/3).'},
+  {t:'neet',q:'A nucleus is made of:',o:['protons and electrons','protons and neutrons','neutrons and electrons','only protons'],c:1,a:'Together called nucleons.'},
+  {t:'neet',sim:'mass-defect',q:'1 atomic mass unit is equivalent to:',o:['9.31 MeV','931.5 MeV','1 MeV','0.511 MeV'],c:1,a:'From E = mc².'},
+  {t:'neet',sim:'fission-chain',q:'In a nuclear reactor, the moderator is used to:',o:['absorb neutrons','slow down neutrons','speed up neutrons','cool the reactor'],c:1,a:'Slow neutrons cause fission of ²³⁵U more easily.'},
+  {t:'neet',q:'An alpha particle is:',o:['an electron','a helium nucleus','a proton','a photon'],c:1,a:'2 protons and 2 neutrons.'},
+  {t:'neet',sim:'activity-sample',q:'The SI unit of radioactivity is the:',o:['curie','becquerel','rutherford','gray'],c:1,a:'1 Bq = 1 decay per second.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1782,6 +1809,47 @@ window.PhysicaMockBank={
     {tp:'energy',q:'The energy needed to excite hydrogen from n = 1 to n = 2 is:',o:['13.6 eV','3.4 eV','10.2 eV','1.9 eV'],c:2,s:'−3.4 − (−13.6).'},
     {tp:'energy',q:'For hydrogen-like ions, the energy levels are proportional to:',o:['Z','Z²','1/Z','1/Z²'],c:1,s:'E = −13.6 Z²/n² eV.'},
     {tp:'energy',q:'In a Bohr orbit, the total energy equals:',o:['the kinetic energy','minus the kinetic energy','twice the potential energy','zero'],c:1,s:'E = −KE = PE/2.'}
+  ]},
+'Nuclei':{
+  topics:{comp:'Composition and size of nuclei',be:'Mass defect and binding energy',fiss:'Fission and fusion',decay:'Radioactive decay'},
+  jee:[
+    {tp:'comp',q:'The ratio of the radii of nuclei with mass numbers 27 and 125 is:',o:['27 : 125','3 : 5','9 : 25','5 : 3'],c:1,s:'R ∝ A^(1/3).'},
+    {tp:'comp',q:'The ratio of the nuclear densities of ⁴He and ²³⁸U is about:',o:['1 : 1','1 : 60','60 : 1','4 : 238'],c:0,s:'Nuclear density does not depend on A.'},
+    {tp:'be',q:'A mass defect of 0.1 u corresponds to a binding energy of about:',o:['9.3 MeV','93 MeV','931 MeV','0.93 MeV'],c:1,s:'0.1 × 931.5.'},
+    {tp:'be',q:'The binding energy per nucleon is greatest for nuclei with A near:',o:['4','56','120','238'],c:1,s:'Iron-56 region.'},
+    {tp:'fiss',q:'The energy released in one fission of ²³⁵U is about:',o:['2 MeV','20 MeV','200 MeV','2000 MeV'],c:2,s:'About 200 MeV.'},
+    {tp:'fiss',q:'Fusion needs very high temperatures because:',o:['nuclei must be melted','the positive nuclei repel and must move very fast to get close','neutrons must be released first','electrons must be removed by heating only'],c:1,s:'Thermal energy must beat the Coulomb barrier.'},
+    {tp:'decay',q:'After three half-lives, the fraction of nuclei left is:',o:['1/3','1/8','1/6','1/9'],c:1,s:'(1/2)³.'},
+    {tp:'decay',q:'The mean life τ and half-life T(½) are related by:',o:['τ = T(½)','τ = T(½)/0.693','τ = 0.693 T(½)','τ = 2T(½)'],c:1,s:'τ = 1/λ and T(½) = 0.693/λ.'},
+    {tp:'decay',q:'A nucleus of mass number A at rest emits an alpha particle with energy release Q. The daughter nucleus gets kinetic energy:',o:['Q','4Q/A','(A − 4)Q/A','Q/2'],c:1,s:'Energy shared in inverse ratio of masses.'},
+    {tp:'decay',q:'In β⁻ decay, the atomic number:',o:['falls by 1','rises by 1','falls by 2','does not change'],c:1,s:'n → p + e⁻ + antineutrino.'},
+    {tp:'decay',q:'The activity of a sample falls to 1/16 of its first value in 20 hours. Find the half-life in hours.',n:5,s:'1/16 = (1/2)⁴: four half-lives in 20 h.'},
+    {tp:'comp',q:'Find the radius, in fm, of a nucleus with A = 125 (R₀ = 1.2 fm).',n:6,s:'1.2 × 125^(1/3) = 1.2 × 5.'},
+    {tp:'be',q:'A nucleus with A = 50 has a binding energy per nucleon of 8 MeV. Find its total binding energy in MeV.',n:400,s:'50 × 8.'},
+    {tp:'be',q:'Find the energy, in MeV, equivalent to 2 u of mass (1 u = 931.5 MeV).',n:1863,s:'2 × 931.5.'},
+    {tp:'decay',q:'A sample has 1600 radioactive nuclei. How many are left after four half-lives?',n:100,s:'1600/16.'}
+  ],
+  neet:[
+    {tp:'comp',q:'The particles in a nucleus are called:',o:['electrons','nucleons','photons','mesons only'],c:1,s:'Protons and neutrons.'},
+    {tp:'comp',q:'Isotopes have the same:',o:['mass number','atomic number','number of neutrons','mass'],c:1,s:'Same element, different A.'},
+    {tp:'comp',q:'Isobars have the same:',o:['atomic number','mass number','number of neutrons','chemical properties'],c:1,s:'Same A, different Z.'},
+    {tp:'comp',q:'The nuclear radius is proportional to:',o:['A','A^(1/3)','A²','1/A'],c:1,s:'R = R₀A^(1/3).'},
+    {tp:'comp',q:'The density of nuclear matter:',o:['increases with A','decreases with A','is nearly the same for all nuclei','is zero'],c:2,s:'About 2.3 × 10¹⁷ kg/m³.'},
+    {tp:'be',q:'Mass defect is the difference between:',o:['the mass of the atom and its electrons','the total mass of the separate nucleons and the mass of the nucleus','the masses of two isotopes','the proton and neutron masses'],c:1,s:'The missing mass becomes binding energy.'},
+    {tp:'be',q:'Binding energy and mass defect are related by:',o:['E = mc','E = Δm c²','E = Δm/c²','E = ½mv²'],c:1,s:'Einstein\'s relation.'},
+    {tp:'be',q:'1 u is equivalent to:',o:['931.5 MeV','1 MeV','0.511 MeV','9.315 MeV'],c:0,s:'1 u × c².'},
+    {tp:'be',q:'The most stable nucleus is close to:',o:['hydrogen','helium','iron','uranium'],c:2,s:'Highest BE/A.'},
+    {tp:'be',q:'Nuclear forces are:',o:['long range and weak','short range and very strong','the same as electric forces','only repulsive'],c:1,s:'They act over a few fm.'},
+    {tp:'fiss',q:'Nuclear fission is:',o:['joining of light nuclei','splitting of a heavy nucleus','emission of electrons','decay of a proton'],c:1,s:'For example ²³⁵U splitting.'},
+    {tp:'fiss',q:'A chain reaction needs the fuel mass to be at least the:',o:['atomic mass','critical mass','molar mass','rest mass'],c:1,s:'Otherwise too many neutrons escape.'},
+    {tp:'fiss',q:'Which is used as a moderator?',o:['cadmium','heavy water','boron','uranium'],c:1,s:'Graphite also works.'},
+    {tp:'fiss',q:'Control rods in a reactor are made of:',o:['graphite','cadmium or boron','heavy water','iron'],c:1,s:'They absorb neutrons.'},
+    {tp:'fiss',q:'The Sun\'s energy comes from:',o:['fission','fusion of hydrogen into helium','burning of gases','radioactive decay'],c:1,s:'Thermonuclear fusion.'},
+    {tp:'decay',q:'An alpha particle is a:',o:['helium nucleus','proton','electron','neutron'],c:0,s:'²₄He.'},
+    {tp:'decay',q:'In β⁻ decay, a nucleus:',o:['loses 2 protons','gains a proton as a neutron changes','loses a neutron and a proton','does not change'],c:1,s:'Z increases by 1, A stays the same.'},
+    {tp:'decay',q:'Gamma emission changes the nucleus\'s:',o:['atomic number','mass number','energy only','both Z and A'],c:2,s:'A photon carries away excess energy.'},
+    {tp:'decay',q:'The radioactive decay law is:',o:['N = N₀e^(λt)','N = N₀e^(−λt)','N = N₀λt','N = N₀/λ'],c:1,s:'Exponential decay.'},
+    {tp:'decay',q:'Half-life and decay constant are related by:',o:['T(½) = λ/0.693','T(½) = 0.693/λ','T(½) = 0.693λ','T(½) = 1/λ'],c:1,s:'ln 2/λ.'}
   ]}
 };
 })();
