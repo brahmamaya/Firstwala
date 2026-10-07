@@ -309,6 +309,33 @@ window.PhysicaExam={
   {t:'neet',sim:'carnot',q:'The efficiency of a Carnot engine working between 500 K and 300 K is:',o:['60%','40%','25%','67%'],c:1,a:'η = 1 − 300/500 = 0.4.'},
   {t:'neet',sim:'refrigerator',q:'A refrigerator moves heat from a cold body to a hot one by:',o:['itself, with no work','using external work','using a vacuum','cooling the room'],c:1,a:'Clausius: this needs work from the compressor.'},
   {t:'neet',sim:'first-law',q:'The first law of thermodynamics is a statement of the conservation of:',o:['mass','momentum','energy','temperature'],c:2,a:'ΔQ = ΔU + ΔW.'}
+],
+'Kinetic Theory':[
+  {t:'1',q:'Write the ideal gas equation.',a:'PV = nRT (n = number of moles, R = 8.31 J/mol·K), or PV = NkT for N molecules.'},
+  {t:'1',sim:'kinetic',q:'On what does the average kinetic energy of a gas molecule depend?',a:'Only on the absolute temperature: average KE = (3/2)kT.'},
+  {t:'1',sim:'equipartition',q:'How many degrees of freedom does a monatomic gas molecule have?',a:'Three, all translational (along x, y and z).'},
+  {t:'1',sim:'mean-free-path',q:'Define the mean free path of a gas molecule.',a:'The average distance a molecule travels between two successive collisions.'},
+  {t:'1',sim:'brownian-motion',q:'What does Brownian motion show?',a:'That the molecules of a fluid are in constant random motion, bumping tiny particles from all sides unevenly.'},
+  {t:'3',sim:'pressure-collisions',q:'Outline how kinetic theory gives the pressure of a gas, P = (1/3)ρv²(rms).',a:'A molecule bouncing off a wall changes momentum by 2mv(x) and returns after time 2L/v(x), so it pushes with average force mv(x)²/L.\nAdd N molecules and divide by the wall area L²: P = Nm⟨v(x)²⟩/V.\nMotion is random, so ⟨v(x)²⟩ = ⟨v²⟩/3, giving P = (1/3)(Nm/V)⟨v²⟩ = (1/3)ρv²(rms).'},
+  {t:'3',sim:'maxwell-speeds',q:'Find the rms speed of oxygen molecules at 300 K (M = 0.032 kg/mol, R = 8.31 J/mol·K).',a:'v(rms) = √(3RT/M) = √(3 × 8.31 × 300/0.032) ≈ √233 700 ≈ 483 m/s.'},
+  {t:'3',sim:'gay-lussac',q:'State Gay-Lussac\'s law. A tyre is at 300 kPa at 27 °C. What is its pressure at 87 °C (volume constant)?',a:'At constant volume, P ∝ T (kelvin).\nP₂ = P₁ × T₂/T₁ = 300 × 360/300 = 360 kPa.'},
+  {t:'3',sim:'equipartition',q:'State the law of equipartition of energy and use it to find C(v) and γ for a diatomic gas.',a:'In equilibrium, each degree of freedom has average energy ½kT per molecule.\nA diatomic molecule at room temperature has 5 (3 translational + 2 rotational).\nU per mole = (5/2)RT, so C(v) = 5R/2, C(p) = 7R/2 and γ = 7/5 = 1.4.'},
+  {t:'3',sim:'maxwell-speeds',q:'Compare the rms, average and most probable speeds of gas molecules.',a:'v(rms) = √(3RT/M), v(avg) = √(8RT/πM), v(mp) = √(2RT/M).\nRatio ≈ 1.73 : 1.60 : 1.41, so v(rms) > v(avg) > v(mp).'},
+  {t:'3',sim:'mean-free-path',q:'Write the formula for the mean free path and say how it changes with the number density and the size of the molecules.',a:'λ = 1/(√2 π d² n), where d is the molecular diameter and n the number of molecules per unit volume.\nMore molecules (higher pressure) or bigger molecules mean more collisions and a shorter mean free path.'},
+  {t:'5',sim:'kinetic',q:'Derive the expression for the pressure of an ideal gas and show that the average kinetic energy of a molecule is (3/2)kT.',a:'Cube of side L with N molecules of mass m. One molecule hits a wall with x-velocity v(x): momentum change 2mv(x); time between hits 2L/v(x); force mv(x)²/L.\nAll molecules: F = (m/L)Σv(x)². Random motion: Σv(x)² = N⟨v²⟩/3.\nP = F/L² = (1/3)(Nm/V)⟨v²⟩, so PV = (2/3)N(½m⟨v²⟩).\nCompare with PV = NkT: ½m⟨v²⟩ = (3/2)kT.\nSo temperature measures the average kinetic energy of the molecules.'},
+  {t:'5',sim:'equipartition',q:'Using the law of equipartition, find C(v), C(p) and γ for monatomic, diatomic and non-linear polyatomic gases.',a:'Energy per mole = (f/2)RT, so C(v) = (f/2)R, C(p) = C(v) + R, γ = 1 + 2/f.\nMonatomic (f = 3): C(v) = 3R/2, C(p) = 5R/2, γ = 5/3.\nDiatomic, rigid (f = 5): C(v) = 5R/2, C(p) = 7R/2, γ = 7/5.\nNon-linear polyatomic, rigid (f = 6): C(v) = 3R, C(p) = 4R, γ = 4/3.\n(Vibration adds more degrees of freedom at high temperatures.)'},
+  {t:'5',q:'State the main assumptions of the kinetic theory of gases. Why do real gases differ from ideal gases?',a:'1. A gas is made of a very large number of tiny molecules in random motion.\n2. The size of the molecules is negligible compared with the space between them.\n3. They exert no forces on each other except during collisions.\n4. Collisions with each other and the walls are perfectly elastic and last a negligible time.\n5. Between collisions they move in straight lines with constant speed.\nReal gases have molecules of finite size and attract each other, which matters at high pressure and low temperature, so they differ from PV = nRT there.'},
+  {t:'jee',sim:'maxwell-speeds',q:'At what temperature is the rms speed of oxygen molecules equal to that of hydrogen molecules at 27 °C?',o:['4800 K','2400 K','1200 K','600 K'],c:0,a:'v(rms) ∝ √(T/M): T(O₂)/32 = 300/2, so T = 4800 K.'},
+  {t:'jee',sim:'equipartition',q:'1 mol of a monatomic gas is mixed with 1 mol of a diatomic gas. Find γ for the mixture.',a:'C(v) = (3R/2 + 5R/2)/2 = 2R per mole of mixture.\nC(p) = C(v) + R = 3R.\nγ = 3R/2R = 1.5.'},
+  {t:'jee',sim:'kinetic',q:'If the pressure of a gas is doubled at constant temperature, its rms speed:',o:['doubles','halves','stays the same','becomes √2 times'],c:2,a:'v(rms) = √(3RT/M) depends only on T (the density doubles with the pressure).'},
+  {t:'jee',sim:'mean-free-path',q:'If the pressure of a gas is doubled at constant temperature, its mean free path:',o:['doubles','halves','stays the same','becomes four times'],c:1,a:'λ ∝ 1/n and n ∝ P at fixed T.'},
+  {t:'jee',q:'Estimate the number of molecules in 1 cm³ of a gas at STP (k = 1.38 × 10⁻²³ J/K).',a:'n = P/kT = 1.013 × 10⁵/(1.38 × 10⁻²³ × 273) ≈ 2.7 × 10²⁵ per m³.\nPer cm³ (10⁻⁶ m³): about 2.7 × 10¹⁹ molecules.'},
+  {t:'neet',q:'The total kinetic energy of one mole of an ideal monatomic gas at temperature T is:',o:['(1/2)RT','(3/2)RT','RT','(5/2)RT'],c:1,a:'N(A) × (3/2)kT = (3/2)RT.'},
+  {t:'neet',sim:'maxwell-speeds',q:'The rms speed of gas molecules is proportional to:',o:['T','√T','T²','1/T'],c:1,a:'v(rms) = √(3RT/M).'},
+  {t:'neet',q:'The Boltzmann constant k is equal to:',o:['R × N(A)','R/N(A)','N(A)/R','R²'],c:1,a:'k = R/N(A) = 1.38 × 10⁻²³ J/K.'},
+  {t:'neet',sim:'equipartition',q:'The ratio γ = C(p)/C(v) for a monatomic gas is:',o:['7/5','4/3','5/3','1'],c:2,a:'f = 3: γ = 1 + 2/3 = 5/3.'},
+  {t:'neet',q:'According to classical kinetic theory, at absolute zero the molecules of an ideal gas would:',o:['move fastest','stop moving','move at the speed of light','become heavier'],c:1,a:'Average KE = (3/2)kT = 0 at T = 0.'},
+  {t:'neet',sim:'maxwell-speeds',q:'At the same temperature, heavier gas molecules move:',o:['faster','slower','at the same speed','not at all'],c:1,a:'They have the same average KE, so larger mass means smaller speed (v ∝ 1/√M).'}
 ]};
 
 window.PhysicaMockBank={
@@ -762,6 +789,47 @@ window.PhysicaMockBank={
     {tp:'second',q:'Between two given temperatures, the most efficient engine is:',o:['a diesel engine','a petrol engine','a reversible (Carnot) engine','a steam engine'],c:2,s:'Carnot\'s theorem.'},
     {tp:'second',q:'A heat engine could be 100% efficient only if the sink were at:',o:['0 °C','room temperature','0 K','the source temperature'],c:2,s:'η = 1 − T₂/T₁ = 1 needs T₂ = 0 K, which cannot be reached.'},
     {tp:'second',q:'A process in which the system and surroundings can be returned exactly to their first states is called:',o:['irreversible','reversible','adiabatic','cyclic'],c:1,s:'Reversible processes are ideal: slow, with no friction.'}
+  ]},
+'Kinetic Theory':{
+  topics:{gas:'Ideal gas laws',press:'Pressure and molecular speeds',equi:'Equipartition and specific heats',mfp:'Mean free path and speed distribution'},
+  jee:[
+    {tp:'press',q:'If the absolute temperature of a gas is doubled, the rms speed of its molecules becomes:',o:['2 times','√2 times','4 times','the same'],c:1,s:'v(rms) ∝ √T.'},
+    {tp:'press',q:'A gas of density 1.2 kg/m³ has an rms speed of 500 m/s. Its pressure is:',o:['10⁵ Pa','3 × 10⁵ Pa','2 × 10⁵ Pa','5 × 10⁴ Pa'],c:0,s:'P = (1/3)ρv² = (1/3) × 1.2 × 250 000 = 10⁵ Pa.'},
+    {tp:'equi',q:'A rigid diatomic molecule has how many degrees of freedom, and what is C(v) per mole?',o:['3 and 3R/2','5 and 5R/2','6 and 3R','7 and 7R/2'],c:1,s:'3 translational + 2 rotational = 5; C(v) = (5/2)R.'},
+    {tp:'equi',q:'1 mol of helium is mixed with 1 mol of oxygen (rigid molecules). γ for the mixture is:',o:['1.4','1.67','1.5','1.33'],c:2,s:'C(v) = (3R/2 + 5R/2)/2 = 2R; C(p) = 3R; γ = 1.5.'},
+    {tp:'mfp',q:'If the diameter of the molecules is doubled (same number density), the mean free path becomes:',o:['half','double','one quarter','four times'],c:2,s:'λ ∝ 1/d².'},
+    {tp:'mfp',q:'The ratio of the most probable speed to the rms speed is:',o:['√(2/3)','√(3/2)','2/3','1'],c:0,s:'√(2RT/M)/√(3RT/M) = √(2/3).'},
+    {tp:'gas',q:'A container holds gas at 27 °C and pressure P. Half the gas leaks out and the rest is heated to 127 °C. The new pressure is:',o:['P','2P/3','4P/3','P/2'],c:1,s:'P ∝ nT: P\' = P × (1/2) × (400/300) = 2P/3.'},
+    {tp:'gas',q:'Equal volumes of hydrogen and oxygen at the same temperature and pressure contain:',o:['equal masses','equal numbers of molecules','more oxygen molecules','more hydrogen molecules'],c:1,s:'Avogadro\'s law: N = PV/kT is the same.'},
+    {tp:'press',q:'At the same temperature, the ratio of the rms speeds of hydrogen and oxygen molecules is:',o:['1 : 4','16 : 1','4 : 1','1 : 16'],c:2,s:'v ∝ 1/√M: √(32/2) = 4.'},
+    {tp:'equi',q:'The internal energy of 1 mol of a rigid diatomic ideal gas at temperature T is:',o:['(3/2)RT','(5/2)RT','(7/2)RT','3RT'],c:1,s:'Five degrees of freedom, each ½RT per mole.'},
+    {tp:'gas',q:'A tyre has a pressure of 300 kPa at 27 °C. Find its pressure in kPa at 87 °C (volume constant).',n:360,s:'P₂ = 300 × 360/300 = 360 kPa.'},
+    {tp:'press',q:'The rms speed of a gas is 400 m/s at 300 K. Find it in m/s at 1200 K.',n:800,s:'v ∝ √T: 400 × √4 = 800 m/s.'},
+    {tp:'equi',q:'How many degrees of freedom does a rigid non-linear polyatomic molecule have?',n:6,s:'3 translational + 3 rotational = 6.'},
+    {tp:'gas',q:'How many moles of an ideal gas occupy 49.86 L at 10⁵ Pa and 300 K (R = 8.31 J/mol·K)?',n:2,s:'n = PV/RT = 10⁵ × 0.04986/(8.31 × 300) = 4986/2493 = 2.'},
+    {tp:'mfp',q:'The mean free path of a gas is 100 nm. Find it in nm when the pressure is halved at the same temperature.',n:200,s:'λ ∝ 1/n ∝ 1/P at fixed T: it doubles.'}
+  ],
+  neet:[
+    {tp:'gas',q:'The ideal gas equation for n moles is:',o:['PV = RT','PV = nRT','P = nRTV','PV = n/RT'],c:1,s:'PV = nRT.'},
+    {tp:'gas',q:'Boyle\'s law states that at constant temperature:',o:['P ∝ V','P ∝ 1/V','V ∝ T','P ∝ T'],c:1,s:'PV = constant.'},
+    {tp:'gas',q:'Charles\'s law states that at constant pressure:',o:['V ∝ T','V ∝ 1/T','P ∝ V','PV = constant'],c:0,s:'Volume is proportional to absolute temperature.'},
+    {tp:'gas',q:'Avogadro\'s number is about:',o:['6.02 × 10²³ per mole','1.38 × 10⁻²³ per mole','8.31 per mole','22.4 per mole'],c:0,s:'N(A) = 6.02 × 10²³ mol⁻¹.'},
+    {tp:'gas',q:'One mole of an ideal gas at STP occupies about:',o:['1 L','11.2 L','22.4 L','44.8 L'],c:2,s:'Molar volume at STP ≈ 22.4 L.'},
+    {tp:'press',q:'According to kinetic theory, the pressure of a gas is:',o:['(1/3)ρv²(rms)','(2/3)ρv²(rms)','ρv²(rms)','(1/2)ρv²(rms)'],c:0,s:'P = (1/3)ρv²(rms).'},
+    {tp:'press',q:'The average kinetic energy of a gas molecule is:',o:['(1/2)kT','kT','(3/2)kT','3kT'],c:2,s:'½m⟨v²⟩ = (3/2)kT.'},
+    {tp:'press',q:'The rms speed of gas molecules is:',o:['√(3RT/M)','√(RT/M)','3RT/M','√(M/3RT)'],c:0,s:'v(rms) = √(3RT/M).'},
+    {tp:'press',q:'The average kinetic energy of the molecules of a gas depends on:',o:['its pressure','its volume','its temperature only','the kind of gas'],c:2,s:'Average KE = (3/2)kT.'},
+    {tp:'press',q:'At the same temperature, the average kinetic energies of hydrogen and oxygen molecules are:',o:['in the ratio 1 : 16','equal','in the ratio 16 : 1','in the ratio 4 : 1'],c:1,s:'Average translational KE depends only on T.'},
+    {tp:'equi',q:'The number of degrees of freedom of a monatomic gas molecule is:',o:['1','3','5','6'],c:1,s:'Three translational.'},
+    {tp:'equi',q:'A diatomic molecule at room temperature has how many degrees of freedom?',o:['3','5','6','7'],c:1,s:'3 translational + 2 rotational.'},
+    {tp:'equi',q:'By the law of equipartition, each degree of freedom has an average energy of:',o:['kT','½kT','(3/2)kT','2kT'],c:1,s:'½kT per molecule per degree of freedom.'},
+    {tp:'equi',q:'The molar specific heat at constant volume of a monatomic gas is:',o:['R/2','3R/2','5R/2','3R'],c:1,s:'f = 3, so C(v) = (3/2)R.'},
+    {tp:'equi',q:'The value of γ for a diatomic gas at room temperature is:',o:['5/3','7/5','4/3','1'],c:1,s:'γ = 1 + 2/f = 1 + 2/5.'},
+    {tp:'mfp',q:'The mean free path of gas molecules is inversely proportional to:',o:['temperature','the number of molecules per unit volume','molecular speed','time'],c:1,s:'λ = 1/(√2 π d² n).'},
+    {tp:'mfp',q:'When the pressure of a gas is reduced at constant temperature, the mean free path:',o:['decreases','increases','stays the same','becomes zero'],c:1,s:'Fewer molecules per unit volume, fewer collisions.'},
+    {tp:'mfp',q:'Brownian motion of pollen grains in water is caused by:',o:['convection currents','uneven bombardment by water molecules','gravity','light falling on them'],c:1,s:'Random molecular impacts do not cancel exactly on a tiny particle.'},
+    {tp:'mfp',q:'For gas molecules, the correct order of speeds is:',o:['v(mp) > v(avg) > v(rms)','v(rms) > v(avg) > v(mp)','v(avg) > v(rms) > v(mp)','all are equal'],c:1,s:'√3 > √(8/π) > √2.'},
+    {tp:'mfp',q:'When the temperature of a gas rises, the peak of its Maxwell speed distribution:',o:['moves to lower speeds and rises','moves to higher speeds and falls','stays fixed','disappears'],c:1,s:'Speeds spread out to higher values; the area stays the same, so the peak is lower.'}
   ]}
 };
 })();
