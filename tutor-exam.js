@@ -741,6 +741,33 @@ window.PhysicaExam={
   {t:'neet',sim:'fission-chain',q:'In a nuclear reactor, the moderator is used to:',o:['absorb neutrons','slow down neutrons','speed up neutrons','cool the reactor'],c:1,a:'Slow neutrons cause fission of ²³⁵U more easily.'},
   {t:'neet',q:'An alpha particle is:',o:['an electron','a helium nucleus','a proton','a photon'],c:1,a:'2 protons and 2 neutrons.'},
   {t:'neet',sim:'activity-sample',q:'The SI unit of radioactivity is the:',o:['curie','becquerel','rutherford','gray'],c:1,a:'1 Bq = 1 decay per second.'}
+],
+'Semiconductor Electronics':[
+  {t:'1',q:'Roughly what is the energy band gap of an insulator and of a semiconductor?',a:'Insulator: more than about 3 eV. Semiconductor: about 1 eV (silicon 1.1 eV, germanium 0.7 eV).'},
+  {t:'1',sim:'carrier-concentration',q:'What kind of impurity makes an n-type semiconductor?',a:'A pentavalent impurity (5 valence electrons) such as phosphorus or arsenic, which donates free electrons.'},
+  {t:'1',sim:'diode',q:'What is the depletion region of a p-n junction?',a:'A thin region at the junction with no free charge carriers, left with only fixed ions after electrons and holes diffuse across and recombine.'},
+  {t:'1',sim:'iv-curve',q:'What happens to the width of the depletion layer in forward bias?',a:'It becomes narrower, so current flows easily.'},
+  {t:'1',sim:'carrier-concentration',q:'What are the majority charge carriers in a p-type semiconductor?',a:'Holes.'},
+  {t:'3',q:'Distinguish between conductors, semiconductors and insulators using energy bands.',a:'Conductors: the valence and conduction bands overlap (or the conduction band is partly filled), so electrons move freely.\nSemiconductors: a small gap (about 1 eV); at room temperature some electrons cross it, giving modest conduction that rises with temperature.\nInsulators: a large gap (more than 3 eV); almost no electrons can cross, so they hardly conduct.'},
+  {t:'3',sim:'carrier-concentration',q:'Pure silicon has n(i) = 1.5 × 10¹⁶ m⁻³. It is doped with 4.5 × 10²² m⁻³ donor atoms. Find the hole concentration.',a:'Electrons ≈ donor concentration: n(e) = 4.5 × 10²² m⁻³.\nn(e)n(h) = n(i)², so n(h) = (1.5 × 10¹⁶)²/4.5 × 10²² = 5 × 10⁹ m⁻³.\nThe material is n-type.'},
+  {t:'3',sim:'diode',q:'Explain how the depletion region and the barrier potential form in a p-n junction.',a:'Electrons diffuse from the n-side to the p-side and holes the other way, and they recombine near the junction.\nThis leaves uncovered positive donor ions on the n-side and negative acceptor ions on the p-side: the depletion region.\nThese ions set up a field that opposes further diffusion; the resulting potential difference is the barrier potential (about 0.7 V for silicon, 0.3 V for germanium).'},
+  {t:'3',sim:'iv-curve',q:'Draw and explain the I-V characteristics of a p-n junction diode.',a:'Forward bias: almost no current until the knee (threshold) voltage (≈ 0.7 V for Si), then the current rises steeply.\nReverse bias: only a tiny, nearly constant current due to minority carriers (microamperes), until breakdown at a large reverse voltage, where the current rises sharply.\nSo a diode conducts well in one direction only.'},
+  {t:'3',sim:'rectifier',q:'Explain how a half-wave rectifier works. What is the frequency of its output for a 50 Hz input?',a:'A single diode is placed in series with the load.\nIn the positive half cycle the diode is forward biased and current flows through the load; in the negative half it is reverse biased and blocks.\nThe output is a pulsating DC of one pulse per cycle: 50 Hz.'},
+  {t:'3',sim:'ripple-filter',q:'How does a capacitor smooth the output of a rectifier?',a:'The capacitor across the load charges up to the peak voltage during each pulse.\nBetween pulses, when the rectified voltage falls, it slowly discharges through the load, keeping the voltage nearly steady.\nA larger capacitor (larger RC) leaves less ripple.'},
+  {t:'5',sim:'rectifier',q:'Draw and explain a full-wave rectifier. What is the frequency of its output for a 50 Hz input?',a:'Centre-tap type: two diodes connect to the ends of a centre-tapped transformer secondary; the load returns to the centre tap.\nIn one half cycle diode D₁ is forward biased and conducts; in the other half D₂ conducts. In both halves current flows through the load in the same direction.\n(A bridge of four diodes does the same without a centre tap.)\nOutput: a pulse every half cycle, so its frequency is 100 Hz. A capacitor filter then smooths it.'},
+  {t:'5',sim:'iv-curve',q:'Describe the formation of a p-n junction and explain its behaviour in forward and reverse bias.',a:'Formation: diffusion of electrons and holes across the junction and their recombination leave a depletion region of fixed ions, with a barrier potential.\nForward bias (p to +): the applied voltage opposes the barrier; the depletion region narrows; majority carriers cross and a large current flows beyond the knee voltage.\nReverse bias (p to −): the barrier rises and the depletion region widens; only a tiny current of minority carriers flows, until breakdown.'},
+  {t:'5',sim:'carrier-concentration',q:'Explain intrinsic and extrinsic semiconductors. How do n-type and p-type semiconductors differ?',a:'Intrinsic: pure silicon or germanium; electrons and holes are produced in pairs by heat, so n(e) = n(h) = n(i).\nExtrinsic: doped with a tiny amount of impurity to raise conductivity.\nn-type: pentavalent donor (P, As); extra electrons are the majority carriers; donor level just below the conduction band.\np-type: trivalent acceptor (B, Al, In); holes are the majority carriers; acceptor level just above the valence band.\nIn all cases n(e)n(h) = n(i)², and the crystal stays electrically neutral.'},
+  {t:'jee',sim:'zener-regulator',q:'A Zener diode (10 V) regulates a 15 V supply through a 500 Ω series resistor; the load is 2 kΩ. Find the currents in the resistor, the load and the Zener.',a:'Voltage across the series resistor = 15 − 10 = 5 V, so I = 5/500 = 10 mA.\nLoad current = 10/2000 = 5 mA.\nZener current = 10 − 5 = 5 mA.'},
+  {t:'jee',sim:'led-colour',q:'An LED is made from a material with a band gap of 2 eV. The light it gives has a wavelength of about (hc = 1240 eV·nm):',o:['400 nm','500 nm','620 nm','800 nm'],c:2,a:'λ = 1240/2 = 620 nm (orange-red).'},
+  {t:'jee',sim:'logic-gates',q:'Both inputs of a NOR gate are 0. The output is:',o:['0','1','undefined','equal to the inputs'],c:1,a:'NOR = NOT(A + B) = NOT(0) = 1.'},
+  {t:'jee',sim:'logic-gates',q:'The output of an AND gate is fed into a NOT gate. With both inputs 1, the final output is:',o:['1','0','2','undefined'],c:1,a:'This makes a NAND gate: NOT(1·1) = 0.'},
+  {t:'jee',sim:'solar-cell',q:'How does a solar cell work? Why is its I-V graph drawn in the fourth quadrant?',a:'Light with photon energy above the band gap creates electron-hole pairs near the junction; the junction field separates them, so the n-side becomes negative and the p-side positive, giving a voltage (about 0.5 V for Si).\nNo bias is applied; the cell itself drives current through the load, so its current is in the reverse direction while the voltage is forward: the curve lies in the fourth quadrant (open-circuit voltage and short-circuit current are its ends).'},
+  {t:'neet',q:'The band gap of silicon is about:',o:['0.1 eV','1.1 eV','5 eV','10 eV'],c:1,a:'Germanium is about 0.7 eV.'},
+  {t:'neet',sim:'carrier-concentration',q:'In a p-type semiconductor, the majority carriers are:',o:['electrons','holes','protons','ions'],c:1,a:'Trivalent acceptors create holes.'},
+  {t:'neet',sim:'rectifier',q:'A rectifier changes:',o:['DC into AC','AC into DC','low voltage into high voltage','light into current'],c:1,a:'It lets current flow in one direction only.'},
+  {t:'neet',q:'A photodiode is normally used in:',o:['forward bias','reverse bias','no bias','either, with the same result'],c:1,a:'Then the small reverse current changes strongly with light.'},
+  {t:'neet',sim:'logic-gates',q:'Which gate is called a universal gate?',o:['AND','OR','NAND','NOT'],c:2,a:'Any gate can be built from NAND gates alone (NOR is also universal).'},
+  {t:'neet',sim:'iv-curve',q:'In forward bias, the current through a p-n junction is mainly due to:',o:['minority carriers','majority carriers','ions','protons'],c:1,a:'Majority carriers cross the lowered barrier.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1850,6 +1877,47 @@ window.PhysicaMockBank={
     {tp:'decay',q:'Gamma emission changes the nucleus\'s:',o:['atomic number','mass number','energy only','both Z and A'],c:2,s:'A photon carries away excess energy.'},
     {tp:'decay',q:'The radioactive decay law is:',o:['N = N₀e^(λt)','N = N₀e^(−λt)','N = N₀λt','N = N₀/λ'],c:1,s:'Exponential decay.'},
     {tp:'decay',q:'Half-life and decay constant are related by:',o:['T(½) = λ/0.693','T(½) = 0.693/λ','T(½) = 0.693λ','T(½) = 1/λ'],c:1,s:'ln 2/λ.'}
+  ]},
+'Semiconductor Electronics':{
+  topics:{band:'Energy bands and doping',diode:'p-n junction diode',rect:'Rectifiers and special diodes',logic:'Logic gates'},
+  jee:[
+    {tp:'band',q:'When a semiconductor is heated, its resistance:',o:['increases','decreases','stays the same','becomes infinite'],c:1,s:'More electrons cross the band gap.'},
+    {tp:'band',q:'Silicon with n(i) = 1.5 × 10¹⁶ m⁻³ is doped with 4.5 × 10²² m⁻³ donors. The hole concentration is:',o:['1.5 × 10¹⁶ m⁻³','5 × 10⁹ m⁻³','4.5 × 10²² m⁻³','3 × 10⁶ m⁻³'],c:1,s:'n(h) = n(i)²/n(e).'},
+    {tp:'diode',q:'The barrier potential of a silicon p-n junction is about:',o:['0.3 V','0.7 V','1.5 V','5 V'],c:1,s:'About 0.7 V (0.3 V for germanium).'},
+    {tp:'diode',q:'An ideal diode is forward biased by 5 V through a 1 kΩ resistor. The current is:',o:['5 A','5 mA','0.5 mA','zero'],c:1,s:'An ideal diode has no resistance forward.'},
+    {tp:'rect',q:'A full-wave rectifier is fed with 50 Hz AC. The output ripple frequency is:',o:['25 Hz','50 Hz','100 Hz','200 Hz'],c:2,s:'A pulse every half cycle.'},
+    {tp:'rect',q:'A 10 V Zener regulates a 15 V supply through 500 Ω with a 2 kΩ load. The Zener current is:',o:['10 mA','5 mA','2.5 mA','15 mA'],c:1,s:'10 mA in the resistor minus 5 mA in the load.'},
+    {tp:'rect',q:'An LED with a band gap of 2 eV emits light of wavelength about:',o:['400 nm','620 nm','800 nm','1240 nm'],c:1,s:'λ = 1240/2 nm.'},
+    {tp:'logic',q:'Both inputs of a NOR gate are 0. Its output is:',o:['0','1','both','undefined'],c:1,s:'NOT(0 + 0).'},
+    {tp:'logic',q:'The universal gates are:',o:['AND and OR','NAND and NOR','NOT and OR','AND and NOT'],c:1,s:'Every gate can be built from either.'},
+    {tp:'logic',q:'The Boolean expression Y = A·B̄ + Ā·B describes a:',o:['NAND gate','XOR gate','NOR gate','AND gate'],c:1,s:'Output 1 when the inputs differ.'},
+    {tp:'band',q:'Silicon (n(i) = 1.5 × 10¹⁶ m⁻³) is doped with 4.5 × 10²² m⁻³ donors. The hole concentration is n × 10⁹ m⁻³. Find n.',n:5,s:'(1.5 × 10¹⁶)²/4.5 × 10²² = 5 × 10⁹.'},
+    {tp:'rect',q:'Find the output frequency, in Hz, of a full-wave rectifier fed with 50 Hz AC.',n:100,s:'Twice the input frequency.'},
+    {tp:'diode',q:'An ideal diode is forward biased by 6 V through a 2 kΩ resistor. Find the current in mA.',n:3,s:'6/2000 A = 3 mA.'},
+    {tp:'rect',q:'A 12 V Zener regulates a 20 V supply through a 1 kΩ series resistor; the load is 3 kΩ. Find the Zener current in mA.',n:4,s:'Series current = 8/1000 = 8 mA; load current = 12/3000 = 4 mA; Zener 8 − 4 = 4 mA.'},
+    {tp:'rect',q:'An LED gives light of 620 nm. Find the band gap of its material in eV (hc = 1240 eV·nm).',n:2,s:'1240/620 = 2 eV.'}
+  ],
+  neet:[
+    {tp:'band',q:'In an insulator, the forbidden energy gap is:',o:['zero','about 1 eV','more than about 3 eV','negative'],c:2,s:'Too wide for electrons to cross.'},
+    {tp:'band',q:'A pure semiconductor is called:',o:['extrinsic','intrinsic','n-type','p-type'],c:1,s:'n(e) = n(h).'},
+    {tp:'band',q:'An n-type semiconductor is made by adding:',o:['a trivalent impurity','a pentavalent impurity','a metal','an insulator'],c:1,s:'Such as phosphorus or arsenic.'},
+    {tp:'band',q:'A p-type semiconductor is made by adding:',o:['phosphorus','arsenic','boron','antimony'],c:2,s:'A trivalent acceptor.'},
+    {tp:'band',q:'An n-type semiconductor as a whole is:',o:['negatively charged','positively charged','electrically neutral','charged only when hot'],c:2,s:'The donor atoms are neutral overall.'},
+    {tp:'diode',q:'The depletion region of a p-n junction contains:',o:['many free electrons','many holes','only fixed ions','metal atoms'],c:2,s:'The free carriers have recombined.'},
+    {tp:'diode',q:'In forward bias, the depletion region:',o:['widens','narrows','stays the same','disappears completely always'],c:1,s:'The applied voltage opposes the barrier.'},
+    {tp:'diode',q:'The small reverse current of a diode is due to:',o:['majority carriers','minority carriers','ions','photons'],c:1,s:'Minority carriers are swept across.'},
+    {tp:'diode',q:'A diode allows current to flow:',o:['in both directions equally','mainly in one direction','only with AC','never'],c:1,s:'Forward easily, reverse hardly at all.'},
+    {tp:'diode',q:'The knee voltage of a silicon diode is about:',o:['0.1 V','0.7 V','3 V','10 V'],c:1,s:'Above this the forward current rises steeply.'},
+    {tp:'rect',q:'A half-wave rectifier with 50 Hz input gives an output of frequency:',o:['25 Hz','50 Hz','100 Hz','0 Hz'],c:1,s:'One pulse per cycle.'},
+    {tp:'rect',q:'In a rectifier, a capacitor is used to:',o:['increase the ripple','smooth the output','change DC into AC','raise the frequency'],c:1,s:'It fills in between the pulses.'},
+    {tp:'rect',q:'A Zener diode is used as a:',o:['rectifier','voltage regulator','amplifier','light source'],c:1,s:'It holds a steady voltage in reverse breakdown.'},
+    {tp:'rect',q:'An LED gives light when it is:',o:['reverse biased','forward biased','unbiased','heated'],c:1,s:'Electrons and holes recombine and release photons.'},
+    {tp:'rect',q:'A solar cell works on the:',o:['photovoltaic effect','heating effect','Zener effect','magnetic effect'],c:0,s:'Light creates electron-hole pairs that the junction separates.'},
+    {tp:'logic',q:'The output of an AND gate is 1 only when:',o:['any input is 1','all inputs are 1','all inputs are 0','the inputs differ'],c:1,s:'Y = A·B.'},
+    {tp:'logic',q:'The output of an OR gate is 0 only when:',o:['all inputs are 0','all inputs are 1','one input is 1','the inputs differ'],c:0,s:'Y = A + B.'},
+    {tp:'logic',q:'A NOT gate:',o:['adds inputs','inverts its input','has two inputs','gives a constant output'],c:1,s:'Y = Ā.'},
+    {tp:'logic',q:'A NAND gate gives output 0 only when:',o:['both inputs are 0','both inputs are 1','one input is 1','never'],c:1,s:'NOT(A·B).'},
+    {tp:'logic',q:'A NOR gate gives output 1 only when:',o:['both inputs are 1','both inputs are 0','one input is 1','always'],c:1,s:'NOT(A + B).'}
   ]}
 };
 })();
