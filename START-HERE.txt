@@ -147,7 +147,8 @@ Done recently (PRs #66-#73):
 - Hinglish spoken by the Hindi female voice (tools/hinglish-voice.js builds the word map).
 - Tutor mic stops on a second tap; logo all white; "Focus mode" liquid-glass button.
 Exam practice (Student mode, inside the AI Tutor - nothing new in Normal mode):
-- tutor-exam.js (lazy tutor pack) holds the questions per chapter: window.PhysicaExam = practice (t '1'/'3'/'5' board,
+- tutor-exam.js holds the questions per chapter; it is built into its own pack (physica-exam.min.js) that loads only
+  when the Exam tab opens (the tutor pack carries just PhysicaExamChapters, the list of chapters with questions): window.PhysicaExam = practice (t '1'/'3'/'5' board,
   'jee', 'neet'; step-by-step answers) and window.PhysicaMockBank = timed mock tests (jee: 10 MCQ + 5
   numerical, neet: 20 MCQ; each question has a topic tp for the report). Exam and mock tests are English only.
 - The "🎯 Exam" tab has Board / JEE / NEET kept apart; it appears only for chapters with questions (now: Units and

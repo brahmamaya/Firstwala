@@ -350,10 +350,13 @@ function quiz(c){let score=0,done=0;const out=el('p','tutor-score'),qs=[];
 // Exam (English): Board, JEE and NEET kept apart. Board and practice questions show a step-by-step answer on request and the
 // student marks each one "got it" or "revise"; MCQs are checked at once. JEE and NEET also offer the chapter's timed
 // mock test (tutor-mock.js) and its past reports. Progress stays on this device.
-const examSet=()=>{const s=simObj();return s&&window.PhysicaExam?.[s.chapter]};
+// the questions live in their own pack (tools/build.js), fetched the first time the Exam tab opens; the tutor pack
+// carries only the list of chapters that have them
+const examSet=()=>{const s=simObj();return s&&(window.PhysicaExamChapters||[]).includes(s.chapter)};
 let examTrack='board',examType='all';
 addEventListener('physica-mock-close',e=>{if(examSet()){tab='exam';if(e.detail)examTrack=e.detail;render()}});
-function exam(){const sim=simObj(),qs=examSet(),key=n=>`${sim.chapter}#${n}`;let done={};
+function exam(){if(!window.PhysicaExam){body.append(el('p','tutor-loading','Loading the questions…'));window.PhysicaLoadExam().then(()=>{if(tab==='exam')render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the questions - please check your internet and try again.'))});return}
+  const sim=simObj(),qs=window.PhysicaExam[sim.chapter]||[],key=n=>`${sim.chapter}#${n}`;let done={};
   try{done=JSON.parse(localStorage.getItem('physica-exam')||'{}')||{}}catch{}
   const save=()=>{try{localStorage.setItem('physica-exam',JSON.stringify(done))}catch{}},board=['1','3','5'],
     mine=qs.map((x,n)=>n).filter(n=>examTrack==='board'?board.includes(qs[n].t):qs[n].t===examTrack),
