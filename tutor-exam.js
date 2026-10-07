@@ -606,6 +606,33 @@ window.PhysicaExam={
   {t:'neet',sim:'spectrum',q:'Water purifiers kill germs using:',o:['infrared','ultraviolet','radio waves','microwaves'],c:1,a:'UV damages the DNA of germs.'},
   {t:'neet',q:'Electromagnetic waves need:',o:['air to travel','a solid medium','no medium','water'],c:2,a:'They can travel through vacuum (sunlight reaches us through space).'},
   {t:'neet',sim:'spectrum',q:'X-rays are produced when:',o:['slow electrons hit a metal','fast electrons hit a heavy metal target','light hits glass','a nucleus decays'],c:1,a:'They are made in X-ray tubes by fast electrons stopping suddenly.'}
+],
+'Ray Optics and Optical Instruments':[
+  {t:'1',sim:'spherical-mirrors',q:'How is the focal length of a spherical mirror related to its radius of curvature?',a:'f = R/2.'},
+  {t:'1',sim:'total-internal-reflection',q:'State the two conditions for total internal reflection.',a:'Light must go from a denser to a rarer medium, and the angle of incidence must be greater than the critical angle.'},
+  {t:'1',q:'A lens has a power of +2 D. What is its focal length?',a:'f = 1/P = 0.5 m = 50 cm (a converging lens).'},
+  {t:'1',q:'Why does the sky look blue?',a:'Air molecules scatter short wavelengths far more strongly (scattering ∝ 1/λ⁴), so blue light reaches our eyes from all over the sky.'},
+  {t:'1',sim:'prism-dispersion',q:'What causes the dispersion of white light by a prism?',a:'The refractive index of glass is different for different colours (wavelengths), so each colour bends by a different amount; violet bends most.'},
+  {t:'3',sim:'concave-mirror',q:'An object is 30 cm in front of a concave mirror of focal length 20 cm. Find the position, nature and size of the image.',a:'Using 1/v + 1/u = 1/f with u = −30, f = −20: 1/v = −1/20 + 1/30 = −1/60, so v = −60 cm.\nm = −v/u = −2: the image is real, inverted, twice the size, 60 cm in front of the mirror.'},
+  {t:'3',sim:'apparent-depth',q:'A tank holds water 12 cm deep (n = 4/3). How deep does it look from above? Explain.',a:'Apparent depth = real depth/n = 12 × 3/4 = 9 cm.\nRays from the bottom bend away from the normal as they leave the water, so they seem to come from a point nearer the surface.'},
+  {t:'3',sim:'lens-maker',q:'A biconvex lens has radii 20 cm and 20 cm and n = 1.5. Find its focal length.',a:'Lens maker: 1/f = (n − 1)(1/R₁ − 1/R₂) with R₁ = +20, R₂ = −20.\n1/f = 0.5 × (1/20 + 1/20) = 1/20, so f = 20 cm.'},
+  {t:'3',sim:'contact-lens-pair',q:'Lenses of focal length +20 cm and −40 cm are placed in contact. Find the power and focal length of the combination.',a:'P = P₁ + P₂ = 1/0.2 + 1/(−0.4) = 5 − 2.5 = 2.5 D.\nf = 1/2.5 = 0.4 m = 40 cm (converging).'},
+  {t:'3',sim:'optical-fibre',q:'Explain how an optical fibre carries light. Find the critical angle for a core of refractive index 1.5 in air.',a:'Light enters the core and hits the core-cladding boundary at more than the critical angle each time, so it is totally reflected again and again along the fibre with very little loss.\nsin c = 1/n = 1/1.5, so c ≈ 41.8°.'},
+  {t:'3',sim:'prism-dispersion',q:'A prism of angle 60° gives a minimum deviation of 30°. Find its refractive index.',a:'n = sin((A + δm)/2)/sin(A/2) = sin 45°/sin 30° = (1/√2)/(1/2) = √2 ≈ 1.41.'},
+  {t:'5',sim:'lens-maker',q:'Derive the formula for refraction at a spherical surface and use it to obtain the lens maker\'s formula.',a:'Refraction at one surface (from medium n₁ into n₂, radius R): n₂/v − n₁/u = (n₂ − n₁)/R (from Snell\'s law with small angles).\nFirst surface of a thin lens in air (n₁ = 1, n₂ = n): n/v₁ − 1/u = (n − 1)/R₁.\nSecond surface (from n back to air, the image v₁ acts as the object): 1/v − n/v₁ = (1 − n)/R₂.\nAdd: 1/v − 1/u = (n − 1)(1/R₁ − 1/R₂) = 1/f.'},
+  {t:'5',sim:'compound-microscope',q:'Explain the compound microscope and derive its magnifying power.',a:'A short-focus objective forms a real, magnified image of the tiny object just inside the focus of the eyepiece; the eyepiece acts as a simple magnifier and forms the final virtual image.\nObjective magnification m(o) = v(o)/u(o) ≈ L/f(o) (L = tube length).\nEyepiece: m(e) = 1 + D/f(e) (final image at near point D), or D/f(e) (image at infinity).\nTotal M = m(o) × m(e) ≈ (L/f(o))(D/f(e)). Both focal lengths should be small.'},
+  {t:'5',sim:'astronomical-telescope',q:'Explain the astronomical telescope in normal adjustment. Find its magnifying power and length. Why does the objective have a large aperture?',a:'The objective (long focal length f(o)) forms a real image of a distant object at its focus; the eyepiece (short f(e)) has its focus at the same point, so the final image is at infinity (normal adjustment).\nMagnifying power M = f(o)/f(e). Length L = f(o) + f(e).\nA large aperture collects more light (fainter stars become visible) and gives better resolution.'},
+  {t:'jee',sim:'apparent-depth',q:'A mark at the bottom of a 3 cm glass slab (n = 1.5) is viewed from above. How much does it appear to be raised?',o:['1 cm','2 cm','1.5 cm','0.5 cm'],c:0,a:'Shift = t(1 − 1/n) = 3 × (1 − 2/3) = 1 cm.'},
+  {t:'jee',sim:'lens',q:'A convex lens of focal length 20 cm forms a real image twice the size of the object. The object distance is:',o:['10 cm','30 cm','40 cm','60 cm'],c:1,a:'m = v/u = −2, so v = 2x with u = −x: 1/(2x) + 1/x = 1/20, 3/(2x) = 1/20, x = 30 cm.'},
+  {t:'jee',sim:'lens-maker',q:'A glass lens (n = 1.5) of focal length f in air is put in water (n = 4/3). Its focal length becomes:',o:['f','2f','4f','f/4'],c:2,a:'1/f ∝ (n(glass)/n(medium) − 1): in air 0.5; in water 1.5/1.333 − 1 = 0.125. So f becomes 4f.'},
+  {t:'jee',sim:'lens',q:'Explain the displacement method of finding the focal length of a convex lens.',a:'Keep an object and a screen D apart (D > 4f). Two lens positions, a distance d apart, give sharp images (u and v swap).\nu + v = D and v − u = d, so u = (D − d)/2 and v = (D + d)/2.\nf = uv/(u + v) = (D² − d²)/(4D).'},
+  {t:'jee',sim:'total-internal-reflection',q:'A right-angled isosceles prism is to turn light by 90° using total internal reflection at 45°. Its refractive index must be more than:',o:['1.33','1.5','√2','2'],c:2,a:'Need 45° > c, so sin c < 1/√2, that is n > √2.'},
+  {t:'neet',sim:'mirror-images',q:'The image in a plane mirror is:',o:['real and the same size','virtual and the same size','virtual and smaller','real and inverted'],c:1,a:'Virtual, erect, the same size and as far behind as the object is in front.'},
+  {t:'neet',sim:'spherical-mirrors',q:'Convex mirrors are used as rear-view mirrors because they:',o:['magnify','give a wide field of view','form real images','are cheap'],c:1,a:'They always give small, erect images of a wide area.'},
+  {t:'neet',sim:'prism-dispersion',q:'A rainbow is formed by:',o:['reflection only','refraction, dispersion and internal reflection in raindrops','diffraction only','polarisation'],c:1,a:'Sunlight is split and turned back inside raindrops.'},
+  {t:'neet',q:'The unit of the power of a lens is the:',o:['watt','dioptre','metre','joule'],c:1,a:'1 D = 1 m⁻¹.'},
+  {t:'neet',q:'Short-sightedness (myopia) is corrected by:',o:['a convex lens','a concave lens','a cylindrical lens','a prism'],c:1,a:'A diverging lens moves the image back onto the retina.'},
+  {t:'neet',sim:'total-internal-reflection',q:'A diamond sparkles mainly because of:',o:['dispersion only','total internal reflection (small critical angle)','scattering','interference'],c:1,a:'n ≈ 2.42, critical angle ≈ 24°: light is trapped and reflected many times.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1510,6 +1537,47 @@ window.PhysicaMockBank={
     {tp:'energy',q:'Electromagnetic waves carry:',o:['energy only','momentum only','both energy and momentum','neither'],c:2,s:'p = U/c.'},
     {tp:'energy',q:'In glass, the speed of light is:',o:['more than in vacuum','less than in vacuum','the same as in vacuum','zero'],c:1,s:'v = c/n.'},
     {tp:'energy',q:'In an EM wave, the energy is shared between the electric and magnetic fields:',o:['equally','mostly electric','mostly magnetic','all electric'],c:0,s:'Their average energy densities are equal.'}
+  ]},
+'Ray Optics and Optical Instruments':{
+  topics:{mirror:'Reflection and mirrors',refr:'Refraction and total internal reflection',lens:'Lenses',prism:'Prism and dispersion',inst:'Optical instruments'},
+  jee:[
+    {tp:'mirror',q:'An object is 30 cm from a concave mirror of focal length 20 cm. The magnification is:',o:['−1','−2','+2','−0.5'],c:1,s:'v = −60 cm, m = −v/u = −2.'},
+    {tp:'refr',q:'A mark under a 3 cm glass slab (n = 1.5) appears raised by:',o:['0.5 cm','1 cm','1.5 cm','2 cm'],c:1,s:'t(1 − 1/n).'},
+    {tp:'lens',q:'A convex lens (f = 20 cm) gives a real image twice the size of the object. The object distance is:',o:['10 cm','40 cm','30 cm','60 cm'],c:2,s:'1/(2x) + 1/x = 1/20.'},
+    {tp:'lens',q:'A glass lens (n = 1.5) is moved from air into water (n = 4/3). Its focal length becomes:',o:['f','2f','4f','f/2'],c:2,s:'(1.5/1.333 − 1)/(1.5 − 1) = 1/4 of the power.'},
+    {tp:'refr',q:'For a 45°-45°-90° prism to reflect totally at its long face, n must exceed:',o:['1.33','√2','1.5','2'],c:1,s:'sin 45° > 1/n.'},
+    {tp:'prism',q:'A 60° prism has minimum deviation 30°. Its refractive index is:',o:['1.5','√3','√2','1.33'],c:2,s:'sin 45°/sin 30°.'},
+    {tp:'lens',q:'Lenses of +20 cm and −40 cm in contact have a power of:',o:['7.5 D','2.5 D','−2.5 D','5 D'],c:1,s:'5 − 2.5.'},
+    {tp:'inst',q:'A telescope has f(o) = 100 cm and f(e) = 5 cm. In normal adjustment, its magnifying power and length are:',o:['20 and 105 cm','20 and 95 cm','500 and 105 cm','5 and 100 cm'],c:0,s:'M = f(o)/f(e), L = f(o) + f(e).'},
+    {tp:'inst',q:'To increase the magnifying power of a compound microscope, use:',o:['long focal lengths for both lenses','short focal lengths for both lenses','a long objective and a short eyepiece','a short objective and a long eyepiece'],c:1,s:'M ≈ (L/f(o))(D/f(e)).'},
+    {tp:'mirror',q:'A convex mirror always forms an image that is:',o:['real and inverted','virtual, erect and diminished','virtual and magnified','real and same size'],c:1,s:'For any real object.'},
+    {tp:'lens',q:'A biconvex lens has radii 20 cm and 20 cm and n = 1.5. Find its focal length in cm.',n:20,s:'1/f = 0.5 × (1/20 + 1/20).'},
+    {tp:'refr',q:'Water (n = 4/3) is 12 cm deep. Find its apparent depth in cm.',n:9,s:'12/(4/3) = 9 cm.'},
+    {tp:'lens',q:'Find the power, in dioptres, of a convex lens of focal length 25 cm.',n:4,s:'P = 1/0.25 = 4 D.'},
+    {tp:'inst',q:'A telescope has f(o) = 150 cm and f(e) = 5 cm. Find its magnifying power in normal adjustment.',n:30,s:'M = 150/5 = 30.'},
+    {tp:'mirror',q:'An object is 20 cm from a concave mirror of focal length 15 cm. Find the image distance in cm (size only).',n:60,s:'1/v = −1/15 + 1/20 = −1/60, so v = −60 cm.'}
+  ],
+  neet:[
+    {tp:'mirror',q:'For a spherical mirror, the focal length is:',o:['2R','R','R/2','R/4'],c:2,s:'f = R/2.'},
+    {tp:'mirror',q:'A plane mirror forms an image that is:',o:['real','virtual and laterally inverted','magnified','inverted upside down'],c:1,s:'Left and right are swapped.'},
+    {tp:'mirror',q:'Rear-view mirrors in vehicles are:',o:['plane','concave','convex','cylindrical'],c:2,s:'For a wide field of view.'},
+    {tp:'mirror',q:'The mirror formula is:',o:['1/v − 1/u = 1/f','1/v + 1/u = 1/f','v + u = f','vu = f'],c:1,s:'With the sign convention.'},
+    {tp:'refr',q:'Snell\'s law is:',o:['n₁ sin i = n₂ sin r','n₁ cos i = n₂ cos r','sin i/n₁ = sin r/n₂ only for air','i = r'],c:0,s:'n₁ sin i = n₂ sin r.'},
+    {tp:'refr',q:'The refractive index of a medium is:',o:['v/c','c/v','c × v','1/c'],c:1,s:'n = c/v.'},
+    {tp:'refr',q:'The critical angle c and refractive index n are related by:',o:['sin c = n','sin c = 1/n','cos c = 1/n','tan c = n'],c:1,s:'From denser to air.'},
+    {tp:'refr',q:'Total internal reflection happens when light goes from:',o:['rarer to denser at any angle','denser to rarer at more than the critical angle','denser to rarer at less than the critical angle','air to glass'],c:1,s:'Both conditions are needed.'},
+    {tp:'refr',q:'Optical fibres work on the principle of:',o:['refraction only','total internal reflection','dispersion','diffraction'],c:1,s:'Light is trapped in the core.'},
+    {tp:'lens',q:'The power of a lens of focal length 50 cm is:',o:['0.5 D','2 D','50 D','5 D'],c:1,s:'P = 1/0.5 m.'},
+    {tp:'lens',q:'A convex lens is a:',o:['diverging lens','converging lens','plane lens','prism'],c:1,s:'It brings parallel rays to a focus.'},
+    {tp:'lens',q:'For thin lenses in contact, the total power is:',o:['P₁P₂','P₁ + P₂','P₁ − P₂','P₁/P₂'],c:1,s:'Powers add.'},
+    {tp:'lens',q:'The focal length of a lens depends on:',o:['the object distance','its refractive index and radii of curvature','the size of the object','the image distance'],c:1,s:'Lens maker\'s formula.'},
+    {tp:'prism',q:'Dispersion happens because:',o:['n is the same for all colours','n depends on the wavelength','light slows to zero','glass absorbs red'],c:1,s:'Different colours bend differently.'},
+    {tp:'prism',q:'In a prism, the colour deviated most is:',o:['red','yellow','green','violet'],c:3,s:'Glass has the largest n for violet.'},
+    {tp:'prism',q:'The refractive index of a prism from its angle A and minimum deviation δm is:',o:['sin A/sin δm','sin((A + δm)/2)/sin(A/2)','sin(A/2)/sin((A + δm)/2)','A/δm'],c:1,s:'Prism formula.'},
+    {tp:'inst',q:'The magnifying power of a simple microscope (image at the near point) is:',o:['D/f','1 + D/f','f/D','1 − D/f'],c:1,s:'D = 25 cm.'},
+    {tp:'inst',q:'The magnifying power of an astronomical telescope in normal adjustment is:',o:['f(e)/f(o)','f(o)/f(e)','f(o) + f(e)','f(o)f(e)'],c:1,s:'M = f(o)/f(e).'},
+    {tp:'inst',q:'Short-sightedness (myopia) is corrected using a:',o:['convex lens','concave lens','bifocal prism','plane glass'],c:1,s:'A diverging lens.'},
+    {tp:'inst',q:'Long-sightedness (hypermetropia) is corrected using a:',o:['concave lens','convex lens','cylindrical lens','plane mirror'],c:1,s:'A converging lens.'}
   ]}
 };
 })();
