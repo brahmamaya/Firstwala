@@ -363,6 +363,33 @@ window.PhysicaExam={
   {t:'neet',sim:'shm-energy',q:'The total energy of a particle in SHM is proportional to:',o:['A','A²','1/A','√A'],c:1,a:'E = ½kA².'},
   {t:'neet',sim:'pendulum',q:'The length of a seconds pendulum (period 2 s) on Earth is about:',o:['0.25 m','0.5 m','1 m','2 m'],c:2,a:'l = gT²/4π² = 9.8 × 4/39.5 ≈ 0.99 m.'},
   {t:'neet',sim:'driven-resonance',q:'Resonance happens when the driving frequency is:',o:['zero','equal to the natural frequency','twice the natural frequency','very high'],c:1,a:'Then the amplitude is largest.'}
+],
+'Waves':[
+  {t:'1',sim:'wave',q:'Distinguish between transverse and longitudinal waves.',a:'Transverse: the particles move perpendicular to the direction of the wave (waves on a string).\nLongitudinal: the particles move along the direction of the wave (sound in air).'},
+  {t:'1',q:'Write Laplace\'s formula for the speed of sound in a gas.',a:'v = √(γP/ρ), where γ = C(p)/C(v).'},
+  {t:'1',sim:'beats',q:'What is the beat frequency of two sounds of frequencies f₁ and f₂?',a:'|f₁ − f₂|: the number of times per second the loudness rises and falls.'},
+  {t:'1',sim:'standing-wave',q:'What is the distance between two neighbouring nodes of a standing wave?',a:'λ/2.'},
+  {t:'1',sim:'pulse-reflection',q:'What phase change happens when a wave on a string reflects from a fixed end?',a:'A phase change of π: the pulse comes back upside down.'},
+  {t:'3',sim:'wave',q:'For y = 0.02 sin 2π(100t − 2x) (SI units), find the amplitude, frequency, wavelength and speed.',a:'Compare with y = A sin 2π(ft − x/λ).\nA = 0.02 m, f = 100 Hz, 1/λ = 2 so λ = 0.5 m.\nv = fλ = 100 × 0.5 = 50 m/s (moving in +x).'},
+  {t:'3',sim:'string-wave-speed',q:'Find the speed of a transverse wave on a string under 100 N tension with mass per unit length 0.01 kg/m.',a:'v = √(T/μ) = √(100/0.01) = √10 000 = 100 m/s.'},
+  {t:'3',q:'What was wrong with Newton\'s formula for the speed of sound, and how did Laplace correct it?',a:'Newton assumed the compressions are isothermal: v = √(P/ρ) ≈ 280 m/s in air, too low.\nLaplace said they are so quick that no heat flows: they are adiabatic, so the bulk modulus is γP.\nv = √(γP/ρ) = √1.4 × 280 ≈ 331 m/s, which matches experiment.'},
+  {t:'3',q:'How do temperature, pressure and humidity affect the speed of sound in air?',a:'Temperature: v ∝ √T (kelvin), so sound is faster on hot days.\nPressure: at constant temperature P/ρ stays the same, so pressure has no effect.\nHumidity: moist air is less dense, so sound travels slightly faster.'},
+  {t:'3',sim:'organ-pipes',q:'Compare the harmonics of a pipe open at both ends with a pipe closed at one end.',a:'Open pipe (antinodes at both ends): L = nλ/2, f = nv/2L, n = 1, 2, 3... All harmonics.\nClosed pipe (node at the closed end, antinode at the open end): L = (2n − 1)λ/4, f = (2n − 1)v/4L. Only odd harmonics.\nFor the same length, the open pipe\'s fundamental is twice the closed pipe\'s.'},
+  {t:'3',sim:'beats',q:'Tuning forks of 256 Hz and 260 Hz sound together. How many beats are heard per second? What happens if the 260 Hz fork is loaded with a little wax?',a:'Beats = 260 − 256 = 4 per second.\nWax makes the 260 Hz fork vibrate more slowly, so its frequency falls towards 256 Hz and the beat rate falls.'},
+  {t:'5',sim:'standing-wave',q:'Explain how standing waves form on a string fixed at both ends and find the frequencies it can have.',a:'A wave reflected at each fixed end meets the incoming wave; the two add to give y = 2A sin kx cos ωt.\nPoints with sin kx = 0 never move (nodes); midway between are antinodes.\nBoth ends must be nodes, so L = nλ/2.\nf(n) = nv/2L = (n/2L)√(T/μ), n = 1, 2, 3...\nn = 1 is the fundamental; the others are its harmonics.'},
+  {t:'5',sim:'doppler',q:'Explain the Doppler effect for sound and write the general formula. A 500 Hz source moves at 30 m/s towards a stationary listener (v = 330 m/s). What frequency is heard?',a:'When the source and listener approach, more waves reach the listener each second, so the pitch rises; when they move apart it falls.\nf\' = f(v + v(o))/(v − v(s)), with speeds taken positive for approach.\nHere: f\' = 500 × 330/(330 − 30) = 500 × 330/300 = 550 Hz.'},
+  {t:'5',sim:'organ-pipes',q:'Find the fundamental frequency of a 0.25 m pipe (v = 340 m/s) when it is (a) closed at one end (b) open at both ends. Which harmonics does each produce?',a:'(a) Closed: f₁ = v/4L = 340/1 = 340 Hz; overtones 3f₁, 5f₁... (odd harmonics only).\n(b) Open: f₁ = v/2L = 340/0.5 = 680 Hz; overtones 2f₁, 3f₁... (all harmonics).'},
+  {t:'jee',sim:'string-wave-speed',q:'A 1 m string has a wave speed of 200 m/s. Find its fundamental frequency, and the new fundamental if the tension is made 4 times.',a:'f₁ = v/2L = 200/2 = 100 Hz.\nv ∝ √T, so 4 times the tension doubles v and the fundamental becomes 200 Hz.'},
+  {t:'jee',sim:'organ-pipes',q:'With a 500 Hz fork, a resonance tube (closed at one end) resonates at lengths of 16 cm and 50 cm. Find the speed of sound and the end correction.',a:'Successive resonances differ by λ/2: 50 − 16 = 34 cm, so λ = 68 cm.\nv = fλ = 500 × 0.68 = 340 m/s.\nFirst resonance: L₁ + e = λ/4 = 17 cm, so e = 1 cm.'},
+  {t:'jee',sim:'beats',q:'Fork A (256 Hz) gives 4 beats per second with fork B. When B is loaded with wax the beats fall to 2 per second. The frequency of B was:',o:['252 Hz','260 Hz','258 Hz','254 Hz'],c:1,a:'B is 252 or 260 Hz. Wax lowers B\'s frequency. If B were 260 Hz, lowering it brings it closer to 256, so the beats fall: B = 260 Hz.'},
+  {t:'jee',sim:'doppler',q:'A source and a listener move towards each other, each at one tenth of the speed of sound. The frequency heard is:',o:['f','11f/9','9f/11','1.2f'],c:1,a:'f\' = f(v + v/10)/(v − v/10) = f × 1.1/0.9 = 11f/9.'},
+  {t:'jee',sim:'superposition',q:'Two waves of amplitudes A and 2A and the same frequency meet with a phase difference of π. The resulting amplitude is:',o:['3A','A','zero','√5 A'],c:1,a:'They are opposite in phase, so the amplitudes subtract: 2A − A = A.'},
+  {t:'neet',q:'Sound cannot travel through:',o:['water','steel','vacuum','air'],c:2,a:'Sound is a mechanical wave and needs a medium.'},
+  {t:'neet',q:'The speed of sound in air at 0 °C is about:',o:['332 m/s','3 × 10⁸ m/s','1500 m/s','100 m/s'],c:0,a:'About 332 m/s; it rises by about 0.6 m/s for each degree Celsius.'},
+  {t:'neet',sim:'organ-pipes',q:'A pipe closed at one end produces:',o:['all harmonics','only even harmonics','only odd harmonics','no harmonics'],c:2,a:'f = (2n − 1)v/4L.'},
+  {t:'neet',q:'The intensity of a wave is proportional to:',o:['A','A²','√A','1/A'],c:1,a:'Energy carried ∝ (amplitude)².'},
+  {t:'neet',q:'If the absolute temperature of air is made 4 times, the speed of sound becomes:',o:['4 times','2 times','half','the same'],c:1,a:'v ∝ √T.'},
+  {t:'neet',sim:'beats',q:'Beats are produced by the superposition of two waves of:',o:['the same frequency','slightly different frequencies','very different frequencies','different speeds'],c:1,a:'Slightly different frequencies go in and out of step regularly.'}
 ]};
 
 window.PhysicaMockBank={
@@ -898,6 +925,47 @@ window.PhysicaMockBank={
     {tp:'damp',q:'In damped oscillations, the amplitude:',o:['increases with time','decreases with time','stays the same','becomes infinite'],c:1,s:'Energy is lost to friction or air resistance.'},
     {tp:'damp',q:'Resonance happens when:',o:['the driving frequency equals the natural frequency','the amplitude is zero','there is no damping force at all','the system is at rest'],c:0,s:'Then energy is fed in most effectively.'},
     {tp:'damp',q:'In steady forced oscillations, the system oscillates at:',o:['its natural frequency','the driving frequency','zero frequency','twice the driving frequency'],c:1,s:'The driver sets the frequency.'}
+  ]},
+'Waves':{
+  topics:{basics:'Wave equation and basics',speed:'Speed of waves',stand:'Standing waves, strings and pipes',beat:'Superposition and beats',dop:'Doppler effect'},
+  jee:[
+    {tp:'basics',q:'y = 0.1 sin(20πt − 0.5πx) in SI units. The speed of the wave is:',o:['10 m/s','40 m/s','20 m/s','0.025 m/s'],c:1,s:'v = ω/k = 20π/0.5π = 40 m/s.'},
+    {tp:'basics',q:'For y = A sin(ωt − kx), the ratio of the greatest particle speed to the wave speed is:',o:['A/k','Ak','ω/k','k/A'],c:1,s:'(Aω)/(ω/k) = Ak.'},
+    {tp:'speed',q:'If the tension in a string is made 4 times, the speed of waves on it becomes:',o:['4 times','2 times','half','16 times'],c:1,s:'v = √(T/μ) ∝ √T.'},
+    {tp:'speed',q:'At the same temperature, the ratio of the speed of sound in hydrogen to that in oxygen is:',o:['1 : 4','4 : 1','16 : 1','1 : 16'],c:1,s:'v ∝ 1/√M for gases with the same γ: √(32/2) = 4.'},
+    {tp:'stand',q:'An open pipe and a closed pipe have the same length. The ratio of their fundamental frequencies (open : closed) is:',o:['1 : 2','2 : 1','1 : 1','4 : 1'],c:1,s:'v/2L : v/4L = 2 : 1.'},
+    {tp:'stand',q:'A string fixed at both ends has a fundamental of 100 Hz. Its 4th harmonic is:',o:['25 Hz','400 Hz','300 Hz','700 Hz'],c:1,s:'f(n) = n f₁ = 400 Hz.'},
+    {tp:'beat',q:'Sounds of 400 Hz and 404 Hz are heard together. The time between two loudest moments is:',o:['4 s','0.25 s','0.5 s','2 s'],c:1,s:'4 beats per second, so 1/4 s apart.'},
+    {tp:'beat',q:'Waves of amplitudes A and 2A (same frequency) meet with a phase difference of π. The resulting amplitude is:',o:['3A','A','zero','√5 A'],c:1,s:'Opposite phase: 2A − A.'},
+    {tp:'dop',q:'A source moves away from a still listener at half the speed of sound. The frequency heard is:',o:['2f','2f/3','f/2','3f/2'],c:1,s:'f\' = fv/(v + v/2) = 2f/3.'},
+    {tp:'dop',q:'A listener moves towards a still source at one fifth of the speed of sound. The frequency heard is:',o:['1.2f','0.8f','1.25f','f'],c:0,s:'f\' = f(v + v/5)/v = 1.2f.'},
+    {tp:'basics',q:'A sound of 500 Hz has a wavelength of 0.68 m. Find its speed in m/s.',n:340,s:'v = fλ = 500 × 0.68 = 340 m/s.'},
+    {tp:'speed',q:'A string has tension 160 N and mass per unit length 0.1 kg/m. Find the wave speed in m/s.',n:40,s:'v = √(160/0.1) = √1600 = 40 m/s.'},
+    {tp:'stand',q:'A pipe 0.85 m long is closed at one end (v = 340 m/s). Find its fundamental frequency in Hz.',n:100,s:'f = v/4L = 340/3.4 = 100 Hz.'},
+    {tp:'beat',q:'Tuning forks of 256 Hz and 262 Hz are sounded together. How many beats are heard per second?',n:6,s:'262 − 256 = 6.'},
+    {tp:'dop',q:'A 500 Hz source approaches a still listener at 30 m/s (v = 330 m/s). Find the frequency heard, in Hz.',n:550,s:'f\' = 500 × 330/300 = 550 Hz.'}
+  ],
+  neet:[
+    {tp:'basics',q:'Which of these is a longitudinal wave?',o:['light','a wave on a stretched string','sound in air','a ripple on water'],c:2,s:'Air particles move back and forth along the direction of the sound.'},
+    {tp:'basics',q:'The relation between wave speed, frequency and wavelength is:',o:['v = f/λ','v = fλ','v = λ/f','v = f + λ'],c:1,s:'One wavelength passes per cycle.'},
+    {tp:'basics',q:'A mechanical wave needs:',o:['a vacuum','a material medium','light','a magnetic field'],c:1,s:'Mechanical waves travel through the vibration of particles.'},
+    {tp:'basics',q:'In a transverse wave, the particles of the medium move:',o:['along the wave','perpendicular to the wave','in circles always','not at all'],c:1,s:'Up and down while the wave moves sideways.'},
+    {tp:'basics',q:'The SI unit of wavelength is:',o:['hertz','metre','second','m/s'],c:1,s:'It is a length.'},
+    {tp:'speed',q:'Laplace\'s formula for the speed of sound in a gas is:',o:['√(P/ρ)','√(γP/ρ)','√(ρ/P)','γP/ρ'],c:1,s:'Adiabatic compressions give γP.'},
+    {tp:'speed',q:'The speed of sound in a gas is proportional to:',o:['T','√T','T²','1/T'],c:1,s:'v ∝ √T (kelvin).'},
+    {tp:'speed',q:'Sound travels fastest in:',o:['air','water','steel','vacuum'],c:2,s:'Solids are much stiffer.'},
+    {tp:'speed',q:'The speed of a wave on a stretched string is:',o:['√(T/μ)','√(μ/T)','Tμ','T/μ'],c:0,s:'v = √(T/μ).'},
+    {tp:'stand',q:'The distance between a node and the next antinode is:',o:['λ','λ/2','λ/4','2λ'],c:2,s:'Nodes are λ/2 apart, antinodes halfway between.'},
+    {tp:'stand',q:'A pipe open at both ends produces:',o:['only odd harmonics','all harmonics','only even harmonics','no sound'],c:1,s:'f = nv/2L, n = 1, 2, 3...'},
+    {tp:'stand',q:'A pipe closed at one end produces:',o:['all harmonics','only even harmonics','only odd harmonics','only the fundamental'],c:2,s:'f = (2n − 1)v/4L.'},
+    {tp:'stand',q:'The fundamental frequency of a pipe of length L open at both ends is:',o:['v/4L','v/2L','v/L','2v/L'],c:1,s:'L = λ/2.'},
+    {tp:'stand',q:'In a standing wave, energy is:',o:['carried along the medium','not carried along; it stays trapped between nodes','destroyed','carried twice as fast'],c:1,s:'Equal waves going both ways carry no net energy.'},
+    {tp:'beat',q:'Two sources of 300 Hz and 305 Hz produce beats at:',o:['5 per second','605 per second','302.5 per second','0'],c:0,s:'|f₁ − f₂| = 5.'},
+    {tp:'beat',q:'When two waves meet in phase, the resulting amplitude is:',o:['the difference of their amplitudes','the sum of their amplitudes','zero','the product of their amplitudes'],c:1,s:'Constructive interference.'},
+    {tp:'beat',q:'If the amplitude of a sound wave is doubled, its intensity becomes:',o:['2 times','4 times','half','the same'],c:1,s:'I ∝ A².'},
+    {tp:'dop',q:'When a sound source moves towards a listener, the pitch heard is:',o:['lower','higher','the same','zero'],c:1,s:'The waves are squeezed together.'},
+    {tp:'dop',q:'The apparent change in frequency due to relative motion of source and listener is called:',o:['interference','diffraction','the Doppler effect','resonance'],c:2,s:'Doppler effect.'},
+    {tp:'dop',q:'Police radar guns measure the speed of cars using:',o:['beats','the Doppler effect','resonance','refraction'],c:1,s:'The reflected wave\'s frequency shift gives the speed.'}
   ]}
 };
 })();
