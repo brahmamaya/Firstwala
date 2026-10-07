@@ -3,7 +3,7 @@
    those exams. a = step-by-step answer; o = options and c = the correct one for MCQs; sim = the experiment to try it in.
    window.PhysicaMockBank = the timed mock tests (JEE Main and NEET pattern), separate from the practice questions so a
    student never meets a mock question beforehand. tp = topic (for the topic-wise report), o + c = MCQ, n = numerical
-   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line, Motion in a Plane. */
+   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion. */
 (() => {
 'use strict';
 window.PhysicaExam={
@@ -93,6 +93,33 @@ window.PhysicaExam={
   {t:'neet',sim:'circular-motion',q:'In uniform circular motion:',o:['speed and velocity are both constant','speed is constant but velocity changes','velocity is constant but speed changes','acceleration is zero'],c:1,a:'The size of the velocity stays the same but its direction keeps turning, so there is an acceleration.'},
   {t:'neet',q:'The unit vector along 3î + 4ĵ is:',o:['3î + 4ĵ','(3î + 4ĵ)/7','(3î + 4ĵ)/5','(3î + 4ĵ)/25'],c:2,a:'|3î + 4ĵ| = 5, so the unit vector is (3î + 4ĵ)/5.'},
   {t:'neet',sim:'river-crossing',q:'A boat heads straight across a 1 km wide river at 5 km/h; the river flows at 3 km/h. The time to cross is:',o:['12 min','15 min','20 min','10 min'],c:0,a:'Only the across-component matters: t = 1/5 h = 12 min. (The current only carries it downstream.)'}
+],
+'Laws of Motion':[
+  {t:'1',q:'Why do passengers fall forwards when a moving bus stops suddenly?',a:'Inertia of motion: the lower body stops with the bus, but the upper body tends to keep moving forwards.'},
+  {t:'1',q:'State Newton\'s second law of motion.',a:'The rate of change of momentum of a body equals the net external force on it and is in its direction: F = dp/dt (= ma for constant mass).'},
+  {t:'1',sim:'impulse-catch',q:'What is the SI unit of impulse?',a:'N·s (newton second), the same as kg·m/s, the unit of momentum.'},
+  {t:'1',q:'Action and reaction are equal and opposite. Why don\'t they cancel each other?',a:'They act on two different bodies, so they never add up on the same body.'},
+  {t:'1',sim:'angle-of-repose',q:'Define the angle of repose.',a:'The largest angle of an incline at which a body just stays at rest on it. tan θ = μs (coefficient of static friction).'},
+  {t:'3',q:'Show that Newton\'s first law is contained in the second law.',a:'F = ma. If the net force F = 0, then a = 0.\nSo a body at rest stays at rest and a moving body keeps moving with the same velocity: this is the first law.'},
+  {t:'3',sim:'gun-recoil',q:'Derive the law of conservation of momentum from Newton\'s laws. Use it to find the recoil speed of a 4 kg gun firing a 50 g bullet at 400 m/s.',a:'When A and B interact, F(AB) = −F(BA) (third law). With F = dp/dt: dp(A)/dt = −dp(B)/dt, so d(p(A) + p(B))/dt = 0: the total momentum stays constant.\nGun: 0 = 0.05 × 400 + 4 × V, so V = −5 m/s (5 m/s backwards).'},
+  {t:'3',sim:'elevator-weight',q:'A 60 kg person stands on a weighing scale in a lift. Find the reading when the lift (a) accelerates up at 2 m/s² (b) accelerates down at 2 m/s² (c) falls freely (g = 10 m/s²).',a:'N − mg = ma (up positive).\n(a) N = m(g + a) = 60 × 12 = 720 N.\n(b) N = m(g − a) = 60 × 8 = 480 N.\n(c) a = g, so N = 0 (weightlessness).'},
+  {t:'3',sim:'impulse-catch',q:'Why does a cricketer pull his hands back while catching a fast ball?',a:'The ball\'s change in momentum Δp is fixed. Force = Δp/Δt.\nPulling the hands back makes the stopping time Δt longer, so the force on the hands is smaller and it hurts less.'},
+  {t:'3',sim:'atwood',q:'Masses of 3 kg and 5 kg hang from a light string over a smooth pulley. Find the acceleration and the tension (g = 10 m/s²).',a:'a = (m₂ − m₁)g/(m₁ + m₂) = 2 × 10/8 = 2.5 m/s².\nT = 2m₁m₂g/(m₁ + m₂) = 2 × 3 × 5 × 10/8 = 37.5 N.'},
+  {t:'3',sim:'angle-of-repose',q:'Show that the coefficient of static friction equals the tangent of the angle of repose.',a:'At the angle of repose θ the block is just about to slide.\nAlong the incline: mg sin θ = f(max) = μs N. Perpendicular: N = mg cos θ.\nSo mg sin θ = μs mg cos θ, giving μs = tan θ.'},
+  {t:'5',sim:'banked-turn',q:'Derive the maximum safe speed of a car on a banked road of radius r, banking angle θ and coefficient of friction μ. What is the speed when there is no friction?',a:'At maximum speed friction acts down the slope.\nVertical: N cos θ = mg + f sin θ. Horizontal: N sin θ + f cos θ = mv²/r, with f = μN.\nDivide: v²/rg = (sin θ + μ cos θ)/(cos θ − μ sin θ).\nv(max) = √[rg(μ + tan θ)/(1 − μ tan θ)].\nWith μ = 0: v = √(rg tan θ), the speed at which no friction is needed.'},
+  {t:'5',sim:'connected-blocks',q:'Blocks of 2 kg and 3 kg are tied by a light string on a smooth table. A 20 N force pulls the 3 kg block. Find the acceleration and the tension. What is the tension if the force pulls the 2 kg block instead?',a:'Whole system: a = F/(m₁ + m₂) = 20/5 = 4 m/s².\nThe string pulls only the 2 kg block: T = 2 × 4 = 8 N.\nPulling the 2 kg block instead, the string pulls the 3 kg block: T = 3 × 4 = 12 N (a is still 4 m/s²).'},
+  {t:'5',sim:'inclined-plane',q:'A 10 kg block slides down a 30° incline with μk = 0.2. Find its acceleration and the force along the incline needed to push it up at constant speed (g = 10 m/s²).',a:'Normal force N = mg cos 30° = 100 × 0.866 = 86.6 N; friction = 0.2 × 86.6 = 17.3 N.\nSliding down: ma = mg sin 30° − f = 50 − 17.3 = 32.7 N, so a ≈ 3.3 m/s².\nPushing up at constant speed (friction now acts down): F = mg sin 30° + f = 50 + 17.3 ≈ 67.3 N.'},
+  {t:'jee',q:'A 2 kg block is pressed against a vertical wall by a horizontal force F. If μs = 0.5, the least F that keeps it from sliding is (g = 10 m/s²):',o:['20 N','40 N','10 N','80 N'],c:1,a:'Normal force = F, so the largest friction is μF.\nμF = mg: F = 20/0.5 = 40 N.'},
+  {t:'jee',q:'A 2 kg block rests on a 4 kg block on a smooth floor; μ between them is 0.3. What is the largest horizontal force on the lower block for which they move together (g = 10 m/s²)?',a:'Friction alone accelerates the top block, so its largest acceleration is μg = 3 m/s².\nBoth move together at this acceleration: F = (2 + 4) × 3 = 18 N.'},
+  {t:'jee',sim:'inclined-plane',q:'A 4 kg block on a smooth 30° incline is tied over a pulley at the top to a hanging 4 kg block. The acceleration is (g = 10 m/s²):',o:['2.5 m/s²','5 m/s²','1.25 m/s²','10 m/s²'],c:0,a:'Driving force = 4g − 4g sin 30° = 40 − 20 = 20 N; total mass = 8 kg.\na = 20/8 = 2.5 m/s².'},
+  {t:'jee',sim:'impulse-catch',q:'A force on a 0.5 kg ball at rest rises steadily from 0 to 100 N and falls back to 0 in a total time of 0.1 s (a triangle on the F-t graph). Find the ball\'s final speed.',a:'Impulse = area under the F-t graph = ½ × 0.1 × 100 = 5 N·s.\nΔp = 5 kg·m/s, so v = 5/0.5 = 10 m/s.'},
+  {t:'jee',sim:'banked-turn',q:'The largest speed at which a car can take a flat curve of radius 50 m with μ = 0.5 is (g = 10 m/s²):',o:['25 m/s','√250 ≈ 15.8 m/s','5 m/s','50 m/s'],c:1,a:'Friction gives the centripetal force: μmg = mv²/r, so v = √(μrg) = √250 ≈ 15.8 m/s. (The mass does not matter.)'},
+  {t:'neet',q:'The inertia of a body depends on its:',o:['speed','shape','mass','colour'],c:2,a:'Mass is the measure of inertia.'},
+  {t:'neet',q:'A 10 N force acts on a 2 kg body for 3 s. The change in its momentum is:',o:['30 kg·m/s','15 kg·m/s','60 kg·m/s','5 kg·m/s'],c:0,a:'Δp = F × t = 10 × 3 = 30 kg·m/s.'},
+  {t:'neet',sim:'elevator-weight',q:'In a lift falling freely, the apparent weight of a person is:',o:['mg','2mg','zero','mg/2'],c:2,a:'N = m(g − a) with a = g, so N = 0.'},
+  {t:'neet',q:'A rocket works on the principle of:',o:['conservation of energy','conservation of momentum','Newton\'s first law','Bernoulli\'s principle'],c:1,a:'The gases are pushed back and the rocket moves forwards: conservation of momentum (Newton\'s third law).'},
+  {t:'neet',q:'For the same two surfaces:',o:['μs = μk','μs < μk','μs > μk','μs = 0'],c:2,a:'It is harder to start sliding than to keep sliding, so static friction is larger than kinetic.'},
+  {t:'neet',sim:'connected-blocks',q:'A 20 N force pushes 4 kg and 6 kg blocks in contact along a smooth floor. Their acceleration is:',o:['5 m/s²','2 m/s²','3.3 m/s²','10 m/s²'],c:1,a:'a = F/(total mass) = 20/10 = 2 m/s².'}
 ]};
 
 window.PhysicaMockBank={
@@ -218,6 +245,47 @@ window.PhysicaMockBank={
     {tp:'rel',q:'A boat moving at 4 m/s heads straight across a river flowing at 3 m/s. Its speed relative to the bank is:',o:['7 m/s','1 m/s','5 m/s','3.5 m/s'],c:2,s:'√(4² + 3²) = 5 m/s.'},
     {tp:'rel',q:'The same boat (4 m/s, heading straight across) crosses a 100 m wide river in:',o:['20 s','25 s','33 s','100 s'],c:1,s:'Only the across speed counts: t = 100/4 = 25 s.'},
     {tp:'rel',q:'Rain falls vertically at 10√3 m/s and a man walks at 10 m/s. He should tilt his umbrella forwards at:',o:['60° to the vertical','45° to the vertical','90° to the vertical','30° to the vertical'],c:3,s:'tan θ = 10 / (10√3) = 1/√3, so θ = 30° to the vertical.'}
+  ]},
+'Laws of Motion':{
+  topics:{newton:'Newton\'s laws',mom:'Momentum and impulse',fric:'Friction',conn:'Connected bodies and pulleys',circ:'Circular motion and banking'},
+  jee:[
+    {tp:'newton',q:'A force F = 6t newton (t in seconds) acts on a 3 kg body at rest. Its speed at t = 2 s is:',o:['2 m/s','6 m/s','4 m/s','8 m/s'],c:2,s:'Impulse = ∫6t dt from 0 to 2 = 3t² = 12 N·s. v = 12/3 = 4 m/s.'},
+    {tp:'newton',q:'A 60 kg man in a lift stands on a scale that reads 480 N (g = 10 m/s²). The lift is:',o:['moving up at constant speed','accelerating upwards at 2 m/s²','accelerating downwards at 2 m/s²','falling freely'],c:2,s:'mg − N = ma: 600 − 480 = 60a, so a = 2 m/s² downwards (or it is slowing down while going up).'},
+    {tp:'mom',q:'A 10 g bullet moving at 500 m/s gets stuck in a 990 g block at rest. The block moves off at:',o:['5 m/s','50 m/s','0.5 m/s','10 m/s'],c:0,s:'0.01 × 500 = (0.01 + 0.99)v, so v = 5 m/s.'},
+    {tp:'mom',q:'A machine gun fires 240 bullets per minute, each of mass 10 g, at 600 m/s. The average force needed to hold it is:',o:['12 N','144 N','36 N','24 N'],c:3,s:'4 bullets per second. F = (number per second) × mv = 4 × 0.01 × 600 = 24 N.'},
+    {tp:'fric',q:'A block on an incline just begins to slide when the incline is raised to 30°. The coefficient of static friction is:',o:['0.5','√3','1/√3','1/(2√3)'],c:2,s:'μs = tan(angle of repose) = tan 30° = 1/√3.'},
+    {tp:'fric',q:'A 5 kg block lies on a floor with μs = 0.4 and μk = 0.3. A horizontal force of 15 N is applied. The friction force is (g = 10 m/s²):',o:['20 N','0','15 N','5 N'],c:2,s:'Limiting friction = 0.4 × 50 = 20 N > 15 N, so the block stays at rest and static friction just balances the push: 15 N.'},
+    {tp:'conn',q:'Masses of 2 kg and 3 kg hang over a smooth pulley (Atwood machine). The tension in the string is (g = 10 m/s²):',o:['24 N','20 N','30 N','12 N'],c:0,s:'T = 2m₁m₂g/(m₁ + m₂) = 2 × 2 × 3 × 10/5 = 24 N.'},
+    {tp:'conn',q:'Blocks of 1, 2 and 3 kg are in contact in a row on a smooth floor. A 12 N force pushes the 1 kg block. The contact force between the 2 kg and 3 kg blocks is:',o:['2 N','12 N','10 N','6 N'],c:3,s:'a = 12/6 = 2 m/s². The contact force alone accelerates the 3 kg block: 3 × 2 = 6 N.'},
+    {tp:'circ',q:'A road of radius 100 m is banked for a speed of 20 m/s with no friction. The banking angle θ has tan θ equal to (g = 10 m/s²):',o:['0.2','0.4','0.8','4'],c:1,s:'tan θ = v²/(rg) = 400/1000 = 0.4.'},
+    {tp:'fric',q:'The shortest stopping distance of a car moving at 20 m/s on a road with μ = 0.5 is (g = 10 m/s²):',o:['20 m','80 m','40 m','10 m'],c:2,s:'Largest retardation = μg = 5 m/s². s = v²/(2a) = 400/10 = 40 m.'},
+    {tp:'newton',q:'A 2 kg block hangs by a string from the roof of a lift accelerating upwards at 2 m/s². Find the tension in newtons (g = 10 m/s²).',n:24,s:'T − mg = ma: T = 2 × (10 + 2) = 24 N.'},
+    {tp:'mom',q:'A 0.15 kg ball arriving at 20 m/s is hit straight back at 20 m/s. The bat is in contact for 0.01 s. Find the average force in newtons.',n:600,s:'Δp = 0.15 × (20 + 20) = 6 kg·m/s. F = 6/0.01 = 600 N.'},
+    {tp:'fric',q:'A 4 kg block is pulled along a floor by a horizontal 20 N force. μk = 0.3. Find its acceleration in m/s² (g = 10 m/s²).',n:2,s:'Friction = 0.3 × 40 = 12 N. a = (20 − 12)/4 = 2 m/s².'},
+    {tp:'conn',q:'A 6 kg block on a smooth 30° incline is tied over a pulley at the top to a hanging 4 kg block. Find the tension in newtons (g = 10 m/s²).',n:36,s:'a = (40 − 60 sin 30°)/10 = (40 − 30)/10 = 1 m/s², with the hanging block going down.\nFor the hanging block: 40 − T = 4 × 1, so T = 36 N.'},
+    {tp:'circ',q:'Find the largest speed, in m/s, at which a car can take a flat curve of radius 50 m if μ = 0.2 (g = 10 m/s²).',n:10,s:'v = √(μrg) = √(0.2 × 50 × 10) = √100 = 10 m/s.'}
+  ],
+  neet:[
+    {tp:'newton',q:'Newton\'s first law of motion gives the idea of:',o:['energy','inertia','work','power'],c:1,s:'A body keeps its state of rest or motion unless a force acts: inertia.'},
+    {tp:'newton',q:'A 10 N force acts on a 5 kg body. Its acceleration is:',o:['50 m/s²','0.5 m/s²','2 m/s²','5 m/s²'],c:2,s:'a = F/m = 10/5 = 2 m/s².'},
+    {tp:'newton',q:'In a lift accelerating upwards at a, the apparent weight of a body of mass m is:',o:['mg','m(g − a)','m(g + a)','zero'],c:2,s:'N − mg = ma, so N = m(g + a).'},
+    {tp:'newton',q:'Action and reaction forces:',o:['act on the same body','act on different bodies','cancel each other','act at different times'],c:1,s:'They act on two different bodies at the same time, so they never cancel.'},
+    {tp:'newton',q:'A book rests on a table. The reaction to the book\'s weight is:',o:['the normal force of the table on the book','the book\'s pull on the Earth','the table\'s weight','friction'],c:1,s:'Weight = the Earth pulls the book; its reaction = the book pulls the Earth. (The normal force is a different pair.)'},
+    {tp:'mom',q:'Impulse is equal to the:',o:['change in momentum','change in kinetic energy','rate of change of momentum','force × distance'],c:0,s:'J = FΔt = Δp.'},
+    {tp:'mom',q:'A 5 kg gun fires a 50 g bullet at 200 m/s. The recoil speed of the gun is:',o:['20 m/s','0.2 m/s','2 m/s','200 m/s'],c:2,s:'5V = 0.05 × 200 = 10, so V = 2 m/s.'},
+    {tp:'mom',q:'A fielder moves his hands back while catching a ball to:',o:['reduce the force by increasing the time','reduce the momentum','increase the impulse','increase the force'],c:0,s:'F = Δp/Δt: the same Δp over a longer time needs a smaller force.'},
+    {tp:'mom',q:'The momentum of a body changes from 10 kg·m/s to 30 kg·m/s in 4 s. The average force is:',o:['10 N','2.5 N','40 N','5 N'],c:3,s:'F = Δp/Δt = 20/4 = 5 N.'},
+    {tp:'mom',q:'A bomb at rest explodes into two equal pieces. The pieces:',o:['move in the same direction','move in opposite directions with equal speeds','both stay at rest','move at right angles'],c:1,s:'Total momentum stays zero: equal masses need equal and opposite velocities.'},
+    {tp:'fric',q:'The force of friction always:',o:['acts along the motion','opposes the relative motion between surfaces','is zero on rough surfaces','depends on the area of contact'],c:1,s:'Friction opposes relative motion (or its tendency) between the surfaces in contact.'},
+    {tp:'fric',q:'Which kind of friction is usually the smallest?',o:['static','kinetic (sliding)','limiting','rolling'],c:3,s:'Rolling friction is much smaller than sliding friction, which is why wheels help.'},
+    {tp:'fric',q:'A 10 kg block slides on a floor with μk = 0.2. The friction force is (g = 10 m/s²):',o:['2 N','20 N','50 N','100 N'],c:1,s:'f = μk mg = 0.2 × 100 = 20 N.'},
+    {tp:'fric',q:'If the angle of repose is 45°, the coefficient of static friction is:',o:['0.5','1/√2','√2','1'],c:3,s:'μs = tan 45° = 1.'},
+    {tp:'fric',q:'The largest acceleration a car can have on a road with μ = 0.6 is (g = 10 m/s²):',o:['6 m/s²','0.6 m/s²','10 m/s²','16 m/s²'],c:0,s:'The road can push forwards with at most μmg, so a(max) = μg = 6 m/s².'},
+    {tp:'conn',q:'Blocks of 2 kg and 3 kg are tied by a string on a smooth floor. A 10 N force pulls the 3 kg block. The tension in the string is:',o:['10 N','6 N','4 N','2 N'],c:2,s:'a = 10/5 = 2 m/s². The string pulls the 2 kg block: T = 2 × 2 = 4 N.'},
+    {tp:'conn',q:'Two equal masses hang over a smooth pulley. Their acceleration is:',o:['g','g/2','zero','2g'],c:2,s:'a = (m₂ − m₁)g/(m₁ + m₂) = 0.'},
+    {tp:'conn',q:'Masses of 1 kg and 3 kg hang over a smooth pulley. The acceleration is (g = 10 m/s²):',o:['2.5 m/s²','5 m/s²','7.5 m/s²','10 m/s²'],c:1,s:'a = (3 − 1) × 10/(3 + 1) = 5 m/s².'},
+    {tp:'circ',q:'When a car turns on a flat (unbanked) road, the centripetal force comes from:',o:['the engine','gravity','friction between the tyres and the road','the normal force'],c:2,s:'On a flat road only friction acts sideways towards the centre.'},
+    {tp:'circ',q:'For a road banked at angle θ with no friction, the correct speed v satisfies:',o:['tan θ = rg/v²','sin θ = v²/rg','tan θ = v²/rg','cos θ = v²/rg'],c:2,s:'N sin θ = mv²/r and N cos θ = mg, so tan θ = v²/(rg).'}
   ]}
 };
 })();
