@@ -3,7 +3,7 @@
    those exams. a = step-by-step answer; o = options and c = the correct one for MCQs; sim = the experiment to try it in.
    window.PhysicaMockBank = the timed mock tests (JEE Main and NEET pattern), separate from the practice questions so a
    student never meets a mock question beforehand. tp = topic (for the topic-wise report), o + c = MCQ, n = numerical
-   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion. */
+   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion, Work, Energy and Power. */
 (() => {
 'use strict';
 window.PhysicaExam={
@@ -120,6 +120,33 @@ window.PhysicaExam={
   {t:'neet',q:'A rocket works on the principle of:',o:['conservation of energy','conservation of momentum','Newton\'s first law','Bernoulli\'s principle'],c:1,a:'The gases are pushed back and the rocket moves forwards: conservation of momentum (Newton\'s third law).'},
   {t:'neet',q:'For the same two surfaces:',o:['μs = μk','μs < μk','μs > μk','μs = 0'],c:2,a:'It is harder to start sliding than to keep sliding, so static friction is larger than kinetic.'},
   {t:'neet',sim:'connected-blocks',q:'A 20 N force pushes 4 kg and 6 kg blocks in contact along a smooth floor. Their acceleration is:',o:['5 m/s²','2 m/s²','3.3 m/s²','10 m/s²'],c:1,a:'a = F/(total mass) = 20/10 = 2 m/s².'}
+],
+'Work, Energy and Power':[
+  {t:'1',sim:'work-angle',q:'When is the work done by a force zero even though the body moves?',a:'When the force is perpendicular to the displacement (W = Fs cos 90° = 0), for example the centripetal force in circular motion.'},
+  {t:'1',sim:'lifting-power',q:'What is the SI unit of power? How many watts make one horsepower?',a:'The watt (W = J/s). 1 hp = 746 W.'},
+  {t:'1',q:'State the work-energy theorem.',a:'The work done by the net force on a body equals the change in its kinetic energy: W(net) = ΔK.'},
+  {t:'1',q:'Write the relation between kinetic energy K and momentum p.',a:'K = p²/2m.'},
+  {t:'1',sim:'collision',q:'In which type of collision is kinetic energy also conserved?',a:'A perfectly elastic collision. (Momentum is conserved in every collision.)'},
+  {t:'3',sim:'work-angle',q:'A 10 N force acts at 60° to the direction of motion and moves a body 5 m. Find the work done.',a:'W = Fs cos θ = 10 × 5 × cos 60° = 25 J.'},
+  {t:'3',q:'Prove the work-energy theorem for a constant force.',a:'For constant acceleration: v² − u² = 2as.\nMultiply by m/2: ½mv² − ½mu² = mas = Fs.\nSo the work done Fs equals the change in kinetic energy.'},
+  {t:'3',sim:'spring-launcher',q:'Show that the potential energy of a spring stretched by x is ½kx².',a:'The spring force is F = kx (it grows steadily from 0).\nWork to stretch it = area under the F-x graph = ½ × x × kx = ½kx².\nThis work is stored as potential energy.'},
+  {t:'3',sim:'lifting-power',q:'A motor lifts a 200 kg load through 10 m in 20 s. Find its power (g = 10 m/s²).',a:'Work = mgh = 200 × 10 × 10 = 20 000 J.\nPower = W/t = 20 000/20 = 1000 W = 1 kW.'},
+  {t:'3',sim:'energy',q:'A ball is dropped from 20 m. Using conservation of energy, find its speed after falling 5 m and on reaching the ground (g = 10 m/s²).',a:'Loss of PE = gain of KE: mgh = ½mv², so v = √(2gh).\nAfter 5 m: v = √(2 × 10 × 5) = 10 m/s.\nAt the ground: v = √(2 × 10 × 20) = 20 m/s.'},
+  {t:'3',sim:'collision',q:'Show that in an elastic head-on collision between equal masses, with one at rest, the bodies exchange velocities.',a:'Momentum: mu = mv₁ + mv₂, so u = v₁ + v₂.\nKinetic energy: u² = v₁² + v₂².\nSquaring the first: u² = v₁² + v₂² + 2v₁v₂, so v₁v₂ = 0.\nThe first body cannot pass through the second, so v₁ = 0 and v₂ = u: they exchange velocities.'},
+  {t:'5',sim:'collision',q:'Derive the final velocities after a one-dimensional elastic collision between masses m₁ and m₂ with initial velocities u₁ and u₂.',a:'Momentum: m₁(u₁ − v₁) = m₂(v₂ − u₂) ... (1)\nKinetic energy: m₁(u₁² − v₁²) = m₂(v₂² − u₂²) ... (2)\n(2) ÷ (1): u₁ + v₁ = v₂ + u₂, so the relative speed is reversed: v₂ − v₁ = u₁ − u₂.\nSolving:\nv₁ = [(m₁ − m₂)u₁ + 2m₂u₂]/(m₁ + m₂)\nv₂ = [(m₂ − m₁)u₂ + 2m₁u₁]/(m₁ + m₂)'},
+  {t:'5',sim:'vertical-circle',q:'A stone on a string of length r moves in a vertical circle. Find the least speed at the top and at the bottom for it to complete the circle, and the difference in tension between the bottom and the top.',a:'At the top, the string just stays tight when T = 0: mg = mv²/r, so v(top) = √(gr).\nEnergy from bottom to top (height 2r): v(bottom)² = v(top)² + 4gr = 5gr, so v(bottom) = √(5gr).\nTensions: T(bottom) = mg + mv(b)²/r, T(top) = mv(t)²/r − mg.\nT(bottom) − T(top) = 2mg + m(v(b)² − v(t)²)/r = 2mg + 4mg = 6mg.'},
+  {t:'5',sim:'ballistic-pendulum',q:'A bullet of mass m hits and sticks in a block of mass M hanging as a pendulum. The block rises by h. Find the bullet\'s speed.',a:'Collision (momentum conserved, KE not): mu = (m + M)V.\nAfter the collision (energy conserved): ½(m + M)V² = (m + M)gh, so V = √(2gh).\nSo u = [(m + M)/m] √(2gh).'},
+  {t:'jee',sim:'variable-force-work',q:'A force F = 3x² newton (x in metres) acts on a particle along x. Find the work done as it moves from x = 0 to x = 2 m.',a:'W = ∫F dx = ∫3x² dx from 0 to 2 = x³ from 0 to 2 = 8 J.'},
+  {t:'jee',q:'A uniform chain of mass M and length L lies on a table with one third of its length hanging over the edge. The work needed to pull the hanging part back on the table is:',o:['MgL/9','MgL/18','MgL/3','MgL/6'],c:1,a:'Hanging mass = M/3; its centre of mass is L/6 below the table.\nW = (M/3) × g × (L/6) = MgL/18.'},
+  {t:'jee',sim:'collision',q:'A ball hits an identical ball at rest and they stick together. The fraction of kinetic energy lost is:',o:['1/4','3/4','1/2','zero'],c:2,a:'mu = 2mV, so V = u/2.\nKE after = ½(2m)(u/2)² = ¼mu², half of ½mu². So 1/2 is lost.'},
+  {t:'jee',sim:'spring-launcher',q:'A 1 kg block moving at 10 m/s on a smooth floor hits a spring of constant 100 N/m. Find the largest compression.',a:'½mv² = ½kx²: x = v√(m/k) = 10 × √(1/100) = 1 m.'},
+  {t:'jee',q:'A ball dropped from a height h bounces back to h/4. The coefficient of restitution is:',o:['1/4','1/2','1/√2','3/4'],c:1,a:'Speeds: √(2gh) before, √(2g h/4) after. e = ratio = √(1/4) = 1/2.'},
+  {t:'neet',sim:'vertical-circle',q:'The work done by the centripetal force on a body moving in a circle is:',o:['positive','negative','zero','mv²'],c:2,a:'The force is always perpendicular to the motion.'},
+  {t:'neet',q:'If the momentum of a body is doubled, its kinetic energy becomes:',o:['2 times','4 times','half','the same'],c:1,a:'K = p²/2m, so K grows as p²: 4 times.'},
+  {t:'neet',q:'The kilowatt-hour is a unit of:',o:['power','force','energy','momentum'],c:2,a:'kW × h = energy: 1 kWh = 3.6 × 10⁶ J.'},
+  {t:'neet',sim:'spring-launcher',q:'A spring of constant 200 N/m is stretched by 0.1 m. Its stored energy is:',o:['10 J','2 J','20 J','1 J'],c:3,a:'U = ½kx² = ½ × 200 × 0.01 = 1 J.'},
+  {t:'neet',q:'A 2 kg body is lifted 5 m. The work done by gravity is (g = 10 m/s²):',o:['100 J','−100 J','10 J','zero'],c:1,a:'Gravity acts down while the body moves up: W = −mgh = −100 J.'},
+  {t:'neet',sim:'collision',q:'In a perfectly elastic collision:',o:['only momentum is conserved','only kinetic energy is conserved','both momentum and kinetic energy are conserved','neither is conserved'],c:2,a:'Momentum is conserved in every collision; in an elastic one the kinetic energy is too.'}
 ]};
 
 window.PhysicaMockBank={
@@ -286,6 +313,47 @@ window.PhysicaMockBank={
     {tp:'conn',q:'Masses of 1 kg and 3 kg hang over a smooth pulley. The acceleration is (g = 10 m/s²):',o:['2.5 m/s²','5 m/s²','7.5 m/s²','10 m/s²'],c:1,s:'a = (3 − 1) × 10/(3 + 1) = 5 m/s².'},
     {tp:'circ',q:'When a car turns on a flat (unbanked) road, the centripetal force comes from:',o:['the engine','gravity','friction between the tyres and the road','the normal force'],c:2,s:'On a flat road only friction acts sideways towards the centre.'},
     {tp:'circ',q:'For a road banked at angle θ with no friction, the correct speed v satisfies:',o:['tan θ = rg/v²','sin θ = v²/rg','tan θ = v²/rg','cos θ = v²/rg'],c:2,s:'N sin θ = mv²/r and N cos θ = mg, so tan θ = v²/(rg).'}
+  ]},
+'Work, Energy and Power':{
+  topics:{work:'Work and variable forces',ke:'Kinetic and potential energy',cons:'Conservation of energy',power:'Power',coll:'Collisions'},
+  jee:[
+    {tp:'work',q:'A force F = (2î + 3ĵ) N moves a particle through d = (4î − ĵ) m. The work done is:',o:['11 J','5 J','8 J','−5 J'],c:1,s:'W = F·d = 2 × 4 + 3 × (−1) = 5 J.'},
+    {tp:'work',q:'A force F = (3x² − 2x) N acts on a particle along x. The work done from x = 1 m to x = 2 m is:',o:['8 J','6 J','4 J','2 J'],c:2,s:'W = [x³ − x²] from 1 to 2 = (8 − 4) − (1 − 1) = 4 J.'},
+    {tp:'ke',q:'The kinetic energy of a body increases by 300%. Its momentum increases by:',o:['50%','200%','300%','100%'],c:3,s:'K becomes 4K. p = √(2mK), so p becomes 2p: an increase of 100%.'},
+    {tp:'ke',q:'Bodies of mass 1 kg and 4 kg have equal kinetic energies. The ratio of their momenta is:',o:['1 : 4','4 : 1','1 : 2','2 : 1'],c:2,s:'p = √(2mK) ∝ √m: √1 : √4 = 1 : 2.'},
+    {tp:'cons',q:'A pendulum of length 1 m is released from the horizontal position. Its speed at the lowest point is (g = 10 m/s²):',o:['√20 m/s','√10 m/s','10 m/s','20 m/s'],c:0,s:'It falls through 1 m: v = √(2gL) = √20 ≈ 4.5 m/s.'},
+    {tp:'cons',q:'A stone on a string moves in a vertical circle. The tension at the lowest point exceeds that at the highest point by:',o:['2mg','4mg','6mg','mg'],c:2,s:'T(bottom) − T(top) = 2mg + m(v(b)² − v(t)²)/r = 2mg + 4mg = 6mg.'},
+    {tp:'power',q:'A car moves at a steady 20 m/s against a total resistance of 500 N. The power of its engine is:',o:['20 kW','10 kW','5 kW','1 kW'],c:1,s:'At constant speed the driving force = 500 N. P = Fv = 500 × 20 = 10 000 W.'},
+    {tp:'power',q:'A pump raises 600 kg of water per minute through 10 m. Its power is (g = 10 m/s²):',o:['600 W','6 kW','1 kW','100 W'],c:2,s:'P = mgh/t = 600 × 10 × 10/60 = 1000 W.'},
+    {tp:'coll',q:'A ball of mass m moving at v hits an identical ball at rest and they stick together. The kinetic energy lost is:',o:['mv²/4','mv²/2','3mv²/4','zero'],c:0,s:'Common speed v/2. KE after = ½(2m)(v/2)² = mv²/4. Lost = mv²/2 − mv²/4 = mv²/4.'},
+    {tp:'coll',q:'A ball dropped from 9 m hits the floor with coefficient of restitution 1/3. It rises to:',o:['3 m','6 m','0.33 m','1 m'],c:3,s:'Rebound height = e²h = (1/9) × 9 = 1 m.'},
+    {tp:'work',q:'A spring of constant 1000 N/m is stretched from 10 cm to 20 cm. Find the work done in joules.',n:15,s:'W = ½k(x₂² − x₁²) = 500 × (0.04 − 0.01) = 15 J.'},
+    {tp:'ke',q:'A horizontal 10 N force pushes a 2 kg block from rest through 4 m on a smooth floor. Find its kinetic energy in joules.',n:40,s:'Work-energy theorem: K = W = 10 × 4 = 40 J.'},
+    {tp:'cons',q:'A 2 kg block slides from rest down a smooth curved track from a height of 5 m and then hits a spring of constant 800 N/m. Find the largest compression in centimetres (g = 10 m/s²).',n:50,s:'mgh = ½kx²: 2 × 10 × 5 = 400x², so x² = 0.25 and x = 0.5 m = 50 cm.'},
+    {tp:'power',q:'A motor that is 75% efficient lifts 300 kg through 15 m in 60 s. Find the power it takes in, in watts (g = 10 m/s²).',n:1000,s:'Useful power = mgh/t = 300 × 10 × 15/60 = 750 W.\nInput = 750/0.75 = 1000 W.'},
+    {tp:'coll',q:'A 2 kg ball at 3 m/s hits a 1 kg ball at rest in a head-on elastic collision. Find the speed of the 1 kg ball afterwards, in m/s.',n:4,s:'v₂ = 2m₁u₁/(m₁ + m₂) = 2 × 2 × 3/3 = 4 m/s.'}
+  ],
+  neet:[
+    {tp:'work',q:'The work done by a force is zero when the angle between the force and the displacement is:',o:['0°','45°','90°','180°'],c:2,s:'W = Fs cos θ and cos 90° = 0.'},
+    {tp:'work',q:'A 5 N force acts at 60° to the motion over 4 m. The work done is:',o:['20 J','10 J','17.3 J','5 J'],c:1,s:'W = 5 × 4 × cos 60° = 10 J.'},
+    {tp:'work',q:'The area under a force-displacement graph gives:',o:['power','impulse','work','momentum'],c:2,s:'W = ∫F dx.'},
+    {tp:'work',q:'A man carries a bucket while walking on level ground at steady speed. The work he does against gravity is:',o:['mgh','positive','negative','zero'],c:3,s:'His upward force is perpendicular to the horizontal displacement, so no work against gravity.'},
+    {tp:'ke',q:'The kinetic energy of a 2 kg body moving at 3 m/s is:',o:['6 J','9 J','18 J','3 J'],c:1,s:'K = ½mv² = ½ × 2 × 9 = 9 J.'},
+    {tp:'ke',q:'If the speed of a body is doubled, its kinetic energy becomes:',o:['2 times','half','4 times','8 times'],c:2,s:'K ∝ v².'},
+    {tp:'ke',q:'Kinetic energy K and momentum p are related by:',o:['K = p²/2m','K = 2mp²','K = p/2m','K = mp²'],c:0,s:'K = ½mv² = (mv)²/2m = p²/2m.'},
+    {tp:'ke',q:'A 1 kg body is lifted through 2 m. Its potential energy increases by (g = 10 m/s²):',o:['2 J','10 J','5 J','20 J'],c:3,s:'ΔU = mgh = 1 × 10 × 2 = 20 J.'},
+    {tp:'cons',q:'A body is dropped from 45 m. It reaches the ground at (g = 10 m/s²):',o:['30 m/s','45 m/s','15 m/s','90 m/s'],c:0,s:'v = √(2gh) = √900 = 30 m/s.'},
+    {tp:'cons',q:'A spring of constant k compressed by x stores energy:',o:['kx','kx²','½kx²','2kx²'],c:2,s:'U = ½kx².'},
+    {tp:'cons',q:'For a body falling freely (no air resistance), the total mechanical energy:',o:['increases','decreases','first increases then decreases','stays constant'],c:3,s:'Only gravity (a conservative force) does work, so KE + PE stays the same.'},
+    {tp:'cons',q:'At the extreme position of a swinging pendulum:',o:['KE is maximum','PE is maximum and KE is zero','both are zero','both are maximum'],c:1,s:'The bob stops for an instant at its highest point.'},
+    {tp:'cons',q:'The least speed at the top of a vertical circle of radius r, for a stone on a string, is:',o:['√(gr)','√(2gr)','√(5gr)','zero'],c:0,s:'At the top T = 0 just works: mg = mv²/r.'},
+    {tp:'power',q:'1 horsepower is equal to:',o:['746 W','1000 W','550 W','100 W'],c:0,s:'1 hp = 746 W.'},
+    {tp:'power',q:'Power can be written as:',o:['F × s','F·v','F/v','F × t'],c:1,s:'P = dW/dt = F·(ds/dt) = F·v.'},
+    {tp:'power',q:'A machine does 600 J of work in 2 minutes. Its power is:',o:['300 W','5 W','50 W','1200 W'],c:1,s:'P = 600/120 = 5 W.'},
+    {tp:'power',q:'A 100 W bulb glows for 10 hours. The energy used is:',o:['10 kWh','0.1 kWh','1000 kWh','1 kWh'],c:3,s:'100 W × 10 h = 1000 Wh = 1 kWh.'},
+    {tp:'coll',q:'In a perfectly inelastic collision:',o:['the bodies stick together and momentum is conserved','kinetic energy is conserved','momentum is not conserved','the bodies bounce apart'],c:0,s:'The bodies move together afterwards; momentum is conserved but kinetic energy is lost.'},
+    {tp:'coll',q:'The coefficient of restitution for a perfectly elastic collision is:',o:['0','between 0 and 1','1','more than 1'],c:2,s:'The relative speed of separation equals that of approach.'},
+    {tp:'coll',q:'A ball hits an identical ball at rest in a head-on elastic collision. Afterwards:',o:['both move together','the first stops and the second moves with the first\'s speed','both stop','the first bounces back'],c:1,s:'Equal masses in an elastic collision exchange velocities.'}
   ]}
 };
 })();
