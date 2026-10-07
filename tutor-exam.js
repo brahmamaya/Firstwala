@@ -687,6 +687,33 @@ window.PhysicaExam={
   {t:'neet',q:'The energy of a photon of wavelength 1240 nm is (hc = 1240 eV·nm):',o:['1 eV','12.4 eV','0.1 eV','1240 eV'],c:0,a:'E = 1240/1240 = 1 eV.'},
   {t:'neet',sim:'debroglie',q:'The de Broglie wavelength of a particle is inversely proportional to its:',o:['mass only','momentum','charge','energy squared'],c:1,a:'λ = h/p.'},
   {t:'neet',sim:'photocell-iv',q:'The photoelectric current is proportional to the:',o:['frequency of light','intensity of light','wavelength','stopping potential'],c:1,a:'More photons give more photoelectrons.'}
+],
+'Atoms':[
+  {t:'1',sim:'rutherford',q:'What did Rutherford\'s alpha-scattering experiment show about the atom?',a:'Almost all the mass and all the positive charge are packed into a tiny central nucleus; most of the atom is empty space.'},
+  {t:'1',sim:'bohr',q:'State Bohr\'s quantisation condition.',a:'The angular momentum of an electron in an allowed orbit is a whole multiple of h/2π: mvr = nh/2π.'},
+  {t:'1',sim:'energy-levels',q:'What is the energy of the electron in the ground state of hydrogen?',a:'−13.6 eV.'},
+  {t:'1',sim:'hydrogen-spectrum',q:'In which part of the spectrum is the Lyman series of hydrogen?',a:'Ultraviolet.'},
+  {t:'1',sim:'rutherford',q:'What is meant by the distance of closest approach?',a:'The nearest an alpha particle fired straight at a nucleus gets before stopping and turning back: all its kinetic energy has become electric potential energy.'},
+  {t:'3',sim:'bohr-orbits-3d',q:'How does the radius of a Bohr orbit depend on n and Z? Find the radius of the 3rd orbit of hydrogen (a₀ = 0.53 Å).',a:'r(n) = a₀n²/Z.\nFor hydrogen (Z = 1), n = 3: r = 0.53 × 9 ≈ 4.8 Å.'},
+  {t:'3',sim:'hydrogen-spectrum',q:'Find the energy and wavelength of the photon emitted when a hydrogen electron falls from n = 3 to n = 2 (hc = 1240 eV·nm).',a:'E(n) = −13.6/n² eV: E₃ = −1.51 eV, E₂ = −3.4 eV.\nPhoton energy = 1.89 eV.\nλ = 1240/1.89 ≈ 656 nm (the red H-alpha line of the Balmer series).'},
+  {t:'3',sim:'hydrogen-like-ions',q:'Find the ionisation energy of He⁺ in its ground state.',a:'For a hydrogen-like ion E(n) = −13.6 Z²/n² eV.\nHe⁺ (Z = 2), n = 1: E = −54.4 eV, so its ionisation energy is 54.4 eV.'},
+  {t:'3',sim:'rutherford',q:'Find the distance of closest approach of a 7.7 MeV alpha particle to a gold nucleus (Z = 79).',a:'K = k(2e)(Ze)/d, so d = k × 2Ze²/K.\nd = 9 × 10⁹ × 2 × 79 × (1.6 × 10⁻¹⁹)²/(7.7 × 10⁶ × 1.6 × 10⁻¹⁹) ≈ 3 × 10⁻¹⁴ m (about 30 fm).\nThis set an upper limit on the size of the nucleus.'},
+  {t:'3',q:'What were the two main shortcomings of Rutherford\'s model of the atom?',a:'1. Stability: an electron moving in a circle is accelerating, so (by classical theory) it should radiate energy and spiral into the nucleus - atoms would collapse.\n2. Spectra: the electron would radiate a continuous range of frequencies, but atoms give sharp line spectra.'},
+  {t:'3',sim:'hydrogen-spectrum',q:'Name the spectral series of hydrogen with the lower level of each and the region where it lies. Write the Rydberg formula.',a:'Lyman: down to n = 1, ultraviolet.\nBalmer: down to n = 2, visible.\nPaschen: down to n = 3, infrared (also Brackett n = 4 and Pfund n = 5, infrared).\nRydberg: 1/λ = R(1/n₁² − 1/n₂²), R = 1.097 × 10⁷ m⁻¹.'},
+  {t:'5',sim:'bohr',q:'State Bohr\'s postulates and derive the radius and energy of the nth orbit of the hydrogen atom.',a:'1. Electrons move in certain circular orbits without radiating.\n2. Allowed orbits have mvr = nh/2π.\n3. A photon is emitted or absorbed when an electron jumps: hν = E(i) − E(f).\nForce: mv²/r = ke²/r². With mvr = nh/2π: r(n) = n²h²/(4π²mke²) = 0.53n² Å.\nEnergy: KE = ke²/2r, PE = −ke²/r, so E = −ke²/2r = −13.6/n² eV.'},
+  {t:'5',sim:'rutherford',q:'Describe Rutherford\'s alpha-scattering experiment, its observations and conclusions.',a:'A narrow beam of alpha particles from a radioactive source hit a very thin gold foil; a movable zinc-sulphide screen counted the scattered particles at different angles.\nObservations: most passed straight through; a few were deflected through large angles; about 1 in 8000 bounced back (more than 90°).\nConclusions: the atom is mostly empty; its positive charge and nearly all its mass are in a tiny nucleus (about 10⁻¹⁴ m or less); electrons move around it.\nThe number scattered falls steeply with angle (∝ 1/sin⁴(θ/2)); a smaller impact parameter gives a larger deflection.'},
+  {t:'5',sim:'hydrogen-spectrum',q:'Using Bohr\'s theory, derive the Rydberg formula. Find the longest and shortest wavelengths of the Balmer series (R = 1.097 × 10⁷ m⁻¹).',a:'hc/λ = E(n₂) − E(n₁) = 13.6 eV (1/n₁² − 1/n₂²), so 1/λ = R(1/n₁² − 1/n₂²) with R = 13.6 eV/(hc).\nBalmer (n₁ = 2):\nLongest (n₂ = 3): 1/λ = R × 5/36, λ ≈ 656 nm.\nShortest (n₂ = ∞): 1/λ = R/4, λ ≈ 365 nm.'},
+  {t:'jee',sim:'hydrogen-spectrum',q:'The ratio of the longest wavelength of the Lyman series to that of the Balmer series is:',o:['5/27','27/5','4/9','3/4'],c:0,a:'Lyman longest: 1/λ = R(3/4). Balmer longest: 1/λ = R(5/36). Ratio λ(L)/λ(B) = (5/36)/(3/4) = 5/27.'},
+  {t:'jee',sim:'energy-levels',q:'Hydrogen atoms are excited to n = 4. How many different spectral lines can they emit on returning to the ground state?',o:['3','4','6','10'],c:2,a:'n(n − 1)/2 = 4 × 3/2 = 6.'},
+  {t:'jee',sim:'bohr',q:'Find the speed of the electron in the nth Bohr orbit of hydrogen and compare it with the speed of light.',a:'From mvr = nh/2π and mv²/r = ke²/r²: v = 2πke²/(nh) ≈ 2.2 × 10⁶/n m/s.\nIn the first orbit v/c ≈ 1/137 (the fine-structure constant), so relativity can be neglected.'},
+  {t:'jee',sim:'hydrogen-like-ions',q:'The ground-state energy of Li²⁺ is:',o:['−13.6 eV','−40.8 eV','−122.4 eV','−54.4 eV'],c:2,a:'E = −13.6 Z² = −13.6 × 9 = −122.4 eV.'},
+  {t:'jee',sim:'bohr',q:'Find the angular momentum of an electron in the third Bohr orbit, and its kinetic and potential energies in the ground state of hydrogen.',a:'L = nh/2π = 3h/2π.\nGround state: E = −13.6 eV; KE = −E = 13.6 eV; PE = 2E = −27.2 eV.'},
+  {t:'neet',sim:'rutherford',q:'Most alpha particles passed straight through the gold foil. This shows that:',o:['the nucleus is large','most of the atom is empty space','electrons are heavy','gold is soft'],c:1,a:'Only a tiny fraction met the nucleus.'},
+  {t:'neet',sim:'hydrogen-spectrum',q:'The Balmer series of hydrogen lies in the:',o:['ultraviolet','visible region','infrared','X-ray region'],c:1,a:'Transitions down to n = 2.'},
+  {t:'neet',sim:'energy-levels',q:'The ionisation energy of a hydrogen atom in its ground state is:',o:['10.2 eV','13.6 eV','3.4 eV','27.2 eV'],c:1,a:'From −13.6 eV to 0.'},
+  {t:'neet',sim:'bohr-orbits-3d',q:'The radius of the first Bohr orbit of hydrogen is about:',o:['0.53 Å','5.3 Å','0.053 Å','53 Å'],c:0,a:'a₀ = 0.53 × 10⁻¹⁰ m.'},
+  {t:'neet',sim:'bohr',q:'In Bohr\'s model, the angular momentum of an electron is quantised in units of:',o:['h','h/2π','2πh','h²'],c:1,a:'mvr = nh/2π.'},
+  {t:'neet',sim:'energy-levels',q:'As n increases, the energy levels of hydrogen:',o:['get further apart','get closer together','stay equally spaced','disappear'],c:1,a:'E ∝ −1/n².'}
 ]};
 
 window.PhysicaMockBank={
@@ -1714,6 +1741,47 @@ window.PhysicaMockBank={
     {tp:'matter',q:'For an electron accelerated through V, the de Broglie wavelength is proportional to:',o:['V','√V','1/√V','1/V'],c:2,s:'λ = h/√(2meV).'},
     {tp:'matter',q:'At the same speed, a heavier particle has a de Broglie wavelength that is:',o:['longer','shorter','the same','zero'],c:1,s:'λ = h/(mv).'},
     {tp:'matter',q:'We do not notice the wave nature of a moving cricket ball because:',o:['it has no wavelength','its wavelength is far too small','it moves too slowly','it is not charged'],c:1,s:'h/(mv) is tiny for large masses.'}
+  ]},
+'Atoms':{
+  topics:{ruth:'Rutherford model and alpha scattering',bohr:'Bohr model',spec:'Hydrogen spectrum',energy:'Energy levels and ions'},
+  jee:[
+    {tp:'spec',q:'The ratio of the longest wavelengths of the Lyman and Balmer series is:',o:['27/5','5/27','4/9','9/4'],c:1,s:'(5/36)/(3/4).'},
+    {tp:'spec',q:'Hydrogen atoms in n = 4 fall to the ground state. The number of possible spectral lines is:',o:['3','6','4','10'],c:1,s:'n(n − 1)/2.'},
+    {tp:'energy',q:'The ground-state energy of Li²⁺ is:',o:['−13.6 eV','−54.4 eV','−122.4 eV','−40.8 eV'],c:2,s:'−13.6 Z².'},
+    {tp:'bohr',q:'The ratio of the radius of the 3rd Bohr orbit to the 1st is:',o:['3','9','27','1/9'],c:1,s:'r ∝ n².'},
+    {tp:'bohr',q:'The ratio of the electron\'s speed in the 2nd orbit to that in the 1st is:',o:['2','1/2','4','1/4'],c:1,s:'v ∝ 1/n.'},
+    {tp:'energy',q:'In the ground state of hydrogen, the kinetic and potential energies are:',o:['13.6 eV and −13.6 eV','13.6 eV and −27.2 eV','−13.6 eV and 27.2 eV','27.2 eV and −13.6 eV'],c:1,s:'KE = −E, PE = 2E.'},
+    {tp:'ruth',q:'If the kinetic energy of the alpha particles is doubled, the distance of closest approach becomes:',o:['double','half','four times','the same'],c:1,s:'d ∝ 1/K.'},
+    {tp:'spec',q:'The shortest wavelength of the Balmer series is about:',o:['656 nm','122 nm','365 nm','486 nm'],c:2,s:'1/λ = R/4.'},
+    {tp:'bohr',q:'The angular momentum of an electron in the third orbit is:',o:['h/2π','3h/2π','9h/2π','h/6π'],c:1,s:'nh/2π.'},
+    {tp:'ruth',q:'Most alpha particles go straight through a thin gold foil. This means:',o:['the atom is mostly empty space','gold has no nucleus','alpha particles have no charge','electrons stop them'],c:0,s:'The nucleus is tiny.'},
+    {tp:'spec',q:'Hydrogen atoms are excited to n = 5. How many spectral lines can they emit?',n:10,s:'5 × 4/2 = 10.'},
+    {tp:'energy',q:'A hydrogen-like ion has a ground-state ionisation energy of 122.4 eV. Find its atomic number Z.',n:3,s:'13.6 Z² = 122.4, so Z² = 9.'},
+    {tp:'bohr',q:'Find the ratio of the radius of the 4th Bohr orbit to that of the 2nd.',n:4,s:'(4/2)² = 4.'},
+    {tp:'spec',q:'Find the wavelength, in nm, of the H-alpha line (n = 3 → 2) of hydrogen, to the nearest nanometre (R = 1.097 × 10⁷ m⁻¹).',n:656,s:'1/λ = R × 5/36, λ ≈ 656 nm.'},
+    {tp:'bohr',q:'The electron speed in the first Bohr orbit of hydrogen is 2.2 × 10⁶ m/s. Find its speed in the second orbit in units of 10⁵ m/s.',n:11,s:'v ∝ 1/n: 1.1 × 10⁶ m/s.'}
+  ],
+  neet:[
+    {tp:'ruth',q:'Rutherford\'s experiment showed that the positive charge of an atom is:',o:['spread evenly','concentrated in a tiny nucleus','on the electrons','absent'],c:1,s:'Large-angle scattering needed a small, dense charge.'},
+    {tp:'ruth',q:'The size of a nucleus is of the order of:',o:['10⁻¹⁰ m','10⁻¹⁵ m','10⁻⁶ m','10⁻²⁰ m'],c:1,s:'About a femtometre.'},
+    {tp:'ruth',q:'In the alpha-scattering experiment, very few alpha particles:',o:['passed straight through','bounced back','were absorbed','changed into electrons'],c:1,s:'About 1 in 8000.'},
+    {tp:'ruth',q:'Rutherford used gold foil because gold:',o:['is cheap','can be made extremely thin','has no electrons','is magnetic'],c:1,s:'So each alpha particle met only one nucleus at most.'},
+    {tp:'ruth',q:'Rutherford\'s model could not explain:',o:['the nucleus','the stability of atoms and line spectra','alpha scattering','the size of the atom'],c:1,s:'An accelerating electron should radiate and spiral in.'},
+    {tp:'bohr',q:'In Bohr\'s model the angular momentum of an electron is:',o:['nh','nh/2π','h/n','2πnh'],c:1,s:'Quantised in units of h/2π.'},
+    {tp:'bohr',q:'The radius of the nth Bohr orbit is proportional to:',o:['n','n²','1/n','1/n²'],c:1,s:'r = 0.53n² Å.'},
+    {tp:'bohr',q:'The speed of the electron in the nth orbit is proportional to:',o:['n','n²','1/n','1/n²'],c:2,s:'v = 2.2 × 10⁶/n m/s.'},
+    {tp:'bohr',q:'The energy of the nth level of hydrogen is proportional to:',o:['n²','−1/n²','n','−n'],c:1,s:'E = −13.6/n² eV.'},
+    {tp:'bohr',q:'The radius of the first Bohr orbit of hydrogen is:',o:['0.53 Å','1.06 Å','0.26 Å','5.3 Å'],c:0,s:'The Bohr radius.'},
+    {tp:'spec',q:'The Lyman series of hydrogen is in the:',o:['visible','ultraviolet','infrared','radio region'],c:1,s:'Transitions to n = 1.'},
+    {tp:'spec',q:'The Balmer series is in the:',o:['ultraviolet','visible','infrared','X-ray region'],c:1,s:'Transitions to n = 2.'},
+    {tp:'spec',q:'The Paschen series is in the:',o:['ultraviolet','visible','infrared','gamma region'],c:2,s:'Transitions to n = 3.'},
+    {tp:'spec',q:'The Rydberg formula is:',o:['1/λ = R(1/n₁² − 1/n₂²)','λ = R(n₁² − n₂²)','1/λ = R(n₁ − n₂)','λ = R/n²'],c:0,s:'n₂ > n₁.'},
+    {tp:'spec',q:'An atom emits a photon when its electron:',o:['jumps to a higher level','falls to a lower level','stays in its orbit','leaves the atom slowly'],c:1,s:'hν = E(upper) − E(lower).'},
+    {tp:'energy',q:'The ground-state energy of hydrogen is:',o:['13.6 eV','−13.6 eV','−3.4 eV','0'],c:1,s:'It is bound, so negative.'},
+    {tp:'energy',q:'The energy needed to remove the electron from hydrogen in its ground state is:',o:['3.4 eV','10.2 eV','13.6 eV','27.2 eV'],c:2,s:'Ionisation energy.'},
+    {tp:'energy',q:'The energy needed to excite hydrogen from n = 1 to n = 2 is:',o:['13.6 eV','3.4 eV','10.2 eV','1.9 eV'],c:2,s:'−3.4 − (−13.6).'},
+    {tp:'energy',q:'For hydrogen-like ions, the energy levels are proportional to:',o:['Z','Z²','1/Z','1/Z²'],c:1,s:'E = −13.6 Z²/n² eV.'},
+    {tp:'energy',q:'In a Bohr orbit, the total energy equals:',o:['the kinetic energy','minus the kinetic energy','twice the potential energy','zero'],c:1,s:'E = −KE = PE/2.'}
   ]}
 };
 })();
