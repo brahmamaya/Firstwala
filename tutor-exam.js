@@ -282,6 +282,33 @@ window.PhysicaExam={
   {t:'neet',q:'According to Kirchhoff\'s law, a good absorber of radiation is also a good:',o:['reflector','emitter','conductor','insulator'],c:1,a:'Good absorbers are good emitters (a black body is best at both).'},
   {t:'neet',sim:'specific-heat',q:'Coastal places have milder climates mainly because water has a:',o:['low specific heat','high specific heat','high density','low boiling point'],c:1,a:'The sea warms and cools slowly, keeping nearby land temperatures steady.'},
   {t:'neet',sim:'thermal-radiation',q:'A star that looks bluish compared with a reddish star is:',o:['cooler','hotter','the same temperature','farther away'],c:1,a:'Wien\'s law: higher T means a shorter λ(max).'}
+],
+'Thermodynamics':[
+  {t:'1',q:'State the zeroth law of thermodynamics.',a:'If two systems are each in thermal equilibrium with a third system, they are in thermal equilibrium with each other. It defines temperature.'},
+  {t:'1',sim:'first-law',q:'State the first law of thermodynamics.',a:'Heat supplied to a system = increase in its internal energy + work done by it: ΔQ = ΔU + ΔW (conservation of energy).'},
+  {t:'1',sim:'isothermal-entropy',q:'What is the change in internal energy of an ideal gas in an isothermal process?',a:'Zero, because the internal energy of an ideal gas depends only on its temperature.'},
+  {t:'1',sim:'adiabatic',q:'What is an adiabatic process?',a:'A process in which no heat enters or leaves the system (ΔQ = 0), for example a very fast compression or one in an insulated cylinder.'},
+  {t:'1',sim:'carnot',q:'Write the efficiency of a Carnot engine working between temperatures T₁ (source) and T₂ (sink).',a:'η = 1 − T₂/T₁ (temperatures in kelvin).'},
+  {t:'3',sim:'isothermal-entropy',q:'Derive the work done by an ideal gas in an isothermal expansion from V₁ to V₂.',a:'W = ∫P dV with P = nRT/V and T constant.\nW = nRT ∫dV/V from V₁ to V₂ = nRT ln(V₂/V₁).\nSince ΔU = 0, the heat taken in equals this work.'},
+  {t:'3',sim:'rectangle-cycle',q:'Show that the net work in a cyclic process equals the area enclosed on the P-V diagram. Find it for a rectangle from 1 × 10⁵ to 3 × 10⁵ Pa and from 1 L to 3 L.',a:'Work on expansion is the area under the upper path; work on compression (negative) is the area under the lower path. The difference is the enclosed area.\nRectangle: W = ΔP × ΔV = 2 × 10⁵ × 2 × 10⁻³ = 400 J.\n(Clockwise loop: net work done by the gas.)'},
+  {t:'3',sim:'first-law',q:'A gas takes in 500 J of heat and does 200 J of work. Find the change in its internal energy. What happens to its temperature?',a:'ΔU = ΔQ − ΔW = 500 − 200 = 300 J.\nThe internal energy increases, so (for an ideal gas) the temperature rises.'},
+  {t:'3',q:'Derive Mayer\'s relation C(p) − C(v) = R for an ideal gas.',a:'Heat 1 mole by ΔT. At constant volume: ΔQ = C(v)ΔT = ΔU.\nAt constant pressure: ΔQ = C(p)ΔT = ΔU + PΔV, and PΔV = RΔT.\nΔU is the same for the same ΔT, so C(p)ΔT = C(v)ΔT + RΔT, giving C(p) − C(v) = R.'},
+  {t:'3',sim:'refrigerator',q:'Define the coefficient of performance of a refrigerator. Find the best possible value for a fridge kept at 4 °C in a room at 30 °C.',a:'β = heat taken from inside / work done = Q₂/W.\nIdeal (Carnot): β = T₂/(T₁ − T₂) = 277/(303 − 277) = 277/26 ≈ 10.7.'},
+  {t:'3',sim:'isobaric-process',q:'2 mol of an ideal gas is heated by 100 K at constant pressure. Find the work done by the gas (R = 8.31 J/mol·K).',a:'W = PΔV = nRΔT = 2 × 8.31 × 100 = 1662 J.'},
+  {t:'5',sim:'carnot',q:'Describe the Carnot cycle and derive its efficiency.',a:'Four reversible steps for an ideal gas:\n1. Isothermal expansion at T₁: takes in Q₁ = nRT₁ ln(V₂/V₁).\n2. Adiabatic expansion: cools from T₁ to T₂.\n3. Isothermal compression at T₂: gives out Q₂ = nRT₂ ln(V₃/V₄).\n4. Adiabatic compression back to T₁.\nFrom the two adiabatics, V₂/V₁ = V₃/V₄, so Q₂/Q₁ = T₂/T₁.\nη = 1 − Q₂/Q₁ = 1 − T₂/T₁.'},
+  {t:'5',sim:'adiabatic',q:'Show that PV^γ = constant for an adiabatic process of an ideal gas, and find the work done.',a:'ΔQ = 0, so dU + P dV = 0: nC(v) dT = −P dV.\nFrom PV = nRT: P dV + V dP = nR dT = (C(p) − C(v)) n dT.\nEliminate dT: C(p) P dV + C(v) V dP = 0, so γ dV/V + dP/P = 0.\nIntegrating: PV^γ = constant.\nWork: W = ∫P dV = (P₁V₁ − P₂V₂)/(γ − 1) = nR(T₁ − T₂)/(γ − 1).'},
+  {t:'5',q:'State the second law of thermodynamics (Kelvin-Planck and Clausius). Why can no engine be 100% efficient?',a:'Kelvin-Planck: no engine working in a cycle can turn all the heat it takes in into work; some heat must go to a colder sink.\nClausius: heat cannot flow by itself from a colder body to a hotter one; work is needed (as in a refrigerator).\nThe best engine is a reversible (Carnot) engine, with η = 1 − T₂/T₁. This could be 100% only if T₂ = 0 K, which cannot be reached.\nReal processes have friction and finite temperature differences, so they are irreversible.'},
+  {t:'jee',sim:'carnot',q:'A Carnot engine has 40% efficiency with its sink at 300 K. By how much must the source temperature rise to make it 50% efficient?',o:['50 K','100 K','150 K','200 K'],c:1,a:'0.4 = 1 − 300/T₁, so T₁ = 500 K. For 50%: T₁ = 300/0.5 = 600 K. Rise = 100 K.'},
+  {t:'jee',sim:'isobaric-process',q:'Heat is given to a monatomic ideal gas at constant pressure. The fraction of the heat that is turned into work is:',o:['2/5','3/5','2/3','1/3'],c:0,a:'W/Q = nRΔT/(nC(p)ΔT) = R/(5R/2) = 2/5.'},
+  {t:'jee',sim:'adiabatic',q:'A monatomic gas (γ = 5/3) at temperature T is compressed adiabatically to 1/8 of its volume. Find its new temperature.',a:'TV^(γ − 1) is constant, with γ − 1 = 2/3.\nT\' = T × 8^(2/3) = 4T.'},
+  {t:'jee',q:'An ideal gas expands freely into a vacuum in an insulated container. Find Q, W, ΔU and the change in temperature.',a:'Insulated: Q = 0. No outside pressure to push against: W = 0.\nSo ΔU = 0, and for an ideal gas the temperature does not change.\n(It is still irreversible: the gas never goes back by itself.)'},
+  {t:'jee',sim:'adiabatic',q:'At the same point on a P-V diagram, the slope of an adiabatic curve compared with an isothermal curve is:',o:['the same','γ times steeper','γ times less steep','1/γ times steeper'],c:1,a:'Isothermal: dP/dV = −P/V. Adiabatic: dP/dV = −γP/V. Since γ > 1, the adiabatic is steeper.'},
+  {t:'neet',q:'The internal energy of an ideal gas depends only on its:',o:['pressure','volume','temperature','density'],c:2,a:'U = nC(v)T for an ideal gas.'},
+  {t:'neet',sim:'rectangle-cycle',q:'In a complete cyclic process, the change in internal energy is:',o:['positive','negative','zero','equal to the work'],c:2,a:'The gas returns to its starting state, so ΔU = 0.'},
+  {t:'neet',q:'In an isochoric (constant volume) process, the work done by the gas is:',o:['PΔV','zero','nRΔT','maximum'],c:1,a:'ΔV = 0, so W = 0.'},
+  {t:'neet',sim:'carnot',q:'The efficiency of a Carnot engine working between 500 K and 300 K is:',o:['60%','40%','25%','67%'],c:1,a:'η = 1 − 300/500 = 0.4.'},
+  {t:'neet',sim:'refrigerator',q:'A refrigerator moves heat from a cold body to a hot one by:',o:['itself, with no work','using external work','using a vacuum','cooling the room'],c:1,a:'Clausius: this needs work from the compressor.'},
+  {t:'neet',sim:'first-law',q:'The first law of thermodynamics is a statement of the conservation of:',o:['mass','momentum','energy','temperature'],c:2,a:'ΔQ = ΔU + ΔW.'}
 ]};
 
 window.PhysicaMockBank={
@@ -694,6 +721,47 @@ window.PhysicaMockBank={
     {tp:'rad',q:'A perfect black body:',o:['reflects all radiation','absorbs all radiation falling on it','emits no radiation','is always cold'],c:1,s:'It absorbs everything (and is also the best emitter).'},
     {tp:'rad',q:'Newton\'s law of cooling says the rate of cooling is proportional to:',o:['the body\'s temperature','the temperature difference with the surroundings','the square of the temperature','the mass of the body'],c:1,s:'dT/dt = −k(T − T₀), for small differences.'},
     {tp:'rad',q:'Good absorbers of radiation are also:',o:['good reflectors','good emitters','poor emitters','transparent'],c:1,s:'Kirchhoff\'s law.'}
+  ]},
+'Thermodynamics':{
+  topics:{first:'First law and internal energy',proc:'Thermodynamic processes',cyc:'Heat engines and refrigerators',second:'Second law'},
+  jee:[
+    {tp:'first',q:'100 J of heat is given to a gas and it does 40 J of work. Its internal energy changes by:',o:['140 J','60 J','−60 J','40 J'],c:1,s:'ΔU = Q − W = 100 − 40 = 60 J.'},
+    {tp:'proc',q:'When an ideal gas expands isothermally:',o:['ΔU = 0 and Q = W','Q = 0','W = 0','ΔU = Q'],c:0,s:'T is constant, so ΔU = 0 and the heat taken in all becomes work.'},
+    {tp:'proc',q:'Heat is given to a monatomic ideal gas at constant pressure. The fraction that raises its internal energy is:',o:['2/5','3/5','5/3','1'],c:1,s:'ΔU/Q = C(v)/C(p) = (3/2)/(5/2) = 3/5.'},
+    {tp:'proc',q:'A gas with γ = 1.5 is compressed adiabatically to half its volume. Its pressure becomes:',o:['2 times','1.5 times','2√2 times','4 times'],c:2,s:'PV^γ constant: P\' = P × 2^1.5 = 2√2 P.'},
+    {tp:'proc',q:'The ratio of the slope of an adiabatic to that of an isothermal at the same point is:',o:['1','γ','1/γ','γ − 1'],c:1,s:'−γP/V divided by −P/V = γ.'},
+    {tp:'cyc',q:'A Carnot engine works between 327 °C and 27 °C. Its efficiency is:',o:['92%','25%','50%','8%'],c:2,s:'η = 1 − 300/600 = 0.5. (Always use kelvin.)'},
+    {tp:'cyc',q:'An engine has efficiency 1/6. Lowering the sink temperature by 62 °C doubles the efficiency. The source temperature is:',o:['372 K','310 K','400 K','300 K'],c:0,s:'1 − T₂/T₁ = 1/6 and 1 − (T₂ − 62)/T₁ = 1/3.\nSubtract: 62/T₁ = 1/6, so T₁ = 372 K (and T₂ = 310 K).'},
+    {tp:'cyc',q:'A refrigerator with a coefficient of performance of 5 takes 500 J from its inside each cycle. The heat it gives to the room each cycle is:',o:['100 J','500 J','600 J','2500 J'],c:2,s:'W = Q₂/β = 100 J. Q₁ = Q₂ + W = 600 J.'},
+    {tp:'second',q:'The Kelvin-Planck statement says that:',o:['heat flows from cold to hot by itself','no engine working in a cycle can turn all the heat it takes in into work','energy is conserved','entropy always falls'],c:1,s:'Some heat must always be given to a sink.'},
+    {tp:'first',q:'The relation C(p) − C(v) = R holds for:',o:['all solids','one mole of an ideal gas','liquids only','any gas per kilogram'],c:1,s:'Mayer\'s relation, per mole of an ideal gas.'},
+    {tp:'first',q:'2 mol of a gas is heated by 10 K at constant volume; C(v) = 12.5 J/mol·K. Find the change in internal energy in joules.',n:250,s:'ΔU = nC(v)ΔT = 2 × 12.5 × 10 = 250 J.'},
+    {tp:'cyc',q:'A gas goes round a rectangular cycle on a P-V diagram between 1 × 10⁵ and 2 × 10⁵ Pa and between 2 L and 5 L. Find the net work per cycle in joules.',n:300,s:'Area = ΔP × ΔV = 10⁵ × 3 × 10⁻³ = 300 J.'},
+    {tp:'cyc',q:'Find the efficiency, in percent, of a Carnot engine working between 400 K and 300 K.',n:25,s:'η = 1 − 300/400 = 0.25 = 25%.'},
+    {tp:'proc',q:'1 mol of an ideal gas is heated by 100 K at constant pressure. Find the work done by the gas in joules (R = 8.31 J/mol·K).',n:831,s:'W = nRΔT = 8.31 × 100 = 831 J.'},
+    {tp:'cyc',q:'Find the coefficient of performance of an ideal refrigerator working between 250 K and 300 K.',n:5,s:'β = T₂/(T₁ − T₂) = 250/50 = 5.'}
+  ],
+  neet:[
+    {tp:'first',q:'The zeroth law of thermodynamics leads to the idea of:',o:['heat','work','temperature','entropy'],c:2,s:'Bodies in thermal equilibrium share the same temperature.'},
+    {tp:'first',q:'The first law of thermodynamics is written as:',o:['ΔQ = ΔU + ΔW','ΔQ = ΔU − ΔW','ΔU = ΔQ + ΔW + PV','ΔW = ΔQ + ΔU'],c:0,s:'Heat in = rise in internal energy + work done by the system.'},
+    {tp:'first',q:'The internal energy of an ideal gas depends on its:',o:['volume only','pressure only','temperature only','shape'],c:2,s:'U = nC(v)T.'},
+    {tp:'first',q:'In a cyclic process:',o:['ΔU = 0','ΔQ = 0','ΔW = 0','ΔT ≠ 0'],c:0,s:'The system ends in its starting state.'},
+    {tp:'first',q:'When a gas expands, the work done by the gas is:',o:['negative','positive','zero','always equal to the heat'],c:1,s:'W = ∫P dV > 0 when dV > 0.'},
+    {tp:'proc',q:'In an isothermal process:',o:['ΔQ = 0','ΔT = 0','ΔV = 0','ΔP = 0'],c:1,s:'Iso-thermal: constant temperature.'},
+    {tp:'proc',q:'In an adiabatic process:',o:['ΔT = 0','ΔQ = 0','ΔU = 0','W = 0'],c:1,s:'No heat exchange.'},
+    {tp:'proc',q:'In an isochoric process:',o:['W = 0','ΔU = 0','ΔQ = 0','ΔT = 0'],c:0,s:'Constant volume, so no work is done.'},
+    {tp:'proc',q:'In an isobaric process, the quantity that stays constant is:',o:['volume','temperature','pressure','heat'],c:2,s:'Iso-baric: constant pressure.'},
+    {tp:'proc',q:'For an adiabatic process of an ideal gas:',o:['PV = constant','PV^γ = constant','P/T = constant','V/T = constant'],c:1,s:'PV^γ = constant.'},
+    {tp:'proc',q:'When a gas expands adiabatically, its temperature:',o:['rises','falls','stays the same','becomes zero'],c:1,s:'It does work using its own internal energy.'},
+    {tp:'cyc',q:'The efficiency of a heat engine is:',o:['W/Q₁','Q₂/Q₁','Q₁/W','W/Q₂'],c:0,s:'Useful work out divided by heat taken from the source.'},
+    {tp:'cyc',q:'The efficiency of a Carnot engine is:',o:['T₂/T₁','1 − T₂/T₁','1 + T₂/T₁','T₁/T₂'],c:1,s:'η = 1 − T₂/T₁ (kelvin).'},
+    {tp:'cyc',q:'A Carnot engine works between 500 K and 300 K. Its efficiency is:',o:['60%','40%','80%','20%'],c:1,s:'1 − 300/500 = 0.4.'},
+    {tp:'cyc',q:'The coefficient of performance of a refrigerator is:',o:['W/Q₂','Q₂/W','Q₁/Q₂','W/Q₁'],c:1,s:'Heat taken from the cold inside per unit work.'},
+    {tp:'cyc',q:'On a P-V diagram, the net work done in a cycle equals:',o:['zero','the area enclosed by the loop','the area under the top curve only','P × V'],c:1,s:'Expansion work minus compression work.'},
+    {tp:'second',q:'"Heat cannot flow by itself from a colder body to a hotter one" is the:',o:['Kelvin-Planck statement','Clausius statement','first law','zeroth law'],c:1,s:'Clausius statement of the second law.'},
+    {tp:'second',q:'Between two given temperatures, the most efficient engine is:',o:['a diesel engine','a petrol engine','a reversible (Carnot) engine','a steam engine'],c:2,s:'Carnot\'s theorem.'},
+    {tp:'second',q:'A heat engine could be 100% efficient only if the sink were at:',o:['0 °C','room temperature','0 K','the source temperature'],c:2,s:'η = 1 − T₂/T₁ = 1 needs T₂ = 0 K, which cannot be reached.'},
+    {tp:'second',q:'A process in which the system and surroundings can be returned exactly to their first states is called:',o:['irreversible','reversible','adiabatic','cyclic'],c:1,s:'Reversible processes are ideal: slow, with no friction.'}
   ]}
 };
 })();
