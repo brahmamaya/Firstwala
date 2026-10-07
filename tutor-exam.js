@@ -498,6 +498,33 @@ window.PhysicaExam={
   {t:'neet',sim:'meter-conversion',q:'An ideal ammeter and an ideal voltmeter should have resistances of:',o:['zero and infinity','infinity and zero','both zero','both infinity'],c:0,a:'The ammeter must not reduce the current; the voltmeter must not draw any.'},
   {t:'neet',q:'A cyclotron cannot accelerate:',o:['protons','alpha particles','deuterons','neutrons'],c:3,a:'Neutrons have no charge, so fields do not act on them.'},
   {t:'neet',sim:'parallel-wires',q:'The magnetic field of a long straight wire at distance r is proportional to:',o:['r','1/r','1/r²','r²'],c:1,a:'B = μ₀I/(2πr).'}
+],
+'Magnetism and Matter':[
+  {t:'1',sim:'magnet',q:'Do magnetic field lines form closed loops?',a:'Yes. Outside a magnet they run from N to S, and inside it from S back to N; there are no isolated magnetic poles.'},
+  {t:'1',sim:'earth-field',q:'Define magnetic declination.',a:'The angle between the geographic meridian and the magnetic meridian at a place.'},
+  {t:'1',sim:'magnetic-materials',q:'What is the sign and size of the susceptibility of a diamagnetic substance?',a:'Small and negative (about −10⁻⁵).'},
+  {t:'1',sim:'curie-law',q:'State Curie\'s law.',a:'The susceptibility of a paramagnetic substance is inversely proportional to its absolute temperature: χ = C/T.'},
+  {t:'1',sim:'earth-field',q:'What is the angle of dip at the magnetic equator?',a:'0°: the Earth\'s field there is horizontal.'},
+  {t:'3',sim:'dipole-field-ratio',q:'Write the magnetic field of a short bar magnet on its axial line and on its equatorial line. Compare them.',a:'Axial: B = μ₀ × 2m/(4πr³), along m.\nEquatorial: B = μ₀m/(4πr³), opposite to m.\nAt the same distance, axial : equatorial = 2 : 1.'},
+  {t:'3',sim:'magnetic-materials',q:'Compare diamagnetic, paramagnetic and ferromagnetic substances.',a:'Diamagnetic: weakly repelled, χ small and negative, moves to weaker field (copper, water, bismuth).\nParamagnetic: weakly attracted, χ small and positive, depends on temperature (aluminium, oxygen).\nFerromagnetic: strongly attracted, χ very large, form domains, keep magnetism (iron, nickel, cobalt); become paramagnetic above the Curie temperature.'},
+  {t:'3',sim:'earth-field',q:'At a place the horizontal component of the Earth\'s field is 0.3 G and the angle of dip is 60°. Find the total field and its vertical component.',a:'B(H) = B cos δ, so B = 0.3/cos 60° = 0.6 G.\nB(V) = B sin δ = 0.6 × 0.866 ≈ 0.52 G (= B(H) tan δ).'},
+  {t:'3',sim:'magnet-oscillation',q:'Show that a small magnet suspended in a uniform field B oscillates with period T = 2π√(I/mB).',a:'Turned by a small angle θ, the restoring torque is −mB sin θ ≈ −mBθ.\nI d²θ/dt² = −mBθ, which is SHM with ω² = mB/I.\nT = 2π√(I/(mB)).'},
+  {t:'3',q:'State Gauss\'s law for magnetism. What does it tell us?',a:'The net magnetic flux through any closed surface is zero: ∮B·dA = 0.\nAs many field lines leave a closed surface as enter it, so there are no isolated magnetic poles (monopoles).'},
+  {t:'3',q:'A bar magnet of moment m is cut into two equal halves (a) at right angles to its length (b) along its length. Find the moment of each piece.',a:'(a) Each piece keeps the same pole strength but half the length: moment m/2.\n(b) Each piece has half the pole strength and the same length: moment m/2.'},
+  {t:'5',sim:'magnet-oscillation',q:'Find the torque and potential energy of a magnetic dipole in a uniform field. How much work turns it from θ = 0 to θ = 180°?',a:'Torque: τ = m × B, size mB sin θ, turning m towards B.\nPotential energy: U = −mB cos θ = −m·B.\nθ = 0: U = −mB, stable equilibrium. θ = 180°: U = +mB, unstable.\nWork from 0 to 180°: W = U(180°) − U(0°) = 2mB.'},
+  {t:'5',sim:'magnetic-materials',q:'Explain the hysteresis loop of a ferromagnet. Which materials suit permanent magnets and which suit electromagnets and transformer cores?',a:'As H is raised, B rises to saturation. When H is brought back to zero, B does not return to zero: the remaining B is the retentivity. A reverse field (the coercivity) is needed to make B zero. Repeating gives a closed loop; its area is the energy lost per cycle.\nPermanent magnets: high retentivity and high coercivity (steel, alnico), so they keep their magnetism.\nElectromagnets and transformer cores: low coercivity and a narrow loop (soft iron), so they magnetise easily and lose little energy.'},
+  {t:'5',sim:'earth-field',q:'Describe the elements of the Earth\'s magnetism. Show that if the apparent dips in two perpendicular vertical planes are δ₁ and δ₂, the true dip δ satisfies cot²δ = cot²δ₁ + cot²δ₂.',a:'Elements: declination (angle between the geographic and magnetic meridians), dip δ (angle of B below the horizontal) and the horizontal component B(H).\nIn a plane at angle α to the meridian the horizontal field seen is B(H) cos α, while B(V) is unchanged: tan δ₁ = B(V)/(B(H) cos α), and in the perpendicular plane tan δ₂ = B(V)/(B(H) sin α).\nSo cot δ₁ = (B(H)/B(V)) cos α and cot δ₂ = (B(H)/B(V)) sin α.\nSquaring and adding: cot²δ₁ + cot²δ₂ = (B(H)/B(V))² = cot²δ.'},
+  {t:'jee',q:'A bar magnet of moment m is bent into a semicircle. Its new magnetic moment is:',o:['m','2m/π','m/π','πm/2'],c:1,a:'The pole strength p stays the same; the length L becomes the arc πR, so the poles are 2R = 2L/π apart.\nm\' = p × 2L/π = 2m/π.'},
+  {t:'jee',sim:'magnet-oscillation',q:'Explain how a vibration magnetometer compares the moments of two magnets by the sum and difference method.',a:'Put the magnets together with like poles side by side: total moment m₁ + m₂, period T₁. With unlike poles together: m₁ − m₂, period T₂ (the moment of inertia is the same).\nT ∝ 1/√m, so (m₁ + m₂)/(m₁ − m₂) = T₂²/T₁².\nm₁/m₂ = (T₂² + T₁²)/(T₂² − T₁²).'},
+  {t:'jee',sim:'curie-law',q:'The susceptibility of a paramagnetic salt is χ at 300 K. At 600 K it is:',o:['2χ','χ/2','χ/4','χ'],c:1,a:'Curie\'s law: χ ∝ 1/T.'},
+  {t:'jee',sim:'dipole-field-ratio',q:'A short bar magnet of moment m lies with its N pole pointing geographic north. Where are the neutral points?',a:'On the equatorial line the magnet\'s field points south, opposite to B(H), so they cancel there.\nμ₀m/(4πr³) = B(H), so r = [μ₀m/(4πB(H))]^(1/3), on both sides of the magnet along its east-west line.'},
+  {t:'jee',sim:'earth-field',q:'The apparent dips at a place in two perpendicular vertical planes are 30° and 45°. The true dip is:',o:['37.5°','tan⁻¹(1/2)','60°','tan⁻¹ 2'],c:1,a:'cot²δ = cot²30° + cot²45° = 3 + 1 = 4, so cot δ = 2 and δ = tan⁻¹(1/2) ≈ 26.6°.'},
+  {t:'neet',sim:'magnetic-materials',q:'Which is a ferromagnetic substance?',o:['copper','aluminium','iron','water'],c:2,a:'Iron, nickel and cobalt.'},
+  {t:'neet',sim:'earth-field',q:'The angle of dip at the Earth\'s magnetic poles is:',o:['0°','45°','90°','180°'],c:2,a:'The field there is vertical.'},
+  {t:'neet',sim:'curie-law',q:'Above its Curie temperature, a ferromagnetic substance becomes:',o:['diamagnetic','paramagnetic','a superconductor','more strongly ferromagnetic'],c:1,a:'Thermal motion breaks up the domains.'},
+  {t:'neet',q:'The SI unit of magnetic moment is:',o:['A·m','A·m²','T','Wb'],c:1,a:'m = NIA.'},
+  {t:'neet',sim:'magnetic-materials',q:'Diamagnetic substances are:',o:['strongly attracted by magnets','weakly attracted','weakly repelled','not affected at all'],c:2,a:'They have a small negative susceptibility.'},
+  {t:'neet',q:'Soft iron is used for electromagnets because it has:',o:['high retentivity and high coercivity','low retentivity and low coercivity','high coercivity only','no permeability'],c:1,a:'It magnetises and demagnetises easily.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1238,6 +1265,47 @@ window.PhysicaMockBank={
     {tp:'galv',q:'To make a galvanometer into an ammeter, connect:',o:['a large resistance in series','a small resistance in parallel','a large resistance in parallel','a small resistance in series'],c:1,s:'The shunt carries most of the current.'},
     {tp:'galv',q:'To make a galvanometer into a voltmeter, connect:',o:['a small resistance in parallel','a large resistance in series','a capacitor','nothing'],c:1,s:'So it draws only a tiny current.'},
     {tp:'galv',q:'The current sensitivity of a moving-coil galvanometer is:',o:['NAB/k','k/(NAB)','NAk/B','NB/(Ak)'],c:0,s:'Deflection per unit current.'}
+  ]},
+'Magnetism and Matter':{
+  topics:{bar:'Bar magnet as a dipole',earth:'Earth\'s magnetism',mat:'Magnetic materials',osc:'Magnet in a field'},
+  jee:[
+    {tp:'bar',q:'At the same distance, the field of a short magnet on its axial line compared with its equatorial line is:',o:['1 : 2','2 : 1','1 : 1','4 : 1'],c:1,s:'2μ₀m/(4πr³) : μ₀m/(4πr³).'},
+    {tp:'bar',q:'A bar magnet of moment m is cut into two equal pieces at right angles to its length. Each piece has moment:',o:['m','m/2','2m','m/4'],c:1,s:'Same pole strength, half the length.'},
+    {tp:'bar',q:'A bar magnet of moment m is bent into a semicircle. Its moment becomes:',o:['m','2m/π','m/π','πm/2'],c:1,s:'The poles end up a diameter 2L/π apart.'},
+    {tp:'earth',q:'B(H) at a place is 0.3 G and the dip is 60°. The total field is:',o:['0.15 G','0.6 G','0.52 G','0.35 G'],c:1,s:'B = B(H)/cos δ.'},
+    {tp:'earth',q:'The apparent dips in two perpendicular vertical planes are 30° and 45°. The true dip δ is:',o:['37.5°','tan⁻¹(1/2)','60°','45°'],c:1,s:'cot²δ = 3 + 1 = 4.'},
+    {tp:'mat',q:'The susceptibility of a paramagnet is χ at 300 K. At 600 K it is:',o:['2χ','χ/2','χ/4','χ'],c:1,s:'χ ∝ 1/T.'},
+    {tp:'mat',q:'The susceptibility of a diamagnetic substance is:',o:['large and positive','small and positive','small and negative','zero'],c:2,s:'It is weakly repelled.'},
+    {tp:'osc',q:'A magnet oscillates in a field B with period T. If the field is made 4B, the period becomes:',o:['2T','T/2','T/4','4T'],c:1,s:'T ∝ 1/√B.'},
+    {tp:'osc',q:'The work needed to turn a magnet of moment m from along B to opposite to B is:',o:['mB','2mB','zero','mB/2'],c:1,s:'U goes from −mB to +mB.'},
+    {tp:'mat',q:'Material for a permanent magnet should have:',o:['low retentivity and low coercivity','high retentivity and high coercivity','high retentivity and low coercivity','low retentivity and high coercivity'],c:1,s:'It must keep its magnetism and resist being demagnetised.'},
+    {tp:'osc',q:'A magnet of moment 4 A·m² sits at right angles to a 0.5 T field. Find the torque in N·m.',n:2,s:'τ = mB sin 90° = 2 N·m.'},
+    {tp:'bar',q:'Find the field, in μT, 0.2 m from a short magnet of moment 4 A·m² on its axial line (μ₀/4π = 10⁻⁷).',n:100,s:'B = 10⁻⁷ × 2 × 4/0.008 = 10⁻⁴ T = 100 μT.'},
+    {tp:'osc',q:'A magnet oscillates with a period of 6 s. Find its period, in seconds, when the field is reduced to one quarter.',n:12,s:'T ∝ 1/√B: 6 × 2 = 12 s.'},
+    {tp:'earth',q:'The Earth\'s field at a place is 0.5 G with a dip of 60°. Find B(H) in units of 0.01 G.',n:25,s:'B(H) = 0.5 × cos 60° = 0.25 G = 25 × 0.01 G.'},
+    {tp:'mat',q:'A paramagnet has χ = 0.0012 at 300 K. Its susceptibility at 200 K is n × 10⁻⁴. Find n.',n:18,s:'χ ∝ 1/T: 0.0012 × 300/200 = 0.0018 = 18 × 10⁻⁴.'}
+  ],
+  neet:[
+    {tp:'bar',q:'Magnetic field lines:',o:['start at N and end at S','form closed loops','never pass through the magnet','can cross'],c:1,s:'They continue inside from S to N.'},
+    {tp:'bar',q:'The SI unit of magnetic dipole moment is:',o:['A·m²','A/m','T·m','Wb/m'],c:0,s:'m = NIA.'},
+    {tp:'bar',q:'Isolated magnetic poles (monopoles):',o:['are common','have never been found','exist in iron','exist at the Earth\'s poles'],c:1,s:'Gauss\'s law for magnetism: net flux through a closed surface is zero.'},
+    {tp:'bar',q:'Outside a bar magnet, field lines run from:',o:['S to N','N to S','east to west','the centre outwards'],c:1,s:'And back from S to N inside.'},
+    {tp:'bar',q:'For a short magnet, the axial field is how many times the equatorial field at the same distance?',o:['1','2','4','½'],c:1,s:'2 : 1.'},
+    {tp:'earth',q:'The angle between the geographic and magnetic meridians is called:',o:['dip','declination','inclination','latitude'],c:1,s:'Declination.'},
+    {tp:'earth',q:'The angle the Earth\'s field makes with the horizontal is called:',o:['declination','dip','azimuth','latitude'],c:1,s:'Dip (inclination).'},
+    {tp:'earth',q:'At the magnetic poles, the angle of dip is:',o:['0°','45°','90°','180°'],c:2,s:'The field is vertical.'},
+    {tp:'earth',q:'At the magnetic equator, the angle of dip is:',o:['0°','30°','60°','90°'],c:0,s:'The field is horizontal.'},
+    {tp:'earth',q:'The horizontal component of the Earth\'s field is:',o:['B sin δ','B cos δ','B tan δ','B'],c:1,s:'B(H) = B cos δ.'},
+    {tp:'mat',q:'A substance weakly repelled by a magnet is:',o:['ferromagnetic','paramagnetic','diamagnetic','antiferromagnetic'],c:2,s:'For example, bismuth and copper.'},
+    {tp:'mat',q:'The susceptibility of a paramagnetic substance is:',o:['small and negative','small and positive','large and positive','zero'],c:1,s:'It is weakly attracted.'},
+    {tp:'mat',q:'Curie\'s law for paramagnets is:',o:['χ ∝ T','χ ∝ 1/T','χ ∝ T²','χ is constant'],c:1,s:'χ = C/T.'},
+    {tp:'mat',q:'Above the Curie temperature, iron becomes:',o:['diamagnetic','paramagnetic','more ferromagnetic','a superconductor'],c:1,s:'Its domains break up.'},
+    {tp:'mat',q:'A superconductor shows perfect:',o:['paramagnetism','ferromagnetism','diamagnetism','conductivity of heat'],c:2,s:'It pushes the magnetic field out completely (Meissner effect).'},
+    {tp:'mat',q:'Ferromagnetism is explained by:',o:['domains','free electrons only','nuclear forces','gravity'],c:0,s:'Small regions with aligned atomic magnets.'},
+    {tp:'osc',q:'The torque on a magnet of moment m in a field B is:',o:['mB cos θ','mB sin θ','m/B','zero'],c:1,s:'τ = m × B.'},
+    {tp:'osc',q:'The potential energy of a magnet in a field is:',o:['mB sin θ','−mB cos θ','mB','zero'],c:1,s:'U = −m·B.'},
+    {tp:'osc',q:'The period of a magnet oscillating in a field is:',o:['2π√(mB/I)','2π√(I/(mB))','2π√(I/m)','2πmB'],c:1,s:'T = 2π√(I/(mB)).'},
+    {tp:'osc',q:'Electromagnet cores are made of soft iron because it has:',o:['high coercivity','low coercivity and low retentivity','high retentivity','no permeability'],c:1,s:'It loses its magnetism as soon as the current stops.'}
   ]}
 };
 })();
