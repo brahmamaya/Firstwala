@@ -633,6 +633,33 @@ window.PhysicaExam={
   {t:'neet',q:'The unit of the power of a lens is the:',o:['watt','dioptre','metre','joule'],c:1,a:'1 D = 1 m⁻¹.'},
   {t:'neet',q:'Short-sightedness (myopia) is corrected by:',o:['a convex lens','a concave lens','a cylindrical lens','a prism'],c:1,a:'A diverging lens moves the image back onto the retina.'},
   {t:'neet',sim:'total-internal-reflection',q:'A diamond sparkles mainly because of:',o:['dispersion only','total internal reflection (small critical angle)','scattering','interference'],c:1,a:'n ≈ 2.42, critical angle ≈ 24°: light is trapped and reflected many times.'}
+],
+'Wave Optics':[
+  {t:'1',q:'What is a wavefront? What shape does it have near a point source?',a:'A surface on which all points vibrate in the same phase. Near a point source it is spherical; far away it becomes plane.'},
+  {t:'1',q:'What are coherent sources?',a:'Sources that give light of the same frequency with a constant phase difference.'},
+  {t:'1',sim:'fringe-width',q:'Write the fringe width in Young\'s double-slit experiment.',a:'β = λD/d (D = slit-to-screen distance, d = slit separation).'},
+  {t:'1',sim:'brewster-angle',q:'State Brewster\'s law.',a:'At the polarising angle i(B), tan i(B) = n; the reflected light is then completely plane polarised.'},
+  {t:'1',sim:'polarization',q:'State Malus\'s law.',a:'I = I₀ cos²θ, where θ is the angle between the plane of polarisation of the light and the axis of the analyser.'},
+  {t:'3',q:'State Huygens\' principle and use it to prove Snell\'s law of refraction.',a:'Every point on a wavefront is a source of secondary wavelets; the new wavefront is the surface touching them all.\nA plane wavefront AB meets the surface at A. While its end B travels BC = v₁t in medium 1, the wavelet from A spreads AE = v₂t in medium 2.\nsin i = BC/AC = v₁t/AC and sin r = AE/AC = v₂t/AC.\nsin i/sin r = v₁/v₂ = n₂/n₁, which is Snell\'s law.'},
+  {t:'3',sim:'doubleslit',q:'In a double-slit experiment λ = 600 nm, D = 1 m and d = 1 mm. Find the fringe width.',a:'β = λD/d = 600 × 10⁻⁹ × 1/10⁻³ = 6 × 10⁻⁴ m = 0.6 mm.'},
+  {t:'3',q:'What conditions are needed for a sustained (steady) interference pattern?',a:'1. The sources must be coherent (constant phase difference).\n2. They should give the same wavelength and nearly equal amplitudes (for good contrast).\n3. The slits should be narrow and close together, and the screen far away.\n4. The sources should be monochromatic.'},
+  {t:'3',sim:'diffraction',q:'For a single slit of width a, find the condition for the first minimum and the width of the central bright band on a screen at distance D.',a:'The first minimum is where the slit splits into two halves that cancel: a sin θ = λ.\nThe central maximum extends from −λ/a to +λ/a, so its width on the screen is 2λD/a (twice that of the other bands).'},
+  {t:'3',sim:'polarization',q:'Unpolarised light of intensity I₀ passes through two polaroids whose axes are at 60°. Find the final intensity.',a:'The first polaroid passes half: I₀/2.\nThe second (Malus): (I₀/2) cos²60° = (I₀/2)(1/4) = I₀/8.'},
+  {t:'3',sim:'thin-film',q:'Why does a soap bubble or a thin oil film show colours?',a:'Light reflected from the top and bottom surfaces of the thin film interferes.\nThe path difference depends on the thickness, so different thicknesses reinforce different colours, giving bands of colour that change as the film changes.'},
+  {t:'5',sim:'doubleslit',q:'Derive the fringe width and the positions of bright and dark fringes in Young\'s double-slit experiment. Write the intensity at a point.',a:'Path difference at a point y from the centre: Δ = yd/D.\nBright: Δ = nλ, so y(n) = nλD/d. Dark: Δ = (2n − 1)λ/2, so y = (2n − 1)λD/2d.\nNeighbouring bright (or dark) fringes are β = λD/d apart.\nWith equal intensities I₀ and phase difference φ = (2π/λ)Δ: I = 4I₀ cos²(φ/2). Energy is only redistributed: bright fringes get 4I₀, dark ones zero.'},
+  {t:'5',sim:'diffraction',q:'Explain single-slit diffraction. How is it different from interference?',a:'Each point of the slit sends out wavelets. Straight ahead all are in phase: bright central maximum. At a sin θ = λ the top and bottom halves cancel pairwise: first minimum. At a sin θ ≈ 3λ/2 one third is left uncancelled: weak secondary maximum, and so on.\nDifferences: interference comes from two separate coherent sources, diffraction from wavelets of one wavefront; interference fringes are equally wide and equally bright, diffraction bands get fainter and the central one is twice as wide.'},
+  {t:'5',sim:'brewster-angle',q:'Describe how light can be polarised by reflection and by polaroids. How does polarisation show that light is a transverse wave?',a:'Reflection: at Brewster\'s angle (tan i(B) = n) the reflected light is fully polarised, at right angles to the plane of incidence; then the reflected and refracted rays are at 90° to each other.\nPolaroids: they pass only the vibrations along their axis. Unpolarised light comes out at half intensity; a second polaroid follows Malus\'s law I = I₀ cos²θ.\nScattering: light from the sky at 90° to the Sun is polarised.\nOnly transverse waves have a direction of vibration across the motion that can be selected, so polarisation proves light is transverse (sound cannot be polarised).'},
+  {t:'jee',sim:'fringe-width',q:'A double-slit experiment is moved from air into water (n = 4/3). The fringe width becomes:',o:['4/3 times','3/4 times','the same','16/9 times'],c:1,a:'λ in water = λ/n, and β ∝ λ.'},
+  {t:'jee',sim:'doubleslit',q:'The two slits have widths in the ratio 1 : 4 (intensities in the same ratio). The ratio of maximum to minimum intensity is:',o:['4 : 1','16 : 1','9 : 1','25 : 9'],c:2,a:'Amplitudes are in ratio 1 : 2. I(max)/I(min) = (1 + 2)²/(2 − 1)² = 9.'},
+  {t:'jee',sim:'doubleslit',q:'A thin glass sheet of thickness t and refractive index μ covers one slit in Young\'s experiment. By how much does the pattern shift?',a:'The sheet adds an extra optical path (μ − 1)t on that side.\nThe central fringe moves to where yd/D = (μ − 1)t, so the shift is y = (μ − 1)tD/d, towards the covered slit.'},
+  {t:'jee',sim:'resolving-power',q:'What limits how finely a telescope can separate two stars? How can it be improved?',a:'Diffraction at the circular objective spreads each star into a disc. Two stars are just resolved when their angular separation is θ = 1.22λ/D (D = objective diameter).\nResolving power ∝ D/λ: a bigger objective (or shorter wavelength) separates closer stars.'},
+  {t:'jee',sim:'diffraction-grating',q:'A grating has 5000 lines per cm. Light of 500 nm falls normally on it. The first-order maximum is at sin θ equal to:',o:['0.1','0.25','0.5','0.025'],c:1,a:'d = 1/5000 cm = 2 × 10⁻⁶ m. d sin θ = λ gives sin θ = 500 × 10⁻⁹/2 × 10⁻⁶ = 0.25.'},
+  {t:'neet',q:'Interference of light shows that light is:',o:['a particle','a wave','a transverse wave in particular','made of electrons'],c:1,a:'Only waves can add to give bright and dark fringes.'},
+  {t:'neet',sim:'polarization',q:'Polarisation of light shows that light is:',o:['longitudinal','transverse','a stream of particles','sound'],c:1,a:'Only transverse waves can be polarised.'},
+  {t:'neet',sim:'doubleslit',q:'In Young\'s experiment the central fringe is:',o:['dark','bright','coloured','absent'],c:1,a:'The path difference there is zero.'},
+  {t:'neet',sim:'fringe-width',q:'If the slit separation in Young\'s experiment is doubled, the fringe width:',o:['doubles','halves','stays the same','becomes four times'],c:1,a:'β = λD/d.'},
+  {t:'neet',q:'Which of these cannot be polarised?',o:['light','radio waves','sound waves in air','X-rays'],c:2,a:'Sound in air is longitudinal.'},
+  {t:'neet',q:'Light from two separate bulbs does not give an interference pattern because the bulbs are:',o:['too bright','not coherent','too far apart','of different sizes'],c:1,a:'Their phase difference changes randomly and very quickly.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1578,6 +1605,47 @@ window.PhysicaMockBank={
     {tp:'inst',q:'The magnifying power of an astronomical telescope in normal adjustment is:',o:['f(e)/f(o)','f(o)/f(e)','f(o) + f(e)','f(o)f(e)'],c:1,s:'M = f(o)/f(e).'},
     {tp:'inst',q:'Short-sightedness (myopia) is corrected using a:',o:['convex lens','concave lens','bifocal prism','plane glass'],c:1,s:'A diverging lens.'},
     {tp:'inst',q:'Long-sightedness (hypermetropia) is corrected using a:',o:['concave lens','convex lens','cylindrical lens','plane mirror'],c:1,s:'A converging lens.'}
+  ]},
+'Wave Optics':{
+  topics:{huyg:'Wavefronts and Huygens\' principle',yd:'Interference and the double slit',diff:'Diffraction and resolution',pol:'Polarisation'},
+  jee:[
+    {tp:'yd',q:'A double-slit set-up is put in water (n = 4/3). The fringe width becomes:',o:['4/3 times','3/4 times','the same','9/16 times'],c:1,s:'β ∝ λ/n.'},
+    {tp:'yd',q:'Slit intensities are in the ratio 1 : 4. The ratio I(max) : I(min) is:',o:['4 : 1','16 : 1','9 : 1','5 : 3'],c:2,s:'Amplitudes 1 : 2; (3)² : (1)².'},
+    {tp:'yd',q:'A thin sheet (thickness t, index μ) covers one slit. The fringe pattern shifts by:',o:['μtD/d','(μ − 1)tD/d','(μ + 1)tD/d','tD/(μd)'],c:1,s:'Extra optical path (μ − 1)t.'},
+    {tp:'diff',q:'For a single slit of width a, the angular width of the central maximum is:',o:['λ/a','2λ/a','a/λ','λ/2a'],c:1,s:'From −λ/a to +λ/a.'},
+    {tp:'diff',q:'A grating with 5000 lines per cm is lit normally with 500 nm light. The first order is at sin θ =',o:['0.25','0.5','0.1','0.05'],c:0,s:'d = 2 μm.'},
+    {tp:'pol',q:'Unpolarised light (I₀) passes two polaroids with axes 60° apart. The final intensity is:',o:['I₀/2','I₀/4','I₀/8','3I₀/8'],c:2,s:'(I₀/2) cos²60°.'},
+    {tp:'pol',q:'The Brewster angle for glass of n = √3 is:',o:['30°','45°','60°','90°'],c:2,s:'tan i(B) = √3.'},
+    {tp:'huyg',q:'The wavefront from a very distant source is:',o:['spherical','cylindrical','plane','irregular'],c:2,s:'A huge sphere looks flat.'},
+    {tp:'yd',q:'In Young\'s experiment with white light:',o:['all fringes are white','the central fringe is white and the others are coloured','no fringes form','all fringes are dark'],c:1,s:'Zero path difference for every colour only at the centre.'},
+    {tp:'diff',q:'The resolving power of a telescope increases when:',o:['the objective aperture is larger','the wavelength is longer','the eyepiece is weaker','the tube is longer'],c:0,s:'θ(min) = 1.22λ/D.'},
+    {tp:'yd',q:'In a double-slit experiment λ = 500 nm, D = 2 m and d = 0.5 mm. Find the fringe width in mm.',n:2,s:'β = 500 × 10⁻⁹ × 2/0.5 × 10⁻³ = 2 × 10⁻³ m.'},
+    {tp:'yd',q:'The path difference at the third bright fringe is nλ. Find n.',n:3,s:'Bright fringes need Δ = nλ.'},
+    {tp:'pol',q:'Unpolarised light of intensity 16 W/m² passes one polaroid. Find the intensity in W/m².',n:8,s:'A polaroid passes half.'},
+    {tp:'diff',q:'Light of 600 nm gives the first single-slit minimum at 30°. Find the slit width in nm.',n:1200,s:'a = λ/sin 30° = 1200 nm.'},
+    {tp:'pol',q:'At the Brewster angle, find the angle in degrees between the reflected and refracted rays.',n:90,s:'i(B) + r = 90°, so the rays are at right angles.'}
+  ],
+  neet:[
+    {tp:'huyg',q:'Huygens\' principle says every point on a wavefront:',o:['absorbs light','acts as a source of secondary wavelets','is at rest','reflects light'],c:1,s:'The new wavefront touches all the wavelets.'},
+    {tp:'huyg',q:'Near a point source the wavefront is:',o:['plane','spherical','cylindrical','conical'],c:1,s:'Light spreads equally in all directions.'},
+    {tp:'huyg',q:'The wavefront of light from the Sun reaching the Earth is nearly:',o:['spherical','plane','cylindrical','elliptical'],c:1,s:'The source is very far away.'},
+    {tp:'huyg',q:'A line source (such as a slit) produces a wavefront that is:',o:['spherical','plane','cylindrical','irregular'],c:2,s:'It spreads out round the line.'},
+    {tp:'yd',q:'Coherent sources must have:',o:['the same amplitude only','a constant phase difference','different frequencies','high intensity'],c:1,s:'And the same frequency.'},
+    {tp:'yd',q:'The fringe width in Young\'s experiment is:',o:['λd/D','λD/d','Dd/λ','λ/(Dd)'],c:1,s:'β = λD/d.'},
+    {tp:'yd',q:'A dark fringe forms where the path difference is:',o:['nλ','(2n − 1)λ/2','2nλ','zero'],c:1,s:'An odd number of half-wavelengths.'},
+    {tp:'yd',q:'A bright fringe forms where the path difference is:',o:['nλ','(2n − 1)λ/2','λ/4','λ/3'],c:0,s:'A whole number of wavelengths.'},
+    {tp:'yd',q:'If the screen is moved twice as far from the slits, the fringe width:',o:['halves','doubles','stays the same','becomes four times'],c:1,s:'β ∝ D.'},
+    {tp:'yd',q:'In interference, light energy is:',o:['destroyed at dark fringes','created at bright fringes','redistributed','lost as heat'],c:2,s:'Energy is conserved.'},
+    {tp:'yd',q:'Colours seen in a thin oil film on water are due to:',o:['dispersion','interference','polarisation','total internal reflection'],c:1,s:'Reflections from the two surfaces of the film interfere.'},
+    {tp:'diff',q:'Diffraction is most noticeable when the size of the opening is:',o:['much larger than λ','about the same as λ','zero','infinite'],c:1,s:'Light then spreads widely.'},
+    {tp:'diff',q:'In single-slit diffraction, the central maximum is:',o:['the same width as the others','twice as wide as the others','dark','half as wide'],c:1,s:'It spans from −λ/a to +λ/a.'},
+    {tp:'diff',q:'If the slit is made wider, the central maximum becomes:',o:['wider','narrower','unchanged','dark'],c:1,s:'Width ∝ 1/a.'},
+    {tp:'diff',q:'The resolving power of a microscope can be increased by using:',o:['longer wavelength','shorter wavelength','a smaller objective','dim light'],c:1,s:'Smaller λ gives a smaller limiting angle.'},
+    {tp:'pol',q:'Polarisation shows that light waves are:',o:['longitudinal','transverse','stationary','not waves'],c:1,s:'Only transverse waves can be polarised.'},
+    {tp:'pol',q:'Malus\'s law is:',o:['I = I₀ cos θ','I = I₀ cos²θ','I = I₀ sin²θ','I = I₀/2'],c:1,s:'For polarised light through an analyser.'},
+    {tp:'pol',q:'Brewster\'s law is:',o:['sin i(B) = n','tan i(B) = n','cos i(B) = n','i(B) = n'],c:1,s:'The reflected light is then fully polarised.'},
+    {tp:'pol',q:'Unpolarised light passing through one polaroid has its intensity:',o:['unchanged','halved','made zero','doubled'],c:1,s:'Half the vibrations are removed on average.'},
+    {tp:'pol',q:'Blue light from the sky (at 90° to the Sun) is partly polarised because of:',o:['refraction','scattering','dispersion','total internal reflection'],c:1,s:'Scattering by air molecules.'}
   ]}
 };
 })();
