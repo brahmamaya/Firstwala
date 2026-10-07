@@ -146,7 +146,15 @@ Done recently (PRs #66-#73):
   object, drag object (to infinity), tip and F; full black stage via window.PhysicaFullStage.
 - Hinglish spoken by the Hindi female voice (tools/hinglish-voice.js builds the word map).
 - Tutor mic stops on a second tap; logo all white; "Focus mode" liquid-glass button.
+Exam practice (Student mode, inside the AI Tutor - nothing new in Normal mode):
+- tutor-exam.js (ships in the lazy tutor pack) holds board-pattern + NEET-style questions per chapter, en/hl/hi,
+  with step-by-step answers. The "🎯 Exam" tab appears only for chapters that have questions (now: Units and
+  Measurements, 26 questions). Progress ("got it" / "revise") is saved on the device under physica-exam.
+- To add a chapter: add its name and questions to window.PhysicaExam in tutor-exam.js - the tab appears by itself.
+
 Still to do / ideas:
+- Exam-date study plan inside the tutor; a visible "install for offline" button (install.js exists).
+- More exam chapters (Motion in a Straight Line, Motion in a Plane, Laws of Motion).
 - Owner to set up the Google Form + Apps Script (tools/tutor-questions.gs) for unanswered questions.
 - Next tutor chapter: Work, Energy and Power.
 - Owner will test on the real 86-inch board and report anything blurry or slow; owner may report Hinglish

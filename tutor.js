@@ -92,9 +92,10 @@ function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tb
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
   if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
   if(!c){body.append(el('p','tutor-note','The AI Tutor covers every physics chapter. Chemistry, Botany and Zoology are coming soon.'));return}
-  for(const [id,label] of [['ask','💬 Chat'],['show','▶ Show me'],['quiz','✓ Quiz']]){const b=btn('',label,()=>{tab=id;render()});b.setAttribute('aria-pressed',String(id===tab));tabs.append(b)}
+  const list=[['ask','💬 Chat'],['show','▶ Show me'],['quiz','✓ Quiz']];if(examSet())list.push(['exam','🎯 Exam']);else if(tab==='exam')tab='ask';
+  for(const [id,label] of list){const b=btn('',label,()=>{tab=id;render()});b.setAttribute('aria-pressed',String(id===tab));tabs.append(b)}
   window.PhysicaGlass?.(tabs);
-  ({ask:chat,show,quiz})[tab](c)}
+  ({ask:chat,show,quiz,exam})[tab](c)}
 
 // ---------------------------------------------------------------------------------------------------------------
 // Chat: a conversation. The student's question appears as a bubble; the tutor "types", answers in a friendly voice,
@@ -345,6 +346,31 @@ function quiz(c){let score=0,done=0;const out=el('p','tutor-score'),qs=[];
       hush();speak(`${pick===qq.correct?'Correct!':'Not quite.'} ${qq.why}${end?` Your score is ${score} out of ${c.quiz.length}.`:''}`,()=>{if(!end){const next=c.quiz.findIndex((_,k)=>!qs[k].dataset.done);if(next>=0)read(next)}})};
     qq.options.forEach((o,i)=>opts.append(btn('tutor-opt',`${i+1}. ${o}`,()=>reveal(i))));body.append(q)});
   body.append(out);read(0)}
+
+// Exam: board-pattern and NEET-style questions for the chapter. Written questions show a step-by-step answer on
+// request and the student marks each one "got it" or "revise"; MCQs are checked at once. Progress stays on this device.
+const examSet=()=>{const s=simObj();return s&&window.PhysicaExam?.[s.chapter]};
+let examType='all';
+function exam(){const sim=simObj(),qs=examSet();let lang='en',done={};
+  try{lang=JSON.parse(localStorage.getItem('physica-learner')||'{}').lang||'en'}catch{}try{done=JSON.parse(localStorage.getItem('physica-exam')||'{}')||{}}catch{}
+  const L=o=>o?(o[lang]||o.en):'',W=(en,hl,hi)=>lang==='hi'?hi:lang==='hl'?hl:en,key=n=>`${sim.chapter}#${n}`;
+  const save=()=>{try{localStorage.setItem('physica-exam',JSON.stringify(done))}catch{}},
+    prog=el('p','tutor-exam-prog'),paint=()=>{const got=qs.filter((_,n)=>done[key(n)]===1).length;prog.textContent=W(`${got} / ${qs.length} mastered`,`${got} / ${qs.length} pakke ho gaye`,`${got} / ${qs.length} पक्के हो गए`)};
+  const kinds=[['all',W('All','Sab','सभी')],['1',W('1 mark','1 mark','1 अंक')],['3',W('2-3 marks','2-3 marks','2-3 अंक')],['5',W('5 marks','5 marks','5 अंक')],['mcq','NEET MCQ']],chips=el('div','tutor-chips');
+  for(const [k,t] of kinds){const b=btn('tutor-chip',t,()=>{examType=k;render()});b.setAttribute('aria-pressed',String(k===examType));chips.append(b)}
+  body.append(el('p','tutor-note',W(`Board-pattern and NEET-style practice for ${sim.chapter}.`,`${sim.chapter} ke board-pattern aur NEET-style sawal.`,`${sim.chapter} के बोर्ड-पैटर्न और NEET-शैली के प्रश्न।`)),prog,chips);paint();
+  qs.forEach((x,n)=>{if(examType!=='all'&&x.t!==examType)return;
+    const q=el('div','tutor-q'),ttl=el('b','',`${x.t==='mcq'?'MCQ':W(`${x.t==='3'?'2-3':x.t} mark${x.t==='1'?'':'s'}`,`${x.t==='3'?'2-3':x.t} mark${x.t==='1'?'':'s'}`,`${x.t==='3'?'2-3':x.t} अंक`)} · ${L(x.q)} `),ans=el('p','tutor-why tutor-ans',L(x.a)),row=el('div','tutor-chips');ans.hidden=true;
+    const mark=()=>q.classList.toggle('got',done[key(n)]===1);mark();
+    const say=t=>{hush();speak(t,null,lang)};
+    if(synth){const r=btn('tutor-read','🔊',()=>say(`${L(x.q)} ${x.o?x.o.map((o,i)=>`${i+1}: ${o}.`).join(' '):''}`));r.title='Read this question';r.setAttribute('aria-label','Read question aloud');ttl.append(r)}
+    q.append(ttl);
+    if(x.o){const opts=el('div','tutor-opts');x.o.forEach((o,i)=>opts.append(btn('tutor-opt',`${i+1}. ${o}`,()=>{if(q.dataset.done)return;q.dataset.done='1';opts.children[x.c].classList.add('right');if(i!==x.c)opts.children[i].classList.add('wrong');ans.hidden=false;done[key(n)]=i===x.c?1:0;save();mark();paint();say(`${i===x.c?W('Correct!','Sahi!','सही!'):W('Not quite.','Thoda galat.','थोड़ा गलत।')} ${L(x.a)}`)})));q.append(opts,ans)}
+    else{const show=btn('tutor-mini',W('Show answer','Answer dekho','उत्तर देखें'),()=>{ans.hidden=false;show.hidden=true;grade.hidden=false;say(L(x.a))}),grade=el('span','tutor-chips');grade.hidden=true;
+      grade.append(btn('tutor-mini',W('✓ Got it','✓ Aa gaya','✓ आ गया'),()=>{done[key(n)]=1;save();mark();paint()}),btn('tutor-mini',W('↺ Revise again','↺ Phir padhna hai','↺ फिर पढ़ना है'),()=>{done[key(n)]=0;save();mark();paint()}));
+      row.append(show,grade);q.append(ans)}
+    if(x.sim&&x.sim!==sim.id)row.append(btn('tutor-mini',W('▶ Try it in the simulation','▶ Simulation mein dekho','▶ सिमुलेशन में देखें'),()=>{hush();location.hash=x.sim}));
+    if(row.childElementCount)q.append(row);body.append(q)})}
 
 // students get the tutor pack fetched quietly in the background, so turning the tutor on is instant
 const prefetchTutor=()=>{if(mode==='student'&&!window.PhysicaTeacher)(window.requestIdleCallback||setTimeout)(()=>loadTutorPack().catch(()=>{}),{timeout:2500})};

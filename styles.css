@@ -525,6 +525,7 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 .tutor-q{padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}.tutor-q:first-child{border-top:0}
 .tutor-why{margin:0;color:rgba(255,255,255,.75);font-size:13.5px}
 .tutor-score{font-weight:900;margin:8px 0 0}
+.tutor-ans{white-space:pre-line;margin-top:6px}.tutor-exam-prog{margin:0 0 8px;font-weight:800;font-size:13px;color:#59e08f}.tutor-chip[aria-pressed=true]{border-color:#fff;background:rgba(255,255,255,.2)}.tutor-q.got>b:first-child::before{content:"✓ ";color:#59e08f}
 .tutor-note{color:rgba(255,255,255,.7);margin:0 0 10px}
 /* Teacher (projector) view: everything bigger and easier to read from the back of the class */
 body.mode-teacher .controls-card .control-label span:first-child{font-size:17px!important}
