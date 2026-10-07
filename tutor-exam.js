@@ -255,6 +255,33 @@ window.PhysicaExam={
   {t:'neet',q:'When the temperature of a liquid rises, its viscosity:',o:['increases','decreases','stays the same','first rises then falls'],c:1,a:'Liquids flow more easily when hot (gases become more viscous).'},
   {t:'neet',sim:'capillary-rise',q:'Water rises higher in a:',o:['wider capillary tube','narrower capillary tube','longer tube','shorter tube'],c:1,a:'h = 2T cos θ/(rρg) ∝ 1/r.'},
   {t:'neet',sim:'drop-bubble-pressure',q:'The excess pressure inside a soap bubble of radius R is:',o:['T/R','2T/R','4T/R','8T/R'],c:2,a:'A bubble has two surfaces: 4T/R.'}
+],
+'Thermal Properties of Matter':[
+  {t:'1',q:'Write the relation between the Celsius and Fahrenheit scales.',a:'F = (9/5)C + 32.'},
+  {t:'1',sim:'water-anomaly',q:'At what temperature is water densest?',a:'At 4 °C. Between 0 °C and 4 °C water contracts on heating (anomalous expansion).'},
+  {t:'1',sim:'bimetallic-strip',q:'Why does a bimetallic strip bend when heated?',a:'Its two metals expand by different amounts (different α), so the strip curves with the more-expanding metal on the outside.'},
+  {t:'1',sim:'specific-heat',q:'Define specific heat capacity.',a:'The heat needed to raise the temperature of 1 kg of a substance by 1 K (unit J/kg·K).'},
+  {t:'1',sim:'thermal-radiation',q:'State Wien\'s displacement law.',a:'The wavelength of maximum emission falls as temperature rises: λ(max) T = b, with b ≈ 2.9 × 10⁻³ m·K.'},
+  {t:'3',q:'Show that the coefficients of linear, area and volume expansion are in the ratio 1 : 2 : 3.',a:'A square of side L becomes L(1 + αΔT). Area: L²(1 + αΔT)² ≈ L²(1 + 2αΔT), so β = 2α.\nA cube: L³(1 + αΔT)³ ≈ L³(1 + 3αΔT), so γ = 3α.\n(Squares of αΔT are tiny and dropped.) So α : β : γ = 1 : 2 : 3.'},
+  {t:'3',sim:'expansion',q:'Steel rails are 10 m long. How big a gap must be left for a temperature rise of 40 °C (α = 1.2 × 10⁻⁵ /°C)?',a:'ΔL = LαΔT = 10 × 1.2 × 10⁻⁵ × 40 = 4.8 × 10⁻³ m ≈ 4.8 mm.'},
+  {t:'3',sim:'calorimetry',q:'100 g of water at 80 °C is mixed with 200 g of water at 20 °C. Find the final temperature.',a:'Heat lost = heat gained: 100 × c × (80 − T) = 200 × c × (T − 20).\n8000 − 100T = 200T − 4000, so T = 40 °C.'},
+  {t:'3',sim:'heating-curve',q:'How much heat turns 10 g of ice at 0 °C into steam at 100 °C? (L(fusion) = 336 J/g, c(water) = 4.2 J/g·°C, L(vaporisation) = 2260 J/g)',a:'Melt: 10 × 336 = 3360 J.\nHeat water 0 → 100 °C: 10 × 4.2 × 100 = 4200 J.\nBoil: 10 × 2260 = 22 600 J.\nTotal = 30 160 J ≈ 30 kJ.'},
+  {t:'3',sim:'heat-conduction',q:'A copper rod (K = 400 W/m·K) is 0.5 m long with cross-section 1 cm². Its ends are at 100 °C and 0 °C. Find the rate of heat flow.',a:'H = KAΔT/L = 400 × 10⁻⁴ × 100/0.5 = 8 W.'},
+  {t:'3',sim:'newton-cooling',q:'A body cools from 80 °C to 60 °C in 5 min in a room at 20 °C. How long will it take to cool from 60 °C to 40 °C? (Use average temperatures.)',a:'Rate ∝ (average temperature − room temperature).\nFirst: 20/5 = k(70 − 20), so k = 0.08 per min.\nSecond: 20/t = 0.08 × (50 − 20) = 2.4, so t ≈ 8.3 min.\n(It cools more slowly as it gets closer to room temperature.)'},
+  {t:'5',sim:'heating-curve',q:'Draw and explain the temperature-time graph when ice at −10 °C is heated steadily into steam above 100 °C.',a:'1. Ice warms from −10 °C to 0 °C: rising line (steep, ice has low c).\n2. Flat line at 0 °C: melting; the heat (latent heat of fusion) breaks bonds, the temperature stays fixed.\n3. Water warms from 0 °C to 100 °C: rising line, less steep (water has high c).\n4. Long flat line at 100 °C: boiling (latent heat of vaporisation is much larger than that of fusion).\n5. Steam warms above 100 °C.\nThe lengths of the flat parts show the latent heats; the slopes show 1/(mc).'},
+  {t:'5',sim:'thermal-radiation',q:'State the Stefan-Boltzmann law and Wien\'s law. If the temperature of a black body is doubled, what happens to the power it radiates and to λ(max)?',a:'Stefan-Boltzmann: power radiated per unit area E = σT⁴ (σ = 5.67 × 10⁻⁸ W/m²·K⁴).\nWien: λ(max)T = constant.\nDoubling T: power becomes 2⁴ = 16 times; λ(max) is halved (colour shifts towards blue).'},
+  {t:'5',sim:'heat-conduction',q:'A copper rod (K = 400) and a steel rod (K = 50) of the same length and area are joined end to end. The free ends are kept at 100 °C and 0 °C. Find the temperature of the junction.',a:'In steady state the same heat flows through both: K₁A(100 − T)/L = K₂A(T − 0)/L.\n400(100 − T) = 50T, so 40 000 = 450T and T ≈ 88.9 °C.\n(Most of the temperature drop is across the poor conductor.)'},
+  {t:'jee',q:'A pendulum clock with a brass rod (α = 2 × 10⁻⁵ /°C) keeps correct time at 20 °C. How much time does it lose per day at 30 °C?',a:'T ∝ √L, so ΔT/T = ½αΔθ = ½ × 2 × 10⁻⁵ × 10 = 10⁻⁴.\nLoss per day = 10⁻⁴ × 86 400 s ≈ 8.6 s.'},
+  {t:'jee',sim:'thermal-radiation',q:'If the absolute temperature of a black body is doubled, the power it radiates becomes:',o:['2 times','4 times','8 times','16 times'],c:3,a:'P ∝ T⁴: 2⁴ = 16.'},
+  {t:'jee',sim:'calorimetry',q:'How much ice at 0 °C can 1 g of steam at 100 °C melt? (L(vap) = 540 cal/g, L(fusion) = 80 cal/g, c(water) = 1 cal/g·°C)',o:['6.75 g','8 g','1 g','4 g'],c:1,a:'Steam gives 540 cal condensing and 100 cal cooling to 0 °C: 640 cal.\nIce melted = 640/80 = 8 g.'},
+  {t:'jee',sim:'newton-cooling',q:'Write Newton\'s law of cooling in its exact (exponential) form.',a:'dT/dt = −k(T − T₀), where T₀ is the room temperature.\nIntegrating: T − T₀ = (T(i) − T₀)e^(−kt).\nThe difference from room temperature falls exponentially.'},
+  {t:'jee',sim:'heat-conduction',q:'Two slabs of equal thickness and conductivities K₁ and K₂ are put together in series. The effective conductivity is:',o:['K₁ + K₂','(K₁ + K₂)/2','2K₁K₂/(K₁ + K₂)','K₁K₂/(K₁ + K₂)'],c:2,a:'Thermal resistances add: 2L/K = L/K₁ + L/K₂, so K = 2K₁K₂/(K₁ + K₂).'},
+  {t:'neet',q:'The Celsius and Fahrenheit scales show the same reading at:',o:['0°','−40°','40°','100°'],c:1,a:'C = (9/5)C + 32 gives C = −40.'},
+  {t:'neet',q:'The SI unit of heat capacity is:',o:['J/kg','J/K','J/kg·K','W'],c:1,a:'Heat capacity = heat/temperature change (specific heat capacity is J/kg·K).'},
+  {t:'neet',sim:'thermal-radiation',q:'Heat from the Sun reaches the Earth by:',o:['conduction','convection','radiation','all three'],c:2,a:'Only radiation can cross empty space.'},
+  {t:'neet',q:'According to Kirchhoff\'s law, a good absorber of radiation is also a good:',o:['reflector','emitter','conductor','insulator'],c:1,a:'Good absorbers are good emitters (a black body is best at both).'},
+  {t:'neet',sim:'specific-heat',q:'Coastal places have milder climates mainly because water has a:',o:['low specific heat','high specific heat','high density','low boiling point'],c:1,a:'The sea warms and cools slowly, keeping nearby land temperatures steady.'},
+  {t:'neet',sim:'thermal-radiation',q:'A star that looks bluish compared with a reddish star is:',o:['cooler','hotter','the same temperature','farther away'],c:1,a:'Wien\'s law: higher T means a shorter λ(max).'}
 ]};
 
 window.PhysicaMockBank={
@@ -626,6 +653,47 @@ window.PhysicaMockBank={
     {tp:'surf',q:'The excess pressure inside a liquid drop of radius R is:',o:['T/R','2T/R','4T/R','T/2R'],c:1,s:'A drop has one surface: 2T/R.'},
     {tp:'surf',q:'Mercury in a glass capillary:',o:['rises above the outside level','falls below the outside level','stays level','boils'],c:1,s:'Its contact angle is more than 90°, so cos θ < 0 and it is pushed down.'},
     {tp:'surf',q:'Detergents clean better because they:',o:['raise the surface tension of water','lower the surface tension of water','raise its viscosity','raise its density'],c:1,s:'Lower surface tension lets water wet fabric and reach the dirt.'}
+  ]},
+'Thermal Properties of Matter':{
+  topics:{temp:'Temperature and thermal expansion',cal:'Calorimetry and latent heat',cond:'Conduction and convection',rad:'Radiation and cooling'},
+  jee:[
+    {tp:'temp',q:'A metal plate with a circular hole is heated. The hole:',o:['gets smaller','gets larger','stays the same','first shrinks then grows'],c:1,s:'Every length in the plate grows in the same ratio, including the hole\'s diameter.'},
+    {tp:'temp',q:'A solid has α = 1.2 × 10⁻⁵ /°C. Its coefficient of volume expansion is:',o:['1.2 × 10⁻⁵ /°C','2.4 × 10⁻⁵ /°C','3.6 × 10⁻⁵ /°C','0.4 × 10⁻⁵ /°C'],c:2,s:'γ = 3α.'},
+    {tp:'cal',q:'50 g of ice at 0 °C is added to 50 g of water at 80 °C. The final temperature is (L = 80 cal/g):',o:['40 °C','0 °C','20 °C','10 °C'],c:1,s:'Melting the ice needs 50 × 80 = 4000 cal; cooling the water to 0 °C gives exactly 50 × 80 = 4000 cal. All the ice just melts and everything ends at 0 °C.'},
+    {tp:'cal',q:'A 1 kW heater warms 2 kg of water from 20 °C to 70 °C (c = 4200 J/kg·K, no losses). It takes:',o:['3.5 min','7 min','14 min','70 s'],c:1,s:'Q = 2 × 4200 × 50 = 420 000 J. t = 420 000/1000 = 420 s = 7 min.'},
+    {tp:'cond',q:'Two rods of the same material have lengths in the ratio 1 : 2 and radii in the ratio 2 : 1. With the same temperature difference, their heat currents are in the ratio:',o:['2 : 1','4 : 1','8 : 1','16 : 1'],c:2,s:'H ∝ A/L: (4/1) : (1/2) = 8 : 1.'},
+    {tp:'cond',q:'Two slabs of equal thickness with conductivities K₁ and K₂ are put in series. The effective conductivity is:',o:['K₁ + K₂','2K₁K₂/(K₁ + K₂)','(K₁ + K₂)/2','√(K₁K₂)'],c:1,s:'Thermal resistances add like resistors in series.'},
+    {tp:'rad',q:'If the absolute temperature of a body is doubled, the power it radiates becomes:',o:['2 times','4 times','16 times','8 times'],c:2,s:'P ∝ T⁴.'},
+    {tp:'rad',q:'The Sun\'s λ(max) is 480 nm. A star with λ(max) = 960 nm has a surface temperature that is:',o:['double the Sun\'s','half the Sun\'s','the same','four times the Sun\'s'],c:1,s:'λ(max)T is constant, so double λ means half T.'},
+    {tp:'rad',q:'A body cools from 70 °C to 60 °C in 5 min in a room at 20 °C. Using average temperatures, the time to cool from 60 °C to 50 °C is about:',o:['5 min','6.4 min','7.5 min','10 min'],c:1,s:'10/5 = k(65 − 20), so k = 2/45.\n10/t = k(55 − 20) = 70/45, so t = 450/70 ≈ 6.4 min.'},
+    {tp:'cal',q:'Ice is heated steadily. On the temperature-time graph, the line for ice is steeper than the line for water because:',o:['ice has a smaller specific heat','ice has a larger specific heat','ice is denser','latent heat is absorbed'],c:0,s:'Slope = P/(mc): c(ice) ≈ 2100 is about half of c(water) ≈ 4200.'},
+    {tp:'temp',q:'A 20 m steel rail (α = 1.2 × 10⁻⁵ /°C) is heated by 50 °C. Find its increase in length in mm.',n:12,s:'ΔL = 20 × 1.2 × 10⁻⁵ × 50 = 0.012 m = 12 mm.'},
+    {tp:'cal',q:'200 g of water at 30 °C is mixed with 100 g of water at 90 °C. Find the final temperature in °C.',n:50,s:'(200 × 30 + 100 × 90)/300 = 15 000/300 = 50 °C.'},
+    {tp:'cal',q:'Find the heat, in kJ, needed to melt 2 kg of ice at 0 °C (L = 336 kJ/kg).',n:672,s:'Q = mL = 2 × 336 = 672 kJ.'},
+    {tp:'cond',q:'A copper rod (K = 400 W/m·K) of area 2 cm² and length 0.4 m has its ends at 100 °C and 0 °C. Find the heat current in watts.',n:20,s:'H = KAΔT/L = 400 × 2 × 10⁻⁴ × 100/0.4 = 20 W.'},
+    {tp:'rad',q:'A black body is heated from 227 °C to 727 °C. By what factor does the power it radiates increase?',n:16,s:'500 K → 1000 K: (1000/500)⁴ = 16.'}
+  ],
+  neet:[
+    {tp:'temp',q:'The Celsius and Fahrenheit scales read the same at:',o:['−40°','0°','40°','100°'],c:0,s:'Solve C = 9C/5 + 32.'},
+    {tp:'temp',q:'The coefficients of linear, area and volume expansion are in the ratio:',o:['1 : 1 : 1','1 : 2 : 3','3 : 2 : 1','1 : 3 : 2'],c:1,s:'β = 2α, γ = 3α.'},
+    {tp:'temp',q:'Water has its greatest density at:',o:['0 °C','100 °C','4 °C','−4 °C'],c:2,s:'Anomalous expansion: water contracts from 0 to 4 °C.'},
+    {tp:'temp',q:'A bimetallic strip is used in:',o:['a thermostat','a barometer','a hydrometer','a galvanometer'],c:0,s:'It bends with temperature and switches circuits on and off.'},
+    {tp:'temp',q:'0 °C on the Kelvin scale is:',o:['0 K','100 K','273.15 K','−273.15 K'],c:2,s:'T(K) = T(°C) + 273.15.'},
+    {tp:'cal',q:'The SI unit of specific heat capacity is:',o:['J/K','J/kg·K','J/kg','W/m·K'],c:1,s:'Heat per kg per kelvin.'},
+    {tp:'cal',q:'The latent heat of fusion of ice is about:',o:['80 cal/g (336 J/g)','540 cal/g','1 cal/g','4.2 J/g'],c:0,s:'80 cal/g; 540 cal/g is for vaporising water.'},
+    {tp:'cal',q:'While ice is melting at normal pressure, its temperature:',o:['rises','falls','stays at 0 °C','first rises then falls'],c:2,s:'The heat goes into changing the state (latent heat).'},
+    {tp:'cal',q:'The principle of calorimetry is:',o:['heat lost = heat gained','heat is destroyed on mixing','temperature lost = temperature gained','mass lost = mass gained'],c:0,s:'In an isolated mixture, heat given out equals heat taken in.'},
+    {tp:'cal',q:'Water is used in car radiators mainly because of its:',o:['low density','high specific heat','low boiling point','high viscosity'],c:1,s:'It carries away a lot of heat for a small temperature rise.'},
+    {tp:'cond',q:'The rate of heat conduction through a rod is:',o:['KAΔT/L','KLΔT/A','KAL/ΔT','KΔT/(AL)'],c:0,s:'H = KAΔT/L.'},
+    {tp:'cond',q:'Which are the best conductors of heat?',o:['gases','liquids','metals','wood and plastic'],c:2,s:'Free electrons carry heat in metals.'},
+    {tp:'cond',q:'Convection can take place in:',o:['solids only','liquids and gases','vacuum','solids and vacuum'],c:1,s:'It needs a fluid that can move.'},
+    {tp:'cond',q:'A sea breeze during the day is caused by:',o:['conduction','convection','radiation','evaporation only'],c:1,s:'Land heats faster; warm air over land rises and cooler sea air flows in.'},
+    {tp:'rad',q:'Which mode of heat transfer needs no medium?',o:['conduction','convection','radiation','all three'],c:2,s:'Radiation (electromagnetic waves) crosses vacuum.'},
+    {tp:'rad',q:'Stefan\'s law states that the energy radiated per second by a black body is proportional to:',o:['T','T²','T³','T⁴'],c:3,s:'E = σT⁴.'},
+    {tp:'rad',q:'Wien\'s law says that λ(max) is:',o:['proportional to T','proportional to 1/T','proportional to T⁴','independent of T'],c:1,s:'λ(max)T = constant.'},
+    {tp:'rad',q:'A perfect black body:',o:['reflects all radiation','absorbs all radiation falling on it','emits no radiation','is always cold'],c:1,s:'It absorbs everything (and is also the best emitter).'},
+    {tp:'rad',q:'Newton\'s law of cooling says the rate of cooling is proportional to:',o:['the body\'s temperature','the temperature difference with the surroundings','the square of the temperature','the mass of the body'],c:1,s:'dT/dt = −k(T − T₀), for small differences.'},
+    {tp:'rad',q:'Good absorbers of radiation are also:',o:['good reflectors','good emitters','poor emitters','transparent'],c:1,s:'Kirchhoff\'s law.'}
   ]}
 };
 })();
