@@ -336,6 +336,33 @@ window.PhysicaExam={
   {t:'neet',sim:'equipartition',q:'The ratio γ = C(p)/C(v) for a monatomic gas is:',o:['7/5','4/3','5/3','1'],c:2,a:'f = 3: γ = 1 + 2/3 = 5/3.'},
   {t:'neet',q:'According to classical kinetic theory, at absolute zero the molecules of an ideal gas would:',o:['move fastest','stop moving','move at the speed of light','become heavier'],c:1,a:'Average KE = (3/2)kT = 0 at T = 0.'},
   {t:'neet',sim:'maxwell-speeds',q:'At the same temperature, heavier gas molecules move:',o:['faster','slower','at the same speed','not at all'],c:1,a:'They have the same average KE, so larger mass means smaller speed (v ∝ 1/√M).'}
+],
+'Oscillations':[
+  {t:'1',sim:'spring-shm',q:'Define simple harmonic motion.',a:'Periodic motion in which the acceleration is proportional to the displacement from the mean position and directed towards it: a = −ω²x.'},
+  {t:'1',sim:'pendulum',q:'Write the time period of a simple pendulum.',a:'T = 2π√(l/g), for small swings.'},
+  {t:'1',q:'Where is the speed of a particle in SHM greatest?',a:'At the mean position (x = 0), where v = Aω. It is zero at the extreme positions.'},
+  {t:'1',sim:'driven-resonance',q:'What is resonance?',a:'When the driving frequency equals the natural frequency of a system, the amplitude of its forced oscillations becomes very large.'},
+  {t:'1',sim:'spring-shm',q:'Write the time period of a mass m on a spring of constant k.',a:'T = 2π√(m/k).'},
+  {t:'3',sim:'shm-phasors',q:'For x = A cos(ωt + φ), find the velocity and acceleration and show that the motion is SHM.',a:'v = dx/dt = −Aω sin(ωt + φ).\na = dv/dt = −Aω² cos(ωt + φ) = −ω²x.\nThe acceleration is proportional to x and opposite to it, so this is SHM.\n(Also v = ±ω√(A² − x²).)'},
+  {t:'3',sim:'shm-energy',q:'Show that the total energy of a particle in SHM is constant.',a:'KE = ½mv² = ½mω²(A² − x²). PE = ½kx² = ½mω²x².\nTotal E = ½mω²A² = ½kA², which does not depend on x.\nEnergy just changes between KE and PE.'},
+  {t:'3',sim:'pendulum',q:'A pendulum has a period of 2 s on Earth. What is its period on the Moon, where g is 1/6 of the Earth\'s?',a:'T ∝ 1/√g, so T(Moon) = 2 × √6 ≈ 4.9 s.'},
+  {t:'3',sim:'spring-shm',q:'A 2 kg mass hangs on a spring of constant 200 N/m. Find its period and frequency.',a:'T = 2π√(m/k) = 2π√(0.01) = 0.2π ≈ 0.63 s.\nf = 1/T ≈ 1.6 Hz.'},
+  {t:'3',q:'Find the effective spring constant of two springs k₁ and k₂ joined (a) in parallel (b) in series.',a:'(a) Parallel: both stretch by the same x and their forces add: k = k₁ + k₂.\n(b) Series: both carry the same force and their stretches add: 1/k = 1/k₁ + 1/k₂, so k = k₁k₂/(k₁ + k₂).'},
+  {t:'3',q:'A particle moves in SHM with amplitude 5 cm and period 2 s. Find its greatest speed and greatest acceleration.',a:'ω = 2π/T = π rad/s.\nv(max) = Aω = 0.05π ≈ 0.16 m/s.\na(max) = Aω² = 0.05π² ≈ 0.49 m/s².'},
+  {t:'5',sim:'pendulum',q:'Derive the time period of a simple pendulum for small oscillations.',a:'A bob of mass m on a string of length l is pulled aside by angle θ.\nThe restoring force along the arc is −mg sin θ ≈ −mgθ for small θ.\nWith the arc s = lθ: m d²s/dt² = −mg s/l, so a = −(g/l)s.\nThis is SHM with ω² = g/l, so T = 2π√(l/g).\nIt does not depend on the mass or (for small swings) on the amplitude.'},
+  {t:'5',sim:'damped-oscillation',q:'Explain damped oscillations, forced oscillations and resonance.',a:'Damped: friction or air resistance takes energy away, so the amplitude falls steadily (often exponentially) with time.\nForced: an outside periodic force keeps the system oscillating; after a while it oscillates at the driver\'s frequency, not its own.\nResonance: when the driving frequency equals the natural frequency, energy is fed in at just the right moments and the amplitude becomes largest. Less damping gives a taller, sharper peak.\nExamples: a swing pushed in time, soldiers breaking step on a bridge, tuning a radio.'},
+  {t:'5',sim:'u-tube',q:'A liquid column of total length L in a U-tube is disturbed. Show that it performs SHM and find its period.',a:'Push one side down by x: the other side rises by x, so the difference in levels is 2x.\nRestoring force = weight of the extra column = ρA(2x)g.\nMass moving = ρAL. Acceleration a = −(2g/L)x.\nSo it is SHM with ω² = 2g/L and T = 2π√(L/2g).'},
+  {t:'jee',sim:'vertical-spring',q:'A mass hung on a spring stretches it by 10 cm. The period of its vertical oscillations is (g = 10 m/s²):',o:['0.2 s','0.63 s','2 s','6.3 s'],c:1,a:'k = mg/x₀, so T = 2π√(m/k) = 2π√(x₀/g) = 2π√0.01 = 0.2π ≈ 0.63 s.'},
+  {t:'jee',sim:'shm-energy',q:'In SHM of amplitude A, the speed at x = A/2 is what fraction of the greatest speed?',o:['1/2','√3/2','1/√2','3/4'],c:1,a:'v = ω√(A² − A²/4) = (√3/2)Aω.'},
+  {t:'jee',sim:'shm-energy',q:'At what displacement are the kinetic and potential energies equal in SHM of amplitude A?',o:['A/2','A/√2','A/4','A'],c:1,a:'½kx² = ½ × ½kA², so x² = A²/2 and x = A/√2.'},
+  {t:'jee',sim:'spring-shm',q:'A spring is cut into two equal halves. How does the period of a given mass on one half compare with that on the full spring?',a:'Each half is twice as stiff (k\' = 2k), since it stretches half as much under the same force.\nT\' = 2π√(m/2k) = T/√2.'},
+  {t:'jee',sim:'pendulum',q:'Find the period of a simple pendulum hung in a lift that accelerates upwards at a.',a:'In the lift the effective gravity is g + a.\nT = 2π√(l/(g + a)), so it swings faster. (In free fall, g(eff) = 0 and it does not swing at all.)'},
+  {t:'neet',sim:'spring-shm',q:'In SHM, the acceleration is:',o:['constant','proportional to the displacement and opposite to it','proportional to the velocity','zero at the extremes'],c:1,a:'a = −ω²x.'},
+  {t:'neet',sim:'shm-phasors',q:'The phase difference between the displacement and the velocity in SHM is:',o:['0','π/2','π','2π'],c:1,a:'x = A sin ωt, v = Aω cos ωt: they differ by π/2.'},
+  {t:'neet',sim:'pendulum',q:'The period of a simple pendulum does NOT depend on:',o:['its length','g','the mass of the bob','the planet it is on'],c:2,a:'T = 2π√(l/g).'},
+  {t:'neet',sim:'shm-energy',q:'The total energy of a particle in SHM is proportional to:',o:['A','A²','1/A','√A'],c:1,a:'E = ½kA².'},
+  {t:'neet',sim:'pendulum',q:'The length of a seconds pendulum (period 2 s) on Earth is about:',o:['0.25 m','0.5 m','1 m','2 m'],c:2,a:'l = gT²/4π² = 9.8 × 4/39.5 ≈ 0.99 m.'},
+  {t:'neet',sim:'driven-resonance',q:'Resonance happens when the driving frequency is:',o:['zero','equal to the natural frequency','twice the natural frequency','very high'],c:1,a:'Then the amplitude is largest.'}
 ]};
 
 window.PhysicaMockBank={
@@ -830,6 +857,47 @@ window.PhysicaMockBank={
     {tp:'mfp',q:'Brownian motion of pollen grains in water is caused by:',o:['convection currents','uneven bombardment by water molecules','gravity','light falling on them'],c:1,s:'Random molecular impacts do not cancel exactly on a tiny particle.'},
     {tp:'mfp',q:'For gas molecules, the correct order of speeds is:',o:['v(mp) > v(avg) > v(rms)','v(rms) > v(avg) > v(mp)','v(avg) > v(rms) > v(mp)','all are equal'],c:1,s:'√3 > √(8/π) > √2.'},
     {tp:'mfp',q:'When the temperature of a gas rises, the peak of its Maxwell speed distribution:',o:['moves to lower speeds and rises','moves to higher speeds and falls','stays fixed','disappears'],c:1,s:'Speeds spread out to higher values; the area stays the same, so the peak is lower.'}
+  ]},
+'Oscillations':{
+  topics:{shm:'SHM: displacement, velocity, acceleration',spring:'Spring systems',pend:'Pendulums',energy:'Energy in SHM',damp:'Damped and forced oscillations'},
+  jee:[
+    {tp:'shm',q:'For x = 4 sin(πt + π/6) cm, the amplitude and period are:',o:['4 cm and 1 s','4 cm and 2 s','2 cm and 2 s','4 cm and π s'],c:1,s:'A = 4 cm; ω = π, so T = 2π/π = 2 s.'},
+    {tp:'shm',q:'In SHM, the speed at half the amplitude is what fraction of the greatest speed?',o:['1/2','√3/2','1/√2','3/4'],c:1,s:'v = ω√(A² − A²/4) = (√3/2)Aω.'},
+    {tp:'shm',q:'A particle in SHM has a greatest speed of 4 m/s and a greatest acceleration of 8 m/s². Its amplitude is:',o:['0.5 m','1 m','2 m','4 m'],c:2,s:'Aω = 4 and Aω² = 8 give ω = 2 rad/s and A = 2 m.'},
+    {tp:'spring',q:'A spring is cut into two equal halves, which are joined in parallel and carry the same mass. The new period is:',o:['T/4','T/2','T','2T'],c:1,s:'Each half has 2k; in parallel 4k. T ∝ 1/√k: T/2.'},
+    {tp:'spring',q:'Two identical springs of constant k are joined in series and carry a mass m. The period is:',o:['2π√(m/2k)','2π√(2m/k)','2π√(m/k)','π√(m/k)'],c:1,s:'Series: k(eff) = k/2.'},
+    {tp:'pend',q:'A simple pendulum hangs in a lift that falls freely. Its period becomes:',o:['zero','the same','infinite (it does not swing)','half'],c:2,s:'g(eff) = 0, so there is no restoring force.'},
+    {tp:'pend',q:'If the length of a pendulum is increased by 21%, its period increases by:',o:['21%','10.5%','10%','42%'],c:2,s:'T ∝ √l: √1.21 = 1.1, so 10%.'},
+    {tp:'energy',q:'In SHM of amplitude A, the kinetic and potential energies are equal at:',o:['x = A/2','x = A/√2','x = A/4','x = A'],c:1,s:'½kx² = ½kA²/2.'},
+    {tp:'energy',q:'If the amplitude of an oscillator is doubled and its frequency halved (same mass), its total energy becomes:',o:['the same','2 times','4 times','half'],c:0,s:'E = ½mω²A² ∝ ω²A²: (1/4) × 4 = 1.'},
+    {tp:'damp',q:'The amplitude of a damped oscillator falls to half in 10 s. After 30 s it is:',o:['1/6 of the start','1/8 of the start','1/3 of the start','1/4 of the start'],c:1,s:'Exponential decay: halves every 10 s, so (1/2)³ = 1/8.'},
+    {tp:'spring',q:'A 0.5 kg mass oscillates on a spring of constant 200 N/m. Find its angular frequency in rad/s.',n:20,s:'ω = √(k/m) = √400 = 20 rad/s.'},
+    {tp:'pend',q:'Where g = π² m/s², find the length of a seconds pendulum (period 2 s) in centimetres.',n:100,s:'l = gT²/4π² = π² × 4/4π² = 1 m = 100 cm.'},
+    {tp:'shm',q:'An SHM has amplitude 10 cm and angular frequency 5 rad/s. Find the greatest speed in cm/s.',n:50,s:'v(max) = Aω = 10 × 5 = 50 cm/s.'},
+    {tp:'energy',q:'A 2 kg mass oscillates on a spring of constant 800 N/m with amplitude 0.1 m. Find the total energy in joules.',n:4,s:'E = ½kA² = ½ × 800 × 0.01 = 4 J.'},
+    {tp:'shm',q:'A particle moves with acceleration a = −36x (SI). Find its angular frequency in rad/s.',n:6,s:'a = −ω²x, so ω² = 36 and ω = 6 rad/s.'}
+  ],
+  neet:[
+    {tp:'shm',q:'In SHM, the restoring force is:',o:['constant','proportional to the displacement and towards the mean position','proportional to the velocity','zero at the extremes'],c:1,s:'F = −kx.'},
+    {tp:'shm',q:'In SHM, the speed is greatest at:',o:['the extreme positions','the mean position','halfway','it is constant'],c:1,s:'v = ω√(A² − x²) is largest at x = 0.'},
+    {tp:'shm',q:'In SHM, the acceleration is greatest at:',o:['the mean position','the extreme positions','halfway','it is constant'],c:1,s:'|a| = ω²|x| is largest at x = ±A.'},
+    {tp:'shm',q:'The phase difference between displacement and acceleration in SHM is:',o:['0','π/2','π','π/4'],c:2,s:'a = −ω²x: they are always opposite.'},
+    {tp:'shm',q:'Which equation describes SHM?',o:['x = A sin ωt','x = At²','x = Ae^(t)','x = A/t'],c:0,s:'A sine (or cosine) of time.'},
+    {tp:'shm',q:'The frequency of an oscillation with a period of 0.2 s is:',o:['0.2 Hz','2 Hz','5 Hz','20 Hz'],c:2,s:'f = 1/T = 5 Hz.'},
+    {tp:'spring',q:'The period of a mass m on a spring of constant k is:',o:['2π√(k/m)','2π√(m/k)','√(m/k)','2πmk'],c:1,s:'T = 2π√(m/k).'},
+    {tp:'spring',q:'If the mass on a spring is made 4 times, its period becomes:',o:['4 times','2 times','half','the same'],c:1,s:'T ∝ √m.'},
+    {tp:'spring',q:'Two springs k₁ and k₂ in parallel have an effective spring constant of:',o:['k₁ + k₂','k₁k₂/(k₁ + k₂)','k₁ − k₂','√(k₁k₂)'],c:0,s:'Their forces add for the same stretch.'},
+    {tp:'spring',q:'Two springs of constant k each are joined in series. The effective constant is:',o:['2k','k','k/2','k/4'],c:2,s:'1/k(eff) = 1/k + 1/k.'},
+    {tp:'pend',q:'The period of a simple pendulum is:',o:['2π√(g/l)','2π√(l/g)','2πlg','√(l/g)'],c:1,s:'T = 2π√(l/g).'},
+    {tp:'pend',q:'If the length of a simple pendulum is made 4 times, its period becomes:',o:['4 times','2 times','half','the same'],c:1,s:'T ∝ √l.'},
+    {tp:'pend',q:'If the bob of a pendulum is replaced by one twice as heavy, the period:',o:['doubles','halves','stays the same','becomes √2 times'],c:2,s:'T does not depend on mass.'},
+    {tp:'pend',q:'A pendulum clock is taken to the Moon. It will:',o:['run faster','run slower','keep correct time','stop'],c:1,s:'Smaller g makes the period longer.'},
+    {tp:'energy',q:'The total energy of a spring oscillator of amplitude A is:',o:['½kA','½kA²','kA²','2kA²'],c:1,s:'E = ½kA².'},
+    {tp:'energy',q:'In SHM, the kinetic energy is greatest at:',o:['the extreme positions','the mean position','x = A/2','it is constant'],c:1,s:'The speed is greatest there.'},
+    {tp:'energy',q:'In SHM, the potential energy is greatest at:',o:['the mean position','the extreme positions','x = A/√2','it is constant'],c:1,s:'PE = ½kx² is largest at x = ±A.'},
+    {tp:'damp',q:'In damped oscillations, the amplitude:',o:['increases with time','decreases with time','stays the same','becomes infinite'],c:1,s:'Energy is lost to friction or air resistance.'},
+    {tp:'damp',q:'Resonance happens when:',o:['the driving frequency equals the natural frequency','the amplitude is zero','there is no damping force at all','the system is at rest'],c:0,s:'Then energy is fed in most effectively.'},
+    {tp:'damp',q:'In steady forced oscillations, the system oscillates at:',o:['its natural frequency','the driving frequency','zero frequency','twice the driving frequency'],c:1,s:'The driver sets the frequency.'}
   ]}
 };
 })();
