@@ -579,6 +579,33 @@ window.PhysicaExam={
   {t:'neet',sim:'rlc-resonance',q:'At resonance, the power factor of a series LCR circuit is:',o:['0','0.5','1','0.707'],c:2,a:'Z = R, so the current is in phase with the voltage.'},
   {t:'neet',sim:'transformer',q:'A step-up transformer:',o:['increases voltage and current','increases voltage and decreases current','decreases voltage and increases current','increases power'],c:1,a:'Power stays (ideally) the same: VI is constant.'},
   {t:'neet',sim:'rms-waveforms',q:'An AC ammeter reads the:',o:['peak value','rms value','average value over a cycle','instantaneous value'],c:1,a:'AC meters are calibrated in rms values.'}
+],
+'Electromagnetic Waves':[
+  {t:'1',sim:'displacement-current',q:'What is displacement current?',a:'The "current" ε₀ dΦ(E)/dt produced by a changing electric field, for example between the plates of a charging capacitor.'},
+  {t:'1',q:'Write the speed of electromagnetic waves in vacuum in terms of μ₀ and ε₀.',a:'c = 1/√(μ₀ε₀) ≈ 3 × 10⁸ m/s.'},
+  {t:'1',sim:'spectrum',q:'Which electromagnetic waves are used in radar?',a:'Microwaves.'},
+  {t:'1',sim:'emwave',q:'How are E, B and the direction of travel arranged in an electromagnetic wave?',a:'All three are at right angles to each other; E and B vary in phase. E × B points along the direction of travel.'},
+  {t:'1',sim:'dipole-antenna',q:'What produces electromagnetic waves?',a:'Accelerated (oscillating) electric charges.'},
+  {t:'3',sim:'displacement-current',q:'Why did Maxwell add the displacement current to Ampère\'s law?',a:'For a charging capacitor, Ampère\'s law gave different answers for a surface cutting the wire (current I) and one passing between the plates (no current).\nBetween the plates the electric field is changing. Maxwell added ε₀ dΦ(E)/dt, which equals I there.\n∮B·dl = μ₀(I + ε₀ dΦ(E)/dt). Now a changing E makes B, just as a changing B makes E - which allows EM waves.'},
+  {t:'3',sim:'emwave',q:'The electric field amplitude of an EM wave in vacuum is 6 V/m. Find the magnetic field amplitude.',a:'E₀ = cB₀, so B₀ = 6/(3 × 10⁸) = 2 × 10⁻⁸ T.'},
+  {t:'3',sim:'spectrum',q:'List the electromagnetic spectrum in order of decreasing wavelength, with one use of each.',a:'Radio waves - radio and TV broadcasting.\nMicrowaves - radar, microwave ovens, mobile phones.\nInfrared - remote controls, heating, night vision.\nVisible light - seeing, photography.\nUltraviolet - sterilising water, detecting forged notes.\nX-rays - medical imaging.\nGamma rays - cancer treatment, sterilising medical tools.'},
+  {t:'3',sim:'em-wave-medium',q:'Write the speed of EM waves in a medium and relate it to the refractive index.',a:'v = 1/√(με) = c/√(μ(r)ε(r)).\nRefractive index n = c/v = √(μ(r)ε(r)) ≈ √ε(r) for non-magnetic materials.\nSo light is slower in glass or water than in vacuum.'},
+  {t:'3',sim:'photon-energy',q:'Find the energy of a photon of wavelength 500 nm in eV (hc = 1240 eV·nm).',a:'E = hc/λ = 1240/500 ≈ 2.48 eV.'},
+  {t:'3',q:'How do infrared and ultraviolet radiation affect life on Earth?',a:'Infrared: the Earth gives out IR, which gases like CO₂ and water vapour trap - the greenhouse effect keeps the Earth warm (too much leads to global warming).\nUltraviolet: the ozone layer absorbs most of the Sun\'s harmful UV; too much UV damages skin and eyes. Some UV helps make vitamin D.'},
+  {t:'5',q:'Write Maxwell\'s four equations in words and list the main properties of electromagnetic waves.',a:'1. Gauss (electricity): electric flux through a closed surface = q/ε₀.\n2. Gauss (magnetism): magnetic flux through a closed surface = 0.\n3. Faraday: a changing magnetic flux induces an electric field (EMF).\n4. Ampère-Maxwell: a current or a changing electric field produces a magnetic field.\nProperties of EM waves: transverse; E and B perpendicular and in phase; speed c = 1/√(μ₀ε₀) in vacuum; no medium needed; E₀ = cB₀; they carry energy and momentum; they can be polarised.'},
+  {t:'5',sim:'displacement-current',q:'Show that the displacement current between the plates of a charging parallel-plate capacitor equals the conduction current in the wires.',a:'Charge on the plates q, area A: E = q/(ε₀A).\nFlux Φ(E) = EA = q/ε₀.\nDisplacement current I(d) = ε₀ dΦ(E)/dt = dq/dt = I.\nSo the current is continuous through the gap: conduction current in the wire, displacement current between the plates.'},
+  {t:'5',q:'Find the energy density and intensity of an EM wave. Show that it carries momentum and exerts pressure.',a:'Energy density u = ½ε₀E² + B²/(2μ₀); with B = E/c the two parts are equal, so u = ε₀E².\nAveraging over time: u(avg) = ½ε₀E₀².\nIntensity I = u(avg) × c = ½cε₀E₀².\nA wave carrying energy U also carries momentum p = U/c.\nPressure on a perfectly absorbing surface: I/c; on a perfectly reflecting surface: 2I/c.'},
+  {t:'jee',sim:'displacement-current',q:'The voltage across a 2 μF capacitor changes at 10⁶ V/s. The displacement current between its plates is:',o:['0.5 A','2 A','20 A','2 mA'],c:1,a:'I(d) = C dV/dt = 2 × 10⁻⁶ × 10⁶ = 2 A.'},
+  {t:'jee',q:'Find the intensity of an EM wave with electric field amplitude 100 V/m (ε₀ = 8.85 × 10⁻¹² F/m).',a:'I = ½cε₀E₀² = ½ × 3 × 10⁸ × 8.85 × 10⁻¹² × 10⁴ ≈ 13.3 W/m².'},
+  {t:'jee',sim:'em-wave-medium',q:'In a non-magnetic medium with ε(r) = 4, EM waves travel at:',o:['3 × 10⁸ m/s','1.5 × 10⁸ m/s','0.75 × 10⁸ m/s','12 × 10⁸ m/s'],c:1,a:'v = c/√4 = 1.5 × 10⁸ m/s.'},
+  {t:'jee',q:'Light of intensity I falls normally on a perfectly reflecting surface. The pressure on it is:',o:['I/c','2I/c','I/2c','Ic'],c:1,a:'The momentum is reversed, so twice the change of an absorbing surface.'},
+  {t:'jee',sim:'emwave',q:'An EM wave has E = E₀ sin(kz − ωt) î. In which direction does it travel, and along which direction is its magnetic field?',a:'It travels along +z (the phase kz − ωt).\nE × B must point along +z: î × ĵ = k̂, so B is along ĵ (B = (E₀/c) sin(kz − ωt) ĵ).'},
+  {t:'neet',sim:'emwave',q:'Electromagnetic waves are:',o:['longitudinal','transverse','both','neither'],c:1,a:'E and B are at right angles to the direction of travel.'},
+  {t:'neet',sim:'spectrum',q:'Which electromagnetic waves have the shortest wavelength?',o:['radio waves','X-rays','gamma rays','ultraviolet'],c:2,a:'Gamma rays (below about 10⁻¹² m).'},
+  {t:'neet',sim:'spectrum',q:'TV remote controls use:',o:['ultraviolet','infrared','microwaves','X-rays'],c:1,a:'Infrared LEDs.'},
+  {t:'neet',sim:'spectrum',q:'Water purifiers kill germs using:',o:['infrared','ultraviolet','radio waves','microwaves'],c:1,a:'UV damages the DNA of germs.'},
+  {t:'neet',q:'Electromagnetic waves need:',o:['air to travel','a solid medium','no medium','water'],c:2,a:'They can travel through vacuum (sunlight reaches us through space).'},
+  {t:'neet',sim:'spectrum',q:'X-rays are produced when:',o:['slow electrons hit a metal','fast electrons hit a heavy metal target','light hits glass','a nucleus decays'],c:1,a:'They are made in X-ray tubes by fast electrons stopping suddenly.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1442,6 +1469,47 @@ window.PhysicaMockBank={
     {tp:'power',q:'A transformer works on the principle of:',o:['self-induction','mutual induction','eddy currents','the photoelectric effect'],c:1,s:'Changing flux from one coil links the other.'},
     {tp:'power',q:'A step-up transformer has:',o:['fewer turns in the secondary','more turns in the secondary','equal turns','no secondary'],c:1,s:'V(s)/V(p) = N(s)/N(p) > 1.'},
     {tp:'power',q:'The frequency of LC oscillations is:',o:['1/(2π√(LC))','2π√(LC)','√(LC)','L/C'],c:0,s:'ω = 1/√(LC).'}
+  ]},
+'Electromagnetic Waves':{
+  topics:{disp:'Displacement current and Maxwell',nature:'Nature of EM waves',spec:'Electromagnetic spectrum',energy:'Energy, intensity and media'},
+  jee:[
+    {tp:'disp',q:'The voltage across a 2 μF capacitor changes at 10⁶ V/s. The displacement current is:',o:['0.5 A','2 mA','2 A','20 A'],c:2,s:'I(d) = C dV/dt.'},
+    {tp:'nature',q:'An EM wave in vacuum has E₀ = 6 V/m. Its B₀ is:',o:['2 × 10⁻⁸ T','18 × 10⁸ T','5 × 10⁷ T','6 T'],c:0,s:'B₀ = E₀/c.'},
+    {tp:'nature',q:'An EM wave travels along +z with E along x. Its magnetic field is along:',o:['x','y','z','−z'],c:1,s:'E × B must point along +z.'},
+    {tp:'energy',q:'In a non-magnetic medium with ε(r) = 4, the speed of EM waves is:',o:['1.5 × 10⁸ m/s','3 × 10⁸ m/s','0.75 × 10⁸ m/s','6 × 10⁸ m/s'],c:0,s:'v = c/√ε(r).'},
+    {tp:'energy',q:'The radiation pressure of a beam of intensity I on a perfectly reflecting surface is:',o:['I/c','2I/c','I/2c','zero'],c:1,s:'The momentum is reversed.'},
+    {tp:'energy',q:'In an EM wave, the average energy in the electric field compared with that in the magnetic field is:',o:['larger','smaller','equal','zero'],c:2,s:'½ε₀E² = B²/(2μ₀) when E = cB.'},
+    {tp:'spec',q:'Which list is in order of increasing frequency?',o:['X-rays, UV, visible, IR','radio, microwave, IR, visible, UV, X-rays, gamma','gamma, X-rays, UV, radio','visible, IR, UV, gamma'],c:1,s:'Frequency rises as wavelength falls.'},
+    {tp:'spec',q:'The wavelength of a 3 GHz microwave is:',o:['1 cm','10 cm','1 m','10 m'],c:1,s:'λ = c/f = 3 × 10⁸/3 × 10⁹ = 0.1 m.'},
+    {tp:'disp',q:'Maxwell added the displacement current term to:',o:['Gauss\'s law','Faraday\'s law','Ampère\'s circuital law','Coulomb\'s law'],c:2,s:'∮B·dl = μ₀(I + ε₀ dΦ(E)/dt).'},
+    {tp:'nature',q:'The speed of EM waves in vacuum is:',o:['√(μ₀ε₀)','1/√(μ₀ε₀)','μ₀ε₀','1/(μ₀ε₀)'],c:1,s:'c = 1/√(μ₀ε₀).'},
+    {tp:'spec',q:'Find the wavelength, in metres, of an FM radio wave of 100 MHz.',n:3,s:'λ = 3 × 10⁸/10⁸ = 3 m.'},
+    {tp:'nature',q:'The magnetic field amplitude of an EM wave is 2 × 10⁻⁸ T. Find its electric field amplitude in V/m.',n:6,s:'E₀ = cB₀ = 3 × 10⁸ × 2 × 10⁻⁸ = 6 V/m.'},
+    {tp:'energy',q:'Light of intensity 3 W/m² falls on a perfectly absorbing surface. The pressure is n × 10⁻⁸ Pa. Find n.',n:1,s:'P = I/c = 3/(3 × 10⁸) = 10⁻⁸ Pa.'},
+    {tp:'disp',q:'The voltage across a 4 μF capacitor changes at 5 × 10⁵ V/s. Find the displacement current in amperes.',n:2,s:'I(d) = 4 × 10⁻⁶ × 5 × 10⁵ = 2 A.'},
+    {tp:'spec',q:'Find the photon energy, in eV, of ultraviolet light of wavelength 124 nm (hc = 1240 eV·nm).',n:10,s:'E = 1240/124 = 10 eV.'}
+  ],
+  neet:[
+    {tp:'disp',q:'Displacement current is caused by:',o:['moving charges','a changing electric field','a steady magnetic field','a steady current'],c:1,s:'I(d) = ε₀ dΦ(E)/dt.'},
+    {tp:'disp',q:'The idea of displacement current was introduced by:',o:['Faraday','Maxwell','Ampère','Hertz'],c:1,s:'Maxwell.'},
+    {tp:'disp',q:'Displacement current exists:',o:['only in metal wires','between the plates of a charging capacitor','only in batteries','nowhere'],c:1,s:'Where the electric field is changing.'},
+    {tp:'disp',q:'The SI unit of displacement current is the:',o:['volt','ampere','tesla','weber'],c:1,s:'It is a current.'},
+    {tp:'nature',q:'Electromagnetic waves are:',o:['longitudinal','transverse','stationary','sound waves'],c:1,s:'E and B oscillate across the direction of travel.'},
+    {tp:'nature',q:'In an EM wave, the electric and magnetic fields are:',o:['parallel','perpendicular to each other and to the direction of travel','along the direction of travel','out of phase by 90°'],c:1,s:'And in phase with each other.'},
+    {tp:'nature',q:'The speed of all EM waves in vacuum is:',o:['3 × 10⁶ m/s','3 × 10⁸ m/s','340 m/s','different for each type'],c:1,s:'c, whatever the frequency.'},
+    {tp:'nature',q:'EM waves can travel through:',o:['only air','only solids','vacuum','only water'],c:2,s:'No medium is needed.'},
+    {tp:'nature',q:'EM waves are produced by:',o:['charges at rest','charges moving at constant velocity','accelerated charges','neutral atoms at rest'],c:2,s:'Oscillating charges radiate.'},
+    {tp:'nature',q:'For an EM wave, E₀/B₀ equals:',o:['1','c','1/c','c²'],c:1,s:'E₀ = cB₀.'},
+    {tp:'spec',q:'Which has the longest wavelength?',o:['X-rays','visible light','radio waves','gamma rays'],c:2,s:'Radio waves can be metres to kilometres long.'},
+    {tp:'spec',q:'Which radiation is mostly felt as heat?',o:['ultraviolet','infrared','X-rays','gamma rays'],c:1,s:'Infrared.'},
+    {tp:'spec',q:'The ozone layer protects us from:',o:['infrared','ultraviolet','radio waves','visible light'],c:1,s:'It absorbs harmful UV.'},
+    {tp:'spec',q:'X-rays are used to:',o:['cook food','see broken bones','send TV signals','warm rooms'],c:1,s:'Medical imaging.'},
+    {tp:'spec',q:'Microwave ovens heat food using:',o:['infrared','microwaves','UV','gamma rays'],c:1,s:'Microwaves make water molecules vibrate.'},
+    {tp:'spec',q:'The wavelength range of visible light is about:',o:['4 to 7 nm','400 to 700 nm','4 to 7 mm','400 to 700 m'],c:1,s:'Violet ≈ 400 nm, red ≈ 700 nm.'},
+    {tp:'spec',q:'Gamma rays are used to:',o:['send radio messages','treat cancer','dry clothes','light rooms'],c:1,s:'Radiotherapy.'},
+    {tp:'energy',q:'Electromagnetic waves carry:',o:['energy only','momentum only','both energy and momentum','neither'],c:2,s:'p = U/c.'},
+    {tp:'energy',q:'In glass, the speed of light is:',o:['more than in vacuum','less than in vacuum','the same as in vacuum','zero'],c:1,s:'v = c/n.'},
+    {tp:'energy',q:'In an EM wave, the energy is shared between the electric and magnetic fields:',o:['equally','mostly electric','mostly magnetic','all electric'],c:0,s:'Their average energy densities are equal.'}
   ]}
 };
 })();
