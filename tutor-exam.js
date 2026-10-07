@@ -201,6 +201,33 @@ window.PhysicaExam={
   {t:'neet',q:'The orbital speed of a satellite close to the Earth\'s surface is about:',o:['11.2 km/s','7.9 km/s','3 km/s','1 km/s'],c:1,a:'v = √(gR) = √(9.8 × 6.4 × 10⁶) ≈ 7.9 km/s.'},
   {t:'neet',sim:'gravity-depth',q:'The weight of a body at the centre of the Earth is:',o:['the same as on the surface','twice','zero','infinite'],c:2,a:'g = 0 at the centre, so the weight is zero (the mass is unchanged).'},
   {t:'neet',sim:'kepler',q:'Kepler\'s second law (equal areas in equal times) follows from the conservation of:',o:['energy','linear momentum','angular momentum','mass'],c:2,a:'Gravity is a central force, so it gives no torque about the Sun: angular momentum is conserved.'}
+],
+'Mechanical Properties of Solids':[
+  {t:'1',sim:'hooke',q:'State Hooke\'s law.',a:'Within the elastic limit, stress is proportional to strain: stress = modulus × strain.'},
+  {t:'1',q:'What is the SI unit of stress?',a:'N/m², which is the pascal (Pa). (Strain has no unit.)'},
+  {t:'1',q:'Which is more elastic, steel or rubber? Why?',a:'Steel. For the same stress it stretches far less, so its Young\'s modulus is much larger.'},
+  {t:'1',sim:'poisson-ratio',q:'Define Poisson\'s ratio.',a:'Lateral strain divided by longitudinal strain: σ = (Δd/d)/(Δl/l). It has no unit.'},
+  {t:'1',sim:'bulk-modulus',q:'Which elastic modulus do liquids and gases have?',a:'Only the bulk modulus; they cannot keep a shape, so they have no Young\'s or shear modulus.'},
+  {t:'3',sim:'young-modulus',q:'A 2 m steel wire of cross-section 1 mm² carries a load of 100 N. Find its extension (Y = 2 × 10¹¹ Pa).',a:'Δl = FL/(AY) = 100 × 2/(10⁻⁶ × 2 × 10¹¹) = 10⁻³ m = 1 mm.'},
+  {t:'3',sim:'stress-strain',q:'Draw and explain the stress-strain curve of a metal wire.',a:'O to A: straight line, Hooke\'s law holds (proportional limit).\nUp to B: elastic limit - the wire still returns to its length.\nBeyond B: yield point, the wire stretches a lot for little extra stress (plastic deformation, permanent set).\nD: ultimate (maximum) stress; after that the wire thins and breaks at E (fracture point).\nA long plastic region means ductile (copper); a short one means brittle (glass).'},
+  {t:'3',sim:'elastic-energy',q:'Show that the elastic energy stored per unit volume of a stretched wire is ½ × stress × strain.',a:'The stretching force grows from 0 to F, so the work W = ½FΔl.\nVolume = AL. Energy per volume = ½FΔl/(AL) = ½ × (F/A) × (Δl/L) = ½ × stress × strain.'},
+  {t:'3',sim:'bulk-modulus',q:'Water (B = 2.2 × 10⁹ Pa) is put under an extra pressure of 10⁷ Pa (about 100 atm). By what fraction does its volume decrease?',a:'ΔV/V = Δp/B = 10⁷/(2.2 × 10⁹) ≈ 4.5 × 10⁻³, about 0.45%.\n(Water is hard to compress.)'},
+  {t:'3',sim:'thermal-stress',q:'A steel rod is clamped between two rigid walls and heated by 50 °C. Find the thermal stress (Y = 2 × 10¹¹ Pa, α = 1.2 × 10⁻⁵ /°C).',a:'The walls stop the expansion, so strain = αΔT.\nStress = YαΔT = 2 × 10¹¹ × 1.2 × 10⁻⁵ × 50 = 1.2 × 10⁸ Pa.'},
+  {t:'3',q:'Why are beams and girders made with an I-shaped cross-section?',a:'A loaded beam sags by δ = WL³/(4bd³Y): the depth d matters most (d³).\nAn I-section puts most of the metal far from the middle, giving a large depth that resists bending and buckling while saving material and weight.'},
+  {t:'5',q:'Derive the work done in stretching a wire and the energy stored per unit volume.',a:'For a wire of length L, area A: F = YAx/L when stretched by x.\nWork for a further dx: dW = F dx = (YA/L) x dx.\nTotal for extension l: W = (YA/L) l²/2 = ½ × (YAl/L) × l = ½Fl.\nPer unit volume: W/(AL) = ½ (F/A)(l/L) = ½ × stress × strain = ½ Y × strain².'},
+  {t:'5',sim:'shear-deformation',q:'Define the modulus of rigidity. A 10 cm aluminium cube (η = 2.5 × 10¹⁰ Pa) has a tangential force of 5 × 10⁴ N on its top face. Find the shear strain and how far the top face moves.',a:'Modulus of rigidity η = shearing stress / shearing strain (angle θ).\nStress = F/A = 5 × 10⁴/0.01 = 5 × 10⁶ Pa.\nStrain θ = 5 × 10⁶/(2.5 × 10¹⁰) = 2 × 10⁻⁴.\nTop face moves Δx = θL = 2 × 10⁻⁴ × 0.1 = 2 × 10⁻⁵ m.'},
+  {t:'5',sim:'young-modulus',q:'A 1 m steel wire and a 1 m copper wire, each of area 1 mm², are joined end to end and carry a 200 N load. Find each extension and the total (Y: steel 2 × 10¹¹ Pa, copper 1 × 10¹¹ Pa).',a:'In series both wires carry the full 200 N.\nSteel: Δl = 200 × 1/(10⁻⁶ × 2 × 10¹¹) = 1 × 10⁻³ m = 1 mm.\nCopper: Δl = 200 × 1/(10⁻⁶ × 10¹¹) = 2 mm.\nTotal = 3 mm. (The softer metal stretches more.)'},
+  {t:'jee',sim:'young-modulus',q:'A wire is replaced by one of the same material with double the length and half the radius. Under the same load, the extension becomes:',o:['2 times','4 times','8 times','16 times'],c:2,a:'Δl = FL/(πr²Y) ∝ L/r²: 2/(1/4) = 8 times.'},
+  {t:'jee',q:'A uniform rod of length L, density ρ and Young\'s modulus Y hangs from one end. Find its extension due to its own weight.',a:'At distance x from the bottom, the tension is the weight below: ρgAx.\nThe small piece dx stretches by (ρgAx/(AY))dx = (ρg/Y) x dx.\nTotal: (ρg/Y) L²/2 = ρgL²/(2Y), half of what a load equal to its weight would give at the end.'},
+  {t:'jee',sim:'elastic-energy',q:'A wire stretched by a force F stores energy U. If the force is doubled (within the elastic limit), the stored energy becomes:',o:['2U','4U','U/2','8U'],c:1,a:'U = ½Fx with x ∝ F, so U ∝ F²: 4U.'},
+  {t:'jee',sim:'poisson-ratio',q:'Show that a wire\'s volume does not change on stretching if its Poisson\'s ratio is 0.5.',a:'V = πr²L, so ΔV/V = ΔL/L + 2Δr/r = ε − 2σε = ε(1 − 2σ).\nWith σ = 0.5, ΔV = 0. (Real metals have σ ≈ 0.3, so their volume increases slightly.)'},
+  {t:'jee',sim:'thermal-stress',q:'A rod of area 10⁻⁴ m² is fixed between rigid walls and heated by 100 °C (Y = 2 × 10¹¹ Pa, α = 10⁻⁵ /°C). The force on the walls is:',o:['2 × 10³ N','2 × 10⁴ N','2 × 10⁵ N','2 × 10² N'],c:1,a:'F = YAαΔT = 2 × 10¹¹ × 10⁻⁴ × 10⁻⁵ × 100 = 2 × 10⁴ N.'},
+  {t:'neet',q:'The SI unit of Young\'s modulus is:',o:['N/m','N/m²','N·m','no unit'],c:1,a:'Y = stress/strain, and strain has no unit: N/m².'},
+  {t:'neet',q:'For a perfectly rigid body, Young\'s modulus is:',o:['zero','one','infinite','negative'],c:2,a:'No strain for any stress: Y = stress/0 → infinite.'},
+  {t:'neet',sim:'stress-strain',q:'Beyond which point does a wire stop returning to its original length?',o:['proportional limit','elastic limit','fracture point','ultimate stress'],c:1,a:'After the elastic limit the deformation becomes permanent.'},
+  {t:'neet',sim:'elastic-energy',q:'The elastic energy stored per unit volume of a stretched wire is:',o:['stress × strain','½ × stress × strain','stress/strain','2 × stress × strain'],c:1,a:'u = ½ × stress × strain.'},
+  {t:'neet',sim:'bulk-modulus',q:'For a gas at constant temperature, the bulk modulus equals:',o:['zero','its pressure','γ × pressure','its volume'],c:1,a:'PV = constant gives −V dP/dV = P.'},
+  {t:'neet',sim:'poisson-ratio',q:'The theoretical limits of Poisson\'s ratio are:',o:['0 to 1','−1 to 0.5','0 to ∞','−∞ to 1'],c:1,a:'Energy considerations limit σ to between −1 and 0.5.'}
 ]};
 
 window.PhysicaMockBank={
@@ -490,6 +517,47 @@ window.PhysicaMockBank={
     {tp:'kep',q:'Kepler\'s third law states:',o:['T ∝ r','T² ∝ r³','T³ ∝ r²','T ∝ r²'],c:1,s:'The square of the period is proportional to the cube of the orbit size.'},
     {tp:'kep',q:'Kepler\'s second law is a result of the conservation of:',o:['energy','linear momentum','angular momentum','mass'],c:2,s:'Gravity is a central force, so there is no torque about the Sun.'},
     {tp:'kep',q:'A planet moves fastest when it is:',o:['farthest from the Sun','closest to the Sun','at the middle distance','its speed never changes'],c:1,s:'vr is constant, so the speed is greatest at the smallest distance (perihelion).'}
+  ]},
+'Mechanical Properties of Solids':{
+  topics:{stress:'Stress, strain and Hooke\'s law',moduli:'Elastic moduli',curve:'Stress-strain curve',energy:'Elastic energy'},
+  jee:[
+    {tp:'moduli',q:'Two wires of the same material have lengths L and 2L and radii r and 2r. Under the same force, the ratio of their extensions is:',o:['1 : 2','2 : 1','4 : 1','1 : 1'],c:1,s:'Δl ∝ L/r²: (1/1) : (2/4) = 1 : 1/2 = 2 : 1.'},
+    {tp:'energy',q:'The elastic energy per unit volume of a wire under stress S, with Young\'s modulus Y, is:',o:['S/2Y','S²/2Y','2S²/Y','S²Y/2'],c:1,s:'u = ½ × stress × strain = ½ × S × S/Y = S²/2Y.'},
+    {tp:'stress',q:'A wire breaks under a load W. A wire of the same material with twice the radius breaks under:',o:['W','2W','W/2','4W'],c:3,s:'Breaking stress is fixed; area is 4 times, so the load is 4W.'},
+    {tp:'moduli',q:'A pressure of 10⁶ Pa reduces the volume of a liquid by 0.05%. Its bulk modulus is:',o:['2 × 10⁸ Pa','5 × 10⁹ Pa','2 × 10¹⁰ Pa','2 × 10⁹ Pa'],c:3,s:'B = Δp/(ΔV/V) = 10⁶/(5 × 10⁻⁴) = 2 × 10⁹ Pa.'},
+    {tp:'curve',q:'On one stress-strain graph, the straight part for wire A is steeper than for wire B. Then:',o:['A has the larger Young\'s modulus','B has the larger Young\'s modulus','A is more ductile','both have equal Young\'s modulus'],c:0,s:'The slope of the straight part (stress/strain) is Young\'s modulus.'},
+    {tp:'moduli',q:'The thermal stress in a rod clamped between rigid walls and heated does NOT depend on its:',o:['Young\'s modulus','expansion coefficient','temperature rise','length'],c:3,s:'Stress = YαΔT, with no length in it.'},
+    {tp:'energy',q:'A wire stretched by x stores energy U. When stretched by 2x (within the elastic limit) it stores:',o:['2U','4U','U/2','8U'],c:1,s:'U = ½kx² ∝ x².'},
+    {tp:'stress',q:'A uniform rod of length L, density ρ and Young\'s modulus Y hangs from one end. Its extension due to its own weight is:',o:['ρgL²/Y','ρgL²/2Y','2ρgL²/Y','ρgL/2Y'],c:1,s:'The tension grows linearly from the bottom, so the average stress is half: Δl = ρgL²/(2Y).'},
+    {tp:'moduli',q:'A wire\'s volume does not change on stretching if its Poisson\'s ratio is:',o:['0','0.25','1','0.5'],c:3,s:'ΔV/V = ε(1 − 2σ) = 0 when σ = 0.5.'},
+    {tp:'moduli',q:'A cube of side L and modulus of rigidity η has a tangential force F on its top face. The top face moves sideways by:',o:['F/(ηL)','FL/η','F/(ηL²)','ηL/F'],c:0,s:'Strain θ = F/(L²η); displacement = θL = F/(ηL).'},
+    {tp:'moduli',q:'A 1 m steel wire of area 1 mm² carries 400 N (Y = 2 × 10¹¹ Pa). Find its extension in millimetres.',n:2,s:'Δl = FL/(AY) = 400/(10⁻⁶ × 2 × 10¹¹) = 2 × 10⁻³ m = 2 mm.'},
+    {tp:'energy',q:'A 200 N force stretches a wire by 2 mm. Find the energy stored, in millijoules.',n:200,s:'U = ½Fx = ½ × 200 × 0.002 = 0.2 J = 200 mJ.'},
+    {tp:'moduli',q:'A rod of area 2 × 10⁻⁴ m² is fixed between rigid walls and heated by 50 °C (Y = 2 × 10¹¹ Pa, α = 10⁻⁵ /°C). Find the force on the walls in kN.',n:20,s:'F = YAαΔT = 2 × 10¹¹ × 2 × 10⁻⁴ × 10⁻⁵ × 50 = 2 × 10⁴ N = 20 kN.'},
+    {tp:'stress',q:'A wire of area 2 mm² has a breaking stress of 5 × 10⁸ Pa. Find the largest mass, in kg, it can hold (g = 10 m/s²).',n:100,s:'F(max) = 5 × 10⁸ × 2 × 10⁻⁶ = 1000 N, so m = 100 kg.'},
+    {tp:'moduli',q:'A 2 m wire of area 1 mm² stretches 1 mm under 100 N. Its Young\'s modulus is n × 10¹¹ Pa. Find n.',n:2,s:'Y = FL/(AΔl) = 100 × 2/(10⁻⁶ × 10⁻³) = 2 × 10¹¹ Pa.'}
+  ],
+  neet:[
+    {tp:'stress',q:'The SI unit of stress is:',o:['N','N/m','N/m² (Pa)','no unit'],c:2,s:'Stress = force/area.'},
+    {tp:'stress',q:'Strain has:',o:['the unit N/m²','the unit m','no unit','the unit N'],c:2,s:'It is a ratio of two lengths (or volumes).'},
+    {tp:'stress',q:'Hooke\'s law says that within the elastic limit:',o:['stress is proportional to strain','stress is constant','strain is constant','stress × strain is constant'],c:0,s:'Stress = modulus × strain.'},
+    {tp:'stress',q:'The breaking stress of a wire depends on its:',o:['length','area','material','load'],c:2,s:'Breaking stress is a property of the material; the breaking load depends on the area.'},
+    {tp:'stress',q:'Longitudinal strain is defined as:',o:['ΔL × L','ΔL/L','L/ΔL','F/A'],c:1,s:'Change in length per unit length.'},
+    {tp:'moduli',q:'Young\'s modulus is:',o:['stress × strain','strain/stress','longitudinal stress/longitudinal strain','force × length'],c:2,s:'Y = (F/A)/(ΔL/L).'},
+    {tp:'moduli',q:'For a perfectly rigid body, Young\'s modulus is:',o:['zero','infinite','1','negative'],c:1,s:'There is no strain at all.'},
+    {tp:'moduli',q:'The modulus of rigidity (shear modulus) describes a change in:',o:['length','volume','shape','mass'],c:2,s:'Shear changes the shape at constant volume.'},
+    {tp:'moduli',q:'The bulk modulus is given by:',o:['−V ΔP/ΔV','ΔV/(VΔP)','PV','ΔP × ΔV'],c:0,s:'B = pressure change / volume strain, with a minus sign since volume falls.'},
+    {tp:'moduli',q:'Compressibility is:',o:['equal to the bulk modulus','the reciprocal of the bulk modulus','the reciprocal of Young\'s modulus','the shear modulus'],c:1,s:'K = 1/B.'},
+    {tp:'moduli',q:'Steel is more elastic than rubber because:',o:['it stretches more','its Young\'s modulus is larger','it is heavier','it conducts heat'],c:1,s:'"More elastic" means more stress needed for the same strain: larger Y.'},
+    {tp:'moduli',q:'Poisson\'s ratio is the ratio of:',o:['longitudinal strain to lateral strain','lateral strain to longitudinal strain','stress to strain','volume strain to shear strain'],c:1,s:'σ = lateral strain/longitudinal strain.'},
+    {tp:'curve',q:'The point beyond which a wire does not regain its original length is the:',o:['fracture point','elastic limit','proportional limit','yield point only after breaking'],c:1,s:'Past the elastic limit there is a permanent set.'},
+    {tp:'curve',q:'Hooke\'s law holds on the stress-strain curve:',o:['up to the proportional limit','up to the fracture point','beyond the yield point','nowhere'],c:0,s:'The straight part from the origin.'},
+    {tp:'curve',q:'A material with a very short plastic region (it breaks soon after the elastic limit) is called:',o:['ductile','brittle','malleable','an elastomer'],c:1,s:'Brittle, like glass or cast iron.'},
+    {tp:'curve',q:'Rubber, which stretches a lot and returns without a clear plastic region, is an example of:',o:['a brittle material','a ductile metal','an elastomer','a rigid body'],c:2,s:'Elastomers (like rubber and the aorta) take large strains elastically.'},
+    {tp:'energy',q:'The elastic energy stored per unit volume is:',o:['stress × strain','½ × stress × strain','stress/strain','strain/stress'],c:1,s:'u = ½ × stress × strain.'},
+    {tp:'energy',q:'The work done in stretching a wire by Δl with a final force F is:',o:['FΔl','½FΔl','2FΔl','F/Δl'],c:1,s:'The force rises from 0 to F, so the average force is F/2.'},
+    {tp:'energy',q:'If the extension of a wire is doubled (within the limit), its stored energy becomes:',o:['2 times','4 times','half','the same'],c:1,s:'U ∝ (extension)².'},
+    {tp:'energy',q:'The thermal stress in a rod clamped at both ends and heated by ΔT is:',o:['αΔT','YαΔT','Y/αΔT','YΔT'],c:1,s:'Strain = αΔT, so stress = YαΔT.'}
   ]}
 };
 })();
