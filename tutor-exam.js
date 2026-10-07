@@ -417,6 +417,33 @@ window.PhysicaExam={
   {t:'neet',sim:'dipole-potential',q:'The net charge of an electric dipole is:',o:['2q','q','zero','−q'],c:2,a:'+q and −q add to zero.'},
   {t:'neet',sim:'flux-cube',q:'The electric flux through a closed surface with no charge inside is:',o:['zero','positive','negative','infinite'],c:0,a:'Gauss\'s law: flux = q(inside)/ε₀ = 0. (Lines entering also leave.)'},
   {t:'neet',sim:'electrostatic',q:'Electric field lines:',o:['start on negative charges and end on positive ones','start on positive charges and end on negative ones','form closed loops','can cross each other'],c:1,a:'They point the way a positive test charge would be pushed.'}
+],
+'Electrostatic Potential and Capacitance':[
+  {t:'1',q:'Define electric potential and give its SI unit.',a:'The work done per unit positive charge in bringing it from infinity to the point (without acceleration). Unit: volt (1 V = 1 J/C).'},
+  {t:'1',sim:'equipotential-map',q:'How much work is done in moving a charge along an equipotential surface?',a:'None: W = qΔV and ΔV = 0.'},
+  {t:'1',sim:'capacitor',q:'Write the capacitance of a parallel-plate capacitor.',a:'C = ε₀A/d (with air between the plates).'},
+  {t:'1',sim:'equipotential-map',q:'How are electric field lines related to equipotential surfaces?',a:'Field lines always cross equipotential surfaces at right angles and point towards lower potential.'},
+  {t:'1',sim:'dielectric-slab',q:'What happens to the capacitance when a dielectric of constant K fills the space between the plates?',a:'It becomes K times larger.'},
+  {t:'3',q:'Derive the potential at distance r from a point charge q.',a:'V = −∫E dr from ∞ to r, with E = kq/r².\nV = −kq ∫dr/r² = kq/r, where k = 1/(4πε₀).\nIt is positive near a positive charge and falls to zero far away.'},
+  {t:'3',sim:'dipole-potential',q:'Find the potential of a short dipole at a point at distance r making angle θ with its axis.',a:'V = kq/r₁ − kq/r₂, with r₁ ≈ r − a cos θ and r₂ ≈ r + a cos θ.\nV ≈ kq × 2a cos θ/r² = kp cos θ/r².\nOn the axis it is kp/r²; on the equatorial line it is zero.'},
+  {t:'3',sim:'capacitor-network',q:'Find the effective capacitance of 2 μF, 3 μF and 6 μF capacitors joined (a) in series (b) in parallel.',a:'(a) Series: 1/C = 1/2 + 1/3 + 1/6 = 1, so C = 1 μF.\n(b) Parallel: C = 2 + 3 + 6 = 11 μF.'},
+  {t:'3',sim:'cap-energy',q:'Show that the energy stored in a capacitor is ½CV², and find it for 10 μF at 100 V.',a:'Moving a small charge dq at potential q/C needs dW = (q/C)dq.\nTotal: W = ∫(q/C)dq from 0 to Q = Q²/2C = ½CV² = ½QV.\n10 μF at 100 V: U = ½ × 10⁻⁵ × 10⁴ = 0.05 J.'},
+  {t:'3',q:'Show that E = −dV/dr. What does this tell us about the direction of the field?',a:'Moving a charge q by dr against the field needs work dW = −qE dr = q dV, so E = −dV/dr.\nThe field points in the direction in which the potential falls fastest, and its size is the potential gradient.'},
+  {t:'3',sim:'charge-sharing',q:'A capacitor C₁ charged to V₁ is joined to an uncharged capacitor C₂. Find the common potential and show that energy is lost.',a:'Charge is conserved: C₁V₁ = (C₁ + C₂)V, so V = C₁V₁/(C₁ + C₂).\nEnergy before: ½C₁V₁². After: ½(C₁ + C₂)V² = ½C₁²V₁²/(C₁ + C₂).\nLoss = ½C₁C₂V₁²/(C₁ + C₂) > 0 (lost as heat and radiation while the charge moves).'},
+  {t:'5',sim:'dielectric-slab',q:'A slab of thickness t and dielectric constant K is placed between the plates (separation d, area A) of a capacitor. Derive its capacitance.',a:'In the air gaps E₀ = σ/ε₀; in the slab E = E₀/K.\nV = E₀(d − t) + (E₀/K)t = (σ/ε₀)(d − t + t/K).\nC = Q/V = σA/V = ε₀A/(d − t + t/K).\nCheck: t = 0 gives ε₀A/d; t = d gives Kε₀A/d. A metal slab (K → ∞) gives ε₀A/(d − t).'},
+  {t:'5',sim:'cap-energy',q:'Show that the energy stored per unit volume in an electric field is ½ε₀E².',a:'For a parallel-plate capacitor: U = ½CV² with C = ε₀A/d and V = Ed.\nU = ½(ε₀A/d)(E²d²) = ½ε₀E² × (Ad).\nAd is the volume between the plates, so the energy density u = ½ε₀E².\nThis holds for any electric field, not just capacitors.'},
+  {t:'5',sim:'spherical-capacitor',q:'Find the capacitance of an isolated conducting sphere of radius R. What is the capacitance of the Earth?',a:'A charge Q on the sphere gives it potential V = kQ/R.\nC = Q/V = R/k = 4πε₀R.\nEarth (R = 6.4 × 10⁶ m): C = 6.4 × 10⁶/(9 × 10⁹) ≈ 7.1 × 10⁻⁴ F ≈ 711 μF - small, which shows the farad is a very large unit.'},
+  {t:'jee',sim:'isolated-dielectric',q:'A charged capacitor is disconnected from its battery and a dielectric of constant K is then slid in. Its stored energy becomes:',o:['K times','1/K times','the same','K² times'],c:1,a:'Q stays the same; C becomes KC. U = Q²/2C falls to U/K (the slab is pulled in).'},
+  {t:'jee',sim:'dielectric-slab',q:'A dielectric (constant K) is slid into a capacitor that stays connected to its battery. What happens to C, Q, V and U?',a:'V stays fixed (battery). C becomes KC.\nQ = CV becomes KQ.\nU = ½CV² becomes KU.\n(The battery supplies the extra charge and energy.)'},
+  {t:'jee',q:'A charge Q is spread uniformly on a ring of radius R. At its centre the potential and the field are:',o:['kQ/R and zero','zero and kQ/R²','kQ/R and kQ/R²','zero and zero'],c:0,a:'Every bit of charge is at distance R, so V = kQ/R; the fields from opposite bits cancel, so E = 0.'},
+  {t:'jee',q:'Three equal charges q sit at the corners of an equilateral triangle of side a. The potential energy of the system is:',o:['kq²/a','3kq²/a','2kq²/a','kq²/3a'],c:1,a:'There are three pairs, each with energy kq²/a.'},
+  {t:'jee',sim:'charge-sharing',q:'Conducting spheres of radii R and 2R are joined by a thin wire and given a total charge. Find the ratio of their charges and of their surface charge densities.',a:'Joined, they reach the same potential: kq₁/R = kq₂/2R, so q₁ : q₂ = 1 : 2.\nσ = q/(4πr²): σ₁ : σ₂ = 1/R² : 2/(4R²) = 2 : 1.\nThe smaller sphere has the denser charge (why charge gathers at sharp points).'},
+  {t:'neet',q:'One volt is equal to:',o:['1 J/C','1 C/J','1 N/C','1 J·C'],c:0,a:'V = W/q.'},
+  {t:'neet',sim:'equipotential-map',q:'The equipotential surfaces around a point charge are:',o:['parallel planes','concentric spheres','straight lines','cylinders'],c:1,a:'V = kq/r is the same at the same r.'},
+  {t:'neet',q:'The SI unit of capacitance is the:',o:['volt','coulomb','farad','henry'],c:2,a:'1 F = 1 C/V.'},
+  {t:'neet',sim:'capacitor',q:'If the distance between the plates of a parallel-plate capacitor is halved, its capacitance:',o:['halves','doubles','stays the same','becomes four times'],c:1,a:'C = ε₀A/d.'},
+  {t:'neet',sim:'capacitor-network',q:'For capacitors in series, which is the same for each?',o:['potential difference','charge','energy','capacitance'],c:1,a:'The same charge flows onto each in series.'},
+  {t:'neet',sim:'cap-energy',q:'The energy stored in a capacitor of capacitance C with charge Q is:',o:['Q²/C','Q²/2C','QC/2','2Q²/C'],c:1,a:'U = Q²/2C = ½CV².'}
 ]};
 
 window.PhysicaMockBank={
@@ -1034,6 +1061,47 @@ window.PhysicaMockBank={
     {tp:'gauss',q:'The flux through a closed surface with no charge inside is:',o:['positive','negative','zero','q/ε₀'],c:2,s:'All lines that enter also leave.'},
     {tp:'gauss',q:'The field near an infinite plane sheet of charge density σ is:',o:['σ/ε₀','σ/(2ε₀)','2σ/ε₀','σε₀'],c:1,s:'Flux through both sides: 2EA = σA/ε₀.'},
     {tp:'gauss',q:'The field inside a uniformly charged thin spherical shell is:',o:['kq/R²','zero','kq/r²','infinite'],c:1,s:'A Gaussian sphere inside encloses no charge.'}
+  ]},
+'Electrostatic Potential and Capacitance':{
+  topics:{pot:'Electric potential',pe:'Potential energy and equipotentials',cap:'Capacitors and combinations',diel:'Dielectrics and stored energy'},
+  jee:[
+    {tp:'pot',q:'Charges +q, +q, −q, −q sit at the corners of a square. The potential at its centre is:',o:['4kq/a','zero','2kq/a','√2 kq/a'],c:1,s:'All four are at the same distance; the charges add to zero, so V = 0 (whatever the order).'},
+    {tp:'pot',q:'The potential along x is V = 4x² volts (x in m). The field at x = 1 m is:',o:['8 V/m along +x','8 V/m along −x','4 V/m along −x','zero'],c:1,s:'E = −dV/dx = −8x = −8 V/m.'},
+    {tp:'pe',q:'Three equal charges q sit at the corners of an equilateral triangle of side a. The work needed to assemble them from far away is:',o:['kq²/a','3kq²/a','2kq²/a','zero'],c:1,s:'Three pairs, each kq²/a.'},
+    {tp:'pe',q:'An electron is accelerated from rest through 100 V. Its kinetic energy is:',o:['100 J','1.6 × 10⁻¹⁷ J','1.6 × 10⁻¹⁹ J','6.25 × 10¹⁸ J'],c:1,s:'KE = eV = 100 eV = 100 × 1.6 × 10⁻¹⁹ J.'},
+    {tp:'cap',q:'A charged parallel-plate capacitor is disconnected from the battery and its plate separation is doubled. Its stored energy:',o:['halves','doubles','stays the same','becomes four times'],c:1,s:'Q is fixed and C halves; U = Q²/2C doubles (work is done pulling the plates apart).'},
+    {tp:'diel',q:'A dielectric of constant K is slid into a capacitor that stays connected to its battery. The stored energy becomes:',o:['1/K times','K times','the same','K² times'],c:1,s:'V fixed, C → KC, U = ½CV² → KU.'},
+    {tp:'diel',q:'A slab of thickness d/2 and K = 2 is placed in a capacitor of plate separation d and capacitance C₀. The new capacitance is:',o:['2C₀','4C₀/3','3C₀/2','C₀'],c:1,s:'C = ε₀A/(d − t + t/K) = ε₀A/(d/2 + d/4) = (4/3)C₀.'},
+    {tp:'cap',q:'Conducting spheres of radii R and 2R are joined by a wire. Their charges are in the ratio:',o:['1 : 1','2 : 1','1 : 2','1 : 4'],c:2,s:'Same potential: q ∝ R.'},
+    {tp:'cap',q:'A capacitor charged to V is joined to an identical uncharged one. The fraction of energy lost is:',o:['zero','one quarter','one half','three quarters'],c:2,s:'V → V/2. Energy after = 2 × ½C(V/2)² = ¼CV², half of ½CV².'},
+    {tp:'pot',q:'Inside a charged conducting sphere of radius R carrying charge Q, the potential is:',o:['zero','kQ/R everywhere','kQ/r','increasing towards the centre'],c:1,s:'E = 0 inside, so V is constant and equal to its surface value.'},
+    {tp:'cap',q:'Capacitors of 2 μF, 3 μF and 6 μF are joined in series. Find the effective capacitance in μF.',n:1,s:'1/C = 1/2 + 1/3 + 1/6 = 1.'},
+    {tp:'diel',q:'Find the energy, in mJ, stored in a 20 μF capacitor at 100 V.',n:100,s:'U = ½CV² = ½ × 2 × 10⁻⁵ × 10⁴ = 0.1 J = 100 mJ.'},
+    {tp:'pot',q:'Find the potential, in volts, 0.9 m from a point charge of 0.1 μC.',n:1000,s:'V = 9 × 10⁹ × 10⁻⁷/0.9 = 1000 V.'},
+    {tp:'cap',q:'A parallel-plate capacitor has plates of area 1 m² that are 8.85 mm apart in air. Find its capacitance in nF (ε₀ = 8.85 × 10⁻¹² F/m).',n:1,s:'C = ε₀A/d = 8.85 × 10⁻¹²/8.85 × 10⁻³ = 10⁻⁹ F = 1 nF.'},
+    {tp:'pe',q:'Find the work, in joules, done in moving a 2 C charge across a potential difference of 6 V.',n:12,s:'W = qΔV = 2 × 6 = 12 J.'}
+  ],
+  neet:[
+    {tp:'pot',q:'The SI unit of electric potential is:',o:['N/C','volt','joule','coulomb'],c:1,s:'1 V = 1 J/C.'},
+    {tp:'pot',q:'The potential at distance r from a point charge q is:',o:['kq/r²','kq/r','kq²/r','kqr'],c:1,s:'V = kq/r.'},
+    {tp:'pot',q:'Electric potential is a:',o:['vector','scalar','tensor','unit'],c:1,s:'Potentials from several charges just add as numbers.'},
+    {tp:'pot',q:'Inside a hollow charged conductor, the potential is:',o:['zero','constant, equal to the surface value','increasing towards the centre','decreasing towards the centre'],c:1,s:'E = 0 inside, so V does not change.'},
+    {tp:'pot',q:'The relation between field and potential is:',o:['E = dV/dr','E = −dV/dr','E = V/r²','E = Vr'],c:1,s:'The field points towards falling potential.'},
+    {tp:'pe',q:'The work done in moving a charge along an equipotential surface is:',o:['positive','negative','zero','qV'],c:2,s:'ΔV = 0.'},
+    {tp:'pe',q:'Equipotential surfaces and field lines are:',o:['parallel','perpendicular','at 45°','unrelated'],c:1,s:'Otherwise moving along the surface would need work.'},
+    {tp:'pe',q:'The potential energy of two point charges q₁ and q₂ a distance r apart is:',o:['kq₁q₂/r²','kq₁q₂/r','kq₁q₂r','zero'],c:1,s:'U = kq₁q₂/r.'},
+    {tp:'pe',q:'One electron-volt equals:',o:['1.6 × 10⁻¹⁹ J','1 J','1.6 × 10¹⁹ J','9.1 × 10⁻³¹ J'],c:0,s:'The energy an electron gains through 1 V.'},
+    {tp:'pe',q:'The equipotential surfaces of a uniform electric field are:',o:['concentric spheres','parallel planes perpendicular to the field','cylinders','parallel to the field'],c:1,s:'V changes only along the field.'},
+    {tp:'cap',q:'The SI unit of capacitance is:',o:['farad','henry','tesla','ohm'],c:0,s:'1 F = 1 C/V.'},
+    {tp:'cap',q:'Capacitance is defined as:',o:['QV','Q/V','V/Q','Q²/V'],c:1,s:'Charge stored per volt.'},
+    {tp:'cap',q:'The capacitance of a parallel-plate capacitor in air is:',o:['ε₀d/A','ε₀A/d','A/(ε₀d)','ε₀Ad'],c:1,s:'C = ε₀A/d.'},
+    {tp:'cap',q:'For capacitors in series, the effective capacitance is given by:',o:['C = C₁ + C₂','1/C = 1/C₁ + 1/C₂','C = C₁C₂','C = C₁ − C₂'],c:1,s:'Like resistors in parallel.'},
+    {tp:'cap',q:'For capacitors in parallel, the effective capacitance is:',o:['C₁ + C₂','C₁C₂/(C₁ + C₂)','smaller than either','zero'],c:0,s:'Plates are effectively added side by side.'},
+    {tp:'cap',q:'The capacitance of an isolated sphere of radius R is:',o:['4πε₀R','4πε₀R²','R/(4πε₀)','ε₀R'],c:0,s:'C = Q/V = 4πε₀R.'},
+    {tp:'diel',q:'Filling a capacitor with a dielectric of constant K makes its capacitance:',o:['1/K times','K times','K² times','unchanged'],c:1,s:'C = Kε₀A/d.'},
+    {tp:'diel',q:'The energy stored in a capacitor is:',o:['CV²','½CV²','2CV²','CV'],c:1,s:'U = ½CV².'},
+    {tp:'diel',q:'The energy stored per unit volume in an electric field E is:',o:['ε₀E²','½ε₀E²','ε₀E','½ε₀E'],c:1,s:'u = ½ε₀E².'},
+    {tp:'diel',q:'A dielectric placed in an electric field:',o:['increases the field inside it','reduces the field inside it','does not affect the field','reverses the field'],c:1,s:'Its polarisation charges set up an opposing field.'}
   ]}
 };
 })();
