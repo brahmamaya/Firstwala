@@ -133,7 +133,7 @@ function panel(c,s){const x=716,y=56,w=228,h=430;c.fillStyle='#0b0c0f';c.strokeS
 let grab=null;
 INT[ID]={draw:stage,
   down(q,p){if(!G)return;const s=solve(p),ox=s.oInf?G.L+30:G.X-s.U*G.SC,oy=G.AX-s.h*G.SC;
-    grab=Math.hypot(q.x-G.Fx,q.y-G.AX)<18?'f':!s.oInf&&Math.hypot(q.x-ox,q.y-oy)<16?'h':Math.abs(q.x-ox)<34&&q.y>G.TOP&&q.y<G.BOT?'u':null;this.move(q,p)},
+    grab=Math.hypot(q.x-G.Fx,q.y-G.AX)<28?'f':!s.oInf&&Math.hypot(q.x-ox,q.y-oy)<26?'h':Math.abs(q.x-ox)<34&&q.y>G.TOP&&q.y<G.BOT?'u':null;this.move(q,p)},
   move(q,p){if(!G||!grab)return;if(grab==='u'){const u=Math.round((G.X-q.x)/G.SC*2)/2;p.u=u>=45.5?INF:clamp(u,2,45)}
     else if(grab==='h')p.h=clamp(Math.round((G.AX-q.y)/G.SC*2)/2,1,10);
     else{const d=G.cc?G.X-q.x:q.x-G.X;p.f=clamp(Math.round(d/G.SC),5,20)}},
