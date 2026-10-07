@@ -53,8 +53,9 @@
   for(const s of sims)if(window.PhysicaSimPatch?.[s.id]&&s.r3){const f=s.r3,ad=ADAPT[s.id];s.r3=ad?(c,p,t)=>f(c,ad(p),t):null}
   window.PhysicaApplyReal3D=()=>{applyReal3D();const RR=window.PhysicaReal3D||{};for(const s of sims)if(window.PhysicaSimPatch?.[s.id]&&RR[s.id]&&s.__rr!==RR[s.id]){const f=RR[s.id],ad=ADAPT[s.id];s.__rr=f;s.r3=ad?(c,p,t)=>f(c,ad(p),t):f}try{syncView3d();renderSimulationTabs();draw()}catch{}};
   let mode='3d';try{const v=localStorage.getItem('physica-mode');mode=localStorage.getItem('physica-view')||(['2d','3d','ultra'].includes(v)?v:(localStorage.getItem('physica-classic-2d')==='1'?'2d':'3d'))}catch{}if(!['2d','3d','ultra'].includes(mode))mode='3d';
-  const HAND=()=>(mode!=='3d'||!current.r3)&&INT(current.id);
-  const is3D=s=>mode!=='2d'&&!(mode==='ultra'&&(INT(s.id)||window.PhysicaUltraScenes?.[s.id]))&&!!(s.view3d||s.r3);
+  const HAND=()=>(mode!=='3d'||!current.r3||INT(current.id)?.allViews)&&INT(current.id);
+  // hands-on instruments marked allViews (vernier, screw gauge) stay on their working stage in every view
+const is3D=s=>mode!=='2d'&&!INT(s.id)?.allViews&&!(mode==='ultra'&&(INT(s.id)||window.PhysicaUltraScenes?.[s.id]))&&!!(s.view3d||s.r3);
   // NCERT biology is taught as Botany and Zoology (standard NEET / board split by chapter).
   function bioSubject(e){const Z={11:[4,7,9,14,15,16,17,18,19],12:[2,3,6,7,9,10]};return (Z[e.grade]||[]).includes(e.chapterNo)?'zoology':'botany'}
   function sameChapter(a,b){return a.chapter===b.chapter&&a.grade===b.grade&&a.subject===b.subject}

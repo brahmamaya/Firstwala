@@ -33,7 +33,7 @@ PATCH.units={formula:'Reading = MSR + n × LC  (LC = 1 MSD − 1 VSD = 0.1 mm) ;
  metrics:p=>{const r=vRead(p),sz=VOBJ[p.obj][1],gap=p.jaw-sz;return[N('Main scale reading (MSR)',r.msr,'mm',0),N('Coinciding vernier division n',r.n,'',0),N('Observed reading',r.reading,'mm',1),N('Corrected reading',r.reading-p.zero,'mm',1),N('Jaws',p.obj==='none'?'free':gap>.05?`${f(gap,1)} mm gap — close the jaw`:'touching the object ✓')]}};
 const V={X0:110,px:4.25,top:172,bh:38};
 let vDrag=null;
-INT.units={
+INT.units={allViews:true,
  draw(c,p,t){const {X0,px,top,bh}=V,r=vRead(p),eff=vEff(p),xj=X0+eff*px,xv=xj+p.zero*px,sz=VOBJ[p.obj][1],bot=top+bh,beamR=X0+125*px;
   text(c,'Drag the sliding jaw · it stops on the object',40,110,'#8ca6b9',11,'left',600);
   // object between the outside jaws
@@ -81,7 +81,7 @@ PATCH['screw-gauge']={formula:'Reading = PSR + n × LC  (LC = pitch / 50) ;  cor
  metrics:p=>{const r=sRead(p),sz=SOBJ[p.obj][1],gap=p.gap-sz;return[N('Pitch scale reading (PSR)',r.psr,'mm',1),N('Thimble division n',r.n,'',0),N('Least count',r.lc,'mm',2),N('Observed reading',r.reading,'mm',2),N('Corrected reading',r.reading-p.zero,'mm',2),N('Spindle',p.obj==='none'?'free':gap>.005?`${f(gap,2)} mm gap`:'touching ✓')]}};
 const G={A:206,xa:196,K:6.2,xz:410};
 let sDrag=null;
-INT['screw-gauge']={
+INT['screw-gauge']={allViews:true,
  draw(c,p,t){const {A,xa,K,xz}=G,r=sRead(p),eff=sEff(p),sz=SOBJ[p.obj][1],xs=xa+eff*7,xt=xz+r.Rr*K,turn=r.n/50;
   text(c,'Turn the thimble: drag up/down (or sideways) on the stage',40,110,'#8ca6b9',11,'left',600);
   // U-frame
