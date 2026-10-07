@@ -347,20 +347,31 @@ function quiz(c){let score=0,done=0;const out=el('p','tutor-score'),qs=[];
     qq.options.forEach((o,i)=>opts.append(btn('tutor-opt',`${i+1}. ${o}`,()=>reveal(i))));body.append(q)});
   body.append(out);read(0)}
 
-// Exam: board-pattern and NEET-style questions for the chapter. Written questions show a step-by-step answer on
-// request and the student marks each one "got it" or "revise"; MCQs are checked at once. Progress stays on this device.
+// Exam: Board, JEE and NEET kept apart. Board and practice questions show a step-by-step answer on request and the
+// student marks each one "got it" or "revise"; MCQs are checked at once. JEE and NEET also offer the chapter's timed
+// mock test (tutor-mock.js) and its past reports. Progress stays on this device.
 const examSet=()=>{const s=simObj();return s&&window.PhysicaExam?.[s.chapter]};
-let examType='all';
+let examTrack='board',examType='all';
+addEventListener('physica-mock-close',e=>{if(examSet()){tab='exam';if(e.detail)examTrack=e.detail;render()}});
 function exam(){const sim=simObj(),qs=examSet();let lang='en',done={};
   try{lang=JSON.parse(localStorage.getItem('physica-learner')||'{}').lang||'en'}catch{}try{done=JSON.parse(localStorage.getItem('physica-exam')||'{}')||{}}catch{}
   const L=o=>o?(o[lang]||o.en):'',W=(en,hl,hi)=>lang==='hi'?hi:lang==='hl'?hl:en,key=n=>`${sim.chapter}#${n}`;
   const save=()=>{try{localStorage.setItem('physica-exam',JSON.stringify(done))}catch{}},
-    prog=el('p','tutor-exam-prog'),paint=()=>{const got=qs.filter((_,n)=>done[key(n)]===1).length;prog.textContent=W(`${got} / ${qs.length} mastered`,`${got} / ${qs.length} pakke ho gaye`,`${got} / ${qs.length} पक्के हो गए`)};
-  const kinds=[['all',W('All','Sab','सभी')],['1',W('1 mark','1 mark','1 अंक')],['3',W('2-3 marks','2-3 marks','2-3 अंक')],['5',W('5 marks','5 marks','5 अंक')],['mcq','NEET MCQ']],chips=el('div','tutor-chips');
-  for(const [k,t] of kinds){const b=btn('tutor-chip',t,()=>{examType=k;render()});b.setAttribute('aria-pressed',String(k===examType));chips.append(b)}
-  body.append(el('p','tutor-note',W(`Board-pattern and NEET-style practice for ${sim.chapter}.`,`${sim.chapter} ke board-pattern aur NEET-style sawal.`,`${sim.chapter} के बोर्ड-पैटर्न और NEET-शैली के प्रश्न।`)),prog,chips);paint();
-  qs.forEach((x,n)=>{if(examType!=='all'&&x.t!==examType)return;
-    const q=el('div','tutor-q'),ttl=el('b','',`${x.t==='mcq'?'MCQ':W(`${x.t==='3'?'2-3':x.t} mark${x.t==='1'?'':'s'}`,`${x.t==='3'?'2-3':x.t} mark${x.t==='1'?'':'s'}`,`${x.t==='3'?'2-3':x.t} अंक`)} · ${L(x.q)} `),ans=el('p','tutor-why tutor-ans',L(x.a)),row=el('div','tutor-chips');ans.hidden=true;
+    prog=el('p','tutor-exam-prog'),paint=()=>{const mine=qs.map((x,n)=>n).filter(n=>examTrack==='board'?board.includes(qs[n].t):qs[n].t===examTrack),got=mine.filter(n=>done[key(n)]===1).length;prog.textContent=W(`${got} / ${mine.length} mastered`,`${got} / ${mine.length} pakke ho gaye`,`${got} / ${mine.length} पक्के हो गए`)};
+  const chipRow=(list,cur,set)=>{const r=el('div','tutor-chips');for(const [k,t] of list){const b=btn('tutor-chip',t,()=>{set(k);render()});b.setAttribute('aria-pressed',String(k===cur));r.append(b)}return r};
+  const board=['1','3','5'],inTrack=x=>examTrack==='board'?board.includes(x.t)&&(examType==='all'||x.t===examType):x.t===examTrack;
+  body.append(chipRow([['board',W('Board','Board','बोर्ड')],['jee','JEE'],['neet','NEET']],examTrack,k=>{examTrack=k}),prog);
+  if(examTrack==='board')body.append(chipRow([['all',W('All','Sab','सभी')],['1',W('1 mark','1 mark','1 अंक')],['3',W('2-3 marks','2-3 marks','2-3 अंक')],['5',W('5 marks','5 marks','5 अंक')]],examType,k=>{examType=k}));
+  const M=window.PhysicaMockTest,info=examTrack!=='board'&&M?.info(sim.chapter,examTrack);
+  if(info){const m=el('div','tutor-mock');
+    m.append(el('b','',`⏱ ${info.name} ${W('mock test','mock test','मॉक टेस्ट')}`),el('p','tutor-why',W(`${info.n} questions · ${info.min} min · +4 / −1 · result after you submit`,`${info.n} sawal · ${info.min} min · +4 / −1 · result submit ke baad`,`${info.n} प्रश्न · ${info.min} मिनट · +4 / −1 · परिणाम सबमिट के बाद`)),
+      btn('tutor-mini',W('Start mock test','Mock test shuru karo','मॉक टेस्ट शुरू करें'),()=>{hush();M.start(sim.chapter,examTrack)}));
+    for(const r of M.past(sim.chapter,examTrack).slice(0,3)){const c=r.res.filter(x=>x==='c').length,w=r.res.filter(x=>x==='w').length;
+      m.append(btn('tutor-mini',`📄 ${new Date(r.at).toLocaleDateString()} · ${4*c-w} / ${4*r.res.length}`,()=>{hush();M.open(r)}))}
+    body.append(m,el('p','tutor-note',W('Practice questions','Practice ke sawal','अभ्यास प्रश्न')))}
+  paint();
+  qs.forEach((x,n)=>{if(!inTrack(x))return;
+    const q=el('div','tutor-q'),ttl=el('b','',`${x.t==='jee'?'JEE':x.t==='neet'?'NEET':W(`${x.t==='3'?'2-3':x.t} mark${x.t==='1'?'':'s'}`,`${x.t==='3'?'2-3':x.t} mark${x.t==='1'?'':'s'}`,`${x.t==='3'?'2-3':x.t} अंक`)} · ${L(x.q)} `),ans=el('p','tutor-why tutor-ans',L(x.a)),row=el('div','tutor-chips');ans.hidden=true;
     const mark=()=>q.classList.toggle('got',done[key(n)]===1);mark();
     const say=t=>{hush();speak(t,null,lang)};
     if(synth){const r=btn('tutor-read','🔊',()=>say(`${L(x.q)} ${x.o?x.o.map((o,i)=>`${i+1}: ${o}.`).join(' '):''}`));r.title='Read this question';r.setAttribute('aria-label','Read question aloud');ttl.append(r)}

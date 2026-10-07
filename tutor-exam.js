@@ -1,6 +1,8 @@
-/* Physica Exam - board-pattern and NEET-style practice questions for the tutor's "Exam" tab.
+/* Physica Exam - Board, JEE and NEET practice questions and timed mock tests for the tutor's "Exam" tab.
    Each question is written in three languages (en = English, hl = Hinglish, hi = Hindi) with a step-by-step answer.
-   t: '1' = 1 mark, '3' = 2-3 marks, '5' = 5 marks, 'mcq' = NEET-style MCQ (o = options, c = correct option).
+   t: '1' = 1 mark, '3' = 2-3 marks, '5' = 5 marks (board); 'jee' / 'neet' = practice for those exams (o = options, c = correct option).
+   window.PhysicaMockBank holds the timed mock tests (JEE Main and NEET pattern), separate from the practice questions so a
+   student never meets a mock question beforehand; each question has a topic (tp) for the topic-wise report.
    sim: the experiment where the idea can be tried out. Chapters so far: Units and Measurements. */
 (() => {
 'use strict';
@@ -45,19 +47,110 @@ window.PhysicaExam={
     a:T('Let F = k mᵃ vᵇ rᶜ.\n[MLT⁻²] = [M]ᵃ [LT⁻¹]ᵇ [L]ᶜ = [Mᵃ Lᵇ⁺ᶜ T⁻ᵇ].\nCompare: a = 1; −b = −2 → b = 2; b + c = 1 → c = −1.\nSo F = k mv²/r (with k = 1: F = mv²/r).','Maan lo F = k mᵃ vᵇ rᶜ.\n[MLT⁻²] = [M]ᵃ [LT⁻¹]ᵇ [L]ᶜ = [Mᵃ Lᵇ⁺ᶜ T⁻ᵇ].\nCompare: a = 1; −b = −2 → b = 2; b + c = 1 → c = −1.\nIsliye F = k mv²/r (k = 1 lene par F = mv²/r).','माना F = k mᵃ vᵇ rᶜ।\n[MLT⁻²] = [M]ᵃ [LT⁻¹]ᵇ [L]ᶜ = [Mᵃ Lᵇ⁺ᶜ T⁻ᵇ]।\nतुलना: a = 1; −b = −2 → b = 2; b + c = 1 → c = −1।\nअतः F = k mv²/r (k = 1 लेने पर F = mv²/r)।')},
   {t:'5',sim:'uncertainty',q:T('The period of a pendulum is measured as 2.63 s, 2.56 s, 2.42 s, 2.71 s and 2.80 s. Find the mean value, mean absolute error, relative error and percentage error.','Pendulum ka period 2.63 s, 2.56 s, 2.42 s, 2.71 s aur 2.80 s mila. Mean value, mean absolute error, relative error aur percentage error nikalo.','लोलक का आवर्तकाल 2.63 s, 2.56 s, 2.42 s, 2.71 s तथा 2.80 s मापा गया। माध्य मान, माध्य निरपेक्ष त्रुटि, आपेक्षिक त्रुटि और प्रतिशत त्रुटि ज्ञात कीजिए।'),
     a:T('Mean T = (2.63 + 2.56 + 2.42 + 2.71 + 2.80)/5 = 13.12/5 = 2.624 ≈ 2.62 s.\nAbsolute errors: 0.01, 0.06, 0.20, 0.09, 0.18 s.\nMean absolute error = 0.54/5 = 0.108 ≈ 0.11 s.\nResult: T = 2.62 ± 0.11 s.\nRelative error = 0.11/2.62 ≈ 0.04; percentage error ≈ 4%.','Mean T = (2.63 + 2.56 + 2.42 + 2.71 + 2.80)/5 = 13.12/5 = 2.624 ≈ 2.62 s.\nAbsolute errors: 0.01, 0.06, 0.20, 0.09, 0.18 s.\nMean absolute error = 0.54/5 = 0.108 ≈ 0.11 s.\nResult: T = 2.62 ± 0.11 s.\nRelative error = 0.11/2.62 ≈ 0.04; percentage error ≈ 4%.','माध्य T = (2.63 + 2.56 + 2.42 + 2.71 + 2.80)/5 = 13.12/5 = 2.624 ≈ 2.62 s।\nनिरपेक्ष त्रुटियाँ: 0.01, 0.06, 0.20, 0.09, 0.18 s।\nमाध्य निरपेक्ष त्रुटि = 0.54/5 = 0.108 ≈ 0.11 s।\nपरिणाम: T = 2.62 ± 0.11 s।\nआपेक्षिक त्रुटि = 0.11/2.62 ≈ 0.04; प्रतिशत त्रुटि ≈ 4%।')},
-  {t:'mcq',q:T('The dimensional formula of the gravitational constant G is:','Gravitational constant G ka dimensional formula hai:','गुरुत्वीय नियतांक G का विमीय सूत्र है:'),o:['[M⁻¹L³T⁻²]','[ML²T⁻²]','[M⁻¹L²T⁻¹]','[ML³T⁻²]'],c:0,
+  {t:'neet',q:T('The dimensional formula of the gravitational constant G is:','Gravitational constant G ka dimensional formula hai:','गुरुत्वीय नियतांक G का विमीय सूत्र है:'),o:['[M⁻¹L³T⁻²]','[ML²T⁻²]','[M⁻¹L²T⁻¹]','[ML³T⁻²]'],c:0,
     a:T('F = Gm²/r² → G = Fr²/m² = [MLT⁻²][L²]/[M²] = [M⁻¹L³T⁻²].','F = Gm²/r² → G = Fr²/m² = [MLT⁻²][L²]/[M²] = [M⁻¹L³T⁻²].','F = Gm²/r² → G = Fr²/m² = [MLT⁻²][L²]/[M²] = [M⁻¹L³T⁻²]।')},
-  {t:'mcq',q:T('How many significant figures are there in 6.320?','6.320 mein kitne significant figures hain?','6.320 में कितने सार्थक अंक हैं?'),o:['2','3','4','5'],c:2,
+  {t:'neet',q:T('How many significant figures are there in 6.320?','6.320 mein kitne significant figures hain?','6.320 में कितने सार्थक अंक हैं?'),o:['2','3','4','5'],c:2,
     a:T('Four. A trailing zero after the decimal point is significant.','Chaar. Decimal ke baad aakhri zero significant hota hai.','चार। दशमलव के बाद अंत का शून्य सार्थक होता है।')},
-  {t:'mcq',sim:'error-propagation',q:T('The radius of a sphere is measured with a 2% error. The error in its volume is:','Sphere ki radius 2% error ke saath naapi gayi. Volume mein error hoga:','गोले की त्रिज्या 2% त्रुटि से मापी गई। आयतन में त्रुटि होगी:'),o:['2%','4%','6%','8%'],c:2,
+  {t:'neet',sim:'error-propagation',q:T('The radius of a sphere is measured with a 2% error. The error in its volume is:','Sphere ki radius 2% error ke saath naapi gayi. Volume mein error hoga:','गोले की त्रिज्या 2% त्रुटि से मापी गई। आयतन में त्रुटि होगी:'),o:['2%','4%','6%','8%'],c:2,
     a:T('V = (4/3)πr³, so ΔV/V = 3 × Δr/r = 3 × 2% = 6%.','V = (4/3)πr³, isliye ΔV/V = 3 × Δr/r = 3 × 2% = 6%.','V = (4/3)πr³, अतः ΔV/V = 3 × Δr/r = 3 × 2% = 6%।')},
-  {t:'mcq',q:T('Which pair has the same dimensions?','Kis pair ki dimensions same hain?','किस युग्म की विमाएँ समान हैं?'),o:['Work and power','Work and torque','Force and momentum','Impulse and force'],c:1,
+  {t:'neet',q:T('Which pair has the same dimensions?','Kis pair ki dimensions same hain?','किस युग्म की विमाएँ समान हैं?'),o:['Work and power','Work and torque','Force and momentum','Impulse and force'],c:1,
     a:T('Work = F × d and torque = r × F, both [ML²T⁻²].','Work = F × d aur torque = r × F, dono [ML²T⁻²].','कार्य = F × d और बल-आघूर्ण = r × F, दोनों [ML²T⁻²]।')},
-  {t:'mcq',sim:'screw-gauge',q:T('A screw gauge has pitch 1 mm and 100 circular divisions. Its least count is:','Screw gauge ka pitch 1 mm aur 100 circular divisions hain. Least count hai:','स्क्रू गेज का पिच 1 mm और 100 वृत्तीय भाग हैं। अल्पतमांक है:'),o:['0.1 mm','0.01 mm','0.001 mm','1 mm'],c:1,
+  {t:'neet',sim:'screw-gauge',q:T('A screw gauge has pitch 1 mm and 100 circular divisions. Its least count is:','Screw gauge ka pitch 1 mm aur 100 circular divisions hain. Least count hai:','स्क्रू गेज का पिच 1 mm और 100 वृत्तीय भाग हैं। अल्पतमांक है:'),o:['0.1 mm','0.01 mm','0.001 mm','1 mm'],c:1,
     a:T('LC = pitch / number of divisions = 1/100 = 0.01 mm.','LC = pitch / divisions = 1/100 = 0.01 mm.','LC = पिच / भागों की संख्या = 1/100 = 0.01 mm।')},
-  {t:'mcq',q:T('4.234 × 1.005, written to the correct significant figures, is:','4.234 × 1.005 ko sahi significant figures mein likho:','4.234 × 1.005 सही सार्थक अंकों में है:'),o:['4.255','4.2552','4.26','4.25517'],c:0,
+  {t:'neet',q:T('4.234 × 1.005, written to the correct significant figures, is:','4.234 × 1.005 ko sahi significant figures mein likho:','4.234 × 1.005 सही सार्थक अंकों में है:'),o:['4.255','4.2552','4.26','4.25517'],c:0,
     a:T('4.234 × 1.005 = 4.25517. Both numbers have 4 significant figures, so the answer keeps 4: 4.255.','4.234 × 1.005 = 4.25517. Dono numbers mein 4 significant figures, to answer mein bhi 4: 4.255.','4.234 × 1.005 = 4.25517। दोनों संख्याओं में 4 सार्थक अंक हैं, अतः उत्तर में भी 4: 4.255।')},
-  {t:'mcq',q:T('The SI unit of impulse is:','Impulse ki SI unit hai:','आवेग का SI मात्रक है:'),o:['N/s','N·s','N·m','kg/s'],c:1,
-    a:T('Impulse = force × time, so N·s (= kg·m/s, the unit of momentum).','Impulse = force × time, isliye N·s (= kg·m/s, momentum ki unit).','आवेग = बल × समय, अतः N·s (= kg·m/s, संवेग का मात्रक)।')}
+  {t:'neet',q:T('The SI unit of impulse is:','Impulse ki SI unit hai:','आवेग का SI मात्रक है:'),o:['N/s','N·s','N·m','kg/s'],c:1,
+    a:T('Impulse = force × time, so N·s (= kg·m/s, the unit of momentum).','Impulse = force × time, isliye N·s (= kg·m/s, momentum ki unit).','आवेग = बल × समय, अतः N·s (= kg·m/s, संवेग का मात्रक)।')},
+  {t:'jee',q:T('v = at + b/(t + c), where v is velocity and t is time. Find the dimensions of a, b and c.','v = at + b/(t + c), jahan v velocity aur t time hai. a, b aur c ki dimensions nikalo.','v = at + b/(t + c), जहाँ v वेग तथा t समय है। a, b और c की विमाएँ ज्ञात कीजिए।'),
+    a:T('c is added to t, so [c] = [T].\nat is a velocity: [a] = [LT⁻¹]/[T] = [LT⁻²].\nb/(t + c) is a velocity: [b] = [LT⁻¹][T] = [L].','c, t mein juda hai, isliye [c] = [T].\nat ek velocity hai: [a] = [LT⁻¹]/[T] = [LT⁻²].\nb/(t + c) ek velocity hai: [b] = [LT⁻¹][T] = [L].','c, t में जुड़ा है, अतः [c] = [T]।\nat एक वेग है: [a] = [LT⁻¹]/[T] = [LT⁻²]।\nb/(t + c) एक वेग है: [b] = [LT⁻¹][T] = [L]।')},
+  {t:'jee',q:T('If the units of length and force are both made four times bigger, the unit of energy becomes:','Agar length aur force dono ki units chaar guna kar di jayein, to energy ki unit ho jayegi:','यदि लंबाई और बल दोनों के मात्रक चार गुना कर दिए जाएँ, तो ऊर्जा का मात्रक हो जाएगा:'),o:['4 times','8 times','16 times','1/16 times'],c:2,
+    a:T('Energy = force × length, so the new unit = 4 × 4 = 16 times the old one.','Energy = force × length, isliye nayi unit = 4 × 4 = 16 guna.','ऊर्जा = बल × लंबाई, अतः नया मात्रक = 4 × 4 = 16 गुना।')},
+  {t:'jee',q:T('The mass and the speed of a body are each measured with a 2% error. Find the maximum percentage error in its kinetic energy.','Ek body ka mass aur speed dono 2% error ke saath naape gaye. Kinetic energy mein maximum percentage error nikalo.','किसी वस्तु का द्रव्यमान और चाल दोनों 2% त्रुटि से मापे गए। गतिज ऊर्जा में अधिकतम प्रतिशत त्रुटि ज्ञात कीजिए।'),
+    a:T('K = ½mv², so ΔK/K = Δm/m + 2Δv/v = 2% + 2 × 2% = 6%.','K = ½mv², isliye ΔK/K = Δm/m + 2Δv/v = 2% + 2 × 2% = 6%.','K = ½mv², अतः ΔK/K = Δm/m + 2Δv/v = 2% + 2 × 2% = 6%।')},
+  {t:'jee',q:T('A stopwatch has a least count of 0.2 s. The time for 20 oscillations of a pendulum is 25 s. Find the percentage error in the time period.','Stopwatch ka least count 0.2 s hai. Pendulum ke 20 oscillations ka time 25 s hai. Time period mein percentage error nikalo.','विराम घड़ी का अल्पतमांक 0.2 s है। लोलक के 20 दोलनों का समय 25 s है। आवर्तकाल में प्रतिशत त्रुटि ज्ञात कीजिए।'),o:['0.8%','1.8%','8%','0.2%'],c:0,
+    a:T('T = t/20, so ΔT/T = Δt/t = 0.2/25 = 0.008 = 0.8%.\n(Timing many oscillations keeps the error small.)','T = t/20, isliye ΔT/T = Δt/t = 0.2/25 = 0.008 = 0.8%.\n(Zyada oscillations ka time lene se error kam rehti hai.)','T = t/20, अतः ΔT/T = Δt/t = 0.2/25 = 0.008 = 0.8%।\n(अधिक दोलनों का समय लेने से त्रुटि कम रहती है।)')},
+  {t:'jee',sim:'dimensional-analysis',q:T('In P = (α/β) e^(−αz/kθ), P is pressure, z is distance, k is Boltzmann\'s constant and θ is temperature. Find the dimensions of β.','P = (α/β) e^(−αz/kθ) mein P pressure, z distance, k Boltzmann constant aur θ temperature hai. β ki dimensions nikalo.','P = (α/β) e^(−αz/kθ) में P दाब, z दूरी, k बोल्ट्ज़मान नियतांक तथा θ ताप है। β की विमाएँ ज्ञात कीजिए।'),
+    a:T('The power of e has no dimensions, so α = kθ/z.\n[kθ] = energy = [ML²T⁻²], so [α] = [ML²T⁻²]/[L] = [MLT⁻²].\nP = α/β gives [β] = [α]/[P] = [MLT⁻²]/[ML⁻¹T⁻²] = [L²].','e ki power dimensionless hoti hai, isliye α = kθ/z.\n[kθ] = energy = [ML²T⁻²], to [α] = [ML²T⁻²]/[L] = [MLT⁻²].\nP = α/β se [β] = [α]/[P] = [MLT⁻²]/[ML⁻¹T⁻²] = [L²].','e की घात विमाहीन होती है, अतः α = kθ/z।\n[kθ] = ऊर्जा = [ML²T⁻²], तो [α] = [ML²T⁻²]/[L] = [MLT⁻²]।\nP = α/β से [β] = [α]/[P] = [MLT⁻²]/[ML⁻¹T⁻²] = [L²]।')}
 ]};
+// Mock tests are in English and Hindi, the two languages of the real papers (Hinglish readers see English).
+// o + c = MCQ (c is the correct option); n = numerical answer. s = solution, shown only in the report after the test.
+const E=(en,hi)=>({en,hi});
+window.PhysicaMockBank={
+'Units and Measurements':{
+  topics:{units:E('Units and SI','मात्रक एवं SI'),dims:E('Dimensional analysis','विमीय विश्लेषण'),sig:E('Significant figures','सार्थक अंक'),err:E('Errors in measurement','मापन में त्रुटियाँ'),inst:E('Vernier and screw gauge','वर्नियर एवं स्क्रू गेज')},
+  jee:[
+    {tp:'dims',q:E('If velocity V, time T and force F are taken as fundamental quantities, the dimensions of mass are:','यदि वेग V, समय T और बल F को मूल राशियाँ माना जाए, तो द्रव्यमान की विमाएँ होंगी:'),o:['[FTV⁻¹]','[FT⁻¹V]','[FV⁻¹T⁻¹]','[FVT]'],c:0,
+      s:E('F = ma = M·V/T, so M = FT/V = [FTV⁻¹].','F = ma = M·V/T, अतः M = FT/V = [FTV⁻¹]।')},
+    {tp:'dims',q:E('The dimensions of the permittivity of free space ε₀ are:','निर्वात की विद्युतशीलता ε₀ की विमाएँ हैं:'),o:['[ML³T⁻⁴A⁻²]','[M⁻¹L⁻³T⁴A²]','[M⁻¹L⁻²T⁴A²]','[M⁻¹L³T⁴A²]'],c:1,
+      s:E('From F = q²/(4πε₀r²): ε₀ = q²/(Fr²) = [A²T²]/([MLT⁻²][L²]) = [M⁻¹L⁻³T⁴A²].','F = q²/(4πε₀r²) से: ε₀ = q²/(Fr²) = [A²T²]/([MLT⁻²][L²]) = [M⁻¹L⁻³T⁴A²]।')},
+    {tp:'dims',q:E('m is a mass and k is the force constant of a spring. Which of these has the dimensions of time?','m द्रव्यमान तथा k स्प्रिंग का बल नियतांक है। इनमें से किसकी विमा समय की है?'),o:['√(k/m)','mk','√(m/k)','m/k'],c:2,
+      s:E('[k] = force/length = [MT⁻²]. √(m/k) = √([M]/[MT⁻²]) = [T].','[k] = बल/लंबाई = [MT⁻²]। √(m/k) = √([M]/[MT⁻²]) = [T]।')},
+    {tp:'dims',q:E('In P = (α/β) e^(−αz/kθ), P is pressure, z distance, k Boltzmann\'s constant and θ temperature. The dimensions of α are:','P = (α/β) e^(−αz/kθ) में P दाब, z दूरी, k बोल्ट्ज़मान नियतांक तथा θ ताप है। α की विमाएँ हैं:'),o:['[L²]','[ML²T⁻²]','[MLT⁻²]','[M⁰L⁰T⁰]'],c:2,
+      s:E('The power of e is dimensionless, so α = kθ/z = [ML²T⁻²]/[L] = [MLT⁻²].','e की घात विमाहीन है, अतः α = kθ/z = [ML²T⁻²]/[L] = [MLT⁻²]।')},
+    {tp:'sig',q:E('The number of significant figures in 0.06900 is:','0.06900 में सार्थक अंकों की संख्या है:'),o:['2','3','5','4'],c:3,
+      s:E('Leading zeros do not count; trailing zeros after the decimal do: 6, 9, 0, 0 → 4.','आरंभ के शून्य नहीं गिने जाते; दशमलव के बाद अंत के शून्य गिने जाते हैं: 6, 9, 0, 0 → 4।')},
+    {tp:'sig',q:E('The sides of a rectangle are 2.5 cm and 1.25 cm. Its area, to the correct significant figures, is:','एक आयत की भुजाएँ 2.5 cm और 1.25 cm हैं। सही सार्थक अंकों में इसका क्षेत्रफल है:'),o:['3.125 cm²','3.13 cm²','3.1 cm²','3 cm²'],c:2,
+      s:E('2.5 × 1.25 = 3.125. The answer keeps the fewest significant figures (2.5 has two): 3.1 cm².','2.5 × 1.25 = 3.125। उत्तर में सबसे कम सार्थक अंक रहते हैं (2.5 में दो): 3.1 cm²।')},
+    {tp:'err',q:E('V = (100 ± 5) V and I = (10 ± 0.2) A. The percentage error in R = V/I is:','V = (100 ± 5) V तथा I = (10 ± 0.2) A है। R = V/I में प्रतिशत त्रुटि है:'),o:['7%','3%','5%','10%'],c:0,
+      s:E('ΔR/R = ΔV/V + ΔI/I = 5% + 2% = 7%.','ΔR/R = ΔV/V + ΔI/I = 5% + 2% = 7%।')},
+    {tp:'err',q:E('The mass and the side of a cube are measured with errors of 3% and 2%. The maximum error in its density is:','घन के द्रव्यमान और भुजा के मापन में 3% तथा 2% त्रुटियाँ हैं। घनत्व में अधिकतम त्रुटि है:'),o:['5%','9%','7%','11%'],c:1,
+      s:E('ρ = m/L³, so Δρ/ρ = Δm/m + 3ΔL/L = 3% + 6% = 9%.','ρ = m/L³, अतः Δρ/ρ = Δm/m + 3ΔL/L = 3% + 6% = 9%।')},
+    {tp:'inst',q:E('In a vernier caliper, 1 MSD = 1 mm and 20 vernier divisions equal 19 main scale divisions. Its least count is:','एक वर्नियर कैलिपर्स में 1 MSD = 1 mm तथा 20 वर्नियर भाग 19 मुख्य पैमाना भागों के बराबर हैं। इसका अल्पतमांक है:'),o:['0.1 mm','0.01 mm','0.05 mm','0.5 mm'],c:2,
+      s:E('1 VSD = 19/20 mm, so LC = 1 MSD − 1 VSD = 1 − 0.95 = 0.05 mm.','1 VSD = 19/20 mm, अतः LC = 1 MSD − 1 VSD = 1 − 0.95 = 0.05 mm।')},
+    {tp:'inst',q:E('A screw gauge (pitch 0.5 mm, 50 circular divisions) has a zero error of +0.02 mm. The main scale reads 2.5 mm and the 20th circular division is on the line. The corrected reading is:','एक स्क्रू गेज (पिच 0.5 mm, 50 वृत्तीय भाग) की शून्यांक त्रुटि +0.02 mm है। मुख्य पैमाना 2.5 mm तथा 20वाँ वृत्तीय भाग रेखा पर है। संशोधित पाठ्यांक है:'),o:['2.70 mm','2.72 mm','2.66 mm','2.68 mm'],c:3,
+      s:E('LC = 0.5/50 = 0.01 mm. Reading = 2.5 + 20 × 0.01 = 2.70 mm. Corrected = 2.70 − 0.02 = 2.68 mm.','LC = 0.5/50 = 0.01 mm। पाठ्यांक = 2.5 + 20 × 0.01 = 2.70 mm। संशोधित = 2.70 − 0.02 = 2.68 mm।')},
+    {tp:'err',q:E('g is found from T = 2π√(l/g). The length l has a 1% error and the period T a 2% error. Find the percentage error in g.','g को T = 2π√(l/g) से ज्ञात किया जाता है। लंबाई l में 1% तथा आवर्तकाल T में 2% त्रुटि है। g में प्रतिशत त्रुटि ज्ञात कीजिए।'),n:5,
+      s:E('g = 4π²l/T², so Δg/g = Δl/l + 2ΔT/T = 1% + 4% = 5.','g = 4π²l/T², अतः Δg/g = Δl/l + 2ΔT/T = 1% + 4% = 5।')},
+    {tp:'units',q:E('Young\'s modulus of steel is 2 × 10¹¹ N/m². In CGS units it is 2 × 10ⁿ dyne/cm². Find n.','स्टील का यंग प्रत्यास्थता गुणांक 2 × 10¹¹ N/m² है। CGS में यह 2 × 10ⁿ dyne/cm² है। n ज्ञात कीजिए।'),n:12,
+      s:E('1 N/m² = 10⁵ dyne / 10⁴ cm² = 10 dyne/cm². So 2 × 10¹¹ N/m² = 2 × 10¹² dyne/cm², n = 12.','1 N/m² = 10⁵ dyne / 10⁴ cm² = 10 dyne/cm²। अतः 2 × 10¹¹ N/m² = 2 × 10¹² dyne/cm², n = 12।')},
+    {tp:'inst',q:E('A screw gauge has a pitch of 1 mm and 100 circular divisions. Find its least count in micrometres (µm).','एक स्क्रू गेज का पिच 1 mm तथा 100 वृत्तीय भाग हैं। इसका अल्पतमांक माइक्रोमीटर (µm) में ज्ञात कीजिए।'),n:10,
+      s:E('LC = 1 mm / 100 = 0.01 mm = 10 µm.','LC = 1 mm / 100 = 0.01 mm = 10 µm।')},
+    {tp:'err',q:E('The momentum p of a body is measured with a 3% error. Find the percentage error in its kinetic energy K = p²/2m (mass known exactly).','किसी वस्तु के संवेग p के मापन में 3% त्रुटि है। गतिज ऊर्जा K = p²/2m में प्रतिशत त्रुटि ज्ञात कीजिए (द्रव्यमान ठीक-ठीक ज्ञात है)।'),n:6,
+      s:E('ΔK/K = 2Δp/p = 2 × 3% = 6.','ΔK/K = 2Δp/p = 2 × 3% = 6।')},
+    {tp:'dims',q:E('The period of a vibrating drop is T ∝ ρᵃ rᵇ Sᶜ (ρ density, r radius, S surface tension). If b = x/2, find x.','कंपन करती बूँद का आवर्तकाल T ∝ ρᵃ rᵇ Sᶜ है (ρ घनत्व, r त्रिज्या, S पृष्ठ तनाव)। यदि b = x/2 हो, तो x ज्ञात कीजिए।'),n:3,
+      s:E('[T] = [ML⁻³]ᵃ [L]ᵇ [MT⁻²]ᶜ. M: a + c = 0; T: −2c = 1 → c = −½, a = ½; L: −3a + b = 0 → b = 3/2. So x = 3.','[T] = [ML⁻³]ᵃ [L]ᵇ [MT⁻²]ᶜ। M: a + c = 0; T: −2c = 1 → c = −½, a = ½; L: −3a + b = 0 → b = 3/2। अतः x = 3।')}
+  ],
+  neet:[
+    {tp:'units',q:E('Which of these is NOT a fundamental SI unit?','इनमें से कौन मूल SI मात्रक नहीं है?'),o:['ampere','candela','newton','kelvin'],c:2,
+      s:E('The newton (kg·m/s²) is a derived unit.','न्यूटन (kg·m/s²) एक व्युत्पन्न मात्रक है।')},
+    {tp:'units',q:E('1 ångström (Å) is equal to:','1 ऐंग्स्ट्रॉम (Å) बराबर है:'),o:['10⁻⁸ m','10⁻¹⁰ m','10⁻¹² m','10⁻¹⁵ m'],c:1,
+      s:E('1 Å = 10⁻¹⁰ m (10⁻¹⁵ m is a fermi).','1 Å = 10⁻¹⁰ m (10⁻¹⁵ m एक फर्मी है)।')},
+    {tp:'units',q:E('The parsec is a unit of:','पारसेक मात्रक है:'),o:['time','velocity','angle','distance'],c:3,
+      s:E('1 parsec ≈ 3.08 × 10¹⁶ m: a unit of distance.','1 पारसेक ≈ 3.08 × 10¹⁶ m: दूरी का मात्रक।')},
+    {tp:'units',q:E('1 kWh is equal to:','1 kWh बराबर है:'),o:['3.6 × 10⁶ J','3.6 × 10³ J','3.6 × 10⁵ J','1000 J'],c:0,
+      s:E('1 kWh = 1000 W × 3600 s = 3.6 × 10⁶ J.','1 kWh = 1000 W × 3600 s = 3.6 × 10⁶ J।')},
+    {tp:'dims',q:E('The dimensional formula of pressure is:','दाब का विमीय सूत्र है:'),o:['[MLT⁻²]','[ML⁻¹T⁻²]','[ML²T⁻²]','[ML⁻²T⁻²]'],c:1,
+      s:E('P = F/A = [MLT⁻²]/[L²] = [ML⁻¹T⁻²].','P = F/A = [MLT⁻²]/[L²] = [ML⁻¹T⁻²]।')},
+    {tp:'dims',q:E('Which of these is dimensionless?','इनमें से कौन विमाहीन है?'),o:['stress','force constant','angular velocity','strain'],c:3,
+      s:E('Strain = change in length / length: no dimensions.','विकृति = लंबाई में परिवर्तन / लंबाई: विमाहीन।')},
+    {tp:'dims',q:E('Which pair has the same dimensions?','किस युग्म की विमाएँ समान हैं?'),o:['Planck\'s constant and angular momentum','Force and work','Momentum and energy','Pressure and force'],c:0,
+      s:E('Both are [ML²T⁻¹].','दोनों [ML²T⁻¹] हैं।')},
+    {tp:'dims',q:E('The dimensions of surface tension are:','पृष्ठ तनाव की विमाएँ हैं:'),o:['[MLT⁻²]','[ML⁻¹T⁻²]','[MT⁻²]','[MT⁻¹]'],c:2,
+      s:E('S = force/length = [MLT⁻²]/[L] = [MT⁻²].','S = बल/लंबाई = [MLT⁻²]/[L] = [MT⁻²]।')},
+    {tp:'dims',q:E('E is energy and h is Planck\'s constant. E/h has the dimensions of:','E ऊर्जा तथा h प्लांक नियतांक है। E/h की विमा किसके समान है?'),o:['velocity','frequency','momentum','time'],c:1,
+      s:E('E = hν, so E/h = ν: frequency, [T⁻¹].','E = hν, अतः E/h = ν: आवृत्ति, [T⁻¹]।')},
+    {tp:'dims',q:E('From Stokes\' law F = 6πηrv, the dimensions of the coefficient of viscosity η are:','स्टोक्स के नियम F = 6πηrv से श्यानता गुणांक η की विमाएँ हैं:'),o:['[ML⁻¹T⁻¹]','[MLT⁻¹]','[ML⁻²T⁻¹]','[ML⁻¹T⁻²]'],c:0,
+      s:E('η = F/(rv) = [MLT⁻²]/([L][LT⁻¹]) = [ML⁻¹T⁻¹].','η = F/(rv) = [MLT⁻²]/([L][LT⁻¹]) = [ML⁻¹T⁻¹]।')},
+    {tp:'sig',q:E('The number of significant figures in 2.0500 is:','2.0500 में सार्थक अंकों की संख्या है:'),o:['3','4','5','2'],c:2,
+      s:E('All five digits count: zeros between digits and trailing zeros after the decimal are significant.','पाँचों अंक गिने जाते हैं: अंकों के बीच के शून्य और दशमलव के बाद अंत के शून्य सार्थक हैं।')},
+    {tp:'sig',q:E('The number of significant figures in 3.0 × 10⁵ is:','3.0 × 10⁵ में सार्थक अंकों की संख्या है:'),o:['1','6','5','2'],c:3,
+      s:E('Only the digits before the power of ten count: 3 and 0 → 2.','केवल दस की घात से पहले के अंक गिने जाते हैं: 3 और 0 → 2।')},
+    {tp:'sig',q:E('12.11 + 18.0 + 1.013, to the correct significant figures, is:','12.11 + 18.0 + 1.013 सही सार्थक अंकों में है:'),o:['31.123','31.12','31.1','31'],c:2,
+      s:E('Sum = 31.123. In addition, keep the fewest decimal places (18.0 has one): 31.1.','योग = 31.123। जोड़ में सबसे कम दशमलव स्थान रहते हैं (18.0 में एक): 31.1।')},
+    {tp:'err',q:E('The side of a square is measured with a 2% error. The error in its area is:','एक वर्ग की भुजा 2% त्रुटि से मापी गई। इसके क्षेत्रफल में त्रुटि है:'),o:['2%','4%','1%','8%'],c:1,
+      s:E('A = L², so ΔA/A = 2ΔL/L = 4%.','A = L², अतः ΔA/A = 2ΔL/L = 4%।')},
+    {tp:'err',q:E('A = 5.0 ± 0.1 and B = 3.0 ± 0.1. Then A − B is:','A = 5.0 ± 0.1 तथा B = 3.0 ± 0.1 है। तब A − B है:'),o:['2.0 ± 0','2.0 ± 0.1','2.0 ± 0.2','2.0 ± 0.05'],c:2,
+      s:E('In subtraction too, absolute errors add: 0.1 + 0.1 = 0.2.','घटाने में भी निरपेक्ष त्रुटियाँ जुड़ती हैं: 0.1 + 0.1 = 0.2।')},
+    {tp:'err',q:E('Three readings are 2.4 s, 2.6 s and 2.5 s. The mean absolute error is about:','तीन पाठ्यांक 2.4 s, 2.6 s तथा 2.5 s हैं। माध्य निरपेक्ष त्रुटि लगभग है:'),o:['0.07 s','0.1 s','0.05 s','0.2 s'],c:0,
+      s:E('Mean = 2.5 s. Absolute errors: 0.1, 0.1, 0. Mean = 0.2/3 ≈ 0.07 s.','माध्य = 2.5 s। निरपेक्ष त्रुटियाँ: 0.1, 0.1, 0। माध्य = 0.2/3 ≈ 0.07 s।')},
+    {tp:'err',q:E('For Z = A⁴B^(1/3)/(C·D^(3/2)), the relative error ΔZ/Z is:','Z = A⁴B^(1/3)/(C·D^(3/2)) के लिए आपेक्षिक त्रुटि ΔZ/Z है:'),o:['4ΔA/A + ⅓ΔB/B − ΔC/C − (3/2)ΔD/D','4ΔA/A + ⅓ΔB/B + ΔC/C + (3/2)ΔD/D','ΔA/A + ΔB/B + ΔC/C + ΔD/D','4ΔA/A + 3ΔB/B + ΔC/C + (2/3)ΔD/D'],c:1,
+      s:E('Each relative error is multiplied by its power, and all of them add (never subtract).','हर आपेक्षिक त्रुटि अपनी घात से गुणा होती है, और सभी जुड़ती हैं (कभी घटती नहीं)।')},
+    {tp:'inst',q:E('In a vernier caliper, 1 MSD = 0.5 mm and 10 vernier divisions equal 9 main scale divisions. Its least count is:','एक वर्नियर कैलिपर्स में 1 MSD = 0.5 mm तथा 10 वर्नियर भाग 9 मुख्य पैमाना भागों के बराबर हैं। इसका अल्पतमांक है:'),o:['0.5 mm','0.1 mm','0.05 mm','0.01 mm'],c:2,
+      s:E('LC = 1 MSD / number of VSD = 0.5/10 = 0.05 mm.','LC = 1 MSD / वर्नियर भागों की संख्या = 0.5/10 = 0.05 mm।')},
+    {tp:'inst',q:E('A screw gauge has pitch 0.5 mm and 50 circular divisions. The main scale reads 4 mm and the 12th circular division is on the line. The reading is:','एक स्क्रू गेज का पिच 0.5 mm तथा 50 वृत्तीय भाग हैं। मुख्य पैमाना 4 mm तथा 12वाँ वृत्तीय भाग रेखा पर है। पाठ्यांक है:'),o:['4.12 mm','4.06 mm','4.24 mm','4.012 mm'],c:0,
+      s:E('LC = 0.5/50 = 0.01 mm. Reading = 4 + 12 × 0.01 = 4.12 mm.','LC = 0.5/50 = 0.01 mm। पाठ्यांक = 4 + 12 × 0.01 = 4.12 mm।')},
+    {tp:'inst',q:E('A vernier caliper has a positive zero error of 0.02 cm. A rod reads 3.25 cm. Its true length is:','एक वर्नियर कैलिपर्स की धनात्मक शून्यांक त्रुटि 0.02 cm है। एक छड़ का पाठ्यांक 3.25 cm है। इसकी वास्तविक लंबाई है:'),o:['3.27 cm','3.25 cm','3.21 cm','3.23 cm'],c:3,
+      s:E('True = observed − zero error = 3.25 − 0.02 = 3.23 cm.','वास्तविक = प्रेक्षित − शून्यांक त्रुटि = 3.25 − 0.02 = 3.23 cm।')}
+  ]}
+};
 })();
