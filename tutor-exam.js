@@ -444,6 +444,33 @@ window.PhysicaExam={
   {t:'neet',sim:'capacitor',q:'If the distance between the plates of a parallel-plate capacitor is halved, its capacitance:',o:['halves','doubles','stays the same','becomes four times'],c:1,a:'C = ε₀A/d.'},
   {t:'neet',sim:'capacitor-network',q:'For capacitors in series, which is the same for each?',o:['potential difference','charge','energy','capacitance'],c:1,a:'The same charge flows onto each in series.'},
   {t:'neet',sim:'cap-energy',q:'The energy stored in a capacitor of capacitance C with charge Q is:',o:['Q²/C','Q²/2C','QC/2','2Q²/C'],c:1,a:'U = Q²/2C = ½CV².'}
+],
+'Current Electricity':[
+  {t:'1',sim:'electron-drift',q:'Define drift velocity.',a:'The small average velocity with which free electrons move through a conductor, opposite to the field, when a potential difference is applied.'},
+  {t:'1',q:'What is the SI unit of resistivity?',a:'Ohm metre (Ω·m).'},
+  {t:'1',sim:'resistance-temperature',q:'How does the resistance of a metal change when it is heated?',a:'It increases: the ions vibrate more and electrons collide more often.'},
+  {t:'1',sim:'kirchhoff-loops',q:'State Kirchhoff\'s junction rule.',a:'The total current entering a junction equals the total current leaving it (conservation of charge).'},
+  {t:'1',sim:'wheatstone',q:'Write the balance condition of a Wheatstone bridge.',a:'P/Q = R/S; then no current flows through the galvanometer.'},
+  {t:'3',sim:'electron-drift',q:'Derive the relation I = neAv(d).',a:'In time t the electrons move v(d)t along a wire of area A.\nThe number passing a section = n × A × v(d)t, carrying charge neAv(d)t.\nI = charge/time = neAv(d).'},
+  {t:'3',q:'Using the drift of electrons, derive Ohm\'s law and the expression for resistivity.',a:'An electron accelerates at eE/m between collisions, with average time τ: v(d) = eEτ/m.\nJ = I/A = nev(d) = (ne²τ/m)E = σE.\nWith E = V/L and J = I/A: V = I(mL/(ne²τA)) = IR.\nResistivity ρ = m/(ne²τ).'},
+  {t:'3',sim:'resistor-network',q:'Find the equivalent resistance of 2 Ω, 3 Ω and 6 Ω joined (a) in series (b) in parallel.',a:'(a) Series: 2 + 3 + 6 = 11 Ω.\n(b) Parallel: 1/R = 1/2 + 1/3 + 1/6 = 1, so R = 1 Ω.'},
+  {t:'3',sim:'internal-resistance',q:'A cell of EMF 2 V and internal resistance 0.5 Ω is joined to a 3.5 Ω resistor. Find the current and the terminal voltage.',a:'I = E/(R + r) = 2/4 = 0.5 A.\nV = E − Ir = 2 − 0.25 = 1.75 V (also = IR = 0.5 × 3.5).'},
+  {t:'3',q:'A wire is stretched to twice its length. How does its resistance change?',a:'The volume stays the same, so the area halves.\nR = ρL/A becomes ρ(2L)/(A/2) = 4R.'},
+  {t:'3',q:'A bulb is rated 100 W, 220 V. Find its resistance and the current it draws.',a:'R = V²/P = 48 400/100 = 484 Ω.\nI = P/V = 100/220 ≈ 0.45 A.'},
+  {t:'5',sim:'wheatstone',q:'State Kirchhoff\'s rules and use them to derive the balance condition of a Wheatstone bridge.',a:'Junction rule: ΣI at a junction = 0 (charge conservation).\nLoop rule: the sum of potential changes round any closed loop = 0 (energy conservation).\nBridge: arms P, Q, R, S with a galvanometer between B and D. At balance I(g) = 0, so P and Q carry I₁, R and S carry I₂, and B and D are at the same potential.\nLoop ABDA: I₁P − I₂R = 0. Loop BCDB: I₁Q − I₂S = 0.\nDivide: P/Q = R/S.'},
+  {t:'5',sim:'potentiometer',q:'Explain how a potentiometer compares the EMFs of two cells and measures the internal resistance of a cell.',a:'A steady current through a long uniform wire gives a fall of potential proportional to length: V = kl.\nComparing EMFs: a cell balances (no current in the galvanometer) at length l. E₁/E₂ = l₁/l₂.\nInternal resistance: balance the cell alone at l₁ (gives E), then with a resistor R across it at l₂ (gives V).\nr = R(E − V)/V = R(l₁ − l₂)/l₂.\nAt balance it draws no current, so it measures the true EMF, unlike a voltmeter.'},
+  {t:'5',sim:'cells-combination',q:'Find the current when (a) n identical cells (E, r) are in series and (b) m such cells are in parallel, with an external resistance R. When is each arrangement better?',a:'(a) Series: EMF nE, resistance nr. I = nE/(R + nr). Best when R ≫ r (I ≈ nE/R).\n(b) Parallel: EMF E, resistance r/m. I = E/(R + r/m) = mE/(mR + r). Best when R ≪ r (I ≈ mE/r).'},
+  {t:'jee',sim:'resistor-network',q:'Twelve equal resistors R form the edges of a cube. The resistance between two opposite corners is:',o:['R','5R/6','3R/4','7R/12'],c:1,a:'By symmetry the current splits 3 ways, then 6 ways, then 3 ways: R/3 + R/6 + R/3 = 5R/6.'},
+  {t:'jee',sim:'internal-resistance',q:'Show that a cell gives the most power to an external resistor R when R equals its internal resistance r, and find this power.',a:'P = I²R = E²R/(R + r)².\ndP/dR = 0 gives (R + r)² − 2R(R + r) = 0, so R = r.\nP(max) = E²r/(2r)² = E²/(4r). (The efficiency is then only 50%.)'},
+  {t:'jee',sim:'wheatstone',q:'In a metre bridge with 2 Ω in the left gap, balance is found at 40 cm from the left end. The unknown resistance in the right gap is:',o:['1.33 Ω','3 Ω','2 Ω','5 Ω'],c:1,a:'2/X = 40/60, so X = 3 Ω.'},
+  {t:'jee',sim:'electron-drift',q:'A current flows through a wire whose cross-section narrows. In the narrow part, the drift speed is:',o:['smaller','larger','the same','zero'],c:1,a:'I = neAv(d) is the same everywhere, so smaller A means larger v(d).'},
+  {t:'jee',sim:'resistance-temperature',q:'A wire has a resistance of 10 Ω at 0 °C and α = 0.004 /°C. Find its resistance at 100 °C and the temperature at which its resistance doubles.',a:'R = R₀(1 + αT) = 10(1 + 0.4) = 14 Ω.\nDouble: 1 + αT = 2, so T = 1/α = 250 °C.'},
+  {t:'neet',q:'The SI unit of electric current is the:',o:['volt','ampere','ohm','coulomb'],c:1,a:'1 A = 1 C/s.'},
+  {t:'neet',q:'The resistance of a wire is proportional to its:',o:['area','length','diameter','mass'],c:1,a:'R = ρL/A.'},
+  {t:'neet',q:'The resistivity of a wire depends on its:',o:['length','area','material and temperature','shape'],c:2,a:'Resistivity is a property of the material.'},
+  {t:'neet',sim:'resistor-network',q:'Which combination of resistors gives the smallest resistance?',o:['all in series','all in parallel','two in series, one parallel','it does not matter'],c:1,a:'In parallel the total is smaller than the smallest one.'},
+  {t:'neet',sim:'kirchhoff-loops',q:'Kirchhoff\'s loop rule is based on the conservation of:',o:['charge','energy','momentum','mass'],c:1,a:'The total potential change round a loop is zero.'},
+  {t:'neet',q:'The commercial unit of electrical energy is:',o:['watt','joule','kilowatt-hour','volt-ampere'],c:2,a:'1 kWh = 3.6 × 10⁶ J (one "unit").'}
 ]};
 
 window.PhysicaMockBank={
@@ -1102,6 +1129,47 @@ window.PhysicaMockBank={
     {tp:'diel',q:'The energy stored in a capacitor is:',o:['CV²','½CV²','2CV²','CV'],c:1,s:'U = ½CV².'},
     {tp:'diel',q:'The energy stored per unit volume in an electric field E is:',o:['ε₀E²','½ε₀E²','ε₀E','½ε₀E'],c:1,s:'u = ½ε₀E².'},
     {tp:'diel',q:'A dielectric placed in an electric field:',o:['increases the field inside it','reduces the field inside it','does not affect the field','reverses the field'],c:1,s:'Its polarisation charges set up an opposing field.'}
+  ]},
+'Current Electricity':{
+  topics:{ohm:'Current, drift and Ohm\'s law',res:'Resistance and combinations',cell:'Cells, EMF and power',kir:'Kirchhoff, bridge and potentiometer'},
+  jee:[
+    {tp:'ohm',q:'A current of 1.6 A flows in a wire. The number of electrons passing a point each second is:',o:['10¹⁸','10¹⁹','1.6 × 10¹⁹','6.25 × 10¹⁸'],c:1,s:'n = I/e = 1.6/1.6 × 10⁻¹⁹ = 10¹⁹.'},
+    {tp:'res',q:'A wire is stretched to n times its length (volume constant). Its resistance becomes:',o:['n times','n² times','1/n times','√n times'],c:1,s:'L × n and A ÷ n, so R × n².'},
+    {tp:'res',q:'Three 3 Ω resistors can be combined in different ways. Which value is NOT possible?',o:['1 Ω','4.5 Ω','6 Ω','9 Ω'],c:2,s:'Possible: 9 (series), 1 (parallel), 4.5 (two parallel + one series), 2 (two series in parallel with one).'},
+    {tp:'res',q:'Twelve equal resistors R are on the edges of a cube. The resistance across a body diagonal is:',o:['R','5R/6','3R/4','7R/12'],c:1,s:'R/3 + R/6 + R/3.'},
+    {tp:'cell',q:'A cell (EMF 12 V, internal resistance 1 Ω) drives current through a 5 Ω resistor. The terminal voltage is:',o:['12 V','10 V','2 V','11 V'],c:1,s:'I = 12/6 = 2 A; V = 12 − 2 × 1 = 10 V.'},
+    {tp:'cell',q:'The most power a cell of EMF 6 V and internal resistance 2 Ω can give to an external resistor is:',o:['18 W','9 W','4.5 W','3 W'],c:2,s:'P(max) = E²/4r = 36/8 = 4.5 W (when R = 2 Ω).'},
+    {tp:'kir',q:'A metre bridge with 2 Ω in the left gap balances at 40 cm. The unknown resistance is:',o:['3 Ω','1.33 Ω','2 Ω','5 Ω'],c:0,s:'2/X = 40/60.'},
+    {tp:'kir',q:'On a potentiometer, two cells balance at 300 cm and 200 cm. The ratio of their EMFs is:',o:['2 : 3','3 : 2','1 : 1','9 : 4'],c:1,s:'E₁/E₂ = l₁/l₂.'},
+    {tp:'ohm',q:'Current flows through a wire that becomes thinner. In the thinner part, the drift speed is:',o:['smaller','larger','the same','zero'],c:1,s:'v(d) = I/(neA).'},
+    {tp:'res',q:'A wire has α = 0.004 /°C. Its resistance doubles (from its value at 0 °C) at:',o:['100 °C','250 °C','400 °C','500 °C'],c:1,s:'1 + αT = 2, so T = 1/α = 250 °C.'},
+    {tp:'res',q:'Resistors of 2 Ω, 3 Ω and 6 Ω are joined in parallel. Find the equivalent resistance in ohms.',n:1,s:'1/R = 1/2 + 1/3 + 1/6 = 1.'},
+    {tp:'cell',q:'A cell of EMF 2 V and internal resistance 0.5 Ω is joined to a 3.5 Ω resistor. Find the current in mA.',n:500,s:'I = 2/4 = 0.5 A.'},
+    {tp:'ohm',q:'Find the power, in watts, used by a 10 Ω resistor carrying 2 A.',n:40,s:'P = I²R = 4 × 10 = 40 W.'},
+    {tp:'kir',q:'A cell balances at 100 cm on a potentiometer, and at 80 cm when an 8 Ω resistor is joined across it. Find its internal resistance in ohms.',n:2,s:'r = R(l₁ − l₂)/l₂ = 8 × 20/80 = 2 Ω.'},
+    {tp:'res',q:'A 10 Ω wire is stretched to twice its length. Find its new resistance in ohms.',n:40,s:'R × 2² = 40 Ω.'}
+  ],
+  neet:[
+    {tp:'ohm',q:'Electric current is:',o:['charge × time','rate of flow of charge','charge per unit area','work per unit charge'],c:1,s:'I = dq/dt.'},
+    {tp:'ohm',q:'The drift speed of electrons in a typical wire is of the order of:',o:['3 × 10⁸ m/s','10⁶ m/s','10⁻⁴ m/s (fractions of a mm/s)','1 m/s'],c:2,s:'Very slow; the signal travels fast, the electrons do not.'},
+    {tp:'ohm',q:'Ohm\'s law states that, at constant temperature:',o:['V ∝ I','V ∝ 1/I','V ∝ I²','V = constant'],c:0,s:'V = IR.'},
+    {tp:'ohm',q:'A conductor that obeys Ohm\'s law has a V-I graph that is:',o:['a curve','a straight line through the origin','a horizontal line','a circle'],c:1,s:'Its resistance stays constant.'},
+    {tp:'ohm',q:'The SI unit of resistivity is:',o:['Ω','Ω/m','Ω·m','Ω·m²'],c:2,s:'ρ = RA/L.'},
+    {tp:'res',q:'For resistors in series, the total resistance is:',o:['the sum','the reciprocal of the sum of reciprocals','the product','smaller than the smallest'],c:0,s:'R = R₁ + R₂ + ...'},
+    {tp:'res',q:'For resistors in parallel:',o:['R = R₁ + R₂','1/R = 1/R₁ + 1/R₂','R = R₁R₂','R = R₁ − R₂'],c:1,s:'The total is less than the smallest.'},
+    {tp:'res',q:'The resistance of a wire is:',o:['ρA/L','ρL/A','ρLA','L/(ρA)'],c:1,s:'R = ρL/A.'},
+    {tp:'res',q:'When a metal wire is heated, its resistance:',o:['decreases','increases','stays the same','becomes zero'],c:1,s:'More collisions with vibrating ions.'},
+    {tp:'res',q:'When a semiconductor is heated, its resistance:',o:['increases','decreases','stays the same','becomes infinite'],c:1,s:'More charge carriers are freed.'},
+    {tp:'cell',q:'The terminal voltage of a cell delivering current I is:',o:['E + Ir','E − Ir','E','Ir'],c:1,s:'Some voltage is lost inside the cell.'},
+    {tp:'cell',q:'The EMF of a cell equals its terminal voltage when:',o:['a large current flows','no current flows','the cell is short-circuited','R = r'],c:1,s:'Then Ir = 0.'},
+    {tp:'cell',q:'The power used by a resistor is:',o:['IR','I²R','I/R','IR²'],c:1,s:'P = VI = I²R = V²/R.'},
+    {tp:'cell',q:'1 kWh is equal to:',o:['3.6 × 10⁶ J','1000 J','3600 J','3.6 × 10³ J'],c:0,s:'1000 W × 3600 s.'},
+    {tp:'cell',q:'A cell gives the most power to an external resistor when:',o:['R = 0','R = r','R is very large','R = 2r'],c:1,s:'Maximum power transfer theorem.'},
+    {tp:'kir',q:'Kirchhoff\'s junction rule comes from the conservation of:',o:['energy','charge','momentum','mass'],c:1,s:'Charge cannot pile up at a junction.'},
+    {tp:'kir',q:'Kirchhoff\'s loop rule comes from the conservation of:',o:['charge','energy','momentum','current'],c:1,s:'Net potential change round a loop is zero.'},
+    {tp:'kir',q:'A Wheatstone bridge with arms P, Q, R, S is balanced when:',o:['P/Q = R/S','P + Q = R + S','PQ = RS','P = S'],c:0,s:'Then no current flows through the galvanometer.'},
+    {tp:'kir',q:'A potentiometer measures EMF better than a voltmeter because it:',o:['has a low resistance','draws no current from the cell at balance','is more sensitive to heat','uses AC'],c:1,s:'At balance no current flows, so there is no Ir drop.'},
+    {tp:'kir',q:'A metre bridge works on the principle of the:',o:['potentiometer','Wheatstone bridge','galvanometer','ammeter'],c:1,s:'It is a Wheatstone bridge using a 1 m wire.'}
   ]}
 };
 })();
