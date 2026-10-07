@@ -778,3 +778,5 @@ body.mock-on{overflow:hidden}body.mock-on>:not(.mock){display:none!important}
 .mock-rv{border-left:4px solid var(--line2);padding:4px 0 4px 12px;margin:0 0 16px;break-inside:avoid}.mock-rv.c{border-color:#59e08f}.mock-rv.w{border-color:#ff7b72}.mock-rv p{margin:0 0 6px}.mock-rv .mock-text{font-size:15px}.mock-sol{color:var(--muted);font-size:14px;white-space:pre-line}
 .tutor-mock{display:grid;gap:6px;justify-items:start;padding:12px 14px;margin:10px 0;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.05)}.tutor-mock p{margin:0}
 @media print{body.mock-on{overflow:visible}.mock{position:static;overflow:visible;background:#fff;color:#000;padding:0}.mock *{color:#000!important;background:transparent!important}.mock-noprint{display:none!important}.mock-table th,.mock-table td,.mock-stats div{border-color:#999!important}}
+.fig{display:block;width:100%;max-width:360px;height:auto;margin:4px 0 14px;color:inherit;font-family:inherit}
+.tutor-q .fig{max-width:320px}

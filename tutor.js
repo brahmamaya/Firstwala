@@ -376,7 +376,7 @@ function exam(){if(!window.PhysicaExam){body.append(el('p','tutor-loading','Load
     const mark=()=>q.classList.toggle('got',done[key(n)]===1);mark();
     const say=t=>{hush();speak(t,null,'en')};
     if(synth){const r=btn('tutor-read','🔊',()=>say(`${x.q} ${x.o?x.o.map((o,i)=>`${i+1}: ${o}.`).join(' '):''}`));r.title='Read this question';r.setAttribute('aria-label','Read question aloud');ttl.append(r)}
-    q.append(ttl);
+    q.append(ttl);{const g=window.PhysicaFig?.(x.fig);if(g)q.append(g)}
     if(x.o){const opts=el('div','tutor-opts');x.o.forEach((o,i)=>opts.append(btn('tutor-opt',`${i+1}. ${o}`,()=>{if(q.dataset.done)return;q.dataset.done='1';opts.children[x.c].classList.add('right');if(i!==x.c)opts.children[i].classList.add('wrong');ans.hidden=false;done[key(n)]=i===x.c?1:0;save();mark();paint();say(`${i===x.c?'Correct!':'Not quite.'} ${x.a}`)})));q.append(opts,ans)}
     else{const grade=el('span','tutor-chips'),show=btn('tutor-mini','Show answer',()=>{ans.hidden=false;show.hidden=true;grade.hidden=false;say(x.a)});grade.hidden=true;
       grade.append(btn('tutor-mini','✓ Got it',()=>{done[key(n)]=1;save();mark();paint()}),btn('tutor-mini','↺ Revise again',()=>{done[key(n)]=0;save();mark();paint()}));
