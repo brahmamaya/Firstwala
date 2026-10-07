@@ -109,6 +109,6 @@ INT['screw-gauge']={
   const gap=p.gap-sz;text(c,p.obj==='none'?'SPINDLE FREE':gap>.005?'GAP · CLOSE TO THE OBJECT':'IN CONTACT ✓',480,346,gap>.005&&p.obj!=='none'?'#ffc36b':'#42d9ca',10,'left',700);text(c,`${f(r.reading,2)} mm`,480,366,'#e9f6ff',17,'left',700);
   text(c,`${f(r.psr,1)} + ${r.n} × ${f(r.lc,2)} mm`,480,384,'#8ca6b9',10,'left',600);text(c,`zero correction: ${p.zero>0?'−':'+'}${f(Math.abs(p.zero),2)} mm → ${f(r.reading-p.zero,2)} mm`,480,398,'#8ca6b9',9.5,'left',600)},
  down(q,p){const b=INT['screw-gauge'].btn;if(b&&q.x>=b.x&&q.x<=b.x+b.w&&q.y>=b.y&&q.y<=b.y+b.h){p.gap=SOBJ[p.obj][1];return}sDrag={x:q.x,y:q.y,g:p.gap}},
- move(q,p){if(!sDrag)return;const pitch=Number(p.pitch),lc=pitch/50,sz=SOBJ[p.obj][1];const g=sDrag.g+(q.x-sDrag.x)/G.K*.5-(q.y-sDrag.y)/4*lc;p.gap=Math.round(clamp(g,sz,25)/lc)*lc;p.gap=Number(p.gap.toFixed(2))},
+ move(q,p){if(!sDrag)return;const pitch=Number(p.pitch)||.5,lc=pitch/50,sz=SOBJ[p.obj][1];const g=sDrag.g+(q.x-sDrag.x)/G.K*.5-(q.y-sDrag.y)/4*lc;p.gap=Math.round(clamp(g,sz,25)/lc)*lc;p.gap=Number(p.gap.toFixed(2))},
  up(q,p){sDrag=null}};
 })();
