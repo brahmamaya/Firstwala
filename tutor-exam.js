@@ -660,6 +660,33 @@ window.PhysicaExam={
   {t:'neet',sim:'fringe-width',q:'If the slit separation in Young\'s experiment is doubled, the fringe width:',o:['doubles','halves','stays the same','becomes four times'],c:1,a:'β = λD/d.'},
   {t:'neet',q:'Which of these cannot be polarised?',o:['light','radio waves','sound waves in air','X-rays'],c:2,a:'Sound in air is longitudinal.'},
   {t:'neet',q:'Light from two separate bulbs does not give an interference pattern because the bulbs are:',o:['too bright','not coherent','too far apart','of different sizes'],c:1,a:'Their phase difference changes randomly and very quickly.'}
+],
+'Dual Nature of Radiation and Matter':[
+  {t:'1',sim:'photoelectric',q:'Define the work function of a metal.',a:'The least energy needed to remove an electron from the surface of the metal.'},
+  {t:'1',sim:'photoelectric',q:'What is threshold frequency?',a:'The lowest frequency of light that can eject electrons from a given metal: ν₀ = φ/h. Below it there is no emission, however bright the light.'},
+  {t:'1',sim:'debroglie',q:'Write the de Broglie wavelength of a particle.',a:'λ = h/p = h/(mv).'},
+  {t:'1',sim:'photocell-iv',q:'How does the photocurrent change when the intensity of light is increased (frequency fixed)?',a:'It increases in proportion to the intensity: more photons eject more electrons. The stopping potential does not change.'},
+  {t:'1',sim:'stopping-potential',q:'How does the stopping potential depend on the frequency of the light?',a:'It increases linearly with frequency: eV₀ = hν − φ.'},
+  {t:'3',sim:'photoelectric',q:'Write Einstein\'s photoelectric equation and use it to explain the main features of the photoelectric effect.',a:'K(max) = hν − φ.\nEach photon gives all its energy to one electron, so:\n1. No emission below ν₀ = φ/h, whatever the intensity.\n2. K(max) rises with frequency, not with intensity.\n3. More intense light has more photons, so more electrons (larger current).\n4. Emission is instant: one photon is enough.'},
+  {t:'3',sim:'stopping-potential',q:'Light of photon energy 4 eV falls on a metal of work function 2 eV. Find K(max), the stopping potential and the threshold wavelength (hc = 1240 eV·nm).',a:'K(max) = 4 − 2 = 2 eV.\nStopping potential V₀ = 2 V.\nλ₀ = hc/φ = 1240/2 = 620 nm.'},
+  {t:'3',sim:'debroglie',q:'Show that the de Broglie wavelength of an electron accelerated through V volts is about 1.227/√V nm, and find it for 100 V.',a:'eV = p²/2m, so p = √(2meV) and λ = h/√(2meV).\nPutting in h, m and e: λ ≈ 1.227/√V nm.\nAt 100 V: λ ≈ 0.123 nm, about the spacing of atoms in a crystal.'},
+  {t:'3',sim:'electron-diffraction',q:'What did the Davisson-Germer experiment show?',a:'Electrons scattered from a nickel crystal gave a strong peak at certain angles, just like X-ray diffraction.\nThe measured wavelength (0.165 nm at 54 V) matched the de Broglie value, proving that electrons behave as waves.'},
+  {t:'3',q:'Write the energy and momentum of a photon. Find them for light of wavelength 600 nm (h = 6.6 × 10⁻³⁴ J·s).',a:'E = hν = hc/λ; p = h/λ = E/c.\nE = 6.6 × 10⁻³⁴ × 3 × 10⁸/6 × 10⁻⁷ = 3.3 × 10⁻¹⁹ J (about 2.1 eV).\np = 6.6 × 10⁻³⁴/6 × 10⁻⁷ = 1.1 × 10⁻²⁷ kg·m/s.'},
+  {t:'3',sim:'stopping-potential',q:'Sketch the graph of stopping potential against frequency. What do its slope and intercept give?',a:'From eV₀ = hν − φ: V₀ = (h/e)ν − φ/e, a straight line.\nSlope = h/e (the same for every metal) - this gives Planck\'s constant.\nIt meets the frequency axis at the threshold frequency ν₀; the intercept on the V₀ axis is −φ/e.'},
+  {t:'5',sim:'photoelectric',q:'State the laws of photoelectric emission. Why does the wave theory of light fail to explain them, and how does Einstein\'s photon theory succeed?',a:'Laws: (1) there is a threshold frequency; (2) K(max) depends on frequency, not intensity; (3) the current is proportional to intensity; (4) emission is instant.\nWave theory: energy would depend on intensity, any frequency would work given time, and dim light would need a delay to build up energy - all wrong.\nEinstein: light comes as photons of energy hν; one photon gives its energy to one electron: K(max) = hν − φ. This explains all four laws.'},
+  {t:'5',sim:'electron-diffraction',q:'Describe the Davisson-Germer experiment and show how it confirms de Broglie\'s hypothesis.',a:'A beam of electrons from a heated filament is accelerated through a voltage V and strikes a nickel crystal; a detector measures the scattered electrons at different angles.\nAt 54 V a sharp peak appeared at 50°.\nTreating the crystal planes as a grating (spacing 0.215 nm): λ = d sin θ ≈ 0.165 nm.\nde Broglie: λ = 1.227/√54 ≈ 0.167 nm. The agreement shows that electrons have wave properties.'},
+  {t:'5',sim:'photocell-iv',q:'Draw and explain the photocurrent-voltage graphs of a photocell (a) for different intensities at one frequency (b) for different frequencies at one intensity.',a:'(a) Higher intensity gives a higher saturation current, but all curves meet the voltage axis at the same stopping potential −V₀ (K(max) does not depend on intensity).\n(b) Higher frequency gives a larger stopping potential (curves meet the axis further left), with about the same saturation current for the same number of photons.\nWith positive anode voltage, the current rises to saturation when all emitted electrons are collected.'},
+  {t:'jee',sim:'debroglie',q:'An electron and a proton have the same kinetic energy. The ratio of their de Broglie wavelengths (electron : proton) is about:',o:['1','√(m(p)/m(e)) ≈ 43','m(p)/m(e)','1/43'],c:1,a:'λ = h/√(2mK) ∝ 1/√m, so the lighter electron has the longer wavelength.'},
+  {t:'jee',sim:'stopping-potential',q:'Light of 300 nm gives a stopping potential of 1.8 V and light of 400 nm gives 0.77 V on the same metal. Show how to find Planck\'s constant.',a:'e(V₁ − V₂) = hc(1/λ₁ − 1/λ₂).\n1.6 × 10⁻¹⁹ × 1.03 = h × 3 × 10⁸ × (1/3 − 1/4) × 10⁷.\nh ≈ 1.65 × 10⁻¹⁹/(2.5 × 10¹⁴) ≈ 6.6 × 10⁻³⁴ J·s.'},
+  {t:'jee',q:'How many photons per second does a 100 W source of wavelength 600 nm emit (all power as light)?',a:'Energy per photon = hc/λ = 3.3 × 10⁻¹⁹ J.\nn = 100/3.3 × 10⁻¹⁹ ≈ 3 × 10²⁰ photons per second.'},
+  {t:'jee',sim:'photoelectric',q:'If the frequency of the incident light is doubled, the maximum kinetic energy of the photoelectrons becomes:',o:['exactly double','more than double','less than double','unchanged'],c:1,a:'K\' = 2hν − φ = 2K + φ, which is more than 2K.'},
+  {t:'jee',sim:'debroglie',q:'A proton and an alpha particle are accelerated through the same voltage. The ratio of their de Broglie wavelengths (alpha : proton) is:',o:['1 : 2','1 : 2√2','2√2 : 1','1 : 4'],c:1,a:'λ = h/√(2mqV) ∝ 1/√(mq). Alpha has 4m and 2q: √8 = 2√2 times smaller.'},
+  {t:'neet',sim:'photoelectric',q:'Photoelectric emission begins:',o:['after a delay','instantly','only after heating','only in a vacuum of 1 hour'],c:1,a:'Within about 10⁻⁹ s.'},
+  {t:'neet',sim:'photoelectric',q:'The maximum kinetic energy of photoelectrons depends on:',o:['the intensity of light','the frequency of light','the area of the metal','the time of exposure'],c:1,a:'K(max) = hν − φ.'},
+  {t:'neet',q:'The rest mass of a photon is:',o:['the same as an electron','zero','infinite','h/c'],c:1,a:'A photon is never at rest.'},
+  {t:'neet',q:'The energy of a photon of wavelength 1240 nm is (hc = 1240 eV·nm):',o:['1 eV','12.4 eV','0.1 eV','1240 eV'],c:0,a:'E = 1240/1240 = 1 eV.'},
+  {t:'neet',sim:'debroglie',q:'The de Broglie wavelength of a particle is inversely proportional to its:',o:['mass only','momentum','charge','energy squared'],c:1,a:'λ = h/p.'},
+  {t:'neet',sim:'photocell-iv',q:'The photoelectric current is proportional to the:',o:['frequency of light','intensity of light','wavelength','stopping potential'],c:1,a:'More photons give more photoelectrons.'}
 ]};
 
 window.PhysicaMockBank={
@@ -1646,6 +1673,47 @@ window.PhysicaMockBank={
     {tp:'pol',q:'Brewster\'s law is:',o:['sin i(B) = n','tan i(B) = n','cos i(B) = n','i(B) = n'],c:1,s:'The reflected light is then fully polarised.'},
     {tp:'pol',q:'Unpolarised light passing through one polaroid has its intensity:',o:['unchanged','halved','made zero','doubled'],c:1,s:'Half the vibrations are removed on average.'},
     {tp:'pol',q:'Blue light from the sky (at 90° to the Sun) is partly polarised because of:',o:['refraction','scattering','dispersion','total internal reflection'],c:1,s:'Scattering by air molecules.'}
+  ]},
+'Dual Nature of Radiation and Matter':{
+  topics:{photo:'Photoelectric effect',eq:'Einstein\'s equation and stopping potential',photon:'Photons',matter:'Matter waves'},
+  jee:[
+    {tp:'eq',q:'A metal has work function 2 eV and photons of 5 eV fall on it. The stopping potential is:',o:['2 V','3 V','5 V','7 V'],c:1,s:'eV₀ = 5 − 2.'},
+    {tp:'eq',q:'If the frequency of light is doubled, K(max) of the photoelectrons becomes:',o:['exactly double','less than double','more than double','the same'],c:2,s:'2hν − φ = 2K + φ.'},
+    {tp:'photo',q:'The threshold wavelength for a metal of work function 2.48 eV is (hc = 1240 eV·nm):',o:['400 nm','500 nm','600 nm','300 nm'],c:1,s:'λ₀ = 1240/2.48.'},
+    {tp:'matter',q:'An electron and a proton have the same kinetic energy. λ(electron)/λ(proton) is:',o:['1','√(m(p)/m(e))','m(e)/m(p)','√(m(e)/m(p))'],c:1,s:'λ ∝ 1/√m at fixed K.'},
+    {tp:'matter',q:'An alpha particle and a proton are accelerated through the same voltage. λ(alpha) : λ(proton) is:',o:['1 : 2','1 : 2√2','2 : 1','1 : 4'],c:1,s:'λ ∝ 1/√(mq).'},
+    {tp:'photon',q:'Photons of 250 nm compared with photons of 500 nm have momentum:',o:['half','the same','double','four times'],c:2,s:'p = h/λ.'},
+    {tp:'eq',q:'The slope of the stopping potential against frequency graph is:',o:['h','h/e','e/h','φ/e'],c:1,s:'V₀ = (h/e)ν − φ/e.'},
+    {tp:'photo',q:'The intensity of light is doubled at the same frequency. Then:',o:['the stopping potential doubles','the saturation current doubles and the stopping potential stays the same','both double','neither changes'],c:1,s:'More photons, same energy each.'},
+    {tp:'matter',q:'The de Broglie wavelength of an electron accelerated through 100 V is about:',o:['1.23 nm','0.123 nm','12.3 nm','0.0123 nm'],c:1,s:'1.227/√100 nm.'},
+    {tp:'photon',q:'The energy of a photon of wavelength 620 nm is about (hc = 1240 eV·nm):',o:['1 eV','2 eV','3 eV','6.2 eV'],c:1,s:'1240/620.'},
+    {tp:'eq',q:'Photons of 6.5 eV fall on a metal of work function 2.5 eV. Find K(max) in eV.',n:4,s:'6.5 − 2.5.'},
+    {tp:'photo',q:'Find the threshold wavelength, in nm, for a metal of work function 2 eV (hc = 1240 eV·nm).',n:620,s:'1240/2.'},
+    {tp:'matter',q:'Find the de Broglie wavelength, in pm, of an electron accelerated through 150 V (use λ = 1.227/√V nm).',n:100,s:'1.227/√150 ≈ 0.100 nm = 100 pm.'},
+    {tp:'photon',q:'Find the energy, in eV, of a photon of wavelength 248 nm (hc = 1240 eV·nm).',n:5,s:'1240/248 = 5 eV.'},
+    {tp:'eq',q:'The fastest photoelectrons have K(max) = 3.2 × 10⁻¹⁹ J. Find the stopping potential in volts (e = 1.6 × 10⁻¹⁹ C).',n:2,s:'V₀ = K/e = 2 V.'}
+  ],
+  neet:[
+    {tp:'photo',q:'The photoelectric effect is the emission of:',o:['protons by heating','electrons when light falls on a metal','light by a hot metal','neutrons from nuclei'],c:1,s:'Light knocks out electrons.'},
+    {tp:'photo',q:'Below the threshold frequency:',o:['emission is slow','no electrons are emitted','only fast electrons are emitted','the current is maximum'],c:1,s:'Each photon has too little energy.'},
+    {tp:'photo',q:'Photoelectric emission is:',o:['delayed by a few seconds','practically instantaneous','only possible in sunlight','only possible with X-rays'],c:1,s:'About 10⁻⁹ s.'},
+    {tp:'photo',q:'The kinetic energy of photoelectrons depends on:',o:['intensity','frequency','exposure time','size of the plate'],c:1,s:'K(max) = hν − φ.'},
+    {tp:'photo',q:'The photocurrent depends on the:',o:['frequency only','intensity of light','work function only','colour only'],c:1,s:'More photons, more electrons.'},
+    {tp:'photo',q:'Which metal has a low work function and is used in photocells?',o:['platinum','caesium','tungsten','iron'],c:1,s:'Alkali metals such as caesium.'},
+    {tp:'eq',q:'Einstein\'s photoelectric equation is:',o:['K(max) = hν + φ','K(max) = hν − φ','K(max) = φ − hν','K(max) = hν'],c:1,s:'Energy left after escaping.'},
+    {tp:'eq',q:'The stopping potential V₀ is related to K(max) by:',o:['K(max) = V₀','K(max) = eV₀','K(max) = V₀/e','K(max) = e/V₀'],c:1,s:'The field must stop the fastest electrons.'},
+    {tp:'eq',q:'The stopping potential does NOT depend on:',o:['frequency','work function','intensity','the metal'],c:2,s:'Intensity changes only the number of electrons.'},
+    {tp:'eq',q:'The threshold frequency ν₀ is related to the work function by:',o:['ν₀ = φh','ν₀ = φ/h','ν₀ = h/φ','ν₀ = φ²'],c:1,s:'φ = hν₀.'},
+    {tp:'eq',q:'The slope of a V₀-ν graph gives:',o:['e/h','h/e','φ','ν₀'],c:1,s:'The same for all metals.'},
+    {tp:'photon',q:'The energy of a photon is:',o:['h/ν','hν','hλ','ν/h'],c:1,s:'E = hν = hc/λ.'},
+    {tp:'photon',q:'The momentum of a photon is:',o:['hλ','h/λ','λ/h','hc'],c:1,s:'p = h/λ.'},
+    {tp:'photon',q:'The rest mass of a photon is:',o:['9.1 × 10⁻³¹ kg','zero','1.67 × 10⁻²⁷ kg','h/c²'],c:1,s:'It always moves at c.'},
+    {tp:'photon',q:'Photons travel in vacuum at:',o:['less than c','c','more than c','a speed depending on energy'],c:1,s:'All photons travel at c.'},
+    {tp:'matter',q:'The de Broglie wavelength is:',o:['h/mv','mv/h','hmv','h/m'],c:0,s:'λ = h/p.'},
+    {tp:'matter',q:'The wave nature of electrons was shown by:',o:['Rutherford','Davisson and Germer','Millikan','Thomson\'s plum pudding'],c:1,s:'Electron diffraction from a nickel crystal.'},
+    {tp:'matter',q:'For an electron accelerated through V, the de Broglie wavelength is proportional to:',o:['V','√V','1/√V','1/V'],c:2,s:'λ = h/√(2meV).'},
+    {tp:'matter',q:'At the same speed, a heavier particle has a de Broglie wavelength that is:',o:['longer','shorter','the same','zero'],c:1,s:'λ = h/(mv).'},
+    {tp:'matter',q:'We do not notice the wave nature of a moving cricket ball because:',o:['it has no wavelength','its wavelength is far too small','it moves too slowly','it is not charged'],c:1,s:'h/(mv) is tiny for large masses.'}
   ]}
 };
 })();
