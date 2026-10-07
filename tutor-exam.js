@@ -390,6 +390,33 @@ window.PhysicaExam={
   {t:'neet',q:'The intensity of a wave is proportional to:',o:['A','A²','√A','1/A'],c:1,a:'Energy carried ∝ (amplitude)².'},
   {t:'neet',q:'If the absolute temperature of air is made 4 times, the speed of sound becomes:',o:['4 times','2 times','half','the same'],c:1,a:'v ∝ √T.'},
   {t:'neet',sim:'beats',q:'Beats are produced by the superposition of two waves of:',o:['the same frequency','slightly different frequencies','very different frequencies','different speeds'],c:1,a:'Slightly different frequencies go in and out of step regularly.'}
+],
+'Electric Charges and Fields':[
+  {t:'1',q:'What is meant by quantisation of charge?',a:'Any charge is a whole-number multiple of the electron\'s charge: q = ne, with e = 1.6 × 10⁻¹⁹ C.'},
+  {t:'1',sim:'flux-cube',q:'What is the SI unit of electric flux?',a:'N·m²/C (equivalently V·m).'},
+  {t:'1',q:'Why do two electric field lines never cross?',a:'At the crossing point the field would have two directions at once, which is impossible.'},
+  {t:'1',sim:'dipole-torque',q:'Write the torque on an electric dipole in a uniform field.',a:'τ = p × E, of size pE sin θ.'},
+  {t:'1',sim:'charged-sphere-field',q:'What is the electric field inside a charged conductor in electrostatic equilibrium?',a:'Zero. All the charge sits on the outer surface.'},
+  {t:'3',sim:'coulomb-distance',q:'Find the force between charges of 2 μC and 3 μC placed 30 cm apart in air.',a:'F = kq₁q₂/r² = 9 × 10⁹ × 2 × 10⁻⁶ × 3 × 10⁻⁶/(0.3)² = 0.054/0.09 = 0.6 N (repulsive).'},
+  {t:'3',sim:'dipole-potential',q:'Derive the electric field at a point on the axis of a short dipole.',a:'Charges −q and +q are 2a apart; the point is at distance r from the centre on the +q side.\nE = kq/(r − a)² − kq/(r + a)² = kq × 4ar/(r² − a²)².\nFor r ≫ a: E = 2k(2aq)/r³ = 2kp/r³, along p.'},
+  {t:'3',q:'State Gauss\'s law and use it to find the field of an infinitely long straight line charge.',a:'Gauss\'s law: the total flux through a closed surface = q(enclosed)/ε₀.\nTake a cylinder of radius r and length L around the wire. Flux only through the curved side: E × 2πrL.\nE × 2πrL = λL/ε₀, so E = λ/(2πε₀r), pointing radially outwards.'},
+  {t:'3',q:'Use Gauss\'s law to find the field near an infinite plane sheet of charge density σ.',a:'Take a cylinder through the sheet with ends of area A on both sides.\nFlux through the two ends: 2EA. Charge inside: σA.\n2EA = σA/ε₀, so E = σ/(2ε₀), the same at every distance.'},
+  {t:'3',sim:'flux-cube',q:'A charge q sits at the centre of a cube. Find the flux through the whole cube and through one face.',a:'Total flux = q/ε₀ (Gauss\'s law).\nBy symmetry each of the 6 faces gets the same share: q/(6ε₀).'},
+  {t:'3',sim:'electron-deflection',q:'An electron enters a uniform field E between two plates with speed v at right angles to the field. Show that its path is a parabola.',a:'Along the plates: x = vt (no force). Across: acceleration eE/m, so y = ½(eE/m)t².\nPut t = x/v: y = (eE/2mv²) x², a parabola (like a thrown ball).'},
+  {t:'5',sim:'charged-sphere-field',q:'Using Gauss\'s law, find the electric field of a uniformly charged thin spherical shell at points outside and inside it.',a:'Outside (r > R): a sphere of radius r encloses q. E × 4πr² = q/ε₀, so E = q/(4πε₀r²), as if all the charge were at the centre.\nInside (r < R): the sphere encloses no charge, so E = 0.\nAt the surface the field jumps from 0 to q/(4πε₀R²).'},
+  {t:'5',sim:'charged-ring-axis',q:'Derive the electric field on the axis of a uniformly charged ring of radius R at distance x from its centre. Where is it largest?',a:'Each small charge dq gives dE = k dq/(x² + R²) along its line. Sideways parts cancel by symmetry; the parts along the axis add.\nE = ∫k dq/(x² + R²) × x/√(x² + R²) = kqx/(x² + R²)^(3/2).\nE = 0 at the centre and far away; setting dE/dx = 0 gives the largest value at x = R/√2.'},
+  {t:'5',sim:'dipole-torque',q:'Find the torque and potential energy of an electric dipole in a uniform field. When is it in stable and unstable equilibrium?',a:'Forces +qE and −qE are equal and opposite: net force zero.\nThey form a couple: τ = (qE)(2a sin θ) = pE sin θ, turning p towards E.\nWork to turn it from 90° to θ: U = −pE cos θ = −p·E.\nθ = 0: U = −pE (lowest), stable equilibrium.\nθ = 180°: U = +pE (highest), unstable equilibrium.'},
+  {t:'jee',q:'Two equal charges q are a distance d apart. What charge Q at the midpoint keeps all three charges in equilibrium?',o:['−q/2','−q/4','q/4','−q'],c:1,a:'The midpoint charge feels equal and opposite pulls, so it is in equilibrium for any Q.\nFor an end charge: kq²/d² + kqQ/(d/2)² = 0, so Q = −q/4.'},
+  {t:'jee',sim:'charged-ring-axis',q:'On the axis of a charged ring of radius R, the electric field is largest at a distance from the centre of:',o:['R','R/2','R/√2','√2 R'],c:2,a:'E ∝ x/(x² + R²)^(3/2); dE/dx = 0 gives x = R/√2.'},
+  {t:'jee',sim:'flux-cube',q:'A charge q is placed at a corner of a cube. The flux through the cube is:',o:['q/ε₀','q/(6ε₀)','q/(8ε₀)','q/(24ε₀)'],c:2,a:'Eight such cubes would surround the charge completely, so this cube gets 1/8 of q/ε₀.'},
+  {t:'jee',q:'Two identical balls of mass m and charge q hang from a point by threads of length l. In equilibrium each thread makes a small angle θ with the vertical. Find the separation x.',a:'For each ball: T cos θ = mg and T sin θ = kq²/x², so tan θ = kq²/(mgx²).\nFor small θ, tan θ ≈ sin θ = x/2l.\nx/2l = kq²/(mgx²), so x³ = 2klq²/(mg) and x = (q²l/(2πε₀mg))^(1/3).'},
+  {t:'jee',sim:'dipole-potential',q:'Find the electric field of a short dipole at a point on its equatorial line at distance r.',a:'The fields of +q and −q have equal size kq/(r² + a²); their parts along the line of the point cancel, and the parts parallel to the dipole add.\nE = 2 × kq/(r² + a²) × a/√(r² + a²) = kp/(r² + a²)^(3/2).\nFor r ≫ a: E = kp/r³, pointing opposite to p (half the axial value).'},
+  {t:'neet',q:'The number of electrons that make up a charge of 1 C is about:',o:['1.6 × 10¹⁹','6.25 × 10¹⁸','9 × 10⁹','6.02 × 10²³'],c:1,a:'n = 1/(1.6 × 10⁻¹⁹) = 6.25 × 10¹⁸.'},
+  {t:'neet',sim:'coulomb-distance',q:'If the distance between two charges is doubled, the force between them becomes:',o:['double','half','one quarter','four times'],c:2,a:'F ∝ 1/r².'},
+  {t:'neet',q:'When two charges are placed in a medium of dielectric constant K instead of air, the force between them:',o:['becomes K times','becomes 1/K times','stays the same','becomes K² times'],c:1,a:'F = kq₁q₂/(Kr²).'},
+  {t:'neet',sim:'dipole-potential',q:'The net charge of an electric dipole is:',o:['2q','q','zero','−q'],c:2,a:'+q and −q add to zero.'},
+  {t:'neet',sim:'flux-cube',q:'The electric flux through a closed surface with no charge inside is:',o:['zero','positive','negative','infinite'],c:0,a:'Gauss\'s law: flux = q(inside)/ε₀ = 0. (Lines entering also leave.)'},
+  {t:'neet',sim:'electrostatic',q:'Electric field lines:',o:['start on negative charges and end on positive ones','start on positive charges and end on negative ones','form closed loops','can cross each other'],c:1,a:'They point the way a positive test charge would be pushed.'}
 ]};
 
 window.PhysicaMockBank={
@@ -966,6 +993,47 @@ window.PhysicaMockBank={
     {tp:'dop',q:'When a sound source moves towards a listener, the pitch heard is:',o:['lower','higher','the same','zero'],c:1,s:'The waves are squeezed together.'},
     {tp:'dop',q:'The apparent change in frequency due to relative motion of source and listener is called:',o:['interference','diffraction','the Doppler effect','resonance'],c:2,s:'Doppler effect.'},
     {tp:'dop',q:'Police radar guns measure the speed of cars using:',o:['beats','the Doppler effect','resonance','refraction'],c:1,s:'The reflected wave\'s frequency shift gives the speed.'}
+  ]},
+'Electric Charges and Fields':{
+  topics:{charge:'Charge and Coulomb\'s law',field:'Electric field',dipole:'Electric dipole',gauss:'Flux and Gauss\'s law'},
+  jee:[
+    {tp:'charge',q:'Two identical metal spheres carry +6 μC and −2 μC and attract with force F. They are touched together and put back at the same distance. The new force is:',o:['F/3, attractive','F/3, repulsive','3F, repulsive','zero'],c:1,s:'After touching each has (6 − 2)/2 = +2 μC.\nOld: k × 6 × 2 = 12k (attractive). New: k × 2 × 2 = 4k (repulsive). Ratio 1/3.'},
+    {tp:'charge',q:'Two charges q are d apart. The charge at the midpoint that keeps the whole system in equilibrium is:',o:['−q/2','−q/4','q/4','−q'],c:1,s:'Balance on an end charge: kq²/d² + 4kqQ/d² = 0, so Q = −q/4.'},
+    {tp:'field',q:'Equal charges q sit at the four corners of a square. The field at its centre is:',o:['zero','kq/a²','4kq/a²','2kq/a²'],c:0,s:'Opposite corners give equal and opposite fields; all cancel.'},
+    {tp:'field',q:'An electron and a proton are placed in the same uniform field. The ratio of their accelerations (electron : proton) is about:',o:['1 : 1','1 : 1836','1836 : 1','1 : 2'],c:2,s:'Equal force eE; a ∝ 1/m, and the proton is about 1836 times heavier.'},
+    {tp:'dipole',q:'At the same large distance r, the field on the axis of a short dipole compared with that on its equatorial line is:',o:['1 : 2','2 : 1','1 : 1','4 : 1'],c:1,s:'2kp/r³ : kp/r³.'},
+    {tp:'dipole',q:'The work needed to turn a dipole p in a uniform field E from θ = 0 to θ = 180° is:',o:['pE','2pE','zero','pE/2'],c:1,s:'W = U(180°) − U(0°) = pE − (−pE) = 2pE.'},
+    {tp:'gauss',q:'A charge q sits at one corner of a cube. The flux through the cube is:',o:['q/ε₀','q/(6ε₀)','q/(8ε₀)','q/(24ε₀)'],c:2,s:'Eight cubes would surround the charge.'},
+    {tp:'gauss',q:'The field of an infinitely long line charge varies with the distance r as:',o:['1/r²','1/r','r','constant'],c:1,s:'E = λ/(2πε₀r).'},
+    {tp:'field',q:'On the axis of a charged ring of radius R, the field is largest at a distance of:',o:['R/√2','R','√2 R','R/2'],c:0,s:'dE/dx = 0 at x = R/√2.'},
+    {tp:'gauss',q:'Just outside the surface of a charged conductor with surface charge density σ, the field is:',o:['σ/(2ε₀)','σ/ε₀','2σ/ε₀','zero'],c:1,s:'The field inside is zero, so all the flux leaves through the outer face.'},
+    {tp:'charge',q:'Find the force, in newtons, between charges of 2 μC and 5 μC placed 10 cm apart in air.',n:9,s:'F = 9 × 10⁹ × 2 × 10⁻⁶ × 5 × 10⁻⁶/0.01 = 9 N.'},
+    {tp:'field',q:'Find the electric field, in N/C, 3 m from a point charge of 1 μC.',n:1000,s:'E = 9 × 10⁹ × 10⁻⁶/9 = 1000 N/C.'},
+    {tp:'dipole',q:'A dipole of moment 2 × 10⁻⁸ C·m is at 30° to a field of 5 × 10⁴ N/C. The torque on it is n × 10⁻⁴ N·m. Find n.',n:5,s:'τ = pE sin θ = 2 × 10⁻⁸ × 5 × 10⁴ × 0.5 = 5 × 10⁻⁴ N·m.'},
+    {tp:'gauss',q:'A closed surface holds a charge of 8.85 μC. The flux through it is n × 10⁵ N·m²/C. Find n (ε₀ = 8.85 × 10⁻¹² C²/N·m²).',n:10,s:'Φ = q/ε₀ = 8.85 × 10⁻⁶/8.85 × 10⁻¹² = 10⁶ = 10 × 10⁵.'},
+    {tp:'charge',q:'How many electrons must be removed from a neutral body to give it a charge of 1.6 × 10⁻¹⁷ C?',n:100,s:'n = q/e = 1.6 × 10⁻¹⁷/1.6 × 10⁻¹⁹ = 100.'}
+  ],
+  neet:[
+    {tp:'charge',q:'The SI unit of charge is the:',o:['ampere','coulomb','volt','farad'],c:1,s:'1 C = 1 A·s.'},
+    {tp:'charge',q:'Charge on any body is always a whole multiple of e. This is called:',o:['conservation of charge','quantisation of charge','induction','polarisation'],c:1,s:'q = ne.'},
+    {tp:'charge',q:'The total charge of an isolated system:',o:['always increases','always decreases','stays constant','is always zero'],c:2,s:'Conservation of charge.'},
+    {tp:'charge',q:'Coulomb\'s force between two point charges is proportional to:',o:['r','1/r','1/r²','r²'],c:2,s:'Inverse square law.'},
+    {tp:'charge',q:'Two charges in water (K = 80) instead of air feel a force that is:',o:['80 times larger','1/80 as large','the same','6400 times smaller'],c:1,s:'F(medium) = F(air)/K.'},
+    {tp:'field',q:'Electric field is defined as:',o:['force × charge','force per unit positive charge','charge per unit area','work per unit charge'],c:1,s:'E = F/q.'},
+    {tp:'field',q:'The SI unit of electric field is:',o:['N/C','C/N','N·C','V·m'],c:0,s:'Newton per coulomb (also V/m).'},
+    {tp:'field',q:'The field of a point charge varies with distance as:',o:['1/r','1/r²','1/r³','r'],c:1,s:'E = kq/r².'},
+    {tp:'field',q:'Two electric field lines:',o:['always cross','never cross','cross at charges only','form closed loops'],c:1,s:'The field has one direction at each point.'},
+    {tp:'field',q:'The electric field inside a hollow charged conductor is:',o:['maximum','zero','equal to that outside','infinite'],c:1,s:'Electrostatic shielding.'},
+    {tp:'dipole',q:'The dipole moment of charges ±q separated by 2a is:',o:['q/2a','2aq, from −q to +q','2aq, from +q to −q','zero'],c:1,s:'p = q × 2a, pointing from negative to positive.'},
+    {tp:'dipole',q:'The SI unit of electric dipole moment is:',o:['C/m','C·m','N·m','V/m'],c:1,s:'Charge × distance.'},
+    {tp:'dipole',q:'The torque on a dipole in a uniform field is:',o:['pE cos θ','pE sin θ','pE','zero always'],c:1,s:'τ = pE sin θ.'},
+    {tp:'dipole',q:'The net force on a dipole in a uniform electric field is:',o:['zero','pE','2qE','qE'],c:0,s:'The two forces are equal and opposite (only a torque acts).'},
+    {tp:'dipole',q:'A dipole in a uniform field is in stable equilibrium when the angle between p and E is:',o:['0°','90°','180°','45°'],c:0,s:'Potential energy −pE is lowest there.'},
+    {tp:'gauss',q:'Gauss\'s law says the total flux through a closed surface equals:',o:['qε₀','q/ε₀','ε₀/q','zero always'],c:1,s:'Φ = q(enclosed)/ε₀.'},
+    {tp:'gauss',q:'The SI unit of electric flux is:',o:['N/C','N·m²/C','C/m²','V/m'],c:1,s:'E × area.'},
+    {tp:'gauss',q:'The flux through a closed surface with no charge inside is:',o:['positive','negative','zero','q/ε₀'],c:2,s:'All lines that enter also leave.'},
+    {tp:'gauss',q:'The field near an infinite plane sheet of charge density σ is:',o:['σ/ε₀','σ/(2ε₀)','2σ/ε₀','σε₀'],c:1,s:'Flux through both sides: 2EA = σA/ε₀.'},
+    {tp:'gauss',q:'The field inside a uniformly charged thin spherical shell is:',o:['kq/R²','zero','kq/r²','infinite'],c:1,s:'A Gaussian sphere inside encloses no charge.'}
   ]}
 };
 })();
