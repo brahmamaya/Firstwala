@@ -525,6 +525,33 @@ window.PhysicaExam={
   {t:'neet',q:'The SI unit of magnetic moment is:',o:['A·m','A·m²','T','Wb'],c:1,a:'m = NIA.'},
   {t:'neet',sim:'magnetic-materials',q:'Diamagnetic substances are:',o:['strongly attracted by magnets','weakly attracted','weakly repelled','not affected at all'],c:2,a:'They have a small negative susceptibility.'},
   {t:'neet',q:'Soft iron is used for electromagnets because it has:',o:['high retentivity and high coercivity','low retentivity and low coercivity','high coercivity only','no permeability'],c:1,a:'It magnetises and demagnetises easily.'}
+],
+'Electromagnetic Induction':[
+  {t:'1',sim:'induction',q:'State Faraday\'s law of electromagnetic induction.',a:'The induced EMF equals the rate of change of magnetic flux linked with the circuit: e = −dΦ/dt (−N dΦ/dt for N turns).'},
+  {t:'1',q:'State Lenz\'s law.',a:'The induced current flows in a direction that opposes the change in flux that produces it. It follows from conservation of energy.'},
+  {t:'1',q:'What is the SI unit of inductance?',a:'The henry (H). 1 H = 1 V·s/A = 1 Wb/A.'},
+  {t:'1',sim:'flux-angle',q:'What is the magnetic flux through a coil whose plane is parallel to the field?',a:'Zero, since Φ = BA cos 90° (the normal to the coil is at right angles to B).'},
+  {t:'1',sim:'eddy-brake',q:'Give one useful application of eddy currents.',a:'Electromagnetic braking in trains (also induction cooking, induction furnaces and damping in meters).'},
+  {t:'3',sim:'motional-emf',q:'Derive the EMF induced in a rod of length l moving with speed v at right angles to a field B. Find it for l = 0.5 m, v = 2 m/s, B = 0.4 T.',a:'In time t the rod sweeps an area l × vt, so the flux through the circuit changes at a rate Blv.\ne = dΦ/dt = Blv. (Equivalently, each electron feels a force evB along the rod.)\ne = 0.4 × 0.5 × 2 = 0.4 V.'},
+  {t:'3',sim:'rotating-rod',q:'A rod of length L rotates with angular speed ω about one end, in a plane perpendicular to a field B. Find the EMF between its ends.',a:'A small piece dr at distance r moves at speed ωr, giving de = Bωr dr.\ne = ∫Bωr dr from 0 to L = ½BωL².\n(Equivalently, it sweeps area ½L²ω per second.)'},
+  {t:'3',sim:'solenoid-inductance',q:'Derive the self-inductance of a long solenoid of length l, area A and n turns per metre.',a:'Field inside: B = μ₀nI. Total turns N = nl.\nFlux linkage NΦ = (nl)(μ₀nI)A = μ₀n²AlI.\nL = NΦ/I = μ₀n²Al.'},
+  {t:'3',q:'Show that the energy stored in an inductor is ½LI². Find it for L = 2 H and I = 3 A.',a:'While the current grows, the battery works against the back EMF L dI/dt: dW = L I dI.\nW = ∫LI dI from 0 to I = ½LI².\nU = ½ × 2 × 9 = 9 J.'},
+  {t:'3',sim:'induction',q:'A 100-turn coil of area 0.01 m² is in a field that changes by 0.5 T in 0.1 s at right angles to the coil. Find the induced EMF.',a:'e = NAΔB/Δt = 100 × 0.01 × 0.5/0.1 = 5 V.'},
+  {t:'3',sim:'mutual-induction',q:'Find the mutual inductance of two long coaxial solenoids of length l: the inner one has n₁ turns per metre and area A, the outer one n₂ turns per metre.',a:'A current I₂ in the outer solenoid gives B = μ₀n₂I₂ inside.\nFlux linked with the inner coil: (n₁l)(μ₀n₂I₂)A.\nM = μ₀n₁n₂Al (the same either way round).'},
+  {t:'5',q:'Explain the principle of an AC generator and derive its EMF.',a:'A coil of N turns and area A rotates with angular speed ω in a uniform field B.\nAt angle θ = ωt the flux is Φ = NBA cos ωt.\ne = −dΦ/dt = NBAω sin ωt = e₀ sin ωt, where e₀ = NBAω.\nThe EMF reverses every half turn, giving alternating current. It is largest when the plane of the coil is along B (flux is zero but changing fastest).'},
+  {t:'5',sim:'motional-emf',q:'A rod of length l slides at constant speed v on two rails joined by a resistance R in a field B. Find the current, the force needed to keep it moving and show that the power equals the heat produced.',a:'EMF e = Blv, current I = Blv/R.\nThe field pushes back on the current-carrying rod with F = BIl = B²l²v/R (Lenz); an equal force must pull it.\nPower supplied = Fv = B²l²v²/R.\nHeat in R = I²R = B²l²v²/R. They are equal: mechanical energy becomes electrical energy, then heat.'},
+  {t:'5',sim:'rl-current',q:'Derive how the current grows in an RL circuit when a battery of EMF E is switched on. What is the time constant?',a:'Loop rule: E − L dI/dt − IR = 0.\nSolve: I = (E/R)(1 − e^(−Rt/L)).\nTime constant τ = L/R: after one τ the current reaches (1 − 1/e) ≈ 63% of its final value E/R.\nThe inductor slows the rise of current, like inertia.'},
+  {t:'jee',sim:'eddy-brake',q:'A bar magnet is dropped through a horizontal copper ring. While it passes through, its acceleration is:',o:['equal to g','more than g','less than g','zero'],c:2,a:'The induced current in the ring opposes the motion (Lenz), both as the magnet approaches and as it leaves.'},
+  {t:'jee',sim:'induction',q:'The flux through a coil is Φ = 5t² + 3t + 2 webers. The induced EMF at t = 2 s is:',o:['23 V','20 V','25 V','13 V'],c:0,a:'|e| = dΦ/dt = 10t + 3 = 23 V.'},
+  {t:'jee',sim:'rotating-rod',q:'A 1 m rod rotates at 20 rad/s about one end in a 0.5 T field perpendicular to its plane of rotation. Find the EMF between its ends.',a:'e = ½BωL² = ½ × 0.5 × 20 × 1 = 5 V.'},
+  {t:'jee',sim:'mutual-induction',q:'Two coils with self-inductances L₁ and L₂ and mutual inductance M are joined in series so that their fluxes add. The total inductance is:',o:['L₁ + L₂','L₁ + L₂ + 2M','L₁ + L₂ − 2M','L₁L₂/(L₁ + L₂)'],c:1,a:'Each coil also gets M from the other: L = L₁ + L₂ + 2M (with −2M if the fluxes oppose).'},
+  {t:'jee',sim:'induction',q:'Show that the charge that flows through a coil when its flux changes does not depend on how fast the change happens.',a:'I = e/R = (N/R) dΦ/dt.\nq = ∫I dt = (N/R) ∫dΦ = NΔΦ/R.\nOnly the total change in flux and the resistance matter, not the time taken.'},
+  {t:'neet',q:'Lenz\'s law is a consequence of the conservation of:',o:['charge','energy','momentum','mass'],c:1,a:'If the induced current helped the change, energy would come from nowhere.'},
+  {t:'neet',q:'The SI unit of magnetic flux is the:',o:['tesla','weber','henry','gauss'],c:1,a:'1 Wb = 1 T·m².'},
+  {t:'neet',sim:'induction',q:'A magnet is held at rest inside a coil. The induced EMF is:',o:['maximum','zero','constant and non-zero','alternating'],c:1,a:'The flux is not changing.'},
+  {t:'neet',q:'Self-inductance in electricity plays a role like that of:',o:['force','inertia (mass)','velocity','energy'],c:1,a:'It opposes changes in current, as mass opposes changes in velocity.'},
+  {t:'neet',sim:'eddy-brake',q:'Transformer cores are laminated to:',o:['increase eddy currents','reduce eddy currents','increase the flux','reduce the weight only'],c:1,a:'Thin insulated sheets break up the eddy current paths and cut heating.'},
+  {t:'neet',q:'The energy stored in an inductor L carrying current I is:',o:['LI','½LI²','LI²','½L²I'],c:1,a:'U = ½LI².'}
 ]};
 
 window.PhysicaMockBank={
@@ -1306,6 +1333,47 @@ window.PhysicaMockBank={
     {tp:'osc',q:'The potential energy of a magnet in a field is:',o:['mB sin θ','−mB cos θ','mB','zero'],c:1,s:'U = −m·B.'},
     {tp:'osc',q:'The period of a magnet oscillating in a field is:',o:['2π√(mB/I)','2π√(I/(mB))','2π√(I/m)','2πmB'],c:1,s:'T = 2π√(I/(mB)).'},
     {tp:'osc',q:'Electromagnet cores are made of soft iron because it has:',o:['high coercivity','low coercivity and low retentivity','high retentivity','no permeability'],c:1,s:'It loses its magnetism as soon as the current stops.'}
+  ]},
+'Electromagnetic Induction':{
+  topics:{flux:'Flux, Faraday and Lenz',motional:'Motional EMF',induct:'Self and mutual inductance',apps:'Eddy currents, RL circuits and generators'},
+  jee:[
+    {tp:'flux',q:'The flux through a coil is Φ = 5t² + 3t + 2 Wb. The induced EMF at t = 2 s is:',o:['20 V','23 V','25 V','13 V'],c:1,s:'dΦ/dt = 10t + 3.'},
+    {tp:'flux',q:'A magnet falls through a horizontal copper ring. Its acceleration while passing is:',o:['g','more than g','less than g','zero'],c:2,s:'Lenz: the ring\'s current always opposes the motion.'},
+    {tp:'motional',q:'A rod of length L rotates at ω about one end in a perpendicular field B. The EMF between its ends is:',o:['BωL²','½BωL²','2BωL²','BωL'],c:1,s:'e = ∫Bωr dr.'},
+    {tp:'motional',q:'A rod of length l slides at constant speed v on rails joined by a resistance R in a field B. The force needed to keep it moving is:',o:['Blv/R','B²l²v/R','Bl²v/R','B²lv²/R'],c:1,s:'F = BIl with I = Blv/R.'},
+    {tp:'induct',q:'Two coils (L₁, L₂, mutual inductance M) are in series with their fluxes adding. The total inductance is:',o:['L₁ + L₂','L₁ + L₂ + 2M','L₁ + L₂ − 2M','L₁L₂'],c:1,s:'Each coil also links the other\'s flux.'},
+    {tp:'induct',q:'The number of turns of a solenoid is doubled with its length and area unchanged. Its self-inductance becomes:',o:['double','four times','half','the same'],c:1,s:'L = μ₀n²Al.'},
+    {tp:'apps',q:'In an RL circuit switched on at t = 0, after one time constant the current is about:',o:['37% of its final value','50%','63%','100%'],c:2,s:'I = I₀(1 − 1/e) ≈ 0.63 I₀.'},
+    {tp:'flux',q:'When the flux through an N-turn coil of resistance R changes by ΔΦ, the charge that flows is:',o:['NΔΦ/R','NΔΦR','ΔΦ/(NR)','it depends on the time taken'],c:0,s:'q = ∫I dt = NΔΦ/R.'},
+    {tp:'apps',q:'The energy stored per unit volume in a magnetic field B is:',o:['B²/μ₀','B²/(2μ₀)','μ₀B²/2','B/(2μ₀)'],c:1,s:'u = B²/(2μ₀).'},
+    {tp:'apps',q:'A coil of N turns and area A spins at ω in a field B. The peak EMF is:',o:['NBA','NBAω','NBA/ω','NBω'],c:1,s:'e = NBAω sin ωt.'},
+    {tp:'motional',q:'A 0.5 m rod moves at 2 m/s at right angles to a 0.4 T field. Find the EMF in mV.',n:400,s:'e = Blv = 0.4 × 0.5 × 2 = 0.4 V.'},
+    {tp:'flux',q:'A 100-turn coil of area 0.01 m² is in a field that changes by 0.5 T in 0.1 s. Find the induced EMF in volts.',n:5,s:'e = NAΔB/Δt = 5 V.'},
+    {tp:'induct',q:'Find the energy, in joules, stored in a 2 H inductor carrying 3 A.',n:9,s:'U = ½LI² = 9 J.'},
+    {tp:'motional',q:'A 2 m rod rotates at 50 rad/s about one end in a 0.2 T field perpendicular to its plane of rotation. Find the EMF in volts.',n:20,s:'e = ½BωL² = ½ × 0.2 × 50 × 4 = 20 V.'},
+    {tp:'induct',q:'The current in a 0.2 H inductor changes by 3 A in 0.05 s. Find the size of the induced EMF in volts.',n:12,s:'e = L ΔI/Δt = 0.2 × 60 = 12 V.'}
+  ],
+  neet:[
+    {tp:'flux',q:'The SI unit of magnetic flux is the:',o:['tesla','weber','henry','ampere'],c:1,s:'Wb = T·m².'},
+    {tp:'flux',q:'Faraday\'s law says that the induced EMF equals:',o:['the flux','the rate of change of flux','flux × time','the field'],c:1,s:'e = −dΦ/dt.'},
+    {tp:'flux',q:'Lenz\'s law follows from the conservation of:',o:['charge','energy','momentum','flux'],c:1,s:'The induced current opposes its cause.'},
+    {tp:'flux',q:'An EMF is induced in a coil only when:',o:['a magnet is near it','the flux through it changes','a current flows','it is made of copper'],c:1,s:'No change in flux, no EMF.'},
+    {tp:'flux',q:'The flux through a coil of area A at angle θ between its normal and B is:',o:['BA sin θ','BA cos θ','BA','B/A'],c:1,s:'Φ = B·A.'},
+    {tp:'flux',q:'The negative sign in e = −dΦ/dt represents:',o:['Faraday\'s first law','Lenz\'s law','Ohm\'s law','Ampère\'s law'],c:1,s:'Opposition to the change.'},
+    {tp:'motional',q:'The EMF across a rod of length l moving at v at right angles to B is:',o:['Bl/v','Blv','Bv/l','B²lv'],c:1,s:'Motional EMF.'},
+    {tp:'motional',q:'The direction of the induced current in a moving conductor is given by:',o:['Fleming\'s left-hand rule','Fleming\'s right-hand rule','the right-hand screw rule only','Coulomb\'s law'],c:1,s:'Right hand for generators.'},
+    {tp:'motional',q:'A rod moving parallel to a magnetic field has an induced EMF of:',o:['Blv','zero','maximum','2Blv'],c:1,s:'It cuts no field lines.'},
+    {tp:'motional',q:'The EMF across a rod of length L rotating at ω about one end in field B is:',o:['BωL','½BωL²','BωL²','2BωL'],c:1,s:'e = ½BωL².'},
+    {tp:'induct',q:'The SI unit of self-inductance is the:',o:['weber','henry','tesla','farad'],c:1,s:'1 H = 1 Wb/A.'},
+    {tp:'induct',q:'Self-induction opposes:',o:['any current','a change in current','voltage','resistance'],c:1,s:'The back EMF is L dI/dt.'},
+    {tp:'induct',q:'The self-inductance of a solenoid is proportional to:',o:['n','n²','1/n','√n'],c:1,s:'L = μ₀n²Al.'},
+    {tp:'induct',q:'When the current in one coil changes, an EMF appears in a nearby coil. This is:',o:['self-induction','mutual induction','eddy current','resonance'],c:1,s:'e₂ = −M dI₁/dt.'},
+    {tp:'induct',q:'The energy stored in an inductor is:',o:['LI','½LI²','L²I','½LI'],c:1,s:'U = ½LI².'},
+    {tp:'apps',q:'Currents induced in a solid metal block by a changing flux are called:',o:['displacement currents','eddy currents','drift currents','alternating currents'],c:1,s:'They swirl like eddies in water.'},
+    {tp:'apps',q:'Eddy current losses in transformers are reduced by:',o:['a solid iron core','a laminated core','a copper core','no core'],c:1,s:'Laminations break up the current paths.'},
+    {tp:'apps',q:'Which uses eddy currents?',o:['an electric bell','electromagnetic braking','a bar magnet','a dry cell'],c:1,s:'Eddy currents oppose the motion of the wheel.'},
+    {tp:'apps',q:'An AC generator works on the principle of:',o:['electromagnetic induction','the heating effect','electrolysis','photoelectric effect'],c:0,s:'A rotating coil has a changing flux.'},
+    {tp:'apps',q:'The time constant of an RL circuit is:',o:['RL','L/R','R/L','1/(RL)'],c:1,s:'τ = L/R.'}
   ]}
 };
 })();
