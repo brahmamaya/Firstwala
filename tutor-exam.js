@@ -471,6 +471,33 @@ window.PhysicaExam={
   {t:'neet',sim:'resistor-network',q:'Which combination of resistors gives the smallest resistance?',o:['all in series','all in parallel','two in series, one parallel','it does not matter'],c:1,a:'In parallel the total is smaller than the smallest one.'},
   {t:'neet',sim:'kirchhoff-loops',q:'Kirchhoff\'s loop rule is based on the conservation of:',o:['charge','energy','momentum','mass'],c:1,a:'The total potential change round a loop is zero.'},
   {t:'neet',q:'The commercial unit of electrical energy is:',o:['watt','joule','kilowatt-hour','volt-ampere'],c:2,a:'1 kWh = 3.6 × 10⁶ J (one "unit").'}
+],
+'Moving Charges and Magnetism':[
+  {t:'1',sim:'lorentz',q:'What is the magnetic force on a charge moving parallel to a magnetic field?',a:'Zero, since F = qvB sin 0° = 0.'},
+  {t:'1',q:'What is the SI unit of magnetic field?',a:'The tesla (T). 1 T = 1 N/(A·m) = 10⁴ gauss.'},
+  {t:'1',sim:'parallel-wires',q:'Two long parallel wires carry currents in the same direction. Do they attract or repel?',a:'They attract. (Opposite currents repel.)'},
+  {t:'1',sim:'loop-axis-field',q:'Write the magnetic field at the centre of a circular loop of radius R carrying current I.',a:'B = μ₀I/(2R), perpendicular to the loop.'},
+  {t:'1',sim:'meter-conversion',q:'How is a galvanometer turned into an ammeter?',a:'By connecting a small resistance (a shunt) in parallel with it.'},
+  {t:'3',sim:'cyclotron-frequency',q:'A charged particle moves at right angles to a uniform magnetic field. Find the radius of its path and show that its period does not depend on its speed.',a:'The magnetic force gives the centripetal force: qvB = mv²/r, so r = mv/(qB).\nT = 2πr/v = 2πm/(qB): no v in it. Faster particles move in bigger circles but take the same time.'},
+  {t:'3',q:'Use Ampère\'s circuital law to find the field of a long straight wire.',a:'Ampère: ∮B·dl = μ₀I(enclosed).\nTake a circle of radius r around the wire; B is the same all round and along the circle.\nB × 2πr = μ₀I, so B = μ₀I/(2πr).'},
+  {t:'3',sim:'solenoid',q:'A long solenoid has 1000 turns per metre and carries 2 A. Find the field inside it.',a:'B = μ₀nI = 4π × 10⁻⁷ × 1000 × 2 ≈ 2.5 × 10⁻³ T, uniform and along the axis.'},
+  {t:'3',sim:'velocity-selector',q:'How do crossed electric and magnetic fields select particles of one speed?',a:'E and B are at right angles to each other and to the beam, so the electric force qE and the magnetic force qvB act in opposite directions.\nOnly particles with qE = qvB, that is v = E/B, go straight through; others are bent aside. This does not depend on the charge or mass.'},
+  {t:'3',sim:'force-on-wire',q:'A 0.5 m wire carries 3 A at right angles to a 0.2 T field. Find the force on it.',a:'F = BIL sin θ = 0.2 × 3 × 0.5 × 1 = 0.3 N, at right angles to both the wire and the field (Fleming\'s left-hand rule).'},
+  {t:'3',sim:'meter-conversion',q:'A galvanometer of resistance 10 Ω gives full-scale deflection at 1 mA. How can it be made into a voltmeter of range 10 V?',a:'Put a large resistance R in series: I(g)(G + R) = V.\nR = V/I(g) − G = 10/0.001 − 10 = 9990 Ω.'},
+  {t:'5',sim:'loop-axis-field',q:'Using the Biot-Savart law, derive the magnetic field on the axis of a circular loop of radius R at distance x from its centre.',a:'Each element dl gives dB = μ₀I dl/(4πr²) with r² = R² + x², at right angles to r.\nThe sideways parts cancel round the loop; the parts along the axis add, each a fraction R/r of dB.\nB = (μ₀I/4πr²)(R/r) × 2πR = μ₀IR²/[2(R² + x²)^(3/2)].\nAt the centre (x = 0): B = μ₀I/2R.'},
+  {t:'5',sim:'moving-coil-galvanometer',q:'Explain the working of a moving-coil galvanometer. What is its current sensitivity?',a:'A coil of N turns and area A hangs in a radial magnetic field B between curved pole pieces and round a soft-iron core.\nA current I gives a torque NIAB (radial field: the plane of the coil is always along B).\nA spring gives a restoring torque kφ. At rest: NIAB = kφ, so φ = (NAB/k)I - the deflection is proportional to the current (linear scale).\nCurrent sensitivity = φ/I = NAB/k. It is raised by more turns, a larger area, a stronger field or a weaker spring.'},
+  {t:'5',q:'Explain the principle of the cyclotron and find its frequency and the maximum kinetic energy it gives a particle.',a:'Two hollow D-shaped electrodes sit in a uniform magnetic field with an alternating voltage across the gap.\nInside the Ds the particle moves in a semicircle; each time it crosses the gap the voltage has reversed, so it is accelerated again and moves on a larger circle.\nThis works because the period T = 2πm/(qB) does not depend on speed. Cyclotron frequency f = qB/(2πm).\nAt the outer radius R: v = qBR/m, so KE(max) = q²B²R²/(2m).'},
+  {t:'jee',sim:'helical-particle',q:'A charged particle enters a uniform field B with speed v at angle θ to B. Describe its path and find its pitch.',a:'The part v cos θ along B is unaffected; the part v sin θ makes it circle with r = mv sin θ/(qB).\nTogether: a helix. Period T = 2πm/(qB).\nPitch = distance along B in one turn = v cos θ × T = 2πmv cos θ/(qB).'},
+  {t:'jee',sim:'cyclotron-frequency',q:'A proton and an alpha particle with the same kinetic energy move at right angles to the same field. The ratio of their radii (proton : alpha) is:',o:['1 : 2','2 : 1','1 : 1','1 : 4'],c:2,a:'r = √(2mK)/(qB) ∝ √m/q: proton √1/1, alpha √4/2 = 1. So 1 : 1.'},
+  {t:'jee',sim:'loop-axis-field',q:'The magnetic field at the centre of a semicircular arc of radius R carrying current I (the straight leads point at the centre and add nothing) is:',o:['μ₀I/2R','μ₀I/4R','μ₀I/πR','μ₀I/8R'],c:1,a:'Half a loop gives half of μ₀I/2R.'},
+  {t:'jee',sim:'parallel-wires',q:'Two long parallel wires 10 cm apart each carry 10 A. The force per metre between them is:',o:['2 × 10⁻⁴ N/m','2 × 10⁻⁵ N/m','10⁻⁴ N/m','2 × 10⁻³ N/m'],c:0,a:'F/L = μ₀I₁I₂/(2πd) = 2 × 10⁻⁷ × 100/0.1 = 2 × 10⁻⁴ N/m.'},
+  {t:'jee',sim:'moving-coil-galvanometer',q:'Find the magnetic moment of a current loop and the torque on it in a uniform field.',a:'Magnetic moment m = NIA, at right angles to the plane of the loop (right-hand rule).\nTorque τ = m × B, size NIAB sin θ (θ between m and B).\nIt is largest when the plane of the loop is along B and zero when the plane is at right angles to B.'},
+  {t:'neet',sim:'lorentz',q:'The Lorentz force on a charge q is:',o:['qE only','q(v × B) only','q(E + v × B)','qvB always'],c:2,a:'Electric plus magnetic forces.'},
+  {t:'neet',sim:'lorentz',q:'The work done by a magnetic field on a moving charge is:',o:['positive','negative','zero','qvB'],c:2,a:'The force is always at right angles to the velocity.'},
+  {t:'neet',sim:'solenoid',q:'The magnetic field inside a long solenoid is:',o:['zero','uniform','strongest at the ends','varies as 1/r'],c:1,a:'B = μ₀nI, the same everywhere well inside.'},
+  {t:'neet',sim:'meter-conversion',q:'An ideal ammeter and an ideal voltmeter should have resistances of:',o:['zero and infinity','infinity and zero','both zero','both infinity'],c:0,a:'The ammeter must not reduce the current; the voltmeter must not draw any.'},
+  {t:'neet',q:'A cyclotron cannot accelerate:',o:['protons','alpha particles','deuterons','neutrons'],c:3,a:'Neutrons have no charge, so fields do not act on them.'},
+  {t:'neet',sim:'parallel-wires',q:'The magnetic field of a long straight wire at distance r is proportional to:',o:['r','1/r','1/r²','r²'],c:1,a:'B = μ₀I/(2πr).'}
 ]};
 
 window.PhysicaMockBank={
@@ -1170,6 +1197,47 @@ window.PhysicaMockBank={
     {tp:'kir',q:'A Wheatstone bridge with arms P, Q, R, S is balanced when:',o:['P/Q = R/S','P + Q = R + S','PQ = RS','P = S'],c:0,s:'Then no current flows through the galvanometer.'},
     {tp:'kir',q:'A potentiometer measures EMF better than a voltmeter because it:',o:['has a low resistance','draws no current from the cell at balance','is more sensitive to heat','uses AC'],c:1,s:'At balance no current flows, so there is no Ir drop.'},
     {tp:'kir',q:'A metre bridge works on the principle of the:',o:['potentiometer','Wheatstone bridge','galvanometer','ammeter'],c:1,s:'It is a Wheatstone bridge using a 1 m wire.'}
+  ]},
+'Moving Charges and Magnetism':{
+  topics:{force:'Magnetic force on charges and wires',field:'Biot-Savart and Ampère\'s law',motion:'Charged particles in fields',galv:'Galvanometer, ammeter and voltmeter'},
+  jee:[
+    {tp:'force',q:'An electron moves along +x in a magnetic field along +y. The force on it is along:',o:['+z','−z','+y','−x'],c:1,s:'v × B = x̂ × ŷ = +ẑ; the electron\'s charge is negative, so −z.'},
+    {tp:'motion',q:'A proton and an alpha particle with the same kinetic energy move at right angles to the same field. Their radii are in the ratio:',o:['1 : 2','2 : 1','1 : 1','1 : 4'],c:2,s:'r = √(2mK)/(qB) ∝ √m/q.'},
+    {tp:'motion',q:'A proton and an alpha particle with the same speed move at right angles to the same field. Their radii (proton : alpha) are in the ratio:',o:['1 : 1','2 : 1','1 : 2','1 : 4'],c:2,s:'r = mv/(qB) ∝ m/q: 1/1 : 4/2.'},
+    {tp:'field',q:'The field at the centre of a semicircular arc of radius R carrying current I (with radial leads) is:',o:['μ₀I/2R','μ₀I/4R','μ₀I/πR','zero'],c:1,s:'Half of the full-loop value μ₀I/2R.'},
+    {tp:'field',q:'The field 5 cm from a long straight wire carrying 10 A is:',o:['4 × 10⁻⁵ T','4 × 10⁻⁴ T','2 × 10⁻⁵ T','10⁻⁵ T'],c:0,s:'B = 2 × 10⁻⁷ × 10/0.05 = 4 × 10⁻⁵ T.'},
+    {tp:'force',q:'Two long parallel wires 10 cm apart each carry 10 A. The force per metre is:',o:['2 × 10⁻⁵ N/m','2 × 10⁻⁴ N/m','2 × 10⁻³ N/m','10⁻⁴ N/m'],c:1,s:'μ₀I²/(2πd) = 2 × 10⁻⁷ × 100/0.1.'},
+    {tp:'galv',q:'A galvanometer (100 Ω, full scale 1 mA) is made into an ammeter of range 1 A. The shunt needed is about:',o:['0.1 Ω','1 Ω','10 Ω','0.01 Ω'],c:0,s:'S = I(g)G/(I − I(g)) = 0.001 × 100/0.999 ≈ 0.1 Ω.'},
+    {tp:'galv',q:'The torque on a current loop in a uniform field is largest when:',o:['the plane of the loop is at right angles to B','the plane of the loop is along B','the loop has no current','B is zero'],c:1,s:'τ = mB sin θ is largest when m (normal to the plane) is at right angles to B.'},
+    {tp:'motion',q:'A charged particle passes undeflected through crossed fields E and B. Its speed is:',o:['EB','E/B','B/E','√(EB)'],c:1,s:'qE = qvB.'},
+    {tp:'field',q:'A solenoid is stretched to twice its length with the same number of turns and current. The field inside becomes:',o:['double','half','the same','four times'],c:1,s:'B = μ₀nI and n (turns per metre) halves.'},
+    {tp:'force',q:'A 0.5 m wire carries 3 A at right angles to a 0.2 T field. Find the force on it in mN.',n:300,s:'F = BIL = 0.2 × 3 × 0.5 = 0.3 N.'},
+    {tp:'motion',q:'A particle has q/m = 10⁸ C/kg and moves in a field B = 0.2π T. Find its cyclotron frequency in MHz.',n:10,s:'f = qB/(2πm) = 10⁸ × 0.2π/(2π) = 10⁷ Hz.'},
+    {tp:'galv',q:'A galvanometer (10 Ω, full scale 1 mA) is made into a voltmeter of range 10 V. Find the series resistance in ohms.',n:9990,s:'R = V/I(g) − G = 10 000 − 10.'},
+    {tp:'field',q:'A coil of 100 turns and radius 0.1 m carries 1 A. The field at its centre is nπ × 10⁻⁴ T. Find n.',n:2,s:'B = μ₀NI/(2R) = 4π × 10⁻⁷ × 100/0.2 = 2π × 10⁻⁴ T.'},
+    {tp:'motion',q:'In a velocity selector, E = 10⁴ V/m and B = 0.02 T. Find the speed that passes undeflected, in km/s.',n:500,s:'v = E/B = 5 × 10⁵ m/s = 500 km/s.'}
+  ],
+  neet:[
+    {tp:'force',q:'The magnetic force on a moving charge is:',o:['qvB cos θ','qvB sin θ','qB/v','zero always'],c:1,s:'F = q(v × B).'},
+    {tp:'force',q:'A charged particle moves at right angles to a uniform field. Its speed:',o:['increases','decreases','stays the same','becomes zero'],c:2,s:'The force is always at right angles to the motion.'},
+    {tp:'force',q:'The force on a wire of length L carrying current I in a field B is:',o:['BIL sin θ','BIL cos θ','BI/L','IL/B'],c:0,s:'F = IL × B.'},
+    {tp:'force',q:'Two parallel wires with currents in the same direction:',o:['repel','attract','feel no force','rotate'],c:1,s:'Like currents attract.'},
+    {tp:'force',q:'The magnetic force on a charge moving along the field is:',o:['maximum','zero','qvB','qE'],c:1,s:'sin 0° = 0.'},
+    {tp:'field',q:'The SI unit of magnetic field is the:',o:['weber','tesla','henry','gauss'],c:1,s:'1 T = 1 N/(A·m).'},
+    {tp:'field',q:'The field of a long straight wire is:',o:['μ₀I/2r','μ₀I/(2πr)','μ₀Ir','μ₀I/(4πr²)'],c:1,s:'From Ampère\'s law.'},
+    {tp:'field',q:'The field at the centre of a circular loop is:',o:['μ₀I/2R','μ₀I/(2πR)','μ₀IR','zero'],c:0,s:'B = μ₀I/(2R).'},
+    {tp:'field',q:'The field inside a long solenoid with n turns per metre is:',o:['μ₀nI','μ₀I/n','μ₀nI/2','zero'],c:0,s:'Uniform field μ₀nI.'},
+    {tp:'field',q:'Ampère\'s circuital law states:',o:['∮B·dl = μ₀I(enclosed)','∮E·dA = q/ε₀','F = qvB','B = μ₀nI'],c:0,s:'The line integral of B round a loop.'},
+    {tp:'motion',q:'The radius of the circular path of a charge q moving at v at right angles to B is:',o:['qB/mv','mv/qB','mvqB','m/qvB'],c:1,s:'qvB = mv²/r.'},
+    {tp:'motion',q:'The time period of a charged particle circling in a uniform field:',o:['increases with speed','decreases with speed','does not depend on speed','depends on the radius only'],c:2,s:'T = 2πm/(qB).'},
+    {tp:'motion',q:'The cyclotron frequency is:',o:['qB/(2πm)','2πm/(qB)','qBm','B/(qm)'],c:0,s:'f = 1/T.'},
+    {tp:'motion',q:'A charge entering a uniform field at an angle (not 0° or 90°) follows a:',o:['straight line','circle','helix','parabola'],c:2,s:'Circular motion plus steady drift along B.'},
+    {tp:'motion',q:'The kinetic energy of a charge moving in a pure magnetic field:',o:['increases','decreases','stays the same','oscillates'],c:2,s:'The magnetic force does no work.'},
+    {tp:'galv',q:'The torque on a coil of N turns, area A and current I in a field B is:',o:['NIAB sin θ','NIAB cos θ','NIA/B','NB/IA'],c:0,s:'τ = mB sin θ with m = NIA.'},
+    {tp:'galv',q:'A moving-coil galvanometer uses a radial magnetic field so that:',o:['the coil does not move','the torque is proportional to the current at every position','the field is zero','it can measure AC'],c:1,s:'The coil\'s plane always lies along B, so the scale is linear.'},
+    {tp:'galv',q:'To make a galvanometer into an ammeter, connect:',o:['a large resistance in series','a small resistance in parallel','a large resistance in parallel','a small resistance in series'],c:1,s:'The shunt carries most of the current.'},
+    {tp:'galv',q:'To make a galvanometer into a voltmeter, connect:',o:['a small resistance in parallel','a large resistance in series','a capacitor','nothing'],c:1,s:'So it draws only a tiny current.'},
+    {tp:'galv',q:'The current sensitivity of a moving-coil galvanometer is:',o:['NAB/k','k/(NAB)','NAk/B','NB/(Ak)'],c:0,s:'Deflection per unit current.'}
   ]}
 };
 })();
