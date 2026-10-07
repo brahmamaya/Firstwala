@@ -3,7 +3,7 @@
    those exams. a = step-by-step answer; o = options and c = the correct one for MCQs; sim = the experiment to try it in.
    window.PhysicaMockBank = the timed mock tests (JEE Main and NEET pattern), separate from the practice questions so a
    student never meets a mock question beforehand. tp = topic (for the topic-wise report), o + c = MCQ, n = numerical
-   answer, s = solution (shown only in the report). Chapters so far: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion, Work, Energy and Power. */
+   answer, s = solution (shown only in the report). One entry per chapter, in NCERT order. */
 (() => {
 'use strict';
 window.PhysicaExam={
@@ -147,6 +147,33 @@ window.PhysicaExam={
   {t:'neet',sim:'spring-launcher',q:'A spring of constant 200 N/m is stretched by 0.1 m. Its stored energy is:',o:['10 J','2 J','20 J','1 J'],c:3,a:'U = ½kx² = ½ × 200 × 0.01 = 1 J.'},
   {t:'neet',q:'A 2 kg body is lifted 5 m. The work done by gravity is (g = 10 m/s²):',o:['100 J','−100 J','10 J','zero'],c:1,a:'Gravity acts down while the body moves up: W = −mgh = −100 J.'},
   {t:'neet',sim:'collision',q:'In a perfectly elastic collision:',o:['only momentum is conserved','only kinetic energy is conserved','both momentum and kinetic energy are conserved','neither is conserved'],c:2,a:'Momentum is conserved in every collision; in an elastic one the kinetic energy is too.'}
+],
+'System of Particles and Rotational Motion':[
+  {t:'1',sim:'centre-of-mass-3d',q:'Does the centre of mass of a body always lie inside it? Give an example.',a:'No. The centre of mass of a ring lies at its centre, where there is no material.'},
+  {t:'1',q:'Define torque and give its SI unit.',a:'Torque is the turning effect of a force: τ = r × F (size rF sin θ). SI unit: N·m.'},
+  {t:'1',sim:'inertia-shapes',q:'On what does the moment of inertia of a body depend?',a:'On its mass, on how the mass is spread out, and on the position of the axis of rotation.'},
+  {t:'1',sim:'angular-momentum',q:'What is conserved when no external torque acts on a system?',a:'Its angular momentum L = Iω.'},
+  {t:'1',q:'Define the radius of gyration.',a:'The distance k from the axis at which the whole mass could be put to give the same moment of inertia: I = Mk².'},
+  {t:'3',sim:'centre-of-mass-3d',q:'Masses of 1 kg, 2 kg and 3 kg are placed at (0, 0), (1, 0) and (0, 1) metres. Find the centre of mass.',a:'x = (1 × 0 + 2 × 1 + 3 × 0)/6 = 1/3 m.\ny = (1 × 0 + 2 × 0 + 3 × 1)/6 = 1/2 m.\nCentre of mass at (1/3 m, 1/2 m).'},
+  {t:'3',sim:'parallel-axis',q:'State and prove the theorem of parallel axes.',a:'I = I(cm) + Md², where d is the distance between the axis and a parallel axis through the centre of mass.\nProof: for each particle at distance x from the CM axis, its distance from the new axis is (x + d).\nI = Σm(x + d)² = Σmx² + 2dΣmx + Σm d².\nΣmx = 0 (measured from the CM), so I = I(cm) + Md².'},
+  {t:'3',sim:'angular-momentum',q:'Why does an ice skater spin faster when she pulls her arms in?',a:'No external torque acts, so L = Iω stays constant.\nPulling the arms in brings mass closer to the axis, so I decreases.\nTherefore ω increases.'},
+  {t:'3',q:'A torque of 10 N·m acts on a flywheel of moment of inertia 2 kg·m² starting from rest. Find its angular acceleration and its angular speed after 4 s.',a:'τ = Iα: α = 10/2 = 5 rad/s².\nω = αt = 5 × 4 = 20 rad/s.'},
+  {t:'3',sim:'rolling',q:'Show that the kinetic energy of a body rolling without slipping is ½mv²(1 + k²/R²). Find it for a disc.',a:'K = ½mv² (moving) + ½Iω² (turning), with I = mk² and ω = v/R.\nK = ½mv² + ½mk²v²/R² = ½mv²(1 + k²/R²).\nDisc: k² = R²/2, so K = ½mv² × 3/2 = ¾mv².'},
+  {t:'3',q:'Use the theorem of perpendicular axes to find the moment of inertia of a ring about a diameter.',a:'For a flat body: I(z) = I(x) + I(y).\nRing about the axis through its centre, perpendicular to its plane: I(z) = MR².\nBy symmetry I(x) = I(y) = I(d), so 2I(d) = MR² and I(d) = MR²/2.'},
+  {t:'5',sim:'rolling-race',q:'Derive the acceleration of a body rolling without slipping down an incline of angle θ. Which reaches the bottom first: a ring, a disc or a solid sphere?',a:'Along the incline: mg sin θ − f = ma. Turning: fR = Iα = mk² × a/R, so f = mk²a/R².\nAdd: mg sin θ = ma(1 + k²/R²), so a = g sin θ/(1 + k²/R²).\nk²/R²: ring 1, disc 1/2, sphere 2/5.\nThe solid sphere has the smallest k²/R², so the largest a: it wins, then the disc, then the ring.'},
+  {t:'5',q:'A uniform 4 m plank of mass 20 kg rests on supports at its two ends. A 60 kg man stands 1 m from the left end. Find the force on each support (g = 10 m/s²).',a:'Equilibrium: net force = 0 and net torque = 0.\nForces: R(A) + R(B) = 200 + 600 = 800 N.\nTorques about the left end: R(B) × 4 = 200 × 2 + 600 × 1 = 1000, so R(B) = 250 N.\nR(A) = 800 − 250 = 550 N.'},
+  {t:'5',q:'Show that angular momentum L = Iω for a rigid body, and that τ = dL/dt. Hence state the conservation of angular momentum.',a:'Each particle moves on a circle of radius r with v = rω, so its angular momentum is mvr = mr²ω.\nSumming: L = (Σmr²)ω = Iω.\nFor a particle L = r × p, so dL/dt = (dr/dt × p) + r × dp/dt = (v × mv) + r × F = 0 + τ.\nSo τ = dL/dt; if τ(external) = 0, L stays constant (conservation of angular momentum).'},
+  {t:'jee',sim:'rod-pendulum',q:'A uniform rod of length L swings about one end as a pendulum. Find its time period for small oscillations.',a:'Torque: τ = −mg(L/2) sin θ ≈ −mg(L/2)θ. I about the end = mL²/3.\nα = −(mgL/2)/(mL²/3) θ = −(3g/2L)θ, so ω² = 3g/2L.\nT = 2π√(2L/3g).'},
+  {t:'jee',sim:'rolling',q:'For a solid sphere rolling without slipping, the ratio of rotational to total kinetic energy is:',o:['2/5','2/7','5/7','1/2'],c:1,a:'Rotational = ½ × (2/5)mR² × (v/R)² = (1/5)mv². Total = (7/10)mv².\nRatio = (1/5)/(7/10) = 2/7.'},
+  {t:'jee',sim:'angular-momentum',q:'A disc of moment of inertia I₁ spinning at ω₁ is gently placed on a coaxial disc I₂ at rest; they then turn together. Find the final angular speed and the fraction of kinetic energy lost.',a:'Angular momentum: I₁ω₁ = (I₁ + I₂)ω, so ω = I₁ω₁/(I₁ + I₂).\nK before = ½I₁ω₁², after = ½(I₁ + I₂)ω² = ½I₁²ω₁²/(I₁ + I₂).\nFraction lost = 1 − I₁/(I₁ + I₂) = I₂/(I₁ + I₂).'},
+  {t:'jee',sim:'topple-or-slide',q:'A horizontal force at the top edge pushes a uniform cube resting on a rough floor. It topples before sliding if the coefficient of friction μ is:',o:['μ > 1/2','μ > 1','μ > 1/√2','μ > 1/4'],c:0,a:'Toppling about the far bottom edge starts when F × a = mg × a/2, so F = mg/2.\nSliding starts when F = μmg.\nIt topples first if mg/2 < μmg, that is μ > 1/2.'},
+  {t:'jee',q:'A particle moves with constant velocity v along the line y = d. Its angular momentum about the origin:',o:['is zero','increases with time','is constant and equal to mvd','decreases with time'],c:2,a:'L = r × p has size m v × (perpendicular distance of the line from the origin) = mvd, which never changes.'},
+  {t:'neet',sim:'inertia-shapes',q:'The moment of inertia of a solid sphere about a diameter is:',o:['MR²','(2/3)MR²','(2/5)MR²','(1/2)MR²'],c:2,a:'Solid sphere: (2/5)MR². (Hollow sphere: (2/3)MR².)'},
+  {t:'neet',q:'The SI unit of angular momentum is:',o:['kg·m²/s','kg·m/s','N·m','kg·m²/s²'],c:0,a:'L = Iω: kg·m² × 1/s = kg·m²/s (same as J·s).'},
+  {t:'neet',sim:'rolling-race',q:'A ring, a disc and a solid sphere roll down the same incline from rest. Which reaches the bottom first?',o:['ring','disc','solid sphere','all together'],c:2,a:'a = g sin θ/(1 + k²/R²); the sphere has the smallest k²/R² (2/5).'},
+  {t:'neet',q:'A 10 N force acts at right angles to a spanner at 0.5 m from the nut. The torque is:',o:['20 N·m','5 N·m','10 N·m','0.5 N·m'],c:1,a:'τ = rF = 0.5 × 10 = 5 N·m.'},
+  {t:'neet',sim:'centre-of-mass-3d',q:'A 2 kg mass is at x = 0 and a 3 kg mass at x = 5 m. The centre of mass is at:',o:['x = 2.5 m','x = 2 m','x = 3 m','x = 4 m'],c:2,a:'x = (2 × 0 + 3 × 5)/5 = 3 m.'},
+  {t:'neet',sim:'angular-momentum',q:'If the Earth shrank to a smaller radius with the same mass, the length of the day would:',o:['increase','decrease','stay the same','become zero'],c:1,a:'L = Iω is conserved; I decreases, so ω increases and the day becomes shorter.'}
 ]};
 
 window.PhysicaMockBank={
@@ -354,6 +381,47 @@ window.PhysicaMockBank={
     {tp:'coll',q:'In a perfectly inelastic collision:',o:['the bodies stick together and momentum is conserved','kinetic energy is conserved','momentum is not conserved','the bodies bounce apart'],c:0,s:'The bodies move together afterwards; momentum is conserved but kinetic energy is lost.'},
     {tp:'coll',q:'The coefficient of restitution for a perfectly elastic collision is:',o:['0','between 0 and 1','1','more than 1'],c:2,s:'The relative speed of separation equals that of approach.'},
     {tp:'coll',q:'A ball hits an identical ball at rest in a head-on elastic collision. Afterwards:',o:['both move together','the first stops and the second moves with the first\'s speed','both stop','the first bounces back'],c:1,s:'Equal masses in an elastic collision exchange velocities.'}
+  ]},
+'System of Particles and Rotational Motion':{
+  topics:{com:'Centre of mass',torque:'Torque and equilibrium',moi:'Moment of inertia',angm:'Angular momentum',roll:'Rolling motion'},
+  jee:[
+    {tp:'com',q:'Three identical particles sit at the corners of an equilateral triangle of side a. The distance of their centre of mass from any corner is:',o:['a/2','a/√3','a/√2','a/3'],c:1,s:'The centre of mass is the centroid, 2/3 of the median (a√3/2) from the corner: (2/3)(a√3/2) = a/√3.'},
+    {tp:'com',q:'From a uniform disc of radius R, a disc of radius R/2 touching its edge is cut out. The centre of mass of the rest shifts from the centre by:',o:['R/2','R/4','R/6','R/3'],c:2,s:'The removed part has mass M/4, centred R/2 away.\nx = −(M/4)(R/2)/(3M/4) = −R/6 (on the opposite side).'},
+    {tp:'moi',q:'The moment of inertia of a uniform rod (mass M, length L) about a perpendicular axis L/4 from one end is:',o:['7ML²/48','ML²/16','ML²/3','5ML²/48'],c:0,s:'The axis is L/4 from the centre. I = ML²/12 + M(L/4)² = 4ML²/48 + 3ML²/48 = 7ML²/48.'},
+    {tp:'moi',q:'The moment of inertia of a disc about a tangent in its own plane is:',o:['3MR²/2','5MR²/4','MR²/2','3MR²/4'],c:1,s:'About a diameter: MR²/4. Parallel axes: MR²/4 + MR² = 5MR²/4.'},
+    {tp:'angm',q:'A spinning skater pulls her arms in and her moment of inertia falls to one third. Her rotational kinetic energy becomes:',o:['the same','one third','3 times','9 times'],c:2,s:'L is constant, so ω triples. K = L²/2I, so with I/3, K becomes 3 times.'},
+    {tp:'angm',q:'A particle moves with constant velocity v along the line y = d. Its angular momentum about the origin is:',o:['zero','increasing with time','mvd and constant','decreasing with time'],c:2,s:'|r × p| = mv × (perpendicular distance d), which does not change.'},
+    {tp:'torque',q:'A force F = (2î + 3ĵ) N acts at the point r = (î − ĵ) m. The torque about the origin is:',o:['5k̂ N·m','−5k̂ N·m','k̂ N·m','−k̂ N·m'],c:0,s:'τ = r × F = (1 × 3 − (−1) × 2)k̂ = 5k̂ N·m.'},
+    {tp:'roll',q:'A solid sphere rolls without slipping down a 30° incline. Its acceleration is (g = 10 m/s²):',o:['5 m/s²','25/7 m/s²','10/3 m/s²','5/2 m/s²'],c:1,s:'a = g sin θ/(1 + 2/5) = 5/(7/5) = 25/7 ≈ 3.6 m/s².'},
+    {tp:'roll',q:'A ring and a disc of the same mass and radius roll at the same speed. The ratio of their kinetic energies (ring : disc) is:',o:['1 : 1','3 : 4','4 : 3','2 : 1'],c:2,s:'K = ½mv²(1 + k²/R²): ring 1 + 1 = 2, disc 1 + ½ = 3/2. Ratio 2 : 3/2 = 4 : 3.'},
+    {tp:'torque',q:'A uniform rod of length L, hinged at one end, is released from the horizontal. Its angular acceleration at that moment is:',o:['g/L','3g/2L','2g/3L','3g/L'],c:1,s:'τ = mg(L/2), I = mL²/3. α = τ/I = (mgL/2)/(mL²/3) = 3g/2L.'},
+    {tp:'torque',q:'A torque of 2 N·m acts on a flywheel (I = 0.5 kg·m²) at rest. Find its angular speed after 5 s, in rad/s.',n:20,s:'α = τ/I = 4 rad/s². ω = 4 × 5 = 20 rad/s.'},
+    {tp:'moi',q:'Four particles of 1 kg each sit at the corners of a square of side 2 m. Find their moment of inertia (kg·m²) about the axis through the centre, perpendicular to the square.',n:8,s:'Each is √2 m from the centre: I = 4 × 1 × (√2)² = 8 kg·m².'},
+    {tp:'roll',q:'A 2 kg disc rolls without slipping at 2 m/s. Find its total kinetic energy in joules.',n:6,s:'K = ¾mv² = ¾ × 2 × 4 = 6 J.'},
+    {tp:'angm',q:'A disc (I = 2 kg·m²) spins at 10 rad/s. A second disc (I = 3 kg·m²) at rest is placed on it, coaxially, and they turn together. Find the final angular speed in rad/s.',n:4,s:'2 × 10 = (2 + 3)ω, so ω = 4 rad/s.'},
+    {tp:'com',q:'A 2 kg particle is at (1, 2) m and a 4 kg particle is at (4, 5) m. Find the x-coordinate of their centre of mass, in metres.',n:3,s:'x = (2 × 1 + 4 × 4)/6 = 18/6 = 3 m.'}
+  ],
+  neet:[
+    {tp:'com',q:'The centre of mass of a uniform ring is:',o:['on the ring','at its centre','anywhere inside','at infinity'],c:1,s:'By symmetry it is at the centre, where there is no material.'},
+    {tp:'com',q:'Masses of 1 kg and 3 kg are 4 m apart. The centre of mass is, from the 1 kg mass:',o:['1 m','2 m','3 m','4 m'],c:2,s:'x = 3 × 4/(1 + 3) = 3 m (closer to the heavier mass).'},
+    {tp:'com',q:'If no external force acts on a system, the velocity of its centre of mass:',o:['increases','decreases','is constant','becomes zero'],c:2,s:'M a(cm) = F(ext) = 0.'},
+    {tp:'com',q:'The centre of mass of a body:',o:['always lies inside it','always lies on its surface','may lie inside or outside it','always lies outside it'],c:2,s:'Examples: a solid ball (inside), a ring (outside the material).'},
+    {tp:'torque',q:'A 20 N force acts at 0.5 m from the axis, at 30° to the arm. The torque is:',o:['10 N·m','5 N·m','8.7 N·m','20 N·m'],c:1,s:'τ = rF sin θ = 0.5 × 20 × 0.5 = 5 N·m.'},
+    {tp:'torque',q:'A rigid body is in equilibrium when:',o:['net force is zero','net torque is zero','both net force and net torque are zero','its speed is constant'],c:2,s:'Translational and rotational equilibrium are both needed.'},
+    {tp:'torque',q:'A couple acting on a body produces:',o:['only translation','only rotation','both','neither'],c:1,s:'Two equal, opposite, non-collinear forces: zero net force, non-zero torque.'},
+    {tp:'moi',q:'The moment of inertia of a ring about the axis through its centre, perpendicular to its plane, is:',o:['MR²/2','MR²','2MR²','MR²/4'],c:1,s:'All the mass is at distance R: I = MR².'},
+    {tp:'moi',q:'The moment of inertia of a disc about the axis through its centre, perpendicular to its plane, is:',o:['MR²','MR²/4','MR²/2','2MR²/5'],c:2,s:'Disc: MR²/2.'},
+    {tp:'moi',q:'The theorem of perpendicular axes applies to:',o:['all bodies','only flat (planar) bodies','only spheres','only rods'],c:1,s:'I(z) = I(x) + I(y) needs all the mass in the x-y plane.'},
+    {tp:'moi',q:'The moment of inertia of a thin rod about a perpendicular axis through its centre is:',o:['ML²/3','ML²/12','ML²/2','ML²'],c:1,s:'Rod about its centre: ML²/12 (about an end: ML²/3).'},
+    {tp:'moi',q:'The radius of gyration of a disc about its own axis is:',o:['R','R/2','R/√2','√2 R'],c:2,s:'Mk² = MR²/2, so k = R/√2.'},
+    {tp:'angm',q:'The SI unit of angular momentum is the same as that of:',o:['energy','power','Planck\'s constant (J·s)','torque'],c:2,s:'kg·m²/s = J·s.'},
+    {tp:'angm',q:'If the net external torque on a body is zero, its:',o:['angular velocity must be zero','angular momentum stays constant','moment of inertia stays constant','kinetic energy is zero'],c:1,s:'τ = dL/dt = 0, so L is constant.'},
+    {tp:'angm',q:'If the Earth contracted with no change in mass, the length of a day would:',o:['increase','stay the same','decrease','become infinite'],c:2,s:'I falls, L is conserved, so ω rises and the day shortens.'},
+    {tp:'angm',q:'A diver tucks in to spin faster because:',o:['her angular momentum increases','her moment of inertia decreases while L stays constant','gravity gives a torque','her mass decreases'],c:1,s:'L = Iω constant: smaller I means larger ω.'},
+    {tp:'roll',q:'The condition for rolling without slipping is:',o:['v = ω/R','v = Rω','v = R²ω','v = 0'],c:1,s:'The contact point is at rest: v − Rω = 0.'},
+    {tp:'roll',q:'The total kinetic energy of a ring rolling at speed v is:',o:['½mv²','¾mv²','mv²','2mv²'],c:2,s:'½mv² + ½(mR²)(v/R)² = mv².'},
+    {tp:'roll',q:'Which reaches the bottom of an incline first when they roll from rest?',o:['ring','hollow sphere','disc','solid sphere'],c:3,s:'Smallest k²/R² (2/5) gives the largest acceleration.'},
+    {tp:'roll',q:'For a solid cylinder rolling without slipping, the rotational kinetic energy is what fraction of the total?',o:['1/2','1/3','2/3','1/4'],c:1,s:'Rotational = ¼mv², total = ¾mv²: fraction 1/3.'}
   ]}
 };
 })();
