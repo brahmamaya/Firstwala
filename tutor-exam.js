@@ -174,6 +174,33 @@ window.PhysicaExam={
   {t:'neet',q:'A 10 N force acts at right angles to a spanner at 0.5 m from the nut. The torque is:',o:['20 N·m','5 N·m','10 N·m','0.5 N·m'],c:1,a:'τ = rF = 0.5 × 10 = 5 N·m.'},
   {t:'neet',sim:'centre-of-mass-3d',q:'A 2 kg mass is at x = 0 and a 3 kg mass at x = 5 m. The centre of mass is at:',o:['x = 2.5 m','x = 2 m','x = 3 m','x = 4 m'],c:2,a:'x = (2 × 0 + 3 × 5)/5 = 3 m.'},
   {t:'neet',sim:'angular-momentum',q:'If the Earth shrank to a smaller radius with the same mass, the length of the day would:',o:['increase','decrease','stay the same','become zero'],c:1,a:'L = Iω is conserved; I decreases, so ω increases and the day becomes shorter.'}
+],
+'Gravitation':[
+  {t:'1',q:'What is the value of the universal gravitational constant G?',a:'G = 6.67 × 10⁻¹¹ N·m²/kg².'},
+  {t:'1',sim:'gravity-depth',q:'Where is the acceleration due to gravity of the Earth zero?',a:'At the centre of the Earth (and far away at infinity).'},
+  {t:'1',sim:'escape',q:'What is the escape speed from the Earth\'s surface?',a:'About 11.2 km/s.'},
+  {t:'1',sim:'kepler',q:'State Kepler\'s law of periods.',a:'The square of a planet\'s period is proportional to the cube of the semi-major axis of its orbit: T² ∝ a³.'},
+  {t:'1',q:'Why do astronauts in an orbiting spacecraft feel weightless?',a:'They and the spacecraft are both falling freely around the Earth with the same acceleration, so the floor pushes on them with no force.'},
+  {t:'3',q:'Derive the relation between g and G.',a:'A body of mass m on the Earth\'s surface is pulled by F = GMm/R².\nThis force gives it acceleration g: mg = GMm/R².\nSo g = GM/R².'},
+  {t:'3',q:'Show that at a small height h above the Earth\'s surface, g(h) ≈ g(1 − 2h/R).',a:'g(h) = GM/(R + h)² = (GM/R²)(1 + h/R)⁻² = g(1 + h/R)⁻².\nFor h ≪ R, (1 + h/R)⁻² ≈ 1 − 2h/R.\nSo g(h) ≈ g(1 − 2h/R).'},
+  {t:'3',sim:'gravity-depth',q:'Show that at a depth d below the Earth\'s surface, g(d) = g(1 − d/R).',a:'At depth d only the inner sphere of radius (R − d) pulls. Its mass M\' = M(R − d)³/R³ (uniform density).\ng(d) = GM\'/(R − d)² = GM(R − d)/R³ = g(1 − d/R).\nSo g falls steadily to zero at the centre.'},
+  {t:'3',sim:'escape',q:'Derive the expression for escape speed from the Earth.',a:'The body must get enough kinetic energy to reach infinity (where its total energy is zero).\n½mv² − GMm/R = 0, so v = √(2GM/R).\nSince GM = gR²: v = √(2gR) ≈ 11.2 km/s.'},
+  {t:'3',q:'Find the orbital speed and the time period of a satellite moving in a circular orbit of radius r around the Earth.',a:'Gravity gives the centripetal force: GMm/r² = mv²/r, so v = √(GM/r).\nT = 2πr/v = 2π√(r³/GM).\n(The mass of the satellite does not matter.)'},
+  {t:'3',sim:'geostationary',q:'What is a geostationary satellite? State its conditions and approximate height.',a:'A satellite that stays above the same point on the equator.\nConditions: period 24 h, circular orbit in the equatorial plane, moving in the same direction as the Earth\'s rotation.\nHeight ≈ 36 000 km (orbit radius ≈ 42 000 km). Used for communication.'},
+  {t:'5',sim:'orbital-energy',q:'Derive the kinetic, potential and total energy of a satellite in a circular orbit of radius r. What is its binding energy?',a:'Potential energy: U = −GMm/r.\nFrom GMm/r² = mv²/r: K = ½mv² = GMm/2r.\nTotal energy: E = K + U = GMm/2r − GMm/r = −GMm/2r.\nThe negative total shows the satellite is bound. Binding energy = GMm/2r: the energy needed to free it.'},
+  {t:'5',sim:'kepler',q:'State Kepler\'s three laws. Derive the third law for a circular orbit.',a:'1. Law of orbits: planets move in ellipses with the Sun at one focus.\n2. Law of areas: the line from the Sun to a planet sweeps equal areas in equal times (angular momentum is conserved).\n3. Law of periods: T² ∝ a³.\nCircular orbit: GMm/r² = m(2π/T)²r, so T² = (4π²/GM)r³, that is T² ∝ r³.'},
+  {t:'5',sim:'earth-tunnel',q:'A tunnel is dug straight through the centre of the Earth. Show that a body dropped into it moves in SHM and find its period.',a:'At distance x from the centre, only the mass within x pulls: g(x) = g x/R.\nForce F = −mg x/R, proportional to −x: simple harmonic motion.\nω² = g/R, so T = 2π√(R/g) ≈ 84 minutes (the same as a satellite skimming the surface).'},
+  {t:'jee',q:'At what height above the Earth\'s surface does g become one quarter of its surface value?',o:['R/2','R','2R','4R'],c:1,a:'g/(1 + h/R)² = g/4, so 1 + h/R = 2 and h = R.'},
+  {t:'jee',sim:'orbital-energy',q:'How much energy is needed to move a satellite of mass m from a circular orbit of radius r to one of radius 2r?',a:'E = −GMm/2r in each orbit.\nΔE = −GMm/4r − (−GMm/2r) = GMm/4r.'},
+  {t:'jee',sim:'escape',q:'A planet has twice the Earth\'s radius and the same density. Its escape speed compared with the Earth\'s is:',o:['the same','2 times','√2 times','4 times'],c:1,a:'v = √(2GM/R) with M = (4/3)πR³ρ gives v ∝ R√ρ. Same ρ, double R: 2 times.'},
+  {t:'jee',q:'What are the gravitational field and potential inside a uniform thin spherical shell?',a:'The field inside is zero everywhere (the pulls from all parts cancel).\nSo the potential does not change inside: it is constant, equal to its value at the surface, −GM/R.'},
+  {t:'jee',q:'The period of a satellite skimming the Earth\'s surface is about (R = 6400 km, g = 10 m/s²):',o:['24 h','84 min','12 h','8 min'],c:1,a:'T = 2π√(R/g) = 2π√(6.4 × 10⁵) ≈ 5000 s ≈ 84 min.'},
+  {t:'neet',q:'If the distance between two masses is doubled, the gravitational force becomes:',o:['half','one quarter','double','four times'],c:1,a:'F ∝ 1/r².'},
+  {t:'neet',q:'The acceleration due to gravity on the Moon is about:',o:['the same as on Earth','1/6 of the Earth\'s','6 times the Earth\'s','zero'],c:1,a:'g(Moon) ≈ 1.6 m/s², about one sixth of 9.8 m/s².'},
+  {t:'neet',sim:'escape',q:'The escape speed of a body does NOT depend on:',o:['the planet\'s mass','the planet\'s radius','the body\'s own mass','the value of G'],c:2,a:'v = √(2GM/R): no m of the body.'},
+  {t:'neet',q:'The orbital speed of a satellite close to the Earth\'s surface is about:',o:['11.2 km/s','7.9 km/s','3 km/s','1 km/s'],c:1,a:'v = √(gR) = √(9.8 × 6.4 × 10⁶) ≈ 7.9 km/s.'},
+  {t:'neet',sim:'gravity-depth',q:'The weight of a body at the centre of the Earth is:',o:['the same as on the surface','twice','zero','infinite'],c:2,a:'g = 0 at the centre, so the weight is zero (the mass is unchanged).'},
+  {t:'neet',sim:'kepler',q:'Kepler\'s second law (equal areas in equal times) follows from the conservation of:',o:['energy','linear momentum','angular momentum','mass'],c:2,a:'Gravity is a central force, so it gives no torque about the Sun: angular momentum is conserved.'}
 ]};
 
 window.PhysicaMockBank={
@@ -422,6 +449,47 @@ window.PhysicaMockBank={
     {tp:'roll',q:'The total kinetic energy of a ring rolling at speed v is:',o:['½mv²','¾mv²','mv²','2mv²'],c:2,s:'½mv² + ½(mR²)(v/R)² = mv².'},
     {tp:'roll',q:'Which reaches the bottom of an incline first when they roll from rest?',o:['ring','hollow sphere','disc','solid sphere'],c:3,s:'Smallest k²/R² (2/5) gives the largest acceleration.'},
     {tp:'roll',q:'For a solid cylinder rolling without slipping, the rotational kinetic energy is what fraction of the total?',o:['1/2','1/3','2/3','1/4'],c:1,s:'Rotational = ¼mv², total = ¾mv²: fraction 1/3.'}
+  ]},
+'Gravitation':{
+  topics:{law:'Law of gravitation and field',gvar:'Variation of g',pot:'Potential energy and escape speed',orbit:'Satellites',kep:'Kepler\'s laws'},
+  jee:[
+    {tp:'law',q:'Two identical uniform spheres of radius R touch each other. The gravitational force between them is proportional to:',o:['R²','R⁴','R⁻²','R⁶'],c:1,s:'m ∝ R³ and the centres are 2R apart: F = Gm²/(2R)² ∝ R⁶/R² = R⁴.'},
+    {tp:'gvar',q:'For h ≪ R, the depth at which g equals its value at height h is:',o:['h','2h','h/2','4h'],c:1,s:'g(1 − d/R) = g(1 − 2h/R), so d = 2h.'},
+    {tp:'gvar',q:'How long would a day have to be for bodies at the equator to feel weightless (R = 6400 km, g = 10 m/s²)?',o:['24 h','about 1.4 h','12 h','6 h'],c:1,s:'Need ω²R = g: ω = √(g/R) = 1/800 rad/s. T = 2π × 800 ≈ 5000 s ≈ 1.4 h.'},
+    {tp:'pot',q:'If the Earth shrank to a quarter of its radius with the same mass, the escape speed would become:',o:['half','the same','4 times','2 times'],c:3,s:'v = √(2GM/R) ∝ 1/√R: a quarter of R doubles v.'},
+    {tp:'pot',q:'The energy needed to put a satellite of mass m, at rest on the Earth, into an orbit at height R above the surface is:',o:['GMm/2R','3GMm/4R','GMm/4R','GMm/R'],c:1,s:'In orbit (r = 2R): E = −GMm/4R. On the ground: −GMm/R.\nEnergy needed = −GMm/4R + GMm/R = 3GMm/4R.'},
+    {tp:'orbit',q:'A satellite at height R above the surface has a period T. A satellite skimming the surface has period T₀. Then T/T₀ is:',o:['2','4','2√2','√2'],c:2,s:'T ∝ r^(3/2): (2R/R)^(3/2) = 2√2.'},
+    {tp:'orbit',q:'If the orbit radius of a satellite becomes 4 times, its orbital speed becomes:',o:['4 times','2 times','half','one quarter'],c:2,s:'v = √(GM/r) ∝ 1/√r: 1/√4 = 1/2.'},
+    {tp:'kep',q:'A planet at distance r from the Sun has period T. A planet at 4r has period:',o:['4T','16T','8T','2T'],c:2,s:'T² ∝ r³: T\' = T × 4^(3/2) = 8T.'},
+    {tp:'kep',q:'A planet\'s closest distance from the Sun is r and its farthest is 3r. The ratio of its speeds (closest : farthest) is:',o:['1 : 3','3 : 1','9 : 1','1 : 1'],c:1,s:'Angular momentum: v₁r₁ = v₂r₂, so v₁/v₂ = 3r/r = 3.'},
+    {tp:'law',q:'Inside a uniform solid sphere, the gravitational field at distance r from the centre is:',o:['zero','proportional to 1/r²','proportional to r','constant'],c:2,s:'Only the inner mass (∝ r³) pulls: E = GM(r³/R³)/r² ∝ r.'},
+    {tp:'gvar',q:'g on the Earth\'s surface is 9 m/s². Find g, in m/s², at a height of R/2 above the surface.',n:4,s:'g\' = g/(1 + 1/2)² = 9 × 4/9 = 4 m/s².'},
+    {tp:'pot',q:'Take the Earth\'s escape speed as 11 km/s. A planet has 9 times the Earth\'s mass and the same radius. Find its escape speed in km/s.',n:33,s:'v ∝ √M: 11 × √9 = 33 km/s.'},
+    {tp:'kep',q:'A satellite has a period of 2 hours in an orbit of radius r. Find its period, in hours, in an orbit of radius 4r.',n:16,s:'T ∝ r^(3/2): 2 × 8 = 16 h.'},
+    {tp:'law',q:'Masses of 10 kg and 40 kg are 3 m apart. At what distance (in m) from the 10 kg mass is the net gravitational field zero?',n:1,s:'G×10/x² = G×40/(3 − x)²: (3 − x)/x = 2, so x = 1 m.'},
+    {tp:'gvar',q:'A 60 kg man goes down to a depth of R/2. Find his weight there in newtons (g = 10 m/s² on the surface).',n:300,s:'g(d) = g(1 − 1/2) = 5 m/s². W = 60 × 5 = 300 N.'}
+  ],
+  neet:[
+    {tp:'law',q:'The SI unit of G is:',o:['N·m²/kg²','N·m/kg','N·kg²/m²','kg²/N·m²'],c:0,s:'G = Fr²/m²: N·m²/kg².'},
+    {tp:'law',q:'If the distance between two masses is halved, the gravitational force becomes:',o:['half','double','4 times','one quarter'],c:2,s:'F ∝ 1/r².'},
+    {tp:'law',q:'The value of G:',o:['is the same everywhere in the universe','is larger at the poles','changes with height','is zero in space'],c:0,s:'G is a universal constant (g is what changes).'},
+    {tp:'law',q:'The gravitational force between two masses is:',o:['always repulsive','always attractive','sometimes attractive','zero in vacuum'],c:1,s:'Gravity only attracts.'},
+    {tp:'gvar',q:'At a height equal to the Earth\'s radius, g becomes:',o:['g/2','g/4','g/8','2g'],c:1,s:'g/(1 + 1)² = g/4.'},
+    {tp:'gvar',q:'At a depth of R/2 below the surface, g becomes:',o:['g/4','2g','g/2','zero'],c:2,s:'g(1 − d/R) = g/2.'},
+    {tp:'gvar',q:'The value of g on the Earth\'s surface is largest at the:',o:['equator','poles','tropics','same everywhere'],c:1,s:'At the poles the radius is smallest and there is no rotation effect.'},
+    {tp:'gvar',q:'Going from the equator towards a pole, g:',o:['increases','decreases','stays the same','first rises then falls'],c:0,s:'Smaller radius and smaller rotation effect towards the poles.'},
+    {tp:'pot',q:'The gravitational potential energy of a mass m at distance r from the centre of the Earth (r ≥ R) is:',o:['GMm/r','−GMm/r','−GMm/r²','mgr'],c:1,s:'U = −GMm/r (zero at infinity).'},
+    {tp:'pot',q:'The escape speed from a planet is:',o:['√(gR)','√(2gR)','2gR','√(g/R)'],c:1,s:'v = √(2GM/R) = √(2gR).'},
+    {tp:'pot',q:'The escape speed of a body from the Earth depends on:',o:['the body\'s mass','the direction of throwing','the Earth\'s mass and radius','the body\'s shape'],c:2,s:'v = √(2GM/R).'},
+    {tp:'pot',q:'The escape speed from the Earth\'s surface is about:',o:['7.9 km/s','11.2 km/s','3 × 10⁵ km/s','1.6 km/s'],c:1,s:'√(2 × 9.8 × 6.4 × 10⁶) ≈ 11.2 km/s.'},
+    {tp:'orbit',q:'The orbital speed of a satellite just above the Earth\'s surface is:',o:['√(2gR)','√(gR)','gR','√(g/R)'],c:1,s:'mg = mv²/R, so v = √(gR) ≈ 7.9 km/s.'},
+    {tp:'orbit',q:'For a satellite close to the surface, the escape speed v(e) and orbital speed v(o) are related by:',o:['v(e) = v(o)','v(e) = 2v(o)','v(e) = √2 v(o)','v(o) = √2 v(e)'],c:2,s:'√(2gR) = √2 × √(gR).'},
+    {tp:'orbit',q:'The period of a geostationary satellite is:',o:['12 h','24 h','84 min','365 days'],c:1,s:'It turns with the Earth: 24 hours.'},
+    {tp:'orbit',q:'The total energy of a satellite in a circular orbit is:',o:['positive','zero','negative','infinite'],c:2,s:'E = −GMm/2r: it is bound to the Earth.'},
+    {tp:'orbit',q:'An astronaut in an orbiting spacecraft is weightless because:',o:['there is no gravity in space','the astronaut and the craft fall freely together','the Moon pulls the other way','the craft is outside the atmosphere'],c:1,s:'Gravity is still about 90% of its surface value there; everything simply falls together.'},
+    {tp:'kep',q:'Kepler\'s third law states:',o:['T ∝ r','T² ∝ r³','T³ ∝ r²','T ∝ r²'],c:1,s:'The square of the period is proportional to the cube of the orbit size.'},
+    {tp:'kep',q:'Kepler\'s second law is a result of the conservation of:',o:['energy','linear momentum','angular momentum','mass'],c:2,s:'Gravity is a central force, so there is no torque about the Sun.'},
+    {tp:'kep',q:'A planet moves fastest when it is:',o:['farthest from the Sun','closest to the Sun','at the middle distance','its speed never changes'],c:1,s:'vr is constant, so the speed is greatest at the smallest distance (perihelion).'}
   ]}
 };
 })();
