@@ -160,7 +160,7 @@ Exam practice (Student mode, inside the AI Tutor - nothing new in Normal mode):
 
 Still to do / ideas:
 - Exam-date study plan inside the tutor; a visible "install for offline" button (install.js exists).
-- Exam + mock tests for the remaining chapters, one by one (done: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion, Work, Energy and Power, System of Particles and Rotational Motion, Gravitation, Mechanical Properties of Solids, Mechanical Properties of Fluids, Thermal Properties of Matter, Thermodynamics, Kinetic Theory, Oscillations; next: Waves).
+- Exam + mock tests for the remaining chapters, one by one (done: Units and Measurements, Motion in a Straight Line, Motion in a Plane, Laws of Motion, Work, Energy and Power, System of Particles and Rotational Motion, Gravitation, Mechanical Properties of Solids, Mechanical Properties of Fluids, Thermal Properties of Matter, Thermodynamics, Kinetic Theory, Oscillations, Waves; next: Class 12, starting with Electric Charges and Fields).
 - Owner to set up the Google Form + Apps Script (tools/tutor-questions.gs) for unanswered questions.
 - Next tutor chapter: Work, Energy and Power.
 - Owner will test on the real 86-inch board and report anything blurry or slow; owner may report Hinglish
