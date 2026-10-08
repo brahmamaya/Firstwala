@@ -208,7 +208,44 @@ refraction:{name:'Refractive index (Snell’s law)',aim:'To find the refractive 
  graphs:[{x:r=>r[0],y:r=>r[1],xl:'Input V_in (V)',yl:'Output V_out (V)',curve:true}],
  precautions:['The Zener must be reverse biased.','Do not exceed the maximum Zener current.'],
  errors:['Zener voltage changes with temperature.'],
- viva:[['Why is the Zener used in reverse bias?','In reverse breakdown its voltage stays almost constant over a wide range of current.'],['What is the role of the series resistor?','It drops the extra input voltage and limits the current.']]}
+ viva:[['Why is the Zener used in reverse bias?','In reverse breakdown its voltage stays almost constant over a wide range of current.'],['What is the role of the series resistor?','It drops the extra input voltage and limits the current.']]},
+'resonance-tube':{name:'Resonance tube',aim:'To determine the speed of sound in air at room temperature using a resonance tube with two resonance positions.',
+ apparatus:['Resonance tube with water reservoir','Tuning forks of known frequency','Rubber pad','Thermometer','Metre scale'],
+ theory:['First resonance: L₁ + e = λ/4; second resonance: L₂ + e = 3λ/4','v = f λ = 2 f (L₂ − L₁)','End correction e = (L₂ − 3L₁) / 2'],
+ how:'Choose a fork. Change the air column until the sound is loudest (first resonance) and press Record; then lengthen the column to the next loud position (second resonance) and press Record. Repeat with other forks.',
+ cols:[['Fork f (Hz)',1],['Resonance (1st / 2nd)',0],['Air column L (cm)',1]],
+ read(p,m){if(!(m('Loudness')>=90))return'Not at resonance yet; adjust the water level until the sound is loudest.';const v=331+.6*p.T,lam=v/p.f*100,n=Math.round(((p.L+1.5)*4/lam+1)/2);if(n>2)return'Use only the first and second resonance positions.';return[+p.f,n,p.L]},
+ result(R,p){const fs=[...new Set(R.map(r=>r[0]))],vs=[],es=[];for(const fq of fs){const a=R.filter(r=>r[0]===fq&&r[1]===1),b=R.filter(r=>r[0]===fq&&r[1]===2);if(a.length&&b.length){const L1=mean(a.map(r=>r[2])),L2=mean(b.map(r=>r[2]));vs.push(2*fq*(L2-L1)/100);es.push((L2-3*L1)/2)}}
+  if(!vs.length)return[['Record the 1st and 2nd resonance for the same fork','—']];return[...stat('Speed of sound v = 2f(L₂ − L₁)',vs,'m/s',1,331+.6*p.T,`Expected at ${p.T} °C`),['End correction e',fx(mean(es),2)+' cm']]},
+ precautions:['Strike the tuning fork on a rubber pad, never on a hard surface.','Hold the fork horizontally just above the mouth of the tube without touching it.','Locate each resonance by approaching it from both sides and take the mean.','Note the room temperature.'],
+ errors:['Moisture and temperature differences inside the tube.','End correction depends on the tube diameter.'],
+ viva:[['Why is the second resonance not exactly 3 × L₁?','Because of the end correction: the antinode forms slightly above the open end.'],['Why does the speed of sound increase with temperature?','v ∝ √T; at higher temperature the molecules move faster.'],['Which harmonics can a closed pipe produce?','Only odd harmonics.']]},
+sonometer:{name:'Sonometer',aim:'To study the relation between frequency and length of a given wire under constant tension using a sonometer.',
+ apparatus:['Sonometer with wire and bridges','Set of tuning forks','Hanger with slotted weights','Paper rider','Rubber pad'],
+ theory:['f = (1/2l) √(T/μ)','At constant tension f × l is constant, so the graph of f against 1/l is a straight line through the origin','Wave speed on the wire v = 2 f l = √(T/μ)'],
+ how:'Keep the load fixed. For each fork, move the bridge until the paper rider flies off, then press Record.',
+ cols:[['Fork f (Hz)',1],['Load M (kg)',1],['Resonant length l (cm)',1],['f × l (Hz·m)',2],['1/l (m⁻¹)',3],['v = 2fl (m/s)',1]],
+ read(p,m){if(!/flies/i.test(m.txt('Paper rider')))return'Not at resonance; move the bridge until the paper rider flies off.';return[+p.f,p.M,p.l,p.f*p.l/100,100/p.l,2*p.f*p.l/100]},
+ result(R,p){const same=R.every(r=>r[1]===R[0][1]),vt=Math.sqrt(R[0][1]*9.8/+p.mu);const out=same?stat('Mean f × l',R.map(r=>r[3]),'Hz·m',2,vt/2,'Expected ½√(T/μ)'):[];out.push(['Mean wave speed v = 2fl',fx(mean(R.map(r=>r[5])),1)+' m/s']);return out},
+ graphs:[{x:r=>r[4],y:r=>r[0],xl:'1/l (m⁻¹)',yl:'Frequency f (Hz)',origin:true,slope:'slope = f × l',sd:2}],
+ warn:(p,R)=>R.length&&R.some(r=>r[1]!==R[0][1])?'Keep the same load for every reading (constant tension).':'',
+ precautions:['The wire should be uniform and free from kinks.','Press the fork stem gently on the box; do not touch the prongs.','Approach the resonance from both sides and take the mean length.'],
+ errors:['Friction at the pulley reduces the actual tension.','The wire may not be perfectly uniform.'],
+ viva:[['What is the role of the paper rider?','It is thrown off when the wire vibrates with maximum amplitude, showing resonance.'],['How does f depend on tension?','f ∝ √T at a fixed length.'],['Why is a sonometer box hollow?','It vibrates with the wire (forced vibration) and makes the sound louder.']]},
+'prism-deviation':{name:'Prism: i–δ curve',aim:'To determine the angle of minimum deviation for a given prism by plotting the i–δ graph, and hence the refractive index of the glass.',
+ apparatus:['Glass prism','Drawing board and white paper','Pins','Protractor','Scale'],
+ theory:['δ = i + e − A','At minimum deviation i = e and r₁ = r₂ = A/2','n = sin[(A + δₘ)/2] / sin(A/2)'],
+ how:'Set an angle of incidence and press Record. Take readings from about 30° to 70° in steps of 5°, with smaller steps near the minimum.',
+ cols:[['Angle of incidence i (°)',1],['Angle of emergence e (°)',1],['Deviation δ (°)',1]],
+ read(p,m){const e=m('Angle of emergence'),d=m('Angle of deviation');if(!Number.isFinite(e)||!Number.isFinite(d))return'No emergent ray at this angle; increase the angle of incidence.';return[p.i,e,d]},
+ result(R,p){if(R.length<3)return[['Take at least 3 readings around the minimum','—']];const S2=[...R].sort((a,b)=>a[0]-b[0]);let k=0;S2.forEach((r,j)=>{if(r[2]<S2[k][2])k=j});let dm=S2[k][2],im=S2[k][0];
+  if(k>0&&k<S2.length-1){const [x0,,y0]=S2[k-1],[x1,,y1]=S2[k],[x2,,y2]=S2[k+1],den=(x0-x1)*(x0-x2)*(x1-x2),a=(x2*(y1-y0)+x1*(y0-y2)+x0*(y2-y1))/den,b=(x2*x2*(y0-y1)+x1*x1*(y2-y0)+x0*x0*(y1-y2))/den,c=(x1*x2*(x1-x2)*y0+x2*x0*(x2-x0)*y1+x0*x1*(x0-x1)*y2)/den;if(a>0){im=-b/(2*a);dm=c-b*b/(4*a)}}
+  const A=p.A,n=Math.sin(rad((A+dm)/2))/Math.sin(rad(A/2));return[['Angle of prism A',fx(A,0)+'°'],['Minimum deviation δₘ (from graph)',fx(dm,1)+'°'],['Angle of incidence at δₘ',fx(im,1)+'°'],['Refractive index n',fx(n,3)],['Value set',fx(p.n,3)],['Percentage error',fx(Math.abs(n-p.n)/p.n*100,2)+' %']]},
+ graphs:[{x:r=>r[0],y:r=>r[2],xl:'Angle of incidence i (°)',yl:'Deviation δ (°)',curve:true}],
+ precautions:['Keep the same face of the prism for all readings and do not move the prism.','Pins should be vertical and at least 8 cm apart.','Take more readings near the minimum of the curve.'],
+ errors:['Pin positions and thick pencil lines.','Protractor reading error of about 0.5°.'],
+ viva:[['What is the shape of the i–δ graph?','A curve that falls to a minimum and then rises; it is not symmetric.'],['What happens at minimum deviation?','i = e and the refracted ray inside the prism is parallel to the base.'],['Does δₘ depend on colour?','Yes, violet light deviates more than red because n is larger for violet.']]}
+
 };
 
 const KEY=id=>'physica-lab-'+id,load=id=>{try{const r=JSON.parse(localStorage.getItem(KEY(id))||'[]');return Array.isArray(r)?r.filter(x=>Array.isArray(x)&&x.every(Number.isFinite)):[]}catch{return[]}},
