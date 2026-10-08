@@ -16,6 +16,6 @@ f.addEventListener('submit',async e=>{e.preventDefault();msg.className='qmsg';
   const b=new URLSearchParams();b.append(F.name,name.slice(0,80));b.append(F.country,`Query | ${type} | ${mail.slice(0,120)||'no email'}`);b.append(F.text,text.slice(0,2000));
   btn.disabled=true;btn.textContent='Sending…';
   try{await fetch(FORM,{method:'POST',mode:'no-cors',body:b});last=Date.now();f.reset();msg.textContent='Thank you! Your query has reached the Physica team. If you left an email, we will reply there.';msg.className='qmsg ok'}
-  catch{msg.textContent='Could not send right now. Please check your internet, or email sahubrahmamaya@gmail.com.';msg.className='qmsg err'}
+  catch{msg.textContent='Could not send right now. Please check your internet, or email easy@physica.in.';msg.className='qmsg err'}
   btn.disabled=false;btn.textContent='Send query'});
 })();

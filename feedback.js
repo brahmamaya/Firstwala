@@ -28,7 +28,7 @@ const send=el('button',{type:'submit',class:'fb-send','data-testid':'feedback-se
 box.append(close,el('h2',{id:'fb-title',text:'Share your feedback'}),el('p',{class:'fb-sub',text:'Help us make Physica better. Your feedback means a lot to us!'}),
   field('What is your name?',name),field('Which country are you from?',country),field('Your feedback or suggestions',text),trap,msg,send,contact());
 // Schools and coaching institutes can write directly.
-function contact(){const mail='sahubrahmamaya@gmail.com',a=el('a',{href:`mailto:${mail}?subject=${encodeURIComponent('Physica for our school / coaching')}`,text:mail});
+function contact(){const mail='easy@physica.in',a=el('a',{href:`mailto:${mail}?subject=${encodeURIComponent('Physica for our school / coaching')}`,text:mail});
   return el('div',{class:'fb-contact'},[el('span',{'aria-hidden':'true',text:'🏫'}),el('p',{},[el('b',{text:'School or coaching owner?'}),document.createElement('br'),document.createTextNode('Contact us at:'),document.createElement('br'),a])])}
 // Help, About, Terms and Privacy pages: from the feedback card and the More menu.
 const links=el('nav',{class:'fb-links','aria-label':'About Physica'},[['about.html','About'],['help.html','Help & queries'],['terms.html','Terms'],['privacy.html','Privacy']].map(([h,t])=>el('a',{href:h,text:t})));box.append(links);
