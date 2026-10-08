@@ -187,3 +187,10 @@ Still to do / ideas:
 - Stopwatch button next to Snapshot: measures simulated time (correct in slow motion), laps.
 - Audit script (scratchpad audit.js) sweeps all 240 physics sims for NaN/Infinity/throws: fixed energy-levels (same level,
   series names Paschen/Brackett/Pfund, absorbed vs emitted).
+
+## Classroom tools (classroom.js, Teacher mode only: body.mode-teacher)
+- Dock (left edge on wide screens, bottom on phones): Draw (pen overlay on the stage, colours/undo/clear, strokes in 0..1
+  coords, cleared on sim change), Poll (pick variable + reading via window.PhysicaExplore, hand-count tallies, Reveal glides
+  the real slider min→max in 6 s then shows the answer, % correct and the graph; slider restored on close), Quiz (NEET MCQs
+  of the current chapter from PhysicaMockBank; loads tutor + exam packs via PhysicaLoadTutorPack/PhysicaLoadExam), Timer
+  (1–10 min countdown, WebAudio bell), Pick (random roll no. or names, no repeats; saved in localStorage physica-class*).
