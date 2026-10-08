@@ -45,7 +45,7 @@ const row=$('.lab-tool-buttons');if(row){const d=document.createElement('details
 // simulation itself is scaled up to fill the whole stage (pointer input is mapped back, so dragging still works).
 {let clean=false;try{clean=localStorage.getItem('physica-clean')==='1'}catch{}window.PhysicaClean=clean;
   const S=640,s=Math.min(960/S,505/345),V=window.PhysicaView={s,ox:(960-S*s)/2-28*s,oy:(505-345*s)/2-76*s};
-  const orig=window.PhysicaRenderExperiment;if(orig)window.PhysicaRenderExperiment=(c,sim,p,t,renderer)=>{if(!window.PhysicaClean||window.PhysicaFullStage?.[sim.id])return orig(c,sim,p,t,renderer);
+  const orig=window.PhysicaRenderExperiment;if(orig)window.PhysicaRenderExperiment=(c,sim,p,t,renderer)=>{if(!window.PhysicaClean||window.PhysicaFullStage?.[window.PhysicaAliasOf?.[sim.id]||sim.id])return orig(c,sim,p,t,renderer);
     c.save();const bg=c.createLinearGradient(0,0,960,505);bg.addColorStop(0,'#0a1d2d');bg.addColorStop(1,'#081624');c.fillStyle=bg;c.fillRect(0,0,960,505);window.Physica3D?.backdrop(c);
     c.translate(V.ox,V.oy);c.scale(V.s,V.s);c.beginPath();c.rect(28,76,640,345);c.clip();renderer(c,p,t);c.restore()};
   const ib=document.createElement('button');ib.type='button';ib.className='focus-btn info-btn';ib.dataset.testid='info-btn';ib.title='Show or hide the text and values drawn inside the simulation';

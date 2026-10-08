@@ -781,3 +781,4 @@ body.mock-on{overflow:hidden}body.mock-on>:not(.mock){display:none!important}
 .fig{display:block;width:100%;max-width:360px;height:auto;margin:4px 0 14px;color:inherit;font-family:inherit}
 .tutor-q .fig{max-width:320px}
 
+.landing-step2 .landing-grades{grid-template-columns:repeat(3,minmax(0,1fr));max-width:660px}

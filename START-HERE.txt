@@ -176,3 +176,14 @@ Still to do / ideas:
 - Audit script (scratchpad audit.js) sweeps all 240 physics sims for NaN/Infinity/throws: fixed energy-levels (same level,
   series names Paschen/Brackett/Pfund, absorbed vs emitted). Explore panel and stopwatch were removed at the owner's request.
 
+
+## Class 10 (NCERT Science, 13 chapters)
+- class10.js lists aliases: c10-<original id> with grade 10 + the Class 10 chapter (53 entries). app.js wraps the original in a
+  Proxy (own id/grade/chapter/subject/group; everything else read live from the original, incl. lazy bio/chem placeholders) and
+  resolves registries keyed by id through RID()/window.PhysicaAliasOf (PhysicaInteractive, UltraScenes, SimulationLessons,
+  FullStage, SimPatch).
+- class10-new.js: 12 new flat 2D sims (glass slab, eye defects, scattering, wire resistance, electric power & bill, field of a
+  straight wire, indicators, neutralisation, reaction types, reactivity series with auto-balanced equations, homologous series,
+  food chain & biomagnification). Packs may now set subject 'physics'/'botany'/'zoology' explicitly.
+- Landing + sidebar have a Class 10 button; sidebar shows NCERT chapter numbers (9–12 physics) for Class 10.
+- Contact email everywhere is easy@physica.in.
