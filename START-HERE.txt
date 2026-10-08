@@ -176,3 +176,5 @@ Still to do / ideas:
 - "Record reading" reads window.PhysicaState (sim, params, time; exposed in app.js) and the sim's own metrics; each lab's read() guards
   invalid setups (jaws not closed, bridge not balanced, virtual image...). Results: mean ± mean abs error, % error, least-squares graph.
 - "Lab record (PDF)" reuses the .mock overlay/print styles; student name etc. saved in localStorage 'physica-lab-who'; rows in 'physica-lab-<id>'.
+- eleventh.js: resonance-tube (v = 2f(L₂−L₁), end correction 0.3d), sonometer (paper rider, f×l), prism-deviation (i–δ curve,
+  δₘ by parabola through the 3 lowest points). All three have lab.js entries (20 labs total).
