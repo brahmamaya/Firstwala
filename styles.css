@@ -816,3 +816,25 @@ body.mock-on{overflow:hidden}body.mock-on>:not(.mock){display:none!important}
 .lab-doc{display:block;width:100%;min-width:0}
 .lab-paper{max-width:820px;margin:0 auto}
 .lab-card{min-width:0;max-width:100%;overflow:hidden}.lab-scroll{max-width:100%}
+.lab-mark{fill:var(--mint);stroke:var(--bg);stroke-width:2}
+/* Explore: predict, then graph */
+.ex-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+.ex-f{flex:1 1 200px;min-width:0}
+.ex-f span{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.ex-sel{width:100%;font:inherit;font-size:14px;padding:10px 12px;min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text)}
+.ex-q{font-weight:600}
+.ex-ch{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.ex-skip{background:transparent}
+.ex-verdict{font-weight:700}
+.ex-verdict.ok{color:var(--mint)}
+.ex-verdict.no{color:#f5a623}
+.ex-data summary{cursor:pointer;font-weight:700;margin:4px 0 8px}
+.ex-note{color:var(--muted);font-size:13px}
+.stopwatch{position:absolute;top:56px;left:12px;z-index:6;min-width:180px;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--panel);color:var(--text);box-shadow:0 8px 24px #0006}
+.stopwatch .lab-x{position:absolute;top:2px;right:2px}
+.sw-t{display:block;font-size:28px;font-variant-numeric:tabular-nums;margin:0 0 8px}
+.sw-row{display:flex;gap:6px}
+.sw-row .lab-btn{padding:8px 10px;min-height:40px}
+.sw-laps{margin:8px 0 0;padding-left:22px;font-size:13px;color:var(--muted);max-height:120px;overflow:auto}
+@media (max-width:600px){.stopwatch{top:6px;left:6px;min-width:150px;padding:8px 10px}.sw-t{font-size:20px;margin-bottom:6px}.sw-row .lab-btn{padding:6px 8px;min-height:36px;font-size:13px}}
+.sw-t{line-height:1.25;padding-top:2px}
