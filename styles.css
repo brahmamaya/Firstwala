@@ -784,3 +784,5 @@ body.mock-on{overflow:hidden}body.mock-on>:not(.mock){display:none!important}
 .landing-step2 .landing-grades{grid-template-columns:repeat(3,minmax(0,1fr));max-width:660px}
 .landing-wa{display:inline-flex;align-items:center;gap:8px;margin:0 auto 10px;padding:11px 20px;min-height:44px;border-radius:999px;border:1px solid #25d36688;background:#25d3661f;color:#d9ffe8;font-size:14px;font-weight:700;text-decoration:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .landing-wa:hover,.landing-wa:focus-visible{background:#25d36638;border-color:#25d366}
+.wa-top{display:inline-grid;place-items:center;flex:none;width:36px;height:32px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(37,211,102,.14);color:#25d366;text-decoration:none;touch-action:manipulation}
+.wa-top:hover,.wa-top:focus-visible{background:rgba(37,211,102,.28);border-color:#25d366}
