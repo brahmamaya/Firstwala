@@ -102,6 +102,6 @@ const tools=el('div','cls-dock');tools.setAttribute('role','toolbar');tools.setA
 for(const [k,ic,t,f] of[['pen','✏️','Draw',()=>pen(!penOn)],['poll','🗳️','Poll',poll],['quiz','❓','Quiz',quiz],['timer','⏲️','Timer',()=>{tw.hidden=!tw.hidden;tools.querySelector('[data-k=timer]').classList.toggle('on',!tw.hidden)}],['pick','🎲','Pick',picker]]){
   const b=btn('cls-tool',null,f);b.dataset.k=k;b.dataset.testid='cls-'+k;const i=el('span','',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t));tools.append(b)}
 document.body.append(tools);
-const sync=()=>{const B=document.body.classList,on=B.contains('mode-teacher')&&!B.contains('landing-open');tools.hidden=!on;if(!on){pen(false);tw.hidden=true;closeOv()}};
-new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});sync();
+const LP=document.getElementById('landing'),sync=()=>{const B=document.body.classList,on=B.contains('mode-teacher')&&!B.contains('landing-open')&&(!LP||LP.hidden);tools.hidden=!on;if(!on){pen(false);tw.hidden=true;closeOv()}};
+const mo=new MutationObserver(sync);mo.observe(document.body,{attributes:true,attributeFilter:['class']});if(LP)mo.observe(LP,{attributes:true,attributeFilter:['hidden','class']});sync();
 })();

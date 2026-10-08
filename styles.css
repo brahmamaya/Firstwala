@@ -890,3 +890,4 @@ body.cls-open{overflow:hidden}
 @media print{.cls-dock,.cls-timer,.cls-penbar{display:none!important}}
 .cls-t{min-width:0;overflow-wrap:anywhere}.cls-opt{min-width:0}.cls-opts{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}.cls-cnt,.cls-n{flex:none}
 @media (min-width:900px){.cls-dock{left:10px;right:auto;bottom:auto;top:50%;transform:translateY(-50%);flex-direction:column}}
+body.landing-open .cls-dock,body.landing-open .cls-timer{display:none!important}
