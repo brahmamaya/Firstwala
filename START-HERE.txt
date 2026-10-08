@@ -169,3 +169,10 @@ Still to do / ideas:
 - Next tutor chapter: Work, Energy and Power.
 - Owner will test on the real 86-inch board and report anything blurry or slow; owner may report Hinglish
   words the voice says oddly (add them to SPOKEN in tools/hinglish-voice.js).
+
+## Virtual lab (lab.js)
+- 17 NCERT practicals get a notebook card under the stage: vernier, screw gauge, spherometer, pendulum, Hooke, Newton cooling,
+  capillary rise, specific heat, Ohm, Wheatstone, potentiometer, internal resistance, convex lens, concave mirror, Snell, diode I–V, Zener.
+- "Record reading" reads window.PhysicaState (sim, params, time; exposed in app.js) and the sim's own metrics; each lab's read() guards
+  invalid setups (jaws not closed, bridge not balanced, virtual image...). Results: mean ± mean abs error, % error, least-squares graph.
+- "Lab record (PDF)" reuses the .mock overlay/print styles; student name etc. saved in localStorage 'physica-lab-who'; rows in 'physica-lab-<id>'.
