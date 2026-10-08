@@ -92,7 +92,8 @@ function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tb
   for(const b of sw.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
   if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
-  if(!c){body.append(el('p','tutor-note','The AI Tutor covers every physics chapter. Chemistry, Botany and Zoology are coming soon.'));return}
+  if(!c){if(examSet()){tab='exam';const b=btn('','🎯 Exam',()=>render());b.setAttribute('aria-pressed','true');tabs.append(b);window.PhysicaGlass?.(tabs);exam();return}
+    body.append(el('p','tutor-note','The AI Tutor covers every physics chapter. Chemistry, Botany and Zoology are coming soon.'));return}
   const list=[['ask','💬 Chat'],['show','▶ Show me'],['quiz','✓ Quiz']];if(examSet())list.push(['exam','🎯 Exam']);else if(tab==='exam')tab='ask';
   for(const [id,label] of list){const b=btn('',label,()=>{tab=id;render()});b.setAttribute('aria-pressed',String(id===tab));tabs.append(b)}
   window.PhysicaGlass?.(tabs);
@@ -356,21 +357,22 @@ function quiz(c){let score=0,done=0;const out=el('p','tutor-score'),qs=[];
 const examSet=()=>{const s=simObj();return s&&(window.PhysicaExamChapters||[]).includes(s.chapter)};
 let examTrack='board',examType='all';
 addEventListener('physica-mock-close',e=>{if(examSet()){tab='exam';if(e.detail)examTrack=e.detail;render()}});
-function exam(){if(!window.PhysicaExam){body.append(el('p','tutor-loading','Loading the questions…'));window.PhysicaLoadExam().then(()=>{if(tab==='exam')render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the questions - please check your internet and try again.'))});return}
+function exam(){const tracks=simObj()?.grade===10?[['board','Board practice'],['cbse','CBSE mock test']]:[['board','Board'],['jee','JEE'],['neet','NEET']];if(!tracks.some(t=>t[0]===examTrack))examTrack='board';
+  if(!window.PhysicaExam){body.append(el('p','tutor-loading','Loading the questions…'));window.PhysicaLoadExam().then(()=>{if(tab==='exam')render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the questions - please check your internet and try again.'))});return}
   const sim=simObj(),qs=window.PhysicaExam[sim.chapter]||[],key=n=>`${sim.chapter}#${n}`;let done={};
   try{done=JSON.parse(localStorage.getItem('physica-exam')||'{}')||{}}catch{}
   const save=()=>{try{localStorage.setItem('physica-exam',JSON.stringify(done))}catch{}},board=['1','3','5'],
     mine=qs.map((x,n)=>n).filter(n=>examTrack==='board'?board.includes(qs[n].t):qs[n].t===examTrack),
     prog=el('p','tutor-exam-prog'),paint=()=>{prog.textContent=`${mine.filter(n=>done[key(n)]===1).length} / ${mine.length} mastered`};
   const chipRow=(list,cur,set)=>{const r=el('div','tutor-chips');for(const [k,t] of list){const b=btn('tutor-chip',t,()=>{set(k);render()});b.setAttribute('aria-pressed',String(k===cur));r.append(b)}return r};
-  body.append(chipRow([['board','Board'],['jee','JEE'],['neet','NEET']],examTrack,k=>{examTrack=k}),prog);
+  body.append(chipRow(tracks,examTrack,k=>{examTrack=k}),prog);
   if(examTrack==='board')body.append(chipRow([['all','All'],['1','1 mark'],['3','2-3 marks'],['5','5 marks']],examType,k=>{examType=k}));
   const M=window.PhysicaMockTest,info=examTrack!=='board'&&M?.info(sim.chapter,examTrack);
   if(info){const m=el('div','tutor-mock');
-    m.append(el('b','',`⏱ ${info.name} mock test`),el('p','tutor-why',`${info.n} questions · ${info.min} min · +4 / −1 · result after you submit`),btn('tutor-mini','Start mock test',()=>{hush();M.start(sim.chapter,examTrack)}));
+    m.append(el('b','',`⏱ ${info.name} mock test`),el('p','tutor-why',`${info.n} questions · ${info.min} min · +${info.plus}${info.minus?' / −'+info.minus:', no negative marking'} · result after you submit`),btn('tutor-mini','Start mock test',()=>{hush();M.start(sim.chapter,examTrack)}));
     for(const r of M.past(sim.chapter,examTrack).slice(0,3)){const c=r.res.filter(x=>x==='c').length,w=r.res.filter(x=>x==='w').length;
-      m.append(btn('tutor-mini',`📄 ${new Date(r.at).toLocaleDateString()} · ${4*c-w} / ${4*r.res.length}`,()=>{hush();M.open(r)}))}
-    body.append(m,el('p','tutor-note','Practice questions'))}
+      m.append(btn('tutor-mini',`📄 ${new Date(r.at).toLocaleDateString()} · ${info.plus*c-info.minus*w} / ${info.plus*r.res.length}`,()=>{hush();M.open(r)}))}
+    body.append(m);if(mine.length)body.append(el('p','tutor-note','Practice questions'))}
   paint();
   for(const n of mine){const x=qs[n];if(examTrack==='board'&&examType!=='all'&&x.t!==examType)continue;
     const q=el('div','tutor-q'),ttl=el('b','',`${x.t==='jee'?'JEE':x.t==='neet'?'NEET':x.t==='1'?'1 mark':x.t==='3'?'2-3 marks':'5 marks'} · ${x.q} `),ans=el('p','tutor-why tutor-ans',x.a),row=el('div','tutor-chips');ans.hidden=true;

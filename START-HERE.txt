@@ -187,3 +187,7 @@ Still to do / ideas:
   food chain & biomagnification). Packs may now set subject 'physics'/'botany'/'zoology' explicitly.
 - Landing + sidebar have a Class 10 button; sidebar shows NCERT chapter numbers (9–12 physics) for Class 10.
 - Contact email everywhere is easy@physica.in.
+- Class 10 exam: tutor-exam.js ends with a generated block (scratchpad merge10.js from add10/NN.json; spec SPEC10.md, validator
+  vadd10.js, topics in topics10.json): per chapter 16 board practice (8×1, 5×3, 3×5 marks) + 25-MCQ "cbse" mock (+1, no
+  negative; PAT.cbse in tutor-mock.js). Class 10 Exam tab shows Board practice / CBSE mock test; Chemistry/Biology Class 10
+  chapters open an exam-only tutor.

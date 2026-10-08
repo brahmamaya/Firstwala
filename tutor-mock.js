@@ -6,7 +6,7 @@
    pack, fetched by PhysicaLoadExam only when they are needed. */
 (() => {
 'use strict';
-const LIVE='physica-mock-live',SAVED='physica-mock',PAT={jee:{name:'JEE Main',per:2.4},neet:{name:'NEET',per:1}};
+const LIVE='physica-mock-live',SAVED='physica-mock',PAT={jee:{name:'JEE Main',per:2.4,plus:4,minus:1},neet:{name:'NEET',per:1,plus:4,minus:1},cbse:{name:'CBSE Class 10',per:1.2,plus:1,minus:0}};
 // JEE papers put the MCQs (section A) before the numerical questions (section B)
 const bank=(ch,k)=>{const q=window.PhysicaMockBank?.[ch]?.[k];return q&&(k==='jee'?[...q.filter(x=>x.o),...q.filter(x=>!x.o)]:q)};
 const get=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
@@ -48,7 +48,7 @@ function close(){const k=box?.dataset.k;clearInterval(tick);box?.remove();box=nu
 function intro(ch,k){const set=bank(ch,k);if(!set)return;const b=shell();b.dataset.k=k;const n=set.length,mcq=set.filter(q=>q.o).length,num=n-mcq,p=el('div','mock-paper');
   const rules=el('ul','mock-rules');
   for(const t of [`${n} questions${num?` (${mcq} MCQ + ${num} numerical)`:''} · ${mins(k,n)} minutes`,
-    '+4 for a correct answer, −1 for a wrong one, 0 if left blank.',
+    PAT[k].minus?`+${PAT[k].plus} for a correct answer, −${PAT[k].minus} for a wrong one, 0 if left blank.`:`+${PAT[k].plus} for a correct answer; no negative marking.`,
     'No hints. The result appears only after you submit.',
     'The test submits itself when the time is up. You can also submit earlier.'])rules.append(el('li','',t));
   const name=el('input','mock-name');name.maxLength=40;name.autocomplete='name';name.value=get('physica-learner',{}).name||'';name.placeholder='Your name';name.setAttribute('aria-label',name.placeholder);
@@ -88,14 +88,14 @@ function report(r){const now=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch
   p.append(el('p','mock-brand',`Physica · ${'Mock test report'}`),el('h2','',r.name),
     el('p','mock-sub',`${PAT[r.k].name} ${'mock'} · ${r.ch} · ${new Date(r.at).toLocaleString()} · ${'Time taken'} ${mmss(r.used)}`));
   const stats=el('div','mock-stats');
-  for(const [t,v] of [['Score',`${4*c-w} / ${4*set.length}`],['Correct',c],['Wrong',w],['Skipped',s],['Accuracy',c+w?`${Math.round(100*c/(c+w))}%`:'-']]){const d=el('div','');d.append(el('b','',String(v)),el('span','',t));stats.append(d)}
+  for(const [t,v] of [['Score',`${PAT[r.k].plus*c-PAT[r.k].minus*w} / ${PAT[r.k].plus*set.length}`],['Correct',c],['Wrong',w],['Skipped',s],['Accuracy',c+w?`${Math.round(100*c/(c+w))}%`:'-']]){const d=el('div','');d.append(el('b','',String(v)),el('span','',t));stats.append(d)}
   if(!same){p.append(stats,el('p','mock-weak','This test was taken with an earlier, shorter question set, so the topic-wise table and question review are not available.'));const row=el('div','mock-row mock-noprint');row.append(btn('mock-nav','Close',close));p.append(row);b.append(p);return}
   // topic-wise: marks per topic, and the topics below half marks to revise
   const tab=el('table','mock-table'),hr=el('tr'),weak=[];
   for(const h of ['Topic','Correct','Wrong','Skipped','Marks'])hr.append(el('th','',h));tab.append(hr);
   const keys=[...new Set(set.map(q=>q.tp))];
-  for(const tp of keys){const idx=set.map((q,i)=>q.tp===tp?i:-1).filter(i=>i>=0),cc=idx.filter(i=>r.res[i]==='c').length,ww=idx.filter(i=>r.res[i]==='w').length,mk=4*cc-ww,name=topics[tp]||tp;
-    if(mk<2*idx.length)weak.push(name);const tr=el('tr');for(const v of [name,cc,ww,idx.length-cc-ww,`${mk} / ${4*idx.length}`])tr.append(el('td','',String(v)));tab.append(tr)}
+  for(const tp of keys){const idx=set.map((q,i)=>q.tp===tp?i:-1).filter(i=>i>=0),cc=idx.filter(i=>r.res[i]==='c').length,ww=idx.filter(i=>r.res[i]==='w').length,mk=PAT[r.k].plus*cc-PAT[r.k].minus*ww,name=topics[tp]||tp;
+    if(mk<2*idx.length)weak.push(name);const tr=el('tr');for(const v of [name,cc,ww,idx.length-cc-ww,`${mk} / ${PAT[r.k].plus*idx.length}`])tr.append(el('td','',String(v)));tab.append(tr)}
   p.append(stats,el('h3','','Topic-wise performance'),tab,
     el('p','mock-weak',weak.length?`Revise: ${weak.join(', ')}`:'Well done - no weak topic in this test.'),
     el('h3','','Question review'));
@@ -106,7 +106,7 @@ function report(r){const now=bank(r.ch,r.k),topics=window.PhysicaMockBank?.[r.ch
   row.append(btn('mock-go','⬇ '+'Download PDF',()=>{const t=document.title;document.title=`Physica ${PAT[r.k].name} report - ${r.name} - ${r.ch}`;addEventListener('afterprint',()=>{document.title=t},{once:true});window.print()}),btn('mock-nav','Close',close));
   p.append(row);b.append(p)}
 
-window.PhysicaMockTest={start:intro,open:report,past:(ch,k)=>get(SAVED,[]).filter(r=>r.ch===ch&&r.k===k),info:(ch,k)=>{const set=bank(ch,k);return set&&{name:PAT[k].name,n:set.length,min:mins(k,set.length)}}};
+window.PhysicaMockTest={start:intro,open:report,past:(ch,k)=>get(SAVED,[]).filter(r=>r.ch===ch&&r.k===k),info:(ch,k)=>{const set=bank(ch,k);return set&&{name:PAT[k].name,n:set.length,min:mins(k,set.length),plus:PAT[k].plus,minus:PAT[k].minus}}};
 // a test that was running when the page closed carries on (or submits, if its time ran out meanwhile)
 let examWait=null;
 window.PhysicaLoadExam=()=>window.PhysicaExam?Promise.resolve():examWait||(examWait=new Promise((ok,no)=>{const s=el('script');s.src='__EXAM_URL__';s.async=true;s.onload=ok;s.onerror=()=>{examWait=null;s.remove();no()};document.head.append(s)}));
