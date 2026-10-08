@@ -170,27 +170,14 @@ Still to do / ideas:
 - Owner will test on the real 86-inch board and report anything blurry or slow; owner may report Hinglish
   words the voice says oddly (add them to SPOKEN in tools/hinglish-voice.js).
 
-## Virtual lab (lab.js)
-- 17 NCERT practicals get a notebook card under the stage: vernier, screw gauge, spherometer, pendulum, Hooke, Newton cooling,
-  capillary rise, specific heat, Ohm, Wheatstone, potentiometer, internal resistance, convex lens, concave mirror, Snell, diode I–V, Zener.
-- "Record reading" reads window.PhysicaState (sim, params, time; exposed in app.js) and the sim's own metrics; each lab's read() guards
-  invalid setups (jaws not closed, bridge not balanced, virtual image...). Results: mean ± mean abs error, % error, least-squares graph.
-- "Lab record (PDF)" reuses the .mock overlay/print styles; student name etc. saved in localStorage 'physica-lab-who'; rows in 'physica-lab-<id>'.
-- eleventh.js: resonance-tube (v = 2f(L₂−L₁), end correction 0.3d), sonometer (paper rider, f×l), prism-deviation (i–δ curve,
-  δₘ by parabola through the 3 lowest points). All three have lab.js entries (20 labs total).
+- eleventh.js: resonance-tube (v = 2f(L₂−L₁), end correction 0.3d), sonometer (paper rider, f×l), prism-deviation (i–δ curve, (virtual lab and classroom tools were removed at the owner's request; graph.js keeps the shared SVG graph)
 
 ## Sim quality upgrade (explore.js)
 - Explore card (04 / EXPLORE) for every sim with a numeric control and a single-number readout: choose X (control) and Y
   (readout), predict the trend (increases / decreases / same / rises-then-falls / falls-then-rises), then see the graph (sim's own
   metrics swept over the control range, snapped to the control step), data table and CSV. Jumps through infinity (lens u→F)
-  are split into branches. lab.js exposes PhysicaLabGraph (marker, gap, ylim, nodots) and PhysicaNum.
+  are split into branches. graph.js exposes PhysicaLabGraph (marker, gap, ylim, nodots) and PhysicaNum.
 - Stopwatch button next to Snapshot: measures simulated time (correct in slow motion), laps.
 - Audit script (scratchpad audit.js) sweeps all 240 physics sims for NaN/Infinity/throws: fixed energy-levels (same level,
   series names Paschen/Brackett/Pfund, absorbed vs emitted).
 
-## Classroom tools (classroom.js, Teacher mode only: body.mode-teacher)
-- Dock (left edge on wide screens, bottom on phones): Draw (pen overlay on the stage, colours/undo/clear, strokes in 0..1
-  coords, cleared on sim change), Poll (pick variable + reading via window.PhysicaExplore, hand-count tallies, Reveal glides
-  the real slider min→max in 6 s then shows the answer, % correct and the graph; slider restored on close), Quiz (NEET MCQs
-  of the current chapter from PhysicaMockBank; loads tutor + exam packs via PhysicaLoadTutorPack/PhysicaLoadExam), Timer
-  (1–10 min countdown, WebAudio bell), Pick (random roll no. or names, no repeats; saved in localStorage physica-class*).
