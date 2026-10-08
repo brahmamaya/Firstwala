@@ -178,3 +178,12 @@ Still to do / ideas:
 - "Lab record (PDF)" reuses the .mock overlay/print styles; student name etc. saved in localStorage 'physica-lab-who'; rows in 'physica-lab-<id>'.
 - eleventh.js: resonance-tube (v = 2f(L₂−L₁), end correction 0.3d), sonometer (paper rider, f×l), prism-deviation (i–δ curve,
   δₘ by parabola through the 3 lowest points). All three have lab.js entries (20 labs total).
+
+## Sim quality upgrade (explore.js)
+- Explore card (04 / EXPLORE) for every sim with a numeric control and a single-number readout: choose X (control) and Y
+  (readout), predict the trend (increases / decreases / same / rises-then-falls / falls-then-rises), then see the graph (sim's own
+  metrics swept over the control range, snapped to the control step), data table and CSV. Jumps through infinity (lens u→F)
+  are split into branches. lab.js exposes PhysicaLabGraph (marker, gap, ylim, nodots) and PhysicaNum.
+- Stopwatch button next to Snapshot: measures simulated time (correct in slow motion), laps.
+- Audit script (scratchpad audit.js) sweeps all 240 physics sims for NaN/Infinity/throws: fixed energy-levels (same level,
+  series names Paschen/Brackett/Pfund, absorbed vs emitted).

@@ -229,7 +229,7 @@ add('photoelectric', 'stopping-potential', 'Stopping potential vs frequency', 'S
 /* ===== Atoms ===== */
 add('bohr', 'energy-levels', 'Hydrogen energy-level ladder', 'Pick a jump and calculate the photon it emits.', 'Eₙ = −13.6/n² eV', 'Jumps ending on n=2 make visible Balmer lines.', 'Compare a 3→2 and a 4→2 transition.',
   [R('ni', 'From level', 2, 6, 1, 3), R('nf', 'To level', 1, 5, 1, 2)],
-  p => { const dE = 13.6 * (1 / p.nf ** 2 - 1 / p.ni ** 2); return [N('Photon energy', `${F(Math.abs(dE))} eV`), N('Wavelength', `${F(1240 / Math.abs(dE), 0)} nm`), N('Series', p.nf === 1 ? 'Lyman' : p.nf === 2 ? 'Balmer' : 'Infra-red')]; },
+  p => { const dE = 13.6 * (1 / p.nf ** 2 - 1 / p.ni ** 2); if (p.ni === p.nf) return [N('Photon energy', '0 eV'), N('Wavelength', 'No photon (same level)'), N('Series', 'No transition')]; const lo = Math.max(1, Math.min(5, Math.round(Math.min(p.ni, p.nf)))); return [N('Photon energy', `${F(Math.abs(dE))} eV`), N('Wavelength', `${F(1240 / Math.abs(dE), 0)} nm`), N('Series', ['Lyman (UV)', 'Balmer (visible)', 'Paschen (IR)', 'Brackett (IR)', 'Pfund (IR)'][lo - 1] + (p.nf > p.ni ? ' — absorbed' : ' — emitted'))]; },
   (c, p, t) => { const map = n => 380 - 300 * (1 - 1 / n ** 2); for (let n = 1; n <= 6; n++) { const y = map(n), on = n === p.ni || n === p.nf; line(c, 150, y, 470, y, on ? C.mint : C.line, on ? 2.5 : 1.5); text(c, `n=${n}`, 490, y, C.muted, 13); } const yi = map(p.ni), yf = map(p.nf); if (p.ni > p.nf) { arrow(c, 300, yi, 300, yf, C.gold, 3); const q = mod(t, 3) / 3; dot(c, 300, yi + (yf - yi) * q, 6, C.gold, true); } text(c, `photon ${F(Math.abs(13.6 * (1 / p.nf ** 2 - 1 / p.ni ** 2)))} eV`, 90, 110, C.white, 20); }
 );
 
