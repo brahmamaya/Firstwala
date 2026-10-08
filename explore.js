@@ -30,6 +30,7 @@ function trend(P){const {out}=branches(P);if(out.length<2)return{t:trend1(P),jum
 const CH=[['up','Increases'],['down','Decreases'],['same','Stays the same'],['upd','Rises, then falls'],['dnu','Falls, then rises']];
 const WORD={up:'increases',down:'decreases',same:'stays the same',upd:'rises and then falls',dnu:'falls and then rises',wavy:'goes up and down several times'};
 
+window.PhysicaExplore={readings,sweep,trend,split,reading,CH,WORD};
 /* ---------- Explore card ---------- */
 const card=el('section','observe-card lab-card explore-card');card.dataset.testid='explore-card';card.setAttribute('aria-labelledby','explore-heading');stage.append(card);
 let state={x:'',y:'',guess:null,shown:false},simId='',raf=0;

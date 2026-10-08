@@ -34,6 +34,7 @@ const CH=()=>window.PhysicaTutorChapters||{};
 // the tutor's lessons and notes (~290 KB) live in their own file, downloaded only when a student turns the tutor on
 let packWait=null;function loadTutorPack(){if(window.PhysicaTeacher)return Promise.resolve();
   return packWait||(packWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__TUTOR_URL__';s.async=true;s.onload=ok;s.onerror=()=>{packWait=null;no()};document.head.append(s)}))}
+window.PhysicaLoadTutorPack=loadTutorPack;
 const simObj=()=>(window.PhysicaSims||[]).find(x=>x.id===simId());
 const num=v=>{const m=String(v).replace(/−/g,'-').match(/-?\d+(\.\d+)?(e-?\d+)?/i);return m?Number(m[0]):NaN};
 const readings=(sim,p)=>{try{return(sim.metrics?.(p,0)||[]).map(m=>({label:m.label,value:m.value,n:num(m.value)}))}catch{return[]}};
