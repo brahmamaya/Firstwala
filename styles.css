@@ -847,3 +847,73 @@ body.rank-open{overflow:hidden}
 .rank-back{z-index:2;letter-spacing:.1em;font-size:13px;text-transform:uppercase}
 .rank-card{text-shadow:0 2px 20px #000a}
 .rank-neet .rank-card{margin-bottom:16vh}
+
+/* Rank mode · NEET Physics practice space */
+.rk-ov{display:block!important;overflow:auto!important;padding:0!important;place-items:normal!important;-webkit-overflow-scrolling:touch}
+.rk-ov::before{position:fixed}
+.rk-head{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:14px;padding:12px 16px;background:linear-gradient(#020b24ee,#020b24cc);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #4d9bff33}
+.rk-back{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #4d9bff99;background:rgba(8,22,60,.82);color:#9fd0ff;font:700 12px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.rk-title{display:flex;flex-direction:column;line-height:1.15}
+.rk-title b{font:800 15px 'Orbitron',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#cfe6ff}
+.rk-title span{font:600 12px 'Exo 2',sans-serif;letter-spacing:.12em;color:#7fb4f5;text-transform:uppercase}
+.rk-wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:16px 16px 60px;font-family:'Exo 2',system-ui,sans-serif;color:#e6f1ff}
+.rk-view{display:flex;flex-direction:column;gap:14px}
+.rk-sel{width:100%;min-height:48px;padding:10px 14px;border-radius:14px;border:1px solid #4d9bff77;background:rgba(6,18,52,.9);color:#e6f1ff;font:600 15px 'Exo 2',sans-serif}
+.rk-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rk-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px 6px;min-height:78px;border-radius:14px;border:1px solid #4d9bff44;background:rgba(8,24,66,.7);text-align:center}
+.rk-tile b{font:800 20px 'Orbitron',sans-serif;color:#9fd0ff}
+.rk-tile span{font-size:11px;color:#a9c8ee;line-height:1.25}
+.rk-go{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:84px;padding:16px;border-radius:20px;border:1px solid #9fd0ff;background:linear-gradient(135deg,#2b6cff,#4d9bff 60%,#7cc0ff);color:#03122e;cursor:pointer;box-shadow:0 10px 40px #2b6cff77,0 0 0 1px #bfe0ff55 inset;transition:transform .15s,box-shadow .2s}
+.rk-go:hover{transform:translateY(-1px);box-shadow:0 14px 48px #2b6cffaa}
+.rk-go b{font:900 22px 'Orbitron',sans-serif;letter-spacing:.2em;text-transform:uppercase}
+.rk-go small{font:700 13px 'Exo 2',sans-serif;letter-spacing:.04em}
+.rk-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;border-radius:999px;border:1px solid #4d9bff44;background:rgba(6,18,52,.8)}
+.rk-tab{min-height:44px;border:0;border-radius:999px;background:transparent;color:#a9c8ee;font:800 13px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.rk-tab[aria-selected=true]{background:linear-gradient(135deg,#2b6cff,#4d9bff);color:#fff;box-shadow:0 4px 18px #2b6cff66}
+.rk-pane{display:flex;flex-direction:column;gap:12px}
+.rk-card{padding:16px;border-radius:18px;border:1px solid #4d9bff44;background:rgba(7,20,58,.78)}
+.rk-card h3{margin:0 0 8px;font:800 14px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#bfe0ff}
+.rk-card h3.rk-sub{margin-top:14px}
+.rk-center{text-align:center}
+.rk-note{margin:0 0 10px;color:#a9c8ee;font-size:14px;line-height:1.5}
+.rk-steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.45}
+.rk-steps b{color:#9fd0ff;font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.rk-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #4d9bff22}
+.rk-row span{flex:1;min-width:0}
+.rk-row small{color:#8db6ea;white-space:nowrap}
+.rk-btn{min-height:50px;padding:12px 22px;border-radius:14px;border:0;background:linear-gradient(135deg,#2b6cff,#4d9bff);color:#fff;font:800 13px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 24px #2b6cff55}
+.rk-btn.rk-alt{background:rgba(10,30,84,.9);border:1px solid #4d9bff99;color:#9fd0ff;box-shadow:none}
+.rk-mini{min-height:40px;padding:6px 14px;border-radius:10px;border:1px solid #4d9bff99;background:rgba(10,30,84,.9);color:#9fd0ff;font:700 12px 'Exo 2',sans-serif;cursor:pointer}
+.rk-link{background:none;border:0;color:#7fb4f5;font:700 13px 'Exo 2',sans-serif;cursor:pointer;min-height:40px;padding:6px 8px;text-decoration:underline}
+.rk-clear{align-self:center;color:#8db6ea}
+.rk-chips{display:flex;flex-wrap:wrap;gap:8px}
+.rk-chip{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid #4d9bff77;background:rgba(10,30,84,.8);color:#cfe6ff;font:600 13px 'Exo 2',sans-serif;cursor:pointer}
+.rk-chip.on{background:#2b6cff;border-color:#9fd0ff;color:#fff}
+.rk-two{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
+.rk-qtop{display:flex;align-items:center;gap:10px}
+.rk-qtop .rk-chip{cursor:default;min-height:32px;padding:4px 12px;font-size:12px}
+.rk-count{margin-left:auto;font:800 13px 'Orbitron',sans-serif;color:#9fd0ff}
+.rk-bar{height:6px;border-radius:99px;background:#4d9bff22;overflow:hidden}
+.rk-bar i{display:block;height:100%;background:linear-gradient(90deg,#2b6cff,#7cc0ff);transition:width .4s}
+.rk-meta{margin:0 0 6px;font-size:12px;letter-spacing:.06em;color:#8db6ea;text-transform:uppercase}
+.rk-q{margin:0 0 14px;font-size:clamp(17px,2.4vw,20px);font-weight:600;line-height:1.5;white-space:pre-line}
+.rk-fig{display:block;width:100%;max-width:340px;margin:4px 0 14px;color:#e6f1ff}
+.rk-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.rk-opt{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:10px 14px;border-radius:14px;border:1px solid #4d9bff55;background:rgba(10,30,84,.7);color:#e6f1ff;font:600 16px 'Exo 2',sans-serif;text-align:left;cursor:pointer}
+.rk-opt:hover:not(:disabled){border-color:#9fd0ff}
+.rk-opt:disabled{cursor:default;opacity:1}
+.rk-l{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#143a8a;font:800 13px 'Orbitron',sans-serif;color:#cfe6ff}
+.rk-t{flex:1;min-width:0}
+.rk-opt.right{border-color:#35d49a;background:rgba(20,120,90,.35)}
+.rk-opt.wrong{border-color:#ff6b7a;background:rgba(150,30,50,.35)}
+.rk-hintbtn{min-height:44px;padding:8px 16px;border-radius:12px;border:1px dashed #4d9bffaa;background:transparent;color:#9fd0ff;font:700 13px 'Exo 2',sans-serif;cursor:pointer}
+.rk-hintbtn:disabled{opacity:.5}
+.rk-hint,.rk-fb{margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(43,108,255,.14);border:1px solid #4d9bff44;line-height:1.55}
+.rk-hint p,.rk-fb p{margin:0 0 6px}
+.rk-ok{color:#5be3b0;font-weight:800}
+.rk-no{color:#ff8c98;font-weight:800}
+.rk-sol{color:#cfe0f7}
+.rk-why{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+.rk-why>span{font-weight:700;color:#bfe0ff;margin-right:4px}
+@media (max-width:600px){.rk-tiles{grid-template-columns:repeat(2,1fr)}.rk-go b{font-size:19px}.rk-head{padding:10px 12px}}
+@media print{.rk-ov{display:none!important}}

@@ -33,8 +33,13 @@ const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElem
 const crown=hammer('rank-logo');const rb=el('b','','Rank mode');
 rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'));sw.append(rankBtn);
 const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
-for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
-let rankOv=null;
+for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>k==='neet'?rankNeet():rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
+let rankOv=null,rankLoading=false;
+// NEET opens the practice space (its code and questions download only now); JEE pages stay "coming soon"
+async function rankNeet(){if(rankLoading)return;rankLoading=true;const wait=el('div','rank-ov');wait.dataset.testid='rank-loading';wait.append(el('p','rank-soon','Loading…'));document.body.append(wait);document.body.classList.add('rank-open');
+  try{await loadTutorPack();await window.PhysicaLoadExam?.()}catch{}
+  wait.remove();document.body.classList.remove('rank-open');rankLoading=false;
+  if(window.PhysicaRankNeet&&window.PhysicaMockBank)window.PhysicaRankNeet.open(()=>rankBtn.focus());else rankSoon('neet','NEET')}
 function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov rank-'+k);ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: '+title);ov.dataset.testid='rank-soon';
   const close=()=>{ov.remove();rankOv=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);rankBtn.focus()},esc=e=>{if(e.key==='Escape')close()};addEventListener('keydown',esc);
   const back=btn('rank-back','← Back',close);const c=el('div','rank-card');

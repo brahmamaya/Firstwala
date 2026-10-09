@@ -198,3 +198,10 @@ Still to do / ideas:
   buttons in underneath (NEET, JEE Mains, JEE Advanced: three buttons) on the same page and hides Open simulations; each opens a full-screen "Coming soon" page (Back / Esc).
   Rank mode is a placeholder: the real competition space (notes, concepts, PYQs, mocks, techniques; no simulations) comes later.
 - Rank mode visuals: premium blue palette, Orbitron/Exo 2, outline hammer logo (SVG built in tutor.js); NEET coming-soon page has an Earth-horizon scene, JEE pages a glowing grid floor (styles "Rank mode: futuristic type, blue scenes").
+- Rank mode · NEET Physics (rank-neet.js, in the tutor pack; opened by the NEET button, JEE pages still "coming soon"):
+  built from the owner's research PDF (Samjho / Practice / Revise + one Continue button). Uses PhysicaMockBank[ch].neet (45 Q per chapter).
+  Continue = ≤3 due recall questions (no notes) + 10 new questions + repair check (fresh variants of missed topics). Help ladder in each
+  question (topic prompt → first step → solution; help use is tracked separately from independent answers); wrong answers ask why
+  (Concept unclear / Start nahi hua / Calculation) and return after 1, 3, 7, 14 days as fresh questions of the same topic.
+  Data is only in localStorage 'physica-rank-neet'. TODO (from the PDF): Samjho concept packs (Kinematics pilot first), authored
+  hint ladders, 4-question entry check, mixed/timed sets, Chemistry/Biology, JEE.
