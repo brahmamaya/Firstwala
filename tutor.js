@@ -22,17 +22,27 @@ const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE Mains
 const rankOpen=open=>{rankSub.classList.toggle('open',open);rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open;const go=document.getElementById('landing-go');if(go)go.hidden=open;document.getElementById('landing')?.classList.toggle('rank-on',open)};
 const rankBtn=btn('land-grade land-mode land-rank',null,()=>rankOpen(!rankSub.classList.contains('open')));
 rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
-const crown=el('span','rank-crown','👑');crown.setAttribute('aria-hidden','true');const rb=el('b','','Rank mode');
+// simple outline hammer logo (the hammer only the worthy can lift)
+const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElementNS(NS,'svg');v.setAttribute('viewBox','0 0 48 48');v.setAttribute('class',cls);v.setAttribute('aria-hidden','true');v.setAttribute('focusable','false');
+  const add=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);v.append(e)};
+  add('rect',{x:9,y:6,width:30,height:15,rx:3.5,fill:'currentColor','fill-opacity':'.16',stroke:'currentColor','stroke-width':'2.2'});
+  add('path',{d:'M17 6v15M31 6v15',stroke:'currentColor','stroke-width':'1.6','stroke-linecap':'round'});
+  add('rect',{x:21.5,y:21,width:5,height:19,rx:2,fill:'none',stroke:'currentColor','stroke-width':'2.2'});
+  add('path',{d:'M21.5 28h5M21.5 33h5',stroke:'currentColor','stroke-width':'1.4','stroke-linecap':'round'});
+  add('circle',{cx:24,cy:43.5,r:2.6,fill:'none',stroke:'currentColor','stroke-width':'2'});return v};
+const crown=hammer('rank-logo');const rb=el('b','','Rank mode');
 rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'));sw.append(rankBtn);
 const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
 for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
 let rankOv=null;
-function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: '+title);ov.dataset.testid='rank-soon';
+function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov rank-'+k);ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: '+title);ov.dataset.testid='rank-soon';
   const close=()=>{ov.remove();rankOv=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);rankBtn.focus()},esc=e=>{if(e.key==='Escape')close()};addEventListener('keydown',esc);
   const back=btn('rank-back','← Back',close);const c=el('div','rank-card');
-  const cr=el('div','rank-crown big','👑');cr.setAttribute('aria-hidden','true');
+  const cr=hammer('rank-logo big');
   c.append(cr,el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','Completely focused on aspirants.'));
-  ov.append(back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
+  // background scene: NEET gets the Earth's horizon from orbit; the JEE pages get a glowing grid floor
+  const scene=el('div','rank-scene');scene.setAttribute('aria-hidden','true');if(k==='neet'){scene.append(el('div','rank-earth-glow'),el('div','rank-earth'))}else{scene.append(el('div','rank-grid'))}
+  ov.append(scene,back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const goBtn=document.getElementById('landing-go');
 if(goBtn){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','1'),document.createTextNode(' Choose your mode'));st.append(h,sw,rankSub);goBtn.before(st)}
 
