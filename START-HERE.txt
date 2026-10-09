@@ -195,5 +195,5 @@ Still to do / ideas:
 ## Rank mode (landing page)
 - The Normal ("Explore freely") card is gone from the landing page; Normal stays the default mode behind the scenes and tapping the
   selected Student/Teacher card again returns to it. A gold-styled Rank mode card (tutor.js) slides two
-  buttons in underneath (NEET, JEE · JEE Advanced) on the same page; each opens a full-screen "Coming soon" page (Back / Esc).
+  buttons in underneath (NEET, JEE, JEE Advanced: three buttons) on the same page and hides Open simulations; each opens a full-screen "Coming soon" page (Back / Esc).
   Rank mode is a placeholder: the real competition space (notes, concepts, PYQs, mocks, techniques; no simulations) comes later.

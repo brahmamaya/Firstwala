@@ -15,10 +15,12 @@ let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('phys
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
 // Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
-for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>setMode(id===mode?'normal':id));b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
+for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode(id===mode?'normal':id)});b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
 // ---- Rank mode: NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
-const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE · JEE Advanced','Engineering entrance']];
-const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const open=rankSub.classList.toggle('open');rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open});
+const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE','JEE Main'],['jeeadv','🚀','JEE Advanced','IIT entrance']];
+// Rank mode open: the three exam buttons slide in and "Open simulations" is hidden (Rank mode has no simulations)
+const rankOpen=open=>{rankSub.classList.toggle('open',open);rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open;const go=document.getElementById('landing-go');if(go)go.hidden=open;document.getElementById('landing')?.classList.toggle('rank-on',open)};
+const rankBtn=btn('land-grade land-mode land-rank',null,()=>rankOpen(!rankSub.classList.contains('open')));
 rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
 const crown=el('span','rank-crown','👑');crown.setAttribute('aria-hidden','true');const rb=el('b','','Rank mode');
 rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'));sw.append(rankBtn);
