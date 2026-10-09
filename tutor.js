@@ -16,12 +16,12 @@ const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group'
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
 // Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
 for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>setMode(id===mode?'normal':id));b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
-// ---- Rank mode (premium): NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
+// ---- Rank mode: NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
 const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE · JEE Advanced','Engineering entrance']];
 const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const open=rankSub.classList.toggle('open');rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open});
 rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
-const crown=el('span','rank-crown','👑');crown.setAttribute('aria-hidden','true');const rb=el('b','','Rank mode');rb.append(el('i','rank-badge','PREMIUM'));
-rankBtn.append(crown,rb,el('small','','For NEET & JEE aspirants'));sw.append(rankBtn);
+const crown=el('span','rank-crown','👑');crown.setAttribute('aria-hidden','true');const rb=el('b','','Rank mode');
+rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'));sw.append(rankBtn);
 const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
 for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
 let rankOv=null;
@@ -29,7 +29,7 @@ function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov');ov.setA
   const close=()=>{ov.remove();rankOv=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);rankBtn.focus()},esc=e=>{if(e.key==='Escape')close()};addEventListener('keydown',esc);
   const back=btn('rank-back','← Back',close);const c=el('div','rank-card');
   const cr=el('div','rank-crown big','👑');cr.setAttribute('aria-hidden','true');
-  c.append(cr,el('span','rank-badge','PREMIUM'),el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','A focused space to prepare for the competition.'));
+  c.append(cr,el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','Completely focused on aspirants.'));
   ov.append(back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const step2=document.querySelector('.landing-step2');
 if(step2){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','2'),document.createTextNode(' Choose your mode'));st.append(h,sw,rankSub);step2.after(st)}
