@@ -851,12 +851,12 @@ body.rank-open{overflow:hidden}
 /* Rank mode · NEET Physics practice space */
 .rk-ov{display:block!important;overflow:auto!important;padding:0!important;place-items:normal!important;-webkit-overflow-scrolling:touch}
 .rk-ov::before{position:fixed}
-.rk-head{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:14px;padding:12px 16px}
-.rk-back{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid #4d9bff99;background:rgba(8,22,60,.82);color:#9fd0ff;font:700 12px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.rk-head{position:sticky;top:0;z-index:3;display:flex;align-items:center}
+.rk-back{border-radius:999px;border:1px solid #4d9bff99;background:rgba(8,22,60,.82);color:#9fd0ff;font:700 12px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .rk-title{display:flex;flex-direction:column;line-height:1.15}
-.rk-title b{font:800 15px 'Orbitron',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#cfe6ff}
-.rk-title span{font:600 12px 'Exo 2',sans-serif;letter-spacing:.12em;color:#7fb4f5;text-transform:uppercase}
-.rk-wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:16px 16px 60px;font-family:'Exo 2',system-ui,sans-serif;color:#e6f1ff}
+.rk-title b{font:800 15px 'Orbitron',sans-serif;text-transform:uppercase;color:#cfe6ff}
+.rk-title span{font:600 12px 'Exo 2',sans-serif;color:#7fb4f5;text-transform:uppercase}
+.rk-wrap{position:relative;z-index:1;font-family:'Exo 2',system-ui,sans-serif;color:#e6f1ff}
 .rk-view{display:flex;flex-direction:column;gap:14px}
 .rk-sel{width:100%;min-height:48px;padding:10px 14px;border-radius:14px;border:1px solid #4d9bff77;background:rgba(6,18,52,.9);color:#e6f1ff;font:600 15px 'Exo 2',sans-serif}
 .rk-tiles{display:grid;gap:10px}
@@ -870,13 +870,12 @@ body.rank-open{overflow:hidden}
 .rk-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;border-radius:999px}
 .rk-tab{min-height:44px;border:0;border-radius:999px;background:transparent;color:#a9c8ee;font:800 13px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .rk-tab[aria-selected=true]{color:#fff}
-.rk-pane{display:flex;flex-direction:column;gap:12px}
+.rk-pane{flex-direction:column}
 .rk-card{padding:16px;border-radius:18px}
 .rk-card h3{margin:0 0 8px;font:800 14px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase}
 .rk-card h3.rk-sub{margin-top:14px}
 .rk-center{text-align:center}
 .rk-note{margin:0 0 10px;color:#a9c8ee;font-size:14px;line-height:1.5}
-.rk-steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.45}
 .rk-steps b{color:#9fd0ff;font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
 .rk-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #4d9bff22}
 .rk-row span{flex:1;min-width:0}
@@ -886,7 +885,6 @@ body.rank-open{overflow:hidden}
 .rk-mini{min-height:40px;padding:6px 14px;border-radius:10px;border:1px solid #4d9bff99;background:rgba(10,30,84,.9);color:#9fd0ff;font:700 12px 'Exo 2',sans-serif;cursor:pointer}
 .rk-link{background:none;border:0;color:#7fb4f5;font:700 13px 'Exo 2',sans-serif;cursor:pointer;min-height:40px;padding:6px 8px;text-decoration:underline}
 .rk-clear{align-self:center;color:#8db6ea}
-.rk-chips{display:flex;flex-wrap:wrap;gap:8px}
 .rk-chip{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid #4d9bff77;background:rgba(10,30,84,.8);color:#cfe6ff;font:600 13px 'Exo 2',sans-serif;cursor:pointer}
 .rk-chip.on{background:#2b6cff;border-color:#9fd0ff;color:#fff}
 .rk-two{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
@@ -915,7 +913,7 @@ body.rank-open{overflow:hidden}
 .rk-sol{color:#cfe0f7}
 .rk-why{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
 .rk-why>span{font-weight:700;color:#bfe0ff;margin-right:4px}
-@media (max-width:600px){.rk-go b{font-size:19px}.rk-head{padding:10px 12px}}
+@media (max-width:600px){.rk-go b{font-size:19px}}
 @media print{.rk-ov{display:none!important}}
 .rk-learn{border-color:#9fd0ff;background:linear-gradient(135deg,#2b6cff,#4d9bff);color:#fff;font-weight:800}
 .rk-ltitle{font:800 13px 'Orbitron',sans-serif;letter-spacing:.06em;color:#cfe6ff}
@@ -966,3 +964,33 @@ body.rank-open{overflow:hidden}
 .rk-tiles{grid-template-columns:repeat(3,1fr)}
 .rk-tile{background:#0d1424;border-color:#22345a}
 @media (max-width:600px){.rk-dims{grid-template-columns:1fr}.rk-tiles{grid-template-columns:repeat(3,1fr)}}
+
+/* Rank mode NEET: one slim bar, full-width grid, diagrams */
+.rk-head{flex-wrap:wrap;gap:6px 12px;padding:8px clamp(12px,2.4vw,28px)}
+.rk-back{min-height:36px;padding:5px 12px;font-size:11px}
+.rk-title b{font-size:13px;letter-spacing:.08em}
+.rk-title span{font-size:10px;letter-spacing:.1em}
+.rk-htabs{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.rk-pill{min-height:36px;padding:4px 14px;border-radius:999px;border:1px solid #2a3b5e;background:#0a0f1a;color:#c4d0e4;font:700 13px 'Exo 2',sans-serif;cursor:pointer;white-space:nowrap}
+.rk-pill[aria-selected=true]{background:#2b6cff;border-color:#2b6cff;color:#fff}
+.rk-pill.act{border-color:#4d9bff;color:#9fd0ff}
+.rk-pill.small{min-height:32px;padding:3px 12px;font-size:12px}
+.rk-wrap{max-width:none;margin:0;padding:14px clamp(12px,2.4vw,28px) 60px}
+.rk-view.run{max-width:760px;margin:0 auto}
+.rk-pane{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;align-items:start}
+.rk-pane>.wide{grid-column:1/-1}
+.rk-jump{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rk-jump>span{color:#7f8ca3;font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-right:4px}
+.rk-sec{margin:10px 0 0;padding-bottom:6px;border-bottom:1px solid #1d2a44;font:800 15px 'Orbitron',sans-serif;letter-spacing:.08em;color:#fff;scroll-margin-top:60px}
+.rk-label{display:block;margin:2px 0 6px;font:800 11px 'Orbitron',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#6fa8f5}
+.rk-steps{margin:0 0 10px;padding-left:22px;display:flex;flex-direction:column;gap:6px;line-height:1.5;color:#d3dcec}
+.rk-steps li::marker{color:#6fa8f5;font-weight:800}
+.rk-bigfig{display:block;width:100%;max-width:520px;height:auto;margin:8px auto;border-radius:10px;background:#050810}
+.rk-card{min-width:0}
+.rk-chips{display:flex;flex-wrap:wrap;gap:8px}
+.rk-tag{padding:7px 12px;border-radius:10px;background:#0d1424;border:1px solid #22345a;color:#e6f1ff;font-size:14px;line-height:1.35}
+.rk-mistakes{border-color:#5a2a2a;background:#0c0707}
+.rk-mistakes h3{color:#ff9d9d}
+@media (min-width:900px){.rk-dims{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:600px){.rk-htabs{margin-left:0;width:100%}.rk-pill{padding:4px 10px}}
+@media (max-width:600px){.rk-title span{display:none}.rk-htabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.rk-htabs::-webkit-scrollbar{display:none}.rk-pill{flex:none}}

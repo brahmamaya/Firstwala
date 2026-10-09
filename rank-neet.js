@@ -13,35 +13,44 @@ const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY));seen=Array.isA
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
   if(out.length<n)out.push(...shuffle(ids.filter(i=>!out.includes(i))).slice(0,n-out.length));return out}
 
-let ov=null,view=null,onClose=null,tab='formulas';
-function close(){if(!ov)return;ov.remove();ov=null;view=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);const f=onClose;onClose=null;f?.()}
+let ov=null,view=null,onClose=null,tab='formulas',tabsEl=null;
+const SECS=['Dimensions','Units','Significant figures','Errors','Instruments'];
+function close(){if(!ov)return;ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);const f=onClose;onClose=null;f?.()}
 function esc(e){if(e.key==='Escape'&&ov){if(ov.dataset.run==='1')home();else close()}}
 function open(cb){if(ov||!U()||!bank().length)return;load();onClose=cb||null;
-  ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: NEET Physics');ov.dataset.testid='rank-neet-page';
+  ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: NEET Physics, '+CH());ov.dataset.testid='rank-neet-page';
+  // one slim bar: back, chapter name and all the buttons
   const head=el('div','rk-head'),back=btn('rk-back','← Back',()=>{if(ov.dataset.run==='1')home();else close()});back.dataset.testid='rk-back';
-  const t=el('div','rk-title');t.append(el('b','','Rank mode'),el('span','','NEET · Physics'));head.append(back,t);
+  const t=el('div','rk-title');t.append(el('b','',CH()),el('span','','Rank mode · NEET Physics'));
+  tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
+  for(const [k,l] of [['formulas','Formulas'],['notes','Short notes'],['asked','Most asked'],['practice','Practice'],['mock','Mock test']]){
+    const b=btn('rk-pill'+(k==='practice'||k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;if(k==='mock'&&!window.PhysicaMockTest)continue;tabsEl.append(b)}
+  head.append(back,t,tabsEl);
   const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);home();back.focus()}
+function go(k){if(k==='practice')return runSet(pick(N),'Practice');if(k==='mock')return window.PhysicaMockTest?.start(CH(),'neet');tab=k;home()}
+function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===tab))}
 
 /* ---------- the chapter page ---------- */
-function home(){if(!view)return;ov.dataset.run='0';view.replaceChildren();ov.scrollTop=0;
-  const h=el('div','rk-hero');h.append(el('span','rk-kicker','Class 11 · Chapter 1'),el('h1','',CH()),el('p','rk-sub','Formulas, short notes and the most asked questions.'));
-  const tabs=el('div','rk-tabs');tabs.setAttribute('role','tablist');
-  for(const [k,l] of [['formulas','Formulas'],['notes','Short notes'],['asked','Most asked']]){const b=btn('rk-tab',l,()=>{tab=k;home()});b.setAttribute('role','tab');b.setAttribute('aria-selected',String(tab===k));b.dataset.testid='rk-tab-'+k;tabs.append(b)}
-  const pane=el('div','rk-pane');({formulas,notes,asked})[tab](pane);
-  const act=el('div','rk-act');act.append(el('h3','','Now practise'),btn('rk-btn',`Practice · ${N} questions`,()=>runSet(pick(N),'Practice')));
-  if(window.PhysicaMockTest)act.append(btn('rk-btn rk-alt','Mock test · 45 questions',()=>window.PhysicaMockTest.start(CH(),'neet')));
-  view.append(h,tabs,pane,act)}
-
-function formulas(p){const D=U();
-  const t=el('div','rk-card');t.append(el('h3','','Dimensions to remember'));const g=el('div','rk-dims');for(const [q,d] of D.table){const r=el('div','rk-dim');r.append(el('span','',q),el('b','','['+d+']'));g.append(r)}t.append(g);p.append(t);
-  for(const f of D.formulas){const c=el('div','rk-card');c.append(el('h3','',f.n),el('p','rk-formula',f.f),el('p','rk-how',f.how));if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(f.ex));c.append(e)}p.append(c)}}
-function notes(p){for(const n of U().notes){const c=el('div','rk-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);p.append(c)}}
-function asked(p){p.append(el('p','rk-lead','These question types come up again and again. Learn the three steps for each one.'));
-  U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
-    const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>runSet(pick(TOPIC,a.tp),tname(a.tp))));p.append(c)})}
+function home(){if(!view)return;ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
+  const pane=el('div','rk-pane');({formulas,notes,asked})[tab](pane);view.append(pane)}
+const fig=key=>{const g=window.PhysicaFig?.(window.PhysicaRankFigs?.[key]);if(g)g.classList.add('rk-fig','rk-bigfig');return g};
+const steps=txt=>{const a=txt.split(/(?<=[.!?])\s+/).filter(Boolean);if(a.length<2)return el('p','rk-how',txt);const ol=el('ol','rk-steps');for(const x of a)ol.append(el('li','',x));return ol};
+const label=t=>el('span','rk-label',t);
+function formulas(p){const D=U(),jump=el('div','rk-jump wide');jump.append(el('span','','Jump to'));
+  SECS.forEach((g,i)=>{jump.append(btn('rk-pill small',`${i+1} · ${g}`,()=>ov.querySelector('#rk-sec-'+i)?.scrollIntoView({behavior:'smooth',block:'start'})))});p.append(jump);
+  SECS.forEach((g,i)=>{const h=el('h2','rk-sec wide',`${i+1} · ${g}`);h.id='rk-sec-'+i;p.append(h);
+    if(g==='Dimensions'){const t=el('div','rk-card wide');t.append(el('h3','','Dimensions to remember'));const gr=el('div','rk-dims');for(const [q,d] of D.table){const r=el('div','rk-dim');r.append(el('span','',q),el('b','','['+d+']'));gr.append(r)}t.append(gr);p.append(t)}
+    for(const f of D.formulas.filter(x=>x.g===g)){const c=el('div','rk-card');c.append(el('h3','',f.n),el('p','rk-formula',f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
+      if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(f.ex));c.append(e)}p.append(c)}})}
+function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
+  D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});
+  const m=el('div','rk-card wide rk-mistakes');m.append(el('h3','','Common mistakes to avoid'));const ul=el('ul','rk-list');for(const x of D.mistakes)ul.append(el('li','',x));m.append(ul);p.append(m)}
+function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
+  U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what),label('Steps'));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
+    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>runSet(pick(TOPIC,a.tp),tname(a.tp))));p.append(c)})}
 
 /* ---------- a set of questions ---------- */
-function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';let k=0;const res=[];
+function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';view.className='rk-view run';paint(true);let k=0;const res=[];
   const show=()=>{if(k>=ids.length)return summary(res,title);const i=ids[k],q=bank()[i];view.replaceChildren();ov.scrollTop=0;
     const top=el('div','rk-qtop');top.append(el('span','rk-chip on',title),el('span','rk-count',`${k+1} / ${ids.length}`),btn('rk-link','End',()=>summary(res,title)));
     const bar=el('div','rk-bar'),fill=el('i');fill.style.width=(k/ids.length*100)+'%';bar.append(fill);
@@ -56,7 +65,7 @@ function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';let k=0;cons
       b.append(el('span','rk-l','ABCD'[pos]),el('span','rk-t',q.o[oi]));b.dataset.testid='rk-opt';b.dataset.correct=String(oi===q.c);opts.append(b)});
     card.append(opts,hb,hint,fb);view.append(top,bar,card,next)};
   show()}
-function summary(res,title){ov.dataset.run='0';view.replaceChildren();ov.scrollTop=0;const n=res.length,ok=res.filter(r=>r.ok).length,alone=res.filter(r=>r.ok&&!r.hints).length;
+function summary(res,title){ov.dataset.run='0';view.className='rk-view run';paint(true);view.replaceChildren();ov.scrollTop=0;const n=res.length,ok=res.filter(r=>r.ok).length,alone=res.filter(r=>r.ok&&!r.hints).length;
   const c=el('div','rk-card rk-center');c.append(el('h3','',title+' · done'));const t=el('div','rk-tiles');
   for(const [v,l] of [[`${ok} / ${n}`,'Correct'],[alone,'Solved without help'],[n-ok,'To revise']]){const d=el('div','rk-tile');d.append(el('b','',String(v)),el('span','',l));t.append(d)}c.append(t);
   const wrong=[...new Set(res.filter(r=>!r.ok).map(r=>tname(r.q.tp)))];if(wrong.length){c.append(el('p','rk-note','Go back to the formulas for:'));for(const w of wrong)c.append(el('p','rk-meta','• '+w))}
