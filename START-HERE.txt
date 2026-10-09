@@ -191,3 +191,9 @@ Still to do / ideas:
   vadd10.js, topics in topics10.json): per chapter 16 board practice (8×1, 5×3, 3×5 marks) + 25-MCQ "cbse" mock (+1, no
   negative; PAT.cbse in tutor-mock.js). Class 10 Exam tab shows Board practice / CBSE mock test; Chemistry/Biology Class 10
   chapters open an exam-only tutor.
+
+## Rank mode (landing page)
+- The Normal ("Explore freely") card is gone from the landing page; Normal stays the default mode behind the scenes and tapping the
+  selected Student/Teacher card again returns to it. A premium Rank mode card (tutor.js, styles "Rank mode (premium)") slides two
+  buttons in underneath (NEET, JEE · JEE Advanced) on the same page; each opens a full-screen "Coming soon" page (Back / Esc).
+  Rank mode is a placeholder: the real competition space (notes, concepts, PYQs, mocks, techniques; no simulations) comes later.
