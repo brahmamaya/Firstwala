@@ -8,8 +8,8 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const U=()=>window.PhysicaRankUnits,CH=()=>U()?.chapter,PB=()=>window.PhysicaMockBank||{},bank=()=>PB()[CH()]?.neet||[],tname=tp=>PB()[CH()]?.topics?.[tp]||tp;
-let seen=[];
-const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY));seen=Array.isArray(s?.seen)?s.seen.filter(Number.isInteger):[]}catch{seen=[]}},save=()=>{try{localStorage.setItem(KEY,JSON.stringify({seen}))}catch{}};
+let seen=[],done=[],acc={};
+const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY));seen=Array.isArray(s?.seen)?s.seen.filter(Number.isInteger):[];done=Array.isArray(s?.done)?s.done.filter(Number.isInteger):[];acc={};for(const k in (s?.acc||{})){const v=s.acc[k];if(Array.isArray(v)&&v.length===2&&v.every(Number.isInteger))acc[k]=v}}catch{seen=[];done=[];acc={}}},save=()=>{try{localStorage.setItem(KEY,JSON.stringify({seen,done,acc}))}catch{}};
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
   if(out.length<n)out.push(...shuffle(ids.filter(i=>!out.includes(i))).slice(0,n-out.length));return out}
 
@@ -33,15 +33,30 @@ function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-sele
 /* ---------- the chapter page ---------- */
 function home(){if(!view)return;ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
   const pane=el('div','rk-pane');({formulas,notes,asked,mistakes})[tab](pane);view.append(pane)}
-const fig=key=>{const g=window.PhysicaFig?.(window.PhysicaRankFigs?.[key]);if(g)g.classList.add('rk-fig','rk-bigfig');return g};
+const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
+const math=t=>{const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\})/)){if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}else if(x)s.append(document.createTextNode(x))}return s};
+const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''));for(const x of r){const d=el('div','rk-eq');d.append(math(x));w.append(d)}return w};
+const total=()=>U().formulas.length,pct=(a,b)=>b?Math.round(a/b*100):0;
 const steps=txt=>{const a=txt.split(/(?<=[.!?])\s+/).filter(Boolean);if(a.length<2)return el('p','rk-how',txt);const ol=el('ol','rk-steps');for(const x of a)ol.append(el('li','',x));return ol};
 const label=t=>el('span','rk-label',t);
-function formulas(p){const D=U(),jump=el('div','rk-jump wide');jump.append(el('span','','Jump to'));
-  SECS.forEach((g,i)=>{jump.append(btn('rk-pill small',`${i+1} · ${g}`,()=>ov.querySelector('#rk-sec-'+i)?.scrollIntoView({behavior:'smooth',block:'start'})))});p.append(jump);
+function progress(box){box.replaceChildren();const D=U(),n=total(),k=done.length;box.append(el('h3','','Your progress'));
+  const row=el('div','rk-prog');const bar=el('div','rk-bar'),fill=el('i');fill.style.width=pct(k,n)+'%';bar.append(fill);row.append(el('b','',`${k} of ${n} formulas understood`),bar);box.append(row);
+  const nx=D.formulas.findIndex((f,i)=>!done.includes(i));
+  if(nx>=0){const g=el('div','rk-upnext');g.append(el('span','','Up next: '+D.formulas[nx].n),btn('rk-mini','Go there',()=>{ov.querySelector('#rk-f-'+nx)?.scrollIntoView({behavior:'smooth',block:'center'})}));box.append(g)}
+  else box.append(el('p','rk-ok','All formulas understood. Now practise and take the mock test.'));
+  const tp=Object.keys(PB()[CH()]?.topics||{});if(tp.length){box.append(el('span','rk-label','Practice strength by topic'));const t=el('div','rk-topics');
+    for(const k2 of tp){const v=acc[k2],d=el('div','rk-topic'),nm=el('span','',tname(k2)),b2=el('div','rk-bar'),f2=el('i');
+      if(v&&v[1]){const q=pct(v[0],v[1]);f2.style.width=q+'%';f2.className=q>=70?'good':q>=40?'mid':'low';d.append(nm,b2,el('b','',`${q}% (${v[0]}/${v[1]})`))}else d.append(nm,b2,el('b','dim','not tried'));b2.append(f2);t.append(d)}box.append(t)}}
+function formulas(p){const D=U(),pg=el('div','rk-card wide rk-progress');progress(pg);p.append(pg);
+  const jump=el('div','rk-jump wide');jump.append(el('span','','Jump to'));const chips=[];
+  SECS.forEach((g,i)=>{const c=btn('rk-pill small','',()=>{ov.querySelector('#rk-sec-'+i)?.scrollIntoView({behavior:'smooth',block:'start'})});chips.push(c);jump.append(c)});p.append(jump);
+  const upd=()=>{SECS.forEach((g,i)=>{const ids=D.formulas.map((f,j)=>f.g===g?j:-1).filter(j=>j>=0);chips[i].textContent=`${i+1} · ${g}  ${ids.filter(j=>done.includes(j)).length}/${ids.length}`});progress(pg)};
   SECS.forEach((g,i)=>{const h=el('h2','rk-sec wide',`${i+1} · ${g}`);h.id='rk-sec-'+i;p.append(h);
     if(g==='Dimensions'){const t=el('div','rk-card wide');t.append(el('h3','','Dimensions to remember'));const gr=el('div','rk-dims');for(const [q,d] of D.table){const r=el('div','rk-dim');r.append(el('span','',q),el('b','','['+d+']'));gr.append(r)}t.append(gr);p.append(t)}
-    for(const f of D.formulas.filter(x=>x.g===g)){const c=el('div','rk-card');c.append(el('h3','',f.n),el('p','rk-formula',f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
-      if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(f.ex));c.append(e)}p.append(c)}})}
+    D.formulas.forEach((f,j)=>{if(f.g!==g)return;const c=el('div','rk-card'+(done.includes(j)?' got':''));c.id='rk-f-'+j;const hd=el('div','rk-fh');hd.append(el('h3','',f.n));
+      const gb=btn('rk-got',done.includes(j)?'✓ Understood':'Got it',()=>{const k=done.indexOf(j);if(k<0)done.push(j);else done.splice(k,1);save();const on=done.includes(j);c.classList.toggle('got',on);gb.textContent=on?'✓ Understood':'Got it';gb.setAttribute('aria-pressed',String(on));upd()});gb.setAttribute('aria-pressed',String(done.includes(j)));gb.dataset.testid='rk-got';hd.append(gb);
+      c.append(hd,eqs(f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
+      if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(f.ex));c.append(e)}p.append(c)})});upd()}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
 function mistakes(p){const D=U();p.append(el('p','rk-lead wide','Students lose marks on these again and again. Check each one before you submit an answer.'));
@@ -62,7 +77,7 @@ function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';view.classNa
     const next=btn('rk-btn',k+1<ids.length?'Next →':'Finish',()=>{k++;show()});next.hidden=true;next.dataset.testid='rk-next';
     order.forEach((oi,pos)=>{const b=btn('rk-opt',null,()=>{if(done)return;done=true;const ok=oi===q.c;b.classList.add(ok?'right':'wrong');if(!ok)opts.children[order.indexOf(q.c)].classList.add('right');
       for(const x of opts.children)x.disabled=true;hb.hidden=true;fb.hidden=false;fb.append(el('p',ok?'rk-ok':'rk-no',ok?(hl?'Correct, with help.':'Correct!'):'Not quite.'));for(const l of lines)fb.append(el('p','rk-sol',l));
-      res.push({q,ok,hints:hl});if(!seen.includes(i))seen.push(i);save();next.hidden=false;next.focus()});
+      res.push({q,ok,hints:hl});{const a=acc[q.tp]||[0,0];acc[q.tp]=[a[0]+(ok?1:0),a[1]+1]}if(!seen.includes(i))seen.push(i);save();next.hidden=false;next.focus()});
       b.append(el('span','rk-l','ABCD'[pos]),el('span','rk-t',q.o[oi]));b.dataset.testid='rk-opt';b.dataset.correct=String(oi===q.c);opts.append(b)});
     card.append(opts,hb,hint,fb);view.append(top,bar,card,next)};
   show()}

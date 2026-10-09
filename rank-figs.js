@@ -1,2 +1,81 @@
-/* Diagrams for Rank mode · Units and Measurements (PhysicaFig specs, generated; all coordinates computed). */
-window.PhysicaRankFigs={"acc":{"w":360,"h":122,"alt":"Four targets: accurate and precise (tight group on the centre), precise but not accurate (tight group off centre), accurate but not precise (scattered around the centre), neither","d":[["c",45,50,40],["c",45,50,27],["c",45,50,14],["c",45,50,2,"F"],["c",135,50,40],["c",135,50,27],["c",135,50,14],["c",135,50,2,"F"],["c",225,50,40],["c",225,50,27],["c",225,50,14],["c",225,50,2,"F"],["c",315,50,40],["c",315,50,27],["c",315,50,14],["c",315,50,2,"F"],["c",45,50,2.6,"F"],["c",48,47,2.6,"F"],["c",42,53,2.6,"F"],["c",47,53,2.6,"F"],["c",43,47,2.6,"F"],["c",151,36,2.6,"F"],["c",154,33,2.6,"F"],["c",148,39,2.6,"F"],["c",153,40,2.6,"F"],["c",149,34,2.6,"F"],["c",210,40,2.6,"F"],["c",241,60,2.6,"F"],["c",222,28,2.6,"F"],["c",236,72,2.6,"F"],["c",213,64,2.6,"F"],["c",332,24,2.6,"F"],["c",348,46,2.6,"F"],["c",320,36,2.6,"F"],["c",338,74,2.6,"F"],["c",298,28,2.6,"F"],["t",45,104,"Accurate","ms"],["t",45,115,"and precise","ms"],["t",135,104,"Precise,","ms"],["t",135,115,"not accurate","ms"],["t",225,104,"Accurate,","ms"],["t",225,115,"not precise","ms"],["t",315,104,"Not accurate,","ms"],["t",315,115,"not precise","ms"]]},"vernier":{"w":350,"h":114,"alt":"Vernier callipers scale: main scale reading 24 mm, sixth vernier division coincides, reading 24.6 mm","d":[["l",20,40,290,40],["l",20,40,20,32],["t",20,27,"22","ms"],["l",46,40,46,32],["l",72,40,72,32],["t",72,27,"24","ms"],["l",98,40,98,32],["l",124,40,124,32],["t",124,27,"26","ms"],["l",150,40,150,32],["l",176,40,176,32],["t",176,27,"28","ms"],["l",202,40,202,32],["l",228,40,228,32],["t",228,27,"30","ms"],["l",254,40,254,32],["l",280,40,280,32],["t",280,27,"32","ms"],["r",87.6,44,234.0,18],["l",87.6,44,87.6,52],["t",87.6,74,"0","ms"],["l",111.0,44,111.0,52],["l",134.4,44,134.4,52],["t",134.4,74,"2","ms"],["l",157.8,44,157.8,52],["l",181.2,44,181.2,52],["t",181.2,74,"4","ms"],["l",204.6,44,204.6,52],["l",228.0,44,228.0,52],["t",228.0,74,"6","ms"],["l",251.4,44,251.4,52],["l",274.8,44,274.8,52],["t",274.8,74,"8","ms"],["l",298.2,44,298.2,52],["l",321.6,44,321.6,52],["t",321.6,74,"10","ms"],["l",228.0,30,228.0,54,"dB"],["t",20,92,"Main scale in mm. MSR = 24 mm (mark just before the vernier zero).","s"],["t",20,106,"6th vernier division lines up: 24 + 6 × 0.1 = 24.6 mm","s"]]},"screw":{"w":350,"h":120,"alt":"Screw gauge: pitch scale reading 3 mm, circular scale division 35 on the reference line, reading 3.35 mm","d":[["l",14,58,168,58],["l",14,58,14,49],["t",14,44,"0","ms"],["l",28.0,58,28.0,64],["l",42,58,42,49],["t",42,44,"1","ms"],["l",56.0,58,56.0,64],["l",70,58,70,49],["t",70,44,"2","ms"],["l",84.0,58,84.0,64],["l",98,58,98,49],["t",98,44,"3","ms"],["l",112.0,58,112.0,64],["l",126,58,126,49],["t",126,44,"4","ms"],["l",140.0,58,140.0,64],["l",154,58,154,49],["t",154,44,"5","ms"],["r",107.8,34,86,48],["t",150.8,63,"thimble","ms"],["l",193.8,58,238,58,"da"],["c",285,58,40],["l",308.5,90.4,305.0,85.5],["t",300.3,82.0,"0","ms"],["l",297.4,96.0,295.5,90.3],["l",285.0,98.0,285.0,92.0],["t",285.0,87.0,"10","ms"],["l",272.6,96.0,274.5,90.3],["l",261.5,90.4,265.0,85.5],["l",252.6,81.5,257.5,78.0],["t",264.0,76.3,"25","ms"],["l",247.0,70.4,252.7,68.5],["l",245.0,58.0,251.0,58.0],["t",259.0,61.0,"35","ms"],["l",247.0,45.6,252.7,47.5],["l",252.6,34.5,257.5,38.0],["l",261.5,25.6,265.0,30.5],["t",269.7,40.0,"50","ms"],["l",272.6,20.0,274.5,25.7],["l",285.0,18.0,285.0,24.0],["t",285.0,35.0,"60","ms"],["l",297.4,20.0,295.5,25.7],["l",308.5,25.6,305.0,30.5],["l",317.4,34.5,312.5,38.0],["t",306.0,45.7,"75","ms"],["l",323.0,45.6,317.3,47.5],["l",325.0,58.0,319.0,58.0],["t",311.0,61.0,"85","ms"],["l",323.0,70.4,317.3,68.5],["l",317.4,81.5,312.5,78.0],["t",285,62,"circular","ms"],["t",14,98,"Pitch 1 mm, 100 divisions: LC = 0.01 mm. PSR = 3 mm.","s"],["t",14,112,"CSR = 35 on the line: 3 + 35 × 0.01 = 3.35 mm","s"]]},"prefix":{"w":360,"h":100,"alt":"Ladder of SI prefixes from tera 10^12 down to femto 10^-15, each step a factor of 1000","d":[["l",8,50,352,50,"b"],["c",22.0,50,3.2,"F"],["t",22.0,36,"tera","ms"],["t",22.0,68,"10¹²","ms"],["c",58.2,50,3.2,"F"],["t",58.2,36,"giga","ms"],["t",58.2,68,"10⁹","ms"],["c",94.4,50,3.2,"F"],["t",94.4,36,"mega","ms"],["t",94.4,68,"10⁶","ms"],["c",130.6,50,3.2,"F"],["t",130.6,36,"kilo","ms"],["t",130.6,68,"10³","ms"],["c",166.8,50,3.2,"F"],["t",166.8,36,"unit","ms"],["t",166.8,68,"1","ms"],["c",203.0,50,3.2,"F"],["t",203.0,36,"milli","ms"],["t",203.0,68,"10⁻³","ms"],["c",239.2,50,3.2,"F"],["t",239.2,36,"micro","ms"],["t",239.2,68,"10⁻⁶","ms"],["c",275.4,50,3.2,"F"],["t",275.4,36,"nano","ms"],["t",275.4,68,"10⁻⁹","ms"],["c",311.6,50,3.2,"F"],["t",311.6,36,"pico","ms"],["t",311.6,68,"10⁻¹²","ms"],["c",347.8,50,3.2,"F"],["t",347.8,36,"femto","ms"],["t",347.8,68,"10⁻¹⁵","ms"],["t",8,92,"Each step is a factor of 1000. Moving right: smaller unit, bigger number.","s"]]},"sphero":{"w":340,"h":162,"alt":"Spherometer on a convex surface: two outer legs a distance l apart, the central screw touches the top, height h above the plane of the legs","d":[["p","M30 104 Q120 70 210 104","B"],["l",60,94.6,60,40],["l",180,94.6,180,40],["l",60,40,180,40],["l",120,40,120,87.0],["c",120,34,6],["l",60,94.6,180,94.6,"d"],["l",60,122,180,122,"b"],["t",120,136,"l  (distance between the legs)","ms"],["l",206,94.6,206,87.0,"b"],["t",212,93.8,"h","s"],["t",8,154,"R = l² ÷ 6h + h ÷ 2. h comes from the screw readings.","s"]]}};
+/* Diagrams for Rank mode · Units and Measurements. Plain SVG built with DOM calls (no innerHTML), white on black. */
+(() => {
+'use strict';
+const NS='http://www.w3.org/2000/svg',INK='#e6f1ff',DIM='#7f8ca3',HI='#ffb347',BLUE='#6fa8f5';
+const mk=(p,t,a,x)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(x!=null)e.textContent=x;p.append(e);return e};
+const svg=(w,h,alt)=>{const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox',`0 0 ${w} ${h}`);s.setAttribute('role','img');s.setAttribute('aria-label',alt);s.setAttribute('font-family','system-ui,-apple-system,Segoe UI,Roboto,sans-serif');return s};
+const line=(p,x1,y1,x2,y2,c=INK,w=1.5,d)=>mk(p,'line',{x1,y1,x2,y2,stroke:c,'stroke-width':w,...(d?{'stroke-dasharray':d}:{})});
+const text=(p,x,y,t,sz=13,c=INK,anc='middle',wt=400)=>mk(p,'text',{x,y,fill:c,'font-size':sz,'text-anchor':anc,'font-weight':wt},t);
+const arrow=(p,x1,y1,x2,y2,c=HI)=>{line(p,x1,y1,x2,y2,c,1.5);const a=Math.atan2(y2-y1,x2-x1);for(const [px,py,s] of [[x2,y2,1],[x1,y1,-1]]){const b=a+(s>0?Math.PI:0);mk(p,'polygon',{points:`${px},${py} ${px+9*Math.cos(b+.4)},${py+9*Math.sin(b+.4)} ${px+9*Math.cos(b-.4)},${py+9*Math.sin(b-.4)}`,fill:c})}};
+
+/* accurate vs precise: four targets */
+function acc(){const s=svg(340,290,'Four targets. Accurate and precise: tight group on the centre. Precise but not accurate: tight group away from the centre. Accurate but not precise: scattered around the centre. Neither: scattered and away from the centre.');
+  const T=[[90,60,'Accurate and precise','tight, on the centre',[[0,0],[5,-4],[-4,5],[4,5],[-5,-3]]],
+    [250,60,'Precise only','tight, off the centre',[[22,-20],[27,-23],[19,-16],[25,-14],[21,-24]]],
+    [90,190,'Accurate only','spread round the centre',[[26,6],[-22,-22],[-8,28],[24,-26],[-30,10]]],
+    [250,190,'Neither','spread, off the centre',[[28,-22],[-6,-30],[30,20],[-12,10],[8,32]]]];
+  for(const [cx,cy,a,b,d] of T){for(const r of [46,31,16])mk(s,'circle',{cx,cy,r,fill:'none',stroke:'#4a5876','stroke-width':1.5});mk(s,'circle',{cx,cy,r:3,fill:'#4a5876'});
+    for(const [x,y] of d)mk(s,'circle',{cx:cx+x,cy:cy+y,r:4,fill:HI});
+    text(s,cx,cy+66,a,13,INK,'middle',700);text(s,cx,cy+82,b,12,DIM)}
+  return s}
+
+/* vernier callipers: 24.6 mm */
+function vernier(){const s=svg(340,170,'Vernier callipers scale. The main scale reads 24 mm just before the vernier zero. The sixth vernier line meets a main-scale line. Reading 24.6 mm.');
+  const X=m=>20+(m-22)*10,v0=X(24.6);
+  text(s,20,12,'MAIN SCALE (mm)',11,DIM,'start',700);
+  line(s,20,52,320,52,INK,2);
+  for(let m=22;m<=52;m++){const x=X(m),big=m%2===0;line(s,x,52,x,big?38:45,INK,1.2);if(big)text(s,x,33,String(m),12)}
+  mk(s,'rect',{x:v0,y:56,width:90,height:32,fill:'#0b1220',stroke:BLUE,'stroke-width':1.5,rx:2});
+  for(let k=0;k<=10;k++){const x=v0+9*k;line(s,x,56,x,k%5===0?76:70,BLUE,1.2);if(k%2===0)text(s,x,102,String(k),12,BLUE)}
+  text(s,v0+45,118,'VERNIER SCALE',11,BLUE,'middle',700);
+  line(s,X(30),38,X(30),88,HI,2);
+  text(s,v0+98,70,'6th line',12,HI,'start',700);text(s,v0+98,84,'meets here',12,HI,'start',700);
+  text(s,20,142,'Main scale: 24 mm (just before the vernier 0)',13,INK,'start');
+  text(s,20,162,'6 × 0.1 = 0.6  →  24 + 0.6 = 24.6 mm',13,HI,'start',700);
+  return s}
+
+/* screw gauge: 3.35 mm */
+function screw(){const s=svg(340,190,'Screw gauge. The pitch scale reads 3 mm. The circular scale shows 35 on the reference line. Reading 3.35 mm.');
+  text(s,110,14,'SLEEVE (pitch scale, mm)',11,DIM,'middle',700);
+  line(s,20,62,200,62,INK,2);
+  for(let i=0;i<=6;i++){line(s,20+30*i,62,20+30*i,48,INK,1.3);text(s,20+30*i,42,String(i),12)}
+  for(let i=0;i<6;i++)line(s,35+30*i,62,35+30*i,70,INK,1);
+  mk(s,'rect',{x:121,y:56,width:90,height:56,fill:'#0b1220',stroke:BLUE,'stroke-width':1.5,rx:3});
+  line(s,121,56,121,112,HI,2.5);
+  text(s,166,88,'thimble',12,BLUE);
+  text(s,121,128,'edge is just past 3',12,HI,'middle',700);
+  text(s,285,14,'CIRCULAR SCALE',11,DIM,'middle',700);
+  mk(s,'rect',{x:250,y:26,width:70,height:96,fill:'#0b1220',stroke:BLUE,'stroke-width':1.5,rx:3});
+  for(let v=23;v<=47;v++){const y=74-(v-35)*4,l=v%5===0;line(s,l?296:308,y,320,y,BLUE,1.2);if(l)text(s,258,y+4,String(v),12,BLUE,'start')}
+  line(s,236,74,320,74,HI,2.5);
+  text(s,285,140,'35 is on the line',12,HI,'middle',700);
+  text(s,20,164,'PSR = 3 mm   CSR = 35   (LC = 0.01 mm)',13,INK,'start');
+  text(s,20,182,'Reading = 3 + 35 × 0.01 = 3.35 mm',13,HI,'start',700);
+  return s}
+
+/* SI prefixes */
+function prefix(){const s=svg(340,176,'SI prefixes: tera 10 to the 12, giga 10 to the 9, mega 10 to the 6, kilo 10 cubed, milli 10 to the minus 3, micro 10 to the minus 6, nano 10 to the minus 9, pico 10 to the minus 12, femto 10 to the minus 15.');
+  const row=(y,lab,items,c)=>{text(s,6,y-6,lab,11,DIM,'start',700);items.forEach(([sym,nm,pw],i)=>{const x=6+i*66.4;mk(s,'rect',{x,y,width:62,height:60,rx:6,fill:'#0b0b0b',stroke:c,'stroke-width':1.3});
+    text(s,x+31,y+22,sym,20,c,'middle',700);text(s,x+31,y+38,nm,12,INK);text(s,x+31,y+54,pw,12,DIM)})};
+  row(22,'BIGGER THAN 1',[['T','tera','10¹²'],['G','giga','10⁹'],['M','mega','10⁶'],['k','kilo','10³'],['1','unit','10⁰']],BLUE);
+  row(102,'SMALLER THAN 1',[['m','milli','10⁻³'],['µ','micro','10⁻⁶'],['n','nano','10⁻⁹'],['p','pico','10⁻¹²'],['f','femto','10⁻¹⁵']],HI);
+  return s}
+
+/* spherometer */
+function sphero(){const s=svg(340,200,'Spherometer on a curved surface. Two outer legs rest on the surface a distance l apart. The middle leg touches the highest point, a height h above the plane of the outer legs.');
+  const cx=150,top=74,R=220,cy=top+R,yl=cy-Math.sqrt(R*R-90*90),arc=[];
+  for(let x=10;x<=290;x+=5)arc.push(`${x},${(cy-Math.sqrt(R*R-(x-cx)*(x-cx))).toFixed(1)}`);
+  mk(s,'polyline',{points:arc.join(' '),fill:'none',stroke:INK,'stroke-width':2});
+  text(s,332,150,'surface',11,DIM,'end');
+  mk(s,'rect',{x:60,y:30,width:180,height:8,rx:3,fill:'#0b1220',stroke:BLUE,'stroke-width':1.5});
+  line(s,60,38,60,yl,BLUE,2.5);line(s,240,38,240,yl,BLUE,2.5);
+  line(s,cx,14,cx,top,HI,2.5);mk(s,'rect',{x:cx-14,y:8,width:28,height:7,rx:2,fill:HI});
+  text(s,cx+22,18,'middle leg (screw)',11,HI,'start');
+  line(s,cx,top,300,top,DIM,1,'4 3');line(s,240,yl,300,yl,DIM,1,'4 3');
+  arrow(s,292,top,292,yl,HI);text(s,305,(top+yl)/2+4,'h',15,HI,'start',700);
+  arrow(s,60,yl+22,240,yl+22,BLUE);text(s,150,yl+40,'l = distance between the outer legs',12,BLUE);
+  text(s,20,172,'R = l² / 6h + h / 2',15,INK,'start',700);text(s,20,192,'Read h from the screw scale',12,DIM,'start');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero};
+})();
