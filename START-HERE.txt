@@ -215,3 +215,5 @@ Still to do / ideas:
   Practise button), then Practice (10 questions) and the mock test. Content in rank-units.js, page in rank-neet.js. The old
   dashboard (Continue / spaced revision / Kinematics lessons in rank-lessons.js) was removed from the build; rank-lessons.js is kept
   in the repo, unused, for later.
+
+Rank mode NEET redesign: slim top bar (chapter name + all buttons), full-width grid, 5 diagrams (rank-figs.js), numbered how-to steps, richer short notes. Units and Measurements only.
