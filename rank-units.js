@@ -8,7 +8,7 @@ table:[['Velocity','LT⁻¹'],['Acceleration','LT⁻²'],['Momentum, impulse','M
 formulas:[
  {g:'Dimensions',n:'Principle of homogeneity',f:'Every term in an equation must have the same dimensions',how:'Write the dimensions of each term. If one term is different, the equation is wrong. You can add or subtract only quantities of the same dimension.',ex:'v = u + at → [LT⁻¹] = [LT⁻¹] + [LT⁻²][T]. Every term is LT⁻¹, so it is correct.'},
  {g:'Dimensions',n:'Dimensions of a quantity',f:'[X] = dimensions of the right-hand side of a formula for X',how:'Pick any formula that contains X. Put M, L, T for each symbol and cancel.',ex:'η = F / (6πrv) → [MLT⁻²] / ([L][LT⁻¹]) = [ML⁻¹T⁻¹].'},
- {g:'Dimensions',n:'Deriving a relation',f:'Q = k aˣ bʸ cᶻ · Then match the powers of M, L and T',how:'Assume Q is a product of powers of the quantities it depends on. Equate the powers of M, L and T on both sides and solve for x, y, z. The constant k stays unknown.',ex:'T = k lˣ gʸ → T¹ = Lˣ(LT⁻²)ʸ. So x + y = 0 and −2y = 1. Then y = −½, x = ½, so T = k√(l/g).'},
+ {g:'Dimensions',n:'Deriving a relation',f:'Q = k aˣ bʸ cᶻ',how:'Assume Q is a product of powers of the quantities it depends on. Equate the powers of M, L and T on both sides and solve for x, y, z. The constant k stays unknown.',ex:'T = k lˣ gʸ → T¹ = Lˣ(LT⁻²)ʸ. So x + y = 0 and −2y = 1. Then y = −½, x = ½, so T = k√(l/g).'},
  {g:'Dimensions',n:'Limits of dimensional analysis',f:'Cannot give pure numbers such as ½, 2π or k',how:'It also fails for sin, log and eˣ (their argument must be dimensionless), cannot tell apart quantities with the same dimensions (work and torque), and gives only a product of powers.',ex:'From dimensions alone you cannot decide whether K.E. is mv² or ½mv².'},
  {g:'Units',n:'Unit conversion',f:'n₂ = n₁ [M₁/M₂]ᵃ [L₁/L₂]ᵇ [T₁/T₂]ᶜ',how:'The quantity has dimensions [MᵃLᵇTᶜ]. The bigger the new unit, the smaller the number. Put the old unit on top of the new one.',ex:'Force [MLT⁻²]: 1 N = 1 × (1000 g / 1 g)(100 cm / 1 cm)(1 s / 1 s)⁻² = 10⁵ dyne.'},
  {g:'Significant figures',n:'Counting significant figures',f:'Non-zero digits count · zeros between digits count · trailing zeros after a decimal point count · leading zeros never count',how:'Write the number in scientific notation. The digits in front of ×10ⁿ are the significant figures.',ex:'0.00230 → 3 · 4.500 → 4 · 2005 → 4 · 1.20 × 10³ → 3.'},
@@ -41,4 +41,54 @@ asked:[
  {t:'Significant figures',what:'Count the significant figures, round off, or give the result of an addition or multiplication.',steps:['Count from the first non-zero digit.','Addition: keep the least number of decimal places.','Multiplication: keep the least number of significant figures.'],ex:'0.0450 has 3 significant figures: the leading zeros do not count and the last zero does. And 12.11 + 0.3 = 12.41 → 12.4.',tp:'sig'},
  {t:'A new system of units',what:'The units of some quantities are changed and you must find the new unit of another quantity.',steps:['Write the dimensions of the asked quantity in terms of the given ones.','Substitute the new units.'],ex:'Unit of force 100 N, length 10 m, time 1 s. From F = ma, M = F T² / L = 100 × 1 / 10 = 10 kg, so the unit of mass is 10 kg.',tp:'units'}
 ]};
+
+window.PhysicaRankUnits.guide={
+intro:'This chapter is small but it feeds every other chapter. Follow the guide top to bottom: basics, then the path, then the thinking habits. Come back to the misconceptions before every test.',
+basics:[
+'The 7 SI base quantities and their units: length (m), mass (kg), time (s), electric current (A), temperature (K), amount of substance (mol), luminous intensity (cd).',
+'Base quantity vs derived quantity: speed, force and energy are built from the base ones.',
+'Radian (plane angle) and steradian (solid angle) are supplementary units with no dimensions.',
+'Powers of 10 and standard form: 4500 = 4.5 × 10³, 0.0032 = 3.2 × 10⁻³.',
+'Prefixes: kilo 10³, milli 10⁻³, micro 10⁻⁶, nano 10⁻⁹, pico 10⁻¹².',
+'Rules of exponents: aˣ × aʸ = aˣ⁺ʸ, (aˣ)ʸ = aˣʸ, a⁰ = 1.',
+'Mean (average) and percentage: percentage = part ÷ whole × 100.',
+'Reading a scale: the smallest division is what you can read directly.'],
+path:[
+{t:'Step 1 · Units and dimensions',d:'Learn the 7 base units and the dimensions of the 20 or so common quantities (force, work, pressure, and so on).',ready:'you can write the dimensions of force, energy, pressure and frequency without looking.',go:'formulas'},
+{t:'Step 2 · Dimensional analysis',d:'Use dimensions to check a formula, to derive a relation, and to convert units.',ready:'you can check any given equation in under a minute.',go:'asked'},
+{t:'Step 3 · Significant figures',d:'Count significant figures, add, multiply and round correctly.',ready:'you can say how many significant figures a number has and round an answer correctly.',go:'notes'},
+{t:'Step 4 · Errors',d:'Absolute, relative and percentage error. Then errors in sums, products and powers.',ready:'you can find the percentage error of a result like A³B² / C.',go:'formulas'},
+{t:'Step 5 · Instruments',d:'Vernier callipers and screw gauge: least count, reading, zero error. Spherometer for curved surfaces.',ready:'you can read a vernier or screw gauge picture and correct the zero error.',go:'formulas'},
+{t:'Step 6 · Practise, then test',d:'Practise by question type first. Then take the mock test. Revise the types you got wrong and repeat.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice'}],
+think:[
+'Read the question twice. Underline what is given and what is asked, with units.',
+'Name the type: dimensions, unit conversion, significant figures, errors, or an instrument.',
+'Write the formula first. Put numbers in only after that.',
+'Bring everything to the same unit system before you calculate.',
+'Calculate with one extra digit and round at the end, using the significant figure rule.',
+'Check the units or dimensions of your answer. Ask if the size of the answer is sensible.',
+'In an MCQ, test the options with dimensions. Wrong options are often removed in 20 seconds.'],
+watch:[
+'Options that differ by a factor of 10, 100 or 1000 are usually testing your unit conversion.',
+'Angles, strain, refractive index and ratios have no dimensions.',
+'The argument of sin, cos, log and exponential must have no dimensions.',
+'Only quantities with the same dimensions can be added, subtracted or equated.',
+'Errors always add, even when the values are subtracted.',
+'For a power, multiply the percentage error by the power.',
+'Zero error has a sign. Corrected reading = reading − zero error.',
+'Round only at the end, never in the middle of a calculation.',
+'Keep about one minute per question. If dimensions give the answer quickly, take it.'],
+myths:[
+['Myth: A dimensionally correct formula is a correct formula.','Truth: Dimensions cannot check numbers like ½ or 2π. s = ut + ¼at² has correct dimensions but is wrong.'],
+['Myth: Same dimensions means same physical quantity.','Truth: Work and torque both have ML²T⁻², but they are different quantities.'],
+['Myth: Subtract the errors when you subtract the values.','Truth: The absolute errors always add.'],
+['Myth: Trailing zeros never count.','Truth: In 2.50 the zero after the decimal point counts, so it has 3 significant figures. Leading zeros never count: 0.0025 has 2.'],
+['Myth: More decimal places means more significant figures.','Truth: 0.0045 m and 4.5 mm both have 2 significant figures. Changing units does not change them.'],
+['Myth: Accuracy and precision are the same.','Truth: Accuracy is closeness to the true value. Precision is closeness of repeated readings to each other.'],
+['Myth: The least count is the error in my answer.','Truth: The least count is the smallest value the instrument can read. It limits the error, it is not the whole error.'],
+['Myth: A negative zero error is subtracted like a positive one.','Truth: Subtract the signed value. If the zero error is −0.02 mm, the correction adds 0.02 mm.'],
+['Myth: The percentage error of x² is the same as of x.','Truth: It is twice as much. The power multiplies the percentage error.'],
+['Myth: A bigger unit gives a bigger number.','Truth: A bigger unit gives a smaller number. 1000 m = 1 km.'],
+['Myth: Radian is not a unit because it has no dimensions.','Truth: Radian is a unit. It has no dimensions, but you still write it.'],
+['Myth: Dimensional analysis can give any constant.','Truth: It gives the powers only. The numerical constant must come from an experiment or a derivation.']]};
 })();
