@@ -16,7 +16,7 @@ const ERR={c:'Concept unclear',s:'Start nahi hua',k:'Calculation / check'};
 const THINK=[['Understand','What exactly is asked? What is given, implied, fixed or changing?'],['Represent','Which sketch, free-body diagram, circuit, graph or initial/final state makes it clear?'],['Choose','Which physical law connects the target to the known quantities, and are its conditions satisfied?'],['Plan','What intermediate quantity is needed? Which equation do you write first?'],['Execute','Keep units and signs consistent; simplify before putting in awkward numbers.'],['Check','Do the dimension, sign, size and physical behaviour of the answer make sense?']];
 
 /* ---------- saved state (this device only) ---------- */
-const blank=()=>({ch:'Motion in a Straight Line',tab:'practice',seen:{},st:{},tp:{},q:[],err:{c:0,s:0,k:0}});
+const blank=()=>({ch:'Motion in a Straight Line',tab:'practice',seen:{},st:{},tp:{},les:{},q:[],err:{c:0,s:0,k:0}});
 let S=blank();
 const num=v=>Number.isFinite(v)?v:0;
 function load(){S=blank();try{const s=JSON.parse(localStorage.getItem(KEY));if(!s||typeof s!=='object')return;
@@ -24,6 +24,7 @@ function load(){S=blank();try{const s=JSON.parse(localStorage.getItem(KEY));if(!
   for(const k in s.seen||{})if(Array.isArray(s.seen[k]))S.seen[k]=s.seen[k].filter(Number.isInteger);
   for(const k in s.st||{}){const o=s.st[k];S.st[k]={n:num(o.n),ok:num(o.ok),ind:num(o.ind),h:num(o.h)}}
   for(const k in s.tp||{}){const o=s.tp[k];S.tp[k]={n:num(o.n),ok:num(o.ok)}}
+  for(const k in s.les||{}){const o=s.les[k];if(o&&typeof o==='object')S.les[k]={score:num(o.score),at:num(o.at)}}
   if(Array.isArray(s.q))S.q=s.q.filter(r=>r&&typeof r.ch==='string'&&typeof r.tp==='string'&&Number.isInteger(r.i)&&Number.isFinite(r.due)).map(r=>({ch:r.ch,tp:r.tp,i:r.i,due:r.due,stage:Math.max(0,Math.min(GAPS.length-1,num(r.stage)))})).slice(-80);
   if(s.err)for(const k of['c','s','k'])S.err[k]=num(s.err[k])}catch{}}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
@@ -72,8 +73,12 @@ function home(){if(!view)return;ov.dataset.run='0';view.replaceChildren();ov.scr
 
 function samjho(p){const c=el('div','rk-card');c.append(el('h3','','How to think about any question'),el('p','rk-note','Practise this routine until it becomes automatic. It is not a magic algorithm for every question.'));
   const ol=el('ol','rk-steps');for(const [a,b] of THINK){const li=el('li');li.append(el('b','',a),el('span','',' '+b));ol.append(li)}c.append(ol);p.append(c);
-  const t=el('div','rk-card');t.append(el('h3','','Topics in this chapter'),el('p','rk-note','Concept lessons are being written chapter by chapter. Until a lesson is ready, learn each topic by solving: use the help ladder inside the questions.'));
-  const topics=PB()[S.ch].topics||{};for(const k of Object.keys(topics)){const s=S.tp[S.ch+'|'+k],row=el('div','rk-row');row.append(el('span','',topics[k]),el('small','',s?`${s.ok} / ${s.n} right`:'not tried'),btn('rk-mini','Practise',()=>topicSet(k)));t.append(row)}
+  const ls=window.PhysicaRankLessons?.[S.ch]||{},t=el('div','rk-card');t.append(el('h3','','Topics in this chapter'),
+    el('p','rk-note',Object.keys(ls).length?'Each lesson takes about 10 minutes: idea, formula with its conditions, one explained example, one for you to complete, and three checks.':'Concept lessons are being written chapter by chapter. Until a lesson is ready, learn each topic by solving: use the help ladder inside the questions.'));
+  const topics=PB()[S.ch].topics||{};for(const k of Object.keys(topics)){const s0=S.tp[S.ch+'|'+k],ld=S.les[S.ch+'|'+k],row=el('div','rk-row');
+    row.append(el('span','',topics[k]),el('small','',ld?`✓ lesson ${ld.score}/3`:ls[k]?'lesson ready':s0?`${s0.ok} / ${s0.n} right`:'not tried'));
+    if(ls[k]){const b=btn('rk-mini rk-learn',ld?'Review':'Learn',()=>lesson(k));b.dataset.testid='rk-learn-'+k;row.append(b)}
+    row.append(btn('rk-mini','Practise',()=>topicSet(k)));t.append(row)}
   p.append(t)}
 function practice(p){const ch=S.ch,B=bank(ch);
   const a=el('div','rk-card');a.append(el('h3','','Question set'),el('p','rk-note',`${NEW} questions on this chapter. New questions come first; the topics are mixed so you choose the method.`),btn('rk-btn',`Start ${NEW} questions`,()=>runPlain(pickNew(ch,NEW).map(i=>({kind:'new',ch,i})),'Chapter practice')));
@@ -122,6 +127,38 @@ function run(items,title,done){ov.dataset.run='1';let k=0;const res=[];ov.scroll
       if(!ok){const w=el('div','rk-why');w.append(el('span','','What went wrong?'));for(const key of['c','s','k']){const c=btn('rk-chip',ERR[key],()=>{if(r.err)return;r.err=key;S.err[key]++;save();for(const x of w.querySelectorAll('.rk-chip'))x.disabled=true;c.classList.add('on')});c.dataset.testid='rk-err-'+key;w.append(c)}fb.append(w)}
       next.hidden=false;next.focus()});b.append(el('span','rk-l','ABCD'[pos]),el('span','rk-t',q.o[oi]));b.dataset.testid='rk-opt';b.dataset.correct=String(oi===q.c);opts.append(b)});
     card.append(opts,hintBtn,hintBox,fb);view.append(top,bar,card,next)};
+  show()}
+
+/* ---------- Samjho lesson player ---------- */
+function lesson(tp){const ch=S.ch,D=window.PhysicaRankLessons?.[ch]?.[tp];if(!D)return;ov.dataset.run='1';let pg=0,score=0,ci=0,answered=false;
+  const PAGES=['Idea','Formula','Example','Your turn','Check'],KINDS={predict:'Predict',first:'First step',change:'Changed condition'};
+  const steps=a=>{const ol=el('ol','rk-steps rk-ex');for(const [x,y] of a){const li=el('li');li.append(el('b','',x),el('span','',' '+y));ol.append(li)}return ol};
+  const fig=f=>{const g=f&&window.PhysicaFig?.(f);if(g)g.classList.add('rk-fig');return g||null};
+  // a multiple-choice block with instant feedback; cb(ok) runs once
+  const mcq=(host,m,cb)=>{const order=shuffle([0,1,2,3]),opts=el('div','rk-opts'),fb=el('div','rk-fb');fb.hidden=true;
+    order.forEach((oi,pos)=>{const b=btn('rk-opt',null,()=>{if(opts.dataset.done)return;opts.dataset.done='1';const ok=oi===m.c;b.classList.add(ok?'right':'wrong');if(!ok)opts.children[order.indexOf(m.c)].classList.add('right');for(const x of opts.children)x.disabled=true;
+      fb.hidden=false;fb.append(el('p',ok?'rk-ok':'rk-no',ok?'Correct!':'Not quite.'),el('p','rk-sol',m.why||m.s));cb(ok)});b.append(el('span','rk-l','ABCD'[pos]),el('span','rk-t',m.o[oi]));b.dataset.testid='rk-lopt';b.dataset.correct=String(oi===m.c);opts.append(b)});
+    host.append(opts,fb)};
+  const show=()=>{view.replaceChildren();ov.scrollTop=0;answered=false;
+    const top=el('div','rk-qtop');top.append(el('span','rk-chip on','Samjho'),el('b','rk-ltitle',D.title));
+    const dots=el('div','rk-dots');PAGES.forEach((n,i)=>{const d=el('span','rk-dot'+(i<pg?' done':i===pg?' now':''));d.title=n;dots.append(d)});
+    const card=el('div','rk-card');card.append(el('h3','',PAGES[pg]));
+    const nav=el('div','rk-two'),next=btn('rk-btn','Next →',()=>{pg++;show()});next.dataset.testid='rk-lnext';
+    const prev=btn('rk-btn rk-alt','← Back',()=>{pg--;show()});
+    if(pg===0){for(const t of D.idea)card.append(el('p','rk-para',t));const w=el('div','rk-trap');w.append(el('b','','Watch out'),el('span','',' '+D.trap));card.append(w)}
+    else if(pg===1){for(const [a,b] of D.rules){const r=el('div','rk-rule');r.append(el('b','',a),el('span','',b));card.append(r)}
+      const v=el('div','rk-vi');const g=el('div','rk-valid');g.append(el('h4','','Valid'));for(const t of D.valid)g.append(el('p','',t));const n=el('div','rk-invalid');n.append(el('h4','','Not valid'));for(const t of D.invalid)n.append(el('p','',t));v.append(g,n);card.append(v)}
+    else if(pg===2){card.append(el('p','rk-q',D.example.q));const f=fig(D.example.fig);if(f)card.append(f);card.append(steps(D.example.steps),el('p','rk-ans','Answer: '+D.example.ans))}
+    else if(pg===3){card.append(el('p','rk-note','Now you finish one. The first steps are done for you.'),el('p','rk-q',D.partial.q));const f=fig(D.partial.fig);if(f)card.append(f);card.append(steps(D.partial.steps),el('p','rk-q rk-ask',D.partial.ask.p));
+      next.disabled=true;mcq(card,D.partial.ask,()=>{card.append(el('p','rk-ans','Answer: '+D.partial.ans));next.disabled=false;next.focus()})}
+    else{const c=D.checks[ci];card.append(el('span','rk-chip on',`${KINDS[c.k]} · ${ci+1} / ${D.checks.length}`),el('p','rk-q',c.q));
+      const nx=btn('rk-btn',ci+1<D.checks.length?'Next check →':'Finish',()=>{ci++;if(ci>=D.checks.length)return done();show()});nx.hidden=true;nx.dataset.testid='rk-lcheck-next';
+      mcq(card,c,ok=>{if(ok)score++;nx.hidden=false;nx.focus()});view.append(top,dots,card,nx);return}
+    if(pg>0)nav.append(prev);if(pg<PAGES.length-1)nav.append(next);view.append(top,dots,card,nav)};
+  const done=()=>{S.les[ch+'|'+tp]={score,at:Date.now()};save();view.replaceChildren();ov.dataset.run='0';const c=el('div','rk-card rk-center');c.append(el('h3','',D.title+' · lesson done'));
+    const t=el('div','rk-tiles rk-tiles2');const d=el('div','rk-tile');d.append(el('b','',`${score} / ${D.checks.length}`),el('span','','Checks right'));t.append(d);c.append(t,
+      el('p','rk-note',score===D.checks.length?'All three checks right. Now practise the topic on fresh questions.':'Re-read the formula page and the example, then practise the topic. The questions will tell you if the gap is closed.'));
+    const row=el('div','rk-two');row.append(btn('rk-btn','Practise this topic',()=>topicSet(tp)),btn('rk-btn rk-alt','Back to topics',home));c.append(row);view.append(c)};
   show()}
 
 /* ---------- end of a set ---------- */

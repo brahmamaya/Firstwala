@@ -205,3 +205,8 @@ Still to do / ideas:
   (Concept unclear / Start nahi hua / Calculation) and return after 1, 3, 7, 14 days as fresh questions of the same topic.
   Data is only in localStorage 'physica-rank-neet'. TODO (from the PDF): Samjho concept packs (Kinematics pilot first), authored
   hint ladders, 4-question entry check, mixed/timed sets, Chemistry/Biology, JEE.
+- Rank mode Samjho lessons (rank-lessons.js, pilot chapter Motion in a Straight Line, 5 topics): idea → formula + conditions
+  (valid / not valid) → one explained example → one partly completed example (student answers the missing step) → 3 checks
+  (predict / first step / changed condition). Result saved in localStorage physica-rank-neet (les). Add a chapter by adding
+  window.PhysicaRankLessons[chapter][topicKey] with the same shape; the Samjho tab shows a Learn button for topics that have one.
+  Status: built on branch claude/chat-session-qj0iii, NOT merged yet (owner asked to review first).

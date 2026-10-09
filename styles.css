@@ -917,3 +917,24 @@ body.rank-open{overflow:hidden}
 .rk-why>span{font-weight:700;color:#bfe0ff;margin-right:4px}
 @media (max-width:600px){.rk-tiles{grid-template-columns:repeat(2,1fr)}.rk-go b{font-size:19px}.rk-head{padding:10px 12px}}
 @media print{.rk-ov{display:none!important}}
+.rk-learn{border-color:#9fd0ff;background:linear-gradient(135deg,#2b6cff,#4d9bff);color:#fff;font-weight:800}
+.rk-ltitle{font:800 13px 'Orbitron',sans-serif;letter-spacing:.06em;color:#cfe6ff}
+.rk-dots{display:flex;gap:8px;justify-content:center}
+.rk-dot{width:34px;height:6px;border-radius:99px;background:#4d9bff33}
+.rk-dot.done{background:#4d9bff}.rk-dot.now{background:#9fd0ff;box-shadow:0 0 12px #4d9bff}
+.rk-para{margin:0 0 12px;line-height:1.6;font-size:16px}
+.rk-trap{padding:12px 14px;border-radius:14px;border:1px solid #ff9d6a88;background:rgba(255,120,60,.1);line-height:1.55}
+.rk-trap b{color:#ffb88a;font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.rk-rule{display:flex;flex-wrap:wrap;gap:4px 14px;padding:10px 0;border-top:1px solid #4d9bff22}
+.rk-rule b{min-width:170px;color:#9fd0ff}
+.rk-rule span{flex:1;min-width:180px;font-weight:600}
+.rk-vi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.rk-valid,.rk-invalid{padding:12px 14px;border-radius:14px;line-height:1.5}
+.rk-valid{border:1px solid #35d49a88;background:rgba(20,120,90,.18)}.rk-invalid{border:1px solid #ff6b7a88;background:rgba(150,30,50,.2)}
+.rk-valid h4,.rk-invalid h4{margin:0 0 6px;font:800 12px 'Orbitron',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.rk-valid p,.rk-invalid p{margin:0 0 6px;font-size:14px}
+.rk-ex{margin:10px 0}.rk-ex li{line-height:1.55}
+.rk-ans{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:rgba(43,108,255,.2);border:1px solid #4d9bff77;font-weight:700;color:#cfe6ff}
+.rk-ask{margin-top:12px;font-size:17px}
+.rk-tiles2{grid-template-columns:1fr;max-width:200px;margin:8px auto}
+@media (max-width:600px){.rk-vi{grid-template-columns:1fr}.rk-rule b{min-width:100%}}

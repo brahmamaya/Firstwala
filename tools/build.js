@@ -18,7 +18,7 @@ fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js'
 // the exam questions ship as their own pack; the tutor pack carries just the list of chapters that have them
 bundle(EXAM,'physica-exam.min.js');
 {const box={};require('vm').runInNewContext(fs.readFileSync(path.join(root,'tutor-exam.js'),'utf8'),{window:box});fs.writeFileSync(path.join(root,'.examidx.tmp.js'),'window.PhysicaExamChapters='+JSON.stringify(Object.keys(box.PhysicaExam))+';')}
-try{bundle([...TUTOR,'rank-neet.js','.hlvoice.tmp.js','.examidx.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'));fs.unlinkSync(path.join(root,'.examidx.tmp.js'))}
+try{bundle([...TUTOR,'rank-lessons.js','rank-neet.js','.hlvoice.tmp.js','.examidx.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'));fs.unlinkSync(path.join(root,'.examidx.tmp.js'))}
 {const tp=path.join(root,'physica-tutor.min.js'),eh=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-exam.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(tp,fs.readFileSync(tp,'utf8').replace('__EXAM_URL__','./physica-exam.min.js?v='+eh))}
 const crypto0=require('crypto'),packV=crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-3d.min.js'))).digest('hex').slice(0,8);
 const hashOf=f=>crypto0.createHash('md5').update(fs.readFileSync(path.join(root,f))).digest('hex').slice(0,8);
