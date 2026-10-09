@@ -210,3 +210,8 @@ Still to do / ideas:
   (predict / first step / changed condition). Result saved in localStorage physica-rank-neet (les). Add a chapter by adding
   window.PhysicaRankLessons[chapter][topicKey] with the same shape; the Samjho tab shows a Learn button for topics that have one.
   Status: merged. Topics without a lesson show "lesson coming soon" and the card says the rest of the lessons will come soon.
+- Rank mode simplified (owner asked): pure black background, and the NEET page now covers ONLY Units and Measurements: Formulas
+  (with how to apply + example, dimension table), Short notes, Most asked question types (each with 3 steps, example and a
+  Practise button), then Practice (10 questions) and the mock test. Content in rank-units.js, page in rank-neet.js. The old
+  dashboard (Continue / spaced revision / Kinematics lessons in rank-lessons.js) was removed from the build; rank-lessons.js is kept
+  in the repo, unused, for later.
