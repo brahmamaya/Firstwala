@@ -209,4 +209,4 @@ Still to do / ideas:
   (valid / not valid) → one explained example → one partly completed example (student answers the missing step) → 3 checks
   (predict / first step / changed condition). Result saved in localStorage physica-rank-neet (les). Add a chapter by adding
   window.PhysicaRankLessons[chapter][topicKey] with the same shape; the Samjho tab shows a Learn button for topics that have one.
-  Status: built on branch claude/chat-session-qj0iii, NOT merged yet (owner asked to review first).
+  Status: merged. Topics without a lesson show "lesson coming soon" and the card says the rest of the lessons will come soon.

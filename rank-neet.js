@@ -74,11 +74,12 @@ function home(){if(!view)return;ov.dataset.run='0';view.replaceChildren();ov.scr
 function samjho(p){const c=el('div','rk-card');c.append(el('h3','','How to think about any question'),el('p','rk-note','Practise this routine until it becomes automatic. It is not a magic algorithm for every question.'));
   const ol=el('ol','rk-steps');for(const [a,b] of THINK){const li=el('li');li.append(el('b','',a),el('span','',' '+b));ol.append(li)}c.append(ol);p.append(c);
   const ls=window.PhysicaRankLessons?.[S.ch]||{},t=el('div','rk-card');t.append(el('h3','','Topics in this chapter'),
-    el('p','rk-note',Object.keys(ls).length?'Each lesson takes about 10 minutes: idea, formula with its conditions, one explained example, one for you to complete, and three checks.':'Concept lessons are being written chapter by chapter. Until a lesson is ready, learn each topic by solving: use the help ladder inside the questions.'));
-  const topics=PB()[S.ch].topics||{};for(const k of Object.keys(topics)){const s0=S.tp[S.ch+'|'+k],ld=S.les[S.ch+'|'+k],row=el('div','rk-row');
-    row.append(el('span','',topics[k]),el('small','',ld?`✓ lesson ${ld.score}/3`:ls[k]?'lesson ready':s0?`${s0.ok} / ${s0.n} right`:'not tried'));
+    el('p','rk-note',Object.keys(ls).length?'Each lesson takes about 10 minutes: idea, formula with its conditions, one explained example, one for you to complete, and three checks.':'Lessons for this chapter will come soon. Until then, learn each topic by solving: use the help ladder inside the questions.'));
+  const topics=PB()[S.ch].topics||{};for(const k of Object.keys(topics)){const ld=S.les[S.ch+'|'+k],row=el('div','rk-row');
+    row.append(el('span','',topics[k]),el('small','',ld?`✓ lesson ${ld.score}/3`:ls[k]?'lesson ready':'lesson coming soon'));
     if(ls[k]){const b=btn('rk-mini rk-learn',ld?'Review':'Learn',()=>lesson(k));b.dataset.testid='rk-learn-'+k;row.append(b)}
     row.append(btn('rk-mini','Practise',()=>topicSet(k)));t.append(row)}
+  t.append(el('p','rk-soonnote','The rest of the lessons will come soon.'));
   p.append(t)}
 function practice(p){const ch=S.ch,B=bank(ch);
   const a=el('div','rk-card');a.append(el('h3','','Question set'),el('p','rk-note',`${NEW} questions on this chapter. New questions come first; the topics are mixed so you choose the method.`),btn('rk-btn',`Start ${NEW} questions`,()=>runPlain(pickNew(ch,NEW).map(i=>({kind:'new',ch,i})),'Chapter practice')));
