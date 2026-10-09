@@ -219,3 +219,5 @@ Still to do / ideas:
 Rank mode NEET redesign: slim top bar (chapter name + all buttons), full-width grid, 5 diagrams (rank-figs.js), numbered how-to steps, richer short notes. Units and Measurements only.
 
 Rank NEET page: plain system fonts, pure black, SVG diagrams redrawn (rank-figs.js, DOM-built), real fractions in equations, 'Got it' progress + topic strength.
+
+Rank NEET page: Guide tab (basics, path, how to think, watch-outs, 12 misconceptions); progress/Got it/jump removed; balanced columns, no gaps; Practice moved into Guide.

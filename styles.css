@@ -971,7 +971,7 @@ body.rank-open{overflow:hidden}
 .rk-pill.small{min-height:32px;padding:3px 12px;font-size:12px}
 .rk-wrap{max-width:none;margin:0;padding:14px clamp(12px,2.4vw,28px) 60px}
 .rk-view.run{max-width:760px;margin:0 auto}
-.rk-pane{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;align-items:start}
+.rk-pane{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;align-items:start}
 .rk-pane>.wide{grid-column:1/-1}
 .rk-jump{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .rk-jump>span{color:#7f8ca3;font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-right:4px}
@@ -998,16 +998,12 @@ body.rank-open{overflow:hidden}
 .rk-pill[aria-selected=true]{background:#2b6cff;border-color:#2b6cff;color:#fff}
 .rk-pill.act{border-color:#4d9bff;color:#9fd0ff}
 .rk-card{background:#000!important;border:1px solid #2a2a2a!important;border-radius:16px;padding:16px}
-.rk-card.got{border-color:#2e7d5b!important}
 .rk-card h3,.rk-sec{font-size:19px;font-weight:700;color:#fff;margin:0 0 8px}
 .rk-sec{font-size:21px;border-bottom:1px solid #222}
 .rk-label{font-size:13px;font-weight:700;color:#7fb4ff;margin:10px 0 6px}
 .rk-steps,.rk-list,.rk-how,.rk-ex,.rk-lead{font-size:16px;line-height:1.6;color:#e2e8f2}
 .rk-ex{margin-top:10px;padding:10px 12px;border-radius:10px;background:#0a0a0a;border:1px solid #222}
 .rk-ex b{color:#7fb4ff}
-.rk-fh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.rk-got{flex:none;min-height:36px;padding:4px 14px;border-radius:999px;border:1px solid #2e7d5b;background:#000;color:#6be3a8;font-size:14px;font-weight:700;cursor:pointer}
-.rk-card.got .rk-got{background:#103a29;color:#b8f5d6}
 .rk-eqs{display:flex;flex-direction:column;gap:8px;margin:4px 0 6px}
 .rk-eqs.long{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 .rk-eq{padding:10px 14px;border-radius:12px;background:#0b0f18;border:1px solid #243049;color:#fff;font-size:18px;line-height:1.9;overflow-wrap:anywhere}
@@ -1016,14 +1012,23 @@ body.rank-open{overflow:hidden}
 .rk-fr>span:first-child{padding:0 5px 2px;border-bottom:1.5px solid #fff}.rk-fr>span:last-child{padding:2px 5px 0}
 .rk-bigfig{max-width:560px;border:1px solid #1d1d1d;background:#000}
 .rk-dim{font-size:15px}
-.rk-progress .rk-prog{display:flex;flex-direction:column;gap:8px}.rk-progress .rk-prog b{font-size:16px;color:#fff}
-.rk-progress .rk-bar{height:10px;background:#1a1a1a}.rk-progress .rk-bar i{background:#2b6cff}
-.rk-upnext{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;color:#e2e8f2;font-size:16px}
-.rk-topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 18px}
-.rk-topic{display:grid;grid-template-columns:1fr;gap:4px;font-size:15px;color:#e2e8f2}.rk-topic b{font-size:13px;color:#a9b6cc}.rk-topic b.dim{color:#6b778c;font-weight:500}
-.rk-topic .rk-bar{background:#1a1a1a}.rk-topic i.good{background:#2fbf84!important}.rk-topic i.mid{background:#e0a93b!important}.rk-topic i.low{background:#e0584f!important}
 .rk-tag{background:#000;border:1px solid #2f3a52;font-size:15px}
 .rk-mistakes{border-color:#5a2a2a!important}.rk-mistakes h3{color:#ff9d9d}
 .rk-opt,.rk-btn,.rk-q,.rk-hintbtn{font-family:inherit!important}
 .rk-btn{background:#2b6cff;font-size:16px;font-weight:700}
 .rk-sel,.rk-tile{background:#000}
+
+/* NEET page: no gaps (balanced columns), guide */
+.rk-pane{display:block;column-width:340px;column-gap:14px}
+.rk-pane>*{break-inside:avoid;margin:0 0 14px}
+.rk-pane>.wide{column-span:all}
+.rk-pane>.rk-sec{margin-top:6px}
+.rk-path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.rk-path li{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding-left:12px;border-left:3px solid #2b6cff}
+.rk-path b{font-size:17px;color:#fff}.rk-path span{color:#e2e8f2;font-size:16px}.rk-path em{font-style:normal;color:#7fb4ff;font-size:15px}
+.rk-path .rk-mini{margin-top:6px}
+.rk-mgrid{column-width:300px;column-gap:14px}
+.rk-myth{break-inside:avoid;margin:0 0 12px;padding:12px;border-radius:12px;background:#0a0a0a;border:1px solid #222}
+.rk-myth p{margin:0;font-size:16px;line-height:1.5}
+.rk-wrong{color:#ff9d9d;font-weight:700;margin-bottom:6px!important}.rk-right{color:#bff0d6}
+.rk-myths h3{color:#fff}
