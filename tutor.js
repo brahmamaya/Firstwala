@@ -14,9 +14,25 @@ let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('phys
 // ---- mode choice: step 3 on the landing page (the logo brings the landing page back to change it)
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
-for(const [id,label] of MODES){const b=btn('land-grade land-mode',null,()=>setMode(id));b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
+// Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
+for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>setMode(id===mode?'normal':id));b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
+// ---- Rank mode (premium): NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
+const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE · JEE Advanced','Engineering entrance']];
+const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const open=rankSub.classList.toggle('open');rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open});
+rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
+const crown=el('span','rank-crown','👑');crown.setAttribute('aria-hidden','true');const rb=el('b','','Rank mode');rb.append(el('i','rank-badge','PREMIUM'));
+rankBtn.append(crown,rb,el('small','','For NEET & JEE aspirants'));sw.append(rankBtn);
+const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
+for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
+let rankOv=null;
+function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: '+title);ov.dataset.testid='rank-soon';
+  const close=()=>{ov.remove();rankOv=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);rankBtn.focus()},esc=e=>{if(e.key==='Escape')close()};addEventListener('keydown',esc);
+  const back=btn('rank-back','← Back',close);const c=el('div','rank-card');
+  const cr=el('div','rank-crown big','👑');cr.setAttribute('aria-hidden','true');
+  c.append(cr,el('span','rank-badge','PREMIUM'),el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','A focused space to prepare for the competition.'));
+  ov.append(back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const step2=document.querySelector('.landing-step2');
-if(step2){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','2'),document.createTextNode(' Choose your mode'));st.append(h,sw);step2.after(st)}
+if(step2){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','2'),document.createTextNode(' Choose your mode'));st.append(h,sw,rankSub);step2.after(st)}
 
 // ---- live simulation access (through the real controls, so everything stays in sync)
 const simId=()=>decodeURIComponent(location.hash.slice(1))||'';
@@ -89,7 +105,7 @@ const tbtn=btn('tutor-switch','',()=>{tutorOn=!tutorOn;try{localStorage.setItem(
 tbtn.dataset.testid='ai-tutor';const tdot=el('span','tutor-switch-knob');tbtn.append(el('span','tutor-switch-ic','✦'),el('b','','AI Tutor'),tdot);
 document.querySelector('.topbar-right')?.prepend(tbtn);
 function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tbtn.hidden=mode!=='student';tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-teacher',mode==='teacher');document.body.classList.toggle('mode-student',on);
-  for(const b of sw.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
+  for(const b of sw.querySelectorAll('button[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
   if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
   if(!c){if(examSet()){tab='exam';const b=btn('','🎯 Exam',()=>render());b.setAttribute('aria-pressed','true');tabs.append(b);window.PhysicaGlass?.(tabs);exam();return}
