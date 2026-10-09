@@ -798,7 +798,7 @@ body.mock-on{overflow:hidden}body.mock-on>:not(.mock){display:none!important}
 .rank-badge{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.14em;padding:3px 8px;border-radius:999px;background:linear-gradient(135deg,#ffe08a,#f2a900);color:#2b1c00}
 .rank-sub{display:grid;grid-template-rows:0fr;max-width:620px;margin:0 auto;transition:grid-template-rows .45s cubic-bezier(.2,.9,.3,1)}
 .rank-sub.open{grid-template-rows:1fr}
-.rank-sub-in{overflow:hidden;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 2px}
+.rank-sub-in{overflow:hidden;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 2px}
 .rank-sub.open .rank-sub-in{padding-top:12px}
 .rank-pick{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;min-height:76px;border-radius:16px;border:1px solid #f7c94899;background:linear-gradient(160deg,rgba(70,48,4,.78),rgba(24,16,2,.88));color:#fff;font:inherit;cursor:pointer;touch-action:manipulation;opacity:0;transform:translateY(-14px);transition:opacity .35s,transform .45s cubic-bezier(.2,1.2,.3,1),border-color .2s,background .2s}
 .rank-sub.open .rank-pick{opacity:1;transform:none}
@@ -822,3 +822,4 @@ body.rank-open{overflow:hidden}
 .rank-sub.open{margin-bottom:22px}
 @media (max-width:600px){.land-rank b{white-space:nowrap;flex:none}.land-rank small{flex:1;text-align:right;font-size:12px}}
 @media (min-width:601px){.landing-modes .land-mode{justify-content:center;align-items:center;text-align:center;gap:6px}.landing-modes .land-mode small{max-width:15em;line-height:1.35}.land-rank small{font-size:11px}}
+.rank-sub.open .rank-pick:nth-child(3){transition-delay:.18s,.18s,0s,0s}.rank-pick{min-width:0}
