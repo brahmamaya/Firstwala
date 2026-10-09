@@ -44,7 +44,7 @@ function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov rank-'+k)
   const scene=el('div','rank-scene');scene.setAttribute('aria-hidden','true');if(k==='neet'){scene.append(el('div','rank-earth-glow'),el('div','rank-earth'))}else{scene.append(el('div','rank-grid'))}
   ov.append(scene,back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const goBtn=document.getElementById('landing-go');
-if(goBtn){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(el('span','','1'),document.createTextNode(' Choose your mode'));st.append(h,sw,rankSub);goBtn.before(st)}
+if(goBtn){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(document.createTextNode('Choose your mode'));st.append(h,sw,rankSub);goBtn.before(st)}
 
 // ---- live simulation access (through the real controls, so everything stays in sync)
 const simId=()=>decodeURIComponent(location.hash.slice(1))||'';
