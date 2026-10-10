@@ -1037,3 +1037,6 @@ body.rank-open{overflow:hidden}
 
 .rk-clock{margin-left:auto;padding:4px 10px;border-radius:999px;border:1px solid #2a2a2a;color:#a9b6cc;font-size:14px}.rk-clock.late{color:#ffb347;border-color:#ffb347}
 .rk-nat{display:flex;flex-direction:column;gap:10px}.rk-in{min-height:50px;padding:10px 14px;border-radius:12px;border:1px solid #2f3a52;background:#000;color:#fff;font-size:20px}
+
+.rk-pyqo{margin:6px 0 10px;padding-left:22px;display:flex;flex-direction:column;gap:6px;color:#e2e8f2;font-size:16px;list-style:lower-alpha}
+.rk-pyqo li::marker{color:#7fb4ff}
