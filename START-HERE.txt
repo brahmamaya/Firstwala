@@ -235,3 +235,5 @@ JEE Mains Units and Measurements: rank-units-jee.js (JEE-level formulas, 15 must
 JEE PYQs tab: pyq list in rank-units-jee.js (topic-wise, exam+year tag). Only 2 IIT-JEE 2004 items so far; real papers could not be fetched (network blocked). Add more as {y,tp,q,o,c|n,s}.
 
 Layout: JS masonry (rank-neet.js) replaces CSS columns (Safari overlap bug); PYQ year tag is a black pill; topic names fall back to a built-in map.
+
+Equation typesetting: el() renders {a;b} fractions, ^(x) superscripts and ΔX/X fractions in all NEET/JEE page text.
