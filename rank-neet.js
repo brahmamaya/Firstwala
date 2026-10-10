@@ -13,7 +13,7 @@ const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY));seen=Array.isA
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
   if(out.length<n)out.push(...shuffle(ids.filter(i=>!out.includes(i))).slice(0,n-out.length));return out}
 
-let ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
+let showAll=false,ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
 const SECS=['Dimensions','Units','Significant figures','Errors','Instruments'];
 function close(){if(!ov)return;ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
 function esc(e){if(e.key==='Escape'&&ov){if(ov.dataset.run==='1')home();else close()}}
@@ -23,7 +23,7 @@ function open(cb){if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onCl
   const head=el('div','rk-head'),back=btn('rk-back','← Back',()=>{if(ov.dataset.run==='1')home();else close()});back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',CH()),el('span','','Rank mode · NEET Physics'));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Short notes'],['asked','Most asked'],['mock','Mock test']]){
+  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['mock','Mock test']]){
     const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
   const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);home();back.focus()}
@@ -42,20 +42,22 @@ const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''
 
 const steps=txt=>{const a=txt.split(/(?<=[.!?])\s+/).filter(Boolean);if(a.length<2)return el('p','rk-how',txt);const ol=el('ol','rk-steps');for(const x of a)ol.append(el('li','',x));return ol};
 const label=t=>el('span','rk-label',t);
-function formulas(p){const D=U();
-  SECS.forEach((g,i)=>{p.append(el('h2','rk-sec wide',`${i+1} · ${g}`));
+function formulas(p){const D=U(),F=D.formulas,must=F.filter(f=>f.p===1).length,bar=el('div','rk-filter wide');
+  bar.append(el('span','','Show'),...[[false,`Must know (${must})`],[true,`All (${F.length})`]].map(([v,l])=>{const b=btn('rk-pill small',l,()=>{showAll=v;home()});b.setAttribute('aria-selected',String(showAll===v));return b}),el('small','',showAll?'Everything in the chapter.':'The 20% that gives most of the marks. Start here.'));p.append(bar);
+  SECS.forEach((g,i)=>{const list=F.filter(x=>x.g===g&&(showAll||x.p===1));if(!list.length&&g!=='Dimensions')return;p.append(el('h2','rk-sec wide',`${i+1} · ${g}`));
     if(g==='Dimensions'){const t=el('div','rk-card wide');t.append(el('h3','','Dimensions to remember'));const gr=el('div','rk-dims');for(const [q,d] of D.table){const r=el('div','rk-dim');r.append(el('span','',q),el('b','','['+d+']'));gr.append(r)}t.append(gr);p.append(t)}
-    for(const f of D.formulas.filter(x=>x.g===g)){const c=el('div','rk-card');c.append(el('h3','',f.n),eqs(f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
+    for(const f of list){const c=el('div','rk-card');c.append(el('h3','',f.n),eqs(f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
       if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(f.ex));c.append(e)}p.append(c)}})}
 function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   const card=(h,n)=>{const c=el('div','rk-card');c.append(el('h3','',(n?n+' · ':'')+h));p.append(c);return c};
   const list=(c,a,ord)=>{const l=el(ord?'ol':'ul',ord?'rk-steps':'rk-list');for(const x of a)l.append(el('li','',x));c.append(l)};
-  let c=card('Know these before you start',1);c.append(el('p','rk-how','If any of these feels shaky, fix it first. It takes 20 minutes and saves hours later.'));list(c,G.basics);
-  c=card('Your path through the chapter',2);const ol=el('ol','rk-path');
+  let c=card('Your 3-day plan',1);const pl=el('ol','rk-path');for(const [d,t] of G.plan){const li=el('li');li.append(el('b','',d),el('span','',t));pl.append(li)}c.append(pl);
+  c=card('Know these before you start',2);c.append(el('p','rk-how','If any of these feels shaky, fix it first. Fixing it takes about 10 minutes.'));list(c,G.basics);
+  c=card('Your path through the chapter',3);const ol=el('ol','rk-path');
   G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));if(x.go){li.append(btn('rk-mini',x.go==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Short notes',asked:'Most asked',mock:'Mock test'})[x.go],()=>x.go==='practice'?needQ(()=>runSet(pick(N),'Practice')):go(x.go)))}ol.append(li)});c.append(ol);
-  c=card('How to think when you meet any question',3);list(c,G.think,true);
-  c=card('What to keep in mind',4);list(c,G.watch);
-  c=el('div','rk-card wide rk-myths');c.append(el('h3','','5 · Common misconceptions'));const g=el('div','rk-mgrid');
+  c=card('How to think when you meet any question',4);list(c,G.think,true);
+  c=card('What to keep in mind',5);list(c,G.watch);
+  c=el('div','rk-card wide rk-myths');c.append(el('h3','','6 · Common misconceptions'));const g=el('div','rk-mgrid');
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}

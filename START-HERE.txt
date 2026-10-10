@@ -227,3 +227,5 @@ Security hardening: tools/lockdown.js writes _redirects (404 for source js, tool
 NEET speed: rank code split into physica-rank.min.js (35 KB, loads on open); tutor+exam packs (1.8 MB) load only on first Practice/Mock; landing WebGL background paused while the page is open.
 
 Hosting is GitHub Pages (no custom headers/redirects). tools/publish.js + .github/workflows/pages.yml publish only public files to Pages. In Settings > Pages set Source = GitHub Actions. framebust.js guards against framing.
+
+NEET focus pass: Must know (13) vs All filter on Formulas, 3-day plan in Guide, Short notes renamed Revise, trimmed basics/watch/myths, new SI base units + prefixes card. MCQ bank (45) answers re-checked.
