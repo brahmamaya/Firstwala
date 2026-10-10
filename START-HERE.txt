@@ -243,3 +243,5 @@ Rank pages: Mock test always reachable (phone tabs wrap, loading card with retry
 Mock test tab on NEET/JEE pages now shows the same card as the Physica tutor (start button + past attempts).
 
 JEE PYQs: rank-pyq-jee.js (203 past questions from the MTG chapterwise book: JEE Main 2019-2025, JEE Advanced, IIT-JEE 1983-2005, AIEEE), lazy pack physica-pyq.min.js, shown as collapsible sub-topics. 114 answers checked against the book's printed key; Q32 and Q128 (key says none correct) are adapted as numerical.
+
+Typesetting: math() in rank-neet.js now draws full-height radicals (SVG sign + bar over the whole radicand), stacked X/Y fractions (units and plain words stay as text), and small Q numbers on PYQ cards.
