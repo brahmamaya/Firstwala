@@ -1,0 +1,4 @@
+Contact: mailto:easy@physica.in
+Expires: 2027-10-10T00:00:00.000Z
+Preferred-Languages: en, hi
+Canonical: https://physica.in/.well-known/security.txt

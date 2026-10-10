@@ -33,3 +33,4 @@ const crypto=require('crypto'),ip=path.join(root,'index.html');let html=fs.readF
 html=html.replace(/\.\/styles\.css(\?v=[0-9a-f]+)?/g,'./styles.min.css');
 for(const f of['physica-core.min.js','physica.min.js','styles.min.css']){const h=crypto.createHash('md5').update(fs.readFileSync(path.join(root,f))).digest('hex').slice(0,8);html=html.replace(new RegExp('\\./'+f.replace(/\./g,'\\.')+'(\\?v=[0-9a-f]+)?','g'),'./'+f+'?v='+h)}
 fs.writeFileSync(ip,html);console.log('built');
+require('./lockdown.js');
