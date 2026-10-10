@@ -1020,3 +1020,12 @@ body.rank-open{overflow:hidden}
 .rk-subbtn::after{content:'+';flex:none;font-size:20px;color:#7fb4ff}
 .rk-subbtn[aria-expanded=true]{border-color:#4d9bff}.rk-subbtn[aria-expanded=true]::after{content:'−'}
 .rk-subbody{margin-top:12px}.rk-subbody[hidden]{display:none!important}
+
+/* radicals, small question numbers */
+.rk-rad{display:inline-flex;align-items:stretch;vertical-align:middle;margin:0 2px}
+.rk-rs{flex:none;width:.7em;min-height:1.3em;overflow:visible}
+.rk-rs path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}
+.rk-rr{display:inline-flex;align-items:center;border-top:1.4px solid currentColor;padding:1px 3px 0 2px}
+.rk-qhead{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.rk-qn{flex:none;font-size:12px;font-weight:700;color:#8fa3c0}
+.rk-qhead .rk-year{margin:0}

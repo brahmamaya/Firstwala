@@ -5,7 +5,7 @@
 'use strict';
 const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,key:'physica-rank-jee',label:'JEE Mains Physics',data:()=>window.PhysicaRankUnitsJee,bank:'jee',target:90}};
 let X=EX.neet;const N=10,TOPIC=8;
-const MK=/\^\(|\{[^}]*;|Δ[A-Za-zα-ω]\/[A-Za-zα-ω]/;
+const MK=/\^\(|\{|√|[A-Za-zα-ωΔ)][⁰-⁹²³′₀-₉]*\/[A-Za-zα-ω(]/;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -56,11 +56,25 @@ let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{if(view?.className=
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
   const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq,mock:mockPane})[tab](pane);view.append(pane);masonry(pane)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
-function math(t){const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\}|\^\([^)]*\)|Δ[A-Za-zα-ω]\/[A-Za-zα-ω][⁰-⁹²³]*)/)){if(!x)continue;
-  if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}
-  else if(x[0]==='^'){s.append(el('sup','',x.slice(2,-1)))}
-  else if(x[0]==='Δ'&&x.includes('/')){const [n,d]=x.split('/'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}
-  else s.append(document.createTextNode(x))}return s}
+/* small typesetter: {n;d} fraction, ^(x) power, √x / √(x) / √{n;d} radical with a bar over the whole radicand, ΔA/A and X/Y fractions */
+const SVG='http://www.w3.org/2000/svg',UNITS=/^(m|s|kg|g|N|J|W|Pa|mol|cm|mm|Hz|dyne|erg|cal|atm|eV|µm|μm|Ω|K|ly|AU|pc|kWh|Wb|H)$/,WORD=/^([a-z]{4,}|is|are|sin|cos|tan|log|exp|and|or|per)$/,plain=x=>{x=x.replace(/[⁰-⁹²³⁻\d]+$/,'');return UNITS.test(x)||WORD.test(x)},TOK='[A-Za-zα-ωΔ][A-Za-zα-ω0-9₀-₉⁰-⁹²³′_]{0,7}',GRP='\\([^()]*\\)',SL=new RegExp('('+GRP+'|'+TOK+')/('+GRP+'|'+TOK+')','g');
+const endOf=(t,i)=>{const o=t[i],c=o==='{'?'}':')';let d=0;for(let j=i;j<t.length;j++){if(t[j]===o)d++;else if(t[j]===c&&--d===0)return j}return -1};
+const split=t=>{let d=0;for(let j=0;j<t.length;j++){if(t[j]==='{'||t[j]==='(')d++;else if(t[j]==='}'||t[j]===')')d--;else if(t[j]===';'&&!d)return[t.slice(0,j),t.slice(j+1)]}return[t,'']};
+const frac=(n,d)=>{const f=el('span','rk-fr');f.append(math(n),math(d));return f};
+const rad=r=>{const w=el('span','rk-rad'),g=document.createElementNS(SVG,'svg');g.setAttribute('viewBox','0 0 10 20');g.setAttribute('preserveAspectRatio','none');g.setAttribute('aria-hidden','true');g.classList.add('rk-rs');
+  const pa=document.createElementNS(SVG,'path');pa.setAttribute('d','M0 12 L2 10 L5 18 L10 1');pa.setAttribute('vector-effect','non-scaling-stroke');g.append(pa);const q=el('span','rk-rr');q.append(r);w.append(g,q);return w};
+function math(t){const s=el('span','rk-m');let buf='';const flush=()=>{if(!buf)return;let last=0;
+    for(const m of buf.matchAll(SL)){const[,n,d]=m;if(plain(n)||plain(d)||/\d$/.test(buf.slice(Math.max(0,m.index-1),m.index)))continue;s.append(document.createTextNode(buf.slice(last,m.index)),frac(n.replace(/^\(|\)$/g,''),d.replace(/^\(|\)$/g,'')));last=m.index+m[0].length}
+    s.append(document.createTextNode(buf.slice(last)));buf=''};
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(c==='{'){const e=endOf(t,i);if(e>0){flush();const[n,d]=split(t.slice(i+1,e));s.append(d===''&&!t.slice(i+1,e).includes(';')?math(n):frac(n,d));i=e;continue}}
+    if(c==='^'&&t[i+1]==='('){const e=endOf(t,i+1);if(e>0){flush();const sp=el('sup');sp.append(math(t.slice(i+2,e)));s.append(sp);i=e;continue}}
+    if(c==='√'){let e=-1,r;if(t[i+1]==='{'){e=endOf(t,i+1);if(e>0){const[n,d]=split(t.slice(i+2,e));r=d===''&&!t.slice(i+2,e).includes(';')?math(n):frac(n,d)}}
+      else if(t[i+1]==='('){e=endOf(t,i+1);if(e>0)r=math(t.slice(i+2,e))}
+      else{const m=/^[A-Za-zα-ωΔ0-9₀-₉⁰-⁹²³′]+/.exec(t.slice(i+1));if(m){e=i+m[0].length;r=math(m[0])}}
+      if(e>0){flush();s.append(rad(r));i=e;continue}}
+    buf+=c}
+  flush();return s}
 const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''));for(const x of r){const d=el('div','rk-eq');d.append(math(x));w.append(d)}return w};
 
 const steps=txt=>{const a=txt.split(/(?<=[.!?])\s+/).filter(Boolean);if(a.length<2)return el('p','rk-how',txt);const ol=el('ol','rk-steps');for(const x of a)ol.append(el('li','',x));return ol};
@@ -88,7 +102,7 @@ let pyqWait=null;const loadPyq=()=>window.PhysicaRankPyq?Promise.resolve():pyqWa
 const ABC='abcd',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
 function pyq(p){const L=window.PhysicaRankPyq;
   if(!L){p.append(loadCard('past-year questions'));loadPyq().then(()=>{if(ov&&tab==='pyq'&&view.className==='rk-view')home()},()=>{if(ov&&tab==='pyq')view.replaceChildren(failCard(home))});return}
-  const card=q=>{const c=el('div','rk-card');c.append(el('span','rk-year',q.y),el('p','rk-q',q.q));
+  const card=(q,n)=>{const c=el('div','rk-card'),hd=el('div','rk-qhead');hd.append(el('span','rk-qn','Q'+(n+1)),el('span','rk-year',q.y));c.append(hd,el('p','rk-q',q.q));
     if(q.o){const ops=el('ol','rk-pyqo');for(const o of q.o)ops.append(el('li','',o));c.append(ops)}
     const ans=el('div','rk-hint');ans.hidden=true;const cs=[].concat(q.c??[]);
     ans.append(el('p','rk-ok','Answer: '+(q.o?PTN(cs)+' '+cs.map(i=>q.o[i]).join('; '):q.n!=null?q.n:q.a)),...String(q.s||'').split('\n').filter(Boolean).map(l=>el('p','',l)));
