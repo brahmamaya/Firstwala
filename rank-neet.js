@@ -73,7 +73,7 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
-function pyq(p){const L=U().pyq;p.append(el('p','rk-lead wide','Questions asked in past papers, grouped by topic, with the exam and year. The wording is adapted, so check the official paper for the exact options. Tap a question to see the answer and the solution.'));
+function pyq(p){const L=U().pyq;
   const by={};for(const q of L)(by[q.tp]=by[q.tp]||[]).push(q);
   for(const tp of Object.keys(by)){p.append(el('h2','rk-sec wide',tname(tp)+' ('+by[tp].length+')'));
     for(const q of by[tp]){const c=el('div','rk-card');c.append(el('span','rk-year',q.y),el('p','rk-q',q.q));let ops;
