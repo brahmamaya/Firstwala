@@ -17,8 +17,9 @@ bundle(CORE,'physica-core.min.js');bundle(PACK,'physica-3d.min.js');
 fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js')(root,TUTOR).js);
 // the exam questions ship as their own pack; the tutor pack carries just the list of chapters that have them
 bundle(EXAM,'physica-exam.min.js');
+bundle(['rank-figs.js','rank-units.js','rank-neet.js'],'physica-rank.min.js');
 {const box={};require('vm').runInNewContext(fs.readFileSync(path.join(root,'tutor-exam.js'),'utf8'),{window:box});fs.writeFileSync(path.join(root,'.examidx.tmp.js'),'window.PhysicaExamChapters='+JSON.stringify(Object.keys(box.PhysicaExam))+';')}
-try{bundle([...TUTOR,'rank-figs.js','rank-units.js','rank-neet.js','.hlvoice.tmp.js','.examidx.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'));fs.unlinkSync(path.join(root,'.examidx.tmp.js'))}
+try{bundle([...TUTOR,'.hlvoice.tmp.js','.examidx.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'));fs.unlinkSync(path.join(root,'.examidx.tmp.js'))}
 {const tp=path.join(root,'physica-tutor.min.js'),eh=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-exam.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(tp,fs.readFileSync(tp,'utf8').replace('__EXAM_URL__','./physica-exam.min.js?v='+eh))}
 const crypto0=require('crypto'),packV=crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-3d.min.js'))).digest('hex').slice(0,8);
 const hashOf=f=>crypto0.createHash('md5').update(fs.readFileSync(path.join(root,f))).digest('hex').slice(0,8);
@@ -26,7 +27,7 @@ for(const k of Object.keys(SUBJECTS))bundle(SUBJECTS[k],'physica-'+k+'.min.js');
 fs.writeFileSync(path.join(root,'.subjects.tmp.js'),require('./subject-manifest.js')(root,SUBJECTS));
 try{bundle(MAIN,'physica.min.js')}finally{fs.unlinkSync(path.join(root,'.subjects.tmp.js'))}
 {const pm=path.join(root,'physica.min.js');let js=fs.readFileSync(pm,'utf8');for(const k of Object.keys(SUBJECTS))js=js.replace('__'+k.toUpperCase()+'_URL__','./physica-'+k+'.min.js?v='+hashOf('physica-'+k+'.min.js'));fs.writeFileSync(pm,js
-.replace('__LAZY_URL__','./physica-3d.min.js?v='+packV).replace('__TUTOR_URL__','./physica-tutor.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-tutor.min.js'))).digest('hex').slice(0,8)))}
+.replace('__LAZY_URL__','./physica-3d.min.js?v='+packV).replace('__RANK_URL__','./physica-rank.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-rank.min.js'))).digest('hex').slice(0,8)).replace('__TUTOR_URL__','./physica-tutor.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-tutor.min.js'))).digest('hex').slice(0,8)))}
 // styles: drop overridden declarations (tools/optimize-css.js), then serve a minified copy
 execFileSync(process.execPath,[path.join(__dirname,'optimize-css.js')],{stdio:'inherit'});execFileSync(ESB,[path.join(root,'styles.css'),'--minify','--log-level=warning','--outfile='+path.join(root,'styles.min.css')],{stdio:'inherit'});
 const crypto=require('crypto'),ip=path.join(root,'index.html');let html=fs.readFileSync(ip,'utf8');

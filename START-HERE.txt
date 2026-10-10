@@ -223,3 +223,5 @@ Rank NEET page: plain system fonts, pure black, SVG diagrams redrawn (rank-figs.
 Rank NEET page: Guide tab (basics, path, how to think, watch-outs, 12 misconceptions); progress/Got it/jump removed; balanced columns, no gaps; Practice moved into Guide.
 
 Security hardening: tools/lockdown.js writes _redirects (404 for source js, tools, notes), stricter _headers (frame-src none, script-src-attr none, wider Permissions-Policy, no-cache html/sw), security.txt, 404.html.
+
+NEET speed: rank code split into physica-rank.min.js (35 KB, loads on open); tutor+exam packs (1.8 MB) load only on first Practice/Mock; landing WebGL background paused while the page is open.
