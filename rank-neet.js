@@ -28,12 +28,22 @@ function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaL
   for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(U().pyq?.length?[['pyq','PYQs']]:[]),['mock','Mock test']]){
     const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
-  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();setTimeout(()=>{if(ov&&!bank().length&&window.PhysicaLoadTutorPack)(window.requestIdleCallback||setTimeout)(()=>{if(ov)window.PhysicaLoadTutorPack().then(()=>window.PhysicaLoadExam()).catch(()=>{})},{timeout:8000})},3000);back.focus()}
+  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();setTimeout(()=>{if(ov&&!PB()[CH()]&&window.PhysicaLoadTutorPack)(window.requestIdleCallback||setTimeout)(()=>{if(ov)window.PhysicaLoadTutorPack().then(()=>window.PhysicaLoadExam()).catch(()=>{})},{timeout:8000})},3000);back.focus()}
 /* questions and the mock test load only when first needed (big pack), the chapter pages open at once */
-function needQ(fn,what){if(bank().length&&window.PhysicaMockTest)return fn();ov.dataset.run='1';view.className='rk-view run';paint(true);
-  const box=el('div','rk-card rk-center');box.append(el('div','rk-spin'),el('h3','','Loading '+(what||'the questions')+'…'),el('p','rk-how','Downloading the question bank (about 2 MB, only the first time). Please wait a few seconds.'));view.replaceChildren(box);ov.scrollTop=0;
-  (window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam()).then(()=>{if(ov)fn()},()=>{if(!ov)return;const b2=el('div','rk-card rk-center');b2.append(el('h3','','Could not load the questions'),el('p','rk-how','Check your internet and try again.'),btn('rk-btn','Try again',()=>needQ(fn,what)),btn('rk-link','Back to the chapter',home));view.replaceChildren(b2)})}
-function go(k){if(k==='mock')return needQ(()=>window.PhysicaMockTest.start(CH(),X.bank),'the '+(X.bank==='jee'?'JEE Main':'NEET')+' mock test');tab=k;home()}
+const loadQ=()=>(window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam());
+const loadCard=what=>{const box=el('div','rk-card rk-center');box.append(el('div','rk-spin'),el('h3','','Loading '+(what||'the questions')+'…'),el('p','rk-how','Downloading the question bank (about 2 MB, only the first time). Please wait a few seconds.'));return box};
+const failCard=(retry)=>{const b2=el('div','rk-card rk-center');b2.append(el('h3','','Could not load the questions'),el('p','rk-how','Check your internet and try again.'),btn('rk-btn','Try again',retry),btn('rk-link','Back to the chapter',home));return b2};
+function needQ(fn,what){if(bank().length&&window.PhysicaMockTest&&PB()[CH()])return fn();ov.dataset.run='1';view.className='rk-view run';paint(true);view.replaceChildren(loadCard(what));ov.scrollTop=0;
+  loadQ().then(()=>{if(ov)fn()},()=>{if(ov)view.replaceChildren(failCard(()=>needQ(fn,what)))})}
+/* the mock test lives on its own tab, same card as in the Physica tutor: start button and past attempts */
+function mockPane(p){const M=window.PhysicaMockTest,info=M&&PB()[CH()]&&M.info(CH(),X.bank);
+  if(!info){p.append(loadCard('the mock test'));loadQ().then(()=>{if(ov&&tab==='mock'&&view.className==='rk-view')home()},()=>{if(ov&&tab==='mock')view.replaceChildren(failCard(home))});return}
+  const c=el('div','rk-card rk-mockcard');c.append(el('h3','','⏱ '+info.name+' mock test'),el('p','rk-how',`${info.n} questions · ${info.min} min · +${info.plus}${info.minus?' / −'+info.minus:', no negative marking'} · result after you submit`));
+  const st=btn('rk-btn','Start mock test',()=>{M.start(CH(),X.bank);const w=setInterval(()=>{if(!ov){clearInterval(w);return}if(!document.querySelector('.mock')){clearInterval(w);if(tab==='mock'&&view.className==='rk-view')home()}},800)});st.dataset.testid='rk-mock-start';c.append(st);
+  const past=M.past(CH(),X.bank).slice(0,3);
+  if(past.length){c.append(el('span','rk-label','Your past attempts'));for(const r of past){const ok=r.res.filter(x=>x==='c').length,w=r.res.filter(x=>x==='w').length;c.append(btn('rk-mini',`📄 ${new Date(r.at).toLocaleDateString()} · ${info.plus*ok-info.minus*w} / ${info.plus*r.res.length}`,()=>M.open(r)))}}
+  p.append(c)}
+function go(k){tab=k;home()}
 function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===tab))}
 
 /* ---------- the chapter page ---------- */
@@ -44,7 +54,7 @@ function masonry(pane){const items=pane._items||(pane._items=[...pane.children])
     cols.reduce((a,b)=>a.offsetHeight<=b.offsetHeight?a:b).append(it)}}
 let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{const p=view?.querySelector('.rk-pane');if(p&&view.className==='rk-view')masonry(p)},150)};
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
-  const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq})[tab](pane);view.append(pane);masonry(pane)}
+  const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq,mock:mockPane})[tab](pane);view.append(pane);masonry(pane)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 function math(t){const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\}|\^\([^)]*\)|Δ[A-Za-zα-ω]\/[A-Za-zα-ω][⁰-⁹²³]*)/)){if(!x)continue;
   if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}

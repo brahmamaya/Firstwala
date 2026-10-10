@@ -1061,3 +1061,4 @@ body.rank-open{overflow:hidden}
 @keyframes rkspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.rk-spin{animation-duration:2.4s}}
 @media (max-width:600px){.rk-htabs{flex-wrap:wrap!important;overflow:visible!important}.rk-pill{flex:1 1 auto!important;min-height:34px;padding:3px 10px}}
+.rk-mockcard{display:flex;flex-direction:column;align-items:flex-start;gap:10px}.rk-mockcard .rk-mini{width:auto}

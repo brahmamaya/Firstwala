@@ -239,3 +239,5 @@ Layout: JS masonry (rank-neet.js) replaces CSS columns (Safari overlap bug); PYQ
 Equation typesetting: el() renders {a;b} fractions, ^(x) superscripts and ΔX/X fractions in all NEET/JEE page text.
 
 Rank pages: Mock test always reachable (phone tabs wrap, loading card with retry, idle preload of the question packs, step 6 of the Guide has a Mock test button).
+
+Mock test tab on NEET/JEE pages now shows the same card as the Physica tutor (start button + past attempts).
