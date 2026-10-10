@@ -28,11 +28,12 @@ function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaL
   for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(U().pyq?.length?[['pyq','PYQs']]:[]),['mock','Mock test']]){
     const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
-  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();back.focus()}
+  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();setTimeout(()=>{if(ov&&!bank().length&&window.PhysicaLoadTutorPack)(window.requestIdleCallback||setTimeout)(()=>{if(ov)window.PhysicaLoadTutorPack().then(()=>window.PhysicaLoadExam()).catch(()=>{})},{timeout:8000})},3000);back.focus()}
 /* questions and the mock test load only when first needed (big pack), the chapter pages open at once */
-function needQ(fn){if(bank().length&&window.PhysicaMockTest)return fn();ov.dataset.run='1';view.className='rk-view run';view.replaceChildren(el('p','rk-lead','Loading the questions…'));paint(true);
-  (window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam()).then(()=>{if(ov)fn()},()=>{if(!ov)return;view.replaceChildren(el('p','rk-lead','Could not load the questions. Check your internet and try again.'),btn('rk-btn','Back to the chapter',home))})}
-function go(k){if(k==='mock')return needQ(()=>window.PhysicaMockTest.start(CH(),X.bank));tab=k;home()}
+function needQ(fn,what){if(bank().length&&window.PhysicaMockTest)return fn();ov.dataset.run='1';view.className='rk-view run';paint(true);
+  const box=el('div','rk-card rk-center');box.append(el('div','rk-spin'),el('h3','','Loading '+(what||'the questions')+'…'),el('p','rk-how','Downloading the question bank (about 2 MB, only the first time). Please wait a few seconds.'));view.replaceChildren(box);ov.scrollTop=0;
+  (window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam()).then(()=>{if(ov)fn()},()=>{if(!ov)return;const b2=el('div','rk-card rk-center');b2.append(el('h3','','Could not load the questions'),el('p','rk-how','Check your internet and try again.'),btn('rk-btn','Try again',()=>needQ(fn,what)),btn('rk-link','Back to the chapter',home));view.replaceChildren(b2)})}
+function go(k){if(k==='mock')return needQ(()=>window.PhysicaMockTest.start(CH(),X.bank),'the '+(X.bank==='jee'?'JEE Main':'NEET')+' mock test');tab=k;home()}
 function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===tab))}
 
 /* ---------- the chapter page ---------- */
@@ -66,7 +67,7 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   let c=card('Your study plan',1);const pl=el('ol','rk-path');for(const [d,t] of G.plan){const li=el('li');li.append(el('b','',d),el('span','',t));pl.append(li)}c.append(pl);
   c=card('Know these before you start',2);c.append(el('p','rk-how','If any of these feels shaky, fix it first. Fixing it takes about 10 minutes.'));list(c,G.basics);
   c=card('Your path through the chapter',3);const ol=el('ol','rk-path');
-  G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));if(x.go){li.append(btn('rk-mini',x.go==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Short notes',asked:'Most asked',mock:'Mock test'})[x.go],()=>x.go==='practice'?needQ(()=>runSet(pick(N),'Practice')):go(x.go)))}ol.append(li)});c.append(ol);
+  G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));for(const g of [x.go,x.go2].filter(Boolean)){li.append(btn('rk-mini',g==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Revise',asked:'Most asked',mock:'Mock test'})[g],()=>g==='practice'?needQ(()=>runSet(pick(N),'Practice'),'practice questions'):go(g)))}ol.append(li)});c.append(ol);
   c=card('How to think when you meet any question',4);list(c,G.think,true);
   c=card('What to keep in mind',5);list(c,G.watch);
   c=el('div','rk-card wide rk-myths');c.append(el('h3','','6 · Common misconceptions'));const g=el('div','rk-mgrid');

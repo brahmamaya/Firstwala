@@ -62,7 +62,7 @@ path:[
 {t:'Step 3 · Significant figures (Day 2)',d:'Count them, add, multiply and round.',ready:'you can tell the number of significant figures and round an answer correctly.',go:'formulas'},
 {t:'Step 4 · Errors (Day 2)',d:'Absolute, relative and percentage error. Then errors in sums, products and powers.',ready:'you can find the percentage error of a result like A³B² / C.',go:'formulas'},
 {t:'Step 5 · Instruments (Day 3)',d:'Least count, reading and zero error of a vernier and a screw gauge.',ready:'you can read a vernier or screw gauge picture and correct the zero error.',go:'formulas'},
-{t:'Step 6 · Practise, then test (Day 3)',d:'Practise by question type first, then take the mock test. Revise the types you got wrong.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice'}],
+{t:'Step 6 · Practise, then test (Day 3)',d:'Practise by question type first, then take the mock test. Revise the types you got wrong.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'mock'}],
 think:[
 'Read the question twice. Underline what is given and what is asked, with units.',
 'Name the type: dimensions, conversion, significant figures, errors, or an instrument.',
