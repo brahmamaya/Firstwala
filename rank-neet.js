@@ -95,7 +95,9 @@ function pyq(p){const L=window.PhysicaRankPyq;
     const b=btn('rk-mini','Show answer',()=>{ans.hidden=!ans.hidden;b.textContent=ans.hidden?'Show answer':'Hide answer'});c.append(b,ans);return c};
   /* a sub-topic builds its cards only when opened, so the 200 questions never load at once */
   const sub=(st,qs,open)=>{const w=el('div','rk-subwrap wide'),body=el('div','rk-pane rk-subbody'),h=btn('rk-subbtn','',()=>{const on=h.getAttribute('aria-expanded')!=='true';h.setAttribute('aria-expanded',String(on));body.hidden=!on;if(on){if(!built){built=1;body.append(...qs.map(card))}masonry(body)}});let built=0;
-    h.append(el('span','',st),el('b','',String(qs.length)));h.setAttribute('aria-expanded','false');body.hidden=true;w.append(h,body);if(open)requestAnimationFrame(()=>h.click());return w};
+    hs.push(h);h.append(el('span','',st),el('b','',String(qs.length)));h.setAttribute('aria-expanded','false');body.hidden=true;w.append(h,body);if(open)requestAnimationFrame(()=>h.click());return w};
+  const hs=[],all=on=>{const todo=hs.filter(h=>(h.getAttribute('aria-expanded')==='true')!==on);(function nx(){const h=todo.shift();if(h&&ov){h.click();requestAnimationFrame(nx)}})()};
+  const bar=el('div','rk-filter wide');bar.append(el('span','',L.length+' questions. Tap a sub-topic to open it.'),btn('rk-pill small','Open all',()=>all(true)),btn('rk-pill small','Close all',()=>all(false)));p.append(bar);
   let first=1;for(const tp of [...new Set(L.map(q=>q.tp))]){const T=L.filter(q=>q.tp===tp);p.append(el('h2','rk-sec wide',tname(tp)+' ('+T.length+')'));
     for(const st of [...new Set(T.map(q=>q.st))]){p.append(sub(st,T.filter(q=>q.st===st),first));first=0}}}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
