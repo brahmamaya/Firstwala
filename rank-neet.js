@@ -3,7 +3,7 @@
    Loaded with the tutor pack, only when the student opens NEET. Nothing leaves the device (localStorage). */
 (() => {
 'use strict';
-const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{key:'physica-rank-jee',label:'JEE Mains Physics',data:()=>window.PhysicaRankUnitsJee,bank:'jee',target:90}};
+const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,key:'physica-rank-jee',label:'JEE Mains Physics',data:()=>window.PhysicaRankUnitsJee,bank:'jee',target:90}};
 let X=EX.neet;const N=10,TOPIC=8;
 const MK=/\^\(|\{[^}]*;|Δ[A-Za-zα-ω]\/[A-Za-zα-ω]/;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
@@ -25,7 +25,7 @@ function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaL
   const head=el('div','rk-head'),back=btn('rk-back','← Back',()=>{if(ov.dataset.run==='1')home();else close()});back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',CH()),el('span','','Rank mode · '+X.label));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(U().pyq?.length?[['pyq','PYQs']]:[]),['mock','Mock test']]){
+  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(X.pyq?[['pyq','PYQs']]:[]),['mock','Mock test']]){
     const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
   const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();setTimeout(()=>{if(ov&&!PB()[CH()]&&window.PhysicaLoadTutorPack)(window.requestIdleCallback||setTimeout)(()=>{if(ov)window.PhysicaLoadTutorPack().then(()=>window.PhysicaLoadExam()).catch(()=>{})},{timeout:8000})},3000);back.focus()}
@@ -52,7 +52,7 @@ function masonry(pane){const items=pane._items||(pane._items=[...pane.children])
   for(const it of items){if(it.classList.contains('wide')||n===1){pane.append(it);cols=null;continue}
     if(!cols){const g=el('div','rk-cols');cols=Array.from({length:n},()=>el('div','rk-col'));g.append(...cols);pane.append(g)}
     cols.reduce((a,b)=>a.offsetHeight<=b.offsetHeight?a:b).append(it)}}
-let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{const p=view?.querySelector('.rk-pane');if(p&&view.className==='rk-view')masonry(p)},150)};
+let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{if(view?.className==='rk-view')for(const m of view.querySelectorAll('.rk-pane:not([hidden])'))masonry(m)},150)};
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
   const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq,mock:mockPane})[tab](pane);view.append(pane);masonry(pane)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
@@ -84,13 +84,20 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
-function pyq(p){const L=U().pyq;
-  const by={};for(const q of L)(by[q.tp]=by[q.tp]||[]).push(q);
-  for(const tp of Object.keys(by)){p.append(el('h2','rk-sec wide',tname(tp)+' ('+by[tp].length+')'));
-    for(const q of by[tp]){const c=el('div','rk-card');c.append(el('span','rk-year',q.y),el('p','rk-q',q.q));let ops;
-      if(q.o){ops=el('ol','rk-pyqo');q.o.forEach((o,j)=>ops.append(el('li',j===q.c?'':'',o)));c.append(ops)}
-      const ans=el('div','rk-hint');ans.hidden=true;ans.append(el('p','rk-ok','Answer: '+(q.o?'('+'abcd'[q.c]+') '+q.o[q.c]:q.n)),...String(q.s||'').split('\n').filter(Boolean).map(l=>el('p','',l)));
-      const b=btn('rk-mini','Show answer',()=>{ans.hidden=!ans.hidden;b.textContent=ans.hidden?'Show answer':'Hide answer'});c.append(b,ans);p.append(c)}}}
+let pyqWait=null;const loadPyq=()=>window.PhysicaRankPyq?Promise.resolve():pyqWait||(pyqWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__PYQ_URL__';s.async=true;s.onload=ok;s.onerror=()=>{pyqWait=null;s.remove();no()};document.head.append(s)}));
+const ABC='abcd',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
+function pyq(p){const L=window.PhysicaRankPyq;
+  if(!L){p.append(loadCard('past-year questions'));loadPyq().then(()=>{if(ov&&tab==='pyq'&&view.className==='rk-view')home()},()=>{if(ov&&tab==='pyq')view.replaceChildren(failCard(home))});return}
+  const card=q=>{const c=el('div','rk-card');c.append(el('span','rk-year',q.y),el('p','rk-q',q.q));
+    if(q.o){const ops=el('ol','rk-pyqo');for(const o of q.o)ops.append(el('li','',o));c.append(ops)}
+    const ans=el('div','rk-hint');ans.hidden=true;const cs=[].concat(q.c??[]);
+    ans.append(el('p','rk-ok','Answer: '+(q.o?PTN(cs)+' '+cs.map(i=>q.o[i]).join('; '):q.n!=null?q.n:q.a)),...String(q.s||'').split('\n').filter(Boolean).map(l=>el('p','',l)));
+    const b=btn('rk-mini','Show answer',()=>{ans.hidden=!ans.hidden;b.textContent=ans.hidden?'Show answer':'Hide answer'});c.append(b,ans);return c};
+  /* a sub-topic builds its cards only when opened, so the 200 questions never load at once */
+  const sub=(st,qs,open)=>{const w=el('div','rk-subwrap wide'),body=el('div','rk-pane rk-subbody'),h=btn('rk-subbtn','',()=>{const on=h.getAttribute('aria-expanded')!=='true';h.setAttribute('aria-expanded',String(on));body.hidden=!on;if(on){if(!built){built=1;body.append(...qs.map(card))}masonry(body)}});let built=0;
+    h.append(el('span','',st),el('b','',String(qs.length)));h.setAttribute('aria-expanded','false');body.hidden=true;w.append(h,body);if(open)requestAnimationFrame(()=>h.click());return w};
+  let first=1;for(const tp of [...new Set(L.map(q=>q.tp))]){const T=L.filter(q=>q.tp===tp);p.append(el('h2','rk-sec wide',tname(tp)+' ('+T.length+')'));
+    for(const st of [...new Set(T.map(q=>q.st))]){p.append(sub(st,T.filter(q=>q.st===st),first));first=0}}}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
   U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what),label('Steps'));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
     const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),math(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))));p.append(c)})}
