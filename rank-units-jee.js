@@ -91,9 +91,6 @@ myths:[
 ['Myth: Counted numbers limit the significant figures.','Truth: Counted numbers and exact constants have unlimited figures. In 2πr, the 2 does not limit the answer.'],
 ['Myth: Accuracy and precision are the same.','Truth: Accuracy is closeness to the true value. Precision is closeness of repeated readings to each other.'],
 ['Myth: The percentage error in x² is the same as in x.','Truth: It is twice as much. A square root halves it.']]},
-pyq:[
-{y:'IIT-JEE 2004 (Screening)',tp:'dims',q:'In P = (α/β) e^(−αz/kθ), P is pressure, z is distance, k is Boltzmann’s constant and θ is temperature. The dimensions of β are:',o:['[M⁰L²T⁰]','[MLT⁻²]','[ML²T⁻²]','[M⁰L⁰T⁰]'],c:0,s:'The exponent has no dimensions, so [α] = [kθ]/[z] = ML²T⁻² / L = MLT⁻². / β = α/P = MLT⁻² / ML⁻¹T⁻² = L², that is [M⁰L²T⁰].'},
-{y:'IIT-JEE 2004 (Screening)',tp:'err',q:'A wire has length L = (6 ± 0.06) cm, radius r = (0.5 ± 0.005) cm and mass M = (0.3 ± 0.003) g. The maximum percentage error in its density is:',o:['1','2','3','4'],c:3,s:'ρ = M/(πr²L). / Δρ/ρ = ΔM/M + 2Δr/r + ΔL/L = 1 % + 2(1 %) + 1 % = 4 %.'}],
 extra:[
 {tp:'dims',q:'In the van der Waals equation (P + a/V²)(V − b) = RT, the quantity a/b has the dimensions of:',o:['pressure','energy','force','power'],c:1,s:'[a] = [P][V²] = ML⁵T⁻² and [b] = [V] = L³. / a/b = ML²T⁻², the dimensions of energy.'},
 {tp:'dims',q:'The quantity ε₀ L ΔV/Δt (ε₀ permittivity of free space, L length, ΔV potential difference, Δt time) has the dimensions of:',o:['charge','electric current','voltage','capacitance'],c:1,s:'ε₀ L ΔV/Δt = [M⁻¹L⁻³T⁴A²][L][ML²T⁻³A⁻¹] / [T] = [A]. / It is an electric current.'},

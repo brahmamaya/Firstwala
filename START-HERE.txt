@@ -241,3 +241,5 @@ Equation typesetting: el() renders {a;b} fractions, ^(x) superscripts and ΔX/X 
 Rank pages: Mock test always reachable (phone tabs wrap, loading card with retry, idle preload of the question packs, step 6 of the Guide has a Mock test button).
 
 Mock test tab on NEET/JEE pages now shows the same card as the Physica tutor (start button + past attempts).
+
+JEE PYQs: rank-pyq-jee.js (203 past questions from the MTG chapterwise book: JEE Main 2019-2025, JEE Advanced, IIT-JEE 1983-2005, AIEEE), lazy pack physica-pyq.min.js, shown as collapsible sub-topics. 114 answers checked against the book's printed key; Q32 and Q128 (key says none correct) are adapted as numerical.
