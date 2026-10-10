@@ -1052,3 +1052,6 @@ body.rank-open{overflow:hidden}
 .rk-q{font-size:18px;line-height:1.55;margin:0 0 10px;color:#fff}
 .rk-pyqo{font-size:16px;line-height:1.5}
 .rk-q{font-weight:500}
+
+.rk-m sup{font-size:.72em;line-height:0}
+.rk-m{overflow-wrap:anywhere}

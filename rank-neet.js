@@ -5,7 +5,8 @@
 'use strict';
 const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{key:'physica-rank-jee',label:'JEE Mains Physics',data:()=>window.PhysicaRankUnitsJee,bank:'jee',target:90}};
 let X=EX.neet;const N=10,TOPIC=8;
-const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const MK=/\^\(|\{[^}]*;|Δ[A-Za-zα-ω]\/[A-Za-zα-ω]/;
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const U=()=>X.data(),CH=()=>U()?.chapter,PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[CH()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge'},tname=tp=>PB()[CH()]?.topics?.[tp]||TN[tp]||tp;
@@ -44,7 +45,11 @@ let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{const p=view?.query
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
   const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq})[tab](pane);view.append(pane);masonry(pane)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
-const math=t=>{const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\})/)){if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}else if(x)s.append(document.createTextNode(x))}return s};
+function math(t){const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\}|\^\([^)]*\)|Δ[A-Za-zα-ω]\/[A-Za-zα-ω][⁰-⁹²³]*)/)){if(!x)continue;
+  if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}
+  else if(x[0]==='^'){s.append(el('sup','',x.slice(2,-1)))}
+  else if(x[0]==='Δ'&&x.includes('/')){const [n,d]=x.split('/'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}
+  else s.append(document.createTextNode(x))}return s}
 const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''));for(const x of r){const d=el('div','rk-eq');d.append(math(x));w.append(d)}return w};
 
 const steps=txt=>{const a=txt.split(/(?<=[.!?])\s+/).filter(Boolean);if(a.length<2)return el('p','rk-how',txt);const ol=el('ol','rk-steps');for(const x of a)ol.append(el('li','',x));return ol};
@@ -54,7 +59,7 @@ function formulas(p){const D=U(),F=D.formulas,must=F.filter(f=>f.p===1).length,b
   secs().forEach((g,i)=>{const list=F.filter(x=>x.g===g&&(showAll||x.p===1));if(!list.length&&g!=='Dimensions')return;p.append(el('h2','rk-sec wide',`${i+1} · ${g}`));
     if(g==='Dimensions'){const t=el('div','rk-card wide');t.append(el('h3','','Dimensions to remember'));const gr=el('div','rk-dims');for(const [q,d] of D.table){const r=el('div','rk-dim');r.append(el('span','',q),el('b','','['+d+']'));gr.append(r)}t.append(gr);p.append(t)}
     for(const f of list){const c=el('div','rk-card');c.append(el('h3','',f.n),eqs(f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
-      if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(f.ex));c.append(e)}p.append(c)}})}
+      if(f.ex){const e=el('p','rk-ex');e.append(el('b','','Example '),math(f.ex));c.append(e)}p.append(c)}})}
 function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   const card=(h,n)=>{const c=el('div','rk-card');c.append(el('h3','',(n?n+' · ':'')+h));p.append(c);return c};
   const list=(c,a,ord)=>{const l=el(ord?'ol':'ul',ord?'rk-steps':'rk-list');for(const x of a)l.append(el('li','',x));c.append(l)};
@@ -77,7 +82,7 @@ function pyq(p){const L=U().pyq;p.append(el('p','rk-lead wide','Questions asked 
       const b=btn('rk-mini','Show answer',()=>{ans.hidden=!ans.hidden;b.textContent=ans.hidden?'Show answer':'Hide answer'});c.append(b,ans);p.append(c)}}}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
   U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what),label('Steps'));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
-    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))));p.append(c)})}
+    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),math(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))));p.append(c)})}
 
 /* ---------- a set of questions ---------- */
 let tm=0;const stopT=()=>{clearInterval(tm);tm=0};
