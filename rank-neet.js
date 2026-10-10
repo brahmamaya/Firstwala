@@ -15,19 +15,22 @@ function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===
 
 let ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
 const SECS=['Dimensions','Units','Significant figures','Errors','Instruments'];
-function close(){if(!ov)return;ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);const f=onClose;onClose=null;f?.()}
+function close(){if(!ov)return;ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
 function esc(e){if(e.key==='Escape'&&ov){if(ov.dataset.run==='1')home();else close()}}
-function open(cb){if(ov||!U()||!bank().length)return;load();onClose=cb||null;
+function open(cb){if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
   ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: NEET Physics, '+CH());ov.dataset.testid='rank-neet-page';
   // one slim bar: back, chapter name and all the buttons
   const head=el('div','rk-head'),back=btn('rk-back','← Back',()=>{if(ov.dataset.run==='1')home();else close()});back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',CH()),el('span','','Rank mode · NEET Physics'));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
   for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Short notes'],['asked','Most asked'],['mock','Mock test']]){
-    const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;if(k==='mock'&&!window.PhysicaMockTest)continue;tabsEl.append(b)}
+    const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
   const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);home();back.focus()}
-function go(k){if(k==='mock')return window.PhysicaMockTest?.start(CH(),'neet');tab=k;home()}
+/* questions and the mock test load only when first needed (big pack), the chapter pages open at once */
+function needQ(fn){if(bank().length&&window.PhysicaMockTest)return fn();ov.dataset.run='1';view.className='rk-view run';view.replaceChildren(el('p','rk-lead','Loading the questions…'));paint(true);
+  (window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam()).then(()=>{if(ov)fn()},()=>{if(!ov)return;view.replaceChildren(el('p','rk-lead','Could not load the questions. Check your internet and try again.'),btn('rk-btn','Back to the chapter',home))})}
+function go(k){if(k==='mock')return needQ(()=>window.PhysicaMockTest.start(CH(),'neet'));tab=k;home()}
 function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===tab))}
 
 /* ---------- the chapter page ---------- */
@@ -49,7 +52,7 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   const list=(c,a,ord)=>{const l=el(ord?'ol':'ul',ord?'rk-steps':'rk-list');for(const x of a)l.append(el('li','',x));c.append(l)};
   let c=card('Know these before you start',1);c.append(el('p','rk-how','If any of these feels shaky, fix it first. It takes 20 minutes and saves hours later.'));list(c,G.basics);
   c=card('Your path through the chapter',2);const ol=el('ol','rk-path');
-  G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));if(x.go){li.append(btn('rk-mini',x.go==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Short notes',asked:'Most asked',mock:'Mock test'})[x.go],()=>x.go==='practice'?runSet(pick(N),'Practice'):go(x.go)))}ol.append(li)});c.append(ol);
+  G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));if(x.go){li.append(btn('rk-mini',x.go==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Short notes',asked:'Most asked',mock:'Mock test'})[x.go],()=>x.go==='practice'?needQ(()=>runSet(pick(N),'Practice')):go(x.go)))}ol.append(li)});c.append(ol);
   c=card('How to think when you meet any question',3);list(c,G.think,true);
   c=card('What to keep in mind',4);list(c,G.watch);
   c=el('div','rk-card wide rk-myths');c.append(el('h3','','5 · Common misconceptions'));const g=el('div','rk-mgrid');
@@ -58,7 +61,7 @@ function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
   U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what),label('Steps'));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
-    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>runSet(pick(TOPIC,a.tp),tname(a.tp))));p.append(c)})}
+    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))));p.append(c)})}
 
 /* ---------- a set of questions ---------- */
 function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';view.className='rk-view run';paint(true);let k=0;const res=[];
