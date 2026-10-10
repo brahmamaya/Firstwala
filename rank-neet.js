@@ -8,7 +8,7 @@ let X=EX.neet;const N=10,TOPIC=8;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const U=()=>X.data(),CH=()=>U()?.chapter,PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[CH()]?.[X.bank]||[]),...(U()?.extra||[])],tname=tp=>PB()[CH()]?.topics?.[tp]||tp;
+const U=()=>X.data(),CH=()=>U()?.chapter,PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[CH()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge'},tname=tp=>PB()[CH()]?.topics?.[tp]||TN[tp]||tp;
 let seen=[];
 const load=()=>{try{const s=JSON.parse(localStorage.getItem(X.key));seen=Array.isArray(s?.seen)?s.seen.filter(Number.isInteger):[]}catch{seen=[]}},save=()=>{try{localStorage.setItem(X.key,JSON.stringify({seen}))}catch{}};
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
@@ -16,7 +16,7 @@ function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===
 
 let showAll=false,ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
 const SECS0=['Dimensions','Units','Significant figures','Errors','Instruments'],secs=()=>U().secs||SECS0;
-function close(){if(!ov)return;stopT();ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
+function close(){if(!ov)return;stopT();ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);removeEventListener('resize',onRz);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
 function esc(e){if(e.key==='Escape'&&ov){if(ov.dataset.run==='1')home();else close()}}
 function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
   ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: '+X.label+', '+CH());ov.dataset.testid='rank-neet-page';
@@ -27,7 +27,7 @@ function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaL
   for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(U().pyq?.length?[['pyq','PYQs']]:[]),['mock','Mock test']]){
     const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
-  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);home();back.focus()}
+  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();back.focus()}
 /* questions and the mock test load only when first needed (big pack), the chapter pages open at once */
 function needQ(fn){if(bank().length&&window.PhysicaMockTest)return fn();ov.dataset.run='1';view.className='rk-view run';view.replaceChildren(el('p','rk-lead','Loading the questions…'));paint(true);
   (window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam()).then(()=>{if(ov)fn()},()=>{if(!ov)return;view.replaceChildren(el('p','rk-lead','Could not load the questions. Check your internet and try again.'),btn('rk-btn','Back to the chapter',home))})}
@@ -35,8 +35,14 @@ function go(k){if(k==='mock')return needQ(()=>window.PhysicaMockTest.start(CH(),
 function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===tab))}
 
 /* ---------- the chapter page ---------- */
+/* cards go to the shortest of n columns, so there are no gaps and nothing breaks across columns (also safe on Safari) */
+function masonry(pane){const items=pane._items||(pane._items=[...pane.children]);pane.replaceChildren();const n=Math.max(1,Math.floor((pane.clientWidth+14)/354));let cols=null;
+  for(const it of items){if(it.classList.contains('wide')||n===1){pane.append(it);cols=null;continue}
+    if(!cols){const g=el('div','rk-cols');cols=Array.from({length:n},()=>el('div','rk-col'));g.append(...cols);pane.append(g)}
+    cols.reduce((a,b)=>a.offsetHeight<=b.offsetHeight?a:b).append(it)}}
+let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{const p=view?.querySelector('.rk-pane');if(p&&view.className==='rk-view')masonry(p)},150)};
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
-  const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq})[tab](pane);view.append(pane)}
+  const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq})[tab](pane);view.append(pane);masonry(pane)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 const math=t=>{const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\})/)){if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}else if(x)s.append(document.createTextNode(x))}return s};
 const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''));for(const x of r){const d=el('div','rk-eq');d.append(math(x));w.append(d)}return w};
@@ -65,7 +71,7 @@ function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3
 function pyq(p){const L=U().pyq;p.append(el('p','rk-lead wide','Questions asked in past papers, grouped by topic, with the exam and year. The wording is adapted, so check the official paper for the exact options. Tap a question to see the answer and the solution.'));
   const by={};for(const q of L)(by[q.tp]=by[q.tp]||[]).push(q);
   for(const tp of Object.keys(by)){p.append(el('h2','rk-sec wide',tname(tp)+' ('+by[tp].length+')'));
-    for(const q of by[tp]){const c=el('div','rk-card');c.append(el('span','rk-chip on',q.y),el('p','rk-q',q.q));let ops;
+    for(const q of by[tp]){const c=el('div','rk-card');c.append(el('span','rk-year',q.y),el('p','rk-q',q.q));let ops;
       if(q.o){ops=el('ol','rk-pyqo');q.o.forEach((o,j)=>ops.append(el('li',j===q.c?'':'',o)));c.append(ops)}
       const ans=el('div','rk-hint');ans.hidden=true;ans.append(el('p','rk-ok','Answer: '+(q.o?'('+'abcd'[q.c]+') '+q.o[q.c]:q.n)),...String(q.s||'').split('\n').filter(Boolean).map(l=>el('p','',l)));
       const b=btn('rk-mini','Show answer',()=>{ans.hidden=!ans.hidden;b.textContent=ans.hidden?'Show answer':'Hide answer'});c.append(b,ans);p.append(c)}}}

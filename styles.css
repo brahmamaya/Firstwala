@@ -893,7 +893,7 @@ body.rank-open{overflow:hidden}
 .rk-bar{height:6px;border-radius:99px;background:#4d9bff22;overflow:hidden}
 .rk-bar i{display:block;height:100%;background:linear-gradient(90deg,#2b6cff,#7cc0ff);transition:width .4s}
 .rk-meta{margin:0 0 6px;font-size:12px;letter-spacing:.06em;color:#8db6ea;text-transform:uppercase}
-.rk-q{margin:0 0 14px;font-size:clamp(17px,2.4vw,20px);font-weight:600;line-height:1.5;white-space:pre-line}
+.rk-q{white-space:pre-line}
 .rk-fig{display:block;width:100%;max-width:340px;margin:4px 0 14px;color:#e6f1ff}
 .rk-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .rk-opt{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:10px 14px;border-radius:14px;border:1px solid #4d9bff55;background:rgba(10,30,84,.7);color:#e6f1ff;font:600 16px 'Exo 2',sans-serif;text-align:left;cursor:pointer}
@@ -1019,16 +1019,15 @@ body.rank-open{overflow:hidden}
 .rk-sel,.rk-tile{background:#000}
 
 /* NEET page: no gaps (balanced columns), guide */
-.rk-pane{display:block;column-width:340px;column-gap:14px}
-.rk-pane>*{break-inside:avoid;margin:0 0 14px}
+.rk-pane>*{margin:0 0 14px}
 .rk-pane>.wide{column-span:all}
 .rk-pane>.rk-sec{margin-top:6px}
 .rk-path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
 .rk-path li{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding-left:12px;border-left:3px solid #2b6cff}
 .rk-path b{font-size:17px;color:#fff}.rk-path span{color:#e2e8f2;font-size:16px}.rk-path em{font-style:normal;color:#7fb4ff;font-size:15px}
 .rk-path .rk-mini{margin-top:6px}
-.rk-mgrid{column-width:300px;column-gap:14px}
-.rk-myth{break-inside:avoid;margin:0 0 12px;padding:12px;border-radius:12px;background:#0a0a0a;border:1px solid #222}
+.rk-mgrid{column-gap:14px}
+.rk-myth{break-inside:avoid;padding:12px;border-radius:12px;background:#0a0a0a;border:1px solid #222}
 .rk-myth p{margin:0;font-size:16px;line-height:1.5}
 .rk-wrong{color:#ff9d9d;font-weight:700;margin-bottom:6px!important}.rk-right{color:#bff0d6}
 .rk-myths h3{color:#fff}
@@ -1038,5 +1037,18 @@ body.rank-open{overflow:hidden}
 .rk-clock{margin-left:auto;padding:4px 10px;border-radius:999px;border:1px solid #2a2a2a;color:#a9b6cc;font-size:14px}.rk-clock.late{color:#ffb347;border-color:#ffb347}
 .rk-nat{display:flex;flex-direction:column;gap:10px}.rk-in{min-height:50px;padding:10px 14px;border-radius:12px;border:1px solid #2f3a52;background:#000;color:#fff;font-size:20px}
 
-.rk-pyqo{margin:6px 0 10px;padding-left:22px;display:flex;flex-direction:column;gap:6px;color:#e2e8f2;font-size:16px;list-style:lower-alpha}
+.rk-pyqo{margin:6px 0 10px;padding-left:22px;display:flex;flex-direction:column;gap:6px;color:#e2e8f2;list-style:lower-alpha}
 .rk-pyqo li::marker{color:#7fb4ff}
+
+/* masonry columns (replaces CSS multi-column, which breaks on Safari) */
+.rk-pane{display:block!important;column-width:auto!important;column-gap:0!important}
+.rk-pane>*{break-inside:auto}
+.rk-cols{display:flex;gap:14px;align-items:flex-start;margin:0 0 14px}
+.rk-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:14px}
+.rk-col>.rk-card{margin:0}
+.rk-mgrid{column-width:auto!important;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.rk-myth{margin:0!important}
+.rk-year{display:block;width:fit-content;max-width:100%;margin:0 0 10px;padding:4px 12px;border-radius:999px;background:#000;border:1px solid #3a4560;color:#a9c4f0;font-size:13px;font-weight:600;line-height:1.3}
+.rk-q{font-size:18px;line-height:1.55;margin:0 0 10px;color:#fff}
+.rk-pyqo{font-size:16px;line-height:1.5}
+.rk-q{font-weight:500}
