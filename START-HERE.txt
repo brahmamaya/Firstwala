@@ -221,3 +221,5 @@ Rank mode NEET redesign: slim top bar (chapter name + all buttons), full-width g
 Rank NEET page: plain system fonts, pure black, SVG diagrams redrawn (rank-figs.js, DOM-built), real fractions in equations, 'Got it' progress + topic strength.
 
 Rank NEET page: Guide tab (basics, path, how to think, watch-outs, 12 misconceptions); progress/Got it/jump removed; balanced columns, no gaps; Practice moved into Guide.
+
+Security hardening: tools/lockdown.js writes _redirects (404 for source js, tools, notes), stricter _headers (frame-src none, script-src-attr none, wider Permissions-Policy, no-cache html/sw), security.txt, 404.html.
