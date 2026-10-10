@@ -1032,3 +1032,5 @@ body.rank-open{overflow:hidden}
 .rk-myth p{margin:0;font-size:16px;line-height:1.5}
 .rk-wrong{color:#ff9d9d;font-weight:700;margin-bottom:6px!important}.rk-right{color:#bff0d6}
 .rk-myths h3{color:#fff}
+
+.rk-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.rk-filter>span{color:#8fa3c0;font-size:14px}.rk-filter small{color:#8fa3c0;font-size:14px}
