@@ -229,3 +229,5 @@ NEET speed: rank code split into physica-rank.min.js (35 KB, loads on open); tut
 Hosting is GitHub Pages (no custom headers/redirects). tools/publish.js + .github/workflows/pages.yml publish only public files to Pages. In Settings > Pages set Source = GitHub Actions. framebust.js guards against framing.
 
 NEET focus pass: Must know (13) vs All filter on Formulas, 3-day plan in Guide, Short notes renamed Revise, trimmed basics/watch/myths, new SI base units + prefixes card. MCQ bank (45) answers re-checked.
+
+JEE Mains Units and Measurements: rank-units-jee.js (JEE-level formulas, 15 must-know, 8 question types, study plan, 15 extra questions incl. 7 numerical), page code shared via rank-neet.js (exam config, numerical answers, per-question timer).
