@@ -237,3 +237,5 @@ JEE PYQs tab: pyq list in rank-units-jee.js (topic-wise, exam+year tag). Only 2 
 Layout: JS masonry (rank-neet.js) replaces CSS columns (Safari overlap bug); PYQ year tag is a black pill; topic names fall back to a built-in map.
 
 Equation typesetting: el() renders {a;b} fractions, ^(x) superscripts and ΔX/X fractions in all NEET/JEE page text.
+
+Rank pages: Mock test always reachable (phone tabs wrap, loading card with retry, idle preload of the question packs, step 6 of the Guide has a Mock test button).

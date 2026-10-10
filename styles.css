@@ -759,7 +759,7 @@ html.noblur .more-pop,html.noblur .toast{background:#16181d!important}
 html.noblur .focus-btn.focus-special{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.07) 47%,rgba(255,255,255,.03) 53%,rgba(255,255,255,.1) 100%),#16181d!important}
 /* Mock test: the paper covers the whole tab; nothing else is shown (or drawn) until it closes */
 body.mock-on{overflow:hidden}body.mock-on>:not(.mock){display:none!important}
-.mock{position:fixed;inset:0;z-index:2147483000;overflow:auto;background:var(--bg);color:var(--text);padding:0 16px 40px;font-size:16px;line-height:1.5}
+.mock{position:fixed;inset:0;overflow:auto;background:var(--bg);color:var(--text);padding:0 16px 40px;font-size:16px;line-height:1.5}
 .mock-paper,.mock-q,.mock-head,.mock-ask,.mock>.mock-row,.mock-pal{max-width:820px;margin-left:auto;margin-right:auto}
 .mock-paper{padding:28px 0}.mock h2{margin:0 0 4px;font-size:24px}.mock h3{margin:26px 0 10px;font-size:17px}.mock-sub,.mock-brand{color:var(--muted);margin:0 0 14px;font-size:14px}.mock-brand{color:var(--mint);font-weight:800;letter-spacing:.5px}
 .mock-rules{margin:0 0 18px;padding-left:20px;color:var(--muted)}.mock-rules li{margin:4px 0}.mock-lbl{display:block;font-weight:700;margin-bottom:6px}
@@ -985,8 +985,8 @@ body.rank-open{overflow:hidden}
 .rk-tag{padding:7px 12px;border-radius:10px;color:#e6f1ff;line-height:1.35}
 .rk-mistakes{background:#0c0707}
 @media (min-width:900px){.rk-dims{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:600px){.rk-htabs{margin-left:0;width:100%}.rk-pill{padding:4px 10px}}
-@media (max-width:600px){.rk-title span{display:none}.rk-htabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.rk-htabs::-webkit-scrollbar{display:none}.rk-pill{flex:none}}
+@media (max-width:600px){.rk-htabs{margin-left:0;width:100%}}
+@media (max-width:600px){.rk-title span{display:none}.rk-htabs{overflow-x:auto;scrollbar-width:none}.rk-htabs::-webkit-scrollbar{display:none}}
 
 /* Rank mode NEET: plain fonts, pure black, equations, progress */
 .rk-ov,.rk-ov *{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif!important;letter-spacing:normal!important;text-transform:none!important;text-shadow:none!important}
@@ -1055,3 +1055,9 @@ body.rank-open{overflow:hidden}
 
 .rk-m sup{font-size:.72em;line-height:0}
 .rk-m{overflow-wrap:anywhere}
+
+.mock{z-index:2147483001!important}
+.rk-spin{width:34px;height:34px;margin:0 auto 12px;border-radius:50%;border:3px solid #2a3550;border-top-color:#4d9bff;animation:rkspin .8s linear infinite}
+@keyframes rkspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.rk-spin{animation-duration:2.4s}}
+@media (max-width:600px){.rk-htabs{flex-wrap:wrap!important;overflow:visible!important}.rk-pill{flex:1 1 auto!important;min-height:34px;padding:3px 10px}}

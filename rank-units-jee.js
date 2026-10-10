@@ -63,7 +63,7 @@ path:[
 {t:'Step 3 · Errors (Day 2)',d:'Maximum error rules, then the experiments that come again and again.',ready:'you can write the percentage error formula for g, ρ and f without hesitation.',go:'formulas'},
 {t:'Step 4 · Instruments (Day 3)',d:'Vernier and screw gauge, including negative zero error and N VSD = (N − 1) MSD.',ready:'you can find the corrected reading from the closed-jaw reading without a mistake.',go:'formulas'},
 {t:'Step 5 · Significant figures and units (Day 3)',d:'Short topics. Quick marks if the rules are clear.',ready:'you can write any result to the correct figures.',go:'formulas'},
-{t:'Step 6 · Practise against the clock, then test (Day 4)',d:'The timer shows how long you take. Aim for 90 seconds. Then take the mock test.',ready:'you average under 90 seconds with 8 out of 10 correct.',go:'practice'}],
+{t:'Step 6 · Practise against the clock, then test (Day 4)',d:'The timer shows how long you take. Aim for 90 seconds. Then take the mock test.',ready:'you average under 90 seconds with 8 out of 10 correct.',go:'practice',go2:'mock'}],
 think:[
 'Read once and name the type: dimensions, error, instrument, figures or units.',
 'Dimensions: write each symbol’s dimensions from its definition, then equate powers.',
