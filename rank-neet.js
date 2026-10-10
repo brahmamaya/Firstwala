@@ -24,7 +24,7 @@ function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaL
   const head=el('div','rk-head'),back=btn('rk-back','← Back',()=>{if(ov.dataset.run==='1')home();else close()});back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',CH()),el('span','','Rank mode · '+X.label));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['mock','Mock test']]){
+  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(U().pyq?.length?[['pyq','PYQs']]:[]),['mock','Mock test']]){
     const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
   head.append(back,t,tabsEl);
   const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);home();back.focus()}
@@ -36,7 +36,7 @@ function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-sele
 
 /* ---------- the chapter page ---------- */
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
-  const pane=el('div','rk-pane');({guide,formulas,notes,asked})[tab](pane);view.append(pane)}
+  const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq})[tab](pane);view.append(pane)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 const math=t=>{const s=el('span','rk-m');for(const x of t.split(/(\{[^}]*\})/)){if(x[0]==='{'){const [n,d]=x.slice(1,-1).split(';'),f=el('span','rk-fr');f.append(el('span','',n),el('span','',d));s.append(f)}else if(x)s.append(document.createTextNode(x))}return s};
 const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''));for(const x of r){const d=el('div','rk-eq');d.append(math(x));w.append(d)}return w};
@@ -62,6 +62,13 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
+function pyq(p){const L=U().pyq;p.append(el('p','rk-lead wide','Questions asked in past papers, grouped by topic, with the exam and year. The wording is adapted, so check the official paper for the exact options. Tap a question to see the answer and the solution.'));
+  const by={};for(const q of L)(by[q.tp]=by[q.tp]||[]).push(q);
+  for(const tp of Object.keys(by)){p.append(el('h2','rk-sec wide',tname(tp)+' ('+by[tp].length+')'));
+    for(const q of by[tp]){const c=el('div','rk-card');c.append(el('span','rk-chip on',q.y),el('p','rk-q',q.q));let ops;
+      if(q.o){ops=el('ol','rk-pyqo');q.o.forEach((o,j)=>ops.append(el('li',j===q.c?'':'',o)));c.append(ops)}
+      const ans=el('div','rk-hint');ans.hidden=true;ans.append(el('p','rk-ok','Answer: '+(q.o?'('+'abcd'[q.c]+') '+q.o[q.c]:q.n)),...String(q.s||'').split('\n').filter(Boolean).map(l=>el('p','',l)));
+      const b=btn('rk-mini','Show answer',()=>{ans.hidden=!ans.hidden;b.textContent=ans.hidden?'Show answer':'Hide answer'});c.append(b,ans);p.append(c)}}}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
   U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what),label('Steps'));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
     const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),document.createTextNode(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))));p.append(c)})}

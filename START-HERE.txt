@@ -231,3 +231,5 @@ Hosting is GitHub Pages (no custom headers/redirects). tools/publish.js + .githu
 NEET focus pass: Must know (13) vs All filter on Formulas, 3-day plan in Guide, Short notes renamed Revise, trimmed basics/watch/myths, new SI base units + prefixes card. MCQ bank (45) answers re-checked.
 
 JEE Mains Units and Measurements: rank-units-jee.js (JEE-level formulas, 15 must-know, 8 question types, study plan, 15 extra questions incl. 7 numerical), page code shared via rank-neet.js (exam config, numerical answers, per-question timer).
+
+JEE PYQs tab: pyq list in rank-units-jee.js (topic-wise, exam+year tag). Only 2 IIT-JEE 2004 items so far; real papers could not be fetched (network blocked). Add more as {y,tp,q,o,c|n,s}.
