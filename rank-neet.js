@@ -3,7 +3,7 @@
    Loaded with the tutor pack, only when the student opens NEET. Nothing leaves the device (localStorage). */
 (() => {
 'use strict';
-const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,key:'physica-rank-jee',label:'JEE Mains Physics',data:()=>window.PhysicaRankUnitsJee,bank:'jee',target:90}};
+const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,pick:1,key:'physica-rank-jee',label:'JEE Mains',data:()=>window.PhysicaRankUnitsJee,bank:'jee',target:90}};
 let X=EX.neet;const N=10,TOPIC=8;
 const MK=/\^\(|\{|√|[A-Za-zα-ωΔ)][⁰-⁹²³′₀-₉]*\/[A-Za-zα-ω(]/;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
@@ -15,20 +15,24 @@ const load=()=>{try{const s=JSON.parse(localStorage.getItem(X.key));seen=Array.i
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
   if(out.length<n)out.push(...shuffle(ids.filter(i=>!out.includes(i))).slice(0,n-out.length));return out}
 
-let showAll=false,ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
+let showAll=false,chap=null,subj='physics',head=null,ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
+const JEE_CH=[['Class 11',['Units and Measurements','Kinematics','Laws of Motion','Work, Energy and Power','Rotational Motion','Gravitation','Properties of Solids and Liquids','Thermodynamics','Kinetic Theory of Gases','Oscillations and Waves']],
+  ['Class 12',['Electrostatics','Current Electricity','Magnetic Effects of Current and Magnetism','Electromagnetic Induction and Alternating Current','Electromagnetic Waves','Optics','Dual Nature of Matter and Radiation','Atoms and Nuclei','Electronic Devices','Experimental Skills']]];
+const picking=()=>X.pick&&!chap,ready=()=>!X.pick||chap===CH(),TABS=[['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['pyq','PYQs'],['mock','Mock test']],SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['maths','Maths']];
 const SECS0=['Dimensions','Units','Significant figures','Errors','Instruments'],secs=()=>U().secs||SECS0;
 function close(){if(!ov)return;stopT();ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);removeEventListener('resize',onRz);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
-function esc(e){if(e.key==='Escape'&&ov){if(ov.dataset.run==='1')home();else close()}}
-function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
-  ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Rank mode: '+X.label+', '+CH());ov.dataset.testid='rank-neet-page';
-  // one slim bar: back, chapter name and all the buttons
-  const head=el('div','rk-head'),back=btn('rk-back','← Back',()=>{if(ov.dataset.run==='1')home();else close()});back.dataset.testid='rk-back';
-  const t=el('div','rk-title');t.append(el('b','',CH()),el('span','','Rank mode · '+X.label));
+function goBack(){if(ov.dataset.run==='1')home();else if(X.pick&&chap){chap=null;tab='guide';setHead();home()}else close()}
+function esc(e){if(e.key==='Escape'&&ov)goBack()}
+/* one slim bar: back, title and the buttons (subjects while choosing, chapter tabs inside a chapter) */
+function setHead(){const back=btn('rk-back','← Back',goBack);back.dataset.testid='rk-back';
+  const t=el('div','rk-title');t.append(el('b','',picking()?X.label:(chap||CH())),el('span','',picking()?'Rank mode · choose a subject':'Rank mode · '+X.label+(X.pick?' · Physics':'')));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of [['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],...(X.pyq?[['pyq','PYQs']]:[]),['mock','Mock test']]){
-    const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid='rk-tab-'+k;tabsEl.append(b)}
-  head.append(back,t,tabsEl);
-  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();setTimeout(()=>{if(ov&&!PB()[CH()]&&window.PhysicaLoadTutorPack)(window.requestIdleCallback||setTimeout)(()=>{if(ov)window.PhysicaLoadTutorPack().then(()=>window.PhysicaLoadExam()).catch(()=>{})},{timeout:8000})},3000);back.focus()}
+  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||X.pyq)){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
+  head.replaceChildren(back,t,tabsEl);ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''))}
+function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
+  ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.dataset.testid='rank-neet-page';
+  head=el('div','rk-head');chap=null;subj='physics';tab='guide';setHead();
+  const wrap=el('div','rk-wrap');view=el('div','rk-view');wrap.append(view);ov.append(head,wrap);document.body.append(ov);document.body.classList.add('rank-open');addEventListener('keydown',esc);addEventListener('resize',onRz);home();setTimeout(()=>{if(ov&&!PB()[CH()]&&window.PhysicaLoadTutorPack)(window.requestIdleCallback||setTimeout)(()=>{if(ov)window.PhysicaLoadTutorPack().then(()=>window.PhysicaLoadExam()).catch(()=>{})},{timeout:8000})},3000)}
 /* questions and the mock test load only when first needed (big pack), the chapter pages open at once */
 const loadQ=()=>(window.PhysicaLoadTutorPack?.()||Promise.reject()).then(()=>window.PhysicaLoadExam());
 const loadCard=what=>{const box=el('div','rk-card rk-center');box.append(el('div','rk-spin'),el('h3','','Loading '+(what||'the questions')+'…'),el('p','rk-how','Downloading the question bank (about 2 MB, only the first time). Please wait a few seconds.'));return box};
@@ -43,8 +47,8 @@ function mockPane(p){const M=window.PhysicaMockTest,info=M&&PB()[CH()]&&M.info(C
   const past=M.past(CH(),X.bank).slice(0,3);
   if(past.length){c.append(el('span','rk-label','Your past attempts'));for(const r of past){const ok=r.res.filter(x=>x==='c').length,w=r.res.filter(x=>x==='w').length;c.append(btn('rk-mini',`📄 ${new Date(r.at).toLocaleDateString()} · ${info.plus*ok-info.minus*w} / ${info.plus*r.res.length}`,()=>M.open(r)))}}
   p.append(c)}
-function go(k){tab=k;home()}
-function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===tab))}
+function go(k){if(picking())subj=k;else tab=k;home()}
+function paint(running){for(const b of tabsEl.children)b.setAttribute('aria-selected',String(!running&&b.dataset.k===(picking()?subj:tab)))}
 
 /* ---------- the chapter page ---------- */
 /* cards go to the shortest of n columns, so there are no gaps and nothing breaks across columns (also safe on Safari) */
@@ -54,7 +58,12 @@ function masonry(pane){const items=pane._items||(pane._items=[...pane.children])
     cols.reduce((a,b)=>a.offsetHeight<=b.offsetHeight?a:b).append(it)}}
 let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{if(view?.className==='rk-view')for(const m of view.querySelectorAll('.rk-pane:not([hidden])'))masonry(m)},150)};
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
-  const pane=el('div','rk-pane');({guide,formulas,notes,asked,pyq,mock:mockPane})[tab](pane);view.append(pane);masonry(pane)}
+  const pane=el('div','rk-pane');(picking()?chooser:ready()?({guide,formulas,notes,asked,pyq,mock:mockPane})[tab]:soonPane)(pane);view.append(pane);masonry(pane)}
+/* JEE: pick a subject, then a chapter. Only Units and Measurements has content so far; the others open the same page with "coming soon". */
+function chooser(p){if(subj!=='physics'){const c=el('div','rk-card rk-center wide');c.append(el('h3','',SUBJ.find(x=>x[0]===subj)[1]+' chapters are coming soon'),el('p','rk-how','Physics is ready to explore. Open it from the buttons above.'));p.append(c);return}
+  for(const [cls,list] of JEE_CH){const c=el('div','rk-card'),l=el('div','rk-chlist');c.append(el('h3','',cls+' Physics'));
+    list.forEach((n,i)=>{const b=btn('rk-ch'+(n===CH()?'':' soon'),null,()=>{chap=n;tab='guide';setHead();home()});b.append(el('i','',String(i+1)),el('span','',n),el('b','',n===CH()?'Ready':'Soon'));b.dataset.testid='rk-ch-'+(i+1)+(cls==='Class 12'?'b':'a');l.append(b)});c.append(l);p.append(c)}}
+function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Units and Measurements is ready now.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 /* small typesetter: {n;d} fraction, ^(x) power, √x / √(x) / √{n;d} radical with a bar over the whole radicand, ΔA/A and X/Y fractions */
 const SVG='http://www.w3.org/2000/svg',UNITS=/^(m|s|kg|g|N|J|W|Pa|mol|cm|mm|Hz|dyne|erg|cal|atm|eV|µm|μm|Ω|K|ly|AU|pc|kWh|Wb|H)$/,WORD=/^([a-z]{4,}|is|are|sin|cos|tan|log|exp|and|or|per)$/,plain=x=>{x=x.replace(/[⁰-⁹²³⁻\d]+$/,'');return UNITS.test(x)||WORD.test(x)},TOK='[A-Za-zα-ωΔ][A-Za-zα-ω0-9₀-₉⁰-⁹²³′_]{0,7}',GRP='\\([^()]*\\)',SL=new RegExp('('+GRP+'|'+TOK+')/('+GRP+'|'+TOK+')','g');
