@@ -161,8 +161,13 @@ function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L
       for(const x of items){let t=tps.find(z=>z.tp===x.q.tp);if(!t)tps.push(t={tp:x.q.tp,name:tname(x.q.tp),n:0,subs:[]});t.n++;const s2=t.subs.find(z=>z[0]===x.q.st);s2?s2[1]++:t.subs.push([x.q.st,1])}
       const meta={chapter:CH(),exam:X.label,subject:'Physics',cls:(JEE_CH.find(c=>c[1].includes(CH()))||['Class 11'])[0],papers,topics:tps};
       const blob=await window.PhysicaRankExport.make({items,withSol:inc==='qs',format:fmt,meta,cancelled:()=>stop,onProgress:(i,n,j,t)=>{const v=j?(n+j)/(n+t):i/(n+t);fill.style.width=Math.round(v*100)+'%';pr.textContent=j?'Saving page '+j+' of '+t+'…':'Making slide '+i+' of '+n+'…'}});
-      if(stop)return;const nm=['Physica',X.label,CH(),'PYQs',inc==='qs'?'with-solutions':'questions'].join('-').replace(/[^A-Za-z0-9-]+/g,'-')+(fmt==='ppt'?'.pptx':'.pdf'),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=nm;document.body.append(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},5000);
-      box.replaceChildren(el('h3','','Done'),el('p','rk-how','Your file is downloading: '+nm),btn('rk-btn','Close',done))}
+      if(stop)return;const nm=['Physica',X.label,CH(),'PYQs',inc==='qs'?'with-solutions':'questions'].join('-').replace(/[^A-Za-z0-9-]+/g,'-')+(fmt==='ppt'?'.pptx':'.pdf'),file=new File([blob],nm,{type:blob.type}),
+        save=()=>{const url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=nm;document.body.append(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},5000)},
+        /* iPad / iPhone: the share sheet has "Save to Files"; a plain download would open in the browser's own downloads list */
+        touch=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),canShare=touch&&navigator.canShare?.({files:[file]});
+      if(canShare){box.replaceChildren(el('h3','','Your file is ready'),el('p','rk-how',nm),el('p','rk-how','Tap "Save to Files", then choose a folder.'));
+        const sv=btn('rk-btn','Save to Files',async()=>{try{await navigator.share({files:[file],title:nm});done()}catch(e2){if(e2?.name!=='AbortError')save()}});sv.dataset.testid='dl-save';box.append(sv,btn('rk-link','Close',done))}
+      else{save();box.replaceChildren(el('h3','','Done'),el('p','rk-how','Your file is downloading: '+nm),btn('rk-btn','Close',done))}}
     catch(e){if(stop)return;box.replaceChildren(el('h3','','Could not make the file'),el('p','rk-how','Please try again. If it keeps failing, choose fewer questions.'),btn('rk-btn','Close',done))}};
   ok.focus?.()}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
