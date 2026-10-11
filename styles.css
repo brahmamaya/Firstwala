@@ -252,7 +252,7 @@ body.focus .below-stage{display:none!important}
   .stage .stage-top{padding:8px 10px!important;gap:6px!important}.stage-bottom{padding:6px 10px!important}
   .topbar{position:relative!important}}
 /* ===== iPadOS-style glass material ===== */
-:root{--g-bg:rgba(44,48,58,.42);--g-bg2:rgba(255,255,255,.06);--g-line:rgba(255,255,255,.14);--g-hi:rgba(255,255,255,.22);--g-blur:blur(26px) saturate(180%)}
+:root{--g-bg:rgba(44,48,58,.42);--g-bg2:rgba(255,255,255,.06);--g-line:rgba(255,255,255,.14);--g-hi:rgba(255,255,255,.22)}
 .topbar,.stage,.controls-card,.observe-card,.formula-card,.physics-panel,.more-pop,.sidebar{background:var(--g-bg)!important;-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:1px solid var(--g-line)!important;box-shadow:inset 0 1px 0 var(--g-hi),0 20px 50px -24px rgba(0,0,0,.75)!important}
 .sidebar{border-width:0 1px 0 0!important}
 .stage:before{opacity:.55}
@@ -1075,3 +1075,8 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 .rk-seltop .rk-pill{background:#fff!important;color:#000!important;border-color:#fff!important;font-weight:700;min-height:40px;padding:6px 22px}
 .rk-seltop .rk-pill[aria-pressed=true]{background:#fff!important;color:#000!important;box-shadow:0 0 0 3px #4d9bff}
 .rk-selbar[hidden]{display:none!important}
+
+/* smoothness: no live blur anywhere (it re-blurs animated pages and the landing background every frame);
+   the glass look stays through the translucent backgrounds */
+*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+:root{--g-blur:none}
