@@ -138,9 +138,9 @@ function pyq(p){const L=window.PhysicaRankPyq,idx=L&&new Map(L.map((q,i)=>[q,i])
   const bar=el('div','rk-filter wide');bar.append(el('span','',L.length+' questions. Tap a sub-topic to open it.'),btn('rk-pill small','Open all',()=>all(true)),btn('rk-pill small','Close all',()=>all(false)));p.append(bar);
   const sbar=el('div','rk-selbar wide'),tgl=btn('rk-pill','Select',()=>{selOn=!selOn;if(!selOn){selSet.clear();syncChecks()}refresh()}),cnt=el('span','rk-selcount'),dl=btn('rk-pill act','⬇ Download',()=>dialog(L)),sa=btn('rk-pill small','Select all '+L.length,()=>{L.forEach((q,i)=>selSet.add(i));syncChecks();refresh()}),sc=btn('rk-pill small','Clear',()=>{selSet.clear();syncChecks();refresh()});
   tgl.dataset.testid='rk-select';dl.dataset.testid='rk-download';
-  sbar.append(tgl,cnt,sa,sc,dl);
+  sbar.append(cnt,sa,sc,dl);const trow=el('div','rk-seltop wide');trow.append(tgl);p.prepend(trow);
   const syncChecks=()=>{for(const c of p.querySelectorAll('.rk-card')){if(c._i==null)continue;const on=selSet.has(c._i);c.querySelector('.rk-pick input').checked=on;c.classList.toggle('picked',on)}},
-    refresh=()=>{p.classList.toggle('selon',selOn);tgl.setAttribute('aria-pressed',String(selOn));tgl.textContent=selOn?'Done':'Select';cnt.textContent=selOn?selSet.size+' selected':'Tap Select to choose questions';sa.hidden=sc.hidden=dl.hidden=!selOn;dl.disabled=!selSet.size;dl.setAttribute('aria-disabled',String(!selSet.size))};
+    refresh=()=>{p.classList.toggle('selon',selOn);tgl.setAttribute('aria-pressed',String(selOn));tgl.textContent=selOn?'Done':'Select';sbar.hidden=!selOn;cnt.textContent=selSet.size+' selected';sa.hidden=sc.hidden=dl.hidden=!selOn;dl.disabled=!selSet.size;dl.setAttribute('aria-disabled',String(!selSet.size))};
   let first=1;for(const tp of [...new Set(L.map(q=>q.tp))]){const T=L.filter(q=>q.tp===tp);p.append(el('h2','rk-sec wide',tname(tp)+' ('+T.length+')'));
     for(const st of [...new Set(T.map(q=>q.st))]){p.append(sub(st,T.filter(q=>q.st===st),first));first=0}}
   p.append(sbar);refresh()}
