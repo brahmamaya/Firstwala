@@ -1054,3 +1054,19 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 .ls-words .w3{color:#7cc0ff}
 .ls-words i{flex:none;width:7px;height:7px;transform:rotate(45deg);background:#5c6678}
 .ls-line{max-width:560px;font-size:clamp(14px,1.9vw,17px);line-height:1.5;color:#c4cad6;font-weight:500;letter-spacing:.01em}
+
+/* PYQ selection, bottom bar and download dialog */
+.rk-selbar{position:sticky;bottom:10px;z-index:4;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;border:1px solid #2a3b5e;background:rgba(0,0,0,.92);margin-top:10px}
+.rk-selcount{flex:1 1 auto;color:#a9b6cc;font-size:14px;min-width:120px}
+.rk-selbar .rk-pill[hidden]{display:none}.rk-pill:disabled{opacity:.4;cursor:not-allowed}
+.rk-pick{display:none;align-items:center;gap:6px;font-size:13px;color:#cfe3ff;cursor:pointer}.selon .rk-pick{display:inline-flex}
+.rk-pick input{width:22px;height:22px;accent-color:#2b6cff}
+.rk-card.picked{border-color:#4d9bff!important}
+.rk-subtools{display:none;align-items:center;gap:8px;flex-wrap:wrap;color:#8fa3c0;font-size:14px}.selon .rk-subtools{display:flex}.rk-subtools span{margin-right:auto}
+.rk-modal{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.78)}
+.rk-dlg{width:min(520px,100%);max-height:92vh;overflow:auto;padding:20px;border-radius:18px;border:1px solid #2a3b5e;background:#05070c;color:#e6f1ff;display:flex;flex-direction:column;gap:14px}
+.rk-dlg h3{margin:0;font-size:20px;color:#fff}
+.rk-fs{margin:0;padding:10px 12px;border:1px solid #243049;border-radius:12px;display:flex;flex-direction:column;gap:8px}.rk-fs legend{padding:0 6px;color:#7fb4ff;font-size:13px;font-weight:700}
+.rk-ropt{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:10px;cursor:pointer}.rk-ropt:hover{background:#0d1424}
+.rk-ropt input{margin-top:4px;width:20px;height:20px;accent-color:#2b6cff;flex:none}.rk-ropt b{display:block;font-size:16px;color:#fff}.rk-ropt small{display:block;color:#9aa6bb;font-size:13px;line-height:1.4}
+.rk-dlgrow{display:flex;justify-content:flex-end;align-items:center;gap:12px}.rk-btn:disabled{opacity:.4;cursor:not-allowed}
