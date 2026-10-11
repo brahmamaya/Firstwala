@@ -249,3 +249,5 @@ Typesetting: math() in rank-neet.js now draws full-height radicals (SVG sign + b
 JEE Mains in Rank mode: subject buttons (Physics / Chemistry / Maths) -> chapter list (Class 11 + 12 Physics, from the MTG contents page) -> chapter page. Only Units and Measurements has content; other chapters show the same buttons with 'coming soon'.
 
 Boards: html.board (+lite) is set in compat.js for large touch panels (>=1700 css px wide with a coarse pointer, or >=3000 device px): no blur or endless shimmer on the landing, lighter landing background.
+
+Landing: new headline 'Simulate · Teach · Rank' + one-line description, '✓ Selected' badge on the active mode card (Rank deselects Student/Teacher), footer mentions NEET/JEE.
