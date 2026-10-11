@@ -253,3 +253,5 @@ Boards: html.board (+lite) is set in compat.js for large touch panels (>=1700 cs
 Landing: new headline 'Simulate · Teach · Rank' + one-line description, '✓ Selected' badge on the active mode card (Rank deselects Student/Teacher), footer mentions NEET/JEE.
 
 PYQ slide export: rank-export.js (lazy pack physica-export.min.js). Select questions -> Download -> only questions / questions + solutions and PDF / editable PPTX. 16:9 black slides, logo top right, title slide with chapter + topics + exam. Built in the browser, no library.
+
+Smoothness pass: landing background paced at 30 fps, max 1.25 device pixels, stops when not on screen; live backdrop blur removed everywhere (translucent glass kept).
