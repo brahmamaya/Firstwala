@@ -251,3 +251,5 @@ JEE Mains in Rank mode: subject buttons (Physics / Chemistry / Maths) -> chapter
 Boards: html.board (+lite) is set in compat.js for large touch panels (>=1700 css px wide with a coarse pointer, or >=3000 device px): no blur or endless shimmer on the landing, lighter landing background.
 
 Landing: new headline 'Simulate · Teach · Rank' + one-line description, '✓ Selected' badge on the active mode card (Rank deselects Student/Teacher), footer mentions NEET/JEE.
+
+PYQ slide export: rank-export.js (lazy pack physica-export.min.js). Select questions -> Download -> only questions / questions + solutions and PDF / editable PPTX. 16:9 black slides, logo top right, title slide with chapter + topics + exam. Built in the browser, no library.
