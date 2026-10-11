@@ -18,7 +18,7 @@ const cv=document.getElementById('landing-bg');if(!cv)return null;
 let gl=null;try{gl=cv.getContext('webgl',{antialias:false,alpha:false,depth:false,stencil:false,powerPreference:'high-performance',preserveDrawingBuffer:false})}catch{}
 if(!gl)return null;
 const reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500;
+const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500||document.documentElement.classList.contains('board');
 const VS='attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
 // 1) the scene: every pixel follows a bent light ray past the hole (Schwarzschild, leapfrog steps)
 const SCENE=`precision highp float;varying vec2 v;
@@ -145,7 +145,7 @@ return{start,stop:release,dive(){dv=.001;diveT=performance.now()},resize:size};
 if(GL)return GL;
 const cv=document.getElementById('landing-bg');if(!cv||!cv.getContext)return null;
 const g=cv.getContext('2d'),TAU=Math.PI*2,reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500;
+const weak=(navigator.hardwareConcurrency||4)<=4||Math.min(screen.width,screen.height)<500||document.documentElement.classList.contains('board');
 let W=0,H=0,dpr=1,raf=0,running=false,last=0,dive=0,mx=0,my=0,tx=0,ty=0,glowC=null,cx=0,cy=0,R=0;
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const stars=Array.from({length:weak?160:300},()=>({x:rnd(-1,1),y:rnd(-1,1),z:rnd(.15,1),s:rnd(.5,1.5),ph:rnd(0,TAU)}));

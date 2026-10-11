@@ -3,6 +3,8 @@
 'use strict';
 // A shared link (#sim-id) opens the experiment directly: hide the landing page from the very first paint.
 if(location.hash.length>1)document.documentElement.classList.add('deep');
+// Interactive boards (large touch panels, 4K or 1080p, with phone-class chips) are flagged from the first paint: no live blur, no endless shimmer, a lighter landing background.
+{const mx=Math.max(screen.width||0,screen.height||0);if(mx*(devicePixelRatio||1)>=3000||(matchMedia('(pointer:coarse)').matches&&mx>=1700))document.documentElement.classList.add('board','lite')}
 if(!Object.hasOwn)Object.hasOwn=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 if(!Array.prototype.at)Object.defineProperty(Array.prototype,'at',{value(n){n=Math.trunc(n)||0;if(n<0)n+=this.length;return n<0||n>=this.length?undefined:this[n]},writable:true,configurable:true});
 const rr=function(x,y,w,h,r=0){let a=Array.isArray(r)?r:[r];a=a.map(v=>typeof v==='object'&&v?v.x||0:+v||0);const [tl,tr=tl,br=tl,bl=tr]=a.length===1?[a[0],a[0],a[0],a[0]]:a.length===2?[a[0],a[1],a[0],a[1]]:a.length===3?[a[0],a[1],a[2],a[1]]:a,m=Math.min(Math.abs(w),Math.abs(h))/2,c=v=>Math.max(0,Math.min(v,m));

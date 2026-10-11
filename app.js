@@ -156,7 +156,7 @@ const is3D=s=>mode!=='2d'&&!INT(s.id)?.allViews&&!(mode==='ultra'&&(INT(s.id)||w
   // Big classroom boards (4K panels with phone-class chips) and Teacher mode run "lite": no live blur, and frames are
   // paced at 30 per second so motion stays even. Resolution adapts to how long drawing really takes (not to the
   // screen's refresh rate), between the screen's own pixels and full sharpness (devicePixelRatio, max 2).
-  const BIG=Math.max(screen.width||0,screen.height||0)*(devicePixelRatio||1)>=3000;
+  const BIG=document.documentElement.classList.contains('board');
   // iPhone / iPad (WebKit): live glass blur over large, scrolling panels can leave parts of the page unpainted there,
   // so those devices get the same look without the blur (pixel-compared: the blur shows nothing over the dark page)
   const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);document.documentElement.classList.toggle('noblur',IOS);
