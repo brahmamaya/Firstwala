@@ -46,7 +46,7 @@ const answerText=q=>q.o?letters(q).join(', '):q.n!=null?String(q.n):String(q.a||
 const txt=(x,y,w,paras)=>({t:'text',x,y,w,paras,h:0});
 function fit(make,from,to,maxH){for(let fs=from;fs>=to;fs-=2){const r=make(fs);if(r.h<=maxH||fs-2<to)return r}}
 function optBlock(opts,fs,w){const fo=fs*.94,lw=fo*2.2,gap=fo*.6;
-  for(const cols of [2,1]){const cw=cols===2?(w-gap*2)/2:w,ls=opts.map(o=>layout(o,fo,cw-lw));
+  for(const cols of [1]){const cw=cols===2?(w-gap*2)/2:w,ls=opts.map(o=>layout(o,fo,cw-lw));
     if(cols===2&&(ls.some(l=>l.lines.length>2)||opts.length%2))continue;
     const cells=[];let y=0;for(let i=0;i<opts.length;i+=cols){const row=ls.slice(i,i+cols),rh=Math.max(...row.map(l=>l.h));row.forEach((l,j)=>cells.push({i:i+j,x:j*(cw+gap*2),y,w:cw,l}));y+=rh+fo*.45}
     return{cells,h:y-fo*.45,fo,lw,cols}}}
@@ -55,16 +55,17 @@ async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const 
 const rect=(x,y,w,h,fill)=>({t:'rect',x,y,w,h,fill});
 function frame(meta,n,N){return[rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO},txt(PAD,H-58,500,[{s:n+' / '+N,fs:24,c:C.dim}])]}
 async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,N),fig=await figCanvas(q);
-  els.push(txt(PAD,36,W-PAD*2-LOGO.w-40,[{s:'Q'+(i+1)+'   '+q.y,fs:36,c:C.tx,b:1,q:'Q'+(i+1)}]),txt(PAD,90,W-PAD*2-LOGO.w-40,[{s:topic,fs:26,c:C.dim}]));
-  const top=170,areaH=430,figW=fig?Math.min(560,Math.round(areaH*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
-  const blk=fit(fs=>{const ql=layout(q.q,fs,qW);const ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:ql.h+(ob?fs*.7+ob.h:0)}},46,22,areaH);
+  /* Q number and paper in small type, then the question straight from the top; options stacked a, b, c, d */
+  els.push(txt(PAD,34,W-PAD*2-LOGO.w-40,[{s:'Q'+(i+1)+'  ·  '+q.y,fs:24,c:C.dim}]));
+  const top=84,areaH=withSol?500:540,figW=fig?Math.min(520,Math.round(areaH*.7*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:LOGO.w+30);
+  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:Math.max(ql.h,fig?figW/fig.ar:0)+(ob?fs*.7+ob.h:0)}},40,22,areaH);
   const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
   if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
-  if(blk.ob){const oy=top+Math.max(blk.ql.h,fig?figW/fig.ar:0)+blk.fs*.7,ob=blk.ob;for(const c of ob.cells){const e=txt(PAD+c.x,oy+c.y,c.w,[{s:q.o[c.i],fs:ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:ob.lw}]);e.h=c.l.h;e.opt=1;els.push(e)}}
-  els.push(rect(PAD,616,W-PAD*2,2,'#2a3550'),txt(PAD,628,400,[{s:withSol?'SOLUTION':'SOLUTION  ·  working space',fs:22,c:C.dim}]));
-  if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)];
-    const r=fit(fs=>{const ls=lines.map((s,j)=>layout(s,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a,l)=>a+l.h,0)+fs*.55*(ls.length-1)}},34,18,360);
-    const e=txt(PAD,672,W-PAD*2,lines.map((s,j)=>({s,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
+  let y=top+Math.max(blk.ql.h,fig?figW/fig.ar:0);
+  if(blk.ob){y+=blk.fs*.7;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}
+  if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=y+40,room=H-90-sy;
+    const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},32,16,room);
+    const e=txt(PAD,sy,W-PAD*2,lines.map((s2,j)=>({s:s2,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
   else{const e=txt(W-PAD-760,H-70,760,[{s:'Ans: '+answerText(q),fs:34,c:C.acc,b:1,al:'r'}]);e.h=48;els.push(e)}
   return els}
 function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO}];
