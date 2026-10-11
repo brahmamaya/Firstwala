@@ -1029,3 +1029,12 @@ body.rank-open{overflow:hidden}
 .rk-qhead{display:flex;align-items:center;gap:8px;margin:0 0 10px}
 .rk-qn{flex:none;font-size:12px;font-weight:700;color:#8fa3c0}
 .rk-qhead .rk-year{margin:0}
+
+/* JEE chapter chooser */
+.rk-chlist{display:flex;flex-direction:column;gap:8px}
+.rk-ch{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:10px 14px;border-radius:12px;border:1px solid #2a2a2a;background:#000;color:#e6f1ff;font-size:16px;text-align:left;cursor:pointer}
+.rk-ch:hover{border-color:#4d9bff}
+.rk-ch i{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#0d1424;color:#9fc6ff;font-style:normal;font-size:13px;font-weight:700}
+.rk-ch span{flex:1;min-width:0}
+.rk-ch b{flex:none;padding:2px 10px;border-radius:999px;border:1px solid #2e7d5b;color:#6be3a8;font-size:12px}
+.rk-ch.soon b{border-color:#3a4560;color:#8fa3c0}
