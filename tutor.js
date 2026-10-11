@@ -13,14 +13,15 @@ let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('phys
 
 // ---- mode choice: step 3 on the landing page (the logo brings the landing page back to change it)
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
+const selTag=()=>{const t=el('span','land-sel','✓ Selected');t.setAttribute('aria-hidden','true');return t};
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
 // Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
-for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode(id===mode?'normal':id)});b.append(el('b','',label),el('small','',SUB[id]));b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
+for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode(id===mode?'normal':id)});b.append(el('b','',label),el('small','',SUB[id]),selTag());b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
 // ---- Rank mode: NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
 const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE Mains','Engineering entrance'],['jeeadv','🚀','JEE Advanced','IIT entrance']];
 // Rank mode open: the three exam buttons slide in and "Open simulations" is hidden (Rank mode has no simulations)
 const rankOpen=open=>{rankSub.classList.toggle('open',open);rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open;const go=document.getElementById('landing-go');if(go)go.hidden=open;document.getElementById('landing')?.classList.toggle('rank-on',open)};
-const rankBtn=btn('land-grade land-mode land-rank',null,()=>rankOpen(!rankSub.classList.contains('open')));
+const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const on=!rankSub.classList.contains('open');if(on&&mode!=='normal')setMode('normal');rankOpen(on)});
 rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
 // simple outline hammer logo (the hammer only the worthy can lift)
 const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElementNS(NS,'svg');v.setAttribute('viewBox','0 0 48 48');v.setAttribute('class',cls);v.setAttribute('aria-hidden','true');v.setAttribute('focusable','false');
@@ -31,7 +32,7 @@ const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElem
   add('path',{d:'M21.5 28h5M21.5 33h5',stroke:'currentColor','stroke-width':'1.4','stroke-linecap':'round'});
   add('circle',{cx:24,cy:43.5,r:2.6,fill:'none',stroke:'currentColor','stroke-width':'2'});return v};
 const crown=hammer('rank-logo');const rb=el('b','','Rank mode');
-rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'));sw.append(rankBtn);
+rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'),selTag());sw.append(rankBtn);
 const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
 for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>k==='neet'||k==='jee'?rankNeet(k):rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
 let rankOv=null,rankLoading=false;
