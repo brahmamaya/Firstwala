@@ -142,5 +142,25 @@ function coll(){const s=svg(340,200,'Head-on collision of two blocks. Before: m1
   row(62,'BEFORE',46,-30,'u₁','u₂');row(158,'AFTER',-26,40,'v₁','v₂');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll};
+/* Rotational Motion: a rolling wheel and a ladder against a wall */
+function roll(){const s=svg(340,210,'A wheel rolling without slipping. The centre moves with speed v, the top point moves with 2v and the point touching the ground is momentarily at rest.');
+  line(s,16,170,324,170,DIM,1.6);mk(s,'circle',{cx:150,cy:110,r:60,fill:'#0b1220',stroke:INK,'stroke-width':2});mk(s,'circle',{cx:150,cy:110,r:3,fill:INK});
+  vec(s,150,110,214,110,BLUE);text(s,222,114,'v',14,BLUE,'start',700);
+  vec(s,150,50,276,50,HI);text(s,284,54,'2v',14,HI,'start',700);
+  mk(s,'circle',{cx:150,cy:170,r:4,fill:'#ff8a8a'});text(s,164,190,'contact point: v = 0',12,'#ff8a8a','start',700);
+  mk(s,'path',{d:'M128 80 A34 34 0 0 1 178 84',fill:'none',stroke:INK,'stroke-width':1.3});text(s,120,76,'ω',14,INK,'end',700);
+  text(s,16,22,'v = ωR',14,INK,'start',700);
+  return s}
+function ladder(){const s=svg(340,210,'A uniform ladder leaning on a smooth wall. Forces: weight W at the middle, normal force N1 and friction f at the floor, normal force N2 from the wall.');
+  line(s,60,16,60,184,INK,3);line(s,30,184,320,184,INK,3);
+  line(s,60,52,200,184,BLUE,4);
+  vec(s,130,118,130,168,HI);text(s,142,160,'W',14,HI,'start',700);
+  vec(s,200,184,200,130,'#7ee0a1');text(s,208,138,'N₁',14,'#7ee0a1','start',700);
+  vec(s,200,184,146,184,'#ff8a8a');text(s,160,178,'f',14,'#ff8a8a','end',700);
+  vec(s,60,52,114,52,BLUE);text(s,122,48,'N₂',14,BLUE,'start',700);
+  text(s,228,176,'θ',14,INK,'start',700);mk(s,'path',{d:'M180 184 A20 20 0 0 0 188 168',fill:'none',stroke:INK,'stroke-width':1.2});
+  text(s,330,28,'N₁ = W,  f = N₂',13,INK,'end',700);text(s,330,46,'N₂ = (W cotθ) ÷ 2',13,INK,'end',700);
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder};
 })();
