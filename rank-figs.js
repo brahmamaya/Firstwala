@@ -77,5 +77,21 @@ function sphero(){const s=svg(340,200,'Spherometer on a curved surface. Two oute
   text(s,20,172,'R = l² / 6h + h / 2',15,INK,'start',700);text(s,20,192,'Read h from the screw scale',12,DIM,'start');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero};
+/* Kinematics: velocity–time graph (area = displacement) and projectile path */
+function vt(){const s=svg(340,200,'Velocity against time: a straight line from v0 rising to v. The area under the line is the displacement.');
+  line(s,40,170,320,170,INK,1.5);line(s,40,170,40,20,INK,1.5);
+  mk(s,'path',{d:'M40 170 L40 140 L300 40 L300 170 Z',fill:HI,'fill-opacity':'.16',stroke:'none'});
+  line(s,40,140,300,40,HI,2.6);
+  text(s,312,186,'t (s)',12,DIM,'start');text(s,44,14,'v (m/s)',12,DIM,'start');text(s,34,137,'v₀',13,HI,'end',700);text(s,304,30,'v',13,HI,'middle',700);
+  text(s,170,110,'area = displacement',12,INK);
+  return s}
+function proj(){const s=svg(340,190,'Projectile path: a parabola from the ground, with its maximum height H and range R marked.');
+  line(s,20,160,330,160,DIM,1.5);
+  mk(s,'path',{d:'M30 160 Q180 -80 330 160',fill:'none',stroke:INK,'stroke-width':2.2,'stroke-linecap':'round'});
+  line(s,180,160,180,40,DIM,1.2,'5 4');text(s,190,104,'H',14,HI,'start',700);
+  arrow(s,30,172,330,172,BLUE);text(s,180,188,'R',14,BLUE,'middle',700);
+  text(s,30,152,'launch',12,DIM,'start');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj};
 })();
