@@ -15,13 +15,19 @@ let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('phys
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
 const selTag=()=>{const t=el('span','land-sel','✓ Selected');t.setAttribute('aria-hidden','true');return t};
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
+// Landing: two buttons. "Simulations" opens Student and Teacher underneath (as before); "Rank mode" opens its exams.
+const simBtn=btn('land-grade land-mode land-sim',null,()=>{const on=!simSub.classList.contains('open');if(on)rankOpen(false);simOpen(on)});
+simBtn.setAttribute('aria-expanded','false');simBtn.setAttribute('aria-controls','sim-sub');simBtn.dataset.testid='mode-simulations';
+const simBtnIc=el('span','sim-ic','▶');simBtnIc.setAttribute('aria-hidden','true');simBtn.append(simBtnIc,el('b','','Simulations'),el('small','','Student or Teacher · 2D, 3D and ultra-realistic'));
+const simSub=el('div','sim-sub');simSub.id='sim-sub';simSub.inert=true;const simIn=el('div','sim-sub-in');simSub.append(simIn);
+const simOpen=open=>{simSub.classList.toggle('open',open);simBtn.setAttribute('aria-expanded',String(open));simSub.inert=!open;simBtn.classList.toggle('open',open)};
 // Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
-for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode(id===mode?'normal':id)});b.append(el('b','',label),el('small','',SUB[id]),selTag());b.dataset.mode=id;b.dataset.testid='mode-'+id;sw.append(b)}
+for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode(id===mode?'normal':id)});b.append(el('b','',label),el('small','',SUB[id]),selTag());b.dataset.mode=id;b.dataset.testid='mode-'+id;simIn.append(b)}
 // ---- Rank mode: NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
 const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE Mains','Engineering entrance'],['jeeadv','🚀','JEE Advanced','IIT entrance']];
 // Rank mode open: the three exam buttons slide in and "Open simulations" is hidden (Rank mode has no simulations)
 const rankOpen=open=>{rankSub.classList.toggle('open',open);rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open;const go=document.getElementById('landing-go');if(go)go.hidden=open;document.getElementById('landing')?.classList.toggle('rank-on',open)};
-const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const on=!rankSub.classList.contains('open');if(on&&mode!=='normal')setMode('normal');rankOpen(on)});
+const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const on=!rankSub.classList.contains('open');if(on){simOpen(false);if(mode!=='normal')setMode('normal')}rankOpen(on)});
 rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
 // simple outline hammer logo (the hammer only the worthy can lift)
 const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElementNS(NS,'svg');v.setAttribute('viewBox','0 0 48 48');v.setAttribute('class',cls);v.setAttribute('aria-hidden','true');v.setAttribute('focusable','false');
@@ -32,7 +38,7 @@ const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElem
   add('path',{d:'M21.5 28h5M21.5 33h5',stroke:'currentColor','stroke-width':'1.4','stroke-linecap':'round'});
   add('circle',{cx:24,cy:43.5,r:2.6,fill:'none',stroke:'currentColor','stroke-width':'2'});return v};
 const crown=hammer('rank-logo');const rb=el('b','','Rank mode');
-rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'),selTag());sw.append(rankBtn);
+rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'),selTag());sw.append(simBtn,rankBtn);
 const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
 for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>k==='neet'||k==='jee'?rankNeet(k):rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
 let rankOv=null,rankLoading=false;
@@ -49,7 +55,7 @@ function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov rank-'+k)
   c.append(cr,el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','Completely focused on aspirants.'));
   ov.append(back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const goBtn=document.getElementById('landing-go');
-if(goBtn){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(document.createTextNode('Choose your mode'));st.append(h,sw,rankSub);goBtn.before(st)}
+if(goBtn){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(document.createTextNode('Choose your mode'));st.append(h,sw,simSub,rankSub);goBtn.before(st)}
 
 // ---- live simulation access (through the real controls, so everything stays in sync)
 const simId=()=>decodeURIComponent(location.hash.slice(1))||'';
@@ -122,7 +128,7 @@ const tbtn=btn('tutor-switch','',()=>{tutorOn=!tutorOn;try{localStorage.setItem(
 tbtn.dataset.testid='ai-tutor';const tdot=el('span','tutor-switch-knob');tbtn.append(el('span','tutor-switch-ic','✦'),el('b','','AI Tutor'),tdot);
 document.querySelector('.topbar-right')?.prepend(tbtn);
 function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tbtn.hidden=mode!=='student';tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-teacher',mode==='teacher');document.body.classList.toggle('mode-student',on);
-  for(const b of sw.querySelectorAll('button[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
+  for(const b of [...sw.querySelectorAll('button[data-mode]'),...simIn.querySelectorAll('button[data-mode]')])b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
   if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
   if(!c){if(examSet()){tab='exam';const b=btn('','🎯 Exam',()=>render());b.setAttribute('aria-pressed','true');tabs.append(b);window.PhysicaGlass?.(tabs);exam();return}

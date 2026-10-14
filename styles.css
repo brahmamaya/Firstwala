@@ -488,7 +488,7 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 .landing-inner>:nth-child(9){animation-delay:.66s!important}
 .landing-inner>:nth-child(10){animation-delay:.74s!important}
 /* ===== Modes + Physica Tutor ===== */
-.landing-modes{grid-template-columns:repeat(3,1fr)!important;max-width:620px!important}
+.landing-modes{grid-template-columns:repeat(2,1fr)!important;max-width:620px!important}
 .land-mode b{text-transform:none!important;letter-spacing:.02em!important}
 @media(max-width:560px){.landing-modes{grid-template-columns:1fr!important}.land-mode{flex-direction:row!important;justify-content:space-between;padding:12px 16px!important}}
 .landing-inner>:nth-child(11){animation-delay:.82s!important}
@@ -1080,3 +1080,14 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
    the glass look stays through the translucent backgrounds */
 *,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 :root{--g-blur:none}
+
+/* landing: Simulations expands to Student / Teacher */
+.sim-sub{display:grid;grid-template-rows:0fr;max-width:620px;margin:0 auto;transition:grid-template-rows .45s cubic-bezier(.2,.9,.3,1)}
+.sim-sub.open{grid-template-rows:1fr;margin-bottom:22px}
+.sim-sub-in{overflow:hidden;min-height:0;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 2px}
+.sim-sub.open .sim-sub-in{padding-top:12px}
+.sim-sub .land-grade{width:100%}
+.land-sim[aria-expanded=true]{border-color:#2fbf84!important;box-shadow:0 0 0 2px #2fbf84,0 8px 34px #2fbf8444!important}
+.sim-ic{display:inline-block;font-size:12px;color:#c4cad6;margin-bottom:2px}
+@media(max-width:560px){.sim-sub-in{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.sim-sub{transition:none}}
