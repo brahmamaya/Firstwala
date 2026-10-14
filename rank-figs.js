@@ -181,5 +181,47 @@ function orbit(){const s=svg(340,210,'An elliptical orbit with the Sun at one fo
   text(s,12,16,'T² ∝ a³, r v = constant at the ends',13,INK,'start',700);text(s,12,198,'equal areas in equal times',12,DIM,'start');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit};
+/* Properties of solids and liquids / Thermodynamics: stress–strain curve, capillary rise, P–V processes and the Carnot cycle */
+function ss(){const s=svg(340,210,'Stress against strain for a ductile metal. Straight line up to the proportional limit, elastic limit just after, then the yield point, plastic flow, the ultimate stress and fracture. The slope of the straight part is the Young modulus.');
+  line(s,40,176,326,176,INK,1.5);line(s,40,176,40,16,INK,1.5);
+  mk(s,'path',{d:'M40 176 L120 56 C140 40 160 38 180 40 C230 44 250 40 262 52 C280 70 290 90 296 112',fill:'none',stroke:HI,'stroke-width':2.4,'stroke-linecap':'round'});
+  line(s,40,176,120,56,BLUE,1.4,'4 3');
+  for(const [x,y,l,dx,dy,a] of [[120,56,'P',-10,-4,'end'],[132,46,'E',2,-10,'start'],[150,39,'Y',2,-10,'start'],[262,52,'U',4,-8,'start'],[296,112,'F',8,4,'start']]){mk(s,'circle',{cx:x,cy:y,r:3.4,fill:INK});text(s,x+dx,y+dy,l,12,INK,a,700)}
+  text(s,326,192,'strain',12,DIM,'end');text(s,46,14,'stress',12,DIM,'start');
+  text(s,62,150,'slope = Y',12,BLUE,'start',700);text(s,176,92,'plastic region',12,HI,'start',700);text(s,326,150,'P proportional limit · E elastic limit',10.5,DIM,'end');text(s,326,164,'Y yield · U ultimate · F fracture',10.5,DIM,'end');
+  return s}
+function capil(){const s=svg(340,200,'Capillary tube in a liquid. Water wets glass, so the angle of contact is acute and the liquid rises by h above the level outside. For mercury the angle is obtuse and the level falls.');
+  line(s,20,150,320,150,DIM,1.5);mk(s,'rect',{x:20,y:100,width:300,height:50,fill:'#17314f','fill-opacity':'.55',stroke:'none'});
+  mk(s,'rect',{x:150,y:20,width:34,height:150,fill:'none',stroke:INK,'stroke-width':2});mk(s,'rect',{x:152,y:54,width:30,height:96,fill:'#2b5d93','fill-opacity':'.7',stroke:'none'});
+  mk(s,'path',{d:'M152 62 Q167 80 182 62',fill:'none',stroke:BLUE,'stroke-width':2.2});
+  line(s,230,100,230,54,HI,1.6,'4 3');vec(s,230,100,230,56,HI);vec(s,230,56,230,100,HI);text(s,242,82,'h',15,HI,'start',700);
+  line(s,190,54,250,54,DIM,1,'4 3');line(s,190,100,250,100,DIM,1,'4 3');
+  text(s,167,190,'h = 2T cosθ / (rρg)',13,INK,'middle',700);text(s,24,128,'liquid outside',12,BLUE,'start',700);text(s,200,28,'θ = angle of contact',12,DIM,'start');
+  return s}
+function pv(){const s=svg(340,210,'Pressure against volume curves through the same starting point: an isobaric line, an isothermal curve, an adiabatic curve that falls faster, and an isochoric vertical line.');
+  line(s,40,184,326,184,INK,1.5);line(s,40,184,40,14,INK,1.5);
+  mk(s,'circle',{cx:130,cy:80,r:4.5,fill:INK});text(s,120,70,'A',13,INK,'end',700);
+  line(s,130,80,296,80,'#7ee0a1',2.4);text(s,326,70,'isobaric',12,'#7ee0a1','end',700);
+  const iso=[],adi=[];for(let v=130;v<=296;v+=4){iso.push(`${v},${(184-(184-80)*130/v).toFixed(1)}`);adi.push(`${v},${(184-(184-80)*Math.pow(130/v,1.67)).toFixed(1)}`)}
+  mk(s,'polyline',{points:iso.join(' '),fill:'none',stroke:HI,'stroke-width':2.4});mk(s,'polyline',{points:adi.join(' '),fill:'none',stroke:BLUE,'stroke-width':2.4});
+  line(s,130,80,130,184,'#ff8a8a',2.4);text(s,136,150,'isochoric',12,'#ff8a8a','start',700);
+  text(s,296,122,'isothermal',12,HI,'end',700);text(s,296,172,'adiabatic (steeper)',12,BLUE,'end',700);
+  text(s,326,200,'V',12,DIM,'end');text(s,46,14,'P',12,DIM,'start');
+  return s}
+function carnot(){const s=svg(340,220,'Carnot cycle on a P–V diagram: isothermal expansion A to B at the hot temperature T1, adiabatic expansion B to C, isothermal compression C to D at the cold temperature T2 and adiabatic compression D to A.');
+  line(s,40,198,326,198,INK,1.5);line(s,40,198,40,14,INK,1.5);
+  const g=1.67,c1=20,c2=10,VA=1.5,VB=3.5,kB=c1/VB*Math.pow(VB,g),kA=c1/VA*Math.pow(VA,g),VC=Math.pow(kB/c2,1/(g-1)),VD=Math.pow(kA/c2,1/(g-1));
+  const X=v=>40+v*24,Y=p=>198-p*13;
+  const iso=(c,v0,v1)=>{const o=[];for(let i=0;i<=30;i++){const v=v0+(v1-v0)*i/30;o.push(`${X(v).toFixed(1)},${Y(c/v).toFixed(1)}`)}return o.join(' ')};
+  const adi=(k,v0,v1)=>{const o=[];for(let i=0;i<=30;i++){const v=v0+(v1-v0)*i/30;o.push(`${X(v).toFixed(1)},${Y(k/Math.pow(v,g)).toFixed(1)}`)}return o.join(' ')};
+  mk(s,'polyline',{points:iso(c1,VA,VB),fill:'none',stroke:'#ff8a8a','stroke-width':2.4});
+  mk(s,'polyline',{points:adi(kB,VB,VC),fill:'none',stroke:BLUE,'stroke-width':2.4});
+  mk(s,'polyline',{points:iso(c2,VD,VC),fill:'none',stroke:'#7ee0a1','stroke-width':2.4});
+  mk(s,'polyline',{points:adi(kA,VA,VD),fill:'none',stroke:BLUE,'stroke-width':2.4});
+  for(const [v,p,l,dx,dy] of [[VA,c1/VA,'A',-12,-4],[VB,c1/VB,'B',10,-6],[VC,c2/VC,'C',10,-6],[VD,c2/VD,'D',-12,-6]]){mk(s,'circle',{cx:X(v),cy:Y(p),r:3.6,fill:INK});text(s,X(v)+dx,Y(p)+dy,l,13,INK,'middle',700)}
+  text(s,X(3)+34,Y(c1/3)-14,'T₁ (hot)',12,'#ff8a8a','middle',700);text(s,X(6),Y(c2/6)+20,'T₂ (cold)',12,'#7ee0a1','middle',700);
+  text(s,326,212,'V',12,DIM,'end');text(s,46,14,'P',12,DIM,'start');text(s,326,40,'η = 1 − T₂/T₁',13,INK,'end',700);text(s,326,58,'W = Q₁ − Q₂',12,DIM,'end');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot};
 })();
