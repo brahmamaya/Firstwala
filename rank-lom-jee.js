@@ -1,4 +1,4 @@
-/* Rank mode · JEE Mains Physics · Laws of Motion (same page as Units and Measurements and Kinematics; no past-year questions yet).
+/* Rank mode · JEE Mains Physics · Laws of Motion (same page as Units and Measurements and Kinematics; past-year questions are in rank-pyq-lom.js).
    Loaded with the JEE pack. Plain data only; the diagrams (incline, atwood) are drawn by rank-figs.js. Nothing leaves the device.
    F(section, level, name, formulas, how to apply, example, diagram): level 1 = must know, 2 = also useful. */
 (() => {
@@ -68,7 +68,7 @@ plan:[
 ['Day 3 · 2 hours','Connected bodies, Atwood machine and pulley constraints.'],
 ['Day 4 · 2 hours','Friction, the incline (smooth and rough), block on block, least force.'],
 ['Day 5 · 90 min','Circular motion: horizontal, vertical, banking, conical pendulum. Then pseudo force.'],
-['Day 6 · 90 min','Practise by question type, take one mock test, and read the Revise tab the day before the exam.']],
+['Day 6 · 90 min','Practise by question type, solve the past-year questions by sub-topic, take one mock test, and read the Revise tab the day before the exam.']],
 basics:['Vectors: resolve a force along two axes, sinθ and cosθ.','Kinematics: v = u + at, s = ut + ½at², v² = u² + 2as.','Centripetal acceleration v²/r and what it means.','Reading a graph: slope and area (for the F–t graph).','Simple algebra for two or three unknowns.','The value of g: 9.8 or 10 m/s².'],
 path:[
 {t:'Step 1 · Newton’s laws and free-body diagrams (Day 1)',d:'Learn how to draw a free-body diagram and write ΣF = ma along each axis.',ready:'you can write the equations of motion for any block problem without help.',go:'formulas'},
@@ -76,7 +76,7 @@ path:[
 {t:'Step 3 · Connected bodies (Day 3)',d:'Work through blocks, Atwood and the table-and-hanging mass.',ready:'you can find a and T for any two-body system.',go:'asked'},
 {t:'Step 4 · Friction and the incline (Day 4)',d:'Learn the check for “does it move?”, then the rough incline and block on block.',ready:'you do not forget to compare the force with μ(s)N before using μ(k)N.',go:'notes'},
 {t:'Step 5 · Circular motion and pseudo force (Day 5)',d:'Mark the forces towards the centre, then use mv²/r. Add −ma in accelerating frames.',ready:'you can find the safe speed on a banked road and the top speed condition of a vertical circle.',go:'formulas'},
-{t:'Step 6 · Practise, then test (Day 6)',d:'Practise by question type, then take the mock test.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'mock'}],
+{t:'Step 6 · Practise, past-year questions, then test (Day 6)',d:'Practise by question type, open the past-year questions by sub-topic, then take the mock test.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'pyq'}],
 think:['Read once and name the type: forces, momentum, connected, friction, incline, circular or pseudo force.','Draw a neat free-body diagram for every body.','Choose the axes along the acceleration (along the slope for an incline).','Write ΣF = ma for each body before you put in numbers.','For friction, first decide whether the body moves.','For a circle, find the net force towards the centre and set it equal to mv²/r.','Check the result: a tension cannot be negative, and the acceleration in an Atwood machine is always less than g.','MCQs have negative marking: remove two wrong options before guessing.'],
 watch:['Friction equals the applied force while the body is at rest, not μN.','Action and reaction are on different bodies and never cancel in one free-body diagram.','Do not draw the centripetal force as an extra arrow.','The tension in a string over a pulley with a moving mass is not equal to the weight of the hanging mass.','In a lift, the normal force N is the reading of the scale, not mg.','Take the direction of motion as positive and keep the sign of friction opposite to the motion.','When a string is cut, the spring force stays the same at that instant.','Use g = 10 m/s² unless told otherwise.'],
 myths:[
