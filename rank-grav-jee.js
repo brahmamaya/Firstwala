@@ -1,4 +1,4 @@
-/* Rank mode · JEE Mains Physics · Gravitation. Same page as the other chapters; no past-year questions yet.
+/* Rank mode · JEE Mains Physics · Gravitation. Same page as the other chapters; past-year questions are in the rank-pyq file.
    Loaded with the JEE pack. Plain data only; the diagrams (shell, orbit) are drawn by rank-figs.js. Nothing leaves the device.
    F(section, level, name, formulas, how to apply, example, diagram): level 1 = must know, 2 = also useful. */
 (() => {
@@ -65,7 +65,7 @@ plan:[
 ['Day 3 · 90 min','Potential energy, escape speed, height reached and binding energy.'],
 ['Day 4 · 2 hours','Satellites: orbital speed, period, energy, geostationary orbit and binary stars.'],
 ['Day 5 · 90 min','Kepler’s laws, elliptical orbits and conservation of angular momentum.'],
-['Day 6 · 90 min','Practise by question type, take one mock test and read the Revise tab the day before the exam.']],
+['Day 6 · 90 min','Practise by question type, solve the past-year questions by sub-topic, take one mock test and read the Revise tab the day before the exam.']],
 basics:['Centripetal force and circular motion.','Conservation of energy and of angular momentum.','Vectors: adding forces by components.','Binomial approximation (1 + x)ⁿ ≈ 1 + nx for small x.','Dimensions and powers of ten for planetary data.','Areas and volumes of spheres: 4πr² and (4/3)πr³.'],
 path:[
 {t:'Step 1 · Law and field (Day 1)',d:'Learn F = Gm₁m₂/r², the field and potential and the shell results.',ready:'you can find the field inside and outside a shell and a sphere without looking.',go:'formulas'},
@@ -73,7 +73,7 @@ path:[
 {t:'Step 3 · Energy and escape (Day 3)',d:'Learn U = −GMm/r, v(e) and the height reached.',ready:'you know v(e) = √(2gR) = √2 v(o) and can find the height for any speed.',go:'formulas'},
 {t:'Step 4 · Satellites (Day 4)',d:'Learn v, T, the three energies and the geostationary orbit.',ready:'you can write K, U and E of a satellite and compare periods with T² ∝ r³.',go:'notes'},
 {t:'Step 5 · Kepler’s laws (Day 5)',d:'Learn the three laws and the energy of an elliptical orbit.',ready:'you can use r v = constant and E = −GMm/2a.',go:'asked'},
-{t:'Step 6 · Practise, then test (Day 6)',d:'Practise by question type, then take the mock test.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'mock'}],
+{t:'Step 6 · Practise, past-year questions, then test (Day 6)',d:'Practise by question type, open the past-year questions by sub-topic, then take the mock test.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'pyq'}],
 think:['Read once and name the type: law, field, g, energy, escape, satellite or Kepler.','Write the formula in terms of g and R when the question gives them, and G and M when it does not.','Use a ratio when two bodies are compared: it removes the unknown constants.','For energy, write the total at the two points and equate them.','For satellites, equate gravity to the centripetal force first.','For ellipses, use r v = constant and the energy equation together.','Check the answer: the escape speed is √2 times the orbital speed and the total energy of a bound orbit is negative.','MCQs have negative marking: remove two wrong options before guessing.'],
 watch:['Inside a shell the field is zero, but the potential is not zero.','g with height falls as 1/(R + h)², not linearly except for small h.','The orbital speed and the period do not depend on the mass of the satellite.','Escape speed does not depend on the mass or the direction of the body.','Gravitational potential energy is negative: U = −GMm/r, with zero at infinity.','A geostationary satellite has a fixed period of 24 h and a fixed height.','Weightlessness in an orbit does not mean that gravity is zero.','Use the distance from the centre of the Earth (R + h), not from the surface, in the formulas.'],
 myths:[
