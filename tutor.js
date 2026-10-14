@@ -22,11 +22,11 @@ const simBtnIc=el('span','sim-ic','▶');simBtnIc.setAttribute('aria-hidden','tr
 const simSub=el('div','sim-sub');simSub.id='sim-sub';simSub.inert=true;const simIn=el('div','sim-sub-in');simSub.append(simIn);
 const simOpen=open=>{simSub.classList.toggle('open',open);simBtn.setAttribute('aria-expanded',String(open));simSub.inert=!open;simBtn.classList.toggle('open',open)};
 // Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
-for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode(id===mode?'normal':id)});b.append(el('b','',label),el('small','',SUB[id]),selTag());b.dataset.mode=id;b.dataset.testid='mode-'+id;simIn.append(b)}
+for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);const on=id!==mode;setMode(on?id:'normal');if(on)document.getElementById('landing-go')?.click()});b.append(el('b','',label),el('small','',SUB[id]),selTag());b.dataset.mode=id;b.dataset.testid='mode-'+id;simIn.append(b)}
 // ---- Rank mode: NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
 const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE Mains','Engineering entrance'],['jeeadv','🚀','JEE Advanced','IIT entrance']];
 // Rank mode open: the three exam buttons slide in and "Open simulations" is hidden (Rank mode has no simulations)
-const rankOpen=open=>{rankSub.classList.toggle('open',open);rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open;const go=document.getElementById('landing-go');if(go)go.hidden=open;document.getElementById('landing')?.classList.toggle('rank-on',open)};
+const rankOpen=open=>{rankSub.classList.toggle('open',open);rankBtn.setAttribute('aria-expanded',String(open));rankSub.inert=!open;document.getElementById('landing')?.classList.toggle('rank-on',open)};
 const rankBtn=btn('land-grade land-mode land-rank',null,()=>{const on=!rankSub.classList.contains('open');if(on){simOpen(false);if(mode!=='normal')setMode('normal')}rankOpen(on)});
 rankBtn.setAttribute('aria-expanded','false');rankBtn.setAttribute('aria-controls','rank-sub');rankBtn.dataset.testid='mode-rank';
 // simple outline hammer logo (the hammer only the worthy can lift)
@@ -55,7 +55,7 @@ function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov rank-'+k)
   c.append(cr,el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','Completely focused on aspirants.'));
   ov.append(back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const goBtn=document.getElementById('landing-go');
-if(goBtn){const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(document.createTextNode('Choose your mode'));st.append(h,sw,simSub,rankSub);goBtn.before(st)}
+if(goBtn){goBtn.hidden=true;const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(document.createTextNode('Choose your mode'));st.append(h,sw,simSub,rankSub);goBtn.before(st)}
 
 // ---- live simulation access (through the real controls, so everything stays in sync)
 const simId=()=>decodeURIComponent(location.hash.slice(1))||'';
