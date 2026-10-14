@@ -4,7 +4,8 @@
 (() => {
 'use strict';
 const W=1920,H=1080,PX=6350,FONT='system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',C={tx:'#ffffff',dim:'#9aa6bb',acc:'#7cc0ff',ok:'#6be3a8',line:'#2a3550'};
-const PAD=96,LOGO={w:300,h:86,x:W-PAD-300,y:30};
+const PAD=80,LOGO={w:250,h:72,x:W-PAD-250,y:36};
+const BAND=LOGO.y+LOGO.h+18;   /* the question starts below the logo band, so the logo never covers text */
 const parse=t=>window.PhysicaRankMath.parse(t);
 let cx=null;const F=(fs,b)=>`${b?'700 ':''}${Math.round(fs*10)/10}px ${FONT}`;
 
@@ -55,18 +56,23 @@ async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const 
 const rect=(x,y,w,h,fill)=>({t:'rect',x,y,w,h,fill});
 function frame(meta,n,N){return[rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO},txt(PAD,H-58,500,[{s:n+' / '+N,fs:24,c:C.dim}])]}
 async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,N),fig=await figCanvas(q);
-  /* Q number and paper in small type, then the question straight from the top; options stacked a, b, c, d */
-  els.push(txt(PAD,34,W-PAD*2-LOGO.w-40,[{s:'Q'+(i+1)+'  ·  '+q.y,fs:24,c:C.dim}]));
-  const top=84,areaH=withSol?500:540,figW=fig?Math.min(520,Math.round(areaH*.7*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:LOGO.w+30);
-  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:Math.max(ql.h,fig?figW/fig.ar:0)+(ob?fs*.7+ob.h:0)}},40,22,areaH);
+  /* header: question number (green) and exam + year (yellow), both as bold pills at the top left */
+  const hy=LOGO.y+8,hh=56;cx.font=F(30,1);const qn='Q'+(i+1),qw=cx.measureText(qn).width+40;
+  els.push({t:'pill',x:PAD,y:hy,w:qw,h:hh,fill:'#0c3a28',stroke:'#3ddc97',text:qn,color:'#3ddc97',fs:30});
+  cx.font=F(26,1);const yr=String(q.y),yw=cx.measureText(yr).width+40;
+  els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:'#262006',stroke:'#ffd54a',text:yr,color:'#ffd54a',fs:26});
+  const top=BAND+20,bottom=withSol?640:H-130;
+  const areaH=bottom-top,figW=fig?Math.min(560,Math.round(areaH*.6*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
+  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:Math.max(ql.h,fig?figW/fig.ar:0)+(ob?fs*.8+ob.h:0)}},58,24,areaH);
   const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
   if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
   let y=top+Math.max(blk.ql.h,fig?figW/fig.ar:0);
-  if(blk.ob){y+=blk.fs*.7;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}
-  if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=y+40,room=H-90-sy;
-    const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},32,16,room);
+  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}
+  if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=Math.max(y+36,bottom+30),room=H-80-sy;
+    els.push(rect(PAD,bottom+6,W-PAD*2,2,'#2a3550'));
+    const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},34,16,room);
     const e=txt(PAD,sy,W-PAD*2,lines.map((s2,j)=>({s:s2,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
-  else{const e=txt(W-PAD-760,H-70,760,[{s:'Ans: '+answerText(q),fs:34,c:C.acc,b:1,al:'r'}]);e.h=48;els.push(e)}
+  else{const e=txt(W-PAD-760,H-76,760,[{s:'Ans: '+answerText(q),fs:36,c:C.acc,b:1,al:'r'}]);e.h=52;els.push(e)}
   return els}
 function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO}];
   els.push(txt(PAD,120,1300,[{s:'PREVIOUS YEAR QUESTIONS',fs:32,c:C.acc,b:1}]),txt(PAD,176,W-PAD*2,[{s:meta.chapter,fs:88,c:C.tx,b:1}]),
@@ -82,6 +88,8 @@ function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,'#000000'),{t:'img',
 function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=W;cv.height=H;cx=cv.getContext('2d');cx.lineCap='round';
   for(const e of els){
     if(e.t==='rect'){cx.fillStyle=e.fill;cx.fillRect(e.x,e.y,e.w,e.h)}
+    else if(e.t==='pill'){const r=e.h/2;cx.beginPath();cx.moveTo(e.x+r,e.y);cx.arcTo(e.x+e.w,e.y,e.x+e.w,e.y+e.h,r);cx.arcTo(e.x+e.w,e.y+e.h,e.x,e.y+e.h,r);cx.arcTo(e.x,e.y+e.h,e.x,e.y,r);cx.arcTo(e.x,e.y,e.x+e.w,e.y,r);cx.closePath();cx.fillStyle=e.fill;cx.fill();cx.lineWidth=2.5;cx.strokeStyle=e.stroke;cx.stroke();
+      cx.font=F(e.fs,1);cx.fillStyle=e.color;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(e.text,e.x+e.w/2,e.y+e.h/2+1);cx.textAlign='left';cx.textBaseline='alphabetic'}
     else if(e.t==='img')cx.drawImage(e.k==='logo'?logo:e.canvas,e.x,e.y,e.w,e.h);
     else{let y=e.y;for(const p of e.paras){const lw=p.lw||0,L=layout(p.s,p.fs,e.w-lw,p.b);
       if(p.label){cx.font=F(p.fs,1);cx.fillStyle=C.acc;cx.textBaseline='alphabetic';cx.fillText(p.label,e.x,y+L.lines[0].a)}
@@ -120,6 +128,7 @@ const runs=ns=>ns.flatMap(x=>x.k==='sup'?[{s:flat(x.c),sup:1}]:x.k==='t'?[{s:x.s
 const hex=c=>c.replace('#','').toUpperCase(),emu=v=>Math.round(v*PX);
 const run=(s,fs,col,b,sup)=>'<a:r><a:rPr lang="en-US" sz="'+Math.round(fs*50)+'" b="'+(b?1:0)+'"'+(sup?' baseline="30000"':'')+' dirty="0"><a:solidFill><a:srgbClr val="'+hex(col)+'"/></a:solidFill><a:latin typeface="Arial"/><a:cs typeface="Arial"/></a:rPr><a:t>'+esc(s)+'</a:t></a:r>';
 function shape(e,id,rel){const xf='<a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)+'"/><a:ext cx="'+emu(e.w)+'" cy="'+emu(e.h)+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>';
+  if(e.t==='pill')return'<p:sp><p:nvSpPr><p:cNvPr id="'+id+'" name="Tag '+id+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)+'"/><a:ext cx="'+emu(e.w)+'" cy="'+emu(e.h)+'"/></a:xfrm><a:prstGeom prst="roundRect"><a:avLst><a:gd name="adj" fmla="val 50000"/></a:avLst></a:prstGeom><a:solidFill><a:srgbClr val="'+hex(e.fill)+'"/></a:solidFill><a:ln w="31750"><a:solidFill><a:srgbClr val="'+hex(e.stroke)+'"/></a:solidFill></a:ln></p:spPr><p:txBody><a:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="ctr"><a:noAutofit/></a:bodyPr><a:lstStyle/><a:p><a:pPr algn="ctr"/>'+run(e.text,e.fs,e.color,1,0)+'</a:p></p:txBody></p:sp>';
   if(e.t==='rect')return'<p:sp><p:nvSpPr><p:cNvPr id="'+id+'" name="Panel '+id+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr>'+xf+'<a:solidFill><a:srgbClr val="'+hex(e.fill)+'"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>';
   if(e.t==='img')return'<p:pic><p:nvPicPr><p:cNvPr id="'+id+'" name="'+(e.k==='logo'?'Physica logo':'Diagram')+'"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr><p:blipFill><a:blip r:embed="'+rel+'"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr>'+xf+'</p:spPr></p:pic>';
   const ps=e.paras.map(p=>{const rs=[];if(p.label)rs.push(run(p.label+'  ',p.fs,C.acc,1));for(const r of runs(parse(p.s)))rs.push(run(r.s,p.fs,p.c,p.b,r.sup));
