@@ -257,3 +257,5 @@ PYQ slide export: rank-export.js (lazy pack physica-export.min.js). Select quest
 Smoothness pass: landing background paced at 30 fps, max 1.25 device pixels, stops when not on screen; live backdrop blur removed everywhere (translucent glass kept).
 
 Landing black hole restored to the earlier settings (60 fps, full resolution); it stops only when hidden or off screen (the earlier check wrongly used offsetParent, which is null for fixed elements).
+
+Landing: two buttons (Simulations, Rank mode). Simulations expands to Student and Teacher, which work as before.
