@@ -93,5 +93,28 @@ function proj(){const s=svg(340,190,'Projectile path: a parabola from the ground
   text(s,30,152,'launch',12,DIM,'start');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj};
+/* Laws of Motion: block on an incline with its forces, and the Atwood machine */
+const vec=(p,x1,y1,x2,y2,c)=>{line(p,x1,y1,x2,y2,c,2);const a=Math.atan2(y2-y1,x2-x1);mk(p,'polygon',{points:`${x2},${y2} ${x2-10*Math.cos(a-.4)},${y2-10*Math.sin(a-.4)} ${x2-10*Math.cos(a+.4)},${y2-10*Math.sin(a+.4)}`,fill:c})};
+function incline(){const s=svg(340,210,'A block on an incline of angle theta. Weight mg acts straight down, the normal force N acts at right angles to the surface, mg sin theta acts down the slope and friction f acts up the slope.');
+  const A=[30,190],B=[290,190],C=[290,40],th=Math.atan2(150,260),d=[Math.cos(th),-Math.sin(th)],n=[-Math.sin(th),-Math.cos(th)];
+  mk(s,'polygon',{points:`${A} ${B} ${C}`,fill:'#0b1220',stroke:INK,'stroke-width':2});
+  const P=[A[0]+.5*(C[0]-A[0]),A[1]+.5*(C[1]-A[1])],o=[P[0]+n[0]*17,P[1]+n[1]*17],q=(a,b)=>[o[0]+d[0]*a+n[0]*b,o[1]+d[1]*a+n[1]*b];
+  mk(s,'polygon',{points:[q(-24,-17),q(24,-17),q(24,17),q(-24,17)].join(' '),fill:'#17314f',stroke:BLUE,'stroke-width':1.8});
+  const ar=(v,l,c,lab,dx,dy)=>{vec(s,o[0],o[1],o[0]+v[0]*l,o[1]+v[1]*l,c);text(s,o[0]+v[0]*l+dx,o[1]+v[1]*l+dy,lab,13,c,'middle',700)};
+  ar([0,1],62,HI,'mg',0,16);ar(n,56,BLUE,'N',-10,-4);ar([-d[0],-d[1]],46,'#7ee0a1','mg sinθ',-8,16);ar(d,40,'#ff8a8a','f',10,-4);
+  text(s,A[0]+50,A[1]-6,'θ',14,INK,'middle',700);mk(s,'path',{d:`M${A[0]+36} ${A[1]} A36 36 0 0 0 ${A[0]+36*Math.cos(th)} ${A[1]-36*Math.sin(th)}`,fill:'none',stroke:INK,'stroke-width':1.2});
+  text(s,20,16,'N = mg cosθ,  f ≤ μN',13,INK,'start',700);
+  return s}
+function atwood(){const s=svg(340,210,'Atwood machine: two masses m1 and m2 hang from a light string over a smooth pulley. The heavier mass m1 goes down with acceleration a and the lighter one goes up.');
+  line(s,170,6,170,40,DIM,3);mk(s,'circle',{cx:170,cy:50,r:18,fill:'#0b1220',stroke:INK,'stroke-width':2});mk(s,'circle',{cx:170,cy:50,r:3,fill:INK});
+  line(s,152,50,152,118,INK,1.8);line(s,188,50,188,86,INK,1.8);
+  mk(s,'rect',{x:132,y:118,width:40,height:34,rx:3,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});mk(s,'rect',{x:172,y:86,width:32,height:28,rx:3,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});
+  text(s,152,140,'m₁',14,INK,'middle',700);text(s,188,105,'m₂',13,INK,'middle',700);
+  vec(s,106,118,106,160,HI);text(s,92,144,'a',13,HI,'end',700);vec(s,234,114,234,76,HI);text(s,246,98,'a',13,HI,'start',700);
+  text(s,142,84,'T',13,BLUE,'end',700);text(s,198,70,'T',13,BLUE,'start',700);
+  vec(s,152,154,152,192,'#ff8a8a');text(s,164,190,'m₁g',12,'#ff8a8a','start',700);vec(s,188,116,188,146,'#ff8a8a');text(s,200,142,'m₂g',12,'#ff8a8a','start',700);
+  text(s,170,206,'m₁ > m₂',12,DIM,'middle');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood};
 })();
