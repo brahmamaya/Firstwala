@@ -267,3 +267,5 @@ PYQ slides: logo fixed at the top-right corner (question starts below it); quest
 PYQ download on iPad/iPhone: no download link any more (it could be saved as .txt); the PDF/PPT opens in the browser's viewer with a Save to Files button.
 
 PYQ slides: question and option size back to the earlier 46 px max, so the solution has room below.
+
+Board sharpness: canvas no longer forced to 0.67 resolution on wide screens (was blurry); render floor 0.75 (boards 0.9); labels scale up on screens wider than 1600 px.
