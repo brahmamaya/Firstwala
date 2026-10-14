@@ -259,3 +259,5 @@ Smoothness pass: landing background paced at 30 fps, max 1.25 device pixels, sto
 Landing black hole restored to the earlier settings (60 fps, full resolution); it stops only when hidden or off screen (the earlier check wrongly used offsetParent, which is null for fixed elements).
 
 Landing: two buttons (Simulations, Rank mode). Simulations expands to Student and Teacher, which work as before.
+
+Landing: choosing Student or Teacher opens the simulations directly; the 'Open simulations' button is hidden.
