@@ -277,3 +277,5 @@ PYQ download: optional checkbox 'Add a blank working slide after each question' 
 Landing lag: black hole scene capped at 2.4 MP (4.2 MP on boards), background paced at 30 fps. Look unchanged.
 
 - Kinematics (JEE Mains): Rank-mode chapter page mirrors Units and Measurements (Guide, Formulas with 5 must-know, Revise, Most asked, Mock test, practice). No PYQ tab for this chapter; PYQ file to be added later. Diagrams (v-t graph, projectile path) added to rank-figs.js. Build + secret-guard pass; Playwright checked on 1180x820 and 390x844.
+
+- Kinematics PYQs (JEE Mains): rank-pyq-kin.js has 297 past-year questions with worked solutions and 63 diagrams, grouped into 7 topics / 30 sub-topics (loaded with the JEE PYQ bundle). 4 questions the book marks as having no correct option were left out. Formulas (36, 18 must-know), Revise, Most asked (12 types) and Guide of rank-kin-jee.js were rewritten. phys-fig.js is now the one PhysicaFig renderer shared by the tutor pack and the rank pack. Slide export: options now sit beside the diagram and diagrams are larger.

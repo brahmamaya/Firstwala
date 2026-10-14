@@ -62,12 +62,12 @@ async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,
   cx.font=F(26,1);const yr=String(q.y),yw=cx.measureText(yr).width+40;
   els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:'#262006',stroke:'#ffd54a',text:yr,color:'#ffd54a',fs:26});
   const top=BAND+20,bottom=withSol?600:H-130;
-  const areaH=bottom-top,figW=fig?Math.min(560,Math.round(areaH*.6*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
-  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:Math.max(ql.h,fig?figW/fig.ar:0)+(ob?fs*.8+ob.h:0)}},46,22,areaH);
+  const areaH=bottom-top,figW=fig?Math.min(720,Math.round(areaH*.95*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
+  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,fig?qW:W-PAD*2):null,left=ql.h+(ob?fs*.8+ob.h:0);return{fs,ql,ob,h:fig?Math.max(left,figW/fig.ar):left}},46,22,areaH);
   const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
   if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
-  let y=top+Math.max(blk.ql.h,fig?figW/fig.ar:0);
-  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}
+  let y=top+blk.ql.h;
+  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
   if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=Math.max(y+36,bottom+30),room=H-80-sy;
     els.push(rect(PAD,bottom+6,W-PAD*2,2,'#2a3550'));
     const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},34,16,room);

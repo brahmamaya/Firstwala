@@ -5,7 +5,7 @@ const root=path.join(__dirname,'..'),ESB=process.env.ESBUILD||'esbuild';
 require('./secret-guard.js')(root); // no API keys or tokens may ever ship
 const CORE=['compat.js','mathtext.js','theme.js','physica3d.js'];
 const MAIN=['physics.js','extras.js','enhancements.js','third.js','fourth.js','fifth.js','sixth.js','labkit.js','seventh.js','eighth.js','ninth.js','tenth.js','eleventh.js','class10-new.js','biokit.js','.subjects.tmp.js','phys3d-a.js','phys3d-b.js','phys3d-c.js','phys3d-d.js','instruments2d.js','optics2d.js','mirrors2d.js','experience.js','class10.js','app.js','focus.js','recorder.js','landing-bg.js','landing.js','feedback.js','install.js','tutor-speech.js','tutor.js','lazy.js'];
-const TUTOR=['tutor-content.js','tutor-chapters.js','tutor-teacher-content.js','tutor-learned.js','tutor-mock.js']; // loaded only when a student opens the AI Tutor
+const TUTOR=['tutor-content.js','tutor-chapters.js','tutor-teacher-content.js','tutor-learned.js','phys-fig.js','tutor-mock.js']; // loaded only when a student opens the AI Tutor
 const EXAM=['tutor-exam.js']; // Board/JEE/NEET questions and mock tests: loaded only when the Exam tab opens
 // Botany/Zoology and Chemistry ship as their own packs; the main bundle carries only their index (tools/subject-manifest.js)
 const SUBJECTS={bio:['bio1.js','bio2.js','bio3.js','bio4.js','bio5.js'],chem:['chem1.js','chem2.js','chem3.js','chem4.js']};
@@ -17,9 +17,9 @@ bundle(CORE,'physica-core.min.js');bundle(PACK,'physica-3d.min.js');
 fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js')(root,TUTOR).js);
 // the exam questions ship as their own pack; the tutor pack carries just the list of chapters that have them
 bundle(EXAM,'physica-exam.min.js');
-bundle(['rank-pyq-jee.js'],'physica-pyq.min.js');
+bundle(['rank-pyq-jee.js','rank-pyq-kin.js'],'physica-pyq.min.js');
 bundle(['rank-export.js'],'physica-export.min.js');
-bundle(['rank-figs.js','rank-units.js','rank-units-jee.js','rank-kin-jee.js','rank-neet.js'],'physica-rank.min.js');
+bundle(['phys-fig.js','rank-figs.js','rank-units.js','rank-units-jee.js','rank-kin-jee.js','rank-neet.js'],'physica-rank.min.js');
 {const rp=path.join(root,'physica-rank.min.js'),ph=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-pyq.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('__PYQ_URL__','./physica-pyq.min.js?v='+ph).replace('__EXPORT_URL__','./physica-export.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-export.min.js'))).digest('hex').slice(0,8)))}
 {const box={};require('vm').runInNewContext(fs.readFileSync(path.join(root,'tutor-exam.js'),'utf8'),{window:box});fs.writeFileSync(path.join(root,'.examidx.tmp.js'),'window.PhysicaExamChapters='+JSON.stringify(Object.keys(box.PhysicaExam))+';')}
 try{bundle([...TUTOR,'.hlvoice.tmp.js','.examidx.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'));fs.unlinkSync(path.join(root,'.examidx.tmp.js'))}
