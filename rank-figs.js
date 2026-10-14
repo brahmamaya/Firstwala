@@ -162,5 +162,24 @@ function ladder(){const s=svg(340,210,'A uniform ladder leaning on a smooth wall
   text(s,330,28,'N₁ = W,  f = N₂',13,INK,'end',700);text(s,330,46,'N₂ = (W cotθ) ÷ 2',13,INK,'end',700);
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder};
+/* Gravitation: field inside and outside a shell and a solid sphere, and an elliptical orbit */
+function shell(){const s=svg(340,210,'Gravitational field against distance from the centre. For a thin shell the field is zero inside and falls as 1 over r squared outside. For a solid sphere it rises in a straight line inside and falls as 1 over r squared outside.');
+  line(s,40,176,326,176,INK,1.5);line(s,40,176,40,18,INK,1.5);
+  const X=t=>40+80*t,pts=[];for(let t=1;t<=3.45;t+=.05)pts.push(`${X(t).toFixed(1)},${(176-132/(t*t)).toFixed(1)}`);
+  mk(s,'polyline',{points:pts.join(' '),fill:'none',stroke:HI,'stroke-width':2.4});
+  line(s,40,176,120,44,BLUE,2.4);line(s,120,44,120,176,DIM,1.2,'4 3');
+  mk(s,'polyline',{points:'40,176 120,176 120,44',fill:'none',stroke:'#ff8a8a','stroke-width':2.4,'stroke-dasharray':'7 4'});
+  text(s,120,194,'R',13,INK,'middle',700);text(s,330,192,'r',13,DIM,'end');text(s,46,16,'g',13,DIM,'start');
+  text(s,176,70,'outside: GM/r²',12,HI,'start',700);text(s,56,36,'solid sphere inside: GMr/R³',12,BLUE,'start',700);text(s,52,168,'shell inside: 0',12,'#ff8a8a','start',700);
+  return s}
+function orbit(){const s=svg(340,210,'An elliptical orbit with the Sun at one focus. The planet moves fastest at the point nearest the Sun, perihelion, and slowest at the farthest point, aphelion. Equal areas are swept in equal times.');
+  const cx=168,cy=104,a=134,b=74,c=Math.sqrt(a*a-b*b);mk(s,'ellipse',{cx,cy,rx:a,ry:b,fill:'none',stroke:INK,'stroke-width':2});
+  mk(s,'circle',{cx:cx+c,cy,r:9,fill:HI});text(s,cx+c,cy+26,'Sun',12,HI,'middle',700);
+  mk(s,'circle',{cx:cx+a,cy,r:5,fill:BLUE});mk(s,'circle',{cx:cx-a,cy,r:5,fill:BLUE});
+  text(s,cx+a-6,cy-28,'perihelion',12,BLUE,'end',700);text(s,cx+a-6,cy-14,'fastest',12,DIM,'end');text(s,cx-a+8,cy-28,'aphelion',12,BLUE,'start',700);text(s,cx-a+8,cy-14,'slowest',12,DIM,'start');
+  line(s,cx-a,cy,cx+a,cy,DIM,1,'4 3');text(s,cx-c,cy+18,'2a',12,DIM,'middle');
+  text(s,12,16,'T² ∝ a³, r v = constant at the ends',13,INK,'start',700);text(s,12,198,'equal areas in equal times',12,DIM,'start');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit};
 })();
