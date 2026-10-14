@@ -273,3 +273,5 @@ Board sharpness: canvas no longer forced to 0.67 resolution on wide screens (was
 PDF export: slide JPEG quality back to 0.93 (was 0.82), so text stays sharp when zoomed on a board.
 
 PYQ download: optional checkbox 'Add a blank working slide after each question' (PDF and PPT).
+
+Landing lag: black hole scene capped at 2.4 MP (4.2 MP on boards), background paced at 30 fps. Look unchanged.

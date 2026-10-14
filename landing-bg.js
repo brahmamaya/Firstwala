@@ -102,13 +102,16 @@ const free=o=>{if(o){gl.deleteTexture(o.tx);gl.deleteFramebuffer(o.fb)}};
 function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(matchMedia('(pointer:coarse)').matches?1.5:2,window.devicePixelRatio||1); // sharper: full resolution, up to 2x on computers
   cv.width=Math.max(2,Math.round(W*k));cv.height=Math.max(2,Math.round(H*k));
   // on 4K-size screens the ray-traced scene stays near 4.2 megapixels (the final image is full resolution)
-  const px=W*k*H*k,cap=px>6e6?Math.sqrt(4.2e6/px):1;sceneW=Math.max(2,Math.round(W*k*scale*cap));sceneH=Math.max(2,Math.round(H*k*scale*cap));
+  const px=W*k*H*k,lim=document.documentElement.classList.contains('board')?4.2e6:2.4e6,cap=px>lim?Math.sqrt(lim/px):1;sceneW=Math.max(2,Math.round(W*k*scale*cap));sceneH=Math.max(2,Math.round(H*k*scale*cap));
   free(A);free(B1);free(B2);free(H0);free(H1);A=target(sceneW,sceneH);H0=target(sceneW,sceneH);H1=target(sceneW,sceneH);fresh=true;const bw=Math.max(2,sceneW>>2),bh=Math.max(2,sceneH>>2);B1=target(bw,bh);B2=target(bw,bh);gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
 const pass=(P,o)=>{gl.bindFramebuffer(gl.FRAMEBUFFER,o?o.fb:null);gl.viewport(0,0,o?o.w:cv.width,o?o.h:cv.height);gl.useProgram(P.p)};
 const ease=x=>x*x*x*(x*(x*6-15)+10);
+let lastPaint=0;
 function draw(now){
   // stop completely while the background is not on screen (page hidden, landing closed or scrolled away)
   if(running&&!dv&&(document.hidden||!cv.getClientRects().length)){running=false;return}
+  // 30 frames a second: the background moves slowly, so this halves the work on every device without losing the look
+  if(running&&!dv&&now-lastPaint<31){raf=requestAnimationFrame(draw);return}lastPaint=now;
   const dt=Math.min(.1,last?(now-last)/1000:.016);last=now;
   // the fall runs on the clock, not on frames, so it lasts 1.45 s on every device
   if(dv>0)dv=Math.max(.001,Math.min(1,(now-diveT)/1450));
