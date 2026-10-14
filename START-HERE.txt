@@ -283,3 +283,12 @@ Landing lag: black hole scene capped at 2.4 MP (4.2 MP on boards), background pa
 - Laws of Motion (JEE Mains): rank-lom-jee.js (27 formulas, 16 must-know, 7 revise groups, 13 most-asked types, guide) + incline and atwood diagrams in rank-figs.js. Uses the existing Laws of Motion mock bank (45 questions). No PYQs tab until the PYQ file is provided. rank-neet.js: READY and PYQ_CH lists decide which chapters are open and which show PYQs.
 
 - Laws of Motion PYQs (JEE Mains): rank-pyq-lom.js has 251 past-year questions with worked solutions and 87 diagrams in 5 topics / 21 sub-topics. Q137 left out (book says no option correct); Q70 and Q173 use the physically correct option because the printed key is wrong. Source: MTG chapterwise PDF.
+
+## Quality rules for every chapter (standing instruction from the owner)
+Applies to every Rank mode chapter (page content and past-year questions). Do not skip a step to save time.
+1. Transcribe past-year questions exactly from the book (numbers, units, options). Questions the book key marks "none correct" are left out.
+2. Never copy a printed answer key blindly. Solve every question yourself; where the key is physically wrong, store the physically correct option and say so in the solution (done for Kinematics Q215, Laws of Motion Q70 and Q173).
+3. Run an independent verification pass: fresh checkers solve each question BEFORE seeing the stored answer, then compare answer, solution steps, question text, options, exam label, topic and diagram. Fix everything they confirm.
+4. Diagrams: render all of them on a contact sheet and look at them (values, labels, option panels in the right order, nothing cut off).
+5. Run node tools/pyq-lint.js (structure checks) and tools/secret-guard.js before every push. Test the chapter in Playwright (desktop + phone), including PYQ download, with no page errors.
+6. Formulas, Revise, Most asked and Guide must match the quality of the Units and Measurements page (worked examples that are numerically checked).
