@@ -292,3 +292,5 @@ Applies to every Rank mode chapter (page content and past-year questions). Do no
 4. Diagrams: render all of them on a contact sheet and look at them (values, labels, option panels in the right order, nothing cut off).
 5. Run node tools/pyq-lint.js (structure checks) and tools/secret-guard.js before every push. Test the chapter in Playwright (desktop + phone), including PYQ download, with no page errors.
 6. Formulas, Revise, Most asked and Guide must match the quality of the Units and Measurements page (worked examples that are numerically checked).
+
+- Work, Energy and Power (JEE Mains): rank-wep-jee.js (27 formulas, 16 must-know, 7 revise groups, 14 most-asked types, guide) and rank-pyq-wep.js (258 PYQs with solutions and 73 diagrams, 5 topics). Q90, Q229, Q233 left out (key: none correct). Q115 (22 N) and Q224 (option b) override the printed key after independent checks. All questions were solved blind a second time by independent checkers. rank-neet.js now uses one CHAPS registry: add a chapter there, in build.js and JEE_CH.
