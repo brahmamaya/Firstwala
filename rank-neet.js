@@ -9,7 +9,7 @@ const MK=/\^\(|\{|√|[A-Za-zα-ωΔ)][⁰-⁹²³′₀-₉]*\/[A-Za-zα-ω(]/;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const U=()=>X.data(),CH=()=>U()?.chapter,MC=()=>CH()==='Kinematics'?'Motion in a Straight Line':CH(),PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[MC()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge'},tname=tp=>PB()[MC()]?.topics?.[tp]||TN[tp]||tp;
+const U=()=>X.data(),CH=()=>U()?.chapter,MC=()=>CH()==='Kinematics'?'Motion in a Straight Line':CH(),PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[MC()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge',pkd:'Motion in a straight line: speed, velocity and graphs',pke:'Equations of motion and free fall',pkv:'Vectors',pkr:'Relative velocity',pkp:'Motion in a plane',pkj:'Projectile motion',pkc:'Circular motion'},tname=tp=>PB()[MC()]?.topics?.[tp]||TN[tp]||tp;
 let seen=[];
 const KEY=()=>X.key+(chap==='Kinematics'?'-kin':'');
 const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY()));seen=Array.isArray(s?.seen)?s.seen.filter(Number.isInteger):[]}catch{seen=[]}},save=()=>{try{localStorage.setItem(KEY(),JSON.stringify({seen}))}catch{}};
@@ -29,7 +29,7 @@ function esc(e){if(e.key==='Escape'&&ov)goBack()}
 function setHead(){const back=btn('rk-back','← Back',goBack);back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',picking()?X.label:(chap||CH())),el('span','',picking()?'Rank mode · choose a subject':'Rank mode · '+X.label+(X.pick?' · Physics':'')));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||(X.pyq&&CH()==='Units and Measurements'))){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
+  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||X.pyq)){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
   head.replaceChildren(back,t,tabsEl);ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''))}
 function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
   ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.dataset.testid='rank-neet-page';
@@ -64,7 +64,7 @@ function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-vi
 /* JEE: pick a subject, then a chapter. Only Units and Measurements has content so far; the others open the same page with "coming soon". */
 function chooser(p){if(subj!=='physics'){const c=el('div','rk-card rk-center wide');c.append(el('h3','',SUBJ.find(x=>x[0]===subj)[1]+' chapters are coming soon'),el('p','rk-how','Physics is ready to explore. Open it from the buttons above.'));p.append(c);return}
   for(const [cls,list] of JEE_CH){const c=el('div','rk-card'),l=el('div','rk-chlist');c.append(el('h3','',cls+' Physics'));
-    list.forEach((n,i)=>{const b=btn('rk-ch'+(READY.includes(n)?'':' soon'),null,()=>{chap=n;tab='guide';load();setHead();home()});b.append(el('i','',String(i+1)),el('span','',n),el('b','',READY.includes(n)?'Ready':'Soon'));b.dataset.testid='rk-ch-'+(i+1)+(cls==='Class 12'?'b':'a');l.append(b)});c.append(l);p.append(c)}}
+    list.forEach((n,i)=>{const b=btn('rk-ch'+(READY.includes(n)?'':' soon'),null,()=>{chap=n;tab='guide';load();selSet.clear();selOn=false;setHead();home()});b.append(el('i','',String(i+1)),el('span','',n),el('b','',READY.includes(n)?'Ready':'Soon'));b.dataset.testid='rk-ch-'+(i+1)+(cls==='Class 12'?'b':'a');l.append(b)});c.append(l);p.append(c)}}
 function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Units and Measurements and Kinematics are ready now.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 /* small typesetter. parse() turns the markup into nodes (text, power, fraction, radical) that the page draws with DOM
@@ -113,20 +113,20 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   let c=card('Your study plan',1);const pl=el('ol','rk-path');for(const [d,t] of G.plan){const li=el('li');li.append(el('b','',d),el('span','',t));pl.append(li)}c.append(pl);
   c=card('Know these before you start',2);c.append(el('p','rk-how','If any of these feels shaky, fix it first. Fixing it takes about 10 minutes.'));list(c,G.basics);
   c=card('Your path through the chapter',3);const ol=el('ol','rk-path');
-  G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));for(const g of [x.go,x.go2].filter(Boolean)){li.append(btn('rk-mini',g==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Revise',asked:'Most asked',mock:'Mock test'})[g],()=>g==='practice'?needQ(()=>runSet(pick(N),'Practice'),'practice questions'):go(g)))}ol.append(li)});c.append(ol);
+  G.path.forEach(x=>{const li=el('li');li.append(el('b','',x.t),el('span','',x.d),el('em','','You are ready when: '+x.ready));for(const g of [x.go,x.go2].filter(Boolean)){li.append(btn('rk-mini',g==='practice'?'Start practice':'Open '+({formulas:'Formulas',notes:'Revise',asked:'Most asked',mock:'Mock test',pyq:'Past-year questions'})[g],()=>g==='practice'?needQ(()=>runSet(pick(N),'Practice'),'practice questions'):go(g)))}ol.append(li)});c.append(ol);
   c=card('How to think when you meet any question',4);list(c,G.think,true);
   c=card('What to keep in mind',5);list(c,G.watch);
   c=el('div','rk-card wide rk-myths');c.append(el('h3','','6 · Common misconceptions'));const g=el('div','rk-mgrid');
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
-let pyqWait=null;const loadPyq=()=>window.PhysicaRankPyq?Promise.resolve():pyqWait||(pyqWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__PYQ_URL__';s.async=true;s.onload=ok;s.onerror=()=>{pyqWait=null;s.remove();no()};document.head.append(s)}));
+let pyqWait=null;const PQ=()=>CH()==='Kinematics'?window.PhysicaRankPyqKin:window.PhysicaRankPyq,loadPyq=()=>PQ()?Promise.resolve():pyqWait||(pyqWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__PYQ_URL__';s.async=true;s.onload=ok;s.onerror=()=>{pyqWait=null;s.remove();no()};document.head.append(s)}));
 let exWait=null;const loadExport=()=>window.PhysicaRankExport?Promise.resolve():exWait||(exWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__EXPORT_URL__';s.async=true;s.onload=ok;s.onerror=()=>{exWait=null;s.remove();no()};document.head.append(s)}));
 let selOn=false;const selSet=new Set();
 const ABC='abcd',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
-function pyq(p){const L=window.PhysicaRankPyq,idx=L&&new Map(L.map((q,i)=>[q,i]));
+function pyq(p){const L=PQ(),idx=L&&new Map(L.map((q,i)=>[q,i]));
   if(!L){p.append(loadCard('past-year questions'));loadPyq().then(()=>{if(ov&&tab==='pyq'&&view.className==='rk-view')home()},()=>{if(ov&&tab==='pyq')view.replaceChildren(failCard(home))});return}
-  const card=(q,n)=>{const c=el('div','rk-card'),hd=el('div','rk-qhead');hd.append(el('span','rk-qn','Q'+(n+1)),el('span','rk-year',q.y));c.append(hd,el('p','rk-q',q.q));
+  const card=(q,n)=>{const c=el('div','rk-card'),hd=el('div','rk-qhead');hd.append(el('span','rk-qn','Q'+(n+1)),el('span','rk-year',q.y));c.append(hd,el('p','rk-q',q.q));{const g=q.fig&&window.PhysicaFig?.(q.fig);if(g){g.classList.add('rk-fig');c.append(g)}}
     const i=idx.get(q),lab=el('label','rk-pick'),cb=el('input');cb.type='checkbox';cb.checked=selSet.has(i);cb.setAttribute('aria-label','Select question');c._i=i;c.classList.toggle('picked',cb.checked);
     cb.addEventListener('change',()=>{cb.checked?selSet.add(i):selSet.delete(i);c.classList.toggle('picked',cb.checked);refresh()});lab.append(cb,el('span','','Select'));hd.prepend(lab);
     if(q.o){const ops=el('ol','rk-pyqo');for(const o of q.o)ops.append(el('li','',o));c.append(ops)}
@@ -178,7 +178,7 @@ function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L
   ok.focus?.()}
 function asked(p){p.append(el('p','rk-lead wide','These question types come up again and again. For each one: read the 3 steps, see the example, then practise it.'));
   U().asked.forEach((a,i)=>{const c=el('div','rk-card');c.append(el('span','rk-num',String(i+1)),el('h3','',a.t),el('p','rk-how',a.what),label('Steps'));const ol=el('ol','rk-steps');for(const s of a.steps)ol.append(el('li','',s));c.append(ol);
-    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),math(a.ex));c.append(e,btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))));p.append(c)})}
+    const fg=a.fig&&fig(a.fig);if(fg)c.append(fg);const e=el('p','rk-ex');e.append(el('b','','Example '),math(a.ex));c.append(e,a.tp?btn('rk-mini','Practise this type',()=>needQ(()=>runSet(pick(TOPIC,a.tp),tname(a.tp)))):btn('rk-mini','Past-year questions',()=>go(a.go||'pyq')));p.append(c)})}
 
 /* ---------- a set of questions ---------- */
 let tm=0;const stopT=()=>{clearInterval(tm);tm=0};
