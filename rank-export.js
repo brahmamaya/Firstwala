@@ -163,7 +163,7 @@ async function make({items,withSol,format,meta,onProgress,cancelled}){
   for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');specs.push(await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
-  const jpgs=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');const cv=drawSlide(specs[i],logo);jpgs.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.82)).then(b=>b.arrayBuffer())));onProgress?.(N+1,N+1,i+1,specs.length);await new Promise(r=>setTimeout(r))}
+  const jpgs=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');const cv=drawSlide(specs[i],logo);jpgs.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(N+1,N+1,i+1,specs.length);await new Promise(r=>setTimeout(r))}
   return makePDF(jpgs)}
 window.PhysicaRankExport={make};
 })();
