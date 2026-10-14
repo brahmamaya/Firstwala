@@ -263,3 +263,5 @@ Landing: two buttons (Simulations, Rank mode). Simulations expands to Student an
 Landing: choosing Student or Teacher opens the simulations directly; the 'Open simulations' button is hidden.
 
 PYQ slides: logo fixed at the top-right corner (question starts below it); question uses the full page width; Q number in a green pill and exam/year in a yellow pill, both bold.
+
+PYQ download on iPad/iPhone: no download link any more (it could be saved as .txt); the PDF/PPT opens in the browser's viewer with a Save to Files button.
