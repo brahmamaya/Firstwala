@@ -1,5 +1,5 @@
 /* Rank mode · JEE Mains Physics · Rotational Motion (system of particles and rotational motion). Same page as the other chapters;
-   no past-year questions yet. Loaded with the JEE pack. Plain data only; the diagrams (roll, ladder) are drawn by rank-figs.js.
+   past-year questions are in the rank-pyq file. Loaded with the JEE pack. Plain data only; the diagrams (roll, ladder) are drawn by rank-figs.js.
    F(section, level, name, formulas, how to apply, example, diagram): level 1 = must know, 2 = also useful. */
 (() => {
 'use strict';
@@ -65,7 +65,7 @@ plan:[
 ['Day 3 · 2 hours','Rotational kinematics, τ = Iα, the massive pulley and the rod hinged at one end.'],
 ['Day 4 · 2 hours','Angular momentum, its conservation, and collisions with rotating bodies.'],
 ['Day 5 · 2 hours','Rolling motion: energy, the incline, friction, and slipping to rolling.'],
-['Day 6 · 90 min','Practise by question type, take one mock test and read the Revise tab the day before the exam.']],
+['Day 6 · 90 min','Practise by question type, solve the past-year questions by sub-topic, take one mock test and read the Revise tab the day before the exam.']],
 basics:['Vector product: the direction by the right-hand rule and the magnitude AB sinθ.','Newton’s laws and free-body diagrams.','Work, energy and power (the Work, Energy and Power chapter).','Linear momentum and collisions.','Equations of straight-line motion for constant acceleration.','Simple integration (needed for I and the centre of mass of continuous bodies).'],
 path:[
 {t:'Step 1 · Centre of mass (Day 1)',d:'Learn the formulas for the standard shapes and the motion of the centre of mass.',ready:'you can find the centre of mass of any composite shape and use Σm Δx = 0.',go:'formulas'},
@@ -73,7 +73,7 @@ path:[
 {t:'Step 3 · Rotational dynamics (Day 3)',d:'Use τ = Iα with a pulley or a hinged rod, and energy for the rod.',ready:'you can solve a massive pulley question in two minutes.',go:'formulas'},
 {t:'Step 4 · Angular momentum (Day 4)',d:'Check the external torque, then conserve L, including for collisions.',ready:'you can find the new ω and the energy change for a skater or a turntable.',go:'asked'},
 {t:'Step 5 · Rolling (Day 5)',d:'Learn K = ½Mv²(1 + k²/R²), the incline and the slipping case.',ready:'you can rank rolling bodies on a slope and find the least friction.',go:'notes'},
-{t:'Step 6 · Practise, then test (Day 6)',d:'Practise by question type, then take the mock test.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'mock'}],
+{t:'Step 6 · Practise, past-year questions, then test (Day 6)',d:'Practise by question type, open the past-year questions by sub-topic, then take the mock test.',ready:'you score 8 out of 10 in practice twice in a row.',go:'practice',go2:'pyq'}],
 think:['Read once and name the type: centre of mass, torque, inertia, dynamics, angular momentum or rolling.','Draw the axis of rotation and mark every force and its perpendicular distance.','Write the equations for translation and for rotation separately.','Check conservation first: external force for momentum, external torque for angular momentum, no friction loss for energy.','For rolling add the constraint v = ωR.','For a pulley with mass, write τ = Iα as well as ΣF = ma.','Check the answer: I about any axis cannot be less than I(cm) about the parallel axis through the centre of mass, and the sign of ω must match the direction you chose.','MCQs have negative marking: remove two wrong options before guessing.'],
 watch:['Take torque and angular momentum about the same point.','The parallel axis theorem needs the axis through the centre of mass first.','The perpendicular axis theorem works only for flat bodies.','Kinetic energy of a rolling body has two parts: translation and rotation.','Static friction in pure rolling does no work and is not μN.','Angular momentum is conserved only if the external torque is zero, but the energy may change.','A pulley with mass has different tensions on the two sides.','Use I of the whole system about the axis when something sticks to it.'],
 myths:[
