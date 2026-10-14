@@ -271,3 +271,5 @@ PYQ slides: question and option size back to the earlier 46 px max, so the solut
 Board sharpness: canvas no longer forced to 0.67 resolution on wide screens (was blurry); render floor 0.75 (boards 0.9); labels scale up on screens wider than 1600 px.
 
 PDF export: slide JPEG quality back to 0.93 (was 0.82), so text stays sharp when zoomed on a board.
+
+PYQ download: optional checkbox 'Add a blank working slide after each question' (PDF and PPT).

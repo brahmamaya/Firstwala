@@ -148,19 +148,20 @@ function pyq(p){const L=window.PhysicaRankPyq,idx=L&&new Map(L.map((q,i)=>[q,i])
 const PAPERS=['JEE Main','JEE Advanced','IIT-JEE','AIEEE'];
 function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L[i],topic:tname(L[i].tp)+' · '+L[i].st}));if(!items.length)return;
   const m=el('div','rk-modal'),box=el('div','rk-dlg');m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Download slides');m.append(box);ov.append(m);
-  let inc=null,fmt=null,stop=false;const done=()=>{stop=true;m.remove()};
+  let inc=null,fmt=null,stop=false,blank=false;const done=()=>{stop=true;m.remove()};
   const group=(title,name,opts,set)=>{const f=el('fieldset','rk-fs');f.append(el('legend','',title+' (choose one)'));for(const [v,l,sub] of opts){const lb=el('label','rk-ropt'),r=el('input');r.type='radio';r.name=name;r.value=v;r.dataset.testid='dl-'+v;r.addEventListener('change',()=>{set(v);ok.disabled=!(inc&&fmt);ok.setAttribute('aria-disabled',String(ok.disabled))});const t=el('span');t.append(el('b','',l),el('small','',sub));lb.append(r,t);f.append(lb)}return f};
   const ok=btn('rk-btn','Download',()=>go2());ok.disabled=true;ok.dataset.testid='dl-go';
   box.append(el('h3','','Download '+items.length+' question'+(items.length>1?'s':'')+' as slides'),
     group('Include','inc',[['q','Only questions','Space left below each question. The answer sits at the bottom right.'],['qs','Questions + solutions','The answer and worked solution are written below each question.']],v=>inc=v),
     group('Format','fmt',[['pdf','PDF','Slides saved as pages, ready to print or project.'],['ppt','PowerPoint (.pptx)','Editable text boxes: change, add or delete anything.']],v=>fmt=v));
+  const bl=el('label','rk-ropt'),bc=el('input');bc.type='checkbox';bc.dataset.testid='dl-blank';bc.addEventListener('change',()=>{blank=bc.checked});const bt=el('span');bt.append(el('b','','Add a blank working slide after each question'),el('small','','For working out the answer on a separate slide. Optional.'));bl.append(bc,bt);box.append(bl);
   const row=el('div','rk-dlgrow');row.append(btn('rk-link','Cancel',done),ok);box.append(row);
   const go2=async()=>{if(!(inc&&fmt))return;box.replaceChildren(el('h3','','Preparing your slides…'));const pr=el('p','rk-how','Loading…'),bar=el('div','rk-bar'),fill=el('i');bar.append(fill);box.append(pr,bar,btn('rk-link','Cancel',done));
     try{await loadExport();if(items.some(x=>x.q.fig))await window.PhysicaLoadTutorPack?.();
       const paper=y=>y.replace(/\s+(19|20)\d\d.*$/,''),papers=PAPERS.filter(a=>items.some(x=>paper(x.q.y)===a)),tps=[];
       for(const x of items){let t=tps.find(z=>z.tp===x.q.tp);if(!t)tps.push(t={tp:x.q.tp,name:tname(x.q.tp),n:0,subs:[]});t.n++;const s2=t.subs.find(z=>z[0]===x.q.st);s2?s2[1]++:t.subs.push([x.q.st,1])}
       const meta={chapter:CH(),exam:X.label,subject:'Physics',cls:(JEE_CH.find(c=>c[1].includes(CH()))||['Class 11'])[0],papers,topics:tps};
-      const blob=await window.PhysicaRankExport.make({items,withSol:inc==='qs',format:fmt,meta,cancelled:()=>stop,onProgress:(i,n,j,t)=>{const v=j?(n+j)/(n+t):i/(n+t);fill.style.width=Math.round(v*100)+'%';pr.textContent=j?'Saving page '+j+' of '+t+'…':'Making slide '+i+' of '+n+'…'}});
+      const blob=await window.PhysicaRankExport.make({items,withSol:inc==='qs',blank,format:fmt,meta,cancelled:()=>stop,onProgress:(i,n,j,t)=>{const v=j?(n+j)/(n+t):i/(n+t);fill.style.width=Math.round(v*100)+'%';pr.textContent=j?'Saving page '+j+' of '+t+'…':'Making slide '+i+' of '+n+'…'}});
       if(stop)return;const nm=['Physica',X.label,CH(),'PYQs',inc==='qs'?'with-solutions':'questions'].join('-').replace(/[^A-Za-z0-9-]+/g,'-')+(fmt==='ppt'?'.pptx':'.pdf'),url=URL.createObjectURL(blob),
         /* iPad / iPhone: a blob download there can be saved as a .txt file, so never use a download link on them.
            Instead the file opens in its own viewer (share button there saves it to Files), or the share sheet opens. */
