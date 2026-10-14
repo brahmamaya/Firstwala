@@ -3,7 +3,7 @@
    Loaded with the tutor pack, only when the student opens NEET. Nothing leaves the device (localStorage). */
 (() => {
 'use strict';
-const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,pick:1,key:'physica-rank-jee',label:'JEE Mains',data:()=>chap==='Kinematics'?window.PhysicaRankKinJee:window.PhysicaRankUnitsJee,bank:'jee',target:90}};
+const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,pick:1,key:'physica-rank-jee',label:'JEE Mains',data:()=>chap==='Kinematics'?window.PhysicaRankKinJee:chap==='Laws of Motion'?window.PhysicaRankLomJee:window.PhysicaRankUnitsJee,bank:'jee',target:90}};
 let X=EX.neet;const N=10,TOPIC=8;
 const MK=/\^\(|\{|√|[A-Za-zα-ωΔ)][⁰-⁹²³′₀-₉]*\/[A-Za-zα-ω(]/;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
@@ -11,7 +11,7 @@ const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventList
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const U=()=>X.data(),CH=()=>U()?.chapter,MC=()=>CH()==='Kinematics'?'Motion in a Straight Line':CH(),PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[MC()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge',pkd:'Motion in a straight line: speed, velocity and graphs',pke:'Equations of motion and free fall',pkv:'Vectors',pkr:'Relative velocity',pkp:'Motion in a plane',pkj:'Projectile motion',pkc:'Circular motion'},tname=tp=>PB()[MC()]?.topics?.[tp]||TN[tp]||tp;
 let seen=[];
-const KEY=()=>X.key+(chap==='Kinematics'?'-kin':'');
+const KEY=()=>X.key+({Kinematics:'-kin','Laws of Motion':'-lom'}[chap]||'');
 const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY()));seen=Array.isArray(s?.seen)?s.seen.filter(Number.isInteger):[]}catch{seen=[]}},save=()=>{try{localStorage.setItem(KEY(),JSON.stringify({seen}))}catch{}};
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
   if(out.length<n)out.push(...shuffle(ids.filter(i=>!out.includes(i))).slice(0,n-out.length));return out}
@@ -19,7 +19,7 @@ function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===
 let showAll=false,chap=null,subj='physics',head=null,ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
 const JEE_CH=[['Class 11',['Units and Measurements','Kinematics','Laws of Motion','Work, Energy and Power','Rotational Motion','Gravitation','Properties of Solids and Liquids','Thermodynamics','Kinetic Theory of Gases','Oscillations and Waves']],
   ['Class 12',['Electrostatics','Current Electricity','Magnetic Effects of Current and Magnetism','Electromagnetic Induction and Alternating Current','Electromagnetic Waves','Optics','Dual Nature of Matter and Radiation','Atoms and Nuclei','Electronic Devices','Experimental Skills']]];
-const READY=['Units and Measurements','Kinematics'];
+const READY=['Units and Measurements','Kinematics','Laws of Motion'],PYQ_CH=['Units and Measurements','Kinematics'];
 const picking=()=>X.pick&&!chap,ready=()=>!X.pick||READY.includes(chap),TABS=[['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['pyq','PYQs'],['mock','Mock test']],SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['maths','Maths']];
 const SECS0=['Dimensions','Units','Significant figures','Errors','Instruments'],secs=()=>U().secs||SECS0;
 function close(){if(!ov)return;stopT();ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);removeEventListener('resize',onRz);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
@@ -29,7 +29,7 @@ function esc(e){if(e.key==='Escape'&&ov)goBack()}
 function setHead(){const back=btn('rk-back','← Back',goBack);back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',picking()?X.label:(chap||CH())),el('span','',picking()?'Rank mode · choose a subject':'Rank mode · '+X.label+(X.pick?' · Physics':'')));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||X.pyq)){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
+  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||(X.pyq&&PYQ_CH.includes(CH())))){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
   head.replaceChildren(back,t,tabsEl);ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''))}
 function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
   ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.dataset.testid='rank-neet-page';
@@ -65,7 +65,7 @@ function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-vi
 function chooser(p){if(subj!=='physics'){const c=el('div','rk-card rk-center wide');c.append(el('h3','',SUBJ.find(x=>x[0]===subj)[1]+' chapters are coming soon'),el('p','rk-how','Physics is ready to explore. Open it from the buttons above.'));p.append(c);return}
   for(const [cls,list] of JEE_CH){const c=el('div','rk-card'),l=el('div','rk-chlist');c.append(el('h3','',cls+' Physics'));
     list.forEach((n,i)=>{const b=btn('rk-ch'+(READY.includes(n)?'':' soon'),null,()=>{chap=n;tab='guide';load();selSet.clear();selOn=false;setHead();home()});b.append(el('i','',String(i+1)),el('span','',n),el('b','',READY.includes(n)?'Ready':'Soon'));b.dataset.testid='rk-ch-'+(i+1)+(cls==='Class 12'?'b':'a');l.append(b)});c.append(l);p.append(c)}}
-function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Units and Measurements and Kinematics are ready now.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
+function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Units and Measurements, Kinematics and Laws of Motion are ready now.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 /* small typesetter. parse() turns the markup into nodes (text, power, fraction, radical) that the page draws with DOM
    elements and the slide export draws on a canvas / writes into PowerPoint.
