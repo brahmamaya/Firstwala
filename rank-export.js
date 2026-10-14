@@ -61,9 +61,9 @@ async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,
   els.push({t:'pill',x:PAD,y:hy,w:qw,h:hh,fill:'#0c3a28',stroke:'#3ddc97',text:qn,color:'#3ddc97',fs:30});
   cx.font=F(26,1);const yr=String(q.y),yw=cx.measureText(yr).width+40;
   els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:'#262006',stroke:'#ffd54a',text:yr,color:'#ffd54a',fs:26});
-  const top=BAND+20,bottom=withSol?640:H-130;
+  const top=BAND+20,bottom=withSol?600:H-130;
   const areaH=bottom-top,figW=fig?Math.min(560,Math.round(areaH*.6*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
-  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:Math.max(ql.h,fig?figW/fig.ar:0)+(ob?fs*.8+ob.h:0)}},58,24,areaH);
+  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,W-PAD*2):null;return{fs,ql,ob,h:Math.max(ql.h,fig?figW/fig.ar:0)+(ob?fs*.8+ob.h:0)}},46,22,areaH);
   const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
   if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
   let y=top+Math.max(blk.ql.h,fig?figW/fig.ar:0);

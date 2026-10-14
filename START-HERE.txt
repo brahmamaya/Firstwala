@@ -265,3 +265,5 @@ Landing: choosing Student or Teacher opens the simulations directly; the 'Open s
 PYQ slides: logo fixed at the top-right corner (question starts below it); question uses the full page width; Q number in a green pill and exam/year in a yellow pill, both bold.
 
 PYQ download on iPad/iPhone: no download link any more (it could be saved as .txt); the PDF/PPT opens in the browser's viewer with a Save to Files button.
+
+PYQ slides: question and option size back to the earlier 46 px max, so the solution has room below.
