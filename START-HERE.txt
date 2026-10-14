@@ -261,3 +261,5 @@ Landing black hole restored to the earlier settings (60 fps, full resolution); i
 Landing: two buttons (Simulations, Rank mode). Simulations expands to Student and Teacher, which work as before.
 
 Landing: choosing Student or Teacher opens the simulations directly; the 'Open simulations' button is hidden.
+
+PYQ slides: logo fixed at the top-right corner (question starts below it); question uses the full page width; Q number in a green pill and exam/year in a yellow pill, both bold.
