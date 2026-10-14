@@ -116,5 +116,31 @@ function atwood(){const s=svg(340,210,'Atwood machine: two masses m1 and m2 hang
   text(s,170,206,'m₁ > m₂',12,DIM,'middle');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood};
+/* Work, Energy and Power: work as the area under an F–x graph, a vertical circle and a head-on collision */
+function fx(){const s=svg(340,200,'Force against displacement. The work done is the area under the graph: a triangle for a force that rises steadily, then a rectangle for a constant force. Area below the axis counts as negative work.');
+  line(s,40,110,320,110,INK,1.5);line(s,40,190,40,16,INK,1.5);
+  mk(s,'path',{d:'M40 110 L130 40 L130 110 Z',fill:HI,'fill-opacity':'.2',stroke:'none'});mk(s,'path',{d:'M130 110 L130 40 L230 40 L230 110 Z',fill:BLUE,'fill-opacity':'.2',stroke:'none'});mk(s,'path',{d:'M230 110 L230 150 L290 150 L290 110 Z',fill:'#ff8a8a','fill-opacity':'.25',stroke:'none'});
+  mk(s,'polyline',{points:'40,110 130,40 230,40 230,150 290,150 290,110',fill:'none',stroke:INK,'stroke-width':2.2});
+  text(s,314,128,'x',13,DIM,'start');text(s,46,14,'F',13,DIM,'start');
+  text(s,100,100,'½F₀x₁',12,HI,'middle',700);text(s,180,82,'F₀(x₂ − x₁)',12,BLUE,'middle',700);text(s,262,138,'negative',12,'#ff8a8a','middle',700);
+  text(s,20,176,'W = ∫F dx = area under the graph',13,INK,'start',700);
+  return s}
+function vloop(){const s=svg(340,246,'A ball on a string moving in a vertical circle of radius r. At the top the tension and weight both point down to the centre; at the bottom the tension points up and the weight down.');
+  const cx=170,cy=116,r=72;mk(s,'circle',{cx,cy,r,fill:'none',stroke:DIM,'stroke-width':1.4,'stroke-dasharray':'5 4'});mk(s,'circle',{cx,cy,r:3,fill:INK});
+  line(s,cx,cy,cx,cy+r,INK,1.5);line(s,cx,cy,cx,cy-r,INK,1.5);
+  for(const [y,t] of [[cy-r,'top'],[cy+r,'bottom']]){mk(s,'circle',{cx,cy:y,r:8,fill:'#17314f',stroke:BLUE,'stroke-width':2})}
+  vec(s,cx,cy-r,cx,cy-r+34,BLUE);text(s,cx+16,cy-r+24,'T',13,BLUE,'start',700);vec(s,cx+10,cy-r,cx+10,cy-r+34,'#ff8a8a');text(s,cx+26,cy-r+6,'mg',12,'#ff8a8a','start',700);
+  vec(s,cx,cy+r,cx,cy+r-34,BLUE);text(s,cx+16,cy+r-24,'T',13,BLUE,'start',700);vec(s,cx+10,cy+r,cx+10,cy+r+30,'#ff8a8a');text(s,cx+26,cy+r+22,'mg',12,'#ff8a8a','start',700);
+  text(s,8,16,'top: T + mg = mv²/r',12,INK,'start',700);text(s,8,32,'v ≥ √(gr)',12,HI,'start',700);
+  text(s,332,226,'bottom: T − mg = mv²/r',12,INK,'end',700);text(s,332,242,'v ≥ √(5gr)',12,HI,'end',700);
+  return s}
+function coll(){const s=svg(340,200,'Head-on collision of two blocks. Before: m1 moves right with speed u1 and m2 moves with u2. After: they move with v1 and v2.');
+  const row=(y,lab,a,b,c1,c2)=>{text(s,8,y-34,lab,12,DIM,'start',700);line(s,10,y+20,330,y+20,DIM,1.2);
+    mk(s,'rect',{x:60,y:y-20,width:50,height:40,rx:4,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});text(s,85,y+5,'m₁',14,INK,'middle',700);
+    mk(s,'rect',{x:210,y:y-14,width:36,height:34,rx:4,fill:'#17314f',stroke:HI,'stroke-width':1.8});text(s,228,y+8,'m₂',13,INK,'middle',700);
+    if(a)vec(s,85,y-28,85+a,y-28,BLUE);if(b)vec(s,228,y-28,228+b,y-28,HI);text(s,85+(a>0?a+4:a-4),y-24,c1,13,BLUE,a>0?'start':'end',700);text(s,228+(b>0?b+4:b-4),y-24,c2,13,HI,b>0?'start':'end',700)};
+  row(62,'BEFORE',46,-30,'u₁','u₂');row(158,'AFTER',-26,40,'v₁','v₂');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll};
 })();

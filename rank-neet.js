@@ -3,15 +3,15 @@
    Loaded with the tutor pack, only when the student opens NEET. Nothing leaves the device (localStorage). */
 (() => {
 'use strict';
-const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,pick:1,key:'physica-rank-jee',label:'JEE Mains',data:()=>chap==='Kinematics'?window.PhysicaRankKinJee:chap==='Laws of Motion'?window.PhysicaRankLomJee:window.PhysicaRankUnitsJee,bank:'jee',target:90}};
+const EX={neet:{key:'physica-rank-neet',label:'NEET Physics',data:()=>window.PhysicaRankUnits,bank:'neet',target:60},jee:{pyq:1,pick:1,key:'physica-rank-jee',label:'JEE Mains',data:()=>window[(CHAPS[chap]||CHAPS['Units and Measurements']).d],bank:'jee',target:90}};
 let X=EX.neet;const N=10,TOPIC=8;
 const MK=/\^\(|\{|√|[A-Za-zα-ωΔ)][⁰-⁹²³′₀-₉]*\/[A-Za-zα-ω(]/;
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null){if(typeof x==='string'&&MK.test(x))e.append(math(x));else e.textContent=x}return e};
 const btn=(c,x,f)=>{const b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const U=()=>X.data(),CH=()=>U()?.chapter,MC=()=>CH()==='Kinematics'?'Motion in a Straight Line':CH(),PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[MC()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge',pkd:'Motion in a straight line: speed, velocity and graphs',pke:'Equations of motion and free fall',pkv:'Vectors',pkr:'Relative velocity',pkp:'Motion in a plane',pkj:'Projectile motion',pkc:'Circular motion',pln:'Newton’s laws and forces',plm:'Momentum and impulse',plc:'Connected bodies and pulleys',plf:'Friction and inclined plane',plr:'Circular motion and banking'},tname=tp=>PB()[MC()]?.topics?.[tp]||TN[tp]||tp;
+const U=()=>X.data(),CH=()=>U()?.chapter,MC=()=>CHAPS[CH()]?.mock||CH(),PB=()=>window.PhysicaMockBank||{},bank=()=>[...(PB()[MC()]?.[X.bank]||[]),...(U()?.extra||[])],TN={units:'Units and SI',dims:'Dimensional analysis',sig:'Significant figures',err:'Errors in measurement',inst:'Vernier and screw gauge',pkd:'Motion in a straight line: speed, velocity and graphs',pke:'Equations of motion and free fall',pkv:'Vectors',pkr:'Relative velocity',pkp:'Motion in a plane',pkj:'Projectile motion',pkc:'Circular motion',pln:'Newton’s laws and forces',plm:'Momentum and impulse',plc:'Connected bodies and pulleys',plf:'Friction and inclined plane',plr:'Circular motion and banking',pww:'Work and the work-energy theorem',pwe:'Potential energy and conservation of energy',pwv:'Motion in a vertical circle',pwp:'Power',pwc:'Collisions'},tname=tp=>PB()[MC()]?.topics?.[tp]||TN[tp]||tp;
 let seen=[];
-const KEY=()=>X.key+({Kinematics:'-kin','Laws of Motion':'-lom'}[chap]||'');
+const KEY=()=>X.key+(CHAPS[chap]?.k||'');
 const load=()=>{try{const s=JSON.parse(localStorage.getItem(KEY()));seen=Array.isArray(s?.seen)?s.seen.filter(Number.isInteger):[]}catch{seen=[]}},save=()=>{try{localStorage.setItem(KEY(),JSON.stringify({seen}))}catch{}};
 function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===tp),fresh=shuffle(ids.filter(i=>!seen.includes(i))),out=fresh.slice(0,n);
   if(out.length<n)out.push(...shuffle(ids.filter(i=>!out.includes(i))).slice(0,n-out.length));return out}
@@ -19,7 +19,8 @@ function pick(n,tp){const B=bank(),ids=B.map((q,i)=>i).filter(i=>!tp||B[i].tp===
 let showAll=false,chap=null,subj='physics',head=null,ov=null,view=null,onClose=null,tab='guide',tabsEl=null;
 const JEE_CH=[['Class 11',['Units and Measurements','Kinematics','Laws of Motion','Work, Energy and Power','Rotational Motion','Gravitation','Properties of Solids and Liquids','Thermodynamics','Kinetic Theory of Gases','Oscillations and Waves']],
   ['Class 12',['Electrostatics','Current Electricity','Magnetic Effects of Current and Magnetism','Electromagnetic Induction and Alternating Current','Electromagnetic Waves','Optics','Dual Nature of Matter and Radiation','Atoms and Nuclei','Electronic Devices','Experimental Skills']]];
-const READY=['Units and Measurements','Kinematics','Laws of Motion'],PYQ_CH=['Units and Measurements','Kinematics','Laws of Motion'];
+/* chapters that are ready: d = content data, q = past-year questions, mock = name in the mock bank when it differs, k = practice-history key suffix */
+const CHAPS={'Units and Measurements':{d:'PhysicaRankUnitsJee',q:'PhysicaRankPyq'},Kinematics:{d:'PhysicaRankKinJee',q:'PhysicaRankPyqKin',mock:'Motion in a Straight Line',k:'-kin'},'Laws of Motion':{d:'PhysicaRankLomJee',q:'PhysicaRankPyqLom',k:'-lom'},'Work, Energy and Power':{d:'PhysicaRankWepJee',q:'PhysicaRankPyqWep',k:'-wep'}},READY=Object.keys(CHAPS),PYQ_CH=READY.filter(k=>CHAPS[k].q);
 const picking=()=>X.pick&&!chap,ready=()=>!X.pick||READY.includes(chap),TABS=[['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['pyq','PYQs'],['mock','Mock test']],SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['maths','Maths']];
 const SECS0=['Dimensions','Units','Significant figures','Errors','Instruments'],secs=()=>U().secs||SECS0;
 function close(){if(!ov)return;stopT();ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);removeEventListener('resize',onRz);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
@@ -65,7 +66,7 @@ function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-vi
 function chooser(p){if(subj!=='physics'){const c=el('div','rk-card rk-center wide');c.append(el('h3','',SUBJ.find(x=>x[0]===subj)[1]+' chapters are coming soon'),el('p','rk-how','Physics is ready to explore. Open it from the buttons above.'));p.append(c);return}
   for(const [cls,list] of JEE_CH){const c=el('div','rk-card'),l=el('div','rk-chlist');c.append(el('h3','',cls+' Physics'));
     list.forEach((n,i)=>{const b=btn('rk-ch'+(READY.includes(n)?'':' soon'),null,()=>{chap=n;tab='guide';load();selSet.clear();selOn=false;setHead();home()});b.append(el('i','',String(i+1)),el('span','',n),el('b','',READY.includes(n)?'Ready':'Soon'));b.dataset.testid='rk-ch-'+(i+1)+(cls==='Class 12'?'b':'a');l.append(b)});c.append(l);p.append(c)}}
-function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Units and Measurements, Kinematics and Laws of Motion are ready now.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
+function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Ready now: '+READY.join(', ')+'.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
 const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
 /* small typesetter. parse() turns the markup into nodes (text, power, fraction, radical) that the page draws with DOM
    elements and the slide export draws on a canvas / writes into PowerPoint.
@@ -120,7 +121,7 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
-let pyqWait=null;const PQ=()=>CH()==='Kinematics'?window.PhysicaRankPyqKin:CH()==='Laws of Motion'?window.PhysicaRankPyqLom:window.PhysicaRankPyq,loadPyq=()=>PQ()?Promise.resolve():pyqWait||(pyqWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__PYQ_URL__';s.async=true;s.onload=ok;s.onerror=()=>{pyqWait=null;s.remove();no()};document.head.append(s)}));
+let pyqWait=null;const PQ=()=>window[CHAPS[CH()]?.q||'PhysicaRankPyq'],loadPyq=()=>PQ()?Promise.resolve():pyqWait||(pyqWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__PYQ_URL__';s.async=true;s.onload=ok;s.onerror=()=>{pyqWait=null;s.remove();no()};document.head.append(s)}));
 let exWait=null;const loadExport=()=>window.PhysicaRankExport?Promise.resolve():exWait||(exWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__EXPORT_URL__';s.async=true;s.onload=ok;s.onerror=()=>{exWait=null;s.remove();no()};document.head.append(s)}));
 let selOn=false;const selSet=new Set();
 const ABC='abcd',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
