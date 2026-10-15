@@ -1125,7 +1125,6 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 :root[data-theme="light"]{--g-bg:rgba(255,255,255,.8);--g-bg2:rgba(70,95,130,.07);--g-line:rgba(70,95,130,.2);--g-hi:rgba(255,255,255,.9)}
 
 /* ======== Light theme polish: flat, calm and comfortable (no glass gloss, no keycap shadows) ======== */
-:root[data-theme="light"]{--lt-card-sh:0 1px 2px rgba(20,40,80,.05),0 8px 24px -12px rgba(20,40,80,.12);--lt-btn-sh:0 1px 2px rgba(20,40,80,.07)}
 :root[data-theme="light"] body::before{background:none}
 html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 /* landing: a clean, bright page (the black hole stays for the dark theme only) */
@@ -1137,9 +1136,9 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .land-subject,:root[data-theme="light"] .land-grade,:root[data-theme="light"] .land-mode{background:#fff;border:1px solid #d6dfeb;box-shadow:var(--lt-card-sh);-webkit-backdrop-filter:none;backdrop-filter:none}
 :root[data-theme="light"] .landing-schools{background:#fff;border:1px solid #dbe3ee;color:#33465c}
 /* top bar, side bar, panels */
-:root[data-theme="light"] .topbar{background:#fff!important;border-bottom:1px solid #dde4ee;box-shadow:0 1px 0 rgba(20,40,80,.04)}
+:root[data-theme="light"] .topbar{background:#fff!important;border-bottom:1px solid #dde4ee}
 :root[data-theme="light"] .topbar::after{opacity:.5}
-:root[data-theme="light"] .sidebar{background:#fff!important;border-right:1px solid #dde4ee;box-shadow:none}
+:root[data-theme="light"] .sidebar{background:#fff!important;border-right:1px solid #dde4ee}
 :root[data-theme="light"] .stage,:root[data-theme="light"] .observe-card,:root[data-theme="light"] .controls-card,:root[data-theme="light"] .tutor-card,:root[data-theme="light"] .lesson-section{background:#fff!important;border:1px solid #dde4ee;box-shadow:var(--lt-card-sh)!important}
 :root[data-theme="light"] .stage:before,:root[data-theme="light"] .controls-card:before{display:none}
 :root[data-theme="light"] .control-row{background:#f6f8fb;box-shadow:none;border:1px solid #e6ebf2;background-image:none}
@@ -1161,7 +1160,6 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 /* the live stage header and the label */
 :root[data-theme="light"] .stage-top{background:transparent}
 :root[data-theme="light"] .stage canvas,:root[data-theme="light"] #physics-canvas{border-radius:10px}
-:root[data-theme="light"] .tutor-switch{background:#fff;border:1px solid #d3dce8;box-shadow:var(--lt-btn-sh)}
 :root[data-theme="light"] .wa-top{box-shadow:none}
 
 /* Light: the experiment viewport stays a calm dark navy panel so every scene keeps the colours it was designed in */
@@ -1172,3 +1170,32 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .stage-bottom button,:root[data-theme="light"] .stage-bottom select,:root[data-theme="light"] .transport button{box-shadow:none!important;background-image:none!important}
 :root[data-theme="light"] .play-button{background:var(--mint)!important;color:#fff!important;border:0!important}
 :root[data-theme="light"] .restart-button,:root[data-theme="light"] .transport button:not(.play-button){background:#fff!important;border:1px solid #cfd8e4!important;color:#122033!important}
+
+/* ======== Light: remove every leftover gloss / glow / heavy shadow ======== */
+:root[data-theme="light"]{--flat-b:#cfd8e4}
+:root[data-theme="light"] button,:root[data-theme="light"] select,:root[data-theme="light"] summary,:root[data-theme="light"] .toast,:root[data-theme="light"] .install-tip,:root[data-theme="light"] .more-pop,:root[data-theme="light"] .restore-chip,:root[data-theme="light"] .fb-entry,:root[data-theme="light"] .feedback-btn{box-shadow:none!important;text-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+:root[data-theme="light"] .panel-close,:root[data-theme="light"] select,:root[data-theme="light"] #tab-prev,:root[data-theme="light"] #tab-next,:root[data-theme="light"] #simulation-step,:root[data-theme="light"] .feedback-btn,:root[data-theme="light"] .fb-entry,:root[data-theme="light"] .restore-chip,:root[data-theme="light"] .install-tip,:root[data-theme="light"] .toast,:root[data-theme="light"] .focus-exit,:root[data-theme="light"] .step-btn,:root[data-theme="light"] .more-pop{background:#fff!important;background-image:none!important;border:1px solid var(--flat-b)!important;color:#122033}
+:root[data-theme="light"] .more-pop,:root[data-theme="light"] .toast,:root[data-theme="light"] .install-tip{box-shadow:0 6px 18px rgba(20,40,80,.12)!important}
+:root[data-theme="light"] .panel-close:hover,:root[data-theme="light"] #tab-prev:hover,:root[data-theme="light"] #tab-next:hover{border-color:#0b857c!important;color:#0b857c}
+:root[data-theme="light"] .topbar,:root[data-theme="light"] .sidebar{box-shadow:none!important;border-color:#e0e6ef!important}
+:root[data-theme="light"] .stage,:root[data-theme="light"] .observe-card,:root[data-theme="light"] .controls-card{box-shadow:0 1px 2px rgba(20,40,80,.06)!important}
+:root[data-theme="light"] .subject-tab.active,:root[data-theme="light"] .grade-tab.active,:root[data-theme="light"] .selected,:root[data-theme="light"] #mode-ultra,:root[data-theme="light"] .is-3d{box-shadow:none!important}
+:root[data-theme="light"] .subject-tab.active,:root[data-theme="light"] .grade-tab.active{border:1px solid #d6dee9}
+:root[data-theme="light"] .formula-card{background:#fffaf0!important;background-image:none!important;box-shadow:inset 3px 0 0 #e0a02e!important}
+:root[data-theme="light"] .rank-logo,:root[data-theme="light"] #title,:root[data-theme="light"] .fs-ic,:root[data-theme="light"] .live-dot{filter:none!important;box-shadow:none!important}
+:root[data-theme="light"] input[type=range]{box-shadow:none!important}
+/* buttons laid over the dark viewport stay dark and flat */
+:root[data-theme="light"] .focus-btn,:root[data-theme="light"] #focus-btn{background:rgba(10,23,38,.62)!important;background-image:none!important;border:1px solid rgba(255,255,255,.22)!important;color:#e9f6ff!important;box-shadow:none!important}
+/* AI Tutor: a plain pill with a small flat switch */
+:root[data-theme="light"] .tutor-switch{background:#fff!important;background-image:none!important;border:1px solid var(--flat-b)!important;color:#122033!important;box-shadow:none!important;overflow:visible}
+:root[data-theme="light"] .tutor-switch::after{display:none}
+:root[data-theme="light"] .tutor-switch:hover{transform:none;border-color:#0b857c!important}
+:root[data-theme="light"] .tutor-switch-ic,:root[data-theme="light"] .tutor-switch[aria-pressed=true] .tutor-switch-ic{color:#0b857c;text-shadow:none;animation:none}
+:root[data-theme="light"] .tutor-switch-knob{background:#c3cedb!important;background-image:none!important;box-shadow:none!important;border:0!important}
+:root[data-theme="light"] .tutor-switch[aria-pressed=true]{border-color:#0b857c!important}
+:root[data-theme="light"] .tutor-switch[aria-pressed=true] .tutor-switch-knob{background:#0b857c!important}
+:root[data-theme="light"] .tutor-switch-knob:after{background:#fff!important;background-image:none!important;box-shadow:none!important;filter:none!important}
+:root[data-theme="light"]{--lt-btn-sh:none;--lt-card-sh:0 1px 2px rgba(20,40,80,.06)}
+:root[data-theme="light"] body .subject-tab.active,:root[data-theme="light"] body .grade-tab.active,:root[data-theme="light"] body button.selected,:root[data-theme="light"] body .stage,:root[data-theme="light"] body .observe-card,:root[data-theme="light"] body .controls-card{box-shadow:none!important}
+:root[data-theme="light"] .focus-special{opacity:1!important;filter:none!important}
+:root[data-theme="light"] .focus-special::before,:root[data-theme="light"] .focus-special::after{display:none!important}
