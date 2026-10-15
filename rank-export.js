@@ -3,7 +3,12 @@
    nothing leaves the device. Loaded only when a student presses Download. */
 (() => {
 'use strict';
-const W=1920,H=1080,PX=6350,FONT='system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',C={tx:'#ffffff',dim:'#9aa6bb',acc:'#7cc0ff',ok:'#6be3a8',line:'#2a3550'};
+const W=1920,H=1080,PX=6350,FONT='system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+/* two looks for the slides: black (default) and white. The teacher chooses when downloading; make() sets it. */
+const PAL={dark:{name:'dark',bg:'#000000',logo:'#ffffff',logoA:.55,fig:'#ffffff',tx:'#ffffff',dim:'#9aa6bb',acc:'#7cc0ff',ok:'#6be3a8',line:'#2a3550',qn:['#0c3a28','#3ddc97','#3ddc97'],yr:['#262006','#ffd54a','#ffd54a'],dk1:'000000',lt1:'FFFFFF'},
+  light:{name:'light',bg:'#ffffff',logo:'#0b1220',logoA:.8,fig:'#0b1220',tx:'#0b1220',dim:'#5b6b82',acc:'#1a56c4',ok:'#0b7a45',line:'#c7d1df',qn:['#e1f6ea','#16a05f','#0b7a45'],yr:['#fff4d6','#c98a00','#8a5d00'],dk1:'FFFFFF',lt1:'000000'}};
+let P=PAL.dark,C=PAL.dark;
+const setPalette=n=>{P=PAL[n]||PAL.dark;C=P};
 const PAD=80,LOGO={w:250,h:72,x:W-PAD-250,y:36};
 const BAND=LOGO.y+LOGO.h+18;   /* the question starts below the logo band, so the logo never covers text */
 const parse=t=>window.PhysicaRankMath.parse(t);
@@ -36,7 +41,7 @@ function drawLay(L,x,y,w,col,al){let by=y;L.lines.forEach((l,i)=>{by+=(i?L.lead:
 
 /* ---------- logo (white, see-through), drawn the same way as the site's brand mark ---------- */
 async function logoCanvas(){try{await document.fonts.load('800 40px Orbitron')}catch{}
-  const k=3,c=document.createElement('canvas');c.width=LOGO.w*k;c.height=LOGO.h*k;const g=c.getContext('2d');g.scale(k,k);g.globalAlpha=.55;g.strokeStyle='#fff';g.fillStyle='#fff';g.lineWidth=2.6;
+  const k=3,c=document.createElement('canvas');c.width=LOGO.w*k;c.height=LOGO.h*k;const g=c.getContext('2d');g.scale(k,k);g.globalAlpha=P.logoA;g.strokeStyle=P.logo;g.fillStyle=P.logo;g.lineWidth=2.6;
   const s=1.5,mx=24*s,my=LOGO.h/2;g.save();g.translate(mx,my);g.rotate(-30*Math.PI/180);g.beginPath();g.arc(0,0,16*s,0,7);g.stroke();
   g.save();g.rotate(-25*Math.PI/180);g.beginPath();g.ellipse(0,0,18.5*s,6.5*s,0,0,7);g.stroke();g.restore();g.beginPath();g.arc(0,0,3.5*s,0,7);g.fill();g.restore();
   g.font=`800 ${27*1.15}px Orbitron,${FONT}`;g.textBaseline='middle';g.fillText('physica.',mx+24*s,my+2);return c}
@@ -51,16 +56,16 @@ function optBlock(opts,fs,w){const fo=fs*.94,lw=fo*2.2,gap=fo*.6;
     if(cols===2&&(ls.some(l=>l.lines.length>1)||opts.length%2))continue; /* two columns only when every option is one short line: it saves height for the teacher's working */
     const cells=[];let y=0;for(let i=0;i<opts.length;i+=cols){const row=ls.slice(i,i+cols),rh=Math.max(...row.map(l=>l.h));row.forEach((l,j)=>cells.push({i:i+j,x:j*(cw+gap*2),y,w:cw,l}));y+=rh+fo*.45}
     return{cells,h:y-fo*.45,fo,lw,cols}}}
-async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const g=window.PhysicaFig(q.fig);if(!g)return null;g.setAttribute('style','color:#fff');g.setAttribute('font-family','Arial,Helvetica,sans-serif');const vb=g.viewBox.baseVal,w=vb.width||240,h=vb.height||140;g.setAttribute('width',w);g.setAttribute('height',h);g.setAttribute('xmlns','http://www.w3.org/2000/svg');
+async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const g=window.PhysicaFig(q.fig);if(!g)return null;g.setAttribute('style','color:'+P.fig);g.setAttribute('font-family','Arial,Helvetica,sans-serif');const vb=g.viewBox.baseVal,w=vb.width||240,h=vb.height||140;g.setAttribute('width',w);g.setAttribute('height',h);g.setAttribute('xmlns','http://www.w3.org/2000/svg');
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(g));await img.decode();const k=3,c=document.createElement('canvas');c.width=w*k;c.height=h*k;c.getContext('2d').drawImage(img,0,0,w*k,h*k);return{c,ar:w/h}}catch{return null}}
 const rect=(x,y,w,h,fill)=>({t:'rect',x,y,w,h,fill});
-function frame(meta,n,N){return[rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO},txt(PAD,H-58,500,[{s:n+' / '+N,fs:24,c:C.dim}])]}
+function frame(meta,n,N){return[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO},txt(PAD,H-58,500,[{s:n+' / '+N,fs:24,c:C.dim}])]}
 async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,N),fig=await figCanvas(q);
   /* header: question number (green) and exam + year (yellow), both as bold pills at the top left */
   const hy=LOGO.y+8,hh=56;cx.font=F(30,1);const qn='Q'+(i+1),qw=cx.measureText(qn).width+40;
-  els.push({t:'pill',x:PAD,y:hy,w:qw,h:hh,fill:'#0c3a28',stroke:'#3ddc97',text:qn,color:'#3ddc97',fs:30});
+  els.push({t:'pill',x:PAD,y:hy,w:qw,h:hh,fill:P.qn[0],stroke:P.qn[1],text:qn,color:P.qn[2],fs:30});
   cx.font=F(26,1);const yr=String(q.y),yw=cx.measureText(yr).width+40;
-  els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:'#262006',stroke:'#ffd54a',text:yr,color:'#ffd54a',fs:26});
+  els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:P.yr[0],stroke:P.yr[1],text:yr,color:P.yr[2],fs:26});
   /* the question stays in the upper part of the slide with a smaller type size: the rest of the slide is the teacher's working space (questions-only deck) or the solution */
   const top=BAND+20,bottom=withSol?560:520;
   const areaH=bottom-top,figW=fig?Math.min(560,Math.round(areaH*.95*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
@@ -70,15 +75,15 @@ async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,
   let y=top+blk.ql.h;
   if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
   if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=Math.max(y+36,bottom+30),room=H-80-sy;
-    els.push(rect(PAD,bottom+6,W-PAD*2,2,'#2a3550'));
+    els.push(rect(PAD,bottom+6,W-PAD*2,2,C.line));
     const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},34,16,room);
     const e=txt(PAD,sy,W-PAD*2,lines.map((s2,j)=>({s:s2,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
   else{const e=txt(W-PAD-760,H-76,760,[{s:'Ans: '+answerText(q),fs:36,c:C.acc,b:1,al:'r'}]);e.h=52;els.push(e)}
   return els}
-function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO}];
+function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}];
   els.push(txt(PAD,120,1300,[{s:'PREVIOUS YEAR QUESTIONS',fs:32,c:C.acc,b:1}]),txt(PAD,176,W-PAD*2,[{s:meta.chapter,fs:88,c:C.tx,b:1}]),
     txt(PAD,300,W-PAD*2,[{s:meta.exam+'  ·  '+meta.subject+'  ·  '+meta.cls,fs:42,c:C.tx}]),txt(PAD,364,W-PAD*2,[{s:'Papers: '+meta.papers.join('  ·  '),fs:30,c:C.dim}]));
-  els.push(rect(PAD,430,W-PAD*2,2,'#2a3550'),txt(PAD,446,600,[{s:'TOPICS INCLUDED',fs:24,c:C.acc,b:1}]));
+  els.push(rect(PAD,430,W-PAD*2,2,C.line),txt(PAD,446,600,[{s:'TOPICS INCLUDED',fs:24,c:C.acc,b:1}]));
   const paras=meta.topics.flatMap(t=>[{s:t.name+'  ('+t.n+')',b:1,c:C.tx},{s:t.subs.map(s=>s[0]+' ('+s[1]+')').join('   ·   '),c:C.dim}]);
   const r=fit(fs=>{const ls=paras.map(p=>layout(p.s,fs,W-PAD*2,p.b));return{fs,h:ls.reduce((a,l)=>a+l.h,0)+fs*.35*(ls.length-1)}},32,16,500);
   const e=txt(PAD,490,W-PAD*2,paras.map(p=>({...p,fs:r.fs,gap:r.fs*.35})));e.h=r.h;els.push(e);
@@ -137,20 +142,20 @@ function shape(e,id,rel){const xf='<a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)
   return'<p:sp><p:nvSpPr><p:cNvPr id="'+id+'" name="Text '+id+'"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)+'"/><a:ext cx="'+emu(e.w)+'" cy="'+emu(Math.max(e.h*1.12,e.paras[0].fs*1.5))+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr><p:txBody><a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t"><a:noAutofit/></a:bodyPr><a:lstStyle/>'+ps.join('')+'</p:txBody></p:sp>'}
 const NS='xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"',XH='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n',REL='http://schemas.openxmlformats.org/officeDocument/2006/relationships/',GRP='<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>';
 const THEME=XH+'<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Physica"><a:themeElements><a:clrScheme name="Physica"><a:dk1><a:srgbClr val="000000"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="0B1220"/></a:dk2><a:lt2><a:srgbClr val="9AA6BB"/></a:lt2><a:accent1><a:srgbClr val="7CC0FF"/></a:accent1><a:accent2><a:srgbClr val="6BE3A8"/></a:accent2><a:accent3><a:srgbClr val="FFB347"/></a:accent3><a:accent4><a:srgbClr val="FF9D9D"/></a:accent4><a:accent5><a:srgbClr val="2B6CFF"/></a:accent5><a:accent6><a:srgbClr val="9AA6BB"/></a:accent6><a:hlink><a:srgbClr val="7CC0FF"/></a:hlink><a:folHlink><a:srgbClr val="9AA6BB"/></a:folHlink></a:clrScheme><a:fontScheme name="Physica"><a:majorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme><a:fmtScheme name="Physica"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst><a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="19050"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="28575"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements></a:theme>';
-const BG='<p:bg><p:bgPr><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>';
+const bgXml=()=>'<p:bg><p:bgPr><a:solidFill><a:srgbClr val="'+hex(P.bg)+'"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>',clrMap=()=>P.name==='light'?'bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2"':'bg1="dk1" tx1="lt1" bg2="dk2" tx2="lt2"';
 async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=>new Uint8Array(await new Promise(r=>c.toBlob(r,'image/png')).then(b=>b.arrayBuffer()));
   files.push({name:'media/logo.png',data:await png(logo)});const slideXml=[],slideRels=[];let figN=0;
   for(let s=0;s<N;s++){let id=2,sp='';const rels=['<Relationship Id="rId1" Type="'+REL+'slideLayout" Target="../slideLayouts/slideLayout1.xml"/>'];
     for(const e of slides[s]){let rel='';if(e.t==='img'){if(e.k==='logo')rel='rId2';else{const nm='fig'+(++figN)+'.png';files.push({name:'media/'+nm,data:await png(e.canvas)});rel='rId'+(10+figN);rels.push('<Relationship Id="'+rel+'" Type="'+REL+'image" Target="../media/'+nm+'"/>')}}
       if(e.t==='rect'&&e.w===W&&e.h===H)continue;sp+=shape(e,id++,rel)}
     rels.push('<Relationship Id="rId2" Type="'+REL+'image" Target="../media/logo.png"/>');
-    slideXml.push(XH+'<p:sld '+NS+'><p:cSld>'+BG+'<p:spTree>'+GRP+sp+'</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>');slideRels.push(XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+rels.join('')+'</Relationships>')}
+    slideXml.push(XH+'<p:sld '+NS+'><p:cSld>'+bgXml()+'<p:spTree>'+GRP+sp+'</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>');slideRels.push(XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+rels.join('')+'</Relationships>')}
   const out=[{name:'[Content_Types].xml',data:XH+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/><Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/><Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/><Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>'+slides.map((_,i)=>'<Override PartName="/ppt/slides/slide'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>').join('')+'</Types>'},
     {name:'_rels/.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+REL+'officeDocument" Target="ppt/presentation.xml"/></Relationships>'},
     {name:'ppt/presentation.xml',data:XH+'<p:presentation '+NS+'><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst>'+slides.map((_,i)=>'<p:sldId id="'+(256+i)+'" r:id="rId'+(3+i)+'"/>').join('')+'</p:sldIdLst><p:sldSz cx="12192000" cy="6858000"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>'},
     {name:'ppt/_rels/presentation.xml.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+REL+'slideMaster" Target="slideMasters/slideMaster1.xml"/><Relationship Id="rId2" Type="'+REL+'theme" Target="theme/theme1.xml"/>'+slides.map((_,i)=>'<Relationship Id="rId'+(3+i)+'" Type="'+REL+'slide" Target="slides/slide'+(i+1)+'.xml"/>').join('')+'</Relationships>'},
     {name:'ppt/theme/theme1.xml',data:THEME},
-    {name:'ppt/slideMasters/slideMaster1.xml',data:XH+'<p:sldMaster '+NS+'><p:cSld>'+BG+'<p:spTree>'+GRP+'</p:spTree></p:cSld><p:clrMap bg1="dk1" tx1="lt1" bg2="dk2" tx2="lt2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/><p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst></p:sldMaster>'},
+    {name:'ppt/slideMasters/slideMaster1.xml',data:XH+'<p:sldMaster '+NS+'><p:cSld>'+bgXml()+'<p:spTree>'+GRP+'</p:spTree></p:cSld><p:clrMap '+clrMap()+' accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/><p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst></p:sldMaster>'},
     {name:'ppt/slideMasters/_rels/slideMaster1.xml.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+REL+'slideLayout" Target="../slideLayouts/slideLayout1.xml"/><Relationship Id="rId2" Type="'+REL+'theme" Target="../theme/theme1.xml"/></Relationships>'},
     {name:'ppt/slideLayouts/slideLayout1.xml',data:XH+'<p:sldLayout '+NS+' type="blank" preserve="1"><p:cSld name="Blank"><p:spTree>'+GRP+'</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>'},
     {name:'ppt/slideLayouts/_rels/slideLayout1.xml.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+REL+'slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>'}];
@@ -158,10 +163,11 @@ async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=
   return zip([...out,...files.map(f=>({name:'ppt/'+f.name,data:f.data}))])}
 
 /* ---------- public: build the file ---------- */
-async function make({items,withSol,blank,format,meta,onProgress,cancelled}){
+async function make({items,withSol,blank,format,meta,theme,onProgress,cancelled}){
+  setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
   const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol)];
-  for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');specs.push(await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,'#000000'),{t:'img',k:'logo',...LOGO}]);onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
+  for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');specs.push(await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
   const jpgs=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');const cv=drawSlide(specs[i],logo);jpgs.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(N+1,N+1,i+1,specs.length);await new Promise(r=>setTimeout(r))}
