@@ -160,6 +160,9 @@ function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L
   box.append(el('h3','','Download '+items.length+' question'+(items.length>1?'s':'')+' as slides'),
     group('Include','inc',[['q','Only questions','Space left below each question. The answer sits at the bottom right.'],['qs','Questions + solutions','The answer and worked solution are written below each question.']],v=>inc=v),
     group('Format','fmt',[['pdf','PDF','Slides saved as pages, ready to print or project.'],['ppt','PowerPoint (.pptx)','Editable text boxes: change, add or delete anything.']],v=>fmt=v));
+  let bgc=window.PhysicaTheme?.current==='light'?'light':'dark';
+  box.append(group('Slide background','bg',[['dark','Dark (black)','Black slides, white text. Good for projectors in a dim room.'],['light','White','White slides, dark text. Good for printing and bright rooms.']],v=>bgc=v));
+  box.querySelector('input[name=bg][value='+bgc+']').checked=true;
   const bl=el('label','rk-ropt'),bc=el('input');bc.type='checkbox';bc.dataset.testid='dl-blank';bc.addEventListener('change',()=>{blank=bc.checked});const bt=el('span');bt.append(el('b','','Add a blank working slide after each question'),el('small','','For working out the answer on a separate slide. Optional.'));bl.append(bc,bt);box.append(bl);
   const row=el('div','rk-dlgrow');row.append(btn('rk-link','Cancel',done),ok);box.append(row);
   const go2=async()=>{if(!(inc&&fmt))return;box.replaceChildren(el('h3','','Preparing your slides…'));const pr=el('p','rk-how','Loading…'),bar=el('div','rk-bar'),fill=el('i');bar.append(fill);box.append(pr,bar,btn('rk-link','Cancel',done));
@@ -167,7 +170,7 @@ function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L
       const paper=y=>y.replace(/\s+(19|20)\d\d.*$/,''),papers=PAPERS.filter(a=>items.some(x=>paper(x.q.y)===a)),tps=[];
       for(const x of items){let t=tps.find(z=>z.tp===x.q.tp);if(!t)tps.push(t={tp:x.q.tp,name:tname(x.q.tp),n:0,subs:[]});t.n++;const s2=t.subs.find(z=>z[0]===x.q.st);s2?s2[1]++:t.subs.push([x.q.st,1])}
       const meta={chapter:CH(),exam:X.label,subject:'Physics',cls:(JEE_CH.find(c=>c[1].includes(CH()))||['Class 11'])[0],papers,topics:tps};
-      const blob=await window.PhysicaRankExport.make({items,withSol:inc==='qs',blank,format:fmt,meta,cancelled:()=>stop,onProgress:(i,n,j,t)=>{const v=j?(n+j)/(n+t):i/(n+t);fill.style.width=Math.round(v*100)+'%';pr.textContent=j?'Saving page '+j+' of '+t+'…':'Making slide '+i+' of '+n+'…'}});
+      const blob=await window.PhysicaRankExport.make({items,withSol:inc==='qs',blank,format:fmt,meta,theme:bgc,cancelled:()=>stop,onProgress:(i,n,j,t)=>{const v=j?(n+j)/(n+t):i/(n+t);fill.style.width=Math.round(v*100)+'%';pr.textContent=j?'Saving page '+j+' of '+t+'…':'Making slide '+i+' of '+n+'…'}});
       if(stop)return;const nm=['Physica',X.label,CH(),'PYQs',inc==='qs'?'with-solutions':'questions'].join('-').replace(/[^A-Za-z0-9-]+/g,'-')+(fmt==='ppt'?'.pptx':'.pdf'),url=URL.createObjectURL(blob),
         /* iPad / iPhone: a blob download there can be saved as a .txt file, so never use a download link on them.
            Instead the file opens in its own viewer (share button there saves it to Files), or the share sheet opens. */
