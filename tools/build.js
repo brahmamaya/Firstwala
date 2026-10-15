@@ -17,7 +17,7 @@ bundle(CORE,'physica-core.min.js');bundle(PACK,'physica-3d.min.js');
 fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js')(root,TUTOR).js);
 // the exam questions ship as their own pack; the tutor pack carries just the list of chapters that have them
 bundle(EXAM,'physica-exam.min.js');
-bundle(['rank-pyq-jee.js','rank-pyq-kin.js','rank-pyq-lom.js','rank-pyq-wep.js','rank-pyq-rot.js','rank-pyq-grav.js','rank-pyq-prop.js','rank-pyq-thermo.js','rank-pyq-ktg.js'],'physica-pyq.min.js');
+bundle(['rank-pyq-jee.js','rank-pyq-kin.js','rank-pyq-lom.js','rank-pyq-wep.js','rank-pyq-rot.js','rank-pyq-grav.js','rank-pyq-prop.js','rank-pyq-thermo.js','rank-pyq-ktg.js','rank-pyq-osc.js'],'physica-pyq.min.js');
 bundle(['rank-export.js'],'physica-export.min.js');
 bundle(['phys-fig.js','rank-figs.js','rank-units.js','rank-units-jee.js','rank-kin-jee.js','rank-lom-jee.js','rank-wep-jee.js','rank-rot-jee.js','rank-grav-jee.js','rank-prop-jee.js','rank-thermo-jee.js','rank-ktg-jee.js','rank-osc-jee.js','rank-neet.js'],'physica-rank.min.js');
 {const rp=path.join(root,'physica-rank.min.js'),ph=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-pyq.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('__PYQ_URL__','./physica-pyq.min.js?v='+ph).replace('__EXPORT_URL__','./physica-export.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-export.min.js'))).digest('hex').slice(0,8)))}
