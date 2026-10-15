@@ -47,8 +47,8 @@ const answerText=q=>q.o?letters(q).join(', '):q.n!=null?String(q.n):String(q.a||
 const txt=(x,y,w,paras)=>({t:'text',x,y,w,paras,h:0});
 function fit(make,from,to,maxH){for(let fs=from;fs>=to;fs-=2){const r=make(fs);if(r.h<=maxH||fs-2<to)return r}}
 function optBlock(opts,fs,w){const fo=fs*.94,lw=fo*2.2,gap=fo*.6;
-  for(const cols of [1]){const cw=cols===2?(w-gap*2)/2:w,ls=opts.map(o=>layout(o,fo,cw-lw));
-    if(cols===2&&(ls.some(l=>l.lines.length>2)||opts.length%2))continue;
+  for(const cols of [2,1]){const cw=cols===2?(w-gap*2)/2:w,ls=opts.map(o=>layout(o,fo,cw-lw));
+    if(cols===2&&(ls.some(l=>l.lines.length>1)||opts.length%2))continue; /* two columns only when every option is one short line: it saves height for the teacher's working */
     const cells=[];let y=0;for(let i=0;i<opts.length;i+=cols){const row=ls.slice(i,i+cols),rh=Math.max(...row.map(l=>l.h));row.forEach((l,j)=>cells.push({i:i+j,x:j*(cw+gap*2),y,w:cw,l}));y+=rh+fo*.45}
     return{cells,h:y-fo*.45,fo,lw,cols}}}
 async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const g=window.PhysicaFig(q.fig);if(!g)return null;g.setAttribute('style','color:#fff');g.setAttribute('font-family','Arial,Helvetica,sans-serif');const vb=g.viewBox.baseVal,w=vb.width||240,h=vb.height||140;g.setAttribute('width',w);g.setAttribute('height',h);g.setAttribute('xmlns','http://www.w3.org/2000/svg');
@@ -61,9 +61,10 @@ async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,
   els.push({t:'pill',x:PAD,y:hy,w:qw,h:hh,fill:'#0c3a28',stroke:'#3ddc97',text:qn,color:'#3ddc97',fs:30});
   cx.font=F(26,1);const yr=String(q.y),yw=cx.measureText(yr).width+40;
   els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:'#262006',stroke:'#ffd54a',text:yr,color:'#ffd54a',fs:26});
-  const top=BAND+20,bottom=withSol?600:H-130;
-  const areaH=bottom-top,figW=fig?Math.min(720,Math.round(areaH*.95*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
-  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,fig?qW:W-PAD*2):null,left=ql.h+(ob?fs*.8+ob.h:0);return{fs,ql,ob,h:fig?Math.max(left,figW/fig.ar):left}},46,22,areaH);
+  /* the question stays in the upper part of the slide with a smaller type size: the rest of the slide is the teacher's working space (questions-only deck) or the solution */
+  const top=BAND+20,bottom=withSol?560:520;
+  const areaH=bottom-top,figW=fig?Math.min(560,Math.round(areaH*.95*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
+  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,fig?qW:W-PAD*2):null,left=ql.h+(ob?fs*.8+ob.h:0);return{fs,ql,ob,h:fig?Math.max(left,figW/fig.ar):left}},34,18,areaH);
   const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
   if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
   let y=top+blk.ql.h;
