@@ -6,7 +6,7 @@
   };
   const key='physica-theme';
   let selected='dark',colours=new Map();
-  const contexts=new WeakMap(),gradientTargets=new WeakMap();
+  const contexts=new WeakMap(),plainContexts=new WeakMap(),gradientTargets=new WeakMap();
   const baseColours={'#42d9ca':'mint','#ffc36b':'gold','#7baaff':'blue','#ff857e':'red','#b89dff':'purple','#e9f6ff':'text','#eff8ff':'text','#8ca6b9':'muted','#0a1d2d':'start','#081624':'end','#29475b':'line','#1d3547':'line'};
   const blend=(a,b,t)=>'#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('');
   function colour(value){
@@ -26,8 +26,10 @@
     }
     const result=(output||hex)+alpha;colours.set(value,result);return result;
   }
-  function wrapContext(context){
-    if(contexts.has(context))return contexts.get(context);
+  /* keep=true: the experiment stage keeps its original colours in every theme (it sits on a dark viewport) */
+  function wrapContext(context,keep){
+    const cache=keep?plainContexts:contexts,tone=keep?(c=>c):colour;
+    if(cache.has(context))return cache.get(context);
     const methods=new Map();
     const proxy=new Proxy(context,{
       get(target,property){
@@ -37,7 +39,7 @@
         let fn;
         if(['createLinearGradient','createRadialGradient','createConicGradient'].includes(property))fn=(...args)=>{
           const gradient=value.apply(target,args);
-          const wrapped=new Proxy(gradient,{get(g,k){if(k==='addColorStop')return(offset,c)=>g.addColorStop(offset,colour(c));const v=Reflect.get(g,k,g);return typeof v==='function'?v.bind(g):v}});
+          const wrapped=new Proxy(gradient,{get(g,k){if(k==='addColorStop')return(offset,c)=>g.addColorStop(offset,tone(c));const v=Reflect.get(g,k,g);return typeof v==='function'?v.bind(g):v}});
           gradientTargets.set(wrapped,gradient);return wrapped;
         };
         else fn=value.bind(target);
@@ -45,11 +47,11 @@
       },
       set(target,property,value){
         if(property==='shadowBlur'&&window.PhysicaLite)value=Math.min(value,2); // big boards: soft glows are the costliest canvas effect
-        if(['fillStyle','strokeStyle','shadowColor'].includes(property))value=typeof value==='string'?colour(value):(gradientTargets.get(value)||value);
+        if(['fillStyle','strokeStyle','shadowColor'].includes(property))value=typeof value==='string'?tone(value):(gradientTargets.get(value)||value);
         return Reflect.set(target,property,value,target);
       }
     });
-    contexts.set(context,proxy);return proxy;
+    cache.set(context,proxy);return proxy;
   }
   function setTheme(name,persist=true){
     if(!Object.hasOwn(themes,name))name='dark'; /* the older Midnight, Violet, Chalkboard and Ink palettes now map to Dark */

@@ -1163,3 +1163,12 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .stage canvas,:root[data-theme="light"] #physics-canvas{border-radius:10px}
 :root[data-theme="light"] .tutor-switch{background:#fff;border:1px solid #d3dce8;box-shadow:var(--lt-btn-sh)}
 :root[data-theme="light"] .wa-top{box-shadow:none}
+
+/* Light: the experiment viewport stays a calm dark navy panel so every scene keeps the colours it was designed in */
+:root[data-theme="light"] #simulation{background:radial-gradient(120% 90% at 50% 0%,#17314a,#0a1726 70%)!important;border-radius:12px;box-shadow:inset 0 0 0 1px #1d3347}
+:root[data-theme="light"] .stage{padding-bottom:0}
+:root[data-theme="light"] .stage-bottom{background:#fff;border-top:1px solid #e3e9f1}
+:root[data-theme="light"] .stage:fullscreen,:root[data-theme="light"] .stage.pseudo-full{background:#eef2f8!important}
+:root[data-theme="light"] .stage-bottom button,:root[data-theme="light"] .stage-bottom select,:root[data-theme="light"] .transport button{box-shadow:none!important;background-image:none!important}
+:root[data-theme="light"] .play-button{background:var(--mint)!important;color:#fff!important;border:0!important}
+:root[data-theme="light"] .restart-button,:root[data-theme="light"] .transport button:not(.play-button){background:#fff!important;border:1px solid #cfd8e4!important;color:#122033!important}
