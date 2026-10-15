@@ -300,3 +300,13 @@ Applies to every Rank mode chapter (page content and past-year questions). Do no
 - Gravitation (JEE Mains): rank-grav-jee.js (24 formulas, 6 revise groups, 14 most-asked types, guide) + shell-field and elliptical-orbit diagrams; content checked by an independent checker. No PYQs tab until the PYQ file is provided. Rotational Motion PYQs also still to come.
 - Properties of Solids and Liquids (JEE Mains): rank-prop-jee.js (41 formulas, 7 revise groups, 14 most-asked types, guide). Covers elasticity, fluids, viscosity, surface tension, thermal expansion, calorimetry and heat transfer; mock test uses a synthesised bank mixing the Solids, Fluids and Thermal Properties banks (COMBO in rank-neet.js).
 - Thermodynamics (JEE Mains): rank-thermo-jee.js (24 formulas, 6 revise groups, 13 most-asked types, guide). New diagrams in rank-figs.js: ss, capil, pv, carnot. Both chapters content-checked by independent checkers. No PYQs tab yet: when the PDFs arrive, add rank-pyq-prop.js / rank-pyq-thermo.js, set q: in CHAPS, add to the physica-pyq bundle, and run the usual blind verification.
+
+Token-efficient PYQ pipeline (used for Properties of Solids and Liquids; reuse for every new chapter)
+1. Read the answer key page ONCE yourself (crop it at high resolution with pdfimages + PIL, 3-4 strips) and write key.txt (NNN a-d, NNN:number, NNN(a,c), NNN(*), NNN=text).
+2. Get a page map (question numbers per PDF page) with pdftotext + a regex on the garbled text layer; put it in the spec so transcribers read only their 5-6 pages.
+3. Generate one SPEC.md per chapter from the previous chapter's spec (change PDF path, page map, key path and the topic/sub-topic table only).
+4. 9 transcribers in parallel (~57 questions each), then merge3.js (validates against key.txt, topics, options, figures) and pyq-lint.
+5. Automatic figure check (prop/figcheck.js: text outside box or overlapping); view contact sheets only for flagged figures and for figures the transcribers called uncertain.
+6. 9 blind verifiers on the JSON only (they open the scan only when their own answer disagrees with the key), fixes applied with verify/apply.js, then rebuild, domscan, PDF/PPTX test.
+7. Patch out-*.json BEFORE the last merge3 write, or apply verifier fixes after it (never regenerate after applying fixes).
+Properties of Solids and Liquids PYQs: 501 questions (7 skipped: 108, 274, 276, 277, 383, 386 have key (*), 411 key not reproducible). Overrides: Q370 answer (c) by the printed key after fixing the figure; Q474 stored as (b,c,d) (book key shows only d, official is B,C,D).
