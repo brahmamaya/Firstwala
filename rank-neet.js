@@ -161,7 +161,7 @@ function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L
     group('Include','inc',[['q','Only questions','Space left below each question. The answer sits at the bottom right.'],['qs','Questions + solutions','The answer and worked solution are written below each question.']],v=>inc=v),
     group('Format','fmt',[['pdf','PDF','Slides saved as pages, ready to print or project.'],['ppt','PowerPoint (.pptx)','Editable text boxes: change, add or delete anything.']],v=>fmt=v));
   let bgc=window.PhysicaTheme?.current==='light'?'light':'dark';
-  box.append(group('Slide background','bg',[['dark','Dark (black)','Black slides, white text. Good for projectors in a dim room.'],['light','White','White slides, dark text. Good for printing and bright rooms.']],v=>bgc=v));
+  box.append(group('Slide theme','bg',[['dark','Dark','Black background, white text. Good for projectors in a dim room.'],['light','Light','White background, dark text. Good for printing and bright rooms.']],v=>bgc=v));
   box.querySelector('input[name=bg][value='+bgc+']').checked=true;
   const bl=el('label','rk-ropt'),bc=el('input');bc.type='checkbox';bc.dataset.testid='dl-blank';bc.addEventListener('change',()=>{blank=bc.checked});const bt=el('span');bt.append(el('b','','Add a blank working slide after each question'),el('small','','For working out the answer on a separate slide. Optional.'));bl.append(bc,bt);box.append(bl);
   const row=el('div','rk-dlgrow');row.append(btn('rk-link','Cancel',done),ok);box.append(row);
