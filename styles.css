@@ -1199,3 +1199,4 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] body .subject-tab.active,:root[data-theme="light"] body .grade-tab.active,:root[data-theme="light"] body button.selected,:root[data-theme="light"] body .stage,:root[data-theme="light"] body .observe-card,:root[data-theme="light"] body .controls-card{box-shadow:none!important}
 :root[data-theme="light"] .focus-special{opacity:1!important;filter:none!important}
 :root[data-theme="light"] .focus-special::before,:root[data-theme="light"] .focus-special::after{display:none!important}
+.rk-seltop .rk-seltoggle{font-size:13px;line-height:1.25;white-space:normal;text-align:center;max-width:min(100%,250px)}
