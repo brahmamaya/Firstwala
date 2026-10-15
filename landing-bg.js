@@ -97,7 +97,8 @@ const target=(w,h)=>{const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx
   for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);
   const fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tx,0);return{tx,fb,w,h}};
 let starve=0,A=null,B1=null,B2=null,H0=null,H1=null,sceneW=0,sceneH=0,fresh=true,shiftX=0,shiftY=0,diveT=0,frameN=0;
-let scale=weak?.6:1,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
+/* start small and grow: the first frames must be cheap on every device (a ray-traced frame at full size can freeze a weak GPU for a second); the scene then steps up while 30 fps is held */
+let maxScale=weak?.6:1,scale=.34,ramp=1,W=0,H=0,raf=0,running=false,dv=0,last=0,slow=0,frames=0,mx=0,my=0,tx=0,ty=0,t0=performance.now();
 const free=o=>{if(o){gl.deleteTexture(o.tx);gl.deleteFramebuffer(o.fb)}};
 function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;const k=Math.min(matchMedia('(pointer:coarse)').matches?1.5:2,window.devicePixelRatio||1); // sharper: full resolution, up to 2x on computers
   cv.width=Math.max(2,Math.round(W*k));cv.height=Math.max(2,Math.round(H*k));
@@ -134,8 +135,9 @@ function draw(now){
   // keep it smooth: drop the resolution on devices that cannot hold ~50 fps (checked only while idle)
   if(running&&still){frames++;if(dt>.024)slow++;
     // very slow device: step down at once instead of waiting 40 frames; below the floor, render fewer frames
-    if(frames>3&&dt>.06&&scale>.3){scale=Math.max(.3,scale*.72);size();frames=slow=0}
-    else if(frames>=40){if(slow>14&&scale>.35){scale=Math.max(.35,scale-.12);size()}frames=slow=0}
+    if(frames>3&&dt>.06&&scale>.3){scale=Math.max(.3,scale*.72);ramp=0;size();frames=slow=0}
+    else if(ramp&&scale<maxScale&&frames>=6&&dt<.042&&slow<3){scale=Math.min(maxScale,scale*1.22);size();frames=slow=0}
+    else if(frames>=40){if(slow>14&&scale>.35){scale=Math.max(.35,scale-.12);ramp=0;size()}else if(ramp&&slow>5)ramp=0;frames=slow=0}
     if(scale<=.3&&dt>.06)starve++;else if(dt<.04)starve=0}
   // a device without a usable GPU: keep the page responsive by drawing only a few frames a second
   if(running)raf=starve>8&&!dv?setTimeout(()=>{raf=requestAnimationFrame(draw)},400):requestAnimationFrame(draw)}
@@ -206,5 +208,8 @@ window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!W)return;
 return{start,stop,dive(){dive=.001},resize:size};
 }
 let api;const get=()=>api===undefined?(api=build()||null):api;
-window.PhysicaLandingBG={start(){get()?.start()},stop(){api?.stop()},dive(){get()?.dive()},resize(){api?.resize()}};
+/* the landing page paints first (plain black plus the text); the scene is built once the page has loaded and the browser is idle, so loading never hangs behind the shader compile */
+let want=0;const later=window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:700}):f=>setTimeout(f,120);
+const go=()=>{if(want)get()?.start()};
+window.PhysicaLandingBG={start(){want=1;if(api){api.start();return}if(document.readyState==='complete')later(go);else addEventListener('load',()=>setTimeout(()=>later(go),60),{once:true})},stop(){want=0;api?.stop()},dive(){want=1;get()?.dive()},resize(){api?.resize()}};
 })();
