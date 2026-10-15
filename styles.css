@@ -24,7 +24,6 @@
 
 /* ---- Light theme: same variables, white background ---- */
 :root[data-theme="light"]{color-scheme:light;--ov:70 95 130;--ovt:18 32 51;--bk:255 255 255;--sh:40 60 100;--sa:.18;--bg:#f4f7fb;--bg2:#eaf0f7;--chrome:#ffffff;--panel:#ffffff;--panel2:#f0f4f9;--line:#d3dce7;--line2:#b8c5d4;--text:#122033;--muted:#4c6076;--muted2:#6a7c90;--mint:#0b857c;--mint-deep:#9bd7d1;--gold:#a86a00;--blue:#2a58c8;--purple:#6b44c8;--active:#dff3f1;--active-line:#7cc9c2;--active-hover:#c9ebe7;--mint-hover:#096e67;--on-mint:#ffffff;--thumb:#0b857c;--shadow:#1a2b4426;--s-000:#ffffff;--s-020910b3:#eef5fcb3;--s-05070b:#fafafa;--s-05070c:#fafafa;--s-0a0a0a:#f5f5f5;--s-0a0b0d:#f5f5f5;--s-0b0c0f:#f4f4f4;--s-0b0f18:#f4f4f4;--s-0b3d2a:#c3f4e1;--s-0c0d10:#f3f3f3;--s-0d1424:#dbe2f2;--s-111:#eeeeee;--s-121317:#ededed;--s-12203d:#c8d5ef;--s-151920:#eaeaea;--s-16181d:#e9e9e9;--s-1a1e26:#e5e5e5;--s-1b1f27:#e4e4e4;--s-1b2029:#d6dbe4;--s-232833:#d5d9e2;--s-9a9a9a:#656565;--s-9fd0ff:#003160;--s-b89dff:#1b0062;--s-bdbdbd:#424242;--s-bfe0ff55:#00214055;--s-cfcfcf:#303030;--s-cfe6ff:#001d3d;--s-d9d9d9:#262626;--s-e4f1ff:#001d3d;--s-e9edf3:#161616;--s-fff:#0c1626;--s-ffffff:#0c1626;--t-000:#ffffff;--t-1d1d1d:#e2e2e2;--t-222:#dddddd;--t-22d3ee:#0fafc7;--t-2a2a2a:#d5d5d5;--t-2b6cff:#0042d6;--t-333:#cccccc;--t-35d49a:#26b17e;--t-4d9bff:#005bd1;--t-4d9bff44:#005bd144;--t-4d9bff55:#005bd155;--t-4d9bff77:#005bd177;--t-4d9bff99:#005bd199;--t-4d9bffaa:#005bd1aa;--t-59e08f:#22b45c;--t-5be3b0:#1fb77e;--t-6be3a8:#21ae68;--t-6fa8f5:#0c50ad;--t-7cc0ff:#0054a2;--t-7dffb0:#00a13f;--t-7fb4f5:#0c4d9c;--t-7fb4ff:#00429f;--t-8a8a8a:#757575;--t-8db6ea:#1a4c8c;--t-8fa3c0:#4a6284;--t-8fb3ff:#002e8f;--t-999:#666666;--t-9aa6bb:#505e77;--t-9e9e9e:#616161;--t-9fc6ff:#00337f;--t-9fd0ff:#00417f;--t-a78bfa:#290691;--t-a9b6cc:#3e4e69;--t-a9c4f0:#143770;--t-a9c8ee:#163e70;--t-b8f5d6:#0e6237;--t-bdbdbd:#424242;--t-bff0d6:#155935;--t-c4cad6:#363d4d;--t-c4d0e4:#253550;--t-c4ffe0:#006630;--t-cfe0f7:#0f2e57;--t-cfe3ff:#002a66;--t-cfe6ff:#003166;--t-d9d9d9:#262626;--t-e2e8f2:#202e46;--t-e6f1ff:#002d66;--t-ff5c8a:#c20037;--t-ff6b7a:#b30012;--t-ff7b72:#ac0b00;--t-ff8a80:#9e0c00;--t-ff8c98:#92000f;--t-ff8f87:#970a00;--t-ff9b93:#8b0a00;--t-ff9d9d:#810000;--t-ffb347:#d67e00;--t-ffb4ae:#700800;--t-ffc36b:#b36a00;--t-ffd2a8:#763900;--t-fff:#0c1626;--k-03091e:227 232 250;--k-040b22:223 229 249;--k-061032:207 216 247;--k-07121f:224 235 248;--k-08163c:197 210 245;--k-091a48:194 208 244;--k-0a1e54:194 208 244;--k-0c0e14:235 237 243;--k-1c202a:213 217 227;--k-2c303a:214 217 224}
-html[data-theme="light"],:root[data-theme="light"] body{background:var(--bg)}
 /* ---- Top bar "Make your own" button ---- */
 .build-btn{border:1px solid color-mix(in srgb,var(--gold) 55%,var(--line));background:linear-gradient(115deg,var(--panel),var(--active));color:var(--gold);border-radius:8px;min-height:40px;padding:0 16px;font-size:13px;font-weight:700;letter-spacing:.3px;transition:border-color .2s,transform .15s}
 .build-btn:hover{border-color:var(--gold);transform:translateY(-1px)}
@@ -1097,7 +1096,6 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 .theme-toggle:hover{border-color:var(--mint)}
 .landing-theme{position:fixed;top:max(14px,env(safe-area-inset-top));right:14px;z-index:5;color:var(--t-fff)}
 :root[data-theme="light"] .landing-bg{filter:invert(1)}
-:root[data-theme="light"] .landing h1,:root[data-theme="light"] .landing-sub,:root[data-theme="light"] .landing-step,:root[data-theme="light"] .landing-foot{text-shadow:0 0 18px rgba(255,255,255,.95),0 0 5px rgba(255,255,255,.9)}
 :root[data-theme="light"] .land-rank{border-color:#2b6cff!important;background:linear-gradient(135deg,#eaf1ff,#d9e6ff)!important;box-shadow:0 0 0 1px #2b6cff33 inset,0 6px 28px #2b6cff30}
 :root[data-theme="light"] .land-rank b,:root[data-theme="light"] .rank-pick b{color:#1b4fc0}
 :root[data-theme="light"] .land-rank small,:root[data-theme="light"] .rank-pick small{color:#3d5f9e}
@@ -1125,4 +1123,43 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 :root[data-theme="light"] .rk-ov svg [stroke="#4a5876"]{stroke:#8da0b6}:root[data-theme="light"] .rk-ov svg [fill="#4a5876"]{fill:#8da0b6}
 :root[data-theme="light"] .rk-ov svg [stroke="#2b5d93"]{stroke:#6a95c8}:root[data-theme="light"] .rk-ov svg [fill="#2b5d93"]{fill:#6a95c8}
 :root[data-theme="light"]{--g-bg:rgba(255,255,255,.8);--g-bg2:rgba(70,95,130,.07);--g-line:rgba(70,95,130,.2);--g-hi:rgba(255,255,255,.9)}
-:root[data-theme="light"] body::before{background:radial-gradient(1100px 560px at 62% -12%,rgba(42,88,200,.07),rgba(0,0,0,0) 62%),radial-gradient(900px 520px at 0% 100%,rgba(11,133,124,.06),rgba(0,0,0,0) 60%)}
+
+/* ======== Light theme polish: flat, calm and comfortable (no glass gloss, no keycap shadows) ======== */
+:root[data-theme="light"]{--lt-card-sh:0 1px 2px rgba(20,40,80,.05),0 8px 24px -12px rgba(20,40,80,.12);--lt-btn-sh:0 1px 2px rgba(20,40,80,.07)}
+:root[data-theme="light"] body::before{background:none}
+html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
+/* landing: a clean, bright page (the black hole stays for the dark theme only) */
+:root[data-theme="light"] .landing,:root[data-theme="light"] body.landing-open{background:radial-gradient(1200px 620px at 50% -8%,#e4edff 0%,rgba(228,237,255,0) 60%),radial-gradient(900px 560px at 85% 110%,#e3f4f1 0%,rgba(227,244,241,0) 60%),#f7f9fc}
+:root[data-theme="light"] .landing-bg{display:none}
+:root[data-theme="light"] .landing::before{content:'';position:fixed;left:50%;top:46%;width:min(1100px,150vw);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(0,0,0,0) 0 31%,rgba(42,88,200,.07) 31.2% 31.5%,rgba(0,0,0,0) 31.7% 44%,rgba(42,88,200,.06) 44.2% 44.4%,rgba(0,0,0,0) 44.6% 57%,rgba(42,88,200,.05) 57.2% 57.4%,rgba(0,0,0,0) 57.6%)}
+:root[data-theme="light"] .landing-inner:before{display:none}
+:root[data-theme="light"] .landing h1,:root[data-theme="light"] .landing-sub,:root[data-theme="light"] .landing-step,:root[data-theme="light"] .landing-foot{text-shadow:none}
+:root[data-theme="light"] .land-subject,:root[data-theme="light"] .land-grade,:root[data-theme="light"] .land-mode{background:#fff;border:1px solid #d6dfeb;box-shadow:var(--lt-card-sh);-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-theme="light"] .landing-schools{background:#fff;border:1px solid #dbe3ee;color:#33465c}
+/* top bar, side bar, panels */
+:root[data-theme="light"] .topbar{background:#fff!important;border-bottom:1px solid #dde4ee;box-shadow:0 1px 0 rgba(20,40,80,.04)}
+:root[data-theme="light"] .topbar::after{opacity:.5}
+:root[data-theme="light"] .sidebar{background:#fff!important;border-right:1px solid #dde4ee;box-shadow:none}
+:root[data-theme="light"] .stage,:root[data-theme="light"] .observe-card,:root[data-theme="light"] .controls-card,:root[data-theme="light"] .tutor-card,:root[data-theme="light"] .lesson-section{background:#fff!important;border:1px solid #dde4ee;box-shadow:var(--lt-card-sh)!important}
+:root[data-theme="light"] .stage:before,:root[data-theme="light"] .controls-card:before{display:none}
+:root[data-theme="light"] .control-row{background:#f6f8fb;box-shadow:none;border:1px solid #e6ebf2;background-image:none}
+/* buttons and pills: flat white with a thin border */
+:root[data-theme="light"] .simulation-tabs button:not(.selected):not([aria-pressed=true]),:root[data-theme="light"] .lab-tool-buttons button,:root[data-theme="light"] .more-menu summary,:root[data-theme="light"] .view3d-bar button,:root[data-theme="light"] .preset-buttons button,:root[data-theme="light"] #prev,:root[data-theme="light"] #next,:root[data-theme="light"] .rail-buttons button,:root[data-theme="light"] .focus-btn,:root[data-theme="light"] .build-btn,:root[data-theme="light"] .step-btn{background:#fff!important;background-image:none!important;border:1px solid #d3dce8!important;box-shadow:var(--lt-btn-sh)!important;color:#122033}
+:root[data-theme="light"] .simulation-tabs button:not(.selected):hover,:root[data-theme="light"] .lab-tool-buttons button:hover,:root[data-theme="light"] .more-menu summary:hover,:root[data-theme="light"] .view3d-bar button:hover,:root[data-theme="light"] .focus-btn:hover{background:#f4f8ff!important;border-color:#9fb7e6!important}
+:root[data-theme="light"] .simulation-tabs button.selected,:root[data-theme="light"] .simulation-tabs button[aria-pressed=true],:root[data-theme="light"] html body .simulation-tabs button.selected{background:#122033!important;background-image:none!important;border-color:#122033!important;color:#fff!important;box-shadow:0 2px 6px rgba(18,32,51,.25)!important}
+:root[data-theme="light"] .lab-tool-buttons button:after,:root[data-theme="light"] .more-menu summary:after,:root[data-theme="light"] .view3d-bar button:after{display:none}
+/* segmented switches: Physics / Botany..., Class 10/11/12, 2D / 3D / Ultra */
+:root[data-theme="light"] .subject-tabs,:root[data-theme="light"] .grade-tabs,:root[data-theme="light"] .glass-host,:root[data-theme="light"] .topbar .subject-tabs.in-topbar{background:#edf1f6!important;border:1px solid #dde4ee;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-theme="light"] .glass-thumb{display:none}
+:root[data-theme="light"] .subject-tab,:root[data-theme="light"] .grade-tab,:root[data-theme="light"] .glass-host>button{color:#4c6076!important;background:transparent!important;box-shadow:none!important;text-shadow:none!important}
+:root[data-theme="light"] .subject-tab.active,:root[data-theme="light"] .subject-tab[aria-pressed=true],:root[data-theme="light"] .grade-tab.active,:root[data-theme="light"] .grade-tab[aria-pressed=true],:root[data-theme="light"] .glass-host>button[aria-pressed=true],:root[data-theme="light"] .glass-host>button.active{background:#fff!important;color:#0b6f68!important;box-shadow:0 1px 3px rgba(20,40,80,.15)!important;border-radius:inherit}
+/* sliders: flat, with a clear thumb */
+:root[data-theme="light"] .controls-card .control-row input[type=range]::-webkit-slider-thumb{background:#fff!important;border:2px solid #0b857c;box-shadow:0 1px 3px rgba(20,40,80,.3)!important}
+:root[data-theme="light"] .controls-card .control-row input[type=range]::-moz-range-thumb{background:#fff!important;border:2px solid #0b857c;box-shadow:0 1px 3px rgba(20,40,80,.3)!important}
+:root[data-theme="light"] .controls-card .control-row input[type=range]{background:transparent}
+:root[data-theme="light"] .controls-card .control-row input[type=range]::-webkit-slider-runnable-track{background:#dbe3ee;box-shadow:none}
+/* the live stage header and the label */
+:root[data-theme="light"] .stage-top{background:transparent}
+:root[data-theme="light"] .stage canvas,:root[data-theme="light"] #physics-canvas{border-radius:10px}
+:root[data-theme="light"] .tutor-switch{background:#fff;border:1px solid #d3dce8;box-shadow:var(--lt-btn-sh)}
+:root[data-theme="light"] .wa-top{box-shadow:none}
