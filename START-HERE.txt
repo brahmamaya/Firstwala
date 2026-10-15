@@ -319,3 +319,5 @@ Kinetic Theory of Gases PYQs: 228 questions (Q42 and Q225 skipped, key (*)), 27 
 
 Landing page hang fix (landing-bg.js): the ray-traced black hole now starts only after the page has loaded and the browser is idle, begins at 0.34 render scale and ramps up while 30 fps holds (steps down and stops ramping when a frame is slow). Measured in headless software GL: long-task time on load fell from ~9 s to ~4.7 s; the 2D fallback costs ~0.2 s.
 PYQ export (rank-export.js): the question and options are smaller (type 34 px max, was 46) and sit in the upper part of the slide (bottom limit 520 px in the questions-only deck, 560 with solutions), options use two columns when every option is one short line, figures max 560 px wide, so the rest of the slide is the teacher's working space.
+
+Topic headings: every new tp key used in a rank-pyq-*.js file MUST have a readable name in the TN map of rank-neet.js (the PYQ tab, practice, mock report and exports show tname(tp)); a missing key shows the raw code (pqg, pse...). Checked for all 9 chapters on 15 Oct: asked, mock-bank and PYQ keys all resolve.
