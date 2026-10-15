@@ -223,5 +223,91 @@ function carnot(){const s=svg(340,220,'Carnot cycle on a P–V diagram: isotherm
   text(s,326,212,'V',12,DIM,'end');text(s,46,14,'P',12,DIM,'start');text(s,326,40,'η = 1 − T₂/T₁',13,INK,'end',700);text(s,326,58,'W = Q₁ − Q₂',12,DIM,'end');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot};
+/* Electrostatics: dipole field and torque, E and V against r for spheres, dielectric slab, capacitor networks, charge sharing */
+const RED='#ff8a8a',GRN='#7ee0a1';
+const chg=(p,x,y,pos)=>{const c=pos?RED:BLUE;mk(p,'circle',{cx:x,cy:y,r:7,fill:'#0b1220',stroke:c,'stroke-width':1.8});text(p,x,y+4,pos?'+':'−',12,c,'middle',700)};
+function dipole(){const s=svg(340,262,'Electric dipole. The axial field at a distance r is 2kp over r cubed, along p. The equatorial field is kp over r cubed, opposite to p. In a uniform field E a dipole at angle theta feels a torque p E sin theta and has potential energy minus p E cos theta.');
+  chg(s,62,70,0);chg(s,98,70,1);vec(s,56,50,104,50,HI);text(s,80,42,'p',14,HI,'middle',700);
+  line(s,108,70,200,70,DIM,1,'4 3');text(s,154,64,'r',12,DIM);mk(s,'circle',{cx:200,cy:70,r:3.5,fill:INK});vec(s,200,70,244,70,GRN);text(s,246,66,'E',13,GRN,'start',700);
+  text(s,200,92,'axial: E = 2kp / r³',12,GRN,'middle',700);
+  line(s,80,78,80,148,DIM,1,'4 3');text(s,88,114,'r',12,DIM,'start');mk(s,'circle',{cx:80,cy:148,r:3.5,fill:INK});vec(s,80,148,40,148,GRN);text(s,34,144,'E',13,GRN,'end',700);
+  text(s,98,152,'equatorial: E = kp / r³',12,GRN,'start',700);text(s,98,168,'(opposite to p)',12,DIM,'start');
+  line(s,20,184,320,184,DIM,1);
+  for(const y of [206,230,254]){vec(s,16,y,120,y,DIM)}
+  text(s,126,256,'E',13,DIM,'start',700);
+  const c=[70,230],a=35*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a);
+  line(s,c[0]-30*dx,c[1]+30*dy,c[0]+30*dx,c[1]-30*dy,INK,2);chg(s,c[0]-30*dx,c[1]+30*dy,0);chg(s,c[0]+30*dx,c[1]-30*dy,1);
+  vec(s,c[0],c[1],c[0]+22*dx,c[1]-22*dy,HI);
+  mk(s,'path',{d:`M${c[0]+34} ${c[1]} A34 34 0 0 0 ${c[0]+34*dx} ${c[1]-34*dy}`,fill:'none',stroke:INK,'stroke-width':1.2});text(s,c[0]+46,c[1]-6,'θ',13,INK,'start',700);
+  text(s,170,206,'τ = pE sinθ',13,INK,'start',700);text(s,170,226,'U = −pE cosθ',13,INK,'start',700);text(s,170,246,'stable at θ = 0',12,DIM,'start');
+  return s}
+function gaussE(){const s=svg(340,268,'Electric field against distance r for a uniformly charged insulating sphere of radius R and for a conducting sphere or shell. Inside the insulating sphere the field rises in a straight line; inside the conductor it is zero; outside both fall as one over r squared.');
+  const X0=44,XR=120,Y0=176,YT=46;
+  line(s,X0,Y0,328,Y0,INK,1.5);line(s,X0,Y0,X0,16,INK,1.5);text(s,328,194,'r',12,DIM,'end');text(s,50,14,'E',12,DIM,'start');
+  line(s,XR,Y0,XR,Y0+6,INK,1.5);text(s,XR,Y0+20,'R',13,INK,'middle',700);line(s,XR,YT,XR,Y0,DIM,1,'4 3');
+  const out=[];for(let x=XR;x<=322;x+=4)out.push(`${x},${(Y0-(Y0-YT)*Math.pow((XR-X0)/(x-X0),2)).toFixed(1)}`);
+  mk(s,'polyline',{points:out.join(' '),fill:'none',stroke:BLUE,'stroke-width':2.4});
+  line(s,X0,Y0,XR,YT,HI,2.4);
+  line(s,X0,Y0-2,XR,Y0-2,GRN,2.4);line(s,XR,Y0-2,XR,YT,GRN,2.4,'3 3');
+  text(s,XR+8,YT-6,'E = kQ / R²',12,INK,'start',700);
+  text(s,322,100,'outside: E = kQ / r²',12,BLUE,'end',700);
+  text(s,20,214,'insulating solid sphere: E = kQr / R³ inside',12,HI,'start',700);
+  text(s,20,232,'conductor or shell: E = 0 inside',12,GRN,'start',700);
+  text(s,20,256,'Both give kQ/r² outside; the field is largest at r = R.',12,DIM,'start');
+  return s}
+function shellV(){const s=svg(340,268,'Potential against distance r. For a conducting sphere or shell the potential is constant kQ over R inside and kQ over r outside. For a uniformly charged insulating sphere the potential at the centre is 1.5 times the surface value.');
+  const X0=62,XR=140,Y0=176,H=100;
+  line(s,X0,Y0,328,Y0,INK,1.5);line(s,X0,Y0,X0,14,INK,1.5);text(s,328,194,'r',12,DIM,'end');text(s,50,14,'V',12,DIM,'start');
+  line(s,XR,Y0,XR,Y0+6,INK,1.5);text(s,XR,Y0+20,'R',13,INK,'middle',700);
+  const out=[];for(let x=XR;x<=322;x+=4)out.push(`${x},${(Y0-H*(XR-X0)/(x-X0)).toFixed(1)}`);
+  mk(s,'polyline',{points:out.join(' '),fill:'none',stroke:BLUE,'stroke-width':2.4});
+  line(s,X0,Y0-H,XR,Y0-H,GRN,2.4);
+  const par=[];for(let x=X0;x<=XR;x+=3){const r=(x-X0)/(XR-X0);par.push(`${x},${(Y0-H*(3-r*r)/2).toFixed(1)}`)}
+  mk(s,'polyline',{points:par.join(' '),fill:'none',stroke:HI,'stroke-width':2.4});
+  line(s,X0,Y0-H,X0-4,Y0-H,INK,1.2);text(s,X0-6,Y0-H+4,'kQ/R',11,DIM,'end');text(s,X0-6,Y0-1.5*H+4,'3kQ/2R',11,DIM,'end');
+  text(s,322,100,'outside: V = kQ / r',12,BLUE,'end',700);
+  text(s,20,214,'insulating sphere: V = kQ(3R² − r²) / 2R³',12,HI,'start',700);
+  text(s,20,232,'conductor or shell: V = kQ / R inside',12,GRN,'start',700);
+  text(s,20,256,'E = −dV/dr: the flat part of V is the zero-field part.',12,DIM,'start');
+  return s}
+function capDiel(){const s=svg(340,232,'Parallel plate capacitor of plate area A and separation d with a dielectric slab of thickness t and constant K between the plates. The capacitance is epsilon zero A over d minus t plus t over K. For a conducting slab K tends to infinity.');
+  mk(s,'rect',{x:50,y:34,width:200,height:7,fill:RED,'fill-opacity':'.55',stroke:RED});mk(s,'rect',{x:50,y:158,width:200,height:7,fill:BLUE,'fill-opacity':'.55',stroke:BLUE});
+  text(s,44,42,'+Q',13,RED,'end',700);text(s,44,166,'−Q',13,BLUE,'end',700);
+  mk(s,'rect',{x:50,y:84,width:200,height:50,fill:'#2b5d93','fill-opacity':'.5',stroke:BLUE,'stroke-width':1.4});
+  for(const x of [90,150,210]){vec(s,x,50,x,80,GRN)}
+  text(s,262,70,'E₀ (air)',12,GRN,'start',700);
+  text(s,150,114,'dielectric K:  E = E₀ / K',12,INK,'middle',700);
+  line(s,258,41,258,158,DIM,1);vec(s,258,41,258,158,DIM);text(s,268,104,'d',14,HI,'start',700);
+  line(s,254,84,300,84,DIM,1,'4 3');line(s,254,134,300,134,DIM,1,'4 3');vec(s,296,84,296,134,HI);vec(s,296,134,296,84,HI);text(s,308,114,'t',14,HI,'start',700);
+  text(s,20,192,'C = ε₀A / (d − t + t/K)',14,INK,'start',700);
+  text(s,20,212,'conducting slab (K → ∞): C = ε₀A / (d − t)',12,DIM,'start');
+  text(s,20,228,'full gap: C = Kε₀A / d',12,DIM,'start');
+  return s}
+const cap=(p,x,y,lab)=>{line(p,x-18,y,x-3,y,INK,2);line(p,x+3,y,x+18,y,INK,2);line(p,x-3,y-12,x-3,y+12,INK,2.4);line(p,x+3,y-12,x+3,y+12,INK,2.4);text(p,x,y-18,lab,13,HI,'middle',700)};
+function capNet(){const s=svg(340,236,'Two capacitors C1 and C2 in series, which share the same charge and have 1 over C equal to 1 over C1 plus 1 over C2, and in parallel, which share the same potential difference and have C equal to C1 plus C2.');
+  text(s,20,14,'SERIES',11,DIM,'start',700);
+  line(s,24,44,52,44,INK,1.6);cap(s,70,44,'C₁');line(s,88,44,112,44,INK,1.6);cap(s,130,44,'C₂');line(s,148,44,190,44,INK,1.6);
+  mk(s,'circle',{cx:24,cy:44,r:3,fill:INK});mk(s,'circle',{cx:190,cy:44,r:3,fill:INK});
+  text(s,20,82,'1/C = 1/C₁ + 1/C₂   (same Q)',13,INK,'start',700);text(s,20,100,'V₁ : V₂ = C₂ : C₁   (smaller C, bigger V)',12,DIM,'start');
+  line(s,20,114,320,114,DIM,1);
+  text(s,20,132,'PARALLEL',11,DIM,'start',700);
+  line(s,40,146,40,196,INK,1.6);line(s,190,146,190,196,INK,1.6);
+  line(s,40,146,97,146,INK,1.6);cap(s,115,146,'C₁');line(s,133,146,190,146,INK,1.6);
+  line(s,40,196,97,196,INK,1.6);cap(s,115,196,'C₂');line(s,133,196,190,196,INK,1.6);
+  mk(s,'circle',{cx:40,cy:171,r:3,fill:INK});mk(s,'circle',{cx:190,cy:171,r:3,fill:INK});line(s,20,171,40,171,INK,1.6);line(s,190,171,210,171,INK,1.6);
+  text(s,222,167,'C = C₁ + C₂',13,INK,'start',700);text(s,222,185,'(same V)',12,DIM,'start');
+  text(s,20,230,'Q₁ : Q₂ = C₁ : C₂ in parallel',12,DIM,'start');
+  return s}
+function share(){const s=svg(340,252,'Two conducting spheres of radii R1 and R2 joined by a thin wire. They reach the same potential, the charges divide in the ratio R1 to R2 and the surface charge densities are in the inverse ratio.');
+  mk(s,'circle',{cx:58,cy:80,r:36,fill:'#17314f',stroke:BLUE,'stroke-width':2});mk(s,'circle',{cx:238,cy:80,r:58,fill:'#17314f',stroke:BLUE,'stroke-width':2});
+  line(s,94,80,180,80,INK,1.6,'5 3');text(s,137,70,'thin wire',11,DIM);
+  line(s,58,80,86,52,DIM,1);text(s,56,86,'Q₁',14,HI,'middle',700);text(s,78,50,'R₁',12,DIM,'start');
+  line(s,238,80,284,48,DIM,1);text(s,236,86,'Q₂',14,HI,'middle',700);text(s,280,46,'R₂',12,DIM,'start');
+  text(s,20,164,'after joining: V₁ = V₂',13,INK,'start',700);
+  text(s,20,184,'V = k(Q₁ + Q₂) / (R₁ + R₂)',13,GRN,'start',700);
+  text(s,20,204,'q₁ : q₂ = R₁ : R₂',13,INK,'start',700);text(s,20,224,'σ₁ : σ₂ = R₂ : R₁   (smaller sphere, larger σ)',13,INK,'start',700);
+  text(s,20,244,'spheres far apart; some energy is lost as heat',12,DIM,'start');
+  return s}
+
+window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share};
 })();
