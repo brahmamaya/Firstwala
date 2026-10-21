@@ -1200,3 +1200,5 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .focus-special{opacity:1!important;filter:none!important}
 :root[data-theme="light"] .focus-special::before,:root[data-theme="light"] .focus-special::after{display:none!important}
 .rk-seltop .rk-seltoggle{font-size:13px;line-height:1.25;white-space:normal;text-align:center;max-width:min(100%,250px)}
+.series-top{font:inherit;font-size:13px;font-weight:700;cursor:pointer;color:var(--on-mint);background:var(--mint);border:1px solid var(--mint);border-radius:999px;padding:6px 12px;white-space:nowrap}.series-top:hover{background:var(--mint-hover)}
+@media(max-width:560px){.series-top{padding:6px 9px;font-size:12px}}

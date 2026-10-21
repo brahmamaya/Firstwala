@@ -30,16 +30,20 @@ select count(*) from public.question_keys;
 insert into public.attempts (user_id, test_id, deadline) values (:u1, 'aaaaaaaa-0000-0000-0000-000000000001', now() + interval '1 day');
 update public.profiles set role = 'admin' where id = :u1;
 update public.profiles set parent_consent_at = now() where id = :u1;
-update public.profiles set display_name = 'Ravi' where id = :u1;
-select 'own display_name update OK: ' || display_name from public.profiles where id = :u1;
+update public.profiles set display_name = 'Ravi' where id = :u1;   -- must be denied: profile writes go through save_profile()
 select 'student sees ' || count(*) || ' published tests (expect 3)' from public.tests;
 
 \echo '== 2. anonymous cannot call RPCs'
 reset role; set role anon;
 select public.start_attempt('aaaaaaaa-0000-0000-0000-000000000001');
 
-\echo '== 3. start / resume / entitlements'
+\echo '== 3. profile gate, start / resume / entitlements'
 reset role; set role authenticated; set request.jwt.claim.sub = :u1;
+select public.start_attempt('aaaaaaaa-0000-0000-0000-000000000001');                 -- profile_incomplete
+select public.save_profile('Ravi', true, false);                                    -- consent_required
+select public.save_profile('', false, false);                                       -- invalid_name
+select public.save_profile('Ravi', true, true);
+select (is_minor and parent_consent_at is not null) as "minor consent recorded (expect t)" from public.profiles where id = :u1;
 select public.start_attempt('aaaaaaaa-0000-0000-0000-000000000001') as a1 \gset
 select :'a1' = public.start_attempt('aaaaaaaa-0000-0000-0000-000000000001')::text as "resume returns same attempt (expect t)";
 select public.start_attempt('aaaaaaaa-0000-0000-0000-000000000002');
@@ -74,6 +78,7 @@ select public.get_attempt(:'a1')->>'submitted' as "get_attempt after submit (exp
 
 \echo '== 7. negative marking, bad numeric input'
 reset role; set role authenticated; set request.jwt.claim.sub = :u2;
+select public.save_profile('Asha', false, false);
 select public.start_attempt('aaaaaaaa-0000-0000-0000-000000000001') as a2 \gset
 select public.save_answer(:'a2', 'bbbbbbbb-0000-0000-0000-000000000001', '0');
 select public.save_answer(:'a2', 'bbbbbbbb-0000-0000-0000-000000000002', 'abc');

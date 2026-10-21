@@ -113,7 +113,6 @@ alter table public.responses     enable row level security;
 drop policy if exists profiles_self_read   on public.profiles;
 drop policy if exists profiles_self_update on public.profiles;
 create policy profiles_self_read   on public.profiles for select to authenticated using (id = (select auth.uid()) or public.is_admin());
-create policy profiles_self_update on public.profiles for update to authenticated using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
 drop policy if exists tests_read on public.tests;
 drop policy if exists tests_admin on public.tests;
@@ -141,7 +140,7 @@ revoke all on public.profiles, public.tests, public.questions, public.question_k
               public.enrollments, public.attempts, public.responses from anon, authenticated;
 grant select on public.tests, public.enrollments, public.attempts, public.responses to authenticated;
 grant select on public.profiles to authenticated;
-grant update (display_name, is_minor) on public.profiles to authenticated;   -- NOT role / parent_consent_at
+-- profile writes go through save_profile() only, so role / consent can't be forged from the browser
 grant select, insert, update, delete on public.tests, public.questions, public.question_keys to authenticated; -- gated by admin policies
 
 -- ---------------------------------------------------------------- helpers (not callable by clients)
@@ -178,6 +177,22 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------- client API (RPC)
+
+-- First-login profile. Minors (<18) must confirm parental consent (DPDP Act 2023); recorded server-side.
+create or replace function public.save_profile(p_name text, p_is_minor boolean, p_parent_consent boolean default false)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if p_name is null or btrim(p_name) = '' or char_length(p_name) > 80 then raise exception 'invalid_name' using errcode = '22023'; end if;
+  if p_is_minor is null then raise exception 'invalid_age' using errcode = '22023'; end if;
+  if p_is_minor and not coalesce(p_parent_consent, false) then raise exception 'consent_required' using errcode = 'P0001'; end if;
+  update public.profiles
+     set display_name = btrim(p_name),
+         is_minor = p_is_minor,
+         parent_consent_at = case when p_is_minor then coalesce(parent_consent_at, now()) else null end
+   where id = auth.uid();
+end $$;
+
 create or replace function public.start_attempt(p_test_id uuid) returns uuid
 language plpgsql security definer set search_path = public as $$
 declare uid uuid := auth.uid(); t public.tests; existing uuid; new_id uuid;
@@ -185,6 +200,10 @@ begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
   select * into t from public.tests where id = p_test_id and published;
   if not found then raise exception 'test_not_found' using errcode = 'P0002'; end if;
+  if not exists (select 1 from public.profiles p where p.id = uid and p.is_minor is not null
+                   and (not p.is_minor or p.parent_consent_at is not null)) then
+    raise exception 'profile_incomplete' using errcode = 'P0001';
+  end if;
 
   select id into existing from public.attempts where user_id = uid and test_id = p_test_id;
   if existing is not null then return existing; end if;           -- resume
@@ -291,7 +310,7 @@ end $$;
 -- ---------------------------------------------------------------- function privileges
 revoke all on function public._finalize(uuid), public._score_answer(text, text, int, int, text), public._to_num(text) from public, anon, authenticated;
 revoke all on function public.start_attempt(uuid), public.get_attempt(uuid), public.save_answer(uuid, uuid, text),
-                       public.submit_attempt(uuid), public.get_result(uuid), public.handle_new_user() from public, anon, authenticated;
+                       public.submit_attempt(uuid), public.get_result(uuid), public.save_profile(text, boolean, boolean), public.handle_new_user() from public, anon, authenticated;
 revoke all on function public.is_admin() from public, anon;
 grant execute on function public.start_attempt(uuid), public.get_attempt(uuid), public.save_answer(uuid, uuid, text),
-                          public.submit_attempt(uuid), public.get_result(uuid), public.is_admin() to authenticated;
+                          public.submit_attempt(uuid), public.get_result(uuid), public.save_profile(text, boolean, boolean), public.is_admin() to authenticated;

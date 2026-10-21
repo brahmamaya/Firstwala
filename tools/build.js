@@ -4,7 +4,7 @@ const fs=require('fs'),path=require('path'),{execFileSync}=require('child_proces
 const root=path.join(__dirname,'..'),ESB=process.env.ESBUILD||'esbuild';
 require('./secret-guard.js')(root); // no API keys or tokens may ever ship
 const CORE=['compat.js','mathtext.js','theme.js','physica3d.js'];
-const MAIN=['physics.js','extras.js','enhancements.js','third.js','fourth.js','fifth.js','sixth.js','labkit.js','seventh.js','eighth.js','ninth.js','tenth.js','eleventh.js','class10-new.js','biokit.js','.subjects.tmp.js','phys3d-a.js','phys3d-b.js','phys3d-c.js','phys3d-d.js','instruments2d.js','optics2d.js','mirrors2d.js','experience.js','class10.js','app.js','focus.js','recorder.js','landing-bg.js','landing.js','feedback.js','install.js','tutor-speech.js','tutor.js','lazy.js'];
+const MAIN=['physics.js','extras.js','enhancements.js','third.js','fourth.js','fifth.js','sixth.js','labkit.js','seventh.js','eighth.js','ninth.js','tenth.js','eleventh.js','class10-new.js','biokit.js','.subjects.tmp.js','phys3d-a.js','phys3d-b.js','phys3d-c.js','phys3d-d.js','instruments2d.js','optics2d.js','mirrors2d.js','experience.js','class10.js','app.js','focus.js','recorder.js','landing-bg.js','landing.js','feedback.js','install.js','series-loader.js','tutor-speech.js','tutor.js','lazy.js'];
 const TUTOR=['tutor-content.js','tutor-chapters.js','tutor-teacher-content.js','tutor-learned.js','phys-fig.js','tutor-mock.js']; // loaded only when a student opens the AI Tutor
 const EXAM=['tutor-exam.js']; // Board/JEE/NEET questions and mock tests: loaded only when the Exam tab opens
 // Botany/Zoology and Chemistry ship as their own packs; the main bundle carries only their index (tools/subject-manifest.js)
@@ -19,6 +19,7 @@ fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js'
 bundle(EXAM,'physica-exam.min.js');
 bundle(['rank-pyq-jee.js','rank-pyq-kin.js','rank-pyq-lom.js','rank-pyq-wep.js','rank-pyq-rot.js','rank-pyq-grav.js','rank-pyq-prop.js','rank-pyq-thermo.js','rank-pyq-ktg.js','rank-pyq-osc.js','rank-pyq-es.js'],'physica-pyq.min.js');
 bundle(['rank-export.js'],'physica-export.min.js');
+bundle(['series.js'],'physica-series.min.js'); // Test Series (Supabase login + exam), fetched when a student opens it
 bundle(['phys-fig.js','rank-figs.js','rank-units.js','rank-units-jee.js','rank-kin-jee.js','rank-lom-jee.js','rank-wep-jee.js','rank-rot-jee.js','rank-grav-jee.js','rank-prop-jee.js','rank-thermo-jee.js','rank-ktg-jee.js','rank-osc-jee.js','rank-electro-jee.js','rank-neet.js'],'physica-rank.min.js');
 {const rp=path.join(root,'physica-rank.min.js'),ph=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-pyq.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('__PYQ_URL__','./physica-pyq.min.js?v='+ph).replace('__EXPORT_URL__','./physica-export.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-export.min.js'))).digest('hex').slice(0,8)))}
 {const box={};require('vm').runInNewContext(fs.readFileSync(path.join(root,'tutor-exam.js'),'utf8'),{window:box});fs.writeFileSync(path.join(root,'.examidx.tmp.js'),'window.PhysicaExamChapters='+JSON.stringify(Object.keys(box.PhysicaExam))+';')}
@@ -30,7 +31,7 @@ for(const k of Object.keys(SUBJECTS))bundle(SUBJECTS[k],'physica-'+k+'.min.js');
 fs.writeFileSync(path.join(root,'.subjects.tmp.js'),require('./subject-manifest.js')(root,SUBJECTS));
 try{bundle(MAIN,'physica.min.js')}finally{fs.unlinkSync(path.join(root,'.subjects.tmp.js'))}
 {const pm=path.join(root,'physica.min.js');let js=fs.readFileSync(pm,'utf8');for(const k of Object.keys(SUBJECTS))js=js.replace('__'+k.toUpperCase()+'_URL__','./physica-'+k+'.min.js?v='+hashOf('physica-'+k+'.min.js'));fs.writeFileSync(pm,js
-.replace('__LAZY_URL__','./physica-3d.min.js?v='+packV).replace('__RANK_URL__','./physica-rank.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-rank.min.js'))).digest('hex').slice(0,8)).replace('__TUTOR_URL__','./physica-tutor.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-tutor.min.js'))).digest('hex').slice(0,8)))}
+.replace('__SERIES_URL__','./physica-series.min.js?v='+hashOf('physica-series.min.js')).replace('__LAZY_URL__','./physica-3d.min.js?v='+packV).replace('__RANK_URL__','./physica-rank.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-rank.min.js'))).digest('hex').slice(0,8)).replace('__TUTOR_URL__','./physica-tutor.min.js?v='+crypto0.createHash('md5').update(fs.readFileSync(path.join(root,'physica-tutor.min.js'))).digest('hex').slice(0,8)))}
 // styles: drop overridden declarations (tools/optimize-css.js), then serve a minified copy
 execFileSync(process.execPath,[path.join(__dirname,'optimize-css.js')],{stdio:'inherit'});execFileSync(ESB,[path.join(root,'styles.css'),'--minify','--log-level=warning','--outfile='+path.join(root,'styles.min.css')],{stdio:'inherit'});
 const crypto=require('crypto'),ip=path.join(root,'index.html');let html=fs.readFileSync(ip,'utf8');
