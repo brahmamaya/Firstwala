@@ -8,7 +8,6 @@
 --   * The timer is server-side: attempts.deadline is set at start; late saves are rejected.
 --   * Payments are not built yet, but start_attempt() already checks tests.is_free / enrollments.
 
-create extension if not exists pgcrypto;
 
 -- ---------------------------------------------------------------- profiles
 create table if not exists public.profiles (
@@ -98,6 +97,9 @@ create table if not exists public.responses (
 
 create index if not exists questions_test_idx on public.questions (test_id, position);
 create index if not exists attempts_user_idx  on public.attempts (user_id);
+create index if not exists attempts_test_idx  on public.attempts (test_id);
+create index if not exists responses_question_idx on public.responses (question_id);
+create index if not exists enrollments_test_idx on public.enrollments (test_id);
 
 -- ---------------------------------------------------------------- RLS
 alter table public.profiles      enable row level security;
@@ -110,8 +112,8 @@ alter table public.responses     enable row level security;
 
 drop policy if exists profiles_self_read   on public.profiles;
 drop policy if exists profiles_self_update on public.profiles;
-create policy profiles_self_read   on public.profiles for select to authenticated using (id = auth.uid() or public.is_admin());
-create policy profiles_self_update on public.profiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
+create policy profiles_self_read   on public.profiles for select to authenticated using (id = (select auth.uid()) or public.is_admin());
+create policy profiles_self_update on public.profiles for update to authenticated using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
 drop policy if exists tests_read on public.tests;
 drop policy if exists tests_admin on public.tests;
@@ -125,14 +127,14 @@ create policy questions_admin     on public.questions     for all to authenticat
 create policy question_keys_admin on public.question_keys for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists enrollments_own on public.enrollments;
-create policy enrollments_own on public.enrollments for select to authenticated using (user_id = auth.uid() or public.is_admin());
+create policy enrollments_own on public.enrollments for select to authenticated using (user_id = (select auth.uid()) or public.is_admin());
 
 drop policy if exists attempts_own on public.attempts;
-create policy attempts_own on public.attempts for select to authenticated using (user_id = auth.uid() or public.is_admin());
+create policy attempts_own on public.attempts for select to authenticated using (user_id = (select auth.uid()) or public.is_admin());
 
 drop policy if exists responses_own on public.responses;
 create policy responses_own on public.responses for select to authenticated
-  using (exists (select 1 from public.attempts a where a.id = attempt_id and (a.user_id = auth.uid() or public.is_admin())));
+  using (exists (select 1 from public.attempts a where a.id = attempt_id and (a.user_id = (select auth.uid()) or public.is_admin())));
 
 -- Table privileges: deny by default, then grant the minimum. (RLS still applies on top.)
 revoke all on public.profiles, public.tests, public.questions, public.question_keys,
@@ -144,11 +146,11 @@ grant select, insert, update, delete on public.tests, public.questions, public.q
 
 -- ---------------------------------------------------------------- helpers (not callable by clients)
 create or replace function public._to_num(t text) returns numeric
-language plpgsql immutable as $$
+language plpgsql immutable set search_path = public as $$
 begin return t::numeric; exception when others then return null; end $$;
 
 create or replace function public._score_answer(p_type text, p_correct text, p_marks int, p_neg int, p_answer text)
-returns int language sql immutable as $$
+returns int language sql immutable set search_path = public as $$
   select case
     when p_answer is null or btrim(p_answer) = '' then 0
     when p_type = 'NUMERICAL' then
@@ -289,7 +291,7 @@ end $$;
 -- ---------------------------------------------------------------- function privileges
 revoke all on function public._finalize(uuid), public._score_answer(text, text, int, int, text), public._to_num(text) from public, anon, authenticated;
 revoke all on function public.start_attempt(uuid), public.get_attempt(uuid), public.save_answer(uuid, uuid, text),
-                       public.submit_attempt(uuid), public.get_result(uuid), public.handle_new_user() from public, anon;
+                       public.submit_attempt(uuid), public.get_result(uuid), public.handle_new_user() from public, anon, authenticated;
 revoke all on function public.is_admin() from public, anon;
 grant execute on function public.start_attempt(uuid), public.get_attempt(uuid), public.save_answer(uuid, uuid, text),
                           public.submit_attempt(uuid), public.get_result(uuid), public.is_admin() to authenticated;
