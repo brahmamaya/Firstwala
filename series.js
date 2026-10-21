@@ -112,6 +112,14 @@ async function finalize(a, t, ix) {
   return total;
 }
 const HEX = a => a.map(b => b.toString(16).padStart(2, '0')).join('');
+/* An attempt is kept in db.a[testId] while it runs and after it ends (so its result can be opened). Starting a test again moves the finished
+   attempt into db.h[testId] (history, ids "<testId>~<n>") and begins a new one: every attempt's result and review stay available. */
+const attemptOf = (db, id) => {
+  const m = /^(.*)~(\d+)$/.exec(id);
+  if (m) { const a = (db.h && db.h[m[1]] || [])[+m[2] - 1]; return a ? { a, tid: m[1] } : null; }
+  const a = db.a && db.a[id]; return a ? { a, tid: id } : null;
+};
+const finished = (db, tid) => [...(db.h && db.h[tid] || []), ...(db.a && db.a[tid] && db.a[tid].done ? [db.a[tid]] : [])];
 const LOCAL = {
   async list_tests({ p_exam }) {
     const ix = await index(), db = dbLoad(), mine = db.a || {}, pat = {};
@@ -120,18 +128,22 @@ const LOCAL = {
     for (const t of ts) { const a = mine[t.id]; if (a && !a.done && Date.now() > a.dl) { await finalize(a, t, ix); changed = true; } }   // time ran out while the page was closed: score it now
     if (changed) dbSave(db);
     for (const t of ts) { const p = ix.patterns[t.pat]; pat[t.pat] = pat[t.pat] || { l: p.label, m: p.minutes, pp: p.papers, q: secTotal(p.sections), mx: secMax(p.sections), s: p.sections }; }
-    return { pat, tests: ts.map(t => { const a = mine[t.id]; return { id: t.id, n: t.n, p: t.p, pat: t.pat, f: true, lk: false, t: t.t || undefined, a: a ? a.id : undefined, s: a && a.done ? a.score : undefined, d: !!(a && a.done) }; }) };
+    return { pat, tests: ts.map(t => { const a = mine[t.id], fin = finished(db, t.id), n = (db.h && db.h[t.id] || []).length + (a ? 1 : 0);
+      return { id: t.id, n: t.n, p: t.p, pat: t.pat, f: true, lk: false, t: t.t || undefined, a: a ? a.id : undefined, s: a && a.done ? a.score : undefined, d: !!(a && a.done), c: n || undefined, b: fin.length ? Math.max(...fin.map(x => x.score)) : undefined }; }) };
   },
   async start_attempt({ p_test_id }) {
-    const ix = await index(), t = await findTest(p_test_id), db = dbLoad(); db.a = db.a || {};
-    if (db.a[t.id]) return db.a[t.id].id;
+    const ix = await index(), t = await findTest(p_test_id), db = dbLoad(); db.a = db.a || {}; db.h = db.h || {};
+    const cur = db.a[t.id];
+    if (cur && !cur.done) return cur.id;                                  // resume
+    if (cur && cur.done) { (db.h[t.id] = db.h[t.id] || []).push(cur); }   // reattempt: keep the finished one in the history
     const pat = ix.patterns[t.pat], n = secTotal(pat.sections), now = Date.now();
-    db.a[t.id] = { id: t.id, start: now, dl: now + pat.minutes * 60000, ans: Array(n).fill(null), fl: Array(n).fill(0), tm: Array(n).fill(0) };
+    db.a[t.id] = { id: t.id, no: (db.h[t.id] || []).length + 1, start: now, dl: now + pat.minutes * 60000, ans: Array(n).fill(null), fl: Array(n).fill(0), tm: Array(n).fill(0) };
     dbSave(db); return t.id;
   },
   async get_attempt({ p_attempt }) {
-    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
-    const t = await findTest(p_attempt), pat = ix.patterns[t.pat];
+    const ix = await index(), db = dbLoad(), h = attemptOf(db, p_attempt); if (!h) throw err('attempt_not_found');
+    const a = h.a, t = await findTest(h.tid), pat = ix.patterns[t.pat];
+    if (p_attempt !== h.tid) return { submitted: true, attempt_id: p_attempt };
     if (!a.done && Date.now() > a.dl) { await finalize(a, t, ix); dbSave(db); }
     if (a.done) return { submitted: true, attempt_id: a.id };
     const paper = await getFile(t);
@@ -160,16 +172,18 @@ const LOCAL = {
     const sc = await finalize(a, await findTest(p_attempt), ix); dbSave(db); return sc;
   },
   async get_result({ p_attempt }) {
-    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
-    if (!a.done) throw err('attempt_in_progress');
-    const t = await findTest(p_attempt), pat = ix.patterns[t.pat];
-    return { l: pat.label, n: t.n, p: t.p, title: t.t, score: a.score, total: secMax(pat.sections), min: pat.minutes, used: Math.round((a.end - a.start) / 60000), rank: 1, of: 1,
+    const ix = await index(), db = dbLoad(), h = attemptOf(db, p_attempt); if (!h) throw err('attempt_not_found');
+    const a = h.a; if (!a.done) throw err('attempt_in_progress');
+    const t = await findTest(h.tid), pat = ix.patterns[t.pat], hist = db.h && db.h[h.tid] || [];
+    const all = [...hist.map((x, i) => ({ id: h.tid + '~' + (i + 1), no: x.no || i + 1, sc: x.score, end: x.end, used: Math.round((x.end - x.start) / 60000) })),
+      ...(db.a[h.tid] && db.a[h.tid].done ? [{ id: h.tid, no: db.a[h.tid].no || hist.length + 1, sc: db.a[h.tid].score, end: db.a[h.tid].end, used: Math.round((db.a[h.tid].end - db.a[h.tid].start) / 60000) }] : [])];
+    return { tid: h.tid, no: a.no || 1, all, l: pat.label, n: t.n, p: t.p, title: t.t, score: a.score, total: secMax(pat.sections), min: pat.minutes, used: Math.round((a.end - a.start) / 60000), rank: 1, of: 1,
       sections: pat.sections.map((x, i) => ({ nm: x.nm, s: x.s, t: x.t, n: x.n, sc: a.det[i][0], mx: x.n * x.c, ok: a.det[i][1], bad: a.det[i][2], skip: a.det[i][3], tm: a.det[i][4] })) };
   },
   async get_review({ p_attempt, p_section }) {
-    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
-    if (!a.done) throw err('attempt_in_progress');
-    const t = await findTest(p_attempt), secs = ix.patterns[t.pat].sections, sec = secs[p_section]; if (!sec) throw err('invalid_section');
+    const ix = await index(), db = dbLoad(), h = attemptOf(db, p_attempt); if (!h) throw err('attempt_not_found');
+    const a = h.a; if (!a.done) throw err('attempt_in_progress');
+    const t = await findTest(h.tid), secs = ix.patterns[t.pat].sections, sec = secs[p_section]; if (!sec) throw err('invalid_section');
     const [paper, key] = await Promise.all([getFile(t), getFile(t, true)]);
     let off = 0; for (let i = 0; i < p_section; i++) off += secs[i].n;
     return Array.from({ length: sec.n }, (_, k) => { const g = off + k, y = a.ans[g], ky = key.ks[g];
@@ -364,20 +378,25 @@ async function hubView(exam) {
     const testBtn = t => {
       const pat = d.pat[t.pat], tag = pat.pp > 1 ? `Paper ${t.p}: ` : '', now2 = Date.now();
       let text, go = null, cls = '';
-      if (t.d) { text = `${tag}Result ${t.s}/${pat.mx}`; go = () => resultView(t.a); cls = 'done'; }
+      const line = () => t.c && t.b != null ? h('p', { class: 'ps-muted ps-soon' }, `Attempts: ${t.c}${t.d ? '' : ' (one in progress)'} · Best ${t.b}/${pat.mx}`) : null;
+      if (t.d) {
+        text = `${tag}Result ${t.s}/${pat.mx}`;
+        return [h('button', { type: 'button', class: 'done', onclick: () => resultView(t.a), 'aria-label': `${NAME[exam]} Test ${t.n}${pat.pp > 1 ? ', paper ' + t.p : ''}: ${text}` }, text),
+          h('button', { type: 'button', class: 'ps-go', onclick: () => instructionsView(t, pat), 'aria-label': `${NAME[exam]} Test ${t.n}${pat.pp > 1 ? ', paper ' + t.p : ''}: reattempt` }, '↻ Reattempt'), line()];
+      }
       else if (t.a) { text = tag + 'Resume'; go = () => runExam(t.a); cls = 'ps-go'; }
       else if (t.lk) { text = tag + '🔒 Locked'; go = () => { note.hidden = false; note.textContent = 'Tests 4 to 30 are paid. Online payment is not open yet; we will announce it here and on the official Physica WhatsApp channel. Tests 1 to 3 are free.'; note.focus(); }; cls = 'locked'; }
       else if (t.op && Date.parse(t.op) > now2) { text = `${tag}Opens ${when(t.op)}`; }
       else if (t.cl && Date.parse(t.cl) < now2) { text = tag + 'Closed'; }
       else { text = tag + 'Start'; go = () => instructionsView(t, pat); cls = 'ps-go'; }
-      return h('button', { type: 'button', class: cls, disabled: !go, onclick: go, 'aria-label': `${NAME[exam]} Test ${t.n}${pat.pp > 1 ? ', paper ' + t.p : ''}: ${text}` }, text);
+      return [h('button', { type: 'button', class: cls, disabled: !go, onclick: go, 'aria-label': `${NAME[exam]} Test ${t.n}${pat.pp > 1 ? ', paper ' + t.p : ''}: ${text}` }, text), line()];
     };
     const cards = [];
     for (let n = 1; n <= 30; n++) {
       const free = n <= 3, ts = byN.get(n);
       cards.push(h('div', { class: 'ps-card ps-tcard' + (ts ? '' : ' soon') },
         h('div', { class: 'ps-ct' }, h('b', null, 'Test ' + n), h('span', { class: 'ps-pill ' + (free ? 'free' : 'paid') }, free ? 'FREE' : 'PAID')),
-        ts ? ts.map(testBtn) : h('p', { class: 'ps-muted ps-soon' }, 'Coming soon')));
+        ts ? ts.map(testBtn).flat() : h('p', { class: 'ps-muted ps-soon' }, 'Coming soon')));
     }
     const recent = null;
     show(h('button', { type: 'button', class: 'ps-link', onclick: close }, '← Back'),
@@ -429,6 +448,7 @@ function instructionsView(t, pat) {
   show(h('button', { type: 'button', class: 'ps-link', onclick: () => hubView(curExam) }, '← All tests'),
     h('h1', null, `${pat.l} · Test ${t.n}${pat.pp > 1 ? ' · Paper ' + t.p : ''}`),
     quoteCard(t.n),
+    t.c ? h('p', { class: 'ps-banner', role: 'status' }, `This will be attempt ${t.c + 1} of this test. Your earlier ${t.c === 1 ? 'result stays' : 'results stay'} saved, so you can compare them.`) : null,
     h('div', { class: 'ps-card' }, h('h2', null, 'General instructions'),
       h('ul', null,
         h('li', null, `The test has ${pat.q} questions, ${pat.mx} marks and lasts `, h('b', null, dur(pat.m)), '. The timer runs on this device from the moment you click “I am ready to begin”. It does not stop if you close the page.'),
@@ -493,10 +513,16 @@ async function resultView(attemptId) {
     reviewBox.append(det);
   });
   show(h('button', { type: 'button', class: 'ps-link', onclick: () => hubView(curExam) }, '← All tests'),
-    h('h1', null, `${r.l} · Test ${r.n}${r.p > 1 ? ' · Paper ' + r.p : ''}`),
+    h('h1', null, `${r.l} · Test ${r.n}${r.p > 1 ? ' · Paper ' + r.p : ''}${r.all.length > 1 ? ' · Attempt ' + r.no : ''}`),
     h('div', { class: 'ps-card ps-score' }, h('div', { class: 'ps-big2' }, `${r.score}`, h('small', null, ` / ${r.total}`)),
       h('p', null, 'Your score is saved on this device only (no account, no rank list).'),
-      h('p', { class: 'ps-muted' }, `Time used: ${clock(r.used * 60)} of ${dur(r.min)}`)),
+      h('p', { class: 'ps-muted' }, `Time used: ${clock(r.used * 60)} of ${dur(r.min)}`),
+      h('p', null, h('button', { type: 'button', class: 'ps-go', onclick: async () => { try { const d = await rpc('list_tests', { p_exam: curExam }), t = d.tests.find(x => x.id === r.tid); instructionsView(t, d.pat[t.pat]); } catch (e) { fatal(e); } } }, '↻ Reattempt this test'))),
+    r.all.length > 1 ? h('div', { class: 'ps-card ps-scroll' }, h('h2', null, `Your attempts (${r.all.length})`),
+      h('table', { class: 'ps-tbl' }, h('thead', null, h('tr', null, ['Attempt', 'Date', 'Score', 'Time', ''].map(x => h('th', { scope: 'col' }, x)))),
+        h('tbody', null, r.all.map(x => h('tr', null, h('td', null, '#' + x.no), h('td', null, new Date(x.end).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })), h('td', null, `${x.sc}/${r.total}`), h('td', null, clock(x.used * 60)),
+          h('td', null, x.id === attemptId ? 'this one' : h('button', { type: 'button', class: 'ps-link', onclick: () => resultView(x.id) }, 'Open')))))),
+      h('p', { class: 'ps-sub' }, `Best score: ${Math.max(...r.all.map(x => x.sc))}/${r.total}`)) : null,
     h('p', { class: 'ps-card ps-quote' }, r.score >= r.total * 0.6 ? 'Strong attempt. Read the review below, fix the few slips, and push the next one higher.' : 'Every score is data, not a verdict. Open the review, find the two or three topics that cost you most marks, and fix those first.'),
     h('div', { class: 'ps-grid' }, subjectCards), reviewBox);
 }
