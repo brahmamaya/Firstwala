@@ -74,7 +74,7 @@ function vectorPlot(c,profile,cx,cy,vectors,max,compact=false){
  if(!compact)text(c,profile.body||'BODY',cx,cy+125,C.muted,13,'center');
 }
 function drawProfile(c,data,s,p,t){
- c.clearRect(0,0,640,330);let bg=c.createLinearGradient(0,0,640,330);bg.addColorStop(0,'#0a1d2d');bg.addColorStop(1,'#081624');c.fillStyle=bg;c.fillRect(0,0,640,330);for(let x=20;x<640;x+=30)line(c,x,0,x,330,'#1d354755',1);for(let y=20;y<330;y+=30)line(c,0,y,640,y,'#1d354755',1);
+ c.clearRect(0,0,640,330);let bg=c.createLinearGradient(0,0,640,330);bg.addColorStop(0,'#010203');bg.addColorStop(1,'#04070a');c.fillStyle=bg;c.fillRect(0,0,640,330);for(let x=20;x<640;x+=30)line(c,x,0,x,330,'#1d354755',1);for(let y=20;y<330;y+=30)line(c,0,y,640,y,'#1d354755',1);
  if(data.kind==='vectors'||data.kind==='flight'){
   let vs=data.vectors,max=Math.max(...vs.map(v=>Math.hypot(v.x,v.y)),1e-9);vectorPlot(c,data,170,151,vs,max);
   let y=46;vs.forEach((v,i)=>{let colour=[C.blue,C.gold,C.mint,C.red,C.purple,C.white][i%6],m=Math.hypot(v.x,v.y);text(c,`${v.label}: ${v.value||F(m,m<.01?4:2)}${v.unit?' '+v.unit:''}`,324,y,colour,17);y+=32});
