@@ -102,7 +102,7 @@ R['calorimetry']=(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.25,pitch:.08,cx:330
   lab(s,[X-.93,1.0,-.1],'insulating jacket',-40,-50);lab(s,[X-.79,.9,-.2],'felt lining',-60,10);lab(s,[X+.5,.5,-.4],'copper calorimeter',90,30);lab(s,[X-.32,2.1+sy,0],'stirrer',-40,-30);lab(s,[X+.6,1.76,0],'ebonite lid',70,-10);lab(s,V.add(B,V.mul(ax,.4)),`hot water ${p.hot} °C`,-80,10);lab(s,[X,cb+hw*.4,.5],`cold water ${p.cold} °C (×${p.ratio} mass)`,40,40);
   s.render();tag(c,`T_final = ${f(Tf,1)} °C`,44,98,C.gold,15)};
 
-R['newton-cooling']=(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.3,pitch:.08,cx:215,cy:325}),tt=cycle(t*4,80),T=p.ambient+(p.initial-p.ambient)*Math.exp(-p.rate*tt),X=-.2,cr=.62,ch=1.25,y0=.32;
+R['newton-cooling']=(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,pitch:.08,cx:240,cy:322}),tt=cycle(t*4,80),T=p.ambient+(p.initial-p.ambient)*Math.exp(-p.rate*tt),X=-.2,cr=.62,ch=1.25,y0=.32;
   bench(s,0,0,5,2.4);s.cyl([X,.16,0],[0,1,0],.8,.32,'#a07850');s.cyl([X,.33,0],[0,1,0],.82,.02,'#8a6440');
   s.cyl([X,y0+ch/2,0],[0,1,0],cr,ch,CU,{caps:false,seg:28});cutaway(s,[X,y0,0],cr-.02,cr-.02,ch,'#c98a4f','#c98a4f');band(s,[X,y0+ch,0],cr,.022,'#d08a52');s.cyl([X,y0+.01,0],[0,1,0],cr,.02,'#9c5f2a');
   const lv=ch*.75;s.cyl([X,y0+lv-.005,0],[0,1,0],cr-.03,.01,waterCol(T),{alpha:.85});
@@ -200,7 +200,7 @@ R['thermo']=(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,pitch:.06,cx:300,cy:34
 function hotRes(s,[x,y,z],w,t){s.box([x,y+.25,z],[w,.5,w*.8],'#5c636a');s.box([x,y+.52,z],[w*.9,.04,w*.7],mix('#c92a2a','#ff8a3c',.5+.3*Math.sin(t*3)));for(let i=0;i<5;i++)s.box([x-w*.4+i*w*.2,y+.25,z+w*.41],[.05,.36,.02],'#343a40')}
 function coldRes(s,[x,y,z],w){s.box([x,y+.25,z],[w,.5,w*.8],'#3b6fb6');for(let i=0;i<6;i++)s.box([x-w*.3+(i%3)*w*.3,y+.55,z+(i<3?-.15:.15)*w],[w*.22,.1,w*.22],'#e7f5ff',{alpha:.9,rotY:i*.4})}
 function padRes(s,[x,y,z],w){s.box([x,y+.25,z],[w,.5,w*.8],'#d9cfb8');for(let i=0;i<4;i++)s.seg([x-w/2,y+.1+i*.12,z+w*.4+.005],[x+w/2,y+.1+i*.12,z+w*.4+.005],'#b8a98a',1)}
-R['carnot']=(c,p,t)=>{const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:205,cy:335}),g=5/3,ph=cycle(t/2,4),leg=Math.floor(ph),q=ph-leg,k=(p.hot/p.cold)**1.5,V1=1,V2=p.ratio,V3=V2*k,V4=V1*k,Vs=[[V1,V2],[V2,V3],[V3,V4],[V4,V1]][leg],Vv=Vs[0]+(Vs[1]-Vs[0])*q,eta=1-p.cold/p.hot;
+R['carnot']=(c,p,t)=>{const s=P3.scene(c,{scale:44,yaw:.3,pitch:.06,cx:215,cy:340}),g=5/3,ph=cycle(t/2,4),leg=Math.floor(ph),q=ph-leg,k=(p.hot/p.cold)**1.5,V1=1,V2=p.ratio,V3=V2*k,V4=V1*k,Vs=[[V1,V2],[V2,V3],[V3,V4],[V4,V1]][leg],Vv=Vs[0]+(Vs[1]-Vs[0])*q,eta=1-p.cold/p.hot;
   const T=leg===0?p.hot:leg===2?p.cold:leg===1?p.hot*(V2/Vv)**(g-1):p.cold*(V4/Vv)**(g-1),h=.3+Vv/V3*1.55,xs=[-1.6,0,1.6,0][leg];
   bench(s,0,0,5.2,2.2);hotRes(s,[-1.6,0,0],1.3,t);padRes(s,[0,0,0],1.2);coldRes(s,[1.6,0,0],1.3);
   const y0=.75,top=pcyl(s,{x:xs,y0,R:.5,H:2.0,h,gas:mix('#74c0fc','#ff6b3c',clamp((T-p.cold)/(p.hot-p.cold),0,1)),ga:.2,rodL:.6,base:false});s.cyl([xs,y0-.1,0],[0,1,0],.62,.2,'#495057');gasIn(s,12,[xs,0],.49,y0,h,.2+Math.sqrt(T)*.025,t,'#42d9ca',.05);
@@ -226,13 +226,13 @@ R['first-law']=(c,p,t)=>{const s=P3.scene(c,{scale:44,yaw:.3,pitch:.06,cx:250,cy
   lab(s,[X,top+.15,0],'piston',-70,-30);lab(s,[X-.55,y0+.4,0],'gas',-60,-10);lab(s,[X-.65,.6,.4],p.heat>=0?'Bunsen burner on tripod':'cold block',-70,20);
   s.render();tag(c,`ΔU = Q − W = ${p.heat} − ${p.work} = ${dU} J`,44,98,C.gold,15)};
 
-R['isothermal-entropy']=(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,pitch:.08,cx:270,cy:340}),ph=.5-.5*Math.cos(t*.6),r=1+(p.ratio-1)*ph,h=.3+r*.55,y0=.35,dS=p.moles*8.314*Math.log(Math.max(1e-6,r)),dSf=p.moles*8.314*Math.log(p.ratio),bw=2.6,bd=2.0,bh=1.05;
+R['isothermal-entropy']=(c,p,t)=>{const s=P3.scene(c,{scale:44,yaw:.3,pitch:.08,cx:270,cy:336}),ph=.5-.5*Math.cos(t*.6),r=1+(p.ratio-1)*ph,h=.3+r*.55,y0=.35,dS=p.moles*8.314*Math.log(Math.max(1e-6,r)),dSf=p.moles*8.314*Math.log(p.ratio),bw=2.6,bd=2.0,bh=1.05;
   bench(s,0,0,5.6,2.6);s.box([0,.03,0],[bw+.1,.06,bd+.1],'#495057');s.box([0,.06+bh/2,0],[bw-.04,bh,bd-.04],'#4dabf7',{alpha:.3});s.box([0,.06+bh/2+.08,0],[bw,bh+.16,bd],GLASS,{alpha:.07});
   s.helix([-.95,.4,.0],[0,0,1],.12,1.4,7,'#c92a2a',2.4);s.box([-1.0,bh+.4,-.75],[.5,.3,.3],'#2b3036');s.ball([-.85,bh+.4,-.59],.03,'#ff6b3c',{glow:true,flat:true});s.engrave([-1.05,bh+.4,-.59],`${p.temperature} K`,'#69f0ae',10);s.cyl([-1.0,bh-.05,-.75],[0,1,0],.03,.6,STEEL);
   const top=pcyl(s,{x:.35,y0,R:.55,H:2.7,h,gas:'#ffa94d',ga:.16,rodL:.6,base:false});s.cyl([.35,y0-.05,0],[0,1,0],.6,.1,CU);gasIn(s,16,[.35,0],.54,y0,h,.4,t,'#42d9ca',.05);
   s.arrow([1.45,.35,.6],[.95,.6,.3],dS>=0?C.red:C.blue,3.5,10,`Q = TΔS = ${f(p.temperature*dS,0)} J`);
   const sx=2.0,sh=Math.max(.03,Math.abs(dS)/12);s.box([sx,.03,.3],[.55,.06,.55],'#343a40');s.box([sx,.06+sh/2,.3],[.3,sh,.3],dS>=0?'#b89dff':'#ff857e');s.label([sx,-.2,.7],`ΔS = ${f(dS,2)} J/K`,C.purple,12);
-  lab(s,[-.95,.45,.7],'heater',-40,40);lab(s,[-1.25,bh+.45,-.75],'thermostat',-50,-30);lab(s,[-1.25,bh*.8,bd/2],'constant-T water bath',-50,-20);lab(s,[.35,top+.2,0],'piston',60,-50);
+  lab(s,[-.95,.45,.7],'heater',-40,40);lab(s,[-1.25,bh+.45,-.75],'thermostat',-50,-30);lab(s,[bw/2-.3,bh*.5,bd/2],'constant-T water bath',50,44);lab(s,[.35,top+.2,0],'piston',60,-50);
   s.render();tag(c,`ΔS = nR ln(Vf/Vi) = ${f(dSf,2)} J/K at ${p.temperature} K`,44,98,C.gold,15)};
 
 R['isobaric-process']=(c,p,t)=>{const Rg=8.314,ph=.5-.5*Math.cos(t*.9),T=p.T1+(p.T2-p.T1)*ph,V1=p.n*Rg*p.T1/(p.P*1000),V=p.n*Rg*T/(p.P*1000),Vmax=p.n*Rg*800/(p.P*1000),h=.35+2.0*V/Math.max(Vmax,1e-9),s=P3.scene(c,{scale:48,yaw:.3,pitch:.06,cx:205,cy:342}),y0=.62,X=0;
@@ -263,7 +263,7 @@ R['refrigerator']=(c,p,t)=>{const Tc=p.Tc+273.15,Th=Math.max(p.Th+273.15,Tc+1),c
   s.render();tag(c,`COP = Tc/(Th − Tc) = ${f(cop,2)}`,44,98,C.gold,15)};
 
 R['rectangle-cycle']=(c,p,t)=>{const P1=Math.min(p.P1,p.P2),P2=Math.max(p.P1,p.P2),V1=Math.min(p.V1,p.V2),V2=Math.max(p.V1,p.V2),ph=cycle(t/2,4),corner=[[V1,P1],[V1,P2],[V2,P2],[V2,P1]],i=Math.floor(ph),fr=ph-i,a=corner[i],b=corner[(i+1)%4],cur=[a[0]+(b[0]-a[0])*fr,a[1]+(b[1]-a[1])*fr];
-  const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:185,cy:342}),heat=i<2,h=.3+cur[0]/10*1.9,y0=.62,X=0,Wn=(P2-P1)*(V2-V1);bench(s,0,0,4,2.2);
+  const s=P3.scene(c,{scale:41,yaw:.3,pitch:.06,cx:200,cy:336}),heat=i<2,h=.3+cur[0]/10*1.9,y0=.62,X=0,Wn=(P2-P1)*(V2-V1);bench(s,0,0,4,2.2);
   if(heat)hotplate(s,[X,0,0],1.8,true,t);else{s.box([X,.14,0],[1.8,.28,1.5],'#3b6fb6');s.cyl([X,.3,0],[0,1,0],.65,.05,'#a5d8ff');s.tube([[X-.9,.1,.5],[X-1.3,.05,.8]],.04,'#74c0fc',{segs:4});s.tube([[X+.9,.1,.5],[X+1.3,.05,.8]],.04,'#74c0fc',{segs:4})}
   const top=pcyl(s,{x:X,y0,R:.62,H:2.4,h,gas:mix('#74c0fc','#ff6b3c',clamp(cur[0]*cur[1]/4000,0,1)),ga:.2,rodL:.12,base:false});s.cyl([X,y0-.04,0],[0,1,0],.68,.08,CU);gasIn(s,14,[X,0],.61,y0,h,.2+Math.sqrt(cur[0]*cur[1])*.012,t,'#42d9ca',.05);
   s.cyl([X,top+.18,0],[0,1,0],.42,.05,IRON);weights(s,[X,top+.2,0],Math.max(1,Math.round(cur[1]/50)),.36);
@@ -328,19 +328,19 @@ R['gay-lussac']=(c,p,t)=>{const s=P3.scene(c,{scale:46,yaw:.3,pitch:.06,cx:270,c
   s.ball(B,.55,GLASS,{alpha:.18});s.ring(B,[0,1,0],.55,'#ffffff55',1,[],30);gas(s,14,[.32,.32,.32],Math.sqrt(p.temperature)*.03,t,'#42d9ca',.05,0,B);
   s.cyl([X,B[1]+1.0,0],[0,1,0],.04,1.0,GLASS,{alpha:.4});s.tube([[X,B[1]+1.5,0],[X,B[1]+1.75,0],[X+1.8,B[1]+1.75,0],[X+1.8,B[1]+1.55,0]],.035,BRASS,{segs:6});gauge(s,[X+1.8,B[1]+1.0,0],P/(p.p0*2.3),`${f(P,0)} kPa`,.42);
   stand(s,[X+1.8,0,-.25],2.6,1.6,[X+.6,1.6,-.05]);thermometer(s,[X+.55,yb+.25,.2],1.8,(p.temperature-100)/500,{label:`${p.temperature} K`});
-  lab(s,V.add(B,[-.4,.2,.3]),'sealed glass bulb (fixed V)',-60,-60);lab(s,[X-br,yb+.5,.3],'heating bath',-50,30);lab(s,[X+1.8+.4,B[1]+1.0,0],'pressure gauge',40,10);
+  lab(s,V.add(B,[-.4,.2,.3]),'sealed glass bulb (fixed V)',30,-80);lab(s,[X-br,yb+.5,.3],'heating bath',-50,30);lab(s,[X+1.8+.4,B[1]+1.0,0],'pressure gauge',40,10);
   s.render();tag(c,`P/T = constant → P = ${p.p0} × ${p.temperature}/300 = ${f(P,0)} kPa`,44,98,C.gold,15)};
 
 R['brownian-motion']=(c,p,t)=>{const kB=1.380649e-23,D=kB*p.T/(6*PI*p.eta*1e-3*p.a*1e-6),step=Math.sqrt(2*D*.2)*1e6,n=Math.min(400,Math.floor(cycle(t,24)*16)),pts=[[0,0]],lim=9.5;
   for(let i=0;i<n;i++){const q=pts[i];pts.push(q.map((v,k)=>clamp(v+step*(hash(i*3+k+1)*2-1)*1.73,-lim,lim)))}
-  const s=P3.scene(c,{scale:56,yaw:.45,pitch:.02,cx:150,cy:352}),M='#c9ced3',A='#f1f3f5';bench(s,0,0,3.4,2.4);
+  const s=P3.scene(c,{scale:52,yaw:.45,pitch:.02,cx:175,cy:340}),M='#c9ced3',A='#f1f3f5';bench(s,0,0,3.4,2.4);
   s.box([0,.08,.1],[1.3,.16,1.5],M);s.box([0,.5,-.45],[.45,.75,.4],M);s.tube([[0,.8,-.5],[0,1.6,-.62],[0,2.3,-.35],[0,2.6,.05]],.17,M,{segs:10});
   s.box([0,1.05,.2],[1.2,.08,1.1],'#23292f');s.box([0,1.11,.25],[.95,.02,.32],GLASS,{alpha:.6});s.box([0,1.125,.25],[.3,.01,.3],GLASS,{alpha:.8});for(const x of[-.35,.35])s.box([x,1.12,.05],[.1,.03,.4],'#adb5bd');
   s.cyl([0,.75,.2],[0,1,.1],.18,.04,'#d4d9de');s.cyl([0,1.5,.22],[0,1,0],.06,.4,'#c3c9cf');s.cyl([0,1.78,.22],[0,1,0],.18,.16,'#868e96');s.cyl([0,2.25,.22],[0,1,0],.14,.8,A);s.cyl([0,2.75,.22],[0,1,0],.09,.3,'#343a40');s.cyl([0,2.95,.22],[0,1,0],.11,.1,'#212529');
   s.cyl([.36,.95,-.45],[1,0,0],.18,.12,'#868e96');s.cyl([.47,.95,-.45],[1,0,0],.11,.1,'#adb5bd');
-  lab(s,[0,2.9,.22],'eyepiece',60,20);lab(s,[0,1.55,.22],'objective lens',-70,-10);lab(s,[-.45,1.12,.25],'slide + suspension',-60,30);lab(s,[.47,.95,-.45],'focus knob',50,40);
+  lab(s,[0,2.9,.22],'eyepiece',45,-8);lab(s,[0,1.55,.22],'objective lens',50,-14);lab(s,[-.45,1.12,.25],'slide + suspension',50,34);lab(s,[.47,.95,-.45],'focus knob',50,12);
   const E=s.P([0,2.98,.22]);s.render();
-  const cx0=470,cy0=242,Rr=128,ctx=c,mp=q=>[cx0+q[0]*12,cy0-q[1]*12];ctx.save();ctx.strokeStyle='#8ca6b966';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(E[0],E[1]);ctx.lineTo(cx0-Rr*.7,cy0-Rr*.7);ctx.moveTo(E[0],E[1]);ctx.lineTo(cx0-Rr*.9,cy0+Rr*.3);ctx.stroke();ctx.setLineDash([]);
+  const cx0=505,cy0=250,Rr=122,ctx=c,mp=q=>[cx0+q[0]*12,cy0-q[1]*12];ctx.save();ctx.strokeStyle='#8ca6b966';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(E[0],E[1]);ctx.lineTo(cx0-Rr*.7,cy0-Rr*.7);ctx.moveTo(E[0],E[1]);ctx.lineTo(cx0-Rr*.9,cy0+Rr*.3);ctx.stroke();ctx.setLineDash([]);
   ctx.beginPath();ctx.arc(cx0,cy0,Rr,0,TAU);const g=ctx.createRadialGradient(cx0-20,cy0-20,10,cx0,cy0,Rr);g.addColorStop(0,'#f4f1e4');g.addColorStop(.75,'#d8d2bc');g.addColorStop(1,'#6b6656');ctx.fillStyle=g;ctx.fill();ctx.save();ctx.clip();
   for(let i=0;i<60;i++){const q=[(hash(i+500)-.5)*22+.15*Math.sin(t*20+i),(hash(i+600)-.5)*22+.15*Math.cos(t*17+i)],[x,y]=mp(q);ctx.fillStyle='#9a9480';ctx.beginPath();ctx.arc(x,y,1.6,0,TAU);ctx.fill()}
   ctx.strokeStyle='#1c7ed6aa';ctx.lineWidth=1.4;ctx.beginPath();pts.forEach((q,i)=>{const [x,y]=mp(q);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();const [px,py]=mp(pts[pts.length-1]),pr=4+p.a*3;const pg=ctx.createRadialGradient(px-pr*.4,py-pr*.4,1,px,py,pr);pg.addColorStop(0,'#ffe8a3');pg.addColorStop(1,'#a8711a');ctx.fillStyle=pg;ctx.beginPath();ctx.arc(px,py,pr,0,TAU);ctx.fill();ctx.fillStyle='#1b1f23';ctx.fillRect(cx0+30,cy0+Rr-30,60,3);ctx.font='600 11px system-ui, sans-serif';ctx.textAlign='center';ctx.fillText('5 μm',cx0+60,cy0+Rr-38);ctx.restore();
