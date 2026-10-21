@@ -68,8 +68,9 @@ select t.ok(not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p
                          where n.nspname in ('public', 'private') and p.prosecdef
                            and not coalesce(array_to_string(p.proconfig, ',') ilike '%search_path=""%', false)), 'every SECURITY DEFINER function pins search_path to empty');
 select t.ok(not exists (select 1 from information_schema.role_table_grants where grantee = 'anon' and table_schema in ('public', 'private')), 'anon holds no table privileges');
-select t.ok(not exists (select 1 from information_schema.role_routine_grants where grantee in ('anon', 'public', 'PUBLIC') and routine_schema in ('public', 'private')
-                         and routine_name not in ('handle_new_user')), 'anon / PUBLIC can execute nothing in public or private');
+select t.ok((select array_agg(routine_name::text order by routine_name::text) from information_schema.role_routine_grants
+              where grantee in ('anon', 'public', 'PUBLIC') and routine_schema in ('public', 'private') and routine_name <> 'handle_new_user') = array['track'],
+            'the ONLY function anon / PUBLIC can execute is public.track (anonymous counters)');
 select t.ok(not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'
                          and p.proname in ('finalize', 'score_answer', 'to_num', 'rate_limit', 'audit', 'purge_inactive', 'current_terms')), 'internal helpers are not in the API-exposed schema');
 select t.ok(not exists (select 1 from information_schema.role_routine_grants where grantee = 'authenticated' and routine_schema = 'private'), 'authenticated cannot execute private.*');
@@ -279,6 +280,42 @@ select t.ok(private.purge_inactive(24) = 1, 'purge removes exactly the one inact
 select t.ok(exists (select 1 from auth.users where id = '66666666-6666-6666-6666-666666666666') and exists (select 1 from auth.users where id = :admin), 'recently active student and admin are kept');
 select t.as_user(:adult);
 select t.err('select private.purge_inactive(24)', 'permission denied', 'students cannot run purge');
+
+\echo '--- audit log retention ---'
+reset role;
+insert into public.audit_log (at, action) values (now() - interval '400 days', 'old.event'), (now() - interval '200 days', 'mid.event');
+select t.err('select private.purge_audit(30)', 'below_cert_in_minimum', 'audit purge refuses to go below CERT-In''s 180 days');
+select t.ok(private.purge_audit(365) = 1, 'audit purge removes only entries older than 12 months');
+select t.ok(exists (select 1 from public.audit_log where action = 'mid.event'), 'entries inside the retention window are kept');
+select t.as_user(:adult);
+select t.err('select private.purge_audit(365)', 'permission denied', 'students cannot purge the audit log');
+
+\echo
+\echo '=== L. privacy-first analytics ==='
+reset role; truncate public.analytics_daily; truncate private.rate_limits; set role anon;
+select public.track('visit'); select public.track('visit', ''); select public.track('view', 'projectile-motion'); select public.track('view', 'projectile-motion');
+select t.err('select public.track(''hax'', ''a'')', 'invalid_event', 'unknown analytics event rejected');
+select t.err(format('select public.track(''view'', %L)', k), 'invalid_event', 'bad analytics key rejected: ' || left(k, 24))
+  from (values ('Has Caps'), ('a b'), ('x;drop table y'), ('<script>'), (repeat('a', 65)), ('é'), ('a/b')) v(k);
+select t.err('select count(*) from public.analytics_daily', 'permission denied', 'anon cannot read the statistics table');
+select t.err('select public.admin_stats(7)', 'permission denied', 'anon cannot call admin_stats');
+reset role;
+select t.ok((select n from public.analytics_daily where event = 'visit' and key = '') = 2 and (select n from public.analytics_daily where event = 'view' and key = 'projectile-motion') = 2, 'counters increment (2 visits, 2 views)');
+select t.ok((select count(*) from information_schema.columns where table_schema = 'public' and table_name = 'analytics_daily') = 4
+        and not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'analytics_daily' and column_name ~* 'ip|user|agent|session|device|email|id$'), 'statistics table has no column that could identify a person (day, event, key, n only)');
+select t.as_user(:adult);
+select t.ok((select count(*) from public.analytics_daily) = 0, 'a signed-in student cannot read the statistics');
+select t.err('select public.admin_stats(7)', 'forbidden', 'student cannot call admin_stats');
+select t.as_user(:admin, 'aal1'); select t.err('select public.admin_stats(7)', 'forbidden', 'admin without MFA cannot call admin_stats');
+select t.as_user(:admin, 'aal2');
+select t.ok((public.admin_stats(7) ->> 'visits_total')::int = 2 and (public.admin_stats(7) #>> '{top_views,0,key}') = 'projectile-motion', 'admin (MFA) sees totals and top pages');
+reset role;
+do $$ begin for i in 1..3005 loop insert into public.analytics_daily (event, key, n) values ('view', 'k' || i, 1) on conflict do nothing; end loop; end $$;
+set role anon; select public.track('view', 'brand-new-key'); reset role;
+select t.ok((select n from public.analytics_daily where key = 'other') = 1 and not exists (select 1 from public.analytics_daily where key = 'brand-new-key'), 'distinct-key cap: new keys fold into "other" once 3000 exist for the day');
+truncate private.rate_limits; set role anon;
+do $$ begin for i in 1..1200 loop perform public.track('visit'); end loop; perform t.err('select public.track(''visit'')', 'rate_limited', 'track is globally rate limited (1200/min)'); end $$;
+reset role;
 
 \echo
 \echo 'ALL SECURITY CHECKS PASSED'

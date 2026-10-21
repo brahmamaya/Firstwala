@@ -1,6 +1,6 @@
 // Concurrency + fuzz tests against a real Postgres loaded with supabase/schema.sql. Run through run.sh.
 const { Pool } = require('pg');
-const pool = new Pool({ host: '/tmp', port: Number(process.env.PGPORT || 5548), user: 'postgres', database: 't', max: 40 });
+const pool = new Pool({ host: process.env.PGHOST || '/tmp', port: Number(process.env.PGPORT || 5548), user: process.env.PGUSER || 'postgres', password: process.env.PGPASSWORD, database: 't', max: 40 });
 let fails = 0;
 const ok = (c, m) => { console.log((c ? 'PASS  ' : 'FAIL  ') + m); if (!c) fails++; };
 
@@ -86,6 +86,7 @@ const KNOWN = /^(not_authenticated|rate_limited|attempt_not_found|attempt_closed
     ['select public.submit_attempt($1::uuid)', 1], ['select public.save_answer($1::uuid,$2::uuid,$3)', 3], ['select public.log_event($1::uuid,$2,$3::jsonb)', 3],
     ['select public.save_profile($1,$2::boolean,$3::boolean,$4,$5)', 5],
   ];
+  const tablesBefore = (await su("select count(*)::int c from information_schema.tables where table_schema='public'")).rows[0].c;
   let calls = 0, bad = [], leaks = 0;
   for (let i = 0; i < 1500; i++) {
     const [sql, n] = rnd(fns);
@@ -100,7 +101,7 @@ const KNOWN = /^(not_authenticated|rate_limited|attempt_not_found|attempt_closed
   ok(bad.length === 0, `${calls} hostile calls: no unexpected / internal errors${bad.length ? ' e.g. ' + bad[0] : ''}`);
   ok(leaks === 0, 'no fuzzed call ever returned an answer key or solution');
   const tables = (await su("select count(*)::int c from information_schema.tables where table_schema='public'")).rows[0].c;
-  ok(tables === 9, 'all 9 public tables still exist after SQL-injection payloads');
+  ok(tables === tablesBefore && tables >= 10, `all ${tablesBefore} public tables still exist after SQL-injection payloads`);
 
   await pool.end();
   console.log(fails ? `\n${fails} FAILED` : '\nALL STRESS CHECKS PASSED');

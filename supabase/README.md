@@ -21,3 +21,7 @@
 ## Tests
 `tests/rls_checks.sql` exercises all of the above (RLS, leaks, scoring, deadline). To run it locally you need a Postgres with
 stub `anon` / `authenticated` roles and an `auth.users` table + `auth.uid()` – see the header of the file for fixtures.
+
+## Security, tests and launch checklist
+See `../docs/SECURITY.md` (threat model, how to run the suites, dashboard hardening, legal checklist).
+Quick tests: `bash tests/run-local.sh` and `bash tests/stress/run.sh`.

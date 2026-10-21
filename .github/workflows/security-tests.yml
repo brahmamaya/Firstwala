@@ -1,0 +1,33 @@
+name: Security tests
+# Runs the database security suite (RLS, rate limits, MFA, erasure, fuzz, races) and the secret guard on every change
+# to the test-series backend or front-end. Fails the build if any assertion fails.
+on:
+  push:
+    paths: ['supabase/**', 'series.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', '.github/workflows/security-tests.yml']
+  pull_request:
+    paths: ['supabase/**', 'series.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', '.github/workflows/security-tests.yml']
+permissions:
+  contents: read
+jobs:
+  db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: ci }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Secret guard
+        run: node -e "require('./tools/secret-guard.js')('.')"
+      - name: Database security suite + stress/fuzz
+        run: bash supabase/tests/run-external.sh

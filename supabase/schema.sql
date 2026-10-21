@@ -117,6 +117,16 @@ create table if not exists public.audit_log (
   meta      jsonb not null default '{}'
 );
 
+-- Privacy-first site statistics: ONLY anonymous daily totals. No user id, no IP, no cookie, no per-visitor row, so
+-- nothing here can identify or follow a person (safe for children's visits; DPDP s.9(3)).
+create table if not exists public.analytics_daily (
+  day   date   not null default (now() at time zone 'Asia/Kolkata')::date,
+  event text   not null check (event in ('visit', 'view')),
+  key   text   not null check (char_length(key) <= 64 and key ~ '^[a-z0-9._-]*$'),
+  n     bigint not null default 0,
+  primary key (day, event, key)
+);
+
 create unlogged table if not exists private.rate_limits (
   key          text not null,
   window_start timestamptz not null,
@@ -226,6 +236,7 @@ alter table public.attempts         enable row level security;
 alter table public.responses        enable row level security;
 alter table public.integrity_events enable row level security;
 alter table public.audit_log        enable row level security;
+alter table public.analytics_daily  enable row level security;
 
 drop policy if exists profiles_self_read   on public.profiles;
 drop policy if exists profiles_self_update on public.profiles;
@@ -255,15 +266,18 @@ create policy responses_own on public.responses for select to authenticated
 drop policy if exists integrity_admin on public.integrity_events;
 create policy integrity_admin on public.integrity_events for select to authenticated using (public.is_admin());
 
+drop policy if exists analytics_admin on public.analytics_daily;
+create policy analytics_admin on public.analytics_daily for select to authenticated using (public.is_admin());
+
 drop policy if exists audit_admin on public.audit_log;
 create policy audit_admin on public.audit_log for select to authenticated using (public.is_admin());
 
 -- Table privileges: deny by default, then grant the minimum (RLS still applies on top).
 revoke all on public.profiles, public.tests, public.questions, public.question_keys, public.enrollments,
-              public.attempts, public.responses, public.integrity_events, public.audit_log from anon, authenticated;
+              public.attempts, public.responses, public.integrity_events, public.audit_log, public.analytics_daily from anon, authenticated;
 revoke all on private.rate_limits from anon, authenticated;
 grant select on public.profiles, public.tests, public.enrollments, public.attempts, public.responses to authenticated;
-grant select on public.integrity_events, public.audit_log to authenticated;                       -- admin-only via RLS
+grant select on public.integrity_events, public.audit_log, public.analytics_daily to authenticated;                       -- admin-only via RLS
 grant select, insert, update, delete on public.tests, public.questions, public.question_keys to authenticated; -- admin-only via RLS
 
 -- ============================================================ client API (RPC)
@@ -487,6 +501,40 @@ begin
   delete from auth.users where id = uid;
 end $$;
 
+-- Anonymous site statistics. Callable by anyone (anon), writes aggregate counters only.
+-- Abuse limits: strict key charset/length, at most 3000 distinct keys per day (extras fold into 'other'),
+-- and a global rate limit. Worst case an attacker skews a counter; nobody's data is exposed.
+create or replace function public.track(p_event text, p_key text default '') returns void
+language plpgsql security definer set search_path = '' as $$
+declare k text := coalesce(p_key, ''); d date := (now() at time zone 'Asia/Kolkata')::date;
+begin
+  if p_event not in ('visit', 'view') then raise exception 'invalid_event' using errcode = '22023'; end if;
+  if char_length(k) > 64 or k !~ '^[a-z0-9._-]*$' then raise exception 'invalid_event' using errcode = '22023'; end if;
+  perform private.rate_limit('track', 1200, interval '1 minute');
+  if not exists (select 1 from public.analytics_daily where day = d and event = p_event and key = k)
+     and (select count(*) from public.analytics_daily where day = d) >= 3000 then
+    k := 'other';
+  end if;
+  insert into public.analytics_daily as a (day, event, key, n) values (d, p_event, k, 1)
+  on conflict (day, event, key) do update set n = a.n + 1;
+end $$;
+
+-- Owner dashboard (admin + MFA only): daily visits and the most viewed simulations over the last N days.
+create or replace function public.admin_stats(p_days int default 30) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not public.is_admin() then raise exception 'forbidden' using errcode = '42501'; end if;
+  p_days := least(greatest(coalesce(p_days, 30), 1), 365);
+  return jsonb_build_object(
+    'days', p_days,
+    'visits_total', (select coalesce(sum(n), 0) from public.analytics_daily where event = 'visit' and day > (now() at time zone 'Asia/Kolkata')::date - p_days),
+    'visits_by_day', (select coalesce(jsonb_agg(jsonb_build_object('day', day, 'visits', n) order by day), '[]')
+                        from public.analytics_daily where event = 'visit' and key = '' and day > (now() at time zone 'Asia/Kolkata')::date - p_days),
+    'top_views', (select coalesce(jsonb_agg(jsonb_build_object('key', key, 'views', v) order by v desc), '[]') from (
+                    select key, sum(n) v from public.analytics_daily where event = 'view' and day > (now() at time zone 'Asia/Kolkata')::date - p_days
+                     group by key order by v desc limit 50) t));
+end $$;
+
 -- Storage limitation: remove student accounts with no test activity for N months (run monthly via pg_cron, see README).
 create or replace function private.purge_inactive(p_months int default 24) returns int
 language plpgsql security definer set search_path = '' as $$
@@ -504,14 +552,27 @@ begin
   return n;
 end $$;
 
+-- Storage limitation for the security log: keep 12 months by default, never less than CERT-In's 180 days.
+create or replace function private.purge_audit(p_days int default 365) returns bigint
+language plpgsql security definer set search_path = '' as $$
+declare n bigint;
+begin
+  if p_days < 180 then raise exception 'below_cert_in_minimum'; end if;
+  with del as (delete from public.audit_log where at < now() - make_interval(days => p_days) returning 1)
+  select count(*) into n from del;
+  return n;
+end $$;
+
 -- ============================================================ function privileges
 revoke all on all functions in schema private from public, anon, authenticated;
 revoke all on function public.handle_new_user() from public, anon, authenticated;
 revoke all on function public.is_admin() from public, anon;
 revoke all on function public.save_profile(text, boolean, boolean, text, text), public.start_attempt(uuid), public.get_attempt(uuid),
                        public.save_answer(uuid, uuid, text), public.submit_attempt(uuid), public.get_result(uuid),
-                       public.log_event(uuid, text, jsonb), public.export_my_data(), public.delete_my_account() from public, anon;
-grant execute on function public.is_admin(), public.save_profile(text, boolean, boolean, text, text), public.start_attempt(uuid),
+                       public.log_event(uuid, text, jsonb), public.export_my_data(), public.delete_my_account(),
+                       public.track(text, text), public.admin_stats(int) from public, anon;
+grant execute on function public.track(text, text) to anon, authenticated;
+grant execute on function public.is_admin(), public.admin_stats(int), public.save_profile(text, boolean, boolean, text, text), public.start_attempt(uuid),
                           public.get_attempt(uuid), public.save_answer(uuid, uuid, text), public.submit_attempt(uuid),
                           public.get_result(uuid), public.log_event(uuid, text, jsonb), public.export_my_data(),
                           public.delete_my_account() to authenticated;

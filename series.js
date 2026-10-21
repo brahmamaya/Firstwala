@@ -7,6 +7,9 @@
 const SUPA = 'https://lbyqvwkichjvrrzcddtq.supabase.co';
 const KEY = 'sb_publishable_E3vG7C6UN13-1PoWwJNauA_uq7zvZxi';
 const STORE = 'physica-series-auth';
+const TERMS = '2026-10-21';            // must equal private.current_terms() in supabase/schema.sql
+const GA_ID = 'G-Z1BGVQBEJ6';
+const IDLE_MS = 30 * 60 * 1000;         // sign out an unattended shared-device session
 const EXAMS = { JEE_MAIN: 'JEE Main', JEE_ADV: 'JEE Advanced', NEET: 'NEET' };
 const MSG = {
   network: 'No internet connection. Check your network and try again.',
@@ -22,6 +25,10 @@ const MSG = {
   profile_incomplete: 'Please finish your profile first.',
   consent_required: 'Students under 18 need a parent or guardian to agree.',
   invalid_name: 'Please enter your name.',
+  invalid_parent_email: 'Please enter a valid email address for your parent or guardian.',
+  invalid_answer: 'That answer is not valid for this question.',
+  terms_outdated: 'Our Terms or Privacy Policy changed. Please read and accept them to continue.',
+  rate_limited: 'You are doing that too fast. Please wait a moment and try again.',
 };
 const say = e => MSG[e && e.code] || (e && e.status === 429 ? MSG.over_email_send_rate_limit : 'Something went wrong. Please try again.');
 
@@ -59,9 +66,13 @@ function rich(el, text) {
 const rt = (tag, text, cls) => rich(h(tag, cls ? { class: cls } : null), text);
 
 /* ---------- auth + REST ---------- */
-let sess = null;
-try { sess = JSON.parse(lsGet(STORE) || 'null'); } catch { sess = null; }
-const save = s => { sess = s; lsSet(STORE, s ? JSON.stringify(s) : null); };
+const ssGet = k => { try { return sessionStorage.getItem(k); } catch { return null; } };
+const ssSet = (k, v) => { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch {} };
+let sess = null, remember = false;
+try { const l = lsGet(STORE); sess = JSON.parse(l || ssGet(STORE) || 'null'); remember = !!l; } catch { sess = null; }
+// Default: the login lives only in this tab (gone when it closes), which is safe on shared / cyber-cafe computers.
+// "Keep me signed in" (own device) stores it in localStorage instead.
+const save = s => { sess = s; lsSet(STORE, null); ssSet(STORE, null); if (s) (remember ? lsSet : ssSet)(STORE, JSON.stringify(s)); };
 const now = () => Math.floor(Date.now() / 1000);
 
 async function raw(path, { method = 'GET', body, token } = {}) {
@@ -95,8 +106,8 @@ async function api(path, opts = {}) {
 }
 const rpc = (fn, args) => api('/rest/v1/rpc/' + fn, { method: 'POST', body: args || {} });
 const sendCode = email => raw('/auth/v1/otp', { method: 'POST', body: { email, create_user: true } });
-const verifyCode = async (email, code) => adopt(await raw('/auth/v1/verify', { method: 'POST', body: { type: 'email', email, token: code } }));
-const signOut = () => { const t = sess && sess.access_token; save(null); if (t) raw('/auth/v1/logout', { method: 'POST', token: t }).catch(() => {}); };
+const verifyCode = async (email, code, keep) => { const d = await raw('/auth/v1/verify', { method: 'POST', body: { type: 'email', email, token: code } }); remember = !!keep; adopt(d); };
+const signOut = (everywhere) => { const t = sess && sess.access_token; save(null); if (t) raw('/auth/v1/logout' + (everywhere ? '?scope=global' : ''), { method: 'POST', token: t }).catch(() => {}); };
 
 /* ---------- styles (theme variables come from styles.css) ---------- */
 const CSS = `
@@ -130,17 +141,22 @@ const CSS = `
 .ps-banner{padding:8px 12px;border-radius:10px;border:1px solid var(--t-ffb347,#ffb347);color:var(--t-ffb347,#ffb347);margin:8px 0}
 .ps-sub{color:var(--muted);font-size:.9em;margin-top:6px}
 .ps-ov sub,.ps-ov sup{font-size:.75em;line-height:0}
+.ps-ov::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:5;background-image:var(--ps-mark,none)}
+.ps-ov.ps-exam .ps-q,.ps-ov.ps-exam .ps-opt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ps-link{background:none!important;border:0!important;padding:0!important;color:var(--mint);text-decoration:underline;cursor:pointer}
+.ps-danger{border-color:var(--t-ff6b7a,#ff6b7a)!important;color:var(--t-ff6b7a,#ff6b7a)!important}
+@media print{.ps-ov{display:none!important}}
 @media(max-width:560px){.ps-bar small{display:none}.ps-pal button{width:36px}}
 `;
 
 /* ---------- shell ---------- */
-let ov = null, main = null, userEl = null, outBtn = null, busyTimer = null, onLeave = null;
+let ov = null, main = null, userEl = null, outBtn = null, onLeave = null, idleTimer = null, lastActive = Date.now();
 let examLive = false;
 
 function ensureShell() {
   if (ov) return;
   if (!document.getElementById('ps-style')) document.head.append(h('style', { id: 'ps-style' }, CSS));
-  userEl = h('small', { 'aria-live': 'polite' });
+  userEl = h('button', { type: 'button', class: 'ps-link', hidden: true, title: 'Your account and data', onclick: () => { if (leaveOk()) accountView(); } });
   outBtn = h('button', { type: 'button', hidden: true, onclick: () => { if (leaveOk()) { signOut(); view(); } } }, 'Logout');
   main = h('main', { class: 'ps-main', tabindex: '-1' });
   ov = h('div', { class: 'ps-ov', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Physica Test Series', hidden: true },
@@ -151,15 +167,29 @@ function ensureShell() {
   // Keep the lab's global shortcuts (Space, R, X, F, arrows ...) from firing while typing answers.
   for (const t of ['keydown', 'keyup', 'keypress']) ov.addEventListener(t, e => e.stopPropagation());
   ov.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  for (const t of ['pointerdown', 'keydown', 'scroll', 'touchstart']) ov.addEventListener(t, () => { lastActive = Date.now(); }, { passive: true, capture: true });
+  // exam content must not be copied out: block context menu / copy / cut / drag while a test is on screen
+  for (const t of ['contextmenu', 'copy', 'cut', 'dragstart']) ov.addEventListener(t, e => {
+    if (!examLive) return;
+    e.preventDefault();
+    if (t !== 'contextmenu' && onCopy) onCopy();
+  });
   document.body.append(ov);
 }
 function leaveOk() {
   return !examLive || confirm('Leave the exam screen? Your timer keeps running and your saved answers are kept. You can resume from the test list.');
 }
+let onCopy = null;
 function open() {
   ensureShell();
+  window['ga-disable-' + GA_ID] = true;          // no analytics inside the exam area, ever (students may be minors)
   ov.hidden = false;
   document.documentElement.style.overflow = 'hidden';
+  lastActive = Date.now();
+  clearInterval(idleTimer);
+  idleTimer = setInterval(() => {                // shared-device safety: drop an unattended, non-remembered login
+    if (sess && !remember && !examLive && Date.now() - lastActive > IDLE_MS) { signOut(); if (ov && !ov.hidden) view(); }
+  }, 30000);
   view();
 }
 function close() {
@@ -167,16 +197,26 @@ function close() {
   if (onLeave) { onLeave(); onLeave = null; }
   examLive = false;
   ov.hidden = true;
+  clearInterval(idleTimer);
   document.documentElement.style.overflow = '';
 }
 function show(...nodes) {
   if (onLeave) { onLeave(); onLeave = null; }
   examLive = false;
   main.replaceChildren(...nodes.flat());
+  ov.classList.remove('ps-exam');
   const email = sess && sess.user && sess.user.email;
-  userEl.textContent = email || '';
+  userEl.textContent = email || ''; userEl.hidden = !email;
   outBtn.hidden = !email;
+  paintMark(email);
   ov.scrollTop = 0;
+}
+// Faint diagonal watermark with the student's own email: a leaked screenshot or photo of a paper can be traced back.
+function paintMark(email) {
+  if (!email) { ov.style.removeProperty('--ps-mark'); return; }
+  const esc = String(email).replace(/[<>&"']/g, c => '&#' + c.charCodeAt(0) + ';');
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='420' height='240'><text x='20' y='130' transform='rotate(-22 210 120)' font-family='sans-serif' font-size='16' fill='gray' fill-opacity='0.17'>${esc} · PHYSICA</text></svg>`;
+  ov.style.setProperty('--ps-mark', `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
 }
 const loading = what => show(h('p', { class: 'ps-muted', role: 'status' }, what || 'Loading…'));
 function fatal(e, retry) {
@@ -190,15 +230,16 @@ async function view() {
   if (!sess) return loginView();
   loading();
   try {
-    const rows = await api('/rest/v1/profiles?select=display_name,is_minor,parent_consent_at&id=eq.' + encodeURIComponent(sess.user.id));
+    const rows = await api('/rest/v1/profiles?select=display_name,is_minor,parent_consent_at,parent_email,terms_version&id=eq.' + encodeURIComponent(sess.user.id));
     const p = rows && rows[0];
-    if (!p || p.is_minor == null || (p.is_minor && !p.parent_consent_at)) return profileView(p);
+    if (!p || p.is_minor == null || (p.is_minor && !(p.parent_consent_at && p.parent_email)) || p.terms_version !== TERMS) return profileView(p);
     listView();
   } catch (e) { fatal(e); }
 }
 
 function loginView() {
-  let email = '', step = 'email', cooldown = 0, timer = null;
+  let email = '', step = 'email', cooldown = 0, timer = null, keep = false;
+  const keepBox = h('input', { type: 'checkbox', id: 'ps-keep', onchange: ev => { keep = ev.target.checked; } });
   const msg = h('p', { class: 'ps-err', role: 'alert' });
   const card = h('div', { class: 'ps-card ps-narrow' });
   const stop = () => { clearInterval(timer); timer = null; };
@@ -213,7 +254,9 @@ function loginView() {
         h('form', { onsubmit: async ev => {
           ev.preventDefault(); email = input.value.trim().toLowerCase(); const set = done(go); set(true, 'Sending…');
           try { await sendCode(email); step = 'code'; startCooldown(); paint(); } catch (e) { msg.textContent = say(e); set(false, 'Email me a code'); }
-        } }, h('label', { class: 'ps-lbl', for: 'ps-email' }, 'Email'), input, h('p', null, go)), msg);
+        } }, h('label', { class: 'ps-lbl', for: 'ps-email' }, 'Email'), input,
+          h('label', { class: 'ps-row ps-sub', for: 'ps-keep' }, keepBox, h('span', null, 'Keep me signed in on this device. Tick only on your own phone or laptop, never on a shared or cyber-cafe computer.')),
+          h('p', null, go)), msg);
       input.focus();
     } else {
       const input = h('input', { type: 'text', id: 'ps-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]{6}', placeholder: '123456', required: true });
@@ -225,7 +268,7 @@ function loginView() {
         h('p', { class: 'ps-muted' }, 'We sent a 6-digit code to ', h('b', null, email), '. Check spam if you don’t see it.'),
         h('form', { onsubmit: async ev => {
           ev.preventDefault(); const set = done(go); set(true, 'Checking…');
-          try { await verifyCode(email, input.value.trim()); stop(); view(); } catch (e) { msg.textContent = say(e); set(false, 'Verify'); }
+          try { await verifyCode(email, input.value.trim(), keep); stop(); view(); } catch (e) { msg.textContent = say(e); set(false, 'Verify'); }
         } }, h('label', { class: 'ps-lbl', for: 'ps-code' }, '6-digit code'), input, h('p', { class: 'ps-row' }, go, resend,
           h('button', { type: 'button', onclick: () => { step = 'email'; stop(); paint(); } }, 'Change email'))), msg);
       resend.disabled = cooldown > 0; resend.textContent = cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code';
@@ -250,23 +293,29 @@ function profileView(p) {
   let minor = p && p.is_minor != null ? p.is_minor : null;
   const msg = h('p', { class: 'ps-err', role: 'alert' });
   const name = h('input', { type: 'text', id: 'ps-name', maxlength: '80', autocomplete: 'name', required: true, value: (p && p.display_name) || '' });
+  const parent = h('input', { type: 'email', id: 'ps-parent', maxlength: '254', autocomplete: 'off', placeholder: 'parent@example.com', value: (p && p.parent_email) || '' });
   const consent = h('input', { type: 'checkbox', id: 'ps-consent' });
-  const consentRow = h('label', { class: 'ps-row', for: 'ps-consent', hidden: true }, consent,
-    h('span', null, 'My parent or guardian has agreed to my using Physica Test Series and to Physica storing my name, email and test results.'));
+  const terms = h('input', { type: 'checkbox', id: 'ps-terms' });
+  const minorBox = h('div', { hidden: minor !== true },
+    h('p', { class: 'ps-sub' }, 'Because you are under 18, a parent or guardian must agree before you use Test Series. We keep their email only so we can reach them about your account.'),
+    h('label', { class: 'ps-lbl', for: 'ps-parent' }, 'Parent or guardian email'), parent,
+    h('label', { class: 'ps-row', for: 'ps-consent' }, consent, h('span', null, 'My parent or guardian has agreed to my using Physica Test Series and to Physica storing my name, email and test results as described in the Privacy Policy.')));
   const radio = (val, label) => h('label', { class: 'ps-row' }, h('input', { type: 'radio', name: 'ps-age', value: String(val), checked: minor === val,
-    onchange: () => { minor = val; consentRow.hidden = !val; } }), label);
-  consentRow.hidden = minor !== true;
+    onchange: () => { minor = val; minorBox.hidden = !val; } }), label);
   const go = h('button', { class: 'ps-go', type: 'submit' }, 'Continue');
-  show(h('div', { class: 'ps-card ps-narrow' }, h('h2', null, 'Almost there'),
+  const link = (href, t) => h('a', { href, target: '_blank', rel: 'noopener' }, t);
+  show(h('div', { class: 'ps-card ps-narrow' }, h('h2', null, p && p.terms_version && p.terms_version !== TERMS ? 'We updated our terms' : 'Almost there'),
     h('form', { onsubmit: async ev => {
       ev.preventDefault();
       if (minor == null) { msg.textContent = 'Please tell us if you are under 18.'; return; }
+      if (!terms.checked) { msg.textContent = 'Please accept the Terms and the Privacy Policy to continue.'; return; }
       go.disabled = true; msg.textContent = '';
-      try { await rpc('save_profile', { p_name: name.value, p_is_minor: minor, p_parent_consent: consent.checked }); listView(); }
+      try { await rpc('save_profile', { p_name: name.value, p_is_minor: minor, p_parent_consent: consent.checked, p_parent_email: minor ? parent.value : null, p_terms_version: TERMS }); listView(); }
       catch (e) { msg.textContent = say(e); go.disabled = false; }
     } }, h('label', { class: 'ps-lbl', for: 'ps-name' }, 'Your name'), name,
-      h('p', { class: 'ps-muted' }, 'Are you…'), radio(false, '18 or older'), radio(true, 'Under 18'), consentRow,
-      h('p', { class: 'ps-sub' }, 'We store only your name, email and test results. See our ', h('a', { href: 'privacy.html', target: '_blank', rel: 'noopener' }, 'Privacy Policy'), '.'),
+      h('p', { class: 'ps-muted' }, 'Are you…'), radio(false, '18 or older'), radio(true, 'Under 18'), minorBox,
+      h('label', { class: 'ps-row', for: 'ps-terms' }, terms, h('span', null, 'I have read and accept the ', link('terms.html', 'Terms of Use'), ' and the ', link('privacy.html', 'Privacy Policy'), '.')),
+      h('p', { class: 'ps-sub' }, 'We collect only what a test series needs. You can download or delete your data any time from your account.'),
       h('p', null, go)), msg));
 }
 
@@ -294,7 +343,7 @@ async function listView() {
       else action = h('button', { type: 'button', class: 'ps-go', onclick: async ev => {
         const b = ev.currentTarget; b.disabled = true; msg.textContent = '';
         if (!confirm(`Start "${t.title}"? The ${t.duration_min}-minute timer starts now and cannot be paused.`)) { b.disabled = false; return; }
-        try { examView(await rpc('start_attempt', { p_test_id: t.id })); } catch (e) { msg.textContent = say(e); b.disabled = false; }
+        try { examView(await rpc('start_attempt', { p_test_id: t.id })); } catch (e) { if (e.code === 'terms_outdated' || e.code === 'profile_incomplete') return view(); msg.textContent = say(e); b.disabled = false; }
       } }, 'Start test');
       return h('div', { class: 'ps-card' },
         rt('h3', t.title),
@@ -401,15 +450,59 @@ async function examView(attemptId) {
     if (left <= 0) finish(true);
   }
 
-  show(h('div', { class: 'ps-row' }, rt('h2', d.title), h('span', { class: 'ps-sp' }), timer), banner, card, pal,
+  show(h('div', { class: 'ps-row' }, rt('h2', d.title), h('span', { class: 'ps-sp' }), timer), h('p', { class: 'ps-sub' }, 'Exam rules: one attempt, server timer. Switching tabs and copying are recorded. Do not share these questions.'), banner, card, pal,
     h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: () => {
       const left = qs.filter(q => !has(q)).length;
       if (confirm(left ? `${left} question(s) are unanswered. Submit the test? You cannot change answers afterwards.` : 'Submit the test? You cannot change answers afterwards.')) finish(false);
     } }, 'Submit test')), msg);
   examLive = true;
-  onLeave = () => { clearInterval(tick); clearTimeout(debounce); clearTimeout(retry); window.removeEventListener('online', online); window.removeEventListener('beforeunload', warn); };
+  ov.classList.add('ps-exam');
+  // advisory integrity signals for the admin (never alter a score automatically)
+  const sig = (kind) => { if (!finishing) rpc('log_event', { p_attempt: attemptId, p_kind: kind, p_meta: {} }).catch(() => {}); };
+  const vis = () => sig(document.hidden ? 'tab_hidden' : 'tab_visible');
+  const off = () => sig('offline'), on = () => sig('online');
+  let lastCopy = 0;
+  onCopy = () => { if (Date.now() - lastCopy > 10000) { lastCopy = Date.now(); sig('copy_attempt'); } };
+  document.addEventListener('visibilitychange', vis); window.addEventListener('offline', off); window.addEventListener('online', on);
+  onLeave = () => { clearInterval(tick); clearTimeout(debounce); clearTimeout(retry); window.removeEventListener('online', online); window.removeEventListener('beforeunload', warn);
+    document.removeEventListener('visibilitychange', vis); window.removeEventListener('offline', off); window.removeEventListener('online', on); onCopy = null; };
   drawQ(); drawPal(); draw();
   tick = setInterval(draw, 1000);
+}
+
+/* ---------- account: data rights (DPDP Act 2023) ---------- */
+function accountView() {
+  const msg = h('p', { role: 'status', class: 'ps-muted' });
+  const email = sess && sess.user && sess.user.email;
+  const note = (t, bad) => { msg.className = bad ? 'ps-err' : 'ps-ok'; msg.textContent = t; };
+  const exportBtn = h('button', { type: 'button', onclick: async () => {
+    exportBtn.disabled = true;
+    try {
+      const data = await rpc('export_my_data');
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+      const a = h('a', { href: url, download: 'physica-my-data.json' }); document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      note('Your data was downloaded as physica-my-data.json.');
+    } catch (e) { note(say(e), true); }
+    exportBtn.disabled = false;
+  } }, 'Download my data');
+  const everywhere = h('button', { type: 'button', onclick: () => { signOut(true); view(); } }, 'Log out on all devices');
+  const confirmBox = h('input', { type: 'text', id: 'ps-del', autocomplete: 'off', placeholder: 'Type DELETE to confirm' });
+  const delBtn = h('button', { type: 'button', class: 'ps-danger', onclick: async () => {
+    if (confirmBox.value.trim() !== 'DELETE') return note('Type DELETE in the box first.', true);
+    if (!confirm('Permanently delete your account, results and profile? This cannot be undone.')) return;
+    delBtn.disabled = true;
+    try { await rpc('delete_my_account'); save(null); view(); } catch (e) { note(say(e), true); delBtn.disabled = false; }
+  } }, 'Delete my account');
+  show(h('h1', null, 'Your account'),
+    h('div', { class: 'ps-card' }, h('p', null, 'Signed in as ', h('b', null, email || '')),
+      h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: listView }, '← Tests'), everywhere)),
+    h('div', { class: 'ps-card' }, h('h3', null, 'Your data'),
+      h('p', { class: 'ps-muted' }, 'Get a copy of everything Physica holds about you (profile, tests, answers). Machine-readable JSON.'), h('p', null, exportBtn)),
+    h('div', { class: 'ps-card' }, h('h3', null, 'Delete my account'),
+      h('p', { class: 'ps-muted' }, 'Erases your profile, answers, results and parent contact. Only a minimal security log (an anonymous id and the action name) is kept as required for security records.'),
+      h('label', { class: 'ps-lbl', for: 'ps-del' }, 'Confirmation'), confirmBox, h('p', null, delBtn)),
+    h('p', { class: 'ps-sub' }, 'Questions or complaints: easy@physica.in · ', h('a', { href: 'privacy.html', target: '_blank', rel: 'noopener' }, 'Privacy Policy'), ' · ', h('a', { href: 'terms.html', target: '_blank', rel: 'noopener' }, 'Terms')), msg);
 }
 
 /* ---------- result ---------- */
