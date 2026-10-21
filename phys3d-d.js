@@ -13,7 +13,6 @@ const arrowObj=(s,x,h,col)=>{s.arrow([x,0,0],[x,h,0],col,4,10)};
 const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
 
 /* ---------- Electromagnetic Waves ---------- */
-reg('emwave',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.65,pitch:.25}),k=TAU/(.6+p.wavelength*.6),E=[],B=[];for(let i=0;i<=90;i++){const x=-3.4+6.8*i/90,v=Math.sin(k*x-t*3)*.6*p.amplitude;E.push([x,v,0]);B.push([x,0,v*.8]);if(i%3===0){s.seg([x,0,0],[x,v,0],'#ffc36b88',1.2);s.seg([x,0,0],[x,0,v*.8],'#7baaff66',1.1)}}s.curve(E,C.gold,2.6,6);s.curve(B,C.blue,2,6);s.arrow([-3.4,0,0],[3.6,0,0],C.muted,1.5,11,'travel at c = 3×10⁸ m/s');s.label([-3,1.4*p.amplitude*.6+.3,0],'E',C.gold,14);s.label([-3,0,1.2*p.amplitude*.6+.2],'B',C.blue,14);s.render()});
 // EM spectrum: a source emits the selected radiation in 3D; λ in ångström and f in hertz. Entering visible light the
 // camera zooms into the 7 colours (VIBGYOR) with their names and wavelength / frequency ranges.
 const EMB=[[-14,-11,'Gamma rays','#be4bdb'],[-11,-8,'X-rays','#7950f2'],[-8,-6.42,'Ultraviolet','#4c6ef5'],[-6.42,-6.12,'Visible light',''],[-6.12,-3,'Infrared','#e8590c'],[-3,-1,'Microwaves','#f08c00'],[-1,3,'Radio waves','#fab005']],
@@ -45,8 +44,6 @@ reg('spectrum',(c,p,t)=>{const e=p.exponent,lam=10**e,nm=lam*1e9,vis=nm>=380&&nm
     tag(c,`Visible light: 3800–7600 Å  ·  3.95–7.89 × 10¹⁴ Hz`,44,138,C.white,14,'left','700')}
   else tag(c,`Range: ${ang(10**Math.max(band[0],-12))} – ${ang(10**band[1])}`,44,114,'#c9d6e6',14)});
 reg('radiation-pressure',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.5}),mir=p.surface==='mirror',Pr=(mir?2:1)*p.intensity/3e8,a=.5+Math.sqrt(p.area)*4;s.box([1.6,0,0],[.1,a,a],mir?'#e9f6ff':'#212529');for(let i=0;i<8;i++){const y=(hash(i)-.5)*a*.8,z=(hash(i+3)-.5)*a*.8,q=cycle(t*.8+i/8,1);s.ball([-3+4.5*Math.min(q*1.2,1),y,z],.05,'#ffd43b',{glow:true,flat:true});if(mir&&q>.83)s.ball([1.5-(q-.83)*8,y,z],.05,'#ffd43b',{flat:true})}for(let i=0;i<5;i++)s.seg([-3,(i-2)*.3,0],[1.55,(i-2)*.3,0],'#ffd43b44',2);s.arrow([1.7,0,0],[1.7+.3+Pr*2e5,0,0],C.red,4,11,`F = ${f(Pr*p.area,3)} N`);s.render();tag(c,mir?'Mirror: momentum reverses → twice the push':'Absorber: photons stop → push',44,98,C.gold,14)});
-reg('displacement-current',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4}),ph=Math.sin(TAU*p.frequency*t*.5),a=.4+Math.sqrt(p.area)*3;for(const x of[-.3,.3])s.cyl([x,0,0],[1,0,0],a,.06,x<0?'#ff857e':'#7baaff');s.cyl([-1.9,0,0],[1,0,0],.04,3.2,'#d9844a');s.cyl([1.9,0,0],[1,0,0],.04,3.2,'#d9844a');for(let i=0;i<4;i++){const y=(i-1.5)*.25;s.arrow([-.25,y,0],[-.25+.5*Math.abs(ph)+.01,y,0],'#ffc36b'+Math.round(80+170*Math.abs(ph)).toString(16).padStart(2,'0'),1.5,6,i===3?`I_d = ${f(p.current*Math.abs(ph),2)} nA`:'')}for(const x of[-1.6,0,1.6])s.ring([x,0,0],[1,0,0],a*.6+.2,'#42d9ca'+Math.round(60+180*Math.abs(Math.cos(TAU*p.frequency*t*.5))).toString(16).padStart(2,'0'),2);s.render();tag(c,'mint rings: B field — present around the wire AND around the gap',44,98,C.muted,13)});
-reg('photon-energy',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.5,pitch:.2}),fq=Math.pow(10,p.exponent),lam=3e8/fq*1e9,col=lam>=380&&lam<=780?spec(lam):lam<380?'#be4bdb':'#e8590c',k=TAU/clamp(4-(p.exponent-6)*.25,.2,4),x0=-3+cycle(t*.6,1)*4;s.curve(Array.from({length:81},(_,i)=>{const x=-3.4+6.8*i/80;return[x,.6*Math.exp(-((x-x0)**2)/.8)*Math.sin(k*x-t*6),0]}),col,2.6,8);s.render();tag(c,`f = ${fq.toExponential(2)} Hz`,44,98,C.gold,15)});
 reg('em-field-intensity',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.6}),I=.5*8.854e-12*3e8*p.electric**2,a=.4+Math.sqrt(p.area)*.15,E=[],k=TAU/1.2;for(let i=0;i<=60;i++){const x=-3.4+4.4*i/60;E.push([x,.5*Math.sin(k*x-t*3)*clamp(p.electric/500,.2,1.6),0])}s.curve(E,C.gold,2.4,6);s.box([1.4,0,0],[.06,a*2,a*2],'#42d9ca',{alpha:clamp(.15+I/2000,.15,.9)});s.render();tag(c,`I = ½ε₀cE₀² = ${f(I,1)} W/m²`,44,98,C.gold,15)});
 
 /* ---------- Ray Optics ---------- */
@@ -64,24 +61,204 @@ reg('optical-fibre',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.2,yaw:.3}),cri
   const pts=[[-3.6,-1.2*Math.tan(rad(p.angle))*.5,0],[-3.2,0,0]];let x=-3.2,y=0,dy=Math.tan(inside);for(let i=0;i<30&&x<3.2;i++){const xx=Math.min(3.2,x+((dy>0?R-y:y+R)/Math.abs(dy)));y=y+dy*(xx-x);x=xx;pts.push([x,y,0]);if(!guided){pts.push([x+.6,y+Math.sign(dy)*.8,0]);break}dy=-dy}s.path(pts,'#ff3b3b',2.5);s.render();tag(c,guided?'Total internal reflection guides the light':'Angle too large: light escapes into the cladding',44,98,guided?C.mint:C.red,14)});
 reg('contact-lens-pair',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.2,yaw:.3}),P=p.p1+p.p2,fm=P!==0?1/P:Infinity,xF=Number.isFinite(fm)?clamp(fm*3,-3.4,3.4):99;lensShape(s,-.08,1.1,Math.sign(p.p1)*.06+.02,'#7fc8e8');lensShape(s,.08,1.1,Math.sign(p.p2)*.06+.02,'#b89dff');for(const y of[-.8,-.4,.4,.8]){s.path([[-3.4,y,0],[0,y,0]],'#ffc36b',1.5);const end=Number.isFinite(fm)?[3.4,y*(1-3.4/(fm*3)),0]:[3.4,y,0];s.path([[0,y,0],[end[0],clamp(end[1],-2.4,2.4),0]],'#ffc36b',1.5)}if(Math.abs(xF)<3.4)s.ball([xF,0,0],.07,C.red,{flat:true,label:'F'});s.render();tag(c,`P = P₁ + P₂ = ${f(P,1)} D`,44,98,C.gold,15)});
 
+/* ---------- Ultra-Realistic optics bench and dual-nature apparatus (shared by the scenes below and by tenth.js / eleventh.js) ---------- */
+const OB=window.PhysicaOpt3D={},YB=.3,RAILTOP=-.73;
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),h2=v=>Math.round(clamp(v,0,1)*255).toString(16).padStart(2,'0');
+// A pale card lit by light of colour col at relative intensity v: dark -> colour -> white-hot. The eye's response is not linear, hence the power.
+const lit=(col,v)=>{const k=Math.pow(clamp(v,0,1),.55),w=Math.max(0,k-.72)*2.2,B=[24,27,32];return'#'+rgb(col).map((q,i)=>{const o=B[i]+(q-B[i])*k;return h2((o+(255-o)*w)/255)}).join('')};
+const sinc2=x=>Math.abs(x)<1e-6?1:(Math.sin(x)/x)**2;
+// wooden table with an aluminium optical rail and a ruler scale
+OB.bench=(s,x0,x1)=>{const xm=(x0+x1)/2,w=x1-x0;s.box([xm,-1,0],[w+1.4,.34,2.3],'#6d4b2f',{ground:true});s.box([xm,-.78,0],[w+.5,.1,.36],'#a4acb4',{ground:true});for(let x=Math.ceil(x0*4)/4;x<=x1+.001;x+=.25)s.seg([x,RAILTOP+.005,-.1],[x,RAILTOP+.005,.1],'#4a5058',1,[],-4.9e5)};
+OB.stand=(s,x,yTop)=>{s.box([x,-.69,0],[.5,.08,.5],'#2d3238');s.cyl([x,(-.65+yTop)/2,0],[0,1,0],.03,Math.max(.05,yTop+.65),'#b9c0c7',{seg:8})};
+// metal holder around a slide, polaroid or screen
+OB.holder=(s,x,y,H,W)=>{for(const sy of[-1,1])s.box([x,y+sy*(H/2+.04),0],[.12,.08,W+.16],'#8b939b');for(const sz of[-1,1])s.box([x,y,sz*(W/2+.04)],[.12,H+.16,.08],'#8b939b');OB.stand(s,x,y-H/2-.08)};
+OB.laser=(s,x,col,y=YB)=>{OB.stand(s,x,y-.17);s.cyl([x,y,0],[1,0,0],.15,1,'#262b31',{seg:14,cap:'#1b1f24'});s.cyl([x-.3,y,0],[1,0,0],.16,.1,'#b99a2e',{seg:14});s.cyl([x+.5,y,0],[1,0,0],.1,.05,'#0d0f12',{seg:12,cap:'#000'});s.ball([x+.54,y,0],.05,col,{glow:true,flat:true});s.ball([x-.12,y+.155,0],.022,'#ff4d4d',{flat:true,glow:true})};
+OB.beam=(s,a,b,col,w=3)=>{s.seg(a,b,col+'2e',w*3.4);s.seg(a,b,col+'77',w*1.5);s.seg(a,b,col,w*.55)};
+// opaque slide with vertical slits (slit centres zs, width sw)
+OB.plate=(s,x,zs,sw,H=1.5,W=1.7,y=YB)=>{let cur=-W/2;for(const zc of zs){const a=zc-sw/2,b=zc+sw/2;if(a>cur+.002)s.box([x,y,(cur+a)/2],[.07,H,a-cur],'#1b1f24');cur=b}if(cur<W/2)s.box([x,y,(cur+W/2)/2],[.07,H,W/2-cur],'#1b1f24');OB.holder(s,x,y,H,W);for(const zc of zs)s.seg([x+.045,y-H/2+.03,zc],[x+.045,y+H/2-.03,zc],'#ffffffcc',1.4,[],undefined)};
+// a white card that shows the light pattern fn(zn), zn in [-1,1] across the card
+OB.screen=(s,x,half,H,fn,col,N=140,y=YB)=>{s.box([x+.06,y,0],[.05,H+.2,2*half+.2],'#23282e');OB.stand(s,x,y-H/2-.1);const dz=2*half/N;for(let i=0;i<N;i++){const z0=-half+dz*i;s.poly([[x,y-H/2,z0],[x,y+H/2,z0],[x,y+H/2,z0+dz*1.15],[x,y-H/2,z0+dz*1.15]],lit(col,fn((i+.5)/N*2-1)),{shade:false})}};
+OB.meter=(s,p,txt,v,col='#1b2129')=>{const [x,y,z]=p;s.box(p,[1.1,.85,.5],'#2a2f35');s.poly([[x-.47,y-.32,z+.256],[x+.47,y-.32,z+.256],[x+.47,y+.38,z+.256],[x-.47,y+.38,z+.256]],'#e9e6da',{shade:false});const px=x,py=y-.2,pz=z+.27;
+  for(let k=0;k<=8;k++){const a=-.9+1.8*k/8;s.seg([px+Math.sin(a)*.5,py+Math.cos(a)*.5,pz],[px+Math.sin(a)*(k%2?.55:.6),py+Math.cos(a)*(k%2?.55:.6),pz],'#3a4047',1,[],undefined)}
+  const a=-.85+1.7*clamp(v,0,1);s.seg([px,py,pz+.01],[px+Math.sin(a)*.52,py+Math.cos(a)*.52,pz+.01],'#c0392b',2,[],undefined);s.ball([px,py,pz+.02],.04,'#222',{flat:true});s.engrave([x,y+.27,z+.27],txt,col,10)};
+// Evacuated photocell: glass bulb, metal cathode (left), ring anode (right), light from a lamp. o={col,K,rate,Vr,lampAt}
+OB.tube=(s,t,o)=>{const C0=[-.82,.25,0],A0=[.62,.25,0],L=A0[0]-C0[0],lamp=[-3,1.75,0],dir=V.norm(V.sub(C0,lamp));
+  s.cyl([0,-1.1,0],[0,1,0],.2,.7,'#cfe8f5',{alpha:.3,seg:12});s.cyl([0,-1.42,0],[0,1,0],.42,.22,'#3a4047',{seg:18,cap:'#4a5058'});
+  s.mesh([0,.25,0],[1.3,1.15,1.15],'#cfe8f5',{alpha:.14,rings:9,segs:16,spec:.8});
+  s.box([C0[0]-.06,.25,0],[.1,1.05,.9],'#c8a46a');s.ring(A0,[1,0,0],.36,'#dfe4e8',3.2);s.seg([A0[0],.25-.36,0],[0,-.75,0],'#cfd5da',2);s.seg([C0[0]-.06,.25-.5,0],[0,-.75,0],'#cfd5da',2);
+  s.cyl(lamp,dir,.34,.85,'#2b3037',{seg:14,cap:'#1a1d21'});s.ball(V.add(lamp,V.mul(dir,.46)),.2,o.col,{glow:true,flat:true});
+  s.poly([V.add(lamp,V.mul(dir,.5)),[C0[0],.8,-.46],[C0[0],-.3,.46]],o.col+'1c',{shade:false});
+  const np=Math.round(2+6*o.rate);for(let i=0;i<np;i++){const q=cycle(t*.9+i/np,1);s.ball(V.add(V.add(lamp,V.mul(dir,.6)),V.mul(V.sub(C0,V.add(lamp,V.mul(dir,.6))),q)),.05,o.col,{glow:true,flat:true})}
+  if(o.K>0){const n=Math.round(3+11*o.rate);for(let i=0;i<n;i++){const u=.25+.75*hash(i+1),q=cycle(t*(.35+.25*Math.sqrt(u))+hash(i+9),1),y=.25+(hash(i+3)-.5)*.75,z=(hash(i+6)-.5)*.65;let d;
+      if(!(o.Vr>0))d=L*q;else{const dm=L*u*o.K/o.Vr;d=dm>=L?L*q:dm*(1-(2*q-1)**2)}
+      s.ball([C0[0]+.05+d,y,z],.05,'#4dabf7',{flat:true,glow:true})}}};
+// optical table
+OB.table=(s,w=8)=>{s.box([0,-1.55,0],[w,.3,2.8],'#6d4b2f',{ground:true})};
+
+/* ----- Young's double slit, Fraunhofer single slit: laser, slide, screen with the true pattern ----- */
+function slitRig(c,t,o){const s=P3.scene(c,{scale:50,yaw:.85,pitch:.3,cx:352,cy:292}),col=o.col,XS=3.3,half=1.5,SH=1.3,yb=YB;
+  OB.bench(s,-4.1,3.9);OB.laser(s,-3.7,col);OB.beam(s,[-3.12,yb,0],[-.05,yb,0],col,3);
+  for(const zc of o.zs){s.poly([[0,yb,zc],[XS,yb,-half],[XS,yb,half]],col+'12',{shade:false});
+    for(let i=0;i<3;i++){const q=(t*.35+i/3)%1,r=q*3.6,pts=[];for(let k=0;k<=16;k++){const ph=-1.1+2.2*k/16,x=.05+r*Math.cos(ph),z=zc+r*Math.sin(ph);if(x<=XS-.05&&Math.abs(z)<=half)pts.push([x,yb,z])}if(pts.length>1)s.path(pts,col+h2(.55*(1-q)),1.6)}}
+  OB.plate(s,0,o.zs,o.sw);OB.screen(s,XS,half,SH,zn=>o.I(zn*o.H),col,150);
+  if(o.step)for(let m=-12;m<=12;m++){const z=m*o.step/o.H*half;if(Math.abs(z)<half)s.seg([0,yb,0],[XS-.02,yb,z],col+'44',1.2)}
+  const yp=yb+SH/2+.26,pr=[];for(let i=0;i<=120;i++){const zn=-1+2*i/120;pr.push([XS-.03,yp+.6*o.I(zn*o.H),zn*half])}s.curve(pr,'#ffe9a8',2,10);s.seg([XS-.03,yp,-half],[XS-.03,yp,half],'#ffffff44',1,[3,3]);
+  const ym=yb-SH/2-.05,yl=yb-SH/2-.27;for(const m of o.marks||[]){const a=m[0]/o.H*half,b=m[1]/o.H*half;s.seg([XS-.03,ym,a],[XS-.03,ym,b],C.gold,3);s.seg([XS-.03,ym-.05,a],[XS-.03,ym+.05,a],C.gold,2);s.seg([XS-.03,ym-.05,b],[XS-.03,ym+.05,b],C.gold,2);s.label([XS-.03,yl,(a+b)/2],m[2],C.gold,12)}
+  s.label([XS-.03,yl,-half+.1],'−'+f(o.H,1)+' mm','#9fb0bf',10);s.label([XS-.03,yl,half-.1],'+'+f(o.H,1)+' mm','#9fb0bf',10);
+  s.callout([-3.7,yb+.17,0],'laser','#dbe7f0',-6,-62,11);s.callout([0,yb+.78,0],o.name,'#dbe7f0',-42,-66,11);s.callout([XS,yb+SH/2-.1,half*.75],'screen','#dbe7f0',30,-60,11);
+  s.render()}
+const young=(lam,slit,D)=>lam*1e-9*D/(slit*1e-3)*1000;
+reg('doubleslit',(c,p,t)=>{const beta=young(p.wavelength,p.slit,p.distance),sd=.14+.34*(p.slit-.2)/.8,H=Math.max(3*beta,Math.min(8,12*beta));
+  slitRig(c,t,{col:spec(p.wavelength),zs:[-sd/2,sd/2],sw:.05,name:'double slit',H,step:beta,marks:[[0,beta,'β']],I:y=>Math.cos(PI*y/beta)**2*sinc2(PI*y/(6*beta))});tag(c,`fringe width β = ${f(beta,2)} mm`,44,98,C.gold,15)});
+reg('fringe-width',(c,p,t)=>{const beta=young(p.wavelength,p.slit,p.D),sd=.14+.34*(p.slit-.2)/.8,H=Math.max(3*beta,Math.min(8,12*beta));
+  slitRig(c,t,{col:spec(p.wavelength),zs:[-sd/2,sd/2],sw:.05,name:'double slit',H,step:beta,marks:[[0,beta,'β = '+f(beta,2)+' mm']],I:y=>Math.cos(PI*y/beta)**2*sinc2(PI*y/(6*beta))});tag(c,'β = λD / d : fringe spacing on the screen',44,98,C.gold,14)});
+reg('diffraction',(c,p,t)=>{const y1=young(p.wavelength,p.width,p.distance),H=4.2*y1,sw=.06+.34*(p.width-.05)/.45;
+  slitRig(c,t,{col:spec(p.wavelength),zs:[0],sw,name:'single slit',H,marks:[[-y1,y1,'2λD/a = '+f(2*y1,1)+' mm']],I:y=>sinc2(PI*y/y1)});tag(c,'central maximum is twice as wide as the others',44,98,C.muted,13)});
+reg('diffraction-grating',(c,p,t)=>{const s=P3.scene(c,{scale:48,yaw:.8,pitch:.3,cx:345,cy:292}),col=spec(p.wavelength),dsp=1e-3/p.density,XS=3.4,half=2.45,SH=1.2,yb=YB,ord=[];
+  for(let m=-p.order;m<=p.order;m++){const sn=m*p.wavelength*1e-9/dsp;if(Math.abs(sn)>=1)continue;const th=Math.asin(sn),tn=Math.tan(th),xe=tn?Math.min(XS,half/Math.abs(tn)):XS;ord.push({m,A:1/(1+.35*Math.abs(m)),xe,ze:tn*xe,onScreen:xe>=XS-1e-6})}
+  OB.bench(s,-4.1,3.9);OB.laser(s,-3.7,col);OB.beam(s,[-3.12,yb,0],[-.05,yb,0],col,3);
+  s.box([0,yb,0],[.05,1.3,1.5],'#cfe8f5',{alpha:.2});OB.holder(s,0,yb,1.3,1.5);const nl=Math.round(clamp(p.density/14,6,34));for(let i=0;i<nl;i++){const z=-.7+1.4*(i+.5)/nl;s.seg([.035,yb-.6,z],[.035,yb+.6,z],'#ffffff66',1,[],undefined)}
+  OB.screen(s,XS,half,SH,zn=>{const z=zn*half;let v=0;for(const o of ord)if(o.onScreen)v+=o.A*Math.exp(-(((z-o.ze)/.06)**2));return Math.min(1,v)},col,230);
+  for(const o of ord){OB.beam(s,[.02,yb,0],[o.xe-.02,yb,o.ze],col,o.m===0?3:2.4*o.A+.4);if(o.onScreen)s.label([XS-.03,yb+SH/2+.14,o.ze],'m='+(o.m>0?'+':o.m<0?'−':'')+Math.abs(o.m),C.white,11)}
+  s.callout([-3.7,yb+.17,0],'laser','#dbe7f0',-6,-62,11);s.callout([0,yb+.74,0],`grating, d = ${f(dsp*1e6,2)} µm`,'#dbe7f0',-30,-70,11);s.callout([XS,yb+SH/2-.1,-half*.8],'screen','#dbe7f0',-20,-72,11);
+  s.render();tag(c,'beams appear only where d sinθ = mλ',44,98,C.muted,13)});
+
+/* ----- Polaroids and Malus's law ----- */
+reg('polarization',(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:.55,pitch:.25,cx:330,cy:292}),th=rad(p.angle),y0=.3,X1=-1,X2=1.1,XD=3.2,k=3.2,I2=Math.cos(th)**2,cl='#ffe9a8',ph=-5*t;
+  OB.bench(s,-4.1,3.9);OB.stand(s,-3.6,y0-.34);s.cyl([-3.7,y0,0],[1,0,0],.3,.7,'#2b3037',{seg:14,cap:'#1a1d21'});s.cyl([-3.3,y0,0],[1,0,0],.34,.18,'#8d959d',{seg:14});s.ball([-3.2,y0,0],.2,cl,{glow:true,flat:true});
+  const pol=(x,a)=>{const d=[0,Math.cos(a),Math.sin(a)],e=[0,-Math.sin(a),Math.cos(a)],O=[x,y0,0];s.cyl(O,[1,0,0],.9,.05,'#8f98a1',{alpha:.4,seg:28,cap:'#8f98a166'});s.ring(O,[1,0,0],.9,'#c6ccd2',4,[],36);
+    for(let i=-4;i<=4;i++){const off=i*.19,hl=Math.sqrt(.81-off*off),m=V.add(O,V.mul(e,off));s.seg(V.add(m,V.mul(d,-hl)),V.add(m,V.mul(d,hl)),'#1e2530bb',1.1)}OB.stand(s,x,y0-.9);s.ball(V.add(O,V.mul(d,.9)),.07,'#e0b040',{flat:true})};
+  // unpolarised light: electric field in every direction
+  for(let i=0;i<13;i++){const x=-3.0+(X1+.1+3.0)*i/12,a=hash(i+4)*PI,A=.34*Math.sin(k*x*2+ph+hash(i)*6);s.seg([x,y0,0],[x,y0+Math.cos(a)*A,Math.sin(a)*A],cl+'cc',1.6)}
+  pol(X1,0);pol(X2,th);
+  const w1=[],w2=[];for(let i=0;i<=18;i++){const x=X1+.1+(X2-X1-.2)*i/18,v=.4*Math.sin(k*x+ph);w1.push([x,y0+v,0]);if(i%2===0)s.seg([x,y0,0],[x,y0+v,0],cl+'66',1)}s.curve(w1,cl,2.6,6);
+  for(let i=0;i<=22;i++){const x=X2+.1+(XD-X2-.3)*i/22,v=.4*Math.cos(th)*Math.sin(k*x+ph);w2.push([x,y0+v*Math.cos(th),v*Math.sin(th)]);if(i%2===0)s.seg([x,y0,0],[x,y0+v*Math.cos(th),v*Math.sin(th)],cl+'66',1)}s.curve(w2,cl,2.6,6);
+  const arc=[];for(let i=0;i<=14;i++){const a=th*i/14;arc.push([X2,y0+1.05*Math.cos(a),1.05*Math.sin(a)])}s.path(arc,C.gold,2);s.label([X2,y0+1.18*Math.cos(th/2),1.18*Math.sin(th/2)],'θ',C.gold,13);
+  s.box([XD,y0,0],[.06,1.35,1.35],lit('#fff3c4',.1+.9*I2));OB.stand(s,XD,y0-.7);s.ball([XD-.06,y0,0],.5,'#ffd060',{flat:true,alpha:.1+.8*I2,glow:I2>.4});
+  s.callout([-3.5,y0+.3,0],'lamp','#dbe7f0',-6,-72,11);s.callout([X1,y0+.9,0],'polariser','#dbe7f0',-34,-60,11);s.callout([X2,y0+.9,0],'analyser','#dbe7f0',26,-62,11);s.callout([XD,y0+.65,0],'screen','#dbe7f0',14,-66,11);
+  s.render();tag(c,`I = I₀cos²θ → ${f(p.intensity/2*I2,1)} units`,44,98,C.gold,15)});
+
+/* ----- Soap film (thin-film interference) ----- */
+reg('thin-film',(c,p,t)=>{const s=P3.scene(c,{scale:47,yaw:.3,pitch:.3,cx:350,cy:300}),n=p.index,d=2*n*p.thickness,R=Math.sin(PI*d/p.wavelength)**2,col=spec(p.wavelength),tw=.14+.62*p.thickness/800,yi=.25,i=rad(35),sr=Math.sin(i)/n,cr=Math.sqrt(1-sr*sr),tr=sr/cr;
+  OB.table(s,8);for(const x of[-2.9,2.9])s.cyl([x,(-1.4+yi)/2,0],[0,1,0],.04,yi+1.4,'#b9c0c7',{seg:8});
+  s.box([-2.7,yi-tw/2,0],[.1,tw+.08,2.4],'#a9b0b7');s.box([2.7,yi-tw/2,0],[.1,tw+.08,2.4],'#a9b0b7');
+  s.box([0,yi-tw/2,0],[5.3,tw,2.2],'#9fd3f0',{alpha:.3});const ra=(.12+.8*R);s.poly([[-2.65,yi+.003,-1.1],[2.65,yi+.003,-1.1],[2.65,yi+.003,1.1],[-2.65,yi+.003,1.1]],col+h2(ra),{shade:false});
+  const A=[-.7,yi,0],u=[Math.sin(i),-Math.cos(i),0],w=[Math.sin(i),Math.cos(i),0],B=[A[0]+sr/cr*0+tw*tr,yi-tw,0],Cp=[A[0]+2*tw*tr,yi,0],L=V.sub(A,V.mul(u,2.3));
+  const wd=1.2+2.2*R;OB.beam(s,L,A,col,3);s.seg(A,V.add(A,V.mul(w,2.3)),col,wd);s.path([A,B,Cp],col+'cc',2.2);s.seg(Cp,V.add(Cp,V.mul(w,2.3)),col,wd);s.seg(B,V.add(B,[tr*.9,-.9,0]),col+'55',1.4);
+  s.seg([A[0],yi-.7,0],[A[0],yi+1.1,0],'#ffffff55',1,[4,4]);
+  const eye=V.add(V.add(A,V.mul(w,2.75)),[tw*tr,0,0]);s.ball(eye,.25,'#f4efe6');s.ball(V.add(eye,[-.1,-.1,.1]),.12,'#35557a',{flat:true});s.ball(V.add(eye,[-.14,-.14,.15]),.06,'#05070a',{flat:true});
+  s.cyl(V.sub(L,V.mul(u,.45)),u,.3,.8,'#2b3037',{seg:14,cap:'#1a1d21'});s.ball(L,.18,'#fff2c4',{glow:true,flat:true});
+  s.callout(V.add(A,V.mul(w,1.5)),'ray 1: top surface (phase jump π)','#dbe7f0',-40,-60,10);s.callout(V.add(Cp,V.mul(w,1.0)),'ray 2: bottom surface','#dbe7f0',50,36,10);s.callout([-2.7,yi-tw/2,.9],`soap film  n = ${f(n,1)}  t = ${f(p.thickness,0)} nm`,'#dbe7f0',-10,52,10);
+  s.callout(eye,R>.6?'bright':R<.2?'dark':'dim',R>.6?C.gold:'#9fb0bf',-34,-14,11);
+  s.render();tag(c,R>.6?'Constructive: bright reflection':R<.2?'Destructive: dark reflection':'Partial reinforcement',44,98,C.gold,14);tag(c,`extra path 2nt = ${f(d,0)} nm  =  ${f(d/p.wavelength,2)} λ`,44,120,C.muted,12)});
+
+/* ----- Photocell: photoelectric effect and stopping potential ----- */
+reg('photoelectric',(c,p,t)=>{const s=P3.scene(c,{scale:47,yaw:.3,pitch:.2,cx:372,cy:290}),E=hc/p.wavelength,K=E-p.workFunction,col=spec(p.wavelength),rate=p.intensity/100;
+  OB.table(s,9);OB.tube(s,t,{col,K,rate,Vr:0});OB.meter(s,[2.6,-.9,0],'µA',K>0?.15+.8*rate:0);
+  s.path([[0,-1.5,.1],[0,-1.5,.7],[2.6,-1.5,.7],[2.6,-1.33,.3]],'#c0392b',2.5);s.path([[.1,-1.5,-.1],[.1,-1.5,-.7],[2.9,-1.5,-.7],[2.9,-1.33,-.2]],'#2b3037',2.5);
+  s.callout([-.88,.25,.3],'metal plate (cathode)','#dbe7f0',-34,70,11);s.callout([.62,.61,0],'collector (anode)','#dbe7f0',40,-52,11);s.callout([-3,1.75,0],'light source','#dbe7f0',0,-30,11);
+  s.render();tag(c,K>0?`Electrons ejected, K_max = ${f(K,2)} eV`:'No emission: photon energy below the work function',44,98,K>0?C.mint:C.red,14)});
+reg('stopping-potential',(c,p,t)=>{const s=P3.scene(c,{scale:40,cx:225,cy:290,yaw:.3,pitch:.2}),E=4.1357e-15*p.freq*1e14,V0=E-p.work,col=spec(c0nm(p.freq));
+  OB.table(s,8);OB.tube(s,t,{col,K:V0,rate:.7,Vr:V0>0?V0:0});OB.meter(s,[1.5,-.9,.2],V0>0?f(V0,2)+' V':'0 V',V0>0?V0/5:0);OB.meter(s,[2.9,-.9,.2],'I = 0',0);
+  s.path([[0,-1.5,.1],[0,-1.5,.8],[1.5,-1.5,.8],[1.5,-1.33,.5]],'#c0392b',2.5);s.path([[1.5,-1.33,.5],[1.5,-1.5,.9],[2.9,-1.5,.9],[2.9,-1.33,.5]],'#c0392b',2.5);s.path([[.1,-1.5,-.1],[.1,-1.5,-.6],[3.3,-1.5,-.6],[3.3,-1.33,-.1]],'#2b3037',2.5);
+  s.callout([.62,.61,0],'collector kept negative','#dbe7f0',30,-56,10);s.render();
+  chart(c,430,96,226,170,{title:'V₀ vs frequency (slope h/e)',xl:'×10¹⁴ Hz',xmin:4,xmax:15,ymin:0,ymax:5,series:[{fn:x=>Math.max(0,4.1357e-15*x*1e14-p.work),col:C.gold}],marker:[p.freq,Math.max(0,V0)]});
+  tag(c,V0>0?`stopping potential V₀ = ${f(V0,2)} V`:'below threshold: no electrons',44,98,V0>0?C.mint:C.red,14)});
+const c0nm=fq=>3e17/(fq*1e14);
+
+/* ----- Electron gun: de Broglie wavelength ----- */
+reg('debroglie',(c,p,t)=>{const s=P3.scene(c,{scale:52,yaw:.4,pitch:.22,cx:335,cy:290}),lam=1.227/Math.sqrt(p.voltage),Lw=clamp(lam*4,.15,1.5),k=TAU/Lw,yb=.3,x0=-1.6+cycle(t*.5,1)*4.2;
+  OB.table(s,9);s.cyl([0,yb,0],[1,0,0],.62,6.2,'#cfe8f5',{alpha:.11,caps:false,seg:20});
+  s.cyl([-3.15,yb,0],[1,0,0],.5,.35,'#7a828a',{seg:16,cap:'#9aa1a8'});s.helix([-2.85,yb,0],[1,0,0],.1,.3,5,'#ff9a3c',2);s.ball([-2.85,yb,0],.2,'#ff8a2a',{glow:true,flat:true,alpha:.5});
+  s.box([-2.2,yb+.42,0],[.07,.42,.8],'#c9d0d6');s.box([-2.2,yb-.42,0],[.07,.42,.8],'#c9d0d6');
+  s.box([3.1,yb,0],[.07,1.0,1.0],'#1f4a34');s.ball([3.03,yb,0],.28,'#7dffb0',{glow:true,flat:true,alpha:.75});
+  s.box([-1,-1.2,0],[1.7,.6,.9],'#2d3238');s.engrave([-1,-1.2,.46],'V = '+f(p.voltage,0)+' volt','#69db7c',12);s.path([[-2.8,yb-.25,0],[-2.8,-1.0,.2],[-1.85,-1.2,.35]],'#c0392b',2.5);s.path([[-2.2,yb-.62,0],[-2.2,-1.0,-.2],[-1.85,-1.2,-.35]],'#2b3037',2.5);
+  const E=[];for(let i=0;i<=100;i++){const x=-2+5*i/100,g=Math.exp(-((x-x0)**2)/.7);E.push([x,yb+.38*g*Math.cos(k*x-t*8),0])}s.curve(E,'#4dabf7',2.6,8);
+  for(let i=0;i<6;i++){const q=cycle(t*.6+i/6,1);s.ball([-2.2+5.2*q,yb+(hash(i)-.5)*.25,(hash(i+2)-.5)*.25],.045,'#cfe9ff',{flat:true,glow:true})}
+  const xm=-.6;s.seg([xm,yb-.75,0],[xm+Lw,yb-.75,0],C.gold,2.5);s.seg([xm,yb-.82,0],[xm,yb-.68,0],C.gold,2);s.seg([xm+Lw,yb-.82,0],[xm+Lw,yb-.68,0],C.gold,2);s.label([xm+Lw/2,yb-.95,0],'λ',C.gold,15);
+  s.callout([-2.85,yb,0],'hot filament','#dbe7f0',-10,-70,11);s.callout([-2.2,yb+.62,0],'anode (+V)','#dbe7f0',30,-62,11);s.callout([3.1,yb+.5,0],'screen','#dbe7f0',-10,-60,11);
+  s.render();tag(c,`λ = 1.227/√V nm = ${f(lam,4)} nm`,44,98,C.gold,15)});
+
+/* ----- Davisson–Germer: Bragg reflection of electrons ----- */
+reg('electron-diffraction',(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.12,pitch:.07,cx:345,cy:262}),lam=1.227/Math.sqrt(p.voltage),sn=lam/(2*p.spacing),ok=sn<=1,th=ok?Math.asin(sn):.45,dd=clamp(p.spacing*2.6,.28,.75),ct=Math.cos(th),st=Math.sin(th),u=[ct,-st,0],w=[ct,st,0],A=[0,0,0],B=[0,-dd,0];
+  const NX=7,NP=4;s.box([0,-dd*(NP-1)/2-.05,0],[3.9,dd*(NP-1)+.25,1.1],'#8d98a3',{alpha:.12});
+  for(let j=0;j<NP;j++){s.poly([[-1.95,-dd*j,.55],[1.95,-dd*j,.55],[1.95,-dd*j,-.55],[-1.95,-dd*j,-.55]],'#42d9ca22',{shade:false});for(let i=0;i<NX;i++)for(const z of[-.28,.28])s.ball([-1.5+i*.5,-dd*j,z],.09,'#b9c2cc')}
+  const Cf=V.sub(B,V.mul(u,dd*st)),D=V.add(B,V.mul(w,dd*st)),G=V.sub(A,V.mul(u,3.1));
+  OB.beam(s,V.sub(G,V.mul(u,0)),A,'#4dabf7',2.6);OB.beam(s,V.sub(B,V.mul(u,2.3)),B,'#4dabf7',2);
+  s.cyl(V.sub(G,V.mul(u,.5)),u,.28,1,'#2b3037',{seg:14,cap:'#1a1d21'});s.ball(G,.08,'#cfe9ff',{glow:true,flat:true});
+  if(ok){OB.beam(s,A,V.add(A,V.mul(w,3)),'#4dabf7',2.6);OB.beam(s,B,V.add(B,V.mul(w,2.5)),'#4dabf7',2);s.cyl(V.add(A,V.mul(w,3.35)),w,.28,.7,'#2b3037',{seg:14,cap:'#7dffb0'});
+    s.seg(A,Cf,C.gold+'99',1.2,[4,4]);s.seg(A,D,C.gold+'99',1.2,[4,4]);s.seg(Cf,B,C.gold,4);s.seg(B,D,C.gold,4);s.label(V.add(V.mul(V.add(Cf,B),.5),[-.3,-.3,0]),'extra path',C.gold,11);s.label(V.add(V.mul(V.add(B,D),.5),[.35,-.3,0]),'2d sinθ = λ',C.gold,11)}
+  const arc=[];for(let i=0;i<=12;i++){const a=th*i/12;arc.push([-.7*Math.cos(a)+0,.7*Math.sin(a)*0,0])}
+  const ar=[];for(let i=0;i<=10;i++){const a=th*i/10;ar.push([-.9*Math.cos(a),.9*Math.sin(a),0])}s.path(ar,C.mint,2);s.label([-1.12*Math.cos(th/2),1.12*Math.sin(th/2)+.05,0],'θ',C.mint,14);
+  s.seg([B[0]-.25,B[1],0],[B[0]+.25,B[1],0],C.white,1);s.arrow([1.95,0,.3],[1.95,-dd,.3],C.white,1.5,6);s.label([2.2,-dd/2,.3],'d',C.white,13);
+  s.callout(G,'electron gun','#dbe7f0',-10,-52,11);s.callout([1.5,-dd*(NP-1),.28],'nickel crystal','#dbe7f0',24,40,11);if(ok)s.callout(V.add(A,V.mul(w,3.35)),'detector','#dbe7f0',24,-30,11);
+  s.render();tag(c,ok?`Bragg angle θ = ${f(deg(th),1)}°`:'No first-order reflection (λ > 2d)',44,98,C.gold,15)});
+
+/* ----- Compton scattering ----- */
+reg('compton',(c,p,t)=>{const s=P3.scene(c,{scale:52,yaw:.12,pitch:.62,cx:330,cy:290}),th=rad(p.angle),dl=2.426*(1-Math.cos(th)),l2=p.wavelength+dl,phi=Math.atan2(1,(1+2.426/p.wavelength)*Math.tan(th/2)||1e-9),ph=th>=PI-1e-6?0:phi;
+  s.box([0,-.12,0],[8.4,.16,5],'#2a2f36',{ground:true});for(let a=-80;a<=80;a+=20){const r=2.6,q=rad(a);s.seg([r*Math.cos(q),-.03,-r*Math.sin(q)],[(r+.14)*Math.cos(q),-.03,-(r+.14)*Math.sin(q)],'#8c99a6',1,[],-4.9e5)}
+  const arcp=[];for(let i=0;i<=40;i++){const q=-1.4+2.8*i/40;arcp.push([2.6*Math.cos(q),-.03,-2.6*Math.sin(q)])}s.path(arcp,'#8c99a688',1.2,[],-4.9e5);
+  s.box([-3.5,.25,0],[.9,.6,.6],'#444b53');s.cyl([-3.0,.25,0],[1,0,0],.17,.4,'#9aa1a8',{seg:12});s.ball([-2.8,.25,0],.07,'#be4bdb',{glow:true,flat:true});
+  s.box([0,.2,0],[.5,.5,.5],'#1c2025');s.box([0,.47,0],[.5,.05,.5],'#3a4047');
+  const wave=(a,b,lam,col)=>{const d=V.sub(b,a),L=Math.hypot(...d),k=TAU/(lam*.04+.15),N=Math.round(L*10),pts=[];for(let i=0;i<=N;i++){const q=i/N;pts.push(V.add(V.add(a,V.mul(d,q)),[0,.17*Math.sin(k*q*L-t*6),0]))}s.curve(pts,col,2.4,8)};
+  const O=[0,.27,0],dir=[Math.cos(th),0,-Math.sin(th)],det=V.add(O,V.mul(dir,2.6));
+  wave([-2.7,.27,0],[-.3,.27,0],p.wavelength,'#be4bdb');wave(V.add(O,V.mul(dir,.35)),V.add(O,V.mul(dir,2.2)),l2,'#8e6bff');
+  s.box(V.add(det,V.mul(dir,.1)),[.55,.5,.55],'#3b4148',{rotY:Math.atan2(dir[2],dir[0])*-1});s.ball(V.add(det,V.mul(dir,-.18)),.1,'#7dffb0',{flat:true,glow:true});
+  const rd=[Math.cos(ph),0,Math.sin(ph)];s.arrow(V.add(O,V.mul(rd,.3)),V.add(O,V.mul(rd,1.7)),C.gold,3,11,'recoil e⁻');s.ball(V.add(O,V.mul(rd,1.7)),.08,'#4dabf7',{glow:true,flat:true});
+  const ar=[];for(let i=0;i<=12;i++){const q=th*i/12;ar.push([1.0*Math.cos(q),.04,-1.0*Math.sin(q)])}s.path(ar,C.mint,2);s.label([1.25*Math.cos(th/2),.1,-1.25*Math.sin(th/2)],'θ',C.mint,14);
+  s.callout([-3.5,.55,0],'X-ray source','#dbe7f0',-10,-48,11);s.callout([0,.5,0],'graphite target','#dbe7f0',-26,-72,11);s.callout(V.add(det,[0,.3,0]),'detector','#dbe7f0',20,-40,11);
+  s.render();tag(c,`Δλ = ${f(dl,3)} pm (longer wavelength after scattering)`,44,98,C.gold,14)});
+
+/* ----- Brewster's angle (shared with tenth.js) ----- */
+OB.brewster=(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.28,pitch:.26,cx:340,cy:290}),th=rad(p.th),tt=Math.asin(Math.sin(th)/p.n2),ci=Math.cos(th),ct=Math.cos(tt),rs=(ci-p.n2*ct)/(ci+p.n2*ct),rp=(p.n2*ci-ct)/(p.n2*ci+ct),thB=Math.atan(p.n2),Rm=Math.sqrt((rs*rs+rp*rp)/2),e='#ffe27a';
+  s.box([0,-1.7,0],[7.2,.3,3],'#6d4b2f',{ground:true});s.box([0,-.78,0],[6.4,1.55,2.3],'#8fd0ea',{alpha:.22});s.poly([[-3.2,.002,-1.15],[3.2,.002,-1.15],[3.2,.002,1.15],[-3.2,.002,1.15]],'#ffffff14',{shade:false});
+  for(let a=-90;a<=90;a+=10){const q=rad(a),r=2.3,l=a%30===0?.2:.1;s.seg([r*Math.sin(q),r*Math.cos(q),1.16],[(r+l)*Math.sin(q),(r+l)*Math.cos(q),1.16],'#e9f0f6',1.2);s.seg([r*Math.sin(q),-r*Math.cos(q),1.16],[(r+l)*Math.sin(q),-(r+l)*Math.cos(q),1.16],'#e9f0f688',1)}
+  for(const a of[30,60])s.label([2.6*Math.sin(rad(a)),2.6*Math.cos(rad(a)),1.16],a+'°','#e9f0f6',10);
+  s.seg([0,-1.5,0],[0,2.6,0],C.muted,1,[4,4]);const L=2.7,inc=[-L*Math.sin(th),L*Math.cos(th),0],ref=[L*Math.sin(th),L*Math.cos(th),0],tr=[L*Math.sin(tt),-L*Math.cos(tt),0],di=V.norm([-inc[0],-inc[1],0]);
+  s.cyl(V.mul(V.norm(inc),3.25),di,.13,.8,'#262b31',{seg:12,cap:'#0d0f12'});OB.beam(s,inc,[0,0,0],e,3.2);OB.beam(s,[0,0,0],ref,e,.8+4.5*Rm);OB.beam(s,[0,0,0],tr,e,3);
+  const sp=(q,dv,A)=>{s.ball(q,.05,C.mint,{flat:true});if(A>.02)s.seg(V.add(q,V.mul(dv,.2*A)),V.add(q,V.mul(dv,-.2*A)),C.mint,2)};
+  for(let i=1;i<=3;i++){const qi=V.mul(inc,i/4),qr=V.mul(ref,i/4);sp(qi,V.norm(V.cross(inc,[0,0,1])),1);sp(qr,V.norm(V.cross(ref,[0,0,1])),Math.min(1,Math.abs(rp)*3))}
+  const a0=Math.atan2(ref[1],ref[0]),a1=Math.atan2(tr[1],tr[0]),arc=[];for(let i=0;i<=12;i++){const a=a0+(a1-a0)*i/12;arc.push([.5*Math.cos(a),.5*Math.sin(a),0])}s.path(arc,C.gold,2.2);s.label([.8*Math.cos((a0+a1)/2),.8*Math.sin((a0+a1)/2),0],f(deg(a0-a1),0)+'°',C.gold,12);
+  s.callout([-2.9,-.8,1.15],`glass  n₂ = ${f(p.n2,2)}`,'#dbe7f0',-4,40,11);s.callout(V.mul(V.norm(inc),3.5),'laser','#dbe7f0',-26,34,11);
+  s.render();tag(c,'dots: s-polarisation (out of page)   bars: p-polarisation',44,98,C.muted,13);tag(c,Math.abs(p.th-deg(thB))<1.2?'Brewster angle: reflected light is fully polarised':`Brewster angle = ${f(deg(thB),1)}°`,44,118,Math.abs(p.th-deg(thB))<1.2?C.mint:C.muted,12)};
+
+/* ----- Resolving power (shared with tenth.js) ----- */
+const J1=x=>{const a=Math.abs(x);if(a<8){let sum=0,term=a/2;for(let k=0;k<22;k++){sum+=term;term*=-(a*a/4)/((k+1)*(k+2))}return x<0?-sum:sum}return Math.sqrt(2/(PI*a))*Math.cos(a-3*PI/4)*(x<0?-1:1)};
+const airyI=x=>Math.abs(x)<1e-5?1:(2*J1(x)/x)**2;
+OB.resolve=(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.15,pitch:.62,cx:335,cy:305}),tm=1.22*p.lam*1e-9/(p.D/1000)*206265,sep=1.7,rho=clamp(sep*tm/p.sep,.22,2.3),k=3.8317/rho,col=spec(p.lam),res=p.sep>=tm;
+  s.cyl([0,-.1,0],[0,1,0],2.9,.1,'#080b10',{seg:36,cap:'#0b0f15'});s.ring([0,-.04,0],[0,1,0],2.9,'#aeb6be',4,[],48);
+  for(const sx of[-1,1]){const cx=sx*sep/2;for(let m=1;m<=3;m++)s.ring([cx,0,0],[0,1,0],rho*[1.22,2.23,3.24][m-1]/1.22,col+h2(.42/m),1.4,[],40);s.ball([cx,.01,0],Math.max(.07,rho*.28),col,{glow:true,flat:true})}
+  const sum=[],a=[],b=[];for(let i=0;i<=120;i++){const x=-2.5+5*i/120,A=airyI(k*(x+sep/2)),B=airyI(k*(x-sep/2));a.push([x,.02+A*1.1,-1.55]);b.push([x,.02+B*1.1,-1.55]);sum.push([x,.02+(A+B)*1.1*.6,-1.55])}
+  s.curve(a,col+'66',1.3,10);s.curve(b,col+'66',1.3,10);s.curve(sum,'#ffe9a8',2.6,10);s.seg([-2.5,.02,-1.55],[2.5,.02,-1.55],'#ffffff44',1,[3,3]);
+  const ys=-1.95;s.seg([-sep/2,0,ys],[sep/2,0,ys],C.mint,3);s.label([0,0,ys+.2],'separation '+f(p.sep,1)+'″',C.mint,12);s.seg([-sep/2,0,ys+.5],[-sep/2+rho,0,ys+.5],C.gold,3);s.label([-sep/2+rho/2,0,ys+.7],'Rayleigh limit '+f(tm,1)+'″',C.gold,12);
+  s.callout([-sep/2,.1,0],'star 1','#dbe7f0',-30,-60,11);s.callout([sep/2,.1,0],'star 2','#dbe7f0',34,-56,11);
+  s.render();tag(c,res?'Resolved: two distinct peaks':'Not resolved: peaks merge',44,98,res?C.mint:C.red,15)};
+
+/* ----- Prism: minimum deviation (shared with eleventh.js) ----- */
+OB.prism=(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:.22,pitch:.22,cy:268,cx:335}),H=3.4,A=rad(p.A),b=H*Math.tan(A/2),top=[0,1.7],Lf=[-b,-1.7],Rr=[b,-1.7],n=p.n,mix=(a,k)=>[a[0],a[1],k],e='#ffe27a';
+  const refr=(d,nr,eta)=>{const ci=-(d[0]*nr[0]+d[1]*nr[1]),kk=1-eta*eta*(1-ci*ci);if(kk<0)return null;const a=eta*ci-Math.sqrt(kk);return[eta*d[0]+a*nr[0],eta*d[1]+a*nr[1]]};
+  const hz=.5,tri=z=>[[top[0],top[1],z],[Lf[0],Lf[1],z],[Rr[0],Rr[1],z]];s.box([0,-1.85,0],[2*b+1,.15,1.5],'#2b3037');
+  s.poly(tri(-hz),'#cfe8f5',{alpha:.14,shade:false});for(const [a,c2] of[[top,Lf],[Lf,Rr],[Rr,top]])s.poly([[...a,-hz],[...c2,-hz],[...c2,hz],[...a,hz]],'#cfe8f5',{alpha:.16,shade:false,stroke:'#cfe8f566'});s.poly(tri(hz),'#cfe8f5',{alpha:.2,shade:false,stroke:'#e6f4ff'});
+  const len=Math.hypot(b,H),n1=[-H/len,b/len],n2=[H/len,b/len],M1=[(top[0]+Lf[0])/2,(top[1]+Lf[1])/2],ok=Math.sin(rad(p.i))/n<1;
+  const inw=[-n1[0],-n1[1]],ci=Math.cos(rad(p.i)),si=Math.sin(rad(p.i)),d=[inw[0]*ci-inw[1]*si,inw[0]*si+inw[1]*ci],S0=[M1[0]-d[0]*3.2,M1[1]-d[1]*3.2];
+  s.cyl([S0[0]-d[0]*.35,S0[1]-d[1]*.35,0],[d[0],d[1],0],.13,.7,'#262b31',{seg:12,cap:'#0d0f12'});OB.beam(s,[...S0,0],[...M1,0],e,3);
+  s.seg([M1[0]+n1[0]*1.3,M1[1]+n1[1]*1.3,0],[M1[0]-n1[0]*1.3,M1[1]-n1[1]*1.3,0],C.muted,1.2,[5,5]);
+  let msg=null;const d2=refr(d,n1,1/n);
+  if(d2){const ex=[Rr[0]-top[0],Rr[1]-top[1]],den=d2[0]*ex[1]-d2[1]*ex[0],tt=((top[0]-M1[0])*ex[1]-(top[1]-M1[1])*ex[0])/den,M2=[M1[0]+d2[0]*tt,M1[1]+d2[1]*tt];
+    OB.beam(s,[...M1,0],[...M2,0],e,2.6);s.seg([M2[0]+n2[0]*1.3,M2[1]+n2[1]*1.3,0],[M2[0]-n2[0]*1.3,M2[1]-n2[1]*1.3,0],C.muted,1.2,[5,5]);
+    const d3=refr(d2,[-n2[0],-n2[1]],n);
+    if(d3){const E=[M2[0]+d3[0]*3.2,M2[1]+d3[1]*3.2];OB.beam(s,[...M2,0],[...E,0],e,3);s.seg([...M1,0],[M1[0]+d[0]*4,M1[1]+d[1]*4,0],e+'77',1.4,[6,6]);
+      s.label([M2[0]+n2[0]*1.5,M2[1]+n2[1]*1.5,0],'e',C.white,13);
+      const det=d[0]*d3[1]-d[1]*d3[0];if(Math.abs(det)>1e-3){const q=((M2[0]-M1[0])*d3[1]-(M2[1]-M1[1])*d3[0])/det,X=[M1[0]+d[0]*q,M1[1]+d[1]*q];if(q>0){const a0=Math.atan2(d[1],d[0]),a1=Math.atan2(d3[1],d3[0]),arc=[];for(let i=0;i<=10;i++){const a=a0+(a1-a0)*i/10;arc.push([X[0]+.8*Math.cos(a),X[1]+.8*Math.sin(a),0])}s.path(arc,C.gold,2.2);s.seg([...X,0],[X[0]+d[0]*1.4,X[1]+d[1]*1.4,0],e+'77',1.4,[6,6]);s.label([X[0]+1.1*Math.cos((a0+a1)/2),X[1]+1.1*Math.sin((a0+a1)/2),0],'δ',C.gold,15)}}}
+    else{const rf=[d2[0]-2*(d2[0]*n2[0]+d2[1]*n2[1])*n2[0],d2[1]-2*(d2[0]*n2[0]+d2[1]*n2[1])*n2[1]];s.seg([...M2,0],[M2[0]+rf[0]*1.4,M2[1]+rf[1]*1.4,0],C.red,2,[5,4]);msg=1}}
+  s.label([M1[0]+n1[0]*1.55,M1[1]+n1[1]*1.55,0],'i',C.white,13);s.label([0,1.98,0],'A',C.white,14);
+  const aa=[];for(let i=0;i<=10;i++){const a=-PI/2-A/2+A*i/10;aa.push([top[0]+.55*Math.cos(a),top[1]+.55*Math.sin(a),0])}s.path(aa,C.mint,2);
+  s.callout([...M1,0],'glass prism','#dbe7f0',-60,-50,11);
+  s.render();tag(c,msg||!d2?'No emergent ray: total internal reflection at the second face':`deviation δ = ${f(deg(prismDev(p)),1)}°  (dashed: the undeviated path)`,44,98,msg||!d2?C.red:C.muted,13)};
+const prismDev=p=>{const n=p.n,A=rad(p.A),i=rad(p.i),r1=Math.asin(Math.sin(i)/n),r2=A-r1,se=n*Math.sin(r2);return i+Math.asin(clamp(se,-1,1))-A};
 /* ---------- Wave Optics ---------- */
-function screenPattern(s,I,col,w=3.2,h=1.6,x=2.4){const n=60;for(let i=0;i<n;i++){const y=-w/2+w*(i+.5)/n,v=clamp(I(y),0,1);s.box([x,y*.9,0],[.05,w/n*.9,h],col,{alpha:.05+.9*v})}}
-reg('doubleslit',(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:-.5,pitch:.2}),col=spec(p.wavelength),beta=p.wavelength*1e-9*p.distance/(p.slit*1e-3)*1000,I=y=>Math.cos(PI*y*1.5/(beta*.5+.05))**2;s.box([-2.4,0,0],[.2,.4,.4],'#495057');s.box([0,0,0],[.06,2.4,1.8],'#343a40');for(const z of[-.15,.15])s.box([0,0,0],[.08,1.6,.04],'#0b1622');for(let i=1;i<=6;i++){const r=((t*.8+i*.4)%2.4);for(const yy of[-.15,.15])s.ring([.05,yy,0],[0,0,1],r,col+'44',1)}screenPattern(s,I,col);s.render();tag(c,`fringe width β = ${f(beta,2)} mm`,44,98,C.gold,15)});
-reg('diffraction',(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:-.5,pitch:.2}),col=spec(p.wavelength),w=p.wavelength*1e-9*p.distance/(p.width*1e-3)*1000,I=y=>{const x=PI*y/(w*.08+.02);return x===0?1:(Math.sin(x)/x)**2};s.box([-2.4,0,0],[.2,.4,.4],'#495057');s.box([0,.7,0],[.06,1,1.8],'#343a40');s.box([0,-.7,0],[.06,1,1.8],'#343a40');screenPattern(s,I,col);s.render();tag(c,'central maximum is twice as wide as the others',44,98,C.muted,13)});
-reg('polarization',(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:.6,pitch:.2}),th=rad(p.angle),I1=p.intensity/2,I2=I1*Math.cos(th)**2;const ring=(x,ang,col)=>{s.ring([x,0,0],[1,0,0],.9,col,4);for(let i=-3;i<=3;i++){const d=[0,Math.cos(ang),Math.sin(ang)],e=[0,-Math.sin(ang),Math.cos(ang)];s.seg(V.add([x,0,0],V.add(V.mul(d,-.8),V.mul(e,i*.2))),V.add([x,0,0],V.add(V.mul(d,.8),V.mul(e,i*.2))),col+'99',1.2)}};ring(-1,0,'#adb5bd');ring(1,th,'#ffc36b');
-  for(let i=0;i<=40;i++){const x=-3.4+2.3*i/40,a=t*3+x*4;s.seg([x,0,0],[x,.5*Math.sin(a),.5*Math.cos(a*1.3)],'#ffd43b55',1)}for(let i=0;i<=20;i++){const x=-.9+1.8*i/20,v=.6*Math.sin(t*4-x*4);s.seg([x,0,0],[x,v,0],'#ffd43b',1.5)}for(let i=0;i<=20;i++){const x=1.1+2.2*i/20,v=.6*Math.sqrt(I2/Math.max(I1,1e-9))*Math.sin(t*4-x*4);s.seg([x,0,0],[x,v*Math.cos(th),v*Math.sin(th)],'#ffd43b',1.5)}s.render();tag(c,`I = I₀cos²θ → ${f(I2,1)} units`,44,98,C.gold,15)});
-reg('thin-film',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.35}),d=2*p.index*p.thickness,ph=TAU*d/p.wavelength,R=(1-Math.cos(ph))/2*0+Math.sin(ph/2)**2,col=spec(p.wavelength);s.box([0,-.6,0],[5,.6,2.4],'#495057');s.box([0,-.15,0],[5,.3,2.4],'#7fc8e8',{alpha:.3});for(let i=0;i<10;i++)s.box([-2.25+i*.5,.02,0],[.5,.04,2.4],col,{alpha:clamp(R,.05,.95)});const inc=[-1.4,1.6,0];s.path([inc,[-.4,0,0]],col,2.5);s.path([[-.4,0,0],[.6,1.6,0]],col+'cc',2);s.path([[-.4,0,0],[-.25,-.3,0],[-.1,0,0],[.9,1.6,0]],col+'88',2);s.render();tag(c,R>.6?'Constructive: bright reflection':R<.2?'Destructive: dark reflection':'Partial reinforcement',44,98,C.gold,14)});
-reg('fringe-width',(c,p,t)=>{const s=P3.scene(c,{scale:54,yaw:-.5,pitch:.2}),col=spec(p.wavelength),beta=p.wavelength*1e-9*p.D/(p.slit*1e-3)*1000,I=y=>Math.cos(PI*y/(beta*.25+.03))**2;s.box([-2.4,0,0],[.2,.4,.4],'#495057');s.box([0,0,0],[.06,2.4,1.8],'#343a40');screenPattern(s,I,col);s.seg([2.5,0,1],[2.5,(beta*.25+.03)*.9,1],C.gold,3);s.label([2.7,.3,1],'β',C.gold,14);s.render()});
-reg('diffraction-grating',(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.5}),col=spec(p.wavelength),dsp=1e-3/p.density;s.box([-2.4,0,0],[.2,.3,.3],'#495057');s.path([[-2.3,0,0],[0,0,0]],col,3);s.box([0,0,0],[.05,1,1.6],'#ced4da',{alpha:.6});for(let m=-p.order;m<=p.order;m++){const sn=m*p.wavelength*1e-9/dsp;if(Math.abs(sn)>=1)continue;const th=Math.asin(sn);s.path([[0,0,0],[3*Math.cos(th),0,3*Math.sin(th)]],col,m===0?3:2);s.label([3.3*Math.cos(th),.2,3.3*Math.sin(th)],'m='+m,C.white,11)}s.render();tag(c,'beams appear only where d sinθ = mλ',44,98,C.muted,13)});
 
 /* ---------- Dual Nature ---------- */
-reg('photoelectric',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4}),E=hc/p.wavelength,K=E-p.workFunction,col=spec(p.wavelength);s.box([0,-.4,0],[2.4,.2,1.6],'#adb5bd');for(let i=0;i<Math.round(p.intensity/10);i++){const q=cycle(t*.8+i/10,1);s.ball([-2.5+2.5*q,2-2.2*q,(hash(i)-.5)*1.2],.05,col,{glow:true,flat:true})}
-  if(K>0)for(let i=0;i<Math.round(p.intensity/12);i++){const q=cycle(t*(.3+Math.sqrt(K)*.4)+i/8,1);s.ball([(hash(i+20)-.5)*1.8,-.3+q*2.4,(hash(i+30)-.5)*1.2],.06,'#4dabf7')}s.render();tag(c,K>0?`Electrons ejected, K_max = ${f(K,2)} eV`:'No emission: photon energy below the work function',44,98,K>0?C.mint:C.red,14)});
-reg('debroglie',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4,pitch:.2}),lam=1.227/Math.sqrt(p.voltage),k=TAU/clamp(lam*4,.15,1.5);s.box([-3,0,0],[.6,.8,.8],'#495057');s.box([-2.3,0,0],[.1,.8,.8],'#ced4da');const x0=-1.8+cycle(t*.5,1)*4.6;s.curve(Array.from({length:81},(_,i)=>{const x=-2+5.4*i/80;return[x,.5*Math.exp(-((x-x0)**2)/.6)*Math.cos(k*x-t*8),.5*Math.exp(-((x-x0)**2)/.6)*Math.sin(k*x-t*8)]}),'#4dabf7',2.4,8);s.render();tag(c,`λ = 1.227/√V nm = ${f(lam,4)} nm`,44,98,C.gold,15)});
-reg('electron-diffraction',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.25}),lam=1.227/Math.sqrt(p.voltage),sn=lam/(2*p.spacing),ok=sn<=1,th=ok?Math.asin(sn):0;for(let i=0;i<6;i++)for(let j=0;j<6;j++)for(let k=0;k<2;k++)s.ball([-1.25+i*.5,-1.6+j*.25,-.25+k*.5],.07,'#adb5bd');const hit=[0,-.4,0];s.path([V.add(hit,[-3*Math.cos(th),3*Math.sin(th),0]),hit],'#4dabf7',3);if(ok)s.path([hit,V.add(hit,[3*Math.cos(th),3*Math.sin(th),0])],'#4dabf7',3);s.render();tag(c,ok?`Bragg angle θ = ${f(deg(th),1)}°`:'No first-order reflection (λ > 2d)',44,98,C.gold,15)});
-reg('compton',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.4}),th=rad(p.angle),dl=2.426*(1-Math.cos(th)),l2=p.wavelength+dl,ph=cycle(t*.5,1);s.ball([0,0,0],.15,'#4dabf7',{label:'e⁻'});const wave=(a,b,lam,col)=>{const d=V.sub(b,a),L=Math.hypot(...d),n=V.norm(d),side=[-n[2],0,n[0]].map(v=>v||0),k=TAU/(lam*.04+.15);s.curve(Array.from({length:41},(_,i)=>{const q=i/40;return V.add(V.add(a,V.mul(d,q)),[0,.15*Math.sin(k*q*L-t*6),0])}),col,2,8)};wave([-3.4,0,0],[0,0,0],p.wavelength,'#be4bdb');wave([0,0,0],[3*Math.cos(th),0,-3*Math.sin(th)],l2,'#7950f2');s.arrow([0,0,0],[1.4*Math.cos(-(PI-th)/2),0,-1.4*Math.sin(-(PI-th)/2)],C.gold,3,11,'recoil e⁻');s.render();tag(c,`Δλ = ${f(dl,3)} pm (longer wavelength after scattering)`,44,98,C.gold,14)});
-reg('stopping-potential',(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:220,yaw:.4}),E=4.1357e-15*p.freq*1e14,V0=E-p.work;s.mesh([0,0,0],[1.6,1,1],'#7fc8e8',{alpha:.12});s.box([-1,0,0],[.08,1.2,.9],'#adb5bd');s.box([1,0,0],[.08,1.2,.9],'#d9844a');if(V0>0)for(let i=0;i<6;i++){const q=cycle(t*.6+i/6,1),turn=q>.5?1-q:q;s.ball([-1+1.8*turn*1.1,(hash(i)-.5)*.8,(hash(i+3)-.5)*.6],.05,'#4dabf7',{flat:true})}s.render();
-  chart(c,430,96,226,170,{title:'V₀ vs frequency (slope h/e)',xl:'×10¹⁴ Hz',xmin:4,xmax:15,ymin:0,ymax:5,series:[{fn:x=>Math.max(0,4.1357e-15*x*1e14-p.work),col:C.gold}],marker:[p.freq,Math.max(0,V0)]})});
 reg('photon-counting',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4}),rate=p.power*1e-3*p.wavelength*1e-9/(6.626e-34*3e8),col=spec(p.wavelength),n=clamp(Math.round(Math.log10(rate)*2),3,40);s.box([-3,0,0],[.8,.5,.5],'#343a40');s.box([2.8,0,0],[.4,1,1],'#212529');for(let i=0;i<n;i++){const q=cycle(t*.7+i/n,1);s.ball([-2.5+5*q,(hash(i)-.5)*.2,(hash(i+3)-.5)*.2],.05,col,{glow:true,flat:true})}s.render();tag(c,`${rate.toExponential(2)} photons per second (dots on a log scale)`,44,98,C.gold,14)});
 
 /* ---------- Atoms ---------- */
@@ -116,4 +293,45 @@ reg('zener-regulator',(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.5,cy:290}),V
 reg('iv-curve',(c,p,t)=>{const s=P3.scene(c,{scale:58,cx:220,pitch:.3}),I=v=>v>0?Math.exp((v-p.knee)/.05)*.01:-.0005,on=p.voltage>p.knee;s.cyl([0,0,0],[1,0,0],.35,1.6,'#1a1a1a');s.cyl([.6,0,0],[1,0,0],.36,.14,'#c9d3da');s.cyl([-1.5,0,0],[1,0,0],.04,1.4,'#adb5bd');s.cyl([1.5,0,0],[1,0,0],.04,1.4,'#adb5bd');if(on)for(let i=0;i<8;i++){const q=cycle(t*.8+i/8,1);s.ball([-2.2+4.4*q,.0,0],.05,'#ffc36b',{flat:true,glow:true})}s.render();
   chart(c,430,96,226,170,{title:'Diode I–V',xl:'V',xmin:-1,xmax:1,ymin:-.2,ymax:1,series:[{fn:v=>clamp(I(v),-.1,1),col:C.gold}],marker:[p.voltage,clamp(I(p.voltage),-.1,1)]})});
 reg('transistor-switch',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.4}),ib=Math.max(0,(p.input-.7)/(p.baseR*1000)),ic=Math.min(p.gain*ib,4.8/220),on=ic>0;s.box([0,-.12,0],[6,.16,3],'#16404a');s.lathe([0,0,0],[[.3,0],[.3,.7],[0,.72]],'#1a1a1a',{segs:16});for(const x of[-.15,0,.15])s.cyl([x,-.05,.2],[0,1,0],.02,.2,'#adb5bd');s.label([0,1,0],'NPN',C.white,12);s.cyl([-1.6,.12,0],[1,0,0],.1,.7,'#c9a36b');s.label([-1.6,.45,0],'R_B',C.muted,11);s.ball([1.6,.4,0],.25,on?'#ffd43b':'#495057',{glow:on});s.label([1.6,.9,0],'load',C.muted,11);s.render();tag(c,on?(p.gain*ib>=4.8/220?'Saturated: switch ON':'Active region'):'Cut off: switch OFF',44,98,on?C.mint:C.muted,14)});
+const K6=window.PhysicaKit6,{wire:wire6,mint:mintL}=K6;
+// shared bits for the realistic wave scenes
+const sheet=(s,fn,x0,x1,n,mk,col,al)=>{let prev=null;for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,q=mk(x,fn(x));if(prev)s.poly([prev[0],prev[1],q[1],q[0]],col,{alpha:al,shade:false,z:undefined});prev=q}};
+const tripod=(s,x,y0,z=0)=>{s.box([x,y0+.08,z],[.9,.16,.9],'#3b4148');s.cyl([x,y0+.8,z],[0,1,0],.05,1.4,'#c3c9cf',{seg:8})};
+reg('emwave',(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.15,pitch:-.05,cy:262}),lam=.6+p.wavelength*.6,k=TAU/lam,A=.62*p.amplitude,W=t*3,Y0=-1.55,E=x=>Math.sin(k*x-W)*A;
+  s.box([0,Y0-.1,0],[8.4,.2,3.2],'#2c333a',{ground:true});
+  // transmitting dipole antenna on the left, receiving rod on the right
+  s.box([-3.9,Y0+.12,0],[.7,.24,.7],'#3b4148');s.cyl([-3.9,Y0+.9,0],[0,1,0],.05,1.4,'#c3c9cf',{seg:8});s.cyl([-3.9,Y0+1.1,0],[0,1,0],.07,.1,'#d98a4b',{seg:8});s.ball([-3.9,Y0+1.62,0],.07,'#ffd27a',{glow:true,flat:true});
+  const base=[-3.4,3.7];s.arrow([base[0],0,0],[base[1]+.2,0,0],'#8ca6b9',1.8,11);
+  sheet(s,E,-3.4,3.6,70,(x,v)=>[[x,0,0],[x,v,0]],'#ffc36b',.3);sheet(s,x=>E(x)*.9,-3.4,3.6,70,(x,v)=>[[x,0,0],[x,0,v]],'#7baaff',.3);
+  const Ep=[],Bp=[];for(let i=0;i<=90;i++){const x=-3.4+7*i/90,v=E(x);Ep.push([x,v,0]);Bp.push([x,0,v*.9])}s.curve(Ep,C.gold,2.8,6);s.curve(Bp,'#8fb8ff',2.4,6);
+  for(let i=0;i<=14;i++){const x=-3.2+i*.46,v=E(x);if(Math.abs(v)>.12){s.arrow([x,0,0],[x,v,0],'#ffd8a0',1.4,6);s.arrow([x,0,0],[x,0,v*.9],'#a9c8ff',1.3,6)}}
+  const x1=-3.4+(((W+PI/2)/k)%lam+lam)%lam+0*lam;let xc=x1;while(xc<-3.4)xc+=lam;if(xc+lam<3.5){s.seg([xc,-A-.35,.45],[xc+lam,-A-.35,.45],C.mint,2);s.seg([xc,-A-.28,.45],[xc,-A-.42,.45],C.mint,2);s.seg([xc+lam,-A-.28,.45],[xc+lam,-A-.42,.45],C.mint,2);s.callout([xc+lam/2,-A-.35,.45],`λ = ${p.wavelength} m`,C.mint,0,45,12)}
+  s.callout([-2.2,A+.1,0],'E (electric): up and down',C.gold,-20,-45,12);s.callout([-1.6,0,A*.9+.1],'B (magnetic): in and out',C.blue,-50,40,12);s.callout([3.5,0,0],'travels at c = 3×10⁸ m/s',C.muted,0,-52,11);
+  s.render();tag(c,'E and B oscillate in step, at right angles to each other and to the direction of travel',44,98,C.muted,13)});
+reg('displacement-current',(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,cy:262}),w=TAU*p.frequency*t*.5,sn=Math.sin(w),cs=Math.cos(w),a=.45+Math.sqrt(p.area)*2.6,Y=-1.9;
+  s.box([0,Y-.1,0],[6.6,.2,3.2],'#2c333a',{ground:true});
+  // two circular metal plates with an air gap between them
+  for(const x of[-.35,.35])s.cyl([x,0,0],[1,0,0],a,.07,'#c3c9cf',{cap:'#e1e5e9',seg:32});
+  s.cyl([-1.5,0,0],[1,0,0],.04,2.3,'#d98a4b');s.cyl([1.5,0,0],[1,0,0],.04,2.3,'#d98a4b');
+  s.box([0,Y+.3,0],[1.5,.6,.8],'#2f353b');s.engrave([0,Y+.32,.41],'~ AC source','#ffd27a',11);wire6(s,[[-.39,0,0],[-2.6,0,0],[-2.6,Y+.4,0],[-.75,Y+.4,0]],'#d64541');wire6(s,[[.39,0,0],[2.6,0,0],[2.6,Y+.4,0],[.75,Y+.4,0]],'#2b2b2b');
+  // plate charge ∝ sin, conduction current in the wires and displacement current in the gap ∝ cos
+  const nq=Math.round(10*Math.abs(sn));for(let i=0;i<nq;i++){const ang=TAU*hash(i+9),r=a*.8*Math.sqrt(hash(i+31));for(const [x,sg] of[[-.4,1],[.4,-1]])s.ball([x*(1+.06),r*Math.cos(ang),r*Math.sin(ang)],.05,(sg*Math.sign(sn))>0?'#ff6b5e':'#5d8bff',{flat:true})}
+  const sgn=Math.sign(cs)||1,ia=Math.abs(cs);for(let i=0;i<5;i++){const y=(i-2)*a*.25;s.arrow([-.3*sgn,y,0],[.3*sgn,y,0],'#ffc36b'+Math.round(60+190*ia).toString(16).padStart(2,'0'),2,7)}
+  for(const [x,d] of[[-2.0,1],[2.0,-1]])s.arrow([x-.3*d*sgn*ia,0,0],[x+.3*d*sgn*ia+.02,0,0],'#ffc36b',3,9);
+  for(const x of[-1.1,0,1.1]){const R=(x===0?a*.55:.28)+.1,al=Math.round(60+190*ia).toString(16).padStart(2,'0'),pts=Array.from({length:37},(_,i)=>[x,R*Math.cos(TAU*i/36),R*Math.sin(TAU*i/36)]);s.path(pts,'#42d9ca'+al,2.2);for(const th of[.8,3.9]){const a2=th+.35*sgn;s.arrow([x,R*Math.cos(th),R*Math.sin(th)],[x,R*Math.cos(a2),R*Math.sin(a2)],'#42d9ca',1.8,7)}}
+  mintL(s,[0,a,0],'parallel metal plates (air gap)',-30,-60);mintL(s,[-2.0,0,0],'conduction current I in wire',-40,-50);s.callout([0,-.15,0],`displacement current I_d = ${f(p.current*Math.abs(cs),2)} nA`,C.gold,60,70,12);
+  s.render();tag(c,'no charge crosses the gap, yet B rings appear there: a changing E field acts like a current',44,98,C.muted,13)});
+reg('photon-energy',(c,p,t)=>{const s=P3.scene(c,{scale:48,yaw:.3,pitch:.15,cy:262}),e=p.exponent,fq=10**e,lam=3e8/fq*1e9,col=lam>=380&&lam<=780?spec(lam):lam<380?'#c77dff':'#ff7a45',k=TAU/clamp(3.6-(e-6)*.24,.18,3.6),x0=-2.9+cycle(t*.5,1)*5.8,eV=6.626e-34*fq/1.602e-19;
+  s.box([0,-1.75,0],[8.2,.2,3.4],'#2c333a',{ground:true});
+  // the spectrum strip, with a marker at the chosen frequency
+  const BD=[[6,9.5,'Radio','#e8b923'],[9.5,11.5,'Micro','#f08c00'],[11.5,14.6,'Infra-red','#e8590c'],[14.6,14.9,'',''],[14.9,16.5,'UV','#5c7cfa'],[16.5,19.5,'X-ray','#7950f2'],[19.5,20,'γ','#be4bdb']],X=q=>-3.4+6.8*(q-6)/14;
+  for(const [a,b,n,bc] of BD){if(!n){for(let i=0;i<6;i++)s.box([X(a)+(X(b)-X(a))*(i+.5)/6,-1.55,.9],[(X(b)-X(a))/6,.25,.5],spec(700-i*55));continue}s.box([(X(a)+X(b))/2,-1.55,.9],[X(b)-X(a),.25,.5],bc);s.engrave([(X(a)+X(b))/2,-1.41,1.15],n,'#101418',9)}
+  s.poly([[X(e),-1.1,.9],[X(e)-.15,-.8,.9],[X(e)+.15,-.8,.9]],'#ffffff',{normal:[0,0,1],shade:false});
+  // source on the left, photon packet travelling right
+  s.cyl([-3.6,-.2,0],[1,0,0],.35,.9,'#4a5159',{cap:col,seg:16});s.box([-3.6,-.75,0],[.5,.5,.5],'#2f353b');s.ball([-3.1,-.2,0],.15,col,{glow:true,flat:true});
+  const env=x=>Math.exp(-((x-x0)**2)/.7),pk=[];for(let i=0;i<=120;i++){const x=-3+6.2*i/120;pk.push([x,.85*env(x)*Math.sin(k*x*4-t*7),0])}s.curve(pk,col+'55',9,6);s.curve(pk,col,3,6);s.ball([x0,0,0],.14,'#ffffff',{glow:true,flat:true});
+  s.seg([-3,0,0],[3.4,0,0],'#ffffff22',1);
+  s.callout([x0,.9*1,0],`one photon: E = hf = ${eV<1e3?f(eV,eV<.01?5:3):eV.toExponential(2)} eV`,C.gold,0,-55,12);s.callout([X(e),-.8,.9],`f = 10^${e} Hz`,'#fff',0,-50,12);mintL(s,[-3.6,-.2,0],'source',-10,-50);
+  s.render();tag(c,`f = ${fq.toExponential(2)} Hz  ·  λ = ${lam<1?lam.toExponential(1):f(lam,lam>100?0:1)} nm`,44,98,C.gold,15)});
+
 })();

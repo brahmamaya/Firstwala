@@ -58,15 +58,15 @@ function protractor(s,o,r,th,lab){const pts=arc(o,r,0,PI/2,30);s.poly([o,...pts]
 const string=(s,a,b,col=STR,w=1.6)=>s.seg(a,b,col,w);
 
 /* ================= Laws of Motion ================= */
-R['forces']=(c,p,t)=>{const s=P3.scene(c,{scale:70,cy:285,cx:330,yaw:.15}),fr=p.friction*p.mass*G,a=p.force>fr?(p.force-fr)/p.mass:0,tt=cycle(t,4),x=clamp(-2.2+.5*a*tt*tt*.25,-2.2,.3),sz=.5+p.mass*.04,w=sz*1.3;
+R['forces']=(c,p,t)=>{const s=P3.scene(c,{scale:58,cy:272,cx:285,yaw:.15}),fr=p.friction*p.mass*G,a=p.force>fr?(p.force-fr)/p.mass:0,tt=cycle(t,4),x=clamp(-2.2+.5*a*tt*tt*.25,-2.2,.3),sz=.5+p.mass*.04,w=sz*1.3;
   bench(s,-3.4,3.6,0,-.9,.9);woodBlock(s,[x,sz/2,0],[w,sz,sz]);const e=[x+w/2+.05,sz/2,0];eye(s,e,[0,1,0]);const b=[e[0]+1.3,sz/2,0];springBalance(s,b,V.add(e,[.04,0,0]),p.force,100);
-  s.tube([b,V.add(b,[.35,0,0])],.012,STR,{segs:5});s.arrow(V.add(b,[.4,0,0]),V.add(b,[.5+p.force*.012,0,0]),C.gold,4,11,`F = ${p.force} N`);
+  s.tube([b,V.add(b,[.35,0,0])],.012,STR,{segs:5});s.arrow(V.add(b,[.4,0,0]),V.add(b,[.5+p.force*.007,0,0]),C.gold,4,11,`F = ${p.force} N`);
   if(p.friction>0)s.arrow([x-w*.2,.03,sz/2+.06],[x-w*.2-.15-Math.min(p.force,fr)*.015,.03,sz/2+.06],C.red,3,11,`f = ${f(Math.min(p.force,fr),1)} N`);
   s.arrow([x,sz+.05,0],[x,sz+.05+p.mass*G*.012,0],C.mint,3,11,`N = ${f(p.mass*G,1)} N`);
   part(s,[x-w/2+.05,sz*.8,sz/2],'wooden block',-50,-50);part(s,V.add(b,[-.6,.08,.05]),'spring balance (0–100 N)',10,-70);part(s,[-3,0,.6],'rough bench top',-10,40);
   s.render();tag(c,a>0?'Net force → block accelerates':'Static friction balances the push',44,98,a>0?C.gold:C.mint,14)};
 
-R['inclined-plane']=(c,p,t)=>{const s=P3.scene(c,{scale:62,cy:292,yaw:.12}),th=rad(p.angle),slide=Math.tan(th)>p.mu,a=slide?G*(Math.sin(th)-p.mu*Math.cos(th)):0,L=4,o=[-2.1,-1.4,0],dir=[Math.cos(th),Math.sin(th),0],nrm=[-Math.sin(th),Math.cos(th),0],u=clamp(.85-(slide?.5*a*cycle(t,2.5)**2*.08:0),.12,.85);
+R['inclined-plane']=(c,p,t)=>{const s=P3.scene(c,{scale:56,cy:262,cx:350,yaw:.12}),th=rad(p.angle),slide=Math.tan(th)>p.mu,a=slide?G*(Math.sin(th)-p.mu*Math.cos(th)):0,L=4,o=[-2.1,-1.4,0],dir=[Math.cos(th),Math.sin(th),0],nrm=[-Math.sin(th),Math.cos(th),0],u=clamp(.85-(slide?.5*a*cycle(t,2.5)**2*.08:0),.12,.85);
   bench(s,-3.2,3,o[1]-.04,-1,1);s.box([o[0]+L*Math.cos(th)/2+.1,o[1]+.0,0],[L*Math.cos(th)+.6,.08,1.5],WOOD,{ground:false});
   // aluminium plane with side rails, hinge and an adjustable prop
   const pc=V.add(o,V.add(V.mul(dir,L/2),V.mul(nrm,.04)));s.box(pc,[L,.05,1.3],AL,{rotZ:th});for(const z of[-.66,.66])s.box(V.add(V.add(o,V.add(V.mul(dir,L/2),V.mul(nrm,.08))),[0,0,z]),[L,.12,.04],'#b9c0c7',{rotZ:th});
@@ -74,16 +74,16 @@ R['inclined-plane']=(c,p,t)=>{const s=P3.scene(c,{scale:62,cy:292,yaw:.12}),th=r
   protractor(s,[o[0],o[1]+.08,.72],1.1,th,`θ = ${p.angle}°`);
   const bp=V.add(o,V.add(V.mul(dir,u*L),V.mul(nrm,.27)));woodBlock(s,bp,[.6,.4,.6],th);
   s.arrow(bp,[bp[0],bp[1]-.85,bp[2]],C.gold,2.5,11,'W = mg');s.arrow(bp,V.add(bp,V.mul(nrm,.75)),C.mint,2.5,11,`N = ${f(Math.cos(th),2)} mg`);s.arrow(V.add(bp,[0,0,.32]),V.add(bp,V.add(V.mul(dir,.7),[0,0,.32])),C.red,2.5,11,`f = ${f(slide?p.mu*Math.cos(th):Math.sin(th),2)} mg`);
-  part(s,V.add(o,V.add(V.mul(dir,L*.55),[0,0,-.6])),'aluminium inclined plane',30,-60);part(s,[o[0],o[1]+.07,-.7],'hinge',-40,30);part(s,[tx,ty*.5+o[1]*.5,-.5],'adjustable prop',40,30);
+  part(s,V.add(o,V.add(V.mul(dir,L*.3),[0,0,.65])),'aluminium inclined plane',-30,70);part(s,[o[0],o[1]+.07,-.7],'hinge',-40,30);part(s,[tx,ty*.5+o[1]*.5,-.5],'adjustable prop',40,30);
   s.render();tag(c,'gold: weight · mint: normal · red: friction',44,98,C.muted,13)};
 
-R['atwood']=(c,p,t)=>{const s=P3.scene(c,{scale:54,cy:280,yaw:.1}),a=(p.m2-p.m1)*G/(p.m1+p.m2),d=clamp(.5*a*cycle(t,3)**2*.15,-.8,.8),Rp=.45,pc=[0,1.75,0],yb=-2.1;
+R['atwood']=(c,p,t)=>{const s=P3.scene(c,{scale:45,cy:262,cx:330,yaw:.1}),a=(p.m2-p.m1)*G/(p.m1+p.m2),d=clamp(.5*a*cycle(t,3)**2*.15,-.8,.8),Rp=.45,pc=[0,1.75,0],yb=-2.1;
   bench(s,-3,3,yb);const top=stand(s,[-1.6,yb,0],pc[1]-yb+.15,-.3);boss(s,[top[0],pc[1]+.05,0]);s.cyl([(top[0]+pc[0])/2,pc[1]+.05,0],[1,0,0],.03,pc[0]-top[0],CHROME);
   for(const z of[-.09,.09])s.box([pc[0],pc[1]+.02,z],[.12,.22,.02],'#6f777f');pulley(s,pc,Rp,-d/Rp+.3);
   const y1=-.1+d,y2=-.1-d;string(s,[-Rp,pc[1],0],[-Rp,y1,0]);string(s,[Rp,pc[1],0],[Rp,y2,0]);s.path(arc(pc,Rp+.005,0,PI,16),STR,1.6);
   const b1=hanger(s,[-Rp,y1,0],p.m1,.5,BRASS,.22),b2=hanger(s,[Rp,y2,0],p.m2,.5,BRASS,.22);s.label([-Rp-.35,(y1+b1[1])/2,0],`m₁ = ${p.m1} kg`,C.blue,12,'right');s.label([Rp+.35,(y2+b2[1])/2,0],`m₂ = ${p.m2} kg`,C.gold,12,'left');
   if(Math.abs(a)>1e-6){const sx=a>0?Rp:-Rp,yy=a>0?y2:y1;s.arrow([sx+(a>0?.45:-.45),yy+.1,.2],[sx+(a>0?.45:-.45),yy+.1-.25-Math.abs(a)*.08,.2],C.mint,3,10,`a = ${f(Math.abs(a),2)} m/s²`)}
-  part(s,[pc[0],pc[1]+Rp,0],'light spoked pulley',50,-30);part(s,[top[0],yb+1,0],'retort stand',-40,10);part(s,V.add(b1,[0,.1,.17]),'slotted masses on hanger',-50,40);
+  part(s,[pc[0],pc[1]+Rp,0],'light spoked pulley',50,-30);part(s,[top[0],yb+.8,0],'retort stand',-60,45);part(s,V.add(b1,[0,.1,.17]),'slotted masses on hanger',-70,-25);
   s.render();tag(c,`a = (m₂ − m₁)g/(m₁ + m₂) = ${f(a,2)} m/s²`,44,98,C.gold,14)};
 
 R['elevator-weight']=(c,p,t)=>{const s=P3.scene(c,{scale:48,cy:268,yaw:.15}),y=.4*Math.sin(t*.8)*Math.sign(p.acceleration||0),Nf=p.mass*(G+p.acceleration),W=2,H=2.8,D=1.6;
@@ -106,20 +106,20 @@ R['connected-blocks']=(c,p,t)=>{const s=P3.scene(c,{scale:68,cy:285,cx:330,yaw:.
   bench(s,-3.6,3.6,0,-.9,.9);const x2=x,x1=x+w2/2+.9+w1/2;woodBlock(s,[x2,z(p.m2)/2,0],[w2,z(p.m2),z(p.m2)],0,'#9a6a3e');woodBlock(s,[x1,z(p.m1)/2,0],[w1,z(p.m1),z(p.m1)]);
   const hy=.18,e2=[x2+w2/2+.05,hy,0],e1=[x1-w1/2-.05,hy,0];eye(s,e2,[0,1,0]);eye(s,e1,[0,1,0]);string(s,e2,e1);const T=p.m2*a;
   const ef=[x1+w1/2+.05,hy,0];eye(s,ef,[0,1,0]);const b=V.add(ef,[1.1,0,0]);springBalance(s,b,V.add(ef,[.04,0,0]),p.force,60);s.arrow(V.add(b,[.08,0,0]),V.add(b,[.2+p.force*.015,0,0]),C.mint,4,11,`F = ${p.force} N`);
-  s.arrow([(e1[0]+e2[0])/2,hy+.32,0],[(e1[0]+e2[0])/2+.15+T*.02,hy+.32,0],C.gold,2.5,9,`T = ${f(T,1)} N`);
-  s.label([x1,z(p.m1)+.3,0],`m₁ = ${p.m1} kg`,C.blue,12);s.label([x2,z(p.m2)+.3,0],`m₂ = ${p.m2} kg`,C.gold,12);
-  part(s,[(e1[0]+e2[0])/2,hy,0],'connecting string',-20,60);part(s,V.add(b,[-.5,.08,.05]),'spring balance',20,-70);
+  s.arrow([(e1[0]+e2[0])/2-.1,hy+.55,0],[(e1[0]+e2[0])/2+.05+T*.02,hy+.55,0],C.gold,2.5,9,`T = ${f(T,1)} N`);
+  s.label([x1,z(p.m1)+.75,0],`m₁ = ${p.m1} kg`,C.blue,12);s.label([x2-.2,z(p.m2)+.4,0],`m₂ = ${p.m2} kg`,C.gold,12);
+  part(s,[(e1[0]+e2[0])/2,hy,0],'connecting string',-20,60);part(s,V.add(b,[-.5,.08,.05]),'spring balance',10,-85);
   s.render();tag(c,`a = F/(m₁ + m₂) = ${f(a,2)} m/s²`,44,98,C.gold,14)};
 
-R['banked-turn']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.08,cy:205}),th=rad(p.angle),v=Math.sqrt(p.radius*G*Math.tan(th)),Rr=2,w=1.15,a=t*.6,y0=-.5,hh=w*Math.tan(th);
+R['banked-turn']=(c,p,t)=>{const s=P3.scene(c,{scale:78,pitch:.1,cy:232,cx:320}),th=rad(p.angle),v=Math.sqrt(p.radius*G*Math.tan(th)),Rr=2,w=1.15,a=t*.6,y0=-.5,hh=w*Math.tan(th);
   s.cyl([0,y0-.06,0],[0,1,0],Rr-w/2,.1,'#3d7a3a',{seg:40});s.lathe([0,y0,0],[[Rr-w/2,0],[Rr+w/2,hh]],'#6c727a',{segs:48,cull:false});s.lathe([0,y0,0],[[Rr+w/2,hh],[Rr+w/2+.06,hh+.08]],'#ced4da',{segs:48});s.lathe([0,y0,0],[[Rr+w/2+.06,hh+.08],[Rr+w/2+.28,-.04]],'#3b5f30',{segs:48});
   for(let i=0;i<48;i++){const q=TAU*i/48,q2=TAU*(i+.6)/48;if(i%2)continue;s.seg([Rr*Math.cos(q),y0+hh/2+.01,Rr*Math.sin(q)],[Rr*Math.cos(q2),y0+hh/2+.01,Rr*Math.sin(q2)],'#f1f3f5',2)}
   for(let i=0;i<40;i++){const q=TAU*i/40,q2=TAU*(i+1)/40,r0=Rr-w/2-.01;s.seg([r0*Math.cos(q),y0+.01,r0*Math.sin(q)],[r0*Math.cos(q2),y0+.01,r0*Math.sin(q2)],i%2?'#e03131':'#f8f9fa',4)}
   // car: body, cabin with glass, four wheels, banked with the road
   const cr=Rr,cc=[cr*Math.cos(a),y0+hh/2,cr*Math.sin(a)],X=q=>V.add(cc,ry(rz(q,th),-a));const bx=(q,sz,col,o={})=>s.box(X(q),sz,col,{rotY:-a,rotZ:th,...o});
   bx([0,.2,0],[.46,.16,.95],'#c92a2a');bx([0,.34,-.05],[.42,.14,.48],'#8a1c1c');bx([0,.34,.195],[.38,.11,.01],'#a5d8ff');bx([0,.34,-.295],[.38,.1,.01],'#a5d8ff');for(const sx of[-1,1])bx([sx*.211,.34,-.05],[.01,.1,.4],'#a5d8ff');for(const sx of[-1,1])bx([sx*.15,.2,.476],[.09,.05,.01],'#fff3bf');for(const dx of[-.24,.24])for(const dz of[-.3,.3])s.cyl(X([dx,.1,dz]),ry(rz([1,0,0],th),-a),.1,.08,RUB,{seg:14,cap:'#868e96'});
-  const nv=ry(rz([0,1,0],th),-a),top=X([0,.42,0]);s.arrow(top,V.add(top,V.mul(nv,.9/Math.cos(th)*.8)),C.mint,3,10,`N = ${f(1/Math.cos(th),2)} mg`);s.arrow(X([0,.16,0]),V.add(X([0,.16,0]),[0,-.75,0]),C.gold,3,10,'mg');
-  part(s,[-Rr*.7,y0+hh/2,Rr*.7],`road banked at ${p.angle}°`,-40,50);part(s,[0,y0,0],'infield',-60,50);
+  const nv=ry(rz([0,1,0],th),-a),top=X([0,.42,0]);s.arrow(top,V.add(top,V.mul(nv,.9/Math.cos(th)*.8)),C.mint,3,10,`N = ${f(1/Math.cos(th),2)} mg`);s.arrow(X([0,.16,0]),V.add(X([0,.16,0]),[0,-.6,0]),C.gold,3,10,'mg');{const o=X([0,.16,0]);s.arrow(o,V.add(o,[-Math.cos(a)*.8,0,-Math.sin(a)*.8]),C.red,3,10,'F net = mg tanθ → centre')}
+  part(s,[Rr*.75,y0+hh/2,Rr*.7],`road banked at ${p.angle}°`,70,60);
   s.render();tag(c,`Design speed ≈ ${f(v,1)} m/s`,44,98,C.gold,15)};
 
 R['two-rope-support']=(c,p,t)=>{const s=P3.scene(c,{scale:60,cy:262,yaw:.1}),al=rad(p.left),be=rad(p.right),knot=[0,-.2,0],Lr=2.1,A=[knot[0]-Lr*Math.cos(al),knot[1]+Lr*Math.sin(al),0],B=[knot[0]+Lr*Math.cos(be),knot[1]+Lr*Math.sin(be),0],yb=-2.0;
@@ -139,8 +139,8 @@ R['impulse-catch']=(c,p,t)=>{const s=P3.scene(c,{scale:64,cy:280,cx:235,yaw:.1})
   const ey=hit?yb+.06+ph+.2:Math.max(y,yb+.06+ph+.2);s.mesh([0,ey,0],[.15,.2,.15],'#f1e3c6',{rings:10,segs:16,spec:.3});s.shadow([0,ey,0],.18,yb+.06+ph,.4);
   const st=stand(s,[-1.3,yb,-.3],3.4,-.3);boss(s,[st[0],1.75,-.3]);s.cyl([(st[0]+0)/2,1.75,-.3],[1,0,0],.025,-st[0],CHROME);s.lathe([0,1.72,-.3],[[.05,0],[.14,.12]],'#cfd4d9',{segs:16});
   if(!hit)s.arrow([.35,ey,0],[.35,ey-.25-p.v*.04,0],C.gold,3,10,`v = ${p.v} m/s`);
-  part(s,[0,ey+.2,0],'egg',40,-20);part(s,[-.6,yb+.06+ph,.3],'foam cushion',-30,40);part(s,[0,1.78,-.3],'release cup',40,-10);s.render();
-  const F=p.m*p.v/p.dt;chart(c,440,96,216,140,{title:'Force while stopping',xl:'t',xmin:0,xmax:.6,ymin:0,ymax:Math.max(F*1.1,1),series:[{pts:[[0,0],[.05,0],[.05,F],[.05+Math.min(.5,p.dt),F],[.05+Math.min(.5,p.dt),0],[.6,0]],col:C.gold}]});tag(c,`F̄ = ${f(F,1)} N`,452,224,C.gold,13)};
+  part(s,[0,ey+.2,0],'egg',40,-20);part(s,[-.6,yb+.06+ph,.3],'foam cushion',-60,-50);part(s,[0,1.78,-.3],'release cup',40,-10);s.render();
+  const F=p.m*p.v/p.dt;chart(c,440,96,216,140,{title:'Force while stopping',xl:'t',xmin:0,xmax:.6,ymin:0,ymax:Math.max(F*1.1,1),series:[{pts:[[0,0],[.05,0],[.05,F],[.05+Math.min(.5,p.dt),F],[.05+Math.min(.5,p.dt),0],[.6,0]],col:C.gold}]});tag(c,`F̄ = ${f(F,1)} N`,452,254,C.gold,13)};
 
 R['gun-recoil']=(c,p,t)=>{const m=p.m/1000,V0=m*p.v/p.M,tt=cycle(t,3),s=P3.scene(c,{scale:78,cy:270,cx:330,yaw:.3}),gx=-.1-Math.min(1.2,V0*tt*.5),yb=-1;
   bench(s,-2.9,3,yb-.12,-.8,.8);for(const z of[-.32,.32]){s.box([0,yb-.06,z],[5.6,.06,.06],'#868e96')}for(let i=0;i<12;i++)s.box([-2.75+i*.5,yb-.1,0],[.08,.03,.8],'#5c4632');
@@ -154,7 +154,7 @@ R['gun-recoil']=(c,p,t)=>{const m=p.m/1000,V0=m*p.v/p.M,tt=cycle(t,3),s=P3.scene
   part(s,[gx+.95,by+.06,0],'rifle clamped to cart',40,-70);part(s,[gx+.6,yb+.07,.33],'low-friction trolley',20,50);part(s,[2.5,yb-.06,.32],'rails',30,30);s.render();
   tag(c,`M V = m v → V = ${f(m*p.v,2)} / ${p.M} = ${f(V0,2)} m/s`,44,98,C.gold,14)};
 
-R['angle-of-repose']=(c,p,t)=>{const th=rad(p.th),mk=.8*p.mus,slide=Math.tan(th)>p.mus,a=slide?G*(Math.sin(th)-mk*Math.cos(th)):0,s=P3.scene(c,{scale:62,cy:292,yaw:.12}),L=4,o=[-2.1,-1.4,0],dir=[Math.cos(th),Math.sin(th),0],nrm=[-Math.sin(th),Math.cos(th),0];
+R['angle-of-repose']=(c,p,t)=>{const th=rad(p.th),mk=.8*p.mus,slide=Math.tan(th)>p.mus,a=slide?G*(Math.sin(th)-mk*Math.cos(th)):0,s=P3.scene(c,{scale:56,cy:262,cx:350,yaw:.12}),L=4,o=[-2.1,-1.4,0],dir=[Math.cos(th),Math.sin(th),0],nrm=[-Math.sin(th),Math.cos(th),0];
   bench(s,-3.2,3,o[1]-.1,-1,1);s.box([o[0]+2,o[1]-.05,0],[4.3,.1,1.6],WOOD,{ground:false});
   // hinged plank with an abrasive top, lifted by a screw jack
   s.box(V.add(o,V.add(V.mul(dir,L/2),V.mul(nrm,.05))),[L,.1,1.5],WOODL,{rotZ:th});s.box(V.add(o,V.add(V.mul(dir,L*.5+.1),V.mul(nrm,.105))),[L-.4,.012,1.2],'#7c7468',{rotZ:th});
@@ -163,7 +163,7 @@ R['angle-of-repose']=(c,p,t)=>{const th=rad(p.th),mk=.8*p.mus,slide=Math.tan(th)
   protractor(s,[o[0],o[1]+.1,.8],1.1,th,`θ = ${p.th}°`);
   const u=clamp(.78-(slide?.5*a*cycle(t,2.5)**2*.12:0),.1,.78),bp=V.add(o,V.add(V.mul(dir,u*L),V.mul(nrm,.32)));woodBlock(s,bp,[.6,.42,.6],th,'#9a6a3e');
   s.arrow(V.add(bp,V.mul(nrm,.3)),V.add(bp,V.add(V.mul(dir,-.75),V.mul(nrm,.3))),C.mint,2.5,11,`mg sinθ = ${f(Math.sin(th),2)} mg`);s.arrow(bp,[bp[0],bp[1]-.85,bp[2]],C.gold,2.5,11,'W = mg');s.arrow(V.add(bp,[0,0,.32]),V.add(bp,V.add(V.mul(dir,.4+.4*Math.min(1,Math.tan(th))),[0,0,.32])),C.red,2.5,11,`f = ${f(slide?.8*p.mus*Math.cos(th):Math.sin(th),2)} mg`);
-  part(s,V.add(o,V.add(V.mul(dir,L*.35),[0,0,-.6])),'sandpaper-covered plank',-20,-70);part(s,[jx,(o[1]+jy)/2,.05],'screw jack',50,10);part(s,[o[0],o[1],-.6],'hinge',-50,20);s.render();
+  part(s,V.add(o,V.add(V.mul(dir,L*.35),[0,0,-.6])),'sandpaper-covered plank',-40,-80);part(s,[jx,(o[1]+jy)/2,.05],'screw jack',50,10);part(s,[o[0],o[1],-.6],'hinge',-50,20);s.render();
   tag(c,slide?'Sliding — kinetic friction (μk = 0.8 μs)':'Static friction holds the block',44,98,slide?C.gold:C.mint,15);tag(c,'mint: down-slope pull   red: friction   gold: weight',44,124,C.muted,13)};
 
 /* ================= Work, Energy and Power ================= */
@@ -188,8 +188,8 @@ R['collision']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.2,yaw:.4,cy:240}),v
   s.box([0,-.25,0],[7.2,.12,.42],'#adb5bd');for(const x of[x0,x3])s.box([x,-.05,0],[.06,.3,.45],'#495057');for(const x of[-2.8,2.8]){s.cyl([x,(yb-.3)/2-.0,0],[0,1,0],.04,-.3-yb,'#5d646b');s.box([x,yb+.03,0],[.45,.06,.3],'#3c4248')}
   s.cyl([x0-.2,-.2,0],[1,0,0],.1,.4,'#343a40');s.label([x0-.2,-.48,0],'air in',C.muted,10);
   const w=m=>.5+m*.08,X1=clamp(x1,-3.3,3.3),X2=clamp(x2+.4,-3.3,3.3);glider(s,X1,w(p.m1),'#3b6fb6',`m₁ = ${p.m1} kg`,1);glider(s,X2,w(p.m2),'#d9822b',`m₂ = ${p.m2} kg`,-1);
-  if(tt<tc)s.arrow([X1,.85,0],[X1+.2+p.u*.1,.85,0],C.gold,3,10,`u = ${p.u} m/s`);else{if(Math.abs(v1)>.05)s.arrow([X1,.75,0],[X1+v1*.1+Math.sign(v1)*.15,.75,0],C.blue,3,10,`v₁ = ${f(v1,2)} m/s`);s.arrow([X2,.75,0],[X2+v2*.1+.15,.75,0],C.gold,3,10,`v₂ = ${f(v2,2)} m/s`)}
-  part(s,[-2,-.1,.1],'air track (perforated)',-20,60);part(s,[X1-w(p.m1)/2,-.05,.15],'glider',-50,-50);
+  if(tt<tc)s.arrow([X1,1.25,0],[X1+.2+p.u*.1,1.25,0],C.gold,3,10,`u = ${p.u} m/s`);else{if(Math.abs(v1)>.05)s.arrow([X1,1.25,0],[X1+v1*.1+Math.sign(v1)*.15,1.25,0],C.blue,3,10,`v₁ = ${f(v1,2)} m/s`);s.arrow([X2,1.25,0],[X2+v2*.1+.15,1.25,0],C.gold,3,10,`v₂ = ${f(v2,2)} m/s`)}
+  part(s,[-2,-.1,.1],'air track (perforated)',-20,60);;
   s.render();tag(c,`after: v₁ = ${f(v1,2)} m/s, v₂ = ${f(v2,2)} m/s`,44,98,C.gold,14)};
 
 R['lifting-power']=(c,p,t)=>{const s=P3.scene(c,{scale:52,cy:285,yaw:.15}),y=-1.25+cycle(t*p.speed*.5,2.4),yb=-1.6,ang=-t*p.speed*4;
@@ -289,7 +289,7 @@ R['rolling']=(c,p,t)=>{const s=P3.scene(c,{scale:60,pitch:.15,yaw:.35,cy:285,cx:
   bench(s,-3.7,3.7,0,-.9,.9);wheel(s,[x,Rw,0],Rw,ang-PI/2);s.cyl([x,Rw,0],[0,0,1],.03,.5,CHROME);
   const tr=[];for(let i=0;i<=60;i++){const xx=-3+(x+3)*i/60,a=(xx+3)/Rw;tr.push([xx-Rw*.78*Math.sin(a),Rw-Rw*.78*Math.cos(a),.09])}s.path(tr,C.gold,2);
   s.arrow([x,2*Rw+.08,.12],[x+.25+p.speed*.25,2*Rw+.08,.12],C.mint,3,11,`top: 2v = ${f(2*p.speed,1)} m/s`);s.arrow([x,Rw,.15],[x+.12+p.speed*.125,Rw,.15],C.blue,3,10,`v = ${p.speed} m/s`);s.ball([x,.01,.1],.05,C.red,{flat:true});s.label([x,-.25,.5],'contact point: v = 0',C.red,11);
-  part(s,[x-Rw*.75,Rw*.4,.08],'rubber tyre',-40,50);part(s,[x,Rw,.1],'hub',-50,-70);
+  part(s,[x-Rw*.95,Rw*.9,.08],'rubber tyre',-85,10);part(s,[x,Rw,.1],'hub',-50,-70);
   s.render();tag(c,'gold: path of a rim point (cycloid) · contact point at rest',44,98,C.muted,13)};
 
 R['angular-momentum']=(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.35,cy:275}),w=p.omega*(p.initialRadius/p.radius)**2,a=t*Math.min(6,w),r=.4+p.radius*1.05,ri=.4+p.initialRadius*1.05,yb=-1.3,h=.6;

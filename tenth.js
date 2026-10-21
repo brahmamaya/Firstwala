@@ -126,11 +126,7 @@ add({base:'doubleslit',id:'brewster-angle',title:'Brewster’s angle',
  tryText:'Find the angle where R_p falls to zero for water (n = 1.33).',
  controls:[R('n2','Refractive index n₂',1.3,2.4,.01,1.5,'',2),R('th','Angle of incidence',0,89,.5,56.3,'°',1)],
  metrics:p=>{const th=rad(p.th),st=Math.sin(th)/p.n2,tt=Math.asin(st),ci=Math.cos(th),ct=Math.cos(tt),rs=(ci-p.n2*ct)/(ci+p.n2*ct),rp=(p.n2*ci-ct)/(p.n2*ci+ct),Rs=rs*rs,Rp=rp*rp;return[N('Brewster angle',deg(Math.atan(p.n2)),'°',1),N('R_s (s-polarised)',Rs*100,'%',2),N('R_p (p-polarised)',Rp*100,'%',3),N('Reflected polarisation',(Rs-Rp)/(Rs+Rp+1e-12)*100,'%',1)]},
- draw:(c,p,t)=>{const th=rad(p.th),tt=Math.asin(Math.sin(th)/p.n2),ci=Math.cos(th),ct=Math.cos(tt),rs=(ci-p.n2*ct)/(ci+p.n2*ct),rp=(p.n2*ci-ct)/(p.n2*ci+ct),s=P3.scene(c,{scale:58,cy:262,yaw:.3});
-  s.box([0,-1,0],[6,2,2.4],'#7fc8e8',{alpha:.2});const L=2.6,inc=[-L*Math.sin(th),L*Math.cos(th),0],ref=[L*Math.sin(th),L*Math.cos(th),0],tr=[L*Math.sin(tt),-L*Math.cos(tt),0];s.path([inc,[0,0,0]],'#ffe27a',3);s.path([[0,0,0],ref],'#ffe27a',1+8*Math.sqrt(rs*rs+rp*rp)/1.4);s.path([[0,0,0],tr],'#ffe27a',2.5);s.seg([0,-2,0],[0,2.4,0],C.muted,1,[4,4]);
-  for(let i=1;i<=3;i++){const q=V.mul(inc,i/4);s.ball(q,.05,C.mint,{flat:true});const d=V.norm(V.cross(inc,[0,0,1]));s.seg(V.add(q,V.mul(d,.2)),V.add(q,V.mul(d,-.2)),C.mint,2)}
-  for(let i=1;i<=3;i++){const q=V.mul(ref,i/4);s.ball(q,.05+.05*Math.abs(rs),C.mint,{flat:true});const d=V.norm(V.cross(ref,[0,0,1]));const k=Math.abs(rp)*3;if(k>.02)s.seg(V.add(q,V.mul(d,.2*k)),V.add(q,V.mul(d,-.2*k)),C.mint,2)}s.render();
-  tag(c,'dots: s-polarisation (out of page)   bars: p-polarisation',44,98,C.muted,13)},
+ draw:(c,p,t)=>window.PhysicaOpt3D.brewster(c,p,t),
  assumption:'Light from air (n₁ = 1) onto a smooth non-absorbing dielectric; Fresnel equations; ray thickness ∝ reflected amplitude.'});
 
 add({base:'doubleslit',id:'resolving-power',title:'Resolving two stars (Rayleigh criterion)',
@@ -140,9 +136,7 @@ add({base:'doubleslit',id:'resolving-power',title:'Resolving two stars (Rayleigh
  tryText:'Increase the aperture diameter until the two peaks separate.',
  controls:[R('D','Aperture diameter',1,200,1,20,'mm'),R('lam','Wavelength',400,700,10,550,'nm'),R('sep','Source separation',.5,20,.1,6,'arcsec',1)],
  metrics:p=>{const tm=1.22*p.lam*1e-9/(p.D/1000)*206265;return[N('Rayleigh limit',tm,'arcsec',2),N('Separation / limit',p.sep/tm,'',2),N('Verdict',p.sep>=tm?'Resolved':'Not resolved')]},
- draw:(c,p,t)=>{const tm=1.22*p.lam*1e-9/(p.D/1000)*206265,s=P3.scene(c,{scale:56,pitch:.5,cy:300}),kx=3.8317/tm,half=p.sep/2,col=spectral(p.lam),span=Math.max(p.sep*1.6,tm*3),n=40,I=(x,z)=>{const r1=Math.hypot(x+half,z),r2=Math.hypot(x-half,z);return airy(kx*r1)+airy(kx*r2)};
-  for(let j=0;j<=n;j++){const z=-span/2+span*j/n,row=[];for(let i=0;i<=n;i++){const x=-span/2+span*i/n;row.push([x/span*6,I(x,z)*1.1,z/span*6])}s.path(row,col+'cc',1.2)}s.render();
-  tag(c,p.sep>=tm?'Resolved: two distinct peaks':'Not resolved: peaks merge',44,98,p.sep>=tm?C.mint:C.red,15)},
+ draw:(c,p,t)=>window.PhysicaOpt3D.resolve(c,p,t),
  assumption:'Circular aperture, incoherent point sources of equal brightness, Airy intensity pattern I ∝ [2J₁(x)/x]².'});
 
 add({base:'doubleslit',id:'coherent-superposition',title:'Superposing two coherent waves',
@@ -164,10 +158,10 @@ add({base:'photoelectric',id:'photocell-iv',title:'Photocell current vs anode vo
  tryText:'Double the intensity, then raise the frequency instead.',
  controls:[R('fq','Light frequency',4,15,.1,8,'× 10¹⁴ Hz',1),R('I','Intensity',0,100,1,60,'%'),S('metal','Cathode','na',[['na','Sodium (φ = 2.28 eV)'],['cs','Caesium (φ = 2.14 eV)'],['zn','Zinc (φ = 4.31 eV)'],['cu','Copper (φ = 4.70 eV)']]),R('Va','Anode voltage',-5,10,.1,2,'V',1)],
  metrics:p=>{const phi={na:2.28,cs:2.14,zn:4.31,cu:4.7}[p.metal],E=h*p.fq*1e14/e,V0=E-phi,Is=p.I*.2,I=V0<=0?0:p.Va>=0?Is:Is*clamp(1+p.Va/V0,0,1);return[N('Photon energy',E,'eV',2),N('Stopping potential',V0>0?V0:'No emission',V0>0?'V':'',2),N('Photocurrent',I,'μA',2)]},
- draw:(c,p,t)=>{const phi={na:2.28,cs:2.14,zn:4.31,cu:4.7}[p.metal],E=h*p.fq*1e14/e,V0=E-phi,Is=p.I*.2,cur=V=>V0<=0?0:V>=0?Is:Is*clamp(1+V/V0,0,1),s=P3.scene(c,{scale:54,cx:230,yaw:.4}),col=spectral(c0/(p.fq*1e14)*1e9);
-  s.ball([0,0,0],1.7,'#7fc8e8',{alpha:.12,flat:true,lift:-10});s.box([-1,0,0],[.08,1.6,1.2],'#9fb4c2');s.box([1,0,0],[.08,1.2,.9],'#d9844a');for(let i=0;i<6;i++){const q=cycle(t*1.2+i/6,1);s.ball([-2.8+1.7*q,1.5-1.5*q,(i-3)*.2],.05,col,{flat:true,glow:true})}
-  if(V0>0&&p.I>0){const n=Math.round(p.I/12);for(let i=0;i<n;i++){const q=cycle(t*(.6+.4*clamp(p.Va/5+.5,0,1))+i/n,1),reach=cur(p.Va)/Math.max(Is,1e-9),x=-1+2*q*(reach>0?1:.4);if(reach>0||q<.5)s.ball([x,(hash(i)-.5)*1.2,(hash(i+7)-.5)*.8],.05,C.blue,{flat:true})}}s.render();
-  chart(c,420,96,236,170,{title:'I vs V',xl:'V (V)',xmin:-5,xmax:10,ymin:0,ymax:22,series:[{fn:cur,col:C.gold}],marker:[p.Va,cur(p.Va)]})},
+ draw:(c,p,t)=>{const phi={na:2.28,cs:2.14,zn:4.31,cu:4.7}[p.metal],E=h*p.fq*1e14/e,V0=E-phi,Is=p.I*.2,cur=V=>V0<=0?0:V>=0?Is:Is*clamp(1+V/V0,0,1),O=window.PhysicaOpt3D,s=P3.scene(c,{scale:44,cx:215,cy:290,yaw:.3,pitch:.2}),col=spectral(c0/(p.fq*1e14)*1e9);
+  O.table(s,8);O.tube(s,t,{col,K:V0>0?V0:0,rate:p.I/100,Vr:p.Va<0?-p.Va:0});O.meter(s,[2.4,-.9,0],'µA',cur(p.Va)/22);O.meter(s,[2.4,-.05,0],f(p.Va,1)+' V',(p.Va+5)/15);
+  s.path([[0,-1.5,.1],[0,-1.5,.7],[2.4,-1.5,.7],[2.4,-1.33,.3]],'#c0392b',2.5);s.path([[.1,-1.5,-.1],[.1,-1.5,-.7],[2.6,-1.5,-.7],[2.6,-1.33,-.2]],'#2b3037',2.5);s.callout([.62,.61,0],'anode (voltage Va)','#dbe7f0',30,-56,10);s.render();
+  chart(c,420,96,236,170,{title:'I vs V',xl:'V (V)',xmin:-5,xmax:10,ymin:0,ymax:22,series:[{fn:cur,col:C.gold}],marker:[p.Va,cur(p.Va)]});tag(c,V0>0?`photocurrent ${f(cur(p.Va),1)} μA`:'No emission: photon energy below the work function',44,98,V0>0?C.mint:C.red,14)},
  assumption:'Emitted electron energies spread uniformly from 0 to K_max (linear fall in current below 0 V); saturation current 0.2 μA per % intensity.'});
 
 add({base:'photoelectric',id:'uncertainty-principle',title:'Heisenberg uncertainty principle',

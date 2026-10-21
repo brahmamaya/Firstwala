@@ -1,5 +1,232 @@
 /* Detailed, realistic 3D apparatus for Class 11 physics (part e): oscillations and waves.
    Same parameters, physics and readouts as the earlier scenes; only the apparatus is new. */
+/* Class 10 Ultra-Realistic scenes (light, electricity, magnetic effects): real lab apparatus, same parameters and readouts as the 2D views. */
+(() => {
+'use strict';
+const R=window.PhysicaReal3D=window.PhysicaReal3D||{};
+const {f,clamp,rad,deg,cycle,tag,chart,PI,TAU,C}=window.PhysicaLab;
+const P3=window.Physica3D,V=P3.vec;
+const WOOD='#8a5a36',CU='#c47a45',STEEL='#c3c9cf',DKP='#252b32',BOARD='#e7e2d6';
+const hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),mixc=(a,b,k)=>{const A=hx(a),B=hx(b);k=clamp(k,0,1);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join('')};
+const lab=(s,p,txt,dx,dy,col=C.mint)=>s.callout(p,txt,col,dx,dy,11);
+const bench=(s,w,d,paper)=>{s.box([0,-.09,0],[w,.18,d],WOOD,{ground:true});for(let i=1;i<9&&!paper;i++){const z=-d/2+d*i/9;s.seg([-w/2+.05,.002,z],[w/2-.05,.002,z+((i*37)%7-3)*.015],'#00000026',1,[],-4.6e5)}if(paper)s.box([0,.03,0],[paper[0],.06,paper[1]],BOARD,{ground:true,stroke:'#00000022'})};
+// insulated connecting wire lying on the board (list of [x,z]); drawn below every component
+const wire=(s,pts,col='#c0392b',y=.1)=>{const q=pts.map(([x,z])=>[x,y,z]);s.path(q,'#0000007a',6,[],-3e5);s.path(q,col,3.6,[],-3e5+1)};
+// conventional-current dots along wire sections, in the order given
+const flow=(s,polys,I,t,col='#ffd24d')=>{const sg=[];let tot=0;for(const pl of polys)for(let i=0;i<pl.length-1;i++){const a=pl[i],b=pl[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L>1e-6){sg.push([a,b,L,tot]);tot+=L}}
+  if(!tot||!I)return;const n=Math.max(5,Math.round(tot/.5)),v=clamp(Math.sqrt(Math.abs(I))*.55,.15,1.7)*Math.sign(I);
+  for(let k=0;k<n;k++){const d=(((k/n)*tot+t*v)%tot+tot)%tot;let g=sg[sg.length-1];for(const q of sg)if(d<q[3]+q[2]){g=q;break}const u=clamp((d-g[3])/g[2],0,1);s.ball([g[0][0]+(g[1][0]-g[0][0])*u,.11,g[0][1]+(g[1][1]-g[0][1])*u],.055,col,{flat:true,glow:true})}};
+const BANDS=['#111','#8b4513','#d62828','#ff8c00','#ffd60a','#2a9d3a','#1d4ed8','#7b2cbf','#808080','#f1f1f1'];
+const bandCols=Rv=>{const e=Math.floor(Math.log10(Math.max(.1,Rv)))-1;let m=Math.round(Rv/Math.pow(10,e));let ee=e;if(m>=100){m=10;ee++}return[BANDS[Math.floor(m/10)%10],BANDS[m%10],ee>=0?BANDS[Math.min(9,ee)]:ee===-1?'#d4af37':'#c0c0c0','#d4af37']};
+// carbon resistor lying along x or z at (x,z); heat 0..1 turns it red
+function resistor(s,x,z,ax,Rv,heat=0){const a=ax==='x'?[1,0,0]:[0,0,1],pt=k=>ax==='x'?[x+k,.2,z]:[x,.2,z+k],body=mixc('#d9c7a0','#ff8a4c',heat);
+  s.cyl(pt(0),a,.125,.5,body,{seg:14});s.cyl(pt(-.3),a,.1,.14,body,{seg:12});s.cyl(pt(.3),a,.1,.14,body,{seg:12});const bc=bandCols(Rv),off=[-.19,-.09,.01,.2];bc.forEach((col,i)=>s.cyl(pt(off[i]),a,.133,.045,col,{seg:12}));
+  s.cyl(pt(-.5),a,.025,.2,STEEL,{seg:6});s.cyl(pt(.5),a,.025,.2,STEEL,{seg:6})}
+// filament lamp in a holder
+function bulb(s,x,z,g){s.cyl([x,.09,z],[0,1,0],.27,.1,DKP,{seg:16});s.cyl([x,.25,z],[0,1,0],.17,.24,'#b9bec4',{seg:14});for(let i=0;i<3;i++)s.cyl([x,.2+i*.07,z],[0,1,0],.178,.02,'#8d9399',{seg:14});
+  if(g>.04)s.ball([x,.75,z],.22,'#ffd27a',{glow:true,flat:true});s.ball([x,.72,z],.4,g>.04?mixc('#e9f6ff','#ffe29a',g):'#e9f6ff',{alpha:.3,flat:true});
+  s.tube([[x-.03,.38,z],[x-.07,.62,z]],.012,'#9aa1a8',{segs:4});s.tube([[x+.03,.38,z],[x+.07,.62,z]],.012,'#9aa1a8',{segs:4});s.helix([x,.66,z],[1,0,0],.04,.14,5,g>.04?mixc('#ffb347','#fff6c8',g):'#7a7f86',2.2);if(g>.04)s.ball([x,.66,z],.1+.1*g,'#fff2c6',{flat:true,glow:true})}
+// battery pack, long axis along z; + terminal at the far (-z) end
+function pack(s,x,z,txt){s.box([x,.2,z],[.72,.34,1.0],DKP);s.box([x,.38,z],[.5,.02,.8],'#3a424b');s.engrave([x,.395,z],txt,'#e9f6ff',12);
+  s.cyl([x,.4,z-.4],[0,1,0],.07,.14,'#d62828',{seg:10});s.cyl([x,.4,z+.4],[0,1,0],.07,.14,'#111',{seg:10});s.engrave([x,.395,z-.26],'+','#ff8a80',13);s.engrave([x,.395,z+.26],'−','#9fb4c2',13)}
+// AA-type cell lying along x, + nub toward +x
+function cellx(s,x,z){s.cyl([x,.17,z],[1,0,0],.16,.56,'#2f6f9a',{seg:14});s.cyl([x-.18,.17,z],[1,0,0],.162,.1,'#c9ced3',{seg:14});s.cyl([x+.31,.17,z],[1,0,0],.06,.07,'#e3e6e9',{seg:10});s.cyl([x+.05,.17,z],[1,0,0],.163,.05,'#d4af37',{seg:14})}
+const CIRC_SCENE=c=>P3.scene(c,{scale:64,pitch:.2,yaw:.3,cy:276});
+const dirArrow=(s,a,b,I)=>s.arrow(a,b,C.gold,3,10,`I = ${f(I,I<1?3:2)} A`);
+
+/* ---------- Ohm's law circuit ---------- */
+R['c10-circuit']=(c,p,t)=>{const s=CIRC_SCENE(c),I=p.voltage/p.resistance,heat=clamp(I*I*p.resistance/150,0,1);bench(s,7.4,4.6,[6.8,4.1]);pack(s,-2.5,0,p.voltage+' V');
+  const A=[[-2.5,-.4],[-2.5,-1.4],[-1.5,-1.4]],B=[[1.5,-1.4],[2.5,-1.4],[2.5,-.27]],D=[[2.5,.27],[2.5,1.4],[-2.5,1.4],[-2.5,.4]];wire(s,A);wire(s,B);wire(s,D,'#2c2f33');
+  resistor(s,0,-1.4,'x',p.resistance,heat);bulb(s,2.5,0,clamp(I/3,0,1));flow(s,[A,B,D],I,t);
+  lab(s,[-2.5,.45,0],'battery',-34,-26);lab(s,[0,.3,-1.4],`resistor R = ${f(p.resistance,1)} Ω`,0,-42);lab(s,[2.5,1,0],'bulb',36,-30);dirArrow(s,[.9,.5,1.4],[-.7,.5,1.4],I);
+  s.render();tag(c,`I = V/R = ${f(I,2)} A  (dots: conventional current, from the + terminal)`,44,98,C.gold,14)};
+
+/* ---------- Series / parallel resistors ---------- */
+R['c10-resistor-network']=(c,p,t)=>{const s=CIRC_SCENE(c),ser=p.mode==='series',Req=ser?p.r1+p.r2:p.r1*p.r2/(p.r1+p.r2);bench(s,7.4,4.6,[6.8,4.1]);pack(s,-2.5,0,'6 V');
+  if(ser){const I=6/Req,A=[[-2.5,-.4],[-2.5,-1.4],[-1.5,-1.4]],B=[[-.5,-1.4],[.5,-1.4]],D=[[1.5,-1.4],[2.5,-1.4],[2.5,1.4],[-2.5,1.4],[-2.5,.4]];wire(s,A);wire(s,B);wire(s,D,'#2c2f33');
+    resistor(s,-1,-1.4,'x',p.r1,clamp(I*I*p.r1/40,0,1));resistor(s,1,-1.4,'x',p.r2,clamp(I*I*p.r2/40,0,1));flow(s,[A,B,D],I,t);lab(s,[-1,.3,-1.4],`R₁ = ${f(p.r1,0)} Ω`,-20,-42);lab(s,[1,.3,-1.4],`R₂ = ${f(p.r2,0)} Ω`,20,-42);dirArrow(s,[.9,.5,1.4],[-.7,.5,1.4],I)}
+  else{const I1=6/p.r1,I2=6/p.r2,I=I1+I2,A=[[-2.5,-.4],[-2.5,-1.4],[-1.3,-1.4]],B1=[[-1.3,-1.4],[-.5,-1.4]],B1b=[[.5,-1.4],[1.3,-1.4]],B2=[[-1.3,.1],[-.5,.1]],B2b=[[.5,.1],[1.3,.1]],cl=[[-1.3,-1.4],[-1.3,.1]],cr=[[1.3,-1.4],[1.3,.1]],D=[[1.3,.1],[2.5,.1],[2.5,1.4],[-2.5,1.4],[-2.5,.4]];
+    for(const w of[A,B1,B1b,B2,B2b,cl,cr])wire(s,w);wire(s,D,'#2c2f33');resistor(s,0,-1.4,'x',p.r1,clamp(I1*I1*p.r1/40,0,1));resistor(s,0,.1,'x',p.r2,clamp(I2*I2*p.r2/40,0,1));
+    flow(s,[A],I,t);flow(s,[B1,B1b],I1,t);flow(s,[B2,B2b],I2,t);flow(s,[D],I,t);flow(s,[[[-1.3,-1.4],[-1.3,.1]]],I2,t);
+    lab(s,[0,.3,-1.4],`R₁ = ${f(p.r1,0)} Ω`,0,-40);lab(s,[0,.3,.1],`R₂ = ${f(p.r2,0)} Ω`,0,34);dirArrow(s,[.9,.5,1.4],[-.7,.5,1.4],I)}
+  s.render();tag(c,`R_eq = ${f(Req,2)} Ω  ·  ${ser?'same current through both':'same voltage across both'}`,44,98,C.gold,14)};
+
+/* ---------- Cells in series and in parallel ---------- */
+R['c10-cells-combination']=(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.2,yaw:.3,cy:276}),n=Math.round(p.n),Is=n*p.E/(p.Rl+n*p.r),Ip=p.E/(p.Rl+p.r/n),ser=p.mode==='series',I=ser?Is:Ip,g=clamp(I*I*p.Rl/10,0,1);bench(s,8.6,5.4,[8,4.9]);
+  let A,B,D;
+  if(ser){const x0=-(n-1)*.33,xp=x0+(n-1)*.66+.4,xm=x0-.3;for(let i=0;i<n;i++)cellx(s,x0+i*.66,1.8);A=[[xp,1.8],[3.2,1.8],[3.2,-1.8],[1.75,-1.8]];B=[[.65,-1.8],[-3.2,-1.8],[-3.2,-.27]];D=[[-3.2,.27],[-3.2,1.8],[xm,1.8]];wire(s,[[xm,1.8],[x0-.12,1.8]],'#2c2f33');
+    lab(s,[x0,.3,1.8],`${n} cells in series`,0,36)}
+  else{const cx=-2.4,z0=-(n-1)*.2,zn=(n-1)*.2;for(let i=0;i<n;i++)cellx(s,cx,z0+i*.4);const xp=cx+.36,xm=cx-.3;A=[[xp,z0],[xp,-1.8],[1.75,-1.8]];B=[[.65,-1.8],[3.2,-1.8],[3.2,-.27]];D=[[3.2,.27],[3.2,1.8],[xm,1.8],[xm,zn]];wire(s,[[xp,z0],[xp,zn]]);wire(s,[[xm,z0],[xm,zn]],'#2c2f33');
+    lab(s,[cx,.3,zn],`${n} cells in parallel`,-10,40)}
+  wire(s,A);wire(s,B);wire(s,D,'#2c2f33');resistor(s,1.2,-1.8,'x',p.Rl,clamp(I*I*p.Rl/40,0,1));bulb(s,3.2,0,g);
+  if(ser)flow(s,[A.slice(1),B,D.slice(0,2)],I,t);else flow(s,[A,B,D],I,t);
+  lab(s,[1.2,.3,-1.8],`load R = ${f(p.Rl,1)} Ω`,0,-40);s.arrow([3.2,.3,1.0],[3.2,.3,-1.0],C.gold,3,10,`I = ${f(I,3)} A`);
+  s.render();tag(c,`each cell ${f(p.E,1)} V, r = ${f(p.r,1)} Ω  ·  I = ${f(I,3)} A`,44,98,C.gold,14)};
+
+/* ---------- Refraction through a glass slab ---------- */
+R['c10-glass-slab']=(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:.5,yaw:.55,cy:268}),i=rad(p.i),r=Math.asin(Math.sin(i)/p.n),dT=p.t*.3,zc=.55,top=zc-dT/2,bot=zc+dT/2,ix=-1.1,ox=ix+dT*Math.tan(r),y=.4,E=1.25,Lr=1.7;
+  s.box([0,-.09,.5],[8.4,.18,6.4],WOOD,{ground:true});s.box([0,.03,.5],[7.6,.06,5.8],'#f1eee5',{ground:true,stroke:'#00000022'});for(let k=-3;k<=3;k++)s.seg([k*1.1,.065,-2.4],[k*1.1,.065,3.4],'#9fb4c233',1,[],-4.5e5);
+  const I0=[ix,y,top],O0=[ox,y,bot],S0=[ix-Lr*Math.sin(i),y,top-Lr*Math.cos(i)],E0=[ox+E*Math.sin(i),y,bot+E*Math.cos(i)],U=[ix+(bot-top+E*Math.cos(i))*Math.tan(i),y,bot+E*Math.cos(i)];
+  s.box([0,.33,zc],[5.6,.54,dT],'#9fd3f0',{alpha:.38,stroke:'#e9f6ffaa'});
+  s.seg([ix,.07,top-1],[ix,.07,top+.9],'#5c6b78',1.3,[5,4],-4e5);s.seg([ox,.07,bot-.9],[ox,.07,bot+1.1],'#5c6b78',1.3,[5,4],-4e5);lab(s,[ix,.07,top-1],'normal',34,-4,'#6b7a86');
+  const beam=(a,b)=>{s.seg(a,b,'#ff4d4d55',7,[],5e5);s.seg(a,b,'#ff6b6b',2.4,[],5e5+1)};beam(S0,I0);beam(I0,O0);beam(O0,E0);if(p.i>2)s.seg(I0,U,'#ff6b6b88',1.4,[6,5],5e5);
+  const dl=V.norm(V.sub(I0,S0));s.cyl(V.sub(S0,V.mul(dl,.32)),dl,.09,.7,'#2b2f35',{seg:10});s.cyl(V.add(V.sub(S0,V.mul(dl,.32)),V.mul(dl,.36)),dl,.095,.04,'#ff3b3b',{seg:10,caps:true});
+  const arc=(o,a0,a1,rr,col)=>s.path(Array.from({length:9},(_,k)=>{const a=a0+(a1-a0)*k/8;return[o[0]+rr*Math.sin(a),y,o[2]+rr*Math.cos(a)]}),col,1.6,[],6e5);
+  arc(I0,PI,PI+i,.6,'#ffffffcc');lab(s,[I0[0]-.6*Math.sin(PI-i/2)*-1*0-.6*Math.sin(i/2),y,I0[2]-.6*Math.cos(i/2)],`i = ${f(p.i,0)}°`,-44,-14,C.white);
+  arc(I0,0,r,.5,'#ffffffcc');lab(s,[I0[0]+.5*Math.sin(r/2),y,I0[2]+.5*Math.cos(r/2)],`r = ${f(deg(r),1)}°`,-46,10,C.white);
+  arc(O0,0,i,.55,'#ffffffcc');lab(s,[O0[0]+.55*Math.sin(i/2),y,O0[2]+.55*Math.cos(i/2)],`e = ${f(p.i,0)}°`,-46,22,C.white);
+  const dcm=p.t*Math.sin(i-r)/Math.cos(r);if(p.i>3){const M=V.add(O0,V.mul([Math.sin(i),0,Math.cos(i)],.8)),N2=V.add(M,V.mul([Math.cos(i),0,-Math.sin(i)],dcm*.3));s.seg(M,N2,C.mint,2.2,[],6e5);lab(s,N2,`d = ${f(dcm,2)} cm`,56,8)}
+  lab(s,[-2.8,.58,bot],`glass  n = ${f(p.n,2)}`,-10,34,'#bfe8ff');
+  s.render();tag(c,'red laser beam through a rectangular glass slab (top view on the table)',44,98,C.muted,13)};
+
+/* ---------- Resistance of a wire ---------- */
+const RHO3={copper:['Copper','#d9844a'],aluminium:['Aluminium','#c5ccd3'],iron:['Iron','#8d99a6'],nichrome:['Nichrome','#b9a37a']},RHOV={copper:1.68e-8,aluminium:2.65e-8,iron:9.7e-8,nichrome:1.10e-6};
+R['c10-wire-resistance']=(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.2,cy:290}),rho=RHOV[p.mat],[name,col]=RHO3[p.mat],A=PI*(p.d/1000)**2/4,Rw=rho*p.L/A,I=p.V/Rw,len=.6+p.L*1.0,th=.07+p.d*.09,x0=-len/2,y=.5;
+  bench(s,9,4.6,[8.2,4]);
+  // metre scale under the wire
+  s.box([0,.07,-.25],[6.4,.1,.5],'#e6c97a');for(let k=0;k<=50;k++){const x=-3.2+k*.128;s.seg([x,.125,-.05],[x,.125,-.05-(k%10===0?.2:k%5===0?.14:.08)],'#2b2118',1,[],-2e5)}for(let k=0;k<=5;k++)s.engrave([-3.2+k*1.28,.126,-.38],String(k),'#2b2118',10,-2e5);
+  for(const sg of[-1,1]){const x=sg*len/2;s.box([x+sg*.08,.3,-.25],[.28,.5,.36],'#2f3d48');s.cyl([x,y,-.25],[1,0,0],.1,.2,STEEL,{seg:8})}
+  s.cyl([0,y,-.25],[1,0,0],th,len,col,{seg:12,cap:mixc(col,'#ffffff',.25)});for(let k=0;k<26;k++){const x=x0+((k/26*len+t*Math.min(1.2,Math.log10(1+I*20)*.35))%len);s.ball([x,y,-.25],Math.max(.03,th*.55),'#ffd24d',{flat:true,glow:true})}
+  wire(s,[[x0,-.25],[x0,1.6],[1.7,1.6]],'#c0392b',.22);wire(s,[[len/2,-.25],[len/2,1.0],[3.1,1.0],[3.1,1.6]],'#2c2f33',.22);
+  s.box([2.4,.3,1.6],[1.5,.5,.8],'#2b3036');s.box([2.4,.57,1.6],[1.1,.04,.5],'#dfe8ef');s.engrave([2.4,.6,1.6],`${f(p.V,1)} V`,'#1b3a52',13);lab(s,[2.4,.55,1.6],'cell / battery',20,30);
+  lab(s,[len/2-.1,y+th,-.25],`d = ${f(p.d,2)} mm`,24,-44);lab(s,[0,y+th+.02,-.25],`${name} wire, l = ${f(p.L,1)} m`,0,-62,col);
+  
+  s.render();tag(c,`R = ρl/A = ${Rw<1?f(Rw,3):f(Rw,2)} Ω   ·   I = ${f(I,3)} A`,44,98,C.gold,15)};
+
+/* ---------- Electric power and the bill ---------- */
+R['c10-electric-power']=(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.1,cy:290}),g=clamp(Math.log10(p.P)/3.5,.1,1),kwh=p.P/1000*p.h*30,days=cycle(t*3,30);bench(s,8.6,4.6,[7.8,4]);
+  if(p.P<150){bulb(s,-2.4,0,g);s.cyl([-2.4,.04,0],[0,1,0],.5,.05,'#2f3640',{seg:20});lab(s,[-2.4,.9,0],`${f(p.P,0)} W bulb`,-50,-38,C.white)}
+  else{const h=clamp((p.P-150)/2850,0,1);s.box([-2.4,.45,0],[1.6,.8,.9],'#c6ccd2');s.box([-2.4,.5,.46],[1.3,.5,.04],'#2b2f35');for(let k=0;k<5;k++)s.box([-2.4,.3+k*.1,.49],[1.2,.03,.03],mixc('#6a3b2a','#ff7a2a',h*(.4+.6*Math.sin(k)**2)),{});if(h>.1)s.ball([-2.4,.5,.9],.5+.5*h,'#ff8a3c',{glow:true,flat:true,alpha:.25});lab(s,[-2.4,.85,0],`${f(p.P,0)} W heater`,-40,-38,C.white)}
+  // electricity meter: housing, readout window and the spinning disc
+  s.box([.4,.9,0],[2.0,1.8,.5],'#dfe3e6',{stroke:'#8d99a6'});s.box([.4,1.35,.27],[1.5,.4,.02],'#0b1722');s.engrave([.4,1.35,.29],f(kwh*days/30,1).padStart(6,' ')+' kWh','#ffd24d',14);
+  s.cyl([.4,.65,.26],[0,0,1],.38,.03,'#c9d3da',{seg:20,cap:'#eef3f6'});const a=TAU*cycle(t*Math.min(4,p.P/400+.2),1);s.seg([.4,.65,.3],[.4+.34*Math.cos(a),.65+.34*Math.sin(a),.3],'#d62828',3,[],5e5);s.engrave([.4,.2,.28],'ENERGY METER','#334455',9,5e5);
+  s.engrave([.4,1.62,.27],`day ${Math.floor(days+1)} of 30`,'#334455',9);
+  wire(s,[[-1.7,0],[-.6,0]],'#c0392b',.25);lab(s,[1.2,1.0,0],'kWh meter',50,-44);
+  s.render();tag(c,`${f(p.P,0)} W × ${f(p.h,1)} h/day × 30 = ${f(kwh,1)} kWh  →  ₹ ${f(kwh*p.rate,0)}`,44,98,C.gold,14)};
+
+/* ---------- Magnetic field around a straight wire ---------- */
+R['c10-wire-field']=(c,p,t)=>{const s=P3.scene(c,{scale:48,pitch:.18,cy:322}),sg=Math.sign(p.I),B=2e-7*Math.abs(p.I)/(p.r/100),w=B/(B+5e-5);bench(s,8.4,6,[0,0]);s.poly([[-3,.02,-2.4],[3,.02,-2.4],[3,.02,2.4],[-3,.02,2.4]].reverse(),'#f1eee5',{normal:[0,1,0],z:-3e5});
+  s.cyl([0,.8,0],[0,1,0],.06,2.7,CU,{seg:10});s.cyl([0,-.2,0],[0,1,0],.12,.1,'#2f3d48',{seg:10});
+  for(let k=1;k<=5;k++){const rr=k*.5;s.ring([0,.04,0],[0,1,0],rr,sg?'#2b8fd1'+Math.round((.95-k*.13)*255).toString(16).padStart(2,'0'):'#9fb4c2',sg?2.2:1.2,[],64);
+    if(sg)for(let j=0;j<2;j++){const a=-sg*t*.5+k+j*PI,a2=a-sg*.3;s.arrow([rr*Math.cos(a),.07,rr*Math.sin(a)],[rr*Math.cos(a2),.07,rr*Math.sin(a2)],'#5bb8f0',2,6)}}
+  // compasses around the wire at distance r (needle = Earth's field to the north plus the wire's field)
+  const rr=p.r*.5;for(let k=0;k<8;k++){const a=TAU*k/8+.4,px=rr*Math.cos(a),pz=rr*Math.sin(a),tg=sg?[sg*Math.sin(a),0,-sg*Math.cos(a)]:[0,0,0],nx=[0,0,-1],vv=V.add(V.mul(nx,sg?1-w:1),V.mul(tg,sg?w:0)),u=V.norm(vv);
+    s.cyl([px,.07,pz],[0,1,0],.2,.07,'#2b333b',{seg:14,cap:'#e9f3f8'});s.tube([[px-u[0]*.15,.12,pz-u[2]*.15],[px,.12,pz]],.028,'#e9f3f8',{segs:5});s.tube([[px,.12,pz],[px+u[0]*.15,.12,pz+u[2]*.15]],.028,'#e63946',{segs:5})}
+  s.arrow([.35,1.9,0],[.35,sg>=0?2.5:1.3,0],C.gold,3,10,`I = ${f(p.I,1)} A`);s.label([0,-.55,2.6],'north  ↑',C.muted,11);lab(s,[0,0,-2.4],'cardboard sheet',60,-20);lab(s,[rr*Math.cos(.4),.12,rr*Math.sin(.4)],`compass at r = ${f(p.r,1)} cm`,70,-48);
+  s.render();tag(c,sg?`field circles ${p.I>0?'anticlockwise':'clockwise'} seen from above (right-hand rule)`:'no current: needles point north',44,98,C.muted,13)};
+
+/* ---------- Defects of vision ---------- */
+const lensProf=(concave,r)=>concave?[[0,.035],[r*.33,.05],[r*.66,.1],[r,.16],[r,-.16],[r*.66,-.1],[r*.33,-.05],[0,-.035]]:[[0,.17],[r*.33,.155],[r*.66,.105],[r*.97,.02],[r*.97,-.02],[r*.66,-.105],[r*.33,-.155],[0,-.17]];
+R['c10-eye-defects']=(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.12,yaw:.05,cx:335,cy:262}),fix=+p.fix&&p.defect!=='normal',XL=-.55,RET=1.04,XS=-1.75,K=.0116;let fx=RET;
+  if(p.defect==='myopia'&&!fix)fx=RET-clamp(30/p.fp+12,14,74)*K;if(p.defect==='hyper'&&!fix)fx=RET+clamp(14*(4-1/p.np),10,60)*K;
+  s.ball([0,0,0],1.1,'#fff4ec',{alpha:.3,flat:true,stroke:'#ffffff55'});s.ball([-.98,0,0],.42,'#cfe8f5',{alpha:.3,flat:true});s.tube([[-1.0,.46,0],[-.9,.3,0]],.05,'#7a5a3a',{segs:6});s.tube([[-1.0,-.46,0],[-.9,-.3,0]],.05,'#7a5a3a',{segs:6});
+  s.path(Array.from({length:21},(_,k)=>{const a=-.8+1.6*k/20;return[1.08*Math.cos(a),1.08*Math.sin(a),0]}),'#ff6b5e',7,[],-1e5);
+  s.lathe([XL,0,0],lensProf(false,.5),'#bfe8ff',{rot:[0,0,PI/2],alpha:.7,spec:.8,segs:16});
+  s.tube([[-.7,.55,0],[-.62,.3,0]],.04,'#8a5a36',{segs:6});s.tube([[-.7,-.55,0],[-.62,-.3,0]],.04,'#8a5a36',{segs:6});
+  const near=p.defect==='hyper',xo=near?-3.2:-3.3,Dv=p.defect==='myopia'?2.4+.5*p.fp:3.05+(p.np-.25)*1.8,hs=[-.42,0,.42];
+  if(near){s.arrow([xo,-.35,0],[xo,.35,0],C.gold,4,10);s.label([xo,.7,0],'object at 25 cm',C.muted,11)}else s.label([xo+.2,.6,0],'distant object',C.muted,11);
+  if(fix){const conc=p.defect==='myopia';s.lathe([XS,0,0],lensProf(conc,.62),'#bfe8ff',{rot:[0,0,PI/2],alpha:.45,spec:.9,segs:18});s.ring([XS,0,0],[1,0,0],.62,'#e9f6ff',2,[],40);lab(s,[XS,-.62,0],conc?'concave spectacle lens':'convex spectacle lens',-30,50)}
+  const beam='#ffc36b';for(const hl of hs){const m=near||fix?hl/Dv:0;let pts;
+    if(fix){const hsp=hl-m*(XL-XS);pts=[[xo,near?0:hsp,0],[XS,hsp,0],[XL,hl,0]]}else pts=[[xo,near?0:hl,0],[XL,hl,0]];
+    pts.push([fx,0,0]);if(fx<RET){const sl=(0-hl)/(fx-XL);pts.push([RET,sl*(RET-fx),0])}
+    s.path(pts,beam,2.4,[],4e5);if(fx>RET){const sl=(0-hl)/(fx-XL);s.path([[RET,hl+sl*(RET-XL),0],[fx,0,0]],beam+'66',1.4,[4,4],4e5)}}
+  const ok=Math.abs(fx-RET)<.02;s.ball([Math.min(fx,RET+.5),0,0],.06,ok?C.mint:C.red,{glow:true,flat:true});
+  lab(s,[1.05,.7,0],'retina',44,-34,'#ff9b8a');lab(s,[XL,.4,0],'eye lens',-8,-60);
+  s.render();tag(c,ok?'sharp image on the retina':fx<RET?'focus in front of the retina':'focus behind the retina',44,98,ok?C.mint:C.red,15)};
+
+/* ---------- Scattering: blue sky, red sunset ---------- */
+const LAM=[650,550,450],rgb=a=>'#'+a.map(v=>Math.round(clamp(v,0,1)*255).toString(16).padStart(2,'0')).join('');
+const skyModel=p=>{const am=1/Math.max(.035,Math.sin(rad(p.sun))),small=p.size==='molecules',k=small?.13:.02;const tr=LAM.map(l=>Math.exp(-k*(small?(550/l)**4:1)*am-(small?0:(p.size==='cloud'?.9:.25))*am*.4));return{am,tr,small,sc:LAM.map(l=>small?(550/l)**4:1)}};
+R['c10-scattering']=(c,p,t)=>{const m=skyModel(p),sunc=m.tr.map(v=>v/Math.max(...m.tr)),X0=34,X1=656,Y0=112,GY=345;
+  const skyTop=m.small?rgb(m.sc.map((q,i)=>.1+.62*q/m.sc[2]*Math.min(1,m.tr[i]+.35)).map(v=>v*(.35+.65*Math.min(1,p.sun/25)))):p.size==='cloud'?'#c9d2db':'#b8bcc0';
+  c.save();const g=c.createLinearGradient(0,Y0,0,GY);g.addColorStop(0,skyTop);g.addColorStop(1,p.sun<12&&m.small?rgb([1,.55*sunc[1]+.25,.3*sunc[2]+.15]):mixc(skyTop,'#ffffff',.35));c.fillStyle=g;c.fillRect(X0,Y0,X1-X0,GY-Y0);
+  if(p.size==='cloud'){c.fillStyle='#ffffffcc';for(const [cx,cy,r] of[[120,190,34],[160,176,44],[205,192,36],[460,230,30],[497,214,40],[540,232,32]]){c.beginPath();c.arc(cx,cy,r,0,TAU);c.fill()}}c.restore();
+  c.save();const gg=c.createLinearGradient(0,GY,0,400);gg.addColorStop(0,'#4d8f45');gg.addColorStop(1,'#2f6a33');c.fillStyle=gg;c.fillRect(X0,GY,X1-X0,400-GY);c.restore();
+  const s=P3.scene(c,{scale:44,pitch:-.25,yaw:0,cx:300,cy:374});for(const [tx,tz,h] of[[-3.6,-.6,1.1],[3.4,-.4,1.4],[4.4,-1.4,1.0],[-4.6,-1.2,1.3]]){s.cyl([tx,h*.25,tz],[0,1,0],.07,h*.5,'#6b4a2c',{seg:6});s.ball([tx,h*.7,tz],.38,'#2f7a38');s.ball([tx,h*.95,tz],.28,'#3b8c43')}
+  const ang=rad(p.sun),eye=[-1.2,.92,.6],dir=[Math.cos(ang),Math.sin(ang),0],sunP=V.add(eye,V.mul(dir,3.5));
+  s.cyl([-1.2,.25,.6],[0,1,0],.17,.5,'#2f4c7a',{seg:10});s.cyl([-1.2,.62,.6],[0,1,0],.2,.45,'#c0392b',{seg:10});s.ball([-1.2,1.0,.6],.16,'#e8b98e');lab(s,[-1.2,.55,.6],'observer',-34,40,C.white);
+  s.ball(sunP,.5,rgb(sunc.map(v=>.25+.75*v)),{glow:true,flat:true});s.ball(sunP,.78,rgb(sunc),{alpha:.18,flat:true});
+  s.seg(eye,sunP,'#fff7d6aa',2,[7,6],5e5);
+  for(let k=0;k<7;k++){const q=(k+.5)/7,pp=V.add(eye,V.mul(dir,q*3.2)),a=TAU*cycle(t*.3+k*.37,1),w=m.small?'#4aa3ff':'#ffffff',dd=[.3*Math.cos(a),.3*Math.sin(a),.1*Math.sin(a*1.7)];s.arrow(pp,V.add(pp,dd),w,1.8,6)}
+  s.render();tag(c,m.small?'blue light is scattered sideways much more than red':'large particles scatter all colours about equally',44,98,m.small?'#bfe0ff':'#f2f2f2',13)};
+
+/* ---------- Electron drift ---------- */
+const hsh=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+R['c10-electron-drift']=(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.22,yaw:.25,cy:268}),Rr=.3+p.radius*.35,vd=p.current/(8.5e28*1.6e-19*PI*(p.radius/1000)**2);
+  s.cyl([0,0,0],[1,0,0],Rr,6.4,'#d9844a',{alpha:.28,caps:false,seg:20});s.cyl([3.2,0,0],[1,0,0],Rr,.02,'#e9a77a',{cap:'#e9a77a',seg:20});s.cyl([-3.2,0,0],[1,0,0],Rr,.02,'#e9a77a',{cap:'#e9a77a',seg:20});
+  for(let i=0;i<5;i++)for(let j=0;j<5;j++)for(let k=0;k<2;k++){const y=(j-2)*Rr*.42,z=(k?.5:-.5)*Rr*.8+(i%2?.12:-.12)*Rr;if(Math.hypot(y,z)>Rr*.88)continue;s.ball([-2.8+i*1.4,y,z],.1,'#ffd8a8',{stroke:'#b9722f'})}
+  for(let i=0;i<22;i++){const x=-3.1+((hsh(i)*6.2-t*vd*800)%6.2+6.2)%6.2,j=.05*Math.sin(t*25+i*3),y=(hsh(i+3)-.5)*1.6*Rr,z=(hsh(i+6)-.5)*1.6*Rr;if(Math.hypot(y,z)>Rr*.9)continue;s.ball([x+j,y+j,z],.055,'#4dabf7',{flat:true,glow:true})}
+  s.arrow([-1.2,Rr+.35,0],[1.2,Rr+.35,0],C.gold,3,11,`I = ${p.current} A (conventional)`);s.arrow([1.2,-Rr-.35,0],[-1.2,-Rr-.35,0],'#4dabf7',3,11,'electrons drift');
+  lab(s,[-2.8,0,.3],'copper ion',-30,50,'#ffd8a8');
+  s.render();tag(c,`drift speed ≈ ${f(vd*1000,3)} mm/s (electrons move opposite to current)`,44,98,C.muted,13)};
+
+/* ---------- Solenoid ---------- */
+R['c10-solenoid']=(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.3,yaw:.2,cy:268}),len=1.6+p.length*2.4,Rc=.6,B=4e-7*PI*p.turns*p.current/p.length,turns=clamp(p.turns/40,6,25);bench(s,8.6,4.6,[0,0]);
+  s.box([0,-.04,0],[7.8,.05,3.8],'#d8d2c4',{ground:true});s.cyl([0,.8,0],[1,0,0],Rc*.92,len,'#c9b99a',{alpha:.5,seg:18,caps:false});
+  s.helix([0,.8,0],[1,0,0],Rc,len,turns,CU,3.4);for(const x of[-len/2,len/2]){s.cyl([x,.4,0],[0,1,0],.04,.8,'#8d99a6',{seg:6})}
+  for(let i=0;i<8;i++){const q=cycle(t*.25+i/8,1),a=TAU*turns*q;s.ball([-len/2+q*len,.8+Rc*Math.cos(a),Rc*Math.sin(a)],.05,'#ffd24d',{flat:true,glow:true})}
+  pack(s,-3.0,1.3,Math.round(p.current*10)/10+' A');wire(s,[[-3.0,.9],[-3.0,.3],[-len/2,.3]],'#c0392b',.06);wire(s,[[-3.0,1.7],[3.0,1.7],[3.0,.3],[len/2,.3]],'#2c2f33',.06);
+  const n=clamp(Math.round(B*1000),2,5);for(let k=0;k<4;k++){const az=TAU*k/4+.5,cs=Math.cos(az),sn=Math.sin(az);for(let j=0;j<n;j++){const rho=Rc*.65*(j+.5)/n*1.4,ro=Rc+.55+.5*j,e=len/2+.35;
+      s.path([[-e,.8+rho*cs,rho*sn],[e,.8+rho*cs,rho*sn]],'#7baaffcc',1.5,[],4e5);
+      s.path(Array.from({length:19},(_,q)=>{const a=PI*q/18,rr=rho+(ro-rho)*Math.sin(a);return[e*Math.cos(a),.8+rr*cs,rr*sn]}),'#7baaff77',1.2,[],4e5);
+      if(j===0&&k===0)s.arrow([-.4,.8+rho*cs,rho*sn],[.5,.8+rho*cs,rho*sn],'#bcd6ff',2,8)}}
+  s.label([len/2+.5,.8,0],'N',C.red,16);s.label([-len/2-.5,.8,0],'S',C.blue,16);lab(s,[0,1.4,0],'coil of insulated copper wire',-20,-34,C.white);
+  s.render();tag(c,`B ≈ μ₀nI = ${f(B*1000,2)} mT  (thumb of right hand along the field)`,44,98,C.gold,14)};
+
+
+/* ---------- Force on a current-carrying conductor ---------- */
+R['c10-force-on-wire']=(c,p,t)=>{const s=P3.scene(c,{scale:44,pitch:.2,yaw:.15,cy:300}),F=p.field*p.current*p.length,Fa=Math.abs(F),Lw=.9+p.length*1.9,yb=.55,yt=yb+Lw,sgn=Math.sign(p.current),dx=-sgn*clamp(Fa*.14,0,.85)*(.5+.5*Math.sin(t*2));bench(s,9,5,[0,0]);
+  // horseshoe-type magnet: N pole (front, translucent so the wire stays visible), S pole (back) and a steel yoke
+  const hy=1.55;s.box([0,hy,-1.25],[2.4,2.6,.5],'#3d78d8');s.box([0,hy,1.25],[2.4,2.6,.5],'#e5484d',{alpha:.4});s.box([-1.4,hy,0],[.4,2.6,3.0],'#9aa1a8');s.label([0,hy+1.55,1.25],'N',C.red,18);s.label([0,hy+1.55,-1.25],'S',C.blue,18);
+  for(let i=0;i<3;i++)for(let j=0;j<2;j++)s.arrow([-.7+i*.7,.75+j*1.6,.95],[-.7+i*.7,.75+j*1.6,-.95],'#bcd6ffaa',1.3,6,i===2&&j===1?`B = ${f(p.field,1)} T (N → S, into the page)`:'');
+  // rails and the moving conductor
+  for(const y of[yb,yt]){s.cyl([0,y,0],[1,0,0],.05,5.2,'#c3c9cf',{seg:8});for(const x of[-2.6,2.6])s.cyl([x,y/2-.05,0],[0,1,0],.07,y,'#2f3d48',{seg:8})}
+  s.cyl([dx,(yb+yt)/2,0],[0,1,0],.07,Lw,CU,{seg:10});
+  const ppos=[3.4,0,1.5];pack(s,ppos[0],ppos[2],'');const topC=sgn>=0?'#2c2f33':'#c0392b',botC=sgn>=0?'#c0392b':'#2c2f33';
+  s.tube([[2.6,yt,0],[3.0,yt,0],[3.0,.4,.9],[3.4,.45,1.0]],.03,topC,{segs:5});s.tube([[2.6,yb,0],[2.95,yb,0],[2.95,.3,1.4],[3.4,.4,1.9]],.03,botC,{segs:5});
+  if(sgn){s.arrow([dx+.25,yb+.2,0],[dx+.25,yb+.2+sgn*Math.min(1,Lw*.5),0],C.gold,3,10,`I = ${Math.abs(p.current)} A`);s.arrow([dx,(yb+yt)/2,0],[dx-sgn*clamp(.5+Fa*.25,.5,1.5),(yb+yt)/2,0],C.red,4,11,`F = BIL = ${f(Fa,2)} N`)}
+  s.render();tag(c,`F = BIL = ${f(Fa,2)} N`+(sgn?`  ·  force is to the ${sgn>0?'left':'right'}`:''),44,98,C.gold,15)};
+
+/* ---------- Magnetic field on the axis of a loop ---------- */
+const loopB=(q,Rv)=>{let bx=0,by=0,bz=0;const N=18;for(let k=0;k<N;k++){const a=TAU*(k+.5)/N,py=Rv*Math.cos(a),pz=Rv*Math.sin(a),dy=-Math.sin(a),dz=Math.cos(a),rx=q[0],ry=q[1]-py,rz=q[2]-pz,r3=Math.pow(rx*rx+ry*ry+rz*rz+.0025,1.5);bx+=(dy*rz-dz*ry)/r3;by+=(dz*rx)/r3;bz+=(-dy*rx)/r3}return[bx,by,bz]};
+let loopCache={k:-1,lines:[]};
+const loopLines=Rv=>{const key=Math.round(Rv*100);if(loopCache.k===key)return loopCache.lines;const lines=[];
+  const seeds=[[.28,1],[.6,1],[.6,-1],[1.35,1],[1.35,-1],[1.9,1],[1.9,-1],[.45,0]];
+  for(const [rr,sg] of seeds){const rho=rr*Rv;const q0=sg===0?[0,0,rho]:[0,sg*rho,0];let q=q0;const pts=[q0];const inner=rr<1;
+    for(let i=0;i<150;i++){const B=loopB(q,Rv),m=Math.hypot(...B);if(m<1e-9)break;const h=.09+.04*Math.min(1,Math.hypot(...q)/2),nq=V.add(q,V.mul(B,h/m));if(Math.hypot(...nq)>4.4)break;if(!inner&&i>12&&q[0]>0&&nq[0]<=0){pts.push(q0);break}q=nq;pts.push(q)}
+    if(inner){let qb=q0;const bk=[];for(let i=0;i<70;i++){const B=loopB(qb,Rv),m=Math.hypot(...B),h=.09+.04*Math.min(1,Math.hypot(...qb)/2),nq=V.sub(qb,V.mul(B,h/m));if(Math.hypot(...nq)>4.4)break;qb=nq;bk.push(qb)}pts.unshift(...bk.reverse())}
+    lines.push(pts)}
+  loopCache={k:key,lines};return lines};
+R['c10-loop-axis-field']=(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:240,yaw:-.2,pitch:.2,cy:268}),Rv=.5+p.Rl*.08,xs=p.x*.09,ya=Rv+.55,Rm=p.Rl/100,Bf=x=>4e-7*PI*p.N*p.I*Rm*Rm/(2*(Rm*Rm+(x/100)**2)**1.5);bench(s,8.4,3.6,[0,0]);
+  s.box([0,.16,0],[6.9,.14,.34],'#d9b46a',{ground:false});for(let k=-30;k<=30;k+=5)s.seg([k*.09,.24,.14],[k*.09,.24,.14-(k%10===0?.12:.07)],'#2b2118',1,[],-2e5);for(let k=-30;k<=30;k+=10)s.engrave([k*.09,.235,-.02],String(k),'#2b2118',9,-2e5);
+  const rn=clamp(Math.round(p.N/20)+1,1,5);for(let k=0;k<rn;k++){s.ring([(k-(rn-1)/2)*.07,ya,0],[1,0,0],Rv,CU,5);s.ring([(k-(rn-1)/2)*.07,ya,0],[1,0,0],Rv-.04,'#8a4a22',2)}
+  s.box([0,.12,0],[.5,.2,1.0],'#3b4046',{});s.cyl([0,(ya-Rv)/2+.2,0],[0,1,0],.05,ya-Rv-.2,'#9aa1a8',{seg:6});
+  const lines=loopLines(Rv);for(const pts of lines){const q=pts.map(a=>[a[0],a[1]+ya,a[2]]);for(let i=0;i<q.length-1;i+=8)s.path(q.slice(i,i+9),'#7baaffaa',1.4,[],4e5)}
+  s.arrow([-1.9,ya,0],[-1.2,ya,0],'#bcd6ff',2,8);
+  for(let i=0;i<8;i++){const a=TAU*i/8+t*2;s.ball([0,ya+Rv*Math.cos(a),Rv*Math.sin(a)],.055,'#ffd24d',{flat:true,glow:true})}
+  s.cyl([xs,(ya+.23)/2,0],[0,1,0],.035,ya-.23,'#9aa1a8',{seg:6});s.box([xs,.28,0],[.22,.12,.3],'#2f3d48');s.box([xs,ya,0],[.1,.22,.22],'#e9f6ff',{stroke:'#2f3d48'});s.ball([xs,ya,0],.05,C.gold,{flat:true,glow:true});
+  s.arrow([xs,ya+.35,0],[xs+clamp(Bf(p.x)/Bf(0),0,1)*1.2,ya+.35,0],C.gold,3,11,`B = ${f(Bf(p.x)*1e6,2)} µT`);lab(s,[xs,ya,0],'Hall probe',-10,-64);lab(s,[0,ya-Rv,0],`coil: N = ${p.N}, R = ${f(p.Rl,1)} cm`,-30,60,C.white);
+  s.render();chart(c,450,96,206,150,{title:'B along axis',xl:'x (cm)',xmin:-30,xmax:30,ymin:0,series:[{fn:Bf,col:C.gold}],marker:[p.x,Bf(p.x)]})};
+
+
+/* ---------- Bar magnet: iron filings and compass needles ---------- */
+const MNp=[.9,.2,0],MSp=[-.9,.2,0];
+const magFn=q=>{const a=V.sub(q,MNp),b=V.sub(q,MSp),ra=Math.max(.15,Math.hypot(...a)),rb=Math.max(.15,Math.hypot(...b));return V.sub(V.mul(a,1/ra**3),V.mul(b,1/rb**3))};
+let magCache=null;
+const magData=()=>{if(magCache)return magCache;const lines=[],fil=[];
+  for(const sg of[-1,1])for(let i=0;i<5;i++){const a0=.55+i*.5,a=sg*a0;let q=V.add(MNp,[.22*Math.cos(a),0,.22*Math.sin(a)]);const pts=[q];
+    for(let k=0;k<160;k++){const B=magFn(q),m=Math.hypot(...B);if(m<1e-9)break;q=V.add(q,V.mul([B[0],0,B[2]],.09/Math.max(1e-9,Math.hypot(B[0],B[2]))));if(Math.hypot(q[0]-MSp[0],q[2]-MSp[2])<.22||Math.hypot(q[0],q[2])>3.4)break;pts.push(q)}lines.push(pts)}
+  for(let i=0;i<19;i++)for(let j=0;j<13;j++){const x=-3.4+i*.38+(hsh(i*13+j)-.5)*.2,z=-2.2+j*.37+(hsh(i+j*7)-.5)*.2;if(Math.abs(x)<1.1&&Math.abs(z)<.3)continue;const B=magFn([x,.2,z]),m=Math.hypot(B[0],B[2])||1;fil.push([x,z,B[0]/m,B[2]/m,Math.min(1,Math.hypot(...B)*1.2)])}
+  magCache={lines,fil};return magCache};
+R['c10-magnet']=(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.3,yaw:.1,cy:272}),D=magData();bench(s,8.6,5.2,[7.8,4.6]);
+  for(const [x,z,dx,dz,k] of D.fil)s.seg([x-dx*.06,.045,z-dz*.06],[x+dx*.06,.045,z+dz*.06],k>.25?'#2d3137':'#6b7077',1.4,[],-4e5);
+  s.box([.45,.2,0],[.9,.34,.4],'#d62f3a');s.box([-.45,.2,0],[.9,.34,.4],'#2f6fd1');s.box([0,.2,0],[1.8,.35,.41],'#00000000',{stroke:'#e9eef2'});s.box([.88,.2,0],[.06,.36,.42],'#c9ced3');s.box([-.88,.2,0],[.06,.36,.42],'#c9ced3');
+  s.engrave([.45,.378,0],'N','#ffffff',22);s.engrave([-.45,.378,0],'S','#ffffff',22);
+  for(const pts of D.lines){const q=pts.map(a=>[a[0],.12,a[2]]);for(let i=0;i<q.length-1;i+=8)s.path(q.slice(i,i+9),'#ffc36bcc',1.6,[],3e5);const m=Math.floor(q.length*.5);if(q.length>m+2)s.arrow(q[m],q[m+1],'#ffd98a',2,7)}
+  for(let i=0;i<7;i++){const a=TAU*i/7+.3,x=2.6*Math.cos(a),z=1.75*Math.sin(a),B=magFn([x,.2,z]),u=V.norm([B[0],0,B[2]]);s.cyl([x,.09,z],[0,1,0],.22,.1,'#b08d3a',{seg:14,cap:'#f4efe0'});s.tube([[x-u[0]*.17,.16,z-u[2]*.17],[x,.16,z]],.03,'#e9f3f8',{segs:5});s.tube([[x,.16,z],[x+u[0]*.17,.16,z+u[2]*.17]],.03,'#e63946',{segs:5})}
+  s.render();tag(c,'iron filings and compasses (red end = north pole) show the field: lines leave N, enter S',44,98,C.muted,13)};
+
+})();
 (() => {
 'use strict';
 const R=window.PhysicaReal3D=window.PhysicaReal3D||{};
