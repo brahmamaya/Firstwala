@@ -121,7 +121,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   console.log('\n=== 3. JEE Main (numerical) and JEE Advanced (two papers) ===');
   { const J = await fresh(browser); await openSeries(J.page, 'jee'); await J.page.click(OV + ' .ps-tcard:nth-child(1) button'); await J.page.waitForSelector(OV + ' h2:has-text("General instructions")');
     await J.page.check('#ps-read'); await J.page.click(OV + ' button:has-text("I am ready to begin")'); await J.page.waitForSelector('.px-time');
-    await J.page.click('.px-pb[aria-label^="Question 21,"]'); ok(await J.page.locator('.px-key, .px-keypad').count() > 0, 'Section B (numerical) shows the on-screen keypad');
+    await J.page.click('.px-pb[aria-label^="Question 21,"]'); ok(await J.page.locator('.px-kp').count() > 0, 'Section B (numerical) shows the on-screen keypad');
     ok((await J.page.textContent('.px h2')) === 'Question 21 of 75', 'JEE Main: 75 questions, Section B starts at 21'); await J.ctx.close(); }
   { const J = await fresh(browser); await openSeries(J.page, 'jeeadv'); ok(await J.page.locator(OV + ' .ps-tcard:nth-child(1) button').count() === 2, 'JEE Advanced test 1 has Paper 1 and Paper 2'); await J.ctx.close(); }
 
