@@ -380,7 +380,8 @@ async function hubView(exam) {
         ts ? ts.map(testBtn) : h('p', { class: 'ps-muted ps-soon' }, 'Coming soon')));
     }
     const recent = null;
-    show(h('h1', null, ICON[exam] + ' ' + NAME[exam] + ' full-length tests'),
+    show(h('button', { type: 'button', class: 'ps-link', onclick: close }, '← Back'),
+      h('h1', null, ICON[exam] + ' ' + NAME[exam] + ' full-length tests'),
       any ? h('p', { class: 'ps-muted' }, `${any.q} questions · ${any.mx} marks · ${dur(any.m)} · real exam pattern${any.pp > 1 ? ' · 2 papers per test' : ''}. Tests 1–3 free, 4–30 paid.`) : h('p', { class: 'ps-muted' }, 'Tests are being added. Check back soon.'),
       h('p', { class: 'ps-sub' }, `${nDone} of 30 attempted`),
       statusMsg ? h('div', { class: 'ps-banner', role: 'status' }, statusMsg) : null, recent, note, msg,

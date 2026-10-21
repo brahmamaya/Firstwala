@@ -44,7 +44,7 @@ async function newPage(browser, opts = {}) {
   await page.route(/googletagmanager|google-analytics/, r => r.abort());
   return { ctx, page, st };
 }
-const fresh = async (browser, opts) => { const x = await newPage(browser, opts); await x.page.goto(BASE, { waitUntil: 'load' }); await x.page.click('.ga-ask :text("No thanks")').catch(() => {}); return x; };
+const fresh = async (browser, opts) => { const x = await newPage(browser, opts); await x.page.goto(BASE, { waitUntil: 'load' }); return x; };
 async function openSeries(page, exam = 'neet') {
   await page.click('[data-testid=mode-rank]'); await page.click(`[data-testid=rank-${exam}]`);
   await page.waitForSelector('[data-testid=rk-series]'); await page.click('[data-testid=rk-series]'); await page.waitForSelector(OV + ' .ps-tcard');
@@ -66,7 +66,9 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   const A = await fresh(browser); await openSeries(A.page, 'neet');
   ok(await A.page.locator(OV + ' .ps-tcard').count() === 30, '30 test cards');
   ok(await A.page.locator(OV + ' .ps-tcard.soon').count() === 27 && await A.page.locator(OV + ' .ps-tcard:not(.soon) button:has-text("Start")').count() === 3, 'tests 1-3 can be started, 4-30 say "Coming soon"');
-  ok(await A.page.locator(OV + ' .ps-bar:visible').count() === 1 && await A.page.locator(OV + ' #ps-email').count() === 0, 'no login screen (nothing to sign in to)');
+  ok(await A.page.locator(OV + ' #ps-email').count() === 0, 'no login screen (nothing to sign in to)');
+  ok(await A.page.locator(OV + ' main button:has-text("← Back")').count() === 1, 'the hub has a Back button');
+  ok(await A.page.locator('.ga-ask').count() === 0, 'no 18+ analytics pop-up on the landing page');
   await A.page.click(OV + ' .ps-tcard:nth-child(1) button'); await A.page.waitForSelector(OV + ' h2:has-text("General instructions")');
   ok(await A.page.locator(OV + ' .ps-quote blockquote').count() === 1 && (await A.page.textContent(OV + ' .ps-quote blockquote')).length > 20, 'a motivational quote is shown before the test starts');
   ok(await A.page.locator(OV + ' .ps-tbl tbody tr').count() === 4 && /\+4/.test(await A.page.textContent(OV + ' .ps-tbl')) && /−1/.test(await A.page.textContent(OV + ' .ps-tbl')), 'marking scheme: 4 subjects, +4 / −1');
@@ -99,7 +101,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   ok(await A.page.evaluate(() => { const e = new MouseEvent('contextmenu', { bubbles: true, cancelable: true }); document.querySelector('.px-q').dispatchEvent(e); return e.defaultPrevented; }), 'right-click is blocked on the paper');
 
   console.log('--- reload in the middle: the test resumes ---');
-  await sleep(3500); await A.page.reload({ waitUntil: 'load' }); await A.page.click('.ga-ask :text("No thanks")').catch(() => {}); await openSeries(A.page, 'neet');
+  await sleep(3500); await A.page.reload({ waitUntil: 'load' }); await openSeries(A.page, 'neet');
   ok(await A.page.locator(OV + ' button:has-text("Resume")').count() === 1, 'hub offers Resume');
   await A.page.click(OV + ' button:has-text("Resume")'); await A.page.waitForSelector('.px-time');
   ok(/Answered/.test(await A.page.getAttribute('.px-pb[aria-label^="Question 1,"]', 'aria-label')), 'saved answers are still there after a reload');
@@ -128,7 +130,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   console.log('\n=== 4. time runs out: the test submits itself ===');
   { const T = await fresh(browser); await openSeries(T.page, 'neet'); await T.page.click(OV + ' .ps-tcard:nth-child(2) button'); await T.page.check('#ps-read'); await T.page.click(OV + ' button:has-text("I am ready to begin")'); await T.page.waitForSelector('.px-time');
     await T.page.evaluate(() => { const d = JSON.parse(localStorage.getItem('physica-ps-v1')); for (const k in d.a) d.a[k].dl = Date.now() - 60000; localStorage.setItem('physica-ps-v1', JSON.stringify(d)); });
-    await T.page.reload({ waitUntil: 'load' }); await T.page.click('.ga-ask :text("No thanks")').catch(() => {}); await openSeries(T.page, 'neet');
+    await T.page.reload({ waitUntil: 'load' }); await openSeries(T.page, 'neet');
     ok(await T.page.locator(OV + ' button:has-text("Result")').count() === 1, 'after the deadline the test is closed and scored (no extra time)'); await T.ctx.close(); }
 
   console.log('\n=== 5. no tests published yet / offline file missing ===');
@@ -148,7 +150,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
       await X.page.evaluate(t => { document.documentElement.dataset.theme = t; }, theme); await sleep(400);
       const res = await X.page.evaluate(async sc => { const r = await axe.run(document.querySelector(sc) || document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } }); return r.violations.map(v => ({ id: v.id, impact: v.impact, sample: v.nodes[0].html.slice(0, 120) })); }, scope);
       ok(res.length === 0, `axe ${label} [${theme}]` + (res.length ? ' -> ' + res.map(v => `${v.id} ${v.sample}`).join(' | ') : '')); } };
-    await X.page.goto(BASE, { waitUntil: 'load' }); await X.page.addScriptTag({ content: axeSrc }); await X.page.click('.ga-ask :text("No thanks")').catch(() => {});
+    await X.page.goto(BASE, { waitUntil: 'load' }); await X.page.addScriptTag({ content: axeSrc });
     await X.page.waitForSelector('[data-testid=series-note]'); await axe('landing notice', '.sn');
     await openSeries(X.page, 'neet'); ok(await X.page.evaluate(() => document.querySelector('.ps-ov').contains(document.activeElement)), 'focus moves into the dialog'); await axe('test hub');
     await X.page.click(OV + ' .ps-tcard:nth-child(1) button'); await X.page.waitForSelector(OV + ' h2:has-text("General instructions")'); await axe('instructions + quote');

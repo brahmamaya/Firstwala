@@ -37,16 +37,5 @@ if (slot) {
 } else {
   if (get() === '1') start();
 }
-if (!slot && get() === null && !/\/(privacy|terms|about|help)\.html$/.test(location.pathname)) {
-  const css = document.createElement('style');
-  css.textContent = '.ga-ask{position:fixed;left:12px;bottom:12px;right:12px;max-width:420px;z-index:99999;background:var(--panel,#101f30);color:var(--text,#eff8ff);border:1px solid var(--line2,#32495e);border-radius:14px;padding:14px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 8px 30px #0006}.ga-ask p{margin:0 0 10px}.ga-ask button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line2,#32495e);background:var(--panel2,#14263a);color:inherit;padding:8px 12px;margin-right:8px}.ga-ask a{color:var(--mint,#42d9ca)}';
-  document.head.append(css);
-  const done = v => { set(v); box.remove(); if (v === '1') start(); };
-  const box = el('div', { class: 'ga-ask', role: 'dialog', 'aria-label': 'Visit statistics choice' },
-    el('p', null, 'Allow anonymous visit statistics (Google Analytics)? It is off unless you say yes. Please choose Yes only if you are 18 or older. ',
-      el('a', { href: 'privacy.html' }, 'Privacy Policy')),
-    el('button', { type: 'button', onclick: () => done('0') }, 'No thanks'),
-    el('button', { type: 'button', onclick: () => done('1') }, 'Yes, I am 18+ and allow'));
-  (document.body ? Promise.resolve() : new Promise(r => document.addEventListener('DOMContentLoaded', r))).then(() => document.body.append(box));
-}
+// No pop-up on the landing page: visit statistics stay OFF unless someone (18 or older) turns them on from the switch on the Privacy page.
 })();
