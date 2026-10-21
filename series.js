@@ -29,6 +29,11 @@ const MSG = {
   invalid_answer: 'That answer is not valid for this question.',
   terms_outdated: 'Our Terms or Privacy Policy changed. Please read and accept them to continue.',
   rate_limited: 'You are doing that too fast. Please wait a moment and try again.',
+  account_locked: 'Your account has been locked for safety. Please write to easy@physica.in and we will help you.',
+  lockdown: 'Physica is temporarily offline for a security check. Your saved answers are safe. Please try again soon.',
+  exams_paused: 'New tests cannot be started right now. Tests already in progress are not affected.',
+  signups_closed: 'New sign-ups are paused for a short while. Please try again later.',
+  invalid_device: 'Could not register this device.',
 };
 const say = e => MSG[e && e.code] || (e && e.status === 429 ? MSG.over_email_send_rate_limit : 'Something went wrong. Please try again.');
 
@@ -48,6 +53,13 @@ const h = (tag, a, ...kids) => {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+const b64 = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+// A random id kept in this browser (not a fingerprint). Only its salted hash is stored on the server, to spot logins from new devices.
+function deviceId() {
+  let d = lsGet('physica-device');
+  if (!d || !/^[A-Za-z0-9_-]{22,64}$/.test(d)) { d = b64(crypto.getRandomValues(new Uint8Array(24))); lsSet('physica-device', d); }
+  return d;
+}
 const err = (code, status) => Object.assign(new Error(code), { code, status });
 
 /* Text -> DOM with real subscripts / superscripts (x_2, v_{0}, m^2, 10^-3). Only text nodes, <sub> and <sup> are created. */
@@ -116,6 +128,9 @@ const CSS = `
 .ps-bar b{letter-spacing:.04em}.ps-bar .ps-sp{flex:1}.ps-bar small{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
 .ps-main{max-width:920px;margin:0 auto;padding:20px 16px 60px}
 .ps-ov h1,.ps-ov h2,.ps-ov h3{margin:.2em 0 .5em;line-height:1.25}
+.ps-ov{--ps-ok:#59e08f;--ps-err:#ff8a93;--ps-warn:#ffb347;--ps-link:var(--blue)}
+:root[data-theme="light"] .ps-ov{--ps-ok:#0b6b3a;--ps-err:#b3261e;--ps-warn:#8a5300;--ps-link:#1a4fb8}
+.ps-ov a,.ps-ov button.ps-link{color:var(--ps-link)}
 .ps-ov [hidden]{display:none!important}
 .ps-lbl{display:block;margin:.6em 0 .35em;font-weight:600}
 .ps-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
@@ -124,33 +139,35 @@ const CSS = `
 .ps-ov button.ps-go{background:var(--mint);color:var(--on-mint);border-color:var(--mint);font-weight:700}
 .ps-ov input[type=text],.ps-ov input[type=email],.ps-ov input[type=number],.ps-ov input[inputmode]{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--text);font:inherit}
 .ps-ov :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
-.ps-muted{color:var(--muted)}.ps-err{color:var(--t-ff6b7a,#ff6b7a);min-height:1.4em}.ps-ok{color:var(--t-59e08f,#59e08f)}
+.ps-muted{color:var(--muted)}.ps-err{color:var(--ps-err);min-height:1.4em}.ps-ok{color:var(--ps-ok)}
 .ps-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.ps-row>.ps-sp{flex:1}
 .ps-pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid var(--line2);color:var(--muted)}
 .ps-narrow{max-width:420px;margin:30px auto}
 .ps-opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;cursor:pointer;background:var(--bg2)}
-.ps-opt.sel{border-color:var(--mint);background:var(--active)}.ps-opt.right{border-color:var(--t-59e08f,#59e08f)}.ps-opt.wrong{border-color:var(--t-ff6b7a,#ff6b7a)}
+.ps-opt.sel{border-color:var(--mint);background:var(--active)}.ps-opt.right{border-color:var(--ps-ok)}.ps-opt.wrong{border-color:var(--ps-err)}
 .ps-opt input{margin-top:4px}
 .ps-q{white-space:pre-wrap;font-size:1.05em;margin:.6em 0}
-.ps-timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.1em}.ps-timer.low{color:var(--t-ff6b7a,#ff6b7a)}
+.ps-timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.1em}.ps-timer.low{color:var(--ps-err)}
 .ps-pal{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
 .ps-pal button{width:40px;padding:7px 0;text-align:center;border-radius:8px}
 .ps-pal button.done{background:var(--mint);color:var(--on-mint);border-color:var(--mint)}
 .ps-pal button.rev{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
 .ps-pal button.cur{outline:2px solid var(--blue);outline-offset:1px}
-.ps-banner{padding:8px 12px;border-radius:10px;border:1px solid var(--t-ffb347,#ffb347);color:var(--t-ffb347,#ffb347);margin:8px 0}
+.ps-banner{padding:8px 12px;border-radius:10px;border:1px solid var(--ps-warn);color:var(--ps-warn);margin:8px 0}
 .ps-sub{color:var(--muted);font-size:.9em;margin-top:6px}
 .ps-ov sub,.ps-ov sup{font-size:.75em;line-height:0}
+
+.ps-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ps-ov::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:5;background-image:var(--ps-mark,none)}
 .ps-ov.ps-exam .ps-q,.ps-ov.ps-exam .ps-opt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.ps-link{background:none!important;border:0!important;padding:0!important;color:var(--mint);text-decoration:underline;cursor:pointer}
-.ps-danger{border-color:var(--t-ff6b7a,#ff6b7a)!important;color:var(--t-ff6b7a,#ff6b7a)!important}
+.ps-ov button.ps-link{background:none!important;border:0!important;padding:0!important;text-decoration:underline;cursor:pointer}
+.ps-danger{border-color:var(--ps-err)!important;color:var(--ps-err)!important}
 @media print{.ps-ov{display:none!important}}
 @media(max-width:560px){.ps-bar small{display:none}.ps-pal button{width:36px}}
 `;
 
 /* ---------- shell ---------- */
-let ov = null, main = null, userEl = null, outBtn = null, onLeave = null, idleTimer = null, lastActive = Date.now();
+let ov = null, main = null, userEl = null, outBtn = null, onLeave = null, idleTimer = null, lastActive = Date.now(), opener = null, deviceNoted = false;
 let examLive = false;
 
 function ensureShell() {
@@ -167,6 +184,14 @@ function ensureShell() {
   // Keep the lab's global shortcuts (Space, R, X, F, arrows ...) from firing while typing answers.
   for (const t of ['keydown', 'keyup', 'keypress']) ov.addEventListener(t, e => e.stopPropagation());
   ov.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  ov.addEventListener('keydown', e => {                  // keep keyboard focus inside the dialog
+    if (e.key !== 'Tab') return;
+    const f = [...ov.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])')].filter(x => !x.closest('[hidden]') && x.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === ov)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
   for (const t of ['pointerdown', 'keydown', 'scroll', 'touchstart']) ov.addEventListener(t, () => { lastActive = Date.now(); }, { passive: true, capture: true });
   // exam content must not be copied out: block context menu / copy / cut / drag while a test is on screen
   for (const t of ['contextmenu', 'copy', 'cut', 'dragstart']) ov.addEventListener(t, e => {
@@ -181,10 +206,13 @@ function leaveOk() {
 }
 let onCopy = null;
 function open() {
+  opener = document.activeElement;
   ensureShell();
   window['ga-disable-' + GA_ID] = true;          // no analytics inside the exam area, ever (students may be minors)
   ov.hidden = false;
   document.documentElement.style.overflow = 'hidden';
+  // modal semantics: the lab behind the dialog must not be reachable by keyboard or screen reader
+  for (const el of document.body.children) if (el !== ov && !el.hasAttribute('inert') && el.tagName !== 'SCRIPT') { el.setAttribute('inert', ''); el.dataset.psInert = '1'; }
   lastActive = Date.now();
   clearInterval(idleTimer);
   idleTimer = setInterval(() => {                // shared-device safety: drop an unattended, non-remembered login
@@ -199,6 +227,8 @@ function close() {
   ov.hidden = true;
   clearInterval(idleTimer);
   document.documentElement.style.overflow = '';
+  for (const el of document.querySelectorAll('[data-ps-inert]')) { el.removeAttribute('inert'); delete el.dataset.psInert; }
+  if (opener && opener.focus) try { opener.focus(); } catch {}
 }
 function show(...nodes) {
   if (onLeave) { onLeave(); onLeave = null; }
@@ -209,6 +239,7 @@ function show(...nodes) {
   userEl.textContent = email || ''; userEl.hidden = !email;
   outBtn.hidden = !email;
   paintMark(email);
+  if (ov && !ov.hidden) main.focus({ preventScroll: true });   // move screen-reader / keyboard focus to the new screen
   ov.scrollTop = 0;
 }
 // Faint diagonal watermark with the student's own email: a leaked screenshot or photo of a paper can be traced back.
@@ -221,15 +252,23 @@ function paintMark(email) {
 const loading = what => show(h('p', { class: 'ps-muted', role: 'status' }, what || 'Loading…'));
 function fatal(e, retry) {
   if (e && (e.code === 'signed_out' || e.status === 401)) { save(null); return view(); }
+  if (e && (e.code === 'account_locked' || e.code === 'lockdown')) {
+    return show(h('div', { class: 'ps-card ps-narrow' }, h('h2', null, e.code === 'lockdown' ? 'Back soon' : 'Account locked'), h('p', { role: 'alert' }, say(e)),
+      h('p', { class: 'ps-row' }, e.code === 'lockdown' ? h('button', { type: 'button', class: 'ps-go', onclick: view }, 'Try again') : null,
+        h('a', { href: 'mailto:easy@physica.in' }, 'easy@physica.in'))));
+  }
   show(h('div', { class: 'ps-card' }, h('p', { class: 'ps-err', role: 'alert' }, say(e)),
     h('button', { type: 'button', class: 'ps-go', onclick: retry || view }, 'Try again')));
 }
 
 /* ---------- views ---------- */
+let statusMsg = null;
 async function view() {
+  try { const st = await raw('/rest/v1/rpc/get_status', { method: 'POST', body: {} }); statusMsg = st && st.message && !st.lockdown ? st.message : null; if (st && st.lockdown) return fatal(err('lockdown')); } catch {}
   if (!sess) return loginView();
   loading();
   try {
+    if (!deviceNoted) { await rpc('note_device', { p_device: deviceId() }); deviceNoted = true; }
     const rows = await api('/rest/v1/profiles?select=display_name,is_minor,parent_consent_at,parent_email,terms_version&id=eq.' + encodeURIComponent(sess.user.id));
     const p = rows && rows[0];
     if (!p || p.is_minor == null || (p.is_minor && !(p.parent_consent_at && p.parent_email)) || p.terms_version !== TERMS) return profileView(p);
@@ -322,12 +361,22 @@ function profileView(p) {
 async function listView() {
   loading('Loading tests…');
   try {
-    const [tests, attempts, enr] = await Promise.all([
+    const [tests, attempts, enr, devs] = await Promise.all([
       api('/rest/v1/tests?select=id,title,exam,duration_min,is_free,opens_at,closes_at&published=eq.true&order=created_at.desc'),
       api('/rest/v1/attempts?select=id,test_id,submitted_at,score,deadline'),
       api('/rest/v1/enrollments?select=test_id'),
+      rpc('list_devices', { p_device: deviceId() }),
     ]);
+    const newDeviceBanner = recentOtherDevice(devs);
     const mine = new Map(attempts.map(a => [a.test_id, a]));
+    function recentOtherDevice(list) {
+      const seen = Number(lsGet('physica-dev-ack') || 0);
+      const fresh = (list || []).find(d => !d.current && Date.parse(d.first_seen) > Date.now() - 7 * 864e5 && Date.parse(d.first_seen) > seen);
+      if (!fresh || list.length < 2) return null;
+      return h('div', { class: 'ps-banner', role: 'alert' }, h('b', null, 'New sign-in: '), 'your account was used on another device on ' + new Date(fresh.first_seen).toLocaleString() + '. If that was not you, ',
+        h('button', { type: 'button', class: 'ps-link', onclick: () => { signOut(true); view(); } }, 'log out everywhere'), ' now. ',
+        h('button', { type: 'button', class: 'ps-link', onclick: ev => { lsSet('physica-dev-ack', String(Date.now())); ev.currentTarget.parentNode.remove(); } }, 'This was me'));
+    }
     const owned = new Set(enr.map(e => e.test_id));
     const msg = h('p', { class: 'ps-err', role: 'alert' });
     const cards = tests.map(t => {
@@ -351,7 +400,7 @@ async function listView() {
           h('span', { class: 'ps-pill' }, t.is_free ? 'Free' : 'Paid')),
         h('p', null, action));
     });
-    show(h('h1', null, 'Tests'), cards.length ? cards : h('p', { class: 'ps-muted' }, 'No tests are published yet. Check back soon.'), msg);
+    show(h('h1', null, 'Tests'), statusMsg ? h('div', { class: 'ps-banner', role: 'status' }, statusMsg) : null, newDeviceBanner, cards.length ? cards : h('p', { class: 'ps-muted' }, 'No tests are published yet. Check back soon.'), msg);
   } catch (e) { fatal(e, listView); }
 }
 
@@ -369,6 +418,8 @@ async function examView(attemptId) {
   let i = 0, inflight = false, retry = null, debounce = null, finishing = false, tick = null;
 
   const timer = h('span', { class: 'ps-timer', role: 'timer', 'aria-label': 'Time left' });
+  const sr = h('div', { class: 'ps-sr', 'aria-live': 'polite', role: 'status' });
+  const said = new Set();
   const banner = h('div', { class: 'ps-banner', role: 'alert', hidden: true }, 'Connection problem: your latest answers are not saved yet. Keep this page open; we will retry.');
   const pal = h('div', { class: 'ps-pal' });
   const card = h('div', { class: 'ps-card' });
@@ -447,10 +498,11 @@ async function examView(attemptId) {
     const hh = Math.floor(left / 3600), mm = Math.floor(left % 3600 / 60), ss = left % 60;
     timer.textContent = (hh ? hh + ':' : '') + String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
     timer.classList.toggle('low', left <= 300);
+    for (const m of [600, 300, 60, 30]) if (left <= m && !said.has(m)) { said.add(m); if (left > 0 && left > m - 5) sr.textContent = m >= 60 ? `${m / 60} minute${m > 60 ? 's' : ''} left` : `${m} seconds left`; }
     if (left <= 0) finish(true);
   }
 
-  show(h('div', { class: 'ps-row' }, rt('h2', d.title), h('span', { class: 'ps-sp' }), timer), h('p', { class: 'ps-sub' }, 'Exam rules: one attempt, server timer. Switching tabs and copying are recorded. Do not share these questions.'), banner, card, pal,
+  show(h('div', { class: 'ps-row' }, rt('h2', d.title), h('span', { class: 'ps-sp' }), timer), sr, h('p', { class: 'ps-sub' }, 'Exam rules: one attempt, server timer. Switching tabs and copying are recorded. Do not share these questions.'), banner, card, pal,
     h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: () => {
       const left = qs.filter(q => !has(q)).length;
       if (confirm(left ? `${left} question(s) are unanswered. Submit the test? You cannot change answers afterwards.` : 'Submit the test? You cannot change answers afterwards.')) finish(false);
@@ -487,6 +539,10 @@ function accountView() {
     exportBtn.disabled = false;
   } }, 'Download my data');
   const everywhere = h('button', { type: 'button', onclick: () => { signOut(true); view(); } }, 'Log out on all devices');
+  const devCard = h('div', { class: 'ps-card' }, h('h3', null, 'Devices that signed in'), h('p', { class: 'ps-muted' }, 'Loading…'));
+  rpc('list_devices', { p_device: deviceId() }).then(list => devCard.replaceChildren(h('h3', null, 'Devices that signed in'),
+    h('p', { class: 'ps-muted' }, 'If you see a device you do not recognise, use “Log out on all devices” and sign in again.'),
+    h('ul', null, (list || []).map(d => h('li', null, (d.current ? 'This device' : 'Another device') + ' · first seen ' + new Date(d.first_seen).toLocaleDateString() + ' · last used ' + new Date(d.last_seen).toLocaleString()))))).catch(() => devCard.remove());
   const confirmBox = h('input', { type: 'text', id: 'ps-del', autocomplete: 'off', placeholder: 'Type DELETE to confirm' });
   const delBtn = h('button', { type: 'button', class: 'ps-danger', onclick: async () => {
     if (confirmBox.value.trim() !== 'DELETE') return note('Type DELETE in the box first.', true);
@@ -497,6 +553,7 @@ function accountView() {
   show(h('h1', null, 'Your account'),
     h('div', { class: 'ps-card' }, h('p', null, 'Signed in as ', h('b', null, email || '')),
       h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: listView }, '← Tests'), everywhere)),
+    devCard,
     h('div', { class: 'ps-card' }, h('h3', null, 'Your data'),
       h('p', { class: 'ps-muted' }, 'Get a copy of everything Physica holds about you (profile, tests, answers). Machine-readable JSON.'), h('p', null, exportBtn)),
     h('div', { class: 'ps-card' }, h('h3', null, 'Delete my account'),

@@ -51,6 +51,7 @@
 <tr><td>Security log: an anonymous account id, the action (for example “test started”) and the time. It holds no names, emails, answers or question text.</td><td>To detect and investigate misuse and incidents, and to meet security-record duties (including CERT-In’s 180-day log rule).</td><td>12 months <b>[[confirm]]</b>. Kept in anonymous form even after an account is deleted.</td></tr>
 <tr><td>Technical data such as IP address and browser type, handled by our hosting and database providers in their server logs</td><td>To deliver the service securely and prevent abuse.</td><td>As set by those providers, normally a few weeks.</td></tr>
 <tr><td>Anonymous daily totals: how many visits, and how many times each simulation was opened (no identifiers; see section 6)</td><td>To understand usage and improve Physica.</td><td>Kept as totals; they cannot be linked to anyone.</td></tr>
+<tr><td>A random device id created in your browser (we store only a one-way scrambled version, plus the first and last time it signed in; never your IP address or device details)</td><td>To warn you if your account is opened on a new device, so a stolen login is noticed quickly.</td><td>Until you delete your account (at most your 20 most recent devices).</td></tr>
 <tr><td>A sign-in token stored in your browser</td><td>To keep you signed in. It is kept for this tab only unless you tick “Keep me signed in”.</td><td>Until you log out or close the tab (or until it expires).</td></tr>
 </tbody></table>
 <p>We process this with your <b>consent</b> (and for students under 18, with the consent of a parent or guardian), and where the law requires or permits it, for example to keep security records. You may withdraw consent by deleting your account (section 9); this does not affect what was done before.</p>
@@ -90,6 +91,8 @@
 <li>Test answers, solutions and other students’ data cannot be read directly from the browser. Every request is checked on the server against who you are, and answers are revealed only after you submit.</li>
 <li>Strict input checks, rate limits against automated abuse, and an audit log of sensitive actions.</li>
 <li>Administrator access needs a second verification step (multi-factor).</li>
+<li>New-device alerts, a “log out on all devices” button, and the ability for us to lock an account or pause the whole service within minutes if we suspect misuse. A locked account can still download or delete its data.</li>
+<li>A watchdog that checks every 30 minutes that the live website is exactly what we published.</li>
 <li>Strict browser security rules (Content Security Policy) and no third-party scripts inside Test Series.</li>
 <li>Regular automated security tests, and limited access to data on a need-to-know basis.</li>
 </ul>

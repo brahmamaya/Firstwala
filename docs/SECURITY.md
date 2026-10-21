@@ -39,6 +39,9 @@ There is no application server of ours to patch: all logic runs inside Postgres 
 | 12 | Accidental exposure of a new table/function | Default privileges revoked; every table RLS-on (catalog test); definer functions pin `search_path` (catalog test) | suite A | none: a new unsafe object fails CI |
 | 13 | Secrets in git | `tools/secret-guard.js` (also blocks Supabase secret / service_role keys); `.gitignore` | CI | n/a |
 | 14 | Children's data / consent | Under-18 flag, parent contact + consent timestamp recorded server-side; no analytics; GA opt-in 18+ only | suite C, e2e §1, §6 | **Consent is not yet independently verified** (see §5) |
+| 16 | Unauthorised login / forced login / stolen session | Email-code login (no passwords to stuff), auth rate limits, new-device alerts + audit, "log out everywhere", per-account **lock** and global **panic** that act within seconds (even before the JWT expires), idle logout, tab-scoped tokens | suite M, e2e §10 | Email account compromise is outside our control (students are told to secure it) |
+| 17 | Site defaced / malicious script injected via hosting or pipeline | Strict CSP, watchdog compares every live file to the published build every 30 min, alert issue + email, exposed-file checks, branch protection (owner step) | `tools/watchdog.test.js` | Detection is within 30 min, not instant |
+| 18 | Operator mistakes / slow response | Runbook `docs/INCIDENT-RESPONSE.md`, one-line SQL tools, drills, DoD checklist | n/a | The human in the loop |
 | 15 | Data-subject rights | `export_my_data`, `delete_my_account`, inactive-account purge, audit purge | suite J, K | Backups keep deleted data for the provider's backup window |
 
 ## 3b. Visitor statistics without tracking people
@@ -57,7 +60,8 @@ select key as simulation, sum(n) as views from public.analytics_daily where even
 ```bash
 bash supabase/tests/run-local.sh                       # ~120 assertions on a throwaway Postgres
 bash supabase/tests/stress/run.sh                      # concurrency, lock race, 1500-call fuzz (npm i inside stress/ once)
-# browser end-to-end (login → exam → XSS → export/delete → idle logout → legal pages): see the Playwright script in the PR description / ask Claude to re-run
+node tools/watchdog.test.js && node tools/perf-budget.js
+(cd supabase/tests/e2e && npm i && bash db.sh && node e2e.js)   # browser: login, exam, XSS, axe accessibility, incidents, slow-4G speed (~95 checks)
 ```
 CI (`.github/workflows/security-tests.yml`) runs the first two on every push that touches the backend or front-end.
 
@@ -100,3 +104,7 @@ select cron.schedule('purge-old-audit',         '30 3 1 * *', $$select private.p
 | CERT-In Directions 2022 | Report incidents in 6 h; keep logs 180 days in India; sync clocks | Audit log, ≥180 d purge floor, Supabase Mumbai; incident plan §5.17 |
 | Consumer Protection (E-Commerce) Rules 2020 | Grievance Officer, 48 h acknowledgement, 1-month redress, clear prices & refund policy (when paid) | Terms §7, §12, Privacy §10 |
 | Indian Contract Act 1872 | Minors cannot contract | Terms §1: parent/guardian accepts on the student's behalf |
+
+## 7. Related
+- `docs/INCIDENT-RESPONSE.md`: what to do when something is wrong (panic button, playbooks, who to notify)
+- `docs/DEFINITION-OF-DONE.md`: checklist applied to every change
