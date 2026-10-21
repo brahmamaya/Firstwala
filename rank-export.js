@@ -103,15 +103,15 @@ function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=
   return cv}
 
 /* ---------- PDF: one JPEG page per slide ---------- */
-function makePDF(pages){const enc=new TextEncoder(),parts=[],off=[];let len=0;const put=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length};
+function makePDF(pages,pw=960,ph=540,iw=W,ih=H){const enc=new TextEncoder(),parts=[],off=[];let len=0;const put=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length};
   const N=pages.length;put('%PDF-1.4\n');put(new Uint8Array([37,226,227,207,211,10]));
   const obj=(n,fn)=>{off[n]=len;put(n+' 0 obj\n');fn();put('\nendobj\n')};
   obj(1,()=>put('<< /Type /Catalog /Pages 2 0 R >>'));
   obj(2,()=>put('<< /Type /Pages /Count '+N+' /Kids ['+pages.map((_,i)=>(3+i*3)+' 0 R').join(' ')+'] >>'));
   pages.forEach((p,i)=>{const pg=3+i*3;
-    obj(pg,()=>put('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Contents '+(pg+1)+' 0 R /Resources << /XObject << /I '+(pg+2)+' 0 R >> >> >>'));
-    const cs='q 960 0 0 540 0 0 cm /I Do Q';obj(pg+1,()=>{put('<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream')});
-    obj(pg+2,()=>{put('<< /Type /XObject /Subtype /Image /Width '+W+' /Height '+H+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+p.length+' >>\nstream\n');put(p);put('\nendstream')})});
+    obj(pg,()=>put('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pw+' '+ph+'] /Contents '+(pg+1)+' 0 R /Resources << /XObject << /I '+(pg+2)+' 0 R >> >> >>'));
+    const cs='q '+pw+' 0 0 '+ph+' 0 0 cm /I Do Q';obj(pg+1,()=>{put('<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream')});
+    obj(pg+2,()=>{put('<< /Type /XObject /Subtype /Image /Width '+iw+' /Height '+ih+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+p.length+' >>\nstream\n');put(p);put('\nendstream')})});
   const total=3+N*3,xr=len;put('xref\n0 '+total+'\n0000000000 65535 f \n');for(let n=1;n<total;n++)put(String(off[n]).padStart(10,'0')+' 00000 n \n');
   put('trailer\n<< /Size '+total+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF\n');return new Blob(parts,{type:'application/pdf'})}
 
@@ -172,5 +172,27 @@ async function make({items,withSol,blank,format,meta,theme,onProgress,cancelled}
   if(format==='ppt')return makePPTX(specs,logo);
   const jpgs=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');const cv=drawSlide(specs[i],logo);jpgs.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(N+1,N+1,i+1,specs.length);await new Promise(r=>setTimeout(r))}
   return makePDF(jpgs)}
-window.PhysicaRankExport={make};
+/* ---------- formula sheet: every formula of a chapter on 1-5 A4 pages (PDF, printable, light) ---------- */
+async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
+  setPalette('light');const AW=1240,AH=1754,M=70,GAP=40,CW=(AW-M*2-GAP)/2,TOP=250,BOT=AH-90;
+  const c0=document.createElement('canvas');c0.width=AW;c0.height=AH;cx=c0.getContext('2d');const logo=await logoCanvas();
+  const blocks=fs=>formulas.map(f=>{const nm=layout(f.n,fs*.85,CW-28,1),eq=layout(f.f.split(' · ').join('\n'),fs,CW-28,0),h=nm.h+eq.h+fs*.5+34;return{nm,eq,h}});
+  let fs=26,pages;
+  for(;fs>=13;fs-=1){const bl=blocks(fs);pages=[[[],[]]];let col=0,y=TOP,pg=0;
+    for(const b of bl){const lim=BOT;if(y+b.h>lim){if(col===0){col=1;y=TOP}else{pages.push([[],[]]);pg++;col=0;y=TOP}}pages[pg][col].push({b,y});y+=b.h+14}
+    if(pages.length<=5)break}
+  fs=Math.max(fs,13);
+  const out=[];
+  for(let i=0;i<pages.length;i++){if(cancelled?.())throw new Error('cancelled');
+    const cv=document.createElement('canvas');cv.width=AW;cv.height=AH;cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);
+    cx.drawImage(logo,M,34,LOGO.w*.8,LOGO.h*.8);
+    cx.fillStyle=P.acc;cx.font=F(24,1);cx.textBaseline='alphabetic';cx.fillText('FORMULA SHEET · '+exam.toUpperCase(),M,150);
+    const t=layout(chapter,56,AW-M*2,1);drawLay(t,M,162,AW-M*2,P.tx);cx.fillStyle=P.line;cx.fillRect(M,TOP-24,AW-M*2,2);
+    pages[i].forEach((colList,c)=>{const x=M+c*(CW+GAP);for(const {b,y} of colList){
+      cx.fillStyle='#f3f7fd';cx.strokeStyle=P.line;cx.lineWidth=2;cx.beginPath();cx.roundRect(x,y,CW,b.h,12);cx.fill();cx.stroke();
+      drawLay(b.nm,x+14,y+12,CW-28,P.acc);drawLay(b.eq,x+14,y+12+b.nm.h+fs*.5,CW-28,P.tx)}});
+    cx.fillStyle=P.dim;cx.font=F(20);cx.fillText('physica.in  ·  page '+(i+1)+' of '+pages.length,M,AH-40);
+    out.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(i+1,pages.length);await new Promise(r=>setTimeout(r))}
+  return makePDF(out,595,842,AW,AH)}
+window.PhysicaRankExport={make,makeSheet};
 })();
