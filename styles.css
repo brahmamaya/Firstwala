@@ -972,9 +972,9 @@ body.rank-open{overflow:hidden}
 .rk-path b{font-size:17px;color:var(--t-fff)}.rk-path span{color:var(--t-e2e8f2);font-size:16px}.rk-path em{font-style:normal;color:var(--t-7fb4ff);font-size:15px}
 .rk-path .rk-mini{margin-top:6px}
 .rk-mgrid{column-gap:14px}
-.rk-myth{break-inside:avoid;padding:12px;border-radius:12px;background:var(--s-0a0a0a);border:1px solid var(--t-222)}
+.rk-myth{break-inside:avoid;padding:12px;border-radius:12px;background:linear-gradient(135deg,#0a4a96,#07705a);border:1px solid #2f7fd0;color:#fff}
 .rk-myth p{margin:0;font-size:16px;line-height:1.5}
-.rk-wrong{color:var(--t-ff9d9d);font-weight:700;margin-bottom:6px!important}.rk-right{color:var(--t-bff0d6)}
+.rk-wrong{color:#fff;font-weight:700;margin-bottom:6px!important}.rk-wrong:before{content:'✗ '}.rk-right{color:#fff}.rk-right:before{content:'✓ '}
 .rk-myths h3{color:var(--t-fff)}
 
 .rk-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.rk-filter>span{color:var(--t-8fa3c0);font-size:14px}.rk-filter small{color:var(--t-8fa3c0);font-size:14px}

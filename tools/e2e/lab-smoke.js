@@ -7,21 +7,22 @@ const ROOT = process.env.SITE_ROOT || path.resolve(__dirname, '../..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/json' };
 const only = process.argv[2] || '', prefix = process.argv[3] || '';
 const srv = http.createServer((q, r) => { const p = decodeURIComponent(new URL(q.url, 'http://x').pathname); let f = path.join(ROOT, p); if (f.endsWith('/')) f += 'index.html';
-  fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(d); }); }).listen(3211);
+  fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(d); }); }).listen(+process.env.PORT || 3211);
 (async () => {
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM || '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
   const page = await b.newPage({ viewport: { width: 1200, height: 900 } }); const errs = [];
   page.on('pageerror', e => errs.push('pageerror: ' + e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|favicon|manifest/.test(m.text())) errs.push('console: ' + m.text().slice(0, 200)); });
   await page.route(/googletagmanager|google-analytics|docs\.google/, r => r.abort());
-  await page.goto('http://localhost:3211/', { waitUntil: 'load' }); await page.waitForTimeout(6000);
+  await page.goto('http://localhost:' + (+process.env.PORT || 3211) + '/', { waitUntil: 'load' }); await page.waitForTimeout(6000);
   await page.evaluate(() => { try { localStorage.setItem('physica-analytics', '0'); } catch {} });
   const sims = await page.evaluate(() => window.PhysicaSims.map(s => ({ id: s.id, subject: s.subject })));
-  const list = sims.filter(s => (!only || s.subject === only) && s.id.startsWith(prefix));
+  const ids = (process.env.IDS || '').split(',').filter(Boolean);
+  const list = sims.filter(s => (!only || s.subject === only) && s.id.startsWith(prefix) && (!ids.length || ids.includes(s.id)));
   const bad = []; let n = 0;
   const blank = () => page.evaluate(() => { const c = document.getElementById('simulation'), g = c.getContext('2d'), d = g.getImageData(0, 0, c.width, c.height).data, seen = new Set(); for (let i = 0; i < d.length; i += 4 * 211) { seen.add((d[i] >> 4) * 256 + (d[i + 1] >> 4) * 16 + (d[i + 2] >> 4)); if (seen.size > 6) return false; } return true; });
   const texts = () => page.evaluate(() => (document.querySelector('.lab-layout') || document.body).innerText.split('\n').filter(t => /NaN|Infinity|undefined|\[object|null\b/.test(t)).slice(0, 3));
   const setSliders = which => page.evaluate(w => { for (const el of document.querySelectorAll('#controls input[type=range]')) { el.value = w === 'min' ? el.min : w === 'max' ? el.max : el.defaultValue; el.dispatchEvent(new Event('input', { bubbles: true })); } for (const s of document.querySelectorAll('#controls select')) { s.selectedIndex = w === 'max' ? s.options.length - 1 : 0; s.dispatchEvent(new Event('change', { bubbles: true })); } }, which);
-  for (const mode of ['2d', 'ultra']) {
+  for (const mode of (process.env.MODES || '2d,ultra').split(',')) {
     await page.evaluate(m => { document.getElementById('mode-' + m).click(); }, mode);
     for (const s of list) {
       n++; const before = errs.length;

@@ -107,7 +107,11 @@ const eqs=t=>{const r=t.split(' · '),w=el('div','rk-eqs'+(r.length>6?' long':''
 const steps=txt=>{const a=txt.split(/(?<=[.!?])\s+/).filter(Boolean);if(a.length<2)return el('p','rk-how',txt);const ol=el('ol','rk-steps');for(const x of a)ol.append(el('li','',x));return ol};
 const label=t=>el('span','rk-label',t);
 function formulas(p){const D=U(),F=D.formulas,must=F.filter(f=>f.p===1).length,bar=el('div','rk-filter wide');
-  bar.append(el('span','','Show'),...[[false,`Must know (${must})`],[true,`All (${F.length})`]].map(([v,l])=>{const b=btn('rk-pill small',l,()=>{showAll=v;home()});b.setAttribute('aria-selected',String(showAll===v));return b}),el('small','',showAll?'Everything in the chapter.':'The 20% that gives most of the marks. Start here.'));p.append(bar);
+  bar.append(el('span','','Show'),...[[false,`Must know (${must})`],[true,`All (${F.length})`]].map(([v,l])=>{const b=btn('rk-pill small',l,()=>{showAll=v;home()});b.setAttribute('aria-selected',String(showAll===v));return b}),el('small','',showAll?'Everything in the chapter.':'The 20% that gives most of the marks. Start here.'));bar.append(btn('rk-pill small','⬇ All formulas (PDF)',async e=>{const b=e.currentTarget,t0=b.textContent;b.disabled=true;b.textContent='Making PDF…';
+    try{await loadExport();const blob=await window.PhysicaRankExport.makeSheet({formulas:F,chapter:CH(),exam:X.label}),nm=['Physica',X.label,CH(),'formulas'].join('-').replace(/[^A-Za-z0-9-]+/g,'-')+'.pdf',url=URL.createObjectURL(blob);
+      if(/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))window.open(url,'_blank')||(location.href=url);else{const a=el('a');a.href=url;a.download=nm;document.body.append(a);a.click();setTimeout(()=>a.remove(),3000)}b.textContent='Downloaded ✓'}
+    catch{b.textContent='Could not make PDF, try again'}setTimeout(()=>{b.textContent=t0;b.disabled=false},3500)}));
+  p.append(bar);
   secs().forEach((g,i)=>{const list=F.filter(x=>x.g===g&&(showAll||x.p===1));if(!list.length&&g!=='Dimensions')return;p.append(el('h2','rk-sec wide',`${i+1} · ${g}`));
     if(g==='Dimensions'){const t=el('div','rk-card wide');t.append(el('h3','','Dimensions to remember'));const gr=el('div','rk-dims');for(const [q,d] of D.table){const r=el('div','rk-dim');r.append(el('span','',q),el('b','','['+d+']'));gr.append(r)}t.append(gr);p.append(t)}
     for(const f of list){const c=el('div','rk-card');c.append(el('h3','',f.n),eqs(f.f),label('How to apply'),steps(f.how));const fg=f.fig&&fig(f.fig);if(fg)c.append(fg);
