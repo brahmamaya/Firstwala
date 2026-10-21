@@ -1,13 +1,13 @@
 /* A shared palette recolours the interface and every canvas experiment. */
 (() => {
   const themes = {
-    dark: {scheme:'dark',bg:'#07121f',start:'#0a1d2d',end:'#081624',surface:'#102638',line:'#29475b',text:'#e9f6ff',muted:'#8ca6b9',mint:'#42d9ca',gold:'#ffc36b',blue:'#7baaff',red:'#ff857e',purple:'#b89dff'},
+    dark: {scheme:'dark',bg:'#000000',start:'#010203',end:'#04070a',surface:'#102638',line:'#29475b',text:'#e9f6ff',muted:'#8ca6b9',mint:'#42d9ca',gold:'#ffc36b',blue:'#7baaff',red:'#ff857e',purple:'#b89dff'},
     light: {scheme:'light',bg:'#f4f7fb',start:'#ffffff',end:'#eef3f9',surface:'#dfe8f2',line:'#9db0c4',text:'#122033',muted:'#4c6076',mint:'#0b857c',gold:'#a86a00',blue:'#2a58c8',red:'#c8372f',purple:'#6b44c8'},
   };
   const key='physica-theme';
   let selected='dark',colours=new Map();
   const contexts=new WeakMap(),plainContexts=new WeakMap(),gradientTargets=new WeakMap();
-  const baseColours={'#42d9ca':'mint','#ffc36b':'gold','#7baaff':'blue','#ff857e':'red','#b89dff':'purple','#e9f6ff':'text','#eff8ff':'text','#8ca6b9':'muted','#0a1d2d':'start','#081624':'end','#29475b':'line','#1d3547':'line'};
+  const baseColours={'#42d9ca':'mint','#ffc36b':'gold','#7baaff':'blue','#ff857e':'red','#b89dff':'purple','#e9f6ff':'text','#eff8ff':'text','#8ca6b9':'muted','#0a1d2d':'start','#081624':'end','#010203':'start','#04070a':'end','#29475b':'line','#1d3547':'line'};
   const blend=(a,b,t)=>'#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('');
   function colour(value){
     if(typeof value!=='string'||selected==='dark')return value;

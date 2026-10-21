@@ -43,6 +43,6 @@ add('nuclear','mass-defect','Mass defect and binding energy','Convert a nuclear 
 add('diode','logic-gates','Logic gates','Change two binary inputs and inspect the output of a logic gate.','Output depends on gate and inputs','Digital gates map binary inputs to a definite binary output.', 'Compare OR and XOR when both inputs are 1.',[{key:'gate',label:'Gate',initial:'AND',options:['AND','OR','XOR','NAND','NOR'].map(x=>[x,x])},r('a','Input A',0,1,1,1),r('b','Input B',0,1,1,0)],p=>[n('Output',({AND:p.a&p.b,OR:p.a|p.b,XOR:p.a^p.b,NAND:1-(p.a&p.b),NOR:1-(p.a|p.b)})[p.gate])],(c,p,t)=>{let out=({AND:p.a&p.b,OR:p.a|p.b,XOR:p.a^p.b,NAND:1-(p.a&p.b),NOR:1-(p.a|p.b)})[p.gate];line(c,200,210,380,210,p.a?M:D,4);line(c,200,320,380,320,p.b?M:D,4);box(c,380,170,180,190,'#235367');txt(c,p.gate,416,266,W,27);line(c,560,265,770,265,out?G:D,4);ball(c,792,265,25,out?G:'#345063');txt(c,`A = ${p.a}`,120,210,M);txt(c,`B = ${p.b}`,120,320,M);txt(c,`Output = ${out}`,687,337,G,24)});
 window.ExtraSimulations=defs;
 const original=window.PhysicsDraw.draw;const byId=new Map(defs.map(s=>[s.id,s]));
-window.PhysicsDraw.draw=(c,id,p,t)=>{let s=byId.get(id);if(!s)return original(c,id,p,t);c.fillStyle='#0a1d2d';c.fillRect(0,0,960,505);s.idraw(c,p,t)};
+window.PhysicsDraw.draw=(c,id,p,t)=>{let s=byId.get(id);if(!s)return original(c,id,p,t);c.fillStyle='#010203';c.fillRect(0,0,960,505);s.idraw(c,p,t)};
 window.PhysicsDraw.available.push(...defs.map(s=>s.id));
 })();
