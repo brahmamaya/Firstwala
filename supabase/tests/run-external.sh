@@ -14,4 +14,7 @@ grep -q "ALL SECURITY CHECKS PASSED" /tmp/suite.out
 echo "== stress / fuzz"
 $P -d postgres -c "drop database if exists t" -c "create database t" >/dev/null
 $P -d t -f "$HERE/stub_supabase.sql"; $P -d t -f "$HERE/../schema.sql" 2>&1 | grep -v NOTICE || true
+ROOT="$HERE/../.."; SAMPLES="$(mktemp -d)"
+node "$ROOT/tools/series-import.js" patterns | $P -d t
+node "$ROOT/tools/series-import.js" sample "$SAMPLES" >/dev/null && node "$ROOT/tools/series-import.js" sql "$SAMPLES" --publish | $P -d t
 (cd "$HERE/stress" && npm ci --silent && node stress.js)

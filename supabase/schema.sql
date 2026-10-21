@@ -164,8 +164,8 @@ create unlogged table if not exists private.rate_limits (
   primary key (key, window_start)
 );
 
-create index if not exists attempts_user_idx      on public.attempts (user_id);
-create index if not exists attempts_test_idx      on public.attempts (test_id);
+-- no separate index on attempts(user_id): the unique (user_id, test_id) constraint already serves it. No index on test_id alone either:
+-- the partial rank index below covers every hot query; deleting a test (rare, admin only) may scan.
 create index if not exists attempts_rank_idx      on public.attempts (test_id, score desc) where submitted_at is not null;
 create index if not exists enrollments_test_idx   on public.enrollments (test_id);
 create index if not exists integrity_attempt_idx  on public.integrity_events (attempt_id);

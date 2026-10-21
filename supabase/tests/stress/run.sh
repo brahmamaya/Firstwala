@@ -9,4 +9,7 @@ trap 'su postgres -c "$BIN/pg_ctl -D $D -m immediate stop >/dev/null" 2>/dev/nul
 P="psql -h /tmp -p $PORT -U postgres -X -q -v ON_ERROR_STOP=1"
 $P -d postgres -c "create database t" >/dev/null
 $P -d t -f "$HERE/../stub_supabase.sql"; $P -d t -f "$SCHEMA" 2>&1 | grep -v NOTICE || true
+ROOT="$HERE/../../.."; SAMPLES="$WORK/samples"
+node "$ROOT/tools/series-import.js" patterns | $P -d t
+node "$ROOT/tools/series-import.js" sample "$SAMPLES" >/dev/null && node "$ROOT/tools/series-import.js" sql "$SAMPLES" --publish | $P -d t
 PGPORT=$PORT node "$HERE/stress.js"
