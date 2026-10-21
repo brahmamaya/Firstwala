@@ -150,7 +150,7 @@ add({...M12,id:'c10-wire-field',title:'Magnetic field around a straight wire',
   ln(c,cx,cy-180,cx,cy+150,'#d9844a',5);arrow(c,cx+16,sgn>=0?cy-60:cy-130,cx+16,sgn>=0?cy-130:cy-60,sgn?C.gold:'#29475b',3,10);T(c,'I = '+f(p.I,1)+' A',cx+26,cy-100,C.gold,13);
   // compasses on a circle of radius r: needles tangent to the field (or pointing north with no current)
   const rr=p.r*K*1.15+12;for(let k=0;k<8;k++){const a=TAU*k/8,x=cx+rr*Math.cos(a),y=cy+rr*.5*Math.sin(a);dot(c,x,y,11,'#0d2132','#c9d3da');
-   const B=2e-7*Math.abs(p.I)/(p.r/100),w=B/(B+5e-5),tx=-Math.sin(a)*(sgn>0?1:-1),ty=Math.cos(a)*(sgn>0?1:-1)*.5,nx=sgn?tx*w:0,ny=sgn?ty*w-(1-w):-1,L=Math.hypot(nx,ny)||1;ln(c,x-8*nx/L,y-8*ny/L,x+8*nx/L,y+8*ny/L,C.red,2.5);dot(c,x,y,2,'#fff')}
+   const B=2e-7*Math.abs(p.I)/(p.r/100),w=B/(B+5e-5),tx=-Math.sin(a)*(sgn>0?-1:1),ty=Math.cos(a)*(sgn>0?-1:1)*.5,nx=sgn?tx*w:0,ny=sgn?ty*w-(1-w):-1,L=Math.hypot(nx,ny)||1;ln(c,x-8*nx/L,y-8*ny/L,x+8*nx/L,y+8*ny/L,C.red,2.5);dot(c,x,y,2,'#fff')}
   T(c,'r = '+f(p.r,1)+' cm',cx+rr+16,cy,C.muted,12)},
  assumption:'Long straight wire; compasses also feel Earth’s horizontal field (taken as 50 μT towards the top of the card).'});
 

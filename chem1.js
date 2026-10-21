@@ -83,7 +83,7 @@ const PT={IE:[1312,2372,520,899,801,1086,1402,1314,1681,2081,496,738,578,787,101
   R:[31,28,128,96,84,76,71,66,57,58,166,141,121,111,107,105,102,106,203,176,170,160,153,139,139,132,126,124,132,122,122,120,119,120,120,116],
   EN:[2.20,0,.98,1.57,2.04,2.55,3.04,3.44,3.98,0,.93,1.31,1.61,1.90,2.19,2.58,3.16,0,.82,1.00,1.36,1.54,1.63,1.66,1.55,1.83,1.88,1.91,1.90,1.65,1.81,2.01,2.18,2.55,2.96,3.00]};
 const pos=Z=>{if(Z<=2)return[1,Z===1?1:18];if(Z<=10)return[2,Z<=4?Z-2:Z+8];if(Z<=18)return[3,Z<=12?Z-10:Z];return[4,Z-18]};
-add({...ch(3,'Classification of Elements and Periodicity in Properties','INORGANIC CHEMISTRY'),id:'chem-periodic-trends',title:'Periodic trends in 3D',
+add({...ch(3,'Classification of Elements and Periodicity in Properties','INORGANIC CHEMISTRY'),id:'chem-periodic-trends',title:'Periodic trends',
  description:'Raise the first 36 elements as bars to compare atomic radius, ionisation enthalpy or electronegativity across periods and down groups.',
  formula:'Across a period: radius ↓, ionisation enthalpy ↑, electronegativity ↑ ;  down a group: the reverse',
  observe:'Noble gases have the highest ionisation enthalpies; alkali metals the lowest. Radius shrinks across a period as nuclear charge rises.',

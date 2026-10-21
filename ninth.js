@@ -116,7 +116,7 @@ add({base:'circuit',id:'kirchhoff-loops',title:'Kirchhoff’s laws: two-loop cir
  metrics:p=>{const r=kirch(p);return[N('I₁ (left branch)',r.I1,'A',3),N('I₂ (right branch)',r.I2,'A',3),N('I₃ (middle)',r.I3,'A',3),N('Voltage across R₃',r.I3*p.R3,'V',2)]},
  draw:(c,p,t)=>{const r=kirch(p),s=P3.scene(c,{scale:56,pitch:.55,cy:280});board(s);const L=[[0,-1.3],[-2.6,-1.3],[-2.6,1.3],[0,1.3]],Rg=[[0,-1.3],[2.6,-1.3],[2.6,1.3],[0,1.3]],M=[[0,1.3],[0,-1.3]];wire(s,L);wire(s,Rg);wire(s,M);
   cell(s,[-2.6,0],'z','E₁');cell(s,[2.6,0],'z','E₂');resistor(s,[-1.3,-1.3],'x','R₁');resistor(s,[1.3,-1.3],'x','R₂');resistor(s,[0,0],'z','R₃');
-  flow(s,[[-2.6,1.3],[-2.6,-1.3],[0,-1.3]],r.I1,t);flow(s,[[2.6,1.3],[2.6,-1.3],[0,-1.3]],r.I2,t);flow(s,M.slice().reverse(),r.I3,t,C.mint,6);s.render();tag(c,'dot speed ∝ current; mint = shared branch',44,98,C.muted,13)},
+  flow(s,[[0,-1.3],[-2.6,-1.3],[-2.6,1.3]],r.I1,t);flow(s,[[0,-1.3],[2.6,-1.3],[2.6,1.3]],r.I2,t);flow(s,M,r.I3,t,C.mint,6);s.render();tag(c,'dot speed ∝ current; mint = shared branch',44,98,C.muted,13)},
  assumption:'Ideal cells (no internal resistance), ideal wires; positive current directions are from each cell towards the shared branch.'});
 function kirch(p){const a=p.R1+p.R3,b=p.R3,c2=p.R3,d=p.R2+p.R3,det=a*d-b*c2,I1=(p.E1*d-b*p.E2)/det,I2=(a*p.E2-c2*p.E1)/det;return{I1,I2,I3:I1+I2}}
 
@@ -179,7 +179,7 @@ add({base:'lorentz',id:'meter-conversion',title:'Galvanometer to ammeter or volt
  observe:'An ammeter needs a very low resistance; a voltmeter needs a very high one.',
  tryText:'Convert to a 10 A ammeter, then to a 100 V voltmeter.',
  controls:[S('mode','Convert to','ammeter',[['ammeter','Ammeter (shunt)'],['voltmeter','Voltmeter (series R)']]),R('G','Galvanometer resistance G',10,200,5,50,'Ω'),R('Ig','Full-scale current I_g',1,10,.5,5,'mA',1),R('range','Desired range',1,100,1,10,'A or V')],
- metrics:p=>{const Ig=p.Ig/1000;if(p.mode==='ammeter'){if(p.range<=Ig)return[N('Shunt','Range must exceed I_g')];const Sh=Ig*p.G/(p.range-Ig);return[N('Shunt resistance',Sh*1000,'mΩ',2),N('Ammeter resistance',Sh*p.G/(Sh+p.G)*1000,'mΩ',2),N('Current through shunt',p.range-Ig,'A',3)]}const Rs=p.range/Ig-p.G;return[N('Series resistance',Rs/1000,'kΩ',2),N('Voltmeter resistance',(Rs+p.G)/1000,'kΩ',2),N('Ohms per volt',1/Ig,'Ω/V',0)]},
+ metrics:p=>{const Ig=p.Ig/1000;if(p.mode==='ammeter'){if(p.range<=Ig)return[N('Shunt','Range must exceed I_g')];const Sh=Ig*p.G/(p.range-Ig);return[N('Shunt resistance',Sh*1000,'mΩ',2),N('Ammeter resistance',Sh*p.G/(Sh+p.G)*1000,'mΩ',2),N('Current through shunt',p.range-Ig,'A',3)]}const Rs=p.range/Ig-p.G;if(Rs<=0)return[N('Series resistance','Range too low: V < I_g G')];return[N('Series resistance',Rs/1000,'kΩ',2),N('Voltmeter resistance',(Rs+p.G)/1000,'kΩ',2),N('Ohms per volt',1/Ig,'Ω/V',0)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.55,cy:280});board(s);s.cyl([0,.25,-.3],[0,1,0],.7,.5,'#2f3d48',{cap:'#e9f6ff'});const nd=.55+.08*Math.sin(t*2);s.seg([0,.52,-.3],[.5*Math.sin(nd),.52,-.3-.5*Math.cos(nd)],C.red,2.5);s.label([0,.9,-.3],'G',C.white,15);
   wire(s,[[-3,-.3],[-.7,-.3]]);wire(s,[[.7,-.3],[3,-.3]]);if(p.mode==='ammeter'){wire(s,[[-1.5,-.3],[-1.5,1.2],[1.5,1.2],[1.5,-.3]]);resistor(s,[0,1.2],'x','shunt S','#c9d3da');flow(s,[[-3,-.3],[-1.5,-.3],[-1.5,1.2],[1.5,1.2],[1.5,-.3],[3,-.3]],2,t);flow(s,[[-1.5,-.3],[-.7,-.3]],.3,t,C.mint,3)}
   else{resistor(s,[-1.8,-.3],'x','series R','#c9a36b');flow(s,[[-3,-.3],[3,-.3]],.4,t,C.mint,8)}s.render();tag(c,p.mode==='ammeter'?'Most current bypasses G through the shunt':'Large series R limits current to I_g at full voltage',44,98,C.muted,13)},
@@ -269,7 +269,7 @@ add({base:'induction',id:'flux-angle',title:'Magnetic flux through a tilted coil
  tryText:'Spin the coil and watch the induced EMF peak when the flux is zero.',
  controls:[R('B','Magnetic field',.1,1,.05,.4,'T',2),R('A','Coil area',10,400,10,100,'cm²'),R('N','Turns',1,200,1,50),R('th','Tilt angle θ',0,180,1,30,'°'),S('spin','Coil','fixed',[['fixed','Held at angle θ'],['spin','Rotating at 1 rev/s']])],
  metrics:(p,t)=>{const th=p.spin==='spin'?TAU*t:rad(p.th),A=p.A*1e-4,Phi=p.N*p.B*A*Math.cos(th);return[N('Flux linkage NΦ',Phi*1000,'mWb',2),N('θ now',deg(th)%360,'°',0),N('EMF if rotating at 1 rev/s',p.spin==='spin'?p.N*p.B*A*TAU*Math.sin(th):'—','V',3)]},
- draw:(c,p,t)=>{const th=p.spin==='spin'?TAU*t*.25:rad(p.th),s=P3.scene(c,{scale:60,cx:240}),w=.5+Math.sqrt(p.A)*.07,n=[Math.sin(th),Math.cos(th),0];
+ draw:(c,p,t)=>{const th=p.spin==='spin'?TAU*t:rad(p.th),s=P3.scene(c,{scale:60,cx:240}),w=.5+Math.sqrt(p.A)*.07,n=[Math.sin(th),Math.cos(th),0];
   for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)s.arrow([i*.6,-1.8,j*.6],[i*.6,1.8,j*.6],'#7baaff55',1.2,7,i===2&&j===-2?`B = ${p.B} T`:'');const u=[Math.cos(th),-Math.sin(th),0],v=[0,0,1],cor=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>V.add(V.mul(u,a*w),V.mul(v,b*w)));
   s.poly(cor,'#ffc36b',{alpha:.25,cull:false,stroke:C.copper,lw:4});s.arrow([0,0,0],V.mul(n,1.2),C.mint,3,11,`n̂ (θ = ${f(deg(th)%360,0)}°)`);s.render();const A=p.A*1e-4;
   chart(c,440,96,216,150,{title:'Flux vs θ',xl:'θ (°)',xmin:0,xmax:360,ymin:-p.N*p.B*A*1000*1.1,ymax:p.N*p.B*A*1000*1.1,series:[{fn:x=>p.N*p.B*A*Math.cos(rad(x))*1000,col:C.gold}],marker:[deg(th)%360,p.N*p.B*A*Math.cos(th)*1000]})},

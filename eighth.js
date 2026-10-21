@@ -214,7 +214,7 @@ add({base:'thermo',id:'rectangle-cycle',title:'Work from a rectangular P–V cyc
  observe:'Net work equals the area enclosed; heat is absorbed on the high-pressure and heating legs.',
  tryText:'Widen the volume range. Does the efficiency improve?',
  controls:[R('P1','Low pressure P₁',50,200,5,100,'kPa'),R('P2','High pressure P₂',100,400,5,250,'kPa'),R('V1','Small volume V₁',1,5,.1,2,'L',1),R('V2','Large volume V₂',2,10,.1,5,'L',1)],
- metrics:p=>{const P1=Math.min(p.P1,p.P2)*1e3,P2=Math.max(p.P1,p.P2)*1e3,V1=Math.min(p.V1,p.V2)/1e3,V2=Math.max(p.V1,p.V2)/1e3,W=(P2-P1)*(V2-V1),Qin=1.5*V1*(P2-P1)+2.5*P2*(V2-V1);return[N('Net work per cycle',W,'J',1),N('Heat absorbed',Qin,'J',1),N('Efficiency',W/Qin*100,'%',1)]},
+ metrics:p=>{const P1=Math.min(p.P1,p.P2)*1e3,P2=Math.max(p.P1,p.P2)*1e3,V1=Math.min(p.V1,p.V2)/1e3,V2=Math.max(p.V1,p.V2)/1e3,W=(P2-P1)*(V2-V1),Qin=1.5*V1*(P2-P1)+2.5*P2*(V2-V1);return[N('Net work per cycle',W,'J',1),N('Heat absorbed',Qin,'J',1),N('Efficiency',Qin>0?W/Qin*100:0,'%',1)]},
  draw:(c,p,t)=>{const P1=Math.min(p.P1,p.P2),P2=Math.max(p.P1,p.P2),V1=Math.min(p.V1,p.V2),V2=Math.max(p.V1,p.V2),ph=cycle(t/2,4),corner=[[V1,P1],[V1,P2],[V2,P2],[V2,P1]],i=Math.floor(ph),fr=ph-i,a=corner[i],b=corner[(i+1)%4],cur=[a[0]+(b[0]-a[0])*fr,a[1]+(b[1]-a[1])*fr];
   const s=P3.scene(c,{scale:56,cx:200,cy:300});s.floor(2.4,.5,-1.6);const h=.4+cur[0]/10*2.6;s.cyl([0,-.1,0],[0,1,0],.85,3,'#ffffff',{alpha:.12,caps:false});s.cyl([0,-1.6+h/2,0],[0,1,0],.8,h,'#ff9a3c',{alpha:.15+.35*cur[1]/400,caps:false});s.cyl([0,-1.6+h+.1,0],[0,1,0],.8,.2,'#5d7b8f');s.render();
   chart(c,380,96,276,190,{title:'P–V cycle (clockwise)',xl:'V (L)',xmin:0,xmax:10.5,ymin:0,ymax:420,series:[{pts:[...corner,corner[0]],col:C.gold,w:2.5}],marker:[cur[0],cur[1]]})},

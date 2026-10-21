@@ -63,8 +63,6 @@
 .range-wrap{display:flex;align-items:center;gap:8px}.range-wrap input[type=range]{flex:1;min-width:0}
 .step-btn{flex:none;width:32px;height:32px;border-radius:8px;font-size:18px;font-weight:700;line-height:1;display:grid;place-items:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .step-btn:hover{color:var(--mint)}.step-btn:active{background:var(--active)}
-.simulation-tabs button.is-3d::after{content:'3D';display:inline-block;margin-left:8px;padding:1px 6px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:.6px;vertical-align:2px;color:var(--on-mint);background:var(--mint)}
-.pill-3d{padding:1px 6px;border-radius:5px;font-size:11px;color:var(--on-mint);background:var(--mint)}
 .view3d-bar{top:58px;right:12px;z-index:2;display:flex;flex-wrap:wrap;gap:6px}
 .view3d-bar[hidden]{display:none}
 .view3d-bar button{border-radius:8px;border:1px solid var(--line2);background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--text);font-weight:700}.view3d-bar button[aria-pressed=true]{color:var(--mint);border-color:var(--active-line);background:var(--active)}

@@ -47,7 +47,7 @@ const snap=(v,step)=>Math.round(v/step)*step;
 
 /* ---- convex lens on the optical bench ---- */
 const BY=330,LX=380;
-make('lens',(c,p,t)=>{const ppc=4,u=p.objectDistance,F=p.focalLength,v=u*F/(u-F),m=-v/u,ox=LX-u*ppc,cy=250,h=34,ix=LX+v*ppc,sx=SCR.lens,real=u>F;hint(c,'Drag the candle, then slide the white screen until the image is sharp');bench(c,40,660,BY,LX,ppc);
+make('lens',(c,p,t)=>{const ppc=4,u=p.objectDistance+(p.objectDistance===p.focalLength?.01:0),F=p.focalLength,v=u*F/(u-F),m=-v/u,ox=LX-u*ppc,cy=250,h=34,ix=LX+v*ppc,sx=SCR.lens,real=u>F;hint(c,'Drag the candle, then slide the white screen until the image is sharp');bench(c,40,660,BY,LX,ppc);
   for(const sg of[-1,1]){c.fillStyle='#ffd43b';c.beginPath();c.arc(LX+sg*F*ppc,cy,2.5,0,TAU);c.fill();txt(c,'F',LX+sg*F*ppc,cy+11,'#ffd43b',9,'center',700)}
   const top=[ox,cy-h],it=[ix,cy-h*m];let beams;if(real)beams=[[top,[LX,cy-h],ext([LX,cy-h],it,sx)],[top,[LX,cy],ext([LX,cy],it,sx)],[top,[LX,it[1]],[sx,it[1]]]];else{const fp=[LX+F*ppc,cy];beams=[[top,[LX,cy-h],ext([LX,cy-h],fp,sx)],[top,[LX,cy],ext(top,[LX,cy],sx)]]}
   post(c,sx,cy+76,BY);post(c,LX,cy+66,BY);post(c,ox,cy,BY);candle(c,ox,cy,h,1,false,t);for(const b of beams)ray(c,b,'#ffc65a',1.5);lens(c,LX,cy,62,10);
@@ -58,12 +58,12 @@ make('lens',(c,p,t)=>{const ppc=4,u=p.objectDistance,F=p.focalLength,v=u*F/(u-F)
  (q,p)=>q.y<150?null:Math.abs(q.x-SCR.lens-12)<22?'scr':'obj',(q,p,md)=>{if(md==='scr')SCR.lens=clamp(Math.round(q.x-12),LX+24,632);else p.objectDistance=clamp(snap((LX-q.x)/4,1),15,80)});
 
 /* ---- concave mirror on the bench ---- */
-make('concave-mirror',(c,p,t)=>{const ppc=6,u=p.u,F=p.f,MX=600,cy=250,h=30,v=u*F/(u-F),m=-v/u,ox=MX-u*ppc,ix=MX-v*ppc,sx=SCR.mirror,real=u>F;hint(c,'Drag the candle; slide the small screen (below the axis) to catch a sharp image');bench(c,40,660,BY,MX,-ppc);
+make('concave-mirror',(c,p,t)=>{const ppc=6,u=p.u+(p.u===p.f?.01:0),F=p.f,MX=600,cy=250,h=30,v=u*F/(u-F),m=-v/u,ox=MX-u*ppc,ix=MX-v*ppc,sx=SCR.mirror,real=u>F;hint(c,'Drag the candle; slide the small screen (below the axis) to catch a sharp image');bench(c,40,660,BY,MX,-ppc);
   c.save();const R=2*F*ppc;c.lineWidth=8;const g=c.createLinearGradient(MX-8,0,MX+6,0);g.addColorStop(0,'#ffffff');g.addColorStop(.4,'#ced4da');g.addColorStop(1,'#343a40');c.strokeStyle=g;c.shadowColor='rgba(200,230,255,.5)';c.shadowBlur=10;c.beginPath();c.arc(MX-R,cy,R,-Math.asin(Math.min(1,70/R)),Math.asin(Math.min(1,70/R)));c.stroke();c.restore();post(c,MX,cy+70,BY);
   for(const [k,l] of[[1,'F'],[2,'C']]){const x=MX-k*F*ppc;if(x>40){c.fillStyle='#ffd43b';c.beginPath();c.arc(x,cy,2.5,0,TAU);c.fill();txt(c,l,x,cy-10,'#ffd43b',9,'center',700)}}
   post(c,ox,cy,BY);candle(c,ox,cy,h,1,false,t);const top=[ox,cy-h];
   if(real){const it=[ix,cy-h*m],fx=MX-F*ppc,hit=[MX,it[1]];ray(c,[top,[MX,cy-h],ext([MX,cy-h],it,sx)],'#ffc65a',1.5);ray(c,[top,ext(top,[fx,cy],MX),[sx,it[1]]],'#ffc65a',1.5);ray(c,[top,[MX,cy],ext([MX,cy],it,sx)],'#ffc65a',1.5);if(ix>40&&Math.abs(ix-sx)>6)candle(c,ix,cy,h,m,true,t)}
-  else{ray(c,[top,[MX,cy-h],[ox-40,cy-h-(h/(F*ppc))*(MX-ox+40)]],'#ffc65a',1.5);ray(c,[[MX,cy-h],[ix,cy-h*m]],'#ffc65a',1,[4,4]);candle(c,ix,cy,h,m,true,t);txt(c,'virtual image behind the mirror — none on screen',Math.min(560,ix),Math.max(122,cy-h*m-16),'#e9f6ff',10,'center',700)}
+  else{ray(c,[top,[MX,cy-h],[ox-40,cy-h+(h/(F*ppc))*(MX-ox+40)]],'#ffc65a',1.5);ray(c,[[MX,cy-h],[ix,cy-h*m]],'#ffc65a',1,[4,4]);candle(c,ix,cy,h,m,true,t);txt(c,'virtual image behind the mirror — none on screen',Math.min(560,ix),Math.max(122,cy-h*m-16),'#e9f6ff',10,'center',700)}
   post(c,sx,cy+70,BY);screenCard(c,sx,cy+4,cy+70,real?Math.abs(sx-ix)*.2:16,()=>candle(c,sx+12,cy,h,real?m:-1,false,t));
   dragDot(c,ox,BY-10,'candle');dragDot(c,sx+12,cy+86,'');panel(c,[`v = ${f(-v,1)} cm`,`1/v + 1/u = 1/f · f = −${F} cm`,`m = ${f(m,2)}`])},
  (q,p)=>q.y<150?null:Math.abs(q.x-SCR.mirror-12)<20&&q.y>254?'scr':'obj',(q,p,md)=>{if(md==='scr')SCR.mirror=clamp(Math.round(q.x-12),50,560);else p.u=clamp(snap((600-q.x)/6,1),5,60)});
@@ -82,7 +82,7 @@ make('total-internal-reflection',(c,p,t)=>boundary(c,p,t,p.n1,p.n2,p.th),q=>q.y<
 /* ---- real and apparent depth ---- */
 make('apparent-depth',(c,p,t)=>{const X=330,top=170,k=70,d=p.d,da=d/p.n;hint(c,'Drag the coin deeper or shallower');c.save();const g=c.createLinearGradient(0,top,0,top+230);g.addColorStop(0,'rgba(120,190,240,.35)');g.addColorStop(1,'rgba(30,90,150,.45)');c.fillStyle=g;c.fillRect(150,top,360,230);c.restore();c.strokeStyle='rgba(220,245,255,.8)';c.strokeRect(150,top-30,360,260);
   const cyR=top+d*k,cyA=top+da*k;c.save();c.fillStyle='#e0a930';c.beginPath();c.ellipse(X,cyR,24,6,0,0,TAU);c.fill();c.globalAlpha=.45;c.setLineDash([3,3]);c.strokeStyle='#ffd43b';c.beginPath();c.ellipse(X,cyA,24,6,0,0,TAU);c.stroke();c.restore();
-  ray(c,[[X+10,cyR],[X+40,top],[X+120,top-90]],'#ffd43b',1.6);ray(c,[[X+40,top],[X+10,cyA]],'#ffd43b',1,[4,4]);txt(c,'👁',X+128,top-98,'#e9f6ff',18,'center');txt(c,`real depth ${f(d,2)} m`,X-60,cyR,'#e0a930',10,'right',700);txt(c,`appears at ${f(da,2)} m`,X-60,cyA,'#ffd43b',10,'right',700);
+  const ea=Math.hypot(30,cyA-top),ex=X+30+30/ea*130,ey=top-(cyA-top)/ea*130;ray(c,[[X,cyR],[X+30,top],[ex,ey]],'#ffd43b',1.6);ray(c,[[X+30,top],[X,cyA]],'#ffd43b',1,[4,4]);txt(c,'👁',ex+6,ey-8,'#e9f6ff',18,'center');txt(c,`real depth ${f(d,2)} m`,X-60,cyR,'#e0a930',10,'right',700);txt(c,`appears at ${f(da,2)} m`,X-60,cyA,'#ffd43b',10,'right',700);
   dragDot(c,X,cyR,'coin');panel(c,[`apparent depth ${f(da,2)} m`,`d′ = d / n · n = ${p.n}`,`shift ${f(d-da,2)} m`])},
  q=>q.y>150?'c':null,(q,p)=>{p.d=clamp(snap((q.y-170)/70,.05),.2,3)});
 
@@ -132,7 +132,7 @@ make('astronomical-telescope',(c,p,t)=>{const cy=230,X0=110,k=2.6,xe=X0+p.fo*k*.
 /* ---- two inclined mirrors ---- */
 make('mirror-images',(c,p,t)=>{const O=[330,300],Lm=190,th=rad(p.th),A=-Math.PI/2-th/2,B=-Math.PI/2+th/2,ph=A+p.phi*th,ob=[O[0]+110*Math.cos(ph),O[1]+110*Math.sin(ph)];hint(c,'Drag the candle between the mirrors; set θ with the slider');
   for(const a of[A,B]){c.save();c.lineWidth=6;c.strokeStyle='#dee2e6';c.shadowColor='rgba(200,230,255,.6)';c.shadowBlur=8;c.beginPath();c.moveTo(...O);c.lineTo(O[0]+Lm*Math.cos(a),O[1]+Lm*Math.sin(a));c.stroke();c.restore()}
-  const imgs=[];const refl=(pt,a)=>{const dx=pt[0]-O[0],dy=pt[1]-O[1],ca=Math.cos(2*a),sa=Math.sin(2*a);return[O[0]+dx*ca+dy*sa,O[1]+dx*sa-dy*ca]};let fr=[ob],seen=[ob];for(let k=0;k<12&&fr.length;k++){const nx=[];for(const q of fr)for(const a of[A,B]){const r=refl(q,a);if(!seen.some(s=>Math.hypot(s[0]-r[0],s[1]-r[1])<4)){seen.push(r);nx.push(r);imgs.push(r)}}fr=nx}
+  const imgs=[];const refl=(pt,a)=>{const dx=pt[0]-O[0],dy=pt[1]-O[1],ca=Math.cos(2*a),sa=Math.sin(2*a);return[O[0]+dx*ca+dy*sa,O[1]+dx*sa-dy*ca]};let fr=[ob],seen=[ob];for(let k=0;k<12&&fr.length;k++){const nx=[];for(const q of fr)for(const a of[A,B]){const r=refl(q,a);if(!seen.some(s=>Math.hypot(s[0]-r[0],s[1]-r[1])<4)){seen.push(r);imgs.push(r);let w=(Math.atan2(r[1]-O[1],r[0]-O[0])-A)%TAU;if(w<0)w+=TAU;if(!(w>=Math.PI-1e-6&&w<=Math.PI+th+1e-6))nx.push(r)}}fr=nx}
   for(const q of imgs){c.save();c.globalAlpha=.55;c.fillStyle='#ffd43b';c.beginPath();c.arc(q[0],q[1],6,0,TAU);c.fill();c.restore()}candle(c,ob[0],ob[1]+12,26,1,false,t);dragDot(c,ob[0],ob[1],'object');panel(c,[`${imgs.length} images`,`θ = ${p.th}° → 360/θ = ${f(360/p.th,2)}`,'faint dots: images'])},
  q=>'o',(q,p)=>{const a=Math.atan2(q.y-300,q.x-330),th=rad(p.th),A=-Math.PI/2-th/2;p.phi=clamp(snap((a-A)/th,.05),.1,.9)});
 })();

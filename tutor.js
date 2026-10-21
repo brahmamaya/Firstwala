@@ -18,7 +18,7 @@ const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher
 // Landing: two buttons. "Simulations" opens Student and Teacher underneath (as before); "Rank mode" opens its exams.
 const simBtn=btn('land-grade land-mode land-sim',null,()=>{const on=!simSub.classList.contains('open');if(on)rankOpen(false);simOpen(on)});
 simBtn.setAttribute('aria-expanded','false');simBtn.setAttribute('aria-controls','sim-sub');simBtn.dataset.testid='mode-simulations';
-const simBtnIc=el('span','sim-ic','▶');simBtnIc.setAttribute('aria-hidden','true');simBtn.append(simBtnIc,el('b','','Simulations'),el('small','','Student or Teacher · 2D, 3D and ultra-realistic'));
+const simBtnIc=el('span','sim-ic','▶');simBtnIc.setAttribute('aria-hidden','true');simBtn.append(simBtnIc,el('b','','Simulations'),el('small','','Student or Teacher · 2D and ultra-realistic'));
 const simSub=el('div','sim-sub');simSub.id='sim-sub';simSub.inert=true;const simIn=el('div','sim-sub-in');simSub.append(simIn);
 const simOpen=open=>{simSub.classList.toggle('open',open);simBtn.setAttribute('aria-expanded',String(open));simSub.inert=!open;simBtn.classList.toggle('open',open)};
 // Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
