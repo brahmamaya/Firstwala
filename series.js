@@ -114,8 +114,11 @@ async function finalize(a, t, ix) {
 const HEX = a => a.map(b => b.toString(16).padStart(2, '0')).join('');
 const LOCAL = {
   async list_tests({ p_exam }) {
-    const ix = await index(), mine = dbLoad().a || {}, pat = {};
+    const ix = await index(), db = dbLoad(), mine = db.a || {}, pat = {};
     const ts = ix.tests.filter(t => t.exam === p_exam);
+    let changed = false;
+    for (const t of ts) { const a = mine[t.id]; if (a && !a.done && Date.now() > a.dl) { await finalize(a, t, ix); changed = true; } }   // time ran out while the page was closed: score it now
+    if (changed) dbSave(db);
     for (const t of ts) { const p = ix.patterns[t.pat]; pat[t.pat] = pat[t.pat] || { l: p.label, m: p.minutes, pp: p.papers, q: secTotal(p.sections), mx: secMax(p.sections), s: p.sections }; }
     return { pat, tests: ts.map(t => { const a = mine[t.id]; return { id: t.id, n: t.n, p: t.p, pat: t.pat, f: true, lk: false, t: t.t || undefined, a: a ? a.id : undefined, s: a && a.done ? a.score : undefined, d: !!(a && a.done) }; }) };
   },
