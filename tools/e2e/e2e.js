@@ -117,6 +117,22 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   ok(await A.page.locator(OV + ' details.ps-sec:nth-of-type(1) .ps-q2').count() === 45, 'review of Physics loads 45 questions on demand');
   await A.page.click(OV + ' details.ps-sec:nth-of-type(1) .ps-q2:nth-child(1) summary'); await A.page.waitForSelector(OV + ' .ps-rb .ps-sub');
   ok(/Sample solution 1\./.test(await A.page.textContent(OV + ' .ps-rb')) && await A.page.locator(OV + ' .ps-rb .ps-opt.right').count() === 1, 'a reviewed question shows solution and correct option');
+  console.log('--- reattempt: results of every attempt stay saved ---');
+  ok(await A.page.locator(OV + ' button:has-text("Reattempt this test")').count() === 1, 'the result page offers "Reattempt this test"');
+  const firstScore = (await A.page.textContent(OV + ' .ps-big2')).trim();
+  await A.page.click(OV + ' button:has-text("Reattempt this test")'); await A.page.waitForSelector(OV + ' h2:has-text("General instructions")');
+  ok(/attempt 2 of this test/.test(await A.page.textContent(OV + ' .ps-banner')), 'instructions say "This will be attempt 2" and that the earlier result stays saved');
+  await A.page.check('#ps-read'); await A.page.click(OV + ' button:has-text("I am ready to begin")'); await A.page.waitForSelector('.px-time');
+  ok(/Time Left: 02:59:/.test(await A.page.textContent('.px-time')) && /Not answered|Not visited/.test(await A.page.getAttribute('.px-pb[aria-label^="Question 1,"]', 'aria-label')), 'a reattempt starts a fresh paper with a full 3 hours and no answers');
+  await A.page.click(opt(1)); await A.page.click('.px ' + SAVE);
+  await A.page.click('.px button:has-text("Submit")'); await A.page.waitForSelector('.px-modal'); await A.page.click('.px-modal button:has-text("Yes, submit")'); await A.page.waitForSelector(OV + ' .ps-score');
+  ok(/Attempt 2/.test(await A.page.textContent(OV + ' h1')) && await A.page.locator(OV + ' h2:has-text("Your attempts (2)")').count() === 1 && await A.page.locator(OV + ' .ps-tbl tbody tr').count() >= 2, 'result shows "Attempt 2" and a table with both attempts');
+  await A.page.click(OV + ' button.ps-link:has-text("Open")'); await A.page.waitForSelector(OV + ' h1:has-text("Attempt 1")');
+  ok((await A.page.textContent(OV + ' .ps-big2')).trim() === firstScore, 'the first attempt can be opened again with its original score');
+  await A.page.click(OV + ' details.ps-sec:nth-of-type(1) summary'); await A.page.waitForSelector(OV + ' details.ps-sec:nth-of-type(1) .ps-q2');
+  ok(await A.page.locator(OV + ' details.ps-sec:nth-of-type(1) .ps-q2').count() === 45, 'and its answer review still works');
+  await A.page.click(OV + ' button:has-text("All tests")'); await A.page.waitForSelector(OV + ' .ps-tcard');
+  ok(/Attempts: 2/.test(await A.page.textContent(OV + ' .ps-tcard:nth-child(1)')) && /Best/.test(await A.page.textContent(OV + ' .ps-tcard:nth-child(1)')), 'hub shows "Attempts: 2 · Best ..." on the test card');
   ok(A.st.ext.length === 0 && A.st.err.length === 0 && A.st.csp.length === 0, 'whole NEET run: no external requests, no page errors, no CSP violations ' + JSON.stringify([A.st.ext.slice(0, 2), A.st.err.slice(0, 2)]));
   await A.ctx.close();
 
