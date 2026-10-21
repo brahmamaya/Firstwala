@@ -34,7 +34,8 @@ function setHead(){const back=btn('rk-back','← Back',goBack);back.dataset.test
   const t=el('div','rk-title');t.append(el('b','',picking()?X.label:(chap||CH())),el('span','',picking()?'Rank mode · choose a subject':'Rank mode · '+X.label+(X.pick?' · Physics':'')));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
   for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||(X.pyq&&PYQ_CH.includes(CH())))){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
-  head.replaceChildren(back,t,tabsEl);window.PhysicaTheme?.mountToggle(head,'rk-theme');ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''))}
+  const sb=btn('rk-pill rk-series','📝 Test Series',()=>{});sb.dataset.seriesExam=X.bank==='neet'?'NEET':'JEE_MAIN';sb.dataset.testid='rk-series';sb.setAttribute('aria-label','Open the full-length Test Series for '+X.label);
+  head.replaceChildren(back,t,tabsEl,sb);window.PhysicaTheme?.mountToggle(head,'rk-theme');ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''))}
 function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
   ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.dataset.testid='rank-neet-page';
   head=el('div','rk-head');chap=null;subj='physics';tab='guide';setHead();

@@ -1,0 +1,20 @@
+name: Checks
+# Fast checks on every change: secrets, private files, content tool, watchdog, size budget. No server or database is involved.
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: node -e "require('./tools/secret-guard.js')('.')"
+      - run: node tools/private-guard.js
+      - run: node tools/series-import.test.js
+      - run: node tools/watchdog.test.js
+      - run: node tools/perf-budget.js

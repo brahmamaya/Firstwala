@@ -1,0 +1,1 @@
+{ "name": "physica-series-e2e", "private": true, "version": "1.0.0", "dependencies": { "playwright-core": "^1.50.0", "axe-core": "^4.10.0" } }
