@@ -60,6 +60,7 @@ async function mock(method, url, headers, body) {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function newPage(browser, opts = {}) {
   const ctx = await browser.newContext({ viewport: opts.viewport || { width: 1100, height: 900 }, acceptDownloads: true, bypassCSP: !!opts.bypassCSP, ignoreHTTPSErrors: !!opts.h2, serviceWorkers: opts.h2 ? 'block' : 'allow' });
+  if (!opts.notLive) await ctx.addInitScript(() => { window.__PS_LIVE = true; });
   const page = await ctx.newPage();
   const st = { csp: [], err: [], ga: [], track: [], saves: [], offline: false };
   page.on('console', m => { if (/Content Security Policy|Refused to/.test(m.text())) st.csp.push(m.text()); });
@@ -179,7 +180,7 @@ const lastAttempt = async email => (await db.query("select a.id, a.ans, a.fl, a.
   console.log('\n=== 2. login, then the 30-test hub ===');
   await login(A.page, 'neet1@example.com', false, 'neet'); await finishProfile(A.page, 'Asha');
   await A.page.waitForSelector(OV + ' h1:has-text("NEET")');
-  ok(/180 questions · 720 marks · 3 h/.test(await A.page.textContent(OV + ' .ps-muted')), 'hub header shows the real NEET 2026 pattern: 180 questions, 720 marks, 3 h');
+  ok(/180 questions · 720 marks · 3 h/.test(await A.page.textContent(OV + ' .ps-muted')), 'hub header shows the real NEET 2027 pattern: 180 questions, 720 marks, 3 h');
   ok(await A.page.locator(OV + ' .ps-tcard').count() === 30, 'exactly 30 test slots');
   ok(await A.page.locator(OV + ' .ps-pill.free').count() === 3 && await A.page.locator(OV + ' .ps-pill.paid').count() === 27, 'tests 1-3 are FREE, 4-30 are PAID');
   ok(await A.page.locator(OV + ' .ps-tcard.soon').count() === 25, 'published tests are active, the other 25 show "Coming soon"');
@@ -192,6 +193,7 @@ const lastAttempt = async email => (await db.query("select a.id, a.ans, a.fl, a.
   console.log('\n=== 3. general instructions before the timer ===');
   await A.page.click(OV + ' .ps-tcard:nth-child(1) button');
   await A.page.waitForSelector(OV + ' h2:has-text("General instructions")');
+  ok(await A.page.locator(OV + ' .ps-quote blockquote').count() === 1 && (await A.page.locator(OV + ' .ps-quote blockquote').innerText()).length > 20, 'a motivational quote is shown before the test starts');
   ok(await A.page.locator(OV + ' .ps-tbl tbody tr').count() === 4 && /\+4/.test(await A.page.textContent(OV + ' .ps-tbl')) && /−1/.test(await A.page.textContent(OV + ' .ps-tbl')), 'marking scheme table: 4 subjects, +4 / −1');
   ok(await A.page.locator(OV + ' .ps-lg').count() === 5, 'palette legend explains all 5 statuses');
   ok(await A.page.isDisabled(OV + ' button:has-text("I am ready to begin")'), '"I am ready to begin" stays disabled until the instructions are acknowledged');
@@ -396,6 +398,14 @@ const lastAttempt = async email => (await db.query("select a.id, a.ans, a.fl, a.
   await login(I.page, 'idle@example.com', false, 'neet'); await finishProfile(I.page, 'Omar'); await I.page.waitForSelector(OV + ' .ps-tcard');
   await I.page.clock.fastForward('31:00'); await I.page.waitForSelector('#ps-email', { timeout: 8000 }).catch(() => {});
   ok(await I.page.locator('#ps-email').count() === 1, 'an unattended, non-remembered session is signed out after 30 minutes'); await I.ctx.close();
+
+  // =================== 10b. launch switch ===================
+  console.log('\n=== 10b. launch switch off: honest "opens soon", nothing is loaded ===');
+  { const X = await newPage(browser, { notLive: true }); await X.page.goto(BASE, { waitUntil: 'load' }); await X.page.click('.ga-ask :text("No thanks")').catch(() => {});
+    await sleep(1500); ok(await X.page.locator('[data-testid=series-note]').count() === 0, 'switch off: no landing notice');
+    await X.page.click('[data-testid=mode-rank]'); await X.page.click('[data-testid=rank-neet]'); await X.page.waitForSelector('[data-testid=rk-series]'); await X.page.click('[data-testid=rk-series]');
+    await sleep(400); ok(/opens very soon/.test(await X.page.locator('#toast').innerText()) && await X.page.locator(OV + ':not([hidden])').count() === 0, 'switch off: the pill says it opens soon and no series screen or server call starts');
+    await X.ctx.close(); }
 
   // =================== 11. legal pages ===================
   console.log('\n=== 11. legal pages ===');

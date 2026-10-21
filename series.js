@@ -5,6 +5,8 @@
 (() => {
 'use strict';
 const SUPA = 'https://lbyqvwkichjvrrzcddtq.supabase.co';
+const GW = '';                          // API gateway address (see gateway/README.md). Empty = talk to Supabase directly.
+const BASE = GW || SUPA;
 const KEY = 'sb_publishable_E3vG7C6UN13-1PoWwJNauA_uq7zvZxi';
 const STORE = 'physica-series-auth';
 const TERMS = '2026-10-21';            // must equal private.current_terms() in supabase/schema.sql
@@ -34,6 +36,11 @@ const MSG = {
   exams_paused: 'New tests cannot be started right now. Tests already in progress are not affected.',
   signups_closed: 'New sign-ups are paused for a short while. Please try again later.',
   invalid_device: 'Could not register this device.',
+  review_expired: 'The question-by-question review is kept for 30 days. Your score and rank are still saved.',
+  busy: 'Physica is very busy right now. Your answers are kept; please wait a few seconds and try again.',
+  upstream: 'Our server had a hiccup. Please try again in a moment.',
+  upstream_timeout: 'Our server is slow right now. Please try again in a moment.',
+  gateway_required: 'Please reload the page and try again.',
 };
 const say = e => MSG[e && e.code] || (e && e.status === 429 ? MSG.over_email_send_rate_limit : 'Something went wrong. Please try again.');
 
@@ -88,15 +95,16 @@ const save = s => { sess = s; lsSet(STORE, null); ssSet(STORE, null); if (s) (re
 const now = () => Math.floor(Date.now() / 1000);
 
 async function raw(path, { method = 'GET', body, token, keepalive } = {}) {
-  const headers = { apikey: KEY, 'Content-Type': 'application/json' };
+  const headers = { 'Content-Type': 'application/json' };
+  if (!GW) headers.apikey = KEY;               // behind the gateway the key is added there
   if (token) headers.Authorization = 'Bearer ' + token;
   let r;
-  try { r = await fetch(SUPA + path, { method, headers, keepalive: !!keepalive, body: body === undefined ? undefined : JSON.stringify(body) }); }
+  try { r = await fetch(BASE + path, { method, headers, keepalive: !!keepalive, body: body === undefined ? undefined : JSON.stringify(body) }); }
   catch { throw err('network'); }
   const txt = await r.text();
   let data = null;
   try { data = txt ? JSON.parse(txt) : null; } catch {}
-  if (!r.ok) throw err((data && (data.error_code || data.message || data.msg)) || 'http_' + r.status, r.status);
+  if (!r.ok) throw err((data && (data.error_code || data.error || data.message || data.msg)) || 'http_' + r.status, r.status);
   return data;
 }
 
@@ -116,6 +124,8 @@ async function api(path, opts = {}) {
   try { return await raw(path, { ...opts, token: sess.access_token }); }
   catch (e) { if (e.status !== 401) throw e; await refresh(); return raw(path, { ...opts, token: sess.access_token }); }
 }
+let stAt = 0, stVal = null;               // status is the same for everyone: reuse it for 20 s instead of asking again on every screen
+const status = async () => { if (stVal && Date.now() - stAt < 20000) return stVal; const v = await raw('/rest/v1/rpc/get_status', { method: 'POST', body: {} }); stVal = v && !v.lockdown && !v.maintenance ? v : null; stAt = Date.now(); return v; };   // only a normal status is reused
 const rpc = (fn, args, keepalive) => api('/rest/v1/rpc/' + fn, { method: 'POST', body: args || {}, keepalive });
 const sendCode = email => raw('/auth/v1/otp', { method: 'POST', body: { email, create_user: true } });
 const verifyCode = async (email, code, keep) => { const d = await raw('/auth/v1/verify', { method: 'POST', body: { type: 'email', email, token: code } }); remember = !!keep; adopt(d); };
@@ -131,6 +141,7 @@ const CSS = `
 .ps-ov h1,.ps-ov h2,.ps-ov h3{margin:.2em 0 .5em;line-height:1.25}
 .ps-ov{--ps-ok:#59e08f;--ps-err:#ff8a93;--ps-warn:#ffb347;--ps-link:var(--blue);--ps-s0:#2a3a4a;--ps-s0t:#eff8ff;--ps-s0b:#5b7186;--ps-s1:#c62828;--ps-s2:#2e7d32;--ps-s3:#6a1b9a}
 :root[data-theme="light"] .ps-ov{--ps-ok:#0b6b3a;--ps-err:#b3261e;--ps-warn:#8a5300;--ps-link:#1a4fb8;--ps-s0:#e6e9ee;--ps-s0t:#1b2530;--ps-s0b:#9aa6b4}
+.ps-quote{margin:12px 0;border-left:4px solid var(--ps-link)}.ps-quote blockquote{margin:0;font-size:1.05em;line-height:1.5}.ps-quote figcaption{margin-top:6px;font-size:.9em;color:var(--muted)}
 .ps-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
 .ps-ov button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);padding:9px 14px}
 .ps-ov button:hover:not(:disabled){border-color:var(--mint)}.ps-ov button:disabled{opacity:.5;cursor:default}
@@ -276,13 +287,12 @@ function fatal(e, retry) {
 /* ---------- views ---------- */
 let statusMsg = null;
 async function view() {
-  try { const st = await raw('/rest/v1/rpc/get_status', { method: 'POST', body: {} }); statusMsg = st && st.message && !st.lockdown ? st.message : null; if (st && st.lockdown) return fatal(err('lockdown')); } catch {}
+  try { const st = await status(); statusMsg = st && st.message && !st.lockdown ? st.message : null; if (st && st.lockdown) return fatal(err('lockdown')); } catch {}
   if (!sess) return loginView();
   loading();
   try {
     if (!deviceNoted) { await rpc('note_device', { p_device: deviceId() }); deviceNoted = true; }
-    const rows = await api('/rest/v1/profiles?select=display_name,is_minor,parent_consent_at,parent_email,terms_version&id=eq.' + encodeURIComponent(sess.user.id));
-    const p = rows && rows[0];
+    const p = await rpc('get_my_profile');
     if (!p || p.is_minor == null || (p.is_minor && !(p.parent_consent_at && p.parent_email)) || p.terms_version !== TERMS) return profileView(p);
     profileName = p.display_name || '';
     hubView(curExam);
@@ -428,6 +438,26 @@ async function hubView(exam) {
   } catch (e) { fatal(e, () => hubView(exam)); }
 }
 
+/* ---------- a short line of encouragement before the timer starts (original lines + a few well-documented sayings) ---------- */
+const QUOTES = [
+  ['Ek test sirf ek photo hai, poori film nahi. Aaj ki galti kal ka marks bachayegi.', ''],
+  ['Every mock you finish is one less surprise on the real exam day.', ''],
+  ['Panic is loud, practice is quiet. Trust the hours you have put in.', ''],
+  ['Kal se behtar bano, doosron se nahi. Rank baad mein apne aap aa jaati hai.', ''],
+  ['Do not fear a wrong answer today; fear never finding out why it was wrong.', ''],
+  ['Pehle jo aata hai woh pakka karo, phir baaki par jao. Smart attempt hi score banata hai.', ''],
+  ['A calm mind solves faster than a worried one. Breathe in, read the question twice, begin.', ''],
+  ['Consistency beats intensity: small daily effort, big result in January and May.', ''],
+  ['Darr ko deadline mat banne do. Tum taiyaar ho, bas shuru karo.', ''],
+  ['Hard questions are meant for everyone. Stay steady and collect the marks you can.', ''],
+  ['Dream, dream, dream. Dreams transform into thoughts and thoughts result in action.', 'Dr A. P. J. Abdul Kalam'],
+  ['Arise, awake, and stop not till the goal is reached.', 'Swami Vivekananda'],
+  ['Genius is one percent inspiration and ninety-nine percent perspiration.', 'Thomas A. Edison'],
+  ['You miss 100% of the shots you do not take.', 'Wayne Gretzky']
+];
+const quoteCard = seed => { const q = QUOTES[(seed + Math.floor(Date.now() / 864e5)) % QUOTES.length];
+  return h('figure', { class: 'ps-card ps-quote' }, h('blockquote', null, '“' + q[0] + '”'), q[1] ? h('figcaption', null, '— ' + q[1]) : null); };
+
 /* ---------- general instructions (like the real exam, shown before the timer starts) ---------- */
 function instructionsView(t, pat) {
   loadExam().catch(() => {});                          // fetch the exam screen while the student reads
@@ -446,6 +476,7 @@ function instructionsView(t, pat) {
   chk.onchange = () => { go.disabled = !chk.checked; };
   show(h('button', { type: 'button', class: 'ps-link', onclick: () => hubView(curExam) }, '← All tests'),
     h('h1', null, `${pat.l} · Test ${t.n}${pat.pp > 1 ? ' · Paper ' + t.p : ''}`),
+    quoteCard(t.n),
     h('div', { class: 'ps-card' }, h('h2', null, 'General instructions'),
       h('ul', null,
         h('li', null, `The test has ${pat.q} questions, ${pat.mx} marks and lasts `, h('b', null, dur(pat.m)), '. The timer runs on our server from the moment you click “I am ready to begin”. It does not stop if you close the page.'),
@@ -469,7 +500,7 @@ const loadExam = () => window.PhysicaSeriesExam ? Promise.resolve() : examWait |
   const s = document.createElement('script'); s.src = '__SERIES_EXAM_URL__'; s.async = true; s.onload = ok; s.onerror = () => { examWait = null; s.remove(); no(err('network')); }; document.head.append(s);
 }));
 const kit = {
-  h, rt, rich, rpc, say, sleep, SUPA, EXAM_NAME: NAME, SUBJ, KIND, minus, dur, secLabel,
+  h, rt, rich, rpc, say, sleep, SUPA: BASE, EXAM_NAME: NAME, SUBJ, KIND, minus, dur, secLabel,
   name: () => profileName || 'Candidate', email: () => sess && sess.user && sess.user.email,
   full: on => ov.classList.toggle('ps-full', !!on),
   live: on => { examLive = !!on; ov.classList.toggle('ps-exam', !!on); },
@@ -555,6 +586,7 @@ async function resultView(attemptId) {
     h('div', { class: 'ps-card ps-score' }, h('div', { class: 'ps-big2' }, `${r.score}`, h('small', null, ` / ${r.total}`)),
       h('p', null, r.of > 1 ? `Rank ${r.rank} of ${r.of} who have taken this test${top ? ` · top ${top}%` : ''}` : 'You are the first to finish this test.'),
       h('p', { class: 'ps-muted' }, `Time used: ${clock(r.used * 60)} of ${dur(r.min)}`)),
+    h('p', { class: 'ps-card ps-quote' }, r.score >= r.total * 0.6 ? 'Strong attempt. Read the review below, fix the few slips, and push the next one higher.' : 'Every score is data, not a verdict. Open the review, find the two or three topics that cost you most marks, and fix those first.'),
     h('div', { class: 'ps-grid' }, subjectCards), reviewBox);
 }
 function reviewItem(it, sec) {
@@ -565,7 +597,7 @@ function reviewItem(it, sec) {
   const det = h('details', { class: 'ps-q2 ' + state, ontoggle: () => {
     if (!det.open || body.firstChild) return;
     body.append(rt('div', q.b, 'ps-q'));
-    if (q.f) body.append(h('img', { class: 'ps-fig', src: `${SUPA}/storage/v1/object/public/q/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
+    if (q.f) body.append(h('img', { class: 'ps-fig', src: `${BASE}/storage/v1/object/public/q/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
     if (q.o) q.o.forEach((o, j) => { const L = 'ABCDEF'[j], isK = correct !== 'bonus' && correct.includes(L), isY = mine.includes(L);
       body.append(h('div', { class: 'ps-opt' + (isK ? ' right' : isY ? ' wrong' : '') }, h('b', null, L + '. '), rt('span', o), isK ? h('b', { class: 'ps-ok' }, ' ✓ correct') : null, isY && !isK ? h('b', { class: 'ps-err' }, ' ✗ yours') : (isY ? h('b', { class: 'ps-muted' }, ' (yours)') : null))); });
     else body.append(h('p', null, 'Your answer: ', h('b', null, mine || '—'), ' · Correct: ', h('b', { class: 'ps-ok' }, correct === 'bonus' ? 'bonus (full marks to all)' : correct.replace(':', ' to '))));

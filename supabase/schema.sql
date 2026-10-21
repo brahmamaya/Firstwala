@@ -42,7 +42,7 @@ create table if not exists public.profiles (
   created_at        timestamptz not null default now()
 );
 
--- Exam pattern = one row per official format (e.g. JEE_MAIN_2026). Sections run in order; questions of a test follow the same order.
+-- Exam pattern = one row per official format (e.g. JEE_MAIN_2027). Sections run in order; questions of a test follow the same order.
 -- section keys: id, s subject, nm name, t type MCQ|MULTI|NUM, n count, c marks if right, w marks if wrong (<= 0), p marks per right option when only partly right (MULTI).
 -- Marks are stored here ONCE, never repeated on each question. Edit supabase/patterns.json and re-run `node tools/series-import.js patterns`.
 create table if not exists public.exam_patterns (
@@ -144,8 +144,11 @@ create table if not exists public.app_settings (
   signups_open boolean not null default true,         -- false: no new account can be created
   lockdown     boolean not null default false,        -- PANIC: every student API call is refused
   message      text check (message is null or char_length(message) <= 300),
+  gateway_hash text,                                  -- sha256 of the secret the API gateway sends; null = gateway not enforced yet
   updated_at   timestamptz not null default now()
 );
+alter table public.app_settings add column if not exists gateway_hash text;
+alter table public.app_settings add column if not exists max_users int not null default 10000 check (max_users > 0);
 insert into public.app_settings (id) values (true) on conflict do nothing;
 
 -- Devices that signed in, as one-way hashes of a random id kept in the browser (not a fingerprint, no IP/user-agent).
@@ -171,12 +174,15 @@ create index if not exists enrollments_test_idx   on public.enrollments (test_id
 create index if not exists integrity_attempt_idx  on public.integrity_events (attempt_id);
 create index if not exists audit_at_idx           on public.audit_log (at);
 create index if not exists audit_actor_idx        on public.audit_log (actor);
+create index if not exists audit_action_idx       on public.audit_log (action, at);
 
 -- ============================================================ auth triggers + helpers
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
   if not (select signups_open from public.app_settings where id) then raise exception 'signups_closed' using errcode = 'P0001'; end if;
+  -- free-plan guard: no more than max_users accounts (default 10,000). Raise it with: update public.app_settings set max_users = 20000;
+  if (select count(*) from public.profiles) >= (select max_users from public.app_settings where id) then raise exception 'signups_closed' using errcode = 'P0001'; end if;
   insert into public.profiles (id) values (new.id) on conflict do nothing;
   return new;
 end $$;
@@ -233,6 +239,8 @@ declare s public.app_settings; locked timestamptz;
 begin
   select * into s from public.app_settings where id;
   if s.lockdown then raise exception 'lockdown' using errcode = 'P0001'; end if;
+  if s.gateway_hash is not null and coalesce(encode(sha256(convert_to(coalesce(nullif(current_setting('request.headers', true), '')::json ->> 'x-gateway-key', ''), 'UTF8')), 'hex'), '') <> s.gateway_hash
+    then raise exception 'gateway_required' using errcode = 'P0001'; end if;      -- once the gateway is live, direct calls are refused
   if not p_allow_locked then
     select locked_at into locked from public.profiles where id = p_uid;
     if locked is not null then raise exception 'account_locked' using errcode = 'P0001'; end if;
@@ -636,6 +644,7 @@ begin
   select * into a from public.attempts where id = p_attempt and user_id = uid;
   if not found then raise exception 'attempt_not_found' using errcode = 'P0002'; end if;
   if a.submitted_at is null then raise exception 'attempt_in_progress' using errcode = 'P0001'; end if;
+  if cardinality(a.ans) = 0 then raise exception 'review_expired' using errcode = 'P0001'; end if;      -- answers were compacted away (private.compact_attempts)
   select p.* into pat from public.exam_patterns p join public.tests t on t.pattern_id = p.id where t.id = a.test_id;
   if p_section is null or p_section < 0 or p_section >= jsonb_array_length(pat.sections) then raise exception 'invalid_section' using errcode = '22023'; end if;
   select c.qs into qs from public.test_content c where c.test_id = a.test_id;
@@ -748,6 +757,29 @@ begin
   return n;
 end $$;
 
+-- Keeps the database inside the free plan: after p_days the per-question answers/timings of a SUBMITTED attempt are dropped.
+-- The scorecard (score, per-section detail, rank) stays; only the question-by-question review expires. ~1.1 KB -> ~0.2 KB per attempt.
+create or replace function private.compact_attempts(p_days int default 30) returns bigint
+language plpgsql security definer set search_path = '' as $$
+declare n bigint;
+begin
+  if p_days < 14 then raise exception 'too_soon'; end if;
+  with c as (update public.attempts set ans = '{}', fl = '\x'::bytea, tm = '{}'
+              where submitted_at is not null and submitted_at < now() - make_interval(days => p_days) and cardinality(ans) > 0 returning 1)
+  select count(*) into n from c;
+  delete from public.integrity_events e using public.attempts a where e.attempt_id = a.id and a.submitted_at < now() - make_interval(days => p_days);
+  insert into public.audit_log (action, meta) values ('system.compact_attempts', jsonb_build_object('days', p_days, 'compacted', n));
+  return n;
+end $$;
+
+-- How full is the free plan? Run: select * from private.ops_storage();   (free limit = 500 MB database)
+create or replace function private.ops_storage(p_limit_mb numeric default 500) returns table (what text, mb numeric, pct_of_limit numeric)
+language sql security definer set search_path = '' as $$
+  select 'whole database', round(pg_database_size(current_database()) / 1048576.0, 1), round(pg_database_size(current_database()) / 10485.76 / p_limit_mb, 1)
+  union all select t, round(pg_total_relation_size(('public.' || t)::regclass) / 1048576.0, 1), round(pg_total_relation_size(('public.' || t)::regclass) / 10485.76 / p_limit_mb, 1)
+  from unnest(array['attempts', 'audit_log', 'integrity_events', 'test_content', 'test_keys', 'analytics_daily']) t
+$$;
+
 create or replace function private.purge_audit(p_days int default 365) returns bigint
 language plpgsql security definer set search_path = '' as $$
 declare n bigint;
@@ -756,6 +788,16 @@ begin
   with del as (delete from public.audit_log where at < now() - make_interval(days => p_days) returning 1)
   select count(*) into n from del;
   return n;
+end $$;
+
+create or replace function public.get_my_profile() returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare uid uuid := (select auth.uid());
+begin
+  if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid, true);
+  return (select jsonb_build_object('display_name', p.display_name, 'is_minor', p.is_minor, 'parent_consent_at', p.parent_consent_at,
+                                    'parent_email', p.parent_email, 'terms_version', p.terms_version) from public.profiles p where p.id = uid);
 end $$;
 
 create or replace function public.get_status() returns jsonb
@@ -842,6 +884,16 @@ begin
   insert into public.audit_log (action, meta) values ('ops.panic', jsonb_build_object('on', p_on, 'sessions_killed', n));
   return case when p_on then 'LOCKDOWN ON; sessions killed: ' || n else 'lockdown off' end;
 end $$;
+-- Gateway wall. ops_set_gateway_key('the-secret') makes the database accept student calls only if they carry that secret in
+-- the x-gateway-key header (the gateway adds it). ops_set_gateway_key(null) switches enforcement off again. Only the hash is stored.
+create or replace function private.ops_set_gateway_key(p_key text) returns text
+language plpgsql security definer set search_path = '' as $$
+begin
+  if p_key is not null and char_length(p_key) < 32 then raise exception 'key_too_short'; end if;
+  update public.app_settings set gateway_hash = case when p_key is null then null else encode(sha256(convert_to(p_key, 'UTF8')), 'hex') end, updated_at = now() where id;
+  insert into public.audit_log (action, meta) values ('ops.gateway_key', jsonb_build_object('enforced', p_key is not null));
+  return case when p_key is null then 'gateway NOT enforced' else 'gateway enforced' end;
+end $$;
 create or replace function private.ops_set_status(p_maintenance boolean default null, p_exams_open boolean default null, p_signups_open boolean default null, p_message text default null) returns text
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -881,9 +933,9 @@ revoke all on function public.save_profile(text, boolean, boolean, text, text), 
                        public.get_attempt(uuid), public.save_state(uuid, jsonb), public.submit_attempt(uuid), public.get_result(uuid),
                        public.get_review(uuid, int), public.log_event(uuid, text), public.export_my_data(), public.delete_my_account(),
                        public.track(text, text), public.admin_stats(int), public.get_status(),
-                       public.note_device(text), public.list_devices(text) from public, anon;
+                       public.note_device(text), public.list_devices(text), public.get_my_profile() from public, anon;
 grant execute on function public.track(text, text), public.get_status() to anon, authenticated;
 grant execute on function public.is_admin(), public.admin_stats(int), public.note_device(text), public.list_devices(text), public.save_profile(text, boolean, boolean, text, text),
                           public.list_tests(text), public.start_attempt(int), public.get_attempt(uuid), public.save_state(uuid, jsonb), public.submit_attempt(uuid),
                           public.get_result(uuid), public.get_review(uuid, int), public.log_event(uuid, text), public.export_my_data(),
-                          public.delete_my_account() to authenticated;
+                          public.delete_my_account(), public.get_my_profile() to authenticated;

@@ -25,6 +25,6 @@ fs.writeFileSync(path.join(tmp, 'broken.json'), '{ nope'); fs.mkdirSync(path.joi
 r = run('check', path.join(tmp, 'j')); ok(r.status === 1 && /not valid JSON/.test(r.stderr), 'caught: file that is not valid JSON');
 r = run('check', path.join(tmp, 'wrong-count')); ok(r.status === 1 && !fs.existsSync(path.join(tmp, 'build.sql')), 'a failed check writes nothing');
 r = run('sql', tmp + '/good', '--publish'); ok(r.status === 0 && /insert into public\.test_content/.test(r.stdout) && /set published = true/.test(r.stdout) && r.stdout.startsWith('-- generated') && /\ncommit;\n$/.test(r.stdout), 'generated SQL is one transaction with content, keys and publish');
-r = run('patterns'); ok(r.status === 0 && /JEE_MAIN_2026/.test(r.stdout) && /NEET_2026/.test(r.stdout) && /JEE_ADV_2026/.test(r.stdout), 'patterns SQL covers all three exams');
+r = run('patterns'); ok(r.status === 0 && /JEE_MAIN_2027/.test(r.stdout) && /NEET_2027/.test(r.stdout) && /JEE_ADV_2027/.test(r.stdout), 'patterns SQL covers all three exams');
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(fails ? `\n${fails} FAILED` : '\nIMPORT TOOL TESTS PASSED'); process.exit(fails ? 1 : 0);

@@ -15,7 +15,7 @@ Check the numbers against the official bulletin of the year and edit them there;
 Folder layout (any layout works, the content decides): `content/NEET/01.json`, `content/JEE_MAIN/07.json`, `content/JEE_ADV/12-p2.json` (paper 2).
 ```json
 {
-  "exam": "NEET", "series": 4, "paper": 1, "pattern": "NEET_2026", "title": null, "price": null,
+  "exam": "NEET", "series": 4, "paper": 1, "pattern": "NEET_2027", "title": null, "price": null,
   "q": [
     { "b": "A body of mass m_1 moves with speed v^2 = 9 ...", "o": ["first", "second", "third", "fourth"], "k": "B", "e": "Because ...", "f": null, "fa": null },
     ...

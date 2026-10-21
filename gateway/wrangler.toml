@@ -1,0 +1,10 @@
+name = "physica-gateway"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+workers_dev = false
+
+[vars]
+SUPABASE_URL = "https://lbyqvwkichjvrrzcddtq.supabase.co"
+ALLOWED_ORIGINS = "https://physica.in,https://www.physica.in"
+MAX_INFLIGHT = "400"
+# Secrets (never put them in this file): wrangler secret put SUPABASE_ANON_KEY ; wrangler secret put GATEWAY_KEY

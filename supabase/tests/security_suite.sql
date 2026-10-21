@@ -499,6 +499,25 @@ select private.ops_panic(false) as pr2 \gset
 select t.ok(:'pr2' = 'lockdown off' and (public.get_status() ->> 'lockdown') = 'false' and (public.get_status() ->> 'exams_open') = 'true', 'panic off restores normal service');
 select t.as_user(:adult); select t.ok(public.get_attempt(:'a4') is not null, 'users work again after panic off'); reset role;
 
+\echo '--- profile RPC + gateway wall ---'
+select t.as_user(:adult);
+select t.ok((public.get_my_profile() ->> 'display_name') = 'Asha' and public.get_my_profile() ? 'is_minor' and not (public.get_my_profile() ? 'role') and not (public.get_my_profile() ? 'locked_at'), 'get_my_profile returns only the student''s own safe fields');
+reset role;
+select t.err($q$select private.ops_set_gateway_key('short')$q$, 'key_too_short', 'gateway key must be long');
+select private.ops_set_gateway_key(repeat('k', 40));
+select t.ok((select gateway_hash from public.app_settings) is not null and (select gateway_hash from public.app_settings) <> repeat('k', 40), 'only a hash of the gateway key is stored');
+select t.as_user(:adult);
+select t.err('select public.get_my_profile()', 'gateway_required', 'gateway on: a direct call without the key is refused');
+select set_config('request.headers', '{"x-gateway-key":"wrong"}', false);
+select t.err('select public.list_tests(''NEET'')', 'gateway_required', 'gateway on: wrong key refused');
+select set_config('request.headers', format('{"x-gateway-key":"%s"}', repeat('k', 40)), false);
+select t.ok(public.get_my_profile() is not null and public.list_tests('NEET') is not null, 'gateway on: right key works');
+select set_config('request.headers', '', false);
+reset role;
+select private.ops_set_gateway_key(null);
+select t.as_user(:adult); select t.ok(public.get_my_profile() is not null, 'gateway off again: direct calls work');
+reset role;
+
 \echo '--- detection helpers ---'
 select t.ok((select count(*) from private.ops_events(24) where action = 'ops.panic') = 1, 'ops_events summarises recent security actions');
 insert into public.audit_log (actor, action) select :other, 'login.new_device' from generate_series(1, 3);
@@ -506,5 +525,21 @@ select t.ok(exists (select 1 from private.ops_suspicious(24) where kind = 'new_d
 insert into public.attempts (id, user_id, test_id, deadline, submitted_at, score, started_at, ans, fl, tm) values ('cccccccc-0000-0000-0000-0000000000a1', :adult, 105, now() + interval '1 hour', now(), 4, now() - interval '1 minute', array['A','B','A','B','1','2'], '\x010101010101', array[1,1,1,1,1,1]::smallint[]);
 select t.ok(exists (select 1 from private.ops_suspicious(24) where kind = 'too_fast'), 'ops_suspicious flags an attempt finished in a fraction of the time');
 
+\echo '--- storage limit: compacting old attempts ---'
+select t.err('select private.compact_attempts(3)', 'too_soon', 'compaction refuses a window under 14 days');
+update public.attempts set submitted_at = now() - interval '90 days' where id = 'cccccccc-0000-0000-0000-0000000000a1';
+select private.compact_attempts(60) as nc \gset
+select t.ok(:nc >= 1 and (select cardinality(ans) = 0 and length(fl) = 0 and cardinality(tm) = 0 and score is not null from public.attempts where id = 'cccccccc-0000-0000-0000-0000000000a1'), 'old submitted attempt is compacted but keeps its score');
+select t.ok(exists (select 1 from public.attempts where submitted_at is null and cardinality(ans) > 0), 'in-progress attempts are never compacted');
+select t.as_user(:adult);
+select t.err($q$select public.get_review('cccccccc-0000-0000-0000-0000000000a1', 0)$q$, 'review_expired', 'review of a compacted attempt says it expired');
+reset role;
+
+select t.ok((select count(*) from private.ops_storage()) = 7 and (select mb from private.ops_storage() where what = 'whole database') > 0, 'ops_storage reports database and table sizes');
+update public.app_settings set max_users = (select count(*) from public.profiles);
+select t.err($q$insert into auth.users (email) values ('cap@x.test')$q$, 'signups_closed', 'account cap (free-plan guard) blocks new sign-ups at max_users');
+update public.app_settings set max_users = 10000;
+insert into auth.users (email) values ('cap2@x.test');
+select t.ok(exists (select 1 from auth.users where email = 'cap2@x.test'), 'sign-ups work again below the cap');
 \echo
 \echo 'ALL SECURITY CHECKS PASSED'

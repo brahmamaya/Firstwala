@@ -3,9 +3,9 @@ name: Security tests
 # to the test-series backend or front-end. Fails the build if any assertion fails.
 on:
   push:
-    paths: ['supabase/**', 'series.js', 'series-exam.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', 'tools/series-import*.js', 'tools/perf-budget.js', '.github/workflows/security-tests.yml']
+    paths: ['supabase/**', 'gateway/**', 'tools/private-guard.js', 'series.js', 'series-exam.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', 'tools/series-import*.js', 'tools/perf-budget.js', '.github/workflows/security-tests.yml']
   pull_request:
-    paths: ['supabase/**', 'series.js', 'series-exam.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', 'tools/series-import*.js', 'tools/perf-budget.js', '.github/workflows/security-tests.yml']
+    paths: ['supabase/**', 'gateway/**', 'tools/private-guard.js', 'series.js', 'series-exam.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', 'tools/series-import*.js', 'tools/perf-budget.js', '.github/workflows/security-tests.yml']
 permissions:
   contents: read
 jobs:
@@ -29,6 +29,12 @@ jobs:
         with: { node-version: 20 }
       - name: Secret guard
         run: node -e "require('./tools/secret-guard.js')('.')"
+      - name: Private-file guard
+        run: node tools/private-guard.js
+      - name: API gateway tests
+        run: node gateway/worker.test.js
+      - name: Gateway load test (3000 students start at once)
+        run: RAMP_MS=0 node gateway/load.test.js 3000
       - name: Performance budget
         run: node tools/perf-budget.js
       - name: Content tool self-test
@@ -37,3 +43,5 @@ jobs:
         run: node tools/watchdog.test.js
       - name: Database security suite + stress/fuzz
         run: bash supabase/tests/run-external.sh
+      - name: Index audit (EXPLAIN at 100k students / 1M audit rows)
+        run: bash supabase/tests/index_audit.sh

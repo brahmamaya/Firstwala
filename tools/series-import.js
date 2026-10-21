@@ -6,7 +6,7 @@
      node tools/series-import.js sample <dir> [exam ...]  -> write synthetic full-size SAMPLE tests (for demos / tests only, never publish them)
    Run the printed SQL in Supabase with:  psql "$DATABASE_URL" -f out.sql     (the SQL editor also works for small files)
    One file per test, e.g. content/NEET/04.json, content/JEE_ADV/07-p2.json:
-     { "exam": "NEET", "series": 4, "paper": 1, "pattern": "NEET_2026", "title": null, "price": null,
+     { "exam": "NEET", "series": 4, "paper": 1, "pattern": "NEET_2027", "title": null, "price": null,
        "q": [ { "b": "question text", "o": ["opt A","opt B","opt C","opt D"], "k": "B", "e": "solution", "f": "figure-key", "fa": "figure alt text" }, ... ] }
    k: MCQ "B" | MULTI "AC" (sorted) | NUM "12.5" or a range "12.3:12.7" | "*" = bonus (everyone gets the marks).
    Text rules: plain text. Write x_2 / x^2 / v_{0} for sub/superscripts, use Unicode for symbols (α ∫ √ ≤ ½ ²). No HTML. */
@@ -69,7 +69,7 @@ function testSql(t, publish) {
 
 function sample(dir, exams) {
   const rnd = (seed => () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296)(7);
-  const jobs = [['JEE_MAIN', 'JEE_MAIN_2026'], ['NEET', 'NEET_2026'], ['JEE_ADV', 'JEE_ADV_2026']].filter(j => !exams.length || exams.includes(j[0]));
+  const jobs = [['JEE_MAIN', 'JEE_MAIN_2027'], ['NEET', 'NEET_2027'], ['JEE_ADV', 'JEE_ADV_2027']].filter(j => !exams.length || exams.includes(j[0]));
   for (const [exam, pid] of jobs) {
     const pat = PAT[pid];
     for (let series = 1; series <= 5; series++) for (let paper = 1; paper <= pat.papers; paper++) {

@@ -5,6 +5,10 @@
 (() => {
 'use strict';
 const SUPA = 'https://lbyqvwkichjvrrzcddtq.supabase.co';
+// Switch: set to true only AFTER supabase/schema.sql has been applied to the live project (see docs/GO-LIVE.md).
+// Until then the buttons say "opens soon" and the landing notice stays hidden. Tests may force it with window.__PS_LIVE.
+const LIVE = false;
+const on = () => LIVE || window.__PS_LIVE === true;
 let wait = null;
 const load = () => window.PhysicaSeries ? Promise.resolve() : wait || (wait = new Promise((ok, no) => {
   const s = document.createElement('script');
@@ -18,12 +22,12 @@ function tell(text) {
   t.textContent = text; t.hidden = false;
   setTimeout(() => { t.hidden = true; }, 3500);
 }
-const open = exam => load().then(() => window.PhysicaSeries.open({ exam }), () => tell('Could not load Test Series. Check your internet and try again.'));
+const open = exam => !on() ? tell('Test Series opens very soon for NEET 2027, JEE Main 2027 and JEE Advanced 2027. Stay tuned!') : load().then(() => window.PhysicaSeries.open({ exam }), () => tell('Could not load Test Series. Check your internet and try again.'));
 window.PhysicaSeriesOpen = open;
 
 // Warm up: start fetching the pack (and open the connection to the server) as soon as someone points at / touches the button.
 const warm = e => {
-  if (!(e.target.closest && e.target.closest('[data-series-exam]'))) return;
+  if (!on() || !(e.target.closest && e.target.closest('[data-series-exam]'))) return;
   if (!document.querySelector('link[data-ps-pc]')) { const l = document.createElement('link'); l.rel = 'preconnect'; l.href = SUPA; l.dataset.psPc = '1'; document.head.append(l); }
   load().catch(() => {});
 };
@@ -37,6 +41,7 @@ document.addEventListener('click', e => {
 
 /* ---- landing-page notice: shown for 10 seconds, pauses while the pointer or keyboard is on it, can be closed ---- */
 function landingNotice() {
+  if (!on()) return;
   const land = document.getElementById('landing');
   try { if (!land || land.hidden || sessionStorage.getItem('physica-series-note') === '1') return; } catch { if (!land || land.hidden) return; }
   const css = document.createElement('style');
@@ -51,7 +56,7 @@ function landingNotice() {
   const go = el('button', '', 'Show me'); go.type = 'button';
   const ol = el('ol'); for (const t of ['Tap Rank mode', 'Choose your exam: NEET, JEE Mains or JEE Advanced', 'Tap the 📝 Test Series button at the top']) ol.append(el('li', '', t));
   const t1 = el('b', '', '📝 Full-length Test Series is live');
-  box.append(x, t1, el('p', '', 'JEE Main, JEE Advanced and NEET: real exam pattern, 30 tests each. The first 3 tests of every exam are free.'), el('p', '', 'Where to find it:'), ol, go, el('div', 'sn-bar'));
+  box.append(x, t1, el('p', '', 'NEET 2027, JEE Main 2027 and JEE Advanced 2027: real exam pattern, 30 tests each. The first 3 tests of every exam are free.'), el('p', '', 'Where to find it:'), ol, go, el('div', 'sn-bar'));
   let left = 10000, started = Date.now(), timer = null;
   const done = remember => { clearTimeout(timer); mo.disconnect(); box.remove(); css.remove(); if (remember) try { sessionStorage.setItem('physica-series-note', '1'); } catch {} };
   const run = () => { started = Date.now(); timer = setTimeout(() => done(false), left); box.classList.remove('paused'); };

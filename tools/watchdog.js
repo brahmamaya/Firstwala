@@ -45,7 +45,7 @@ function* walk(d, rel = '') { for (const f of fs.readdirSync(d)) { const p = pat
     }
   }));
   // pages that must not exist publicly
-  for (const f of ['supabase/schema.sql', '.env', '.git/config', 'tools/build.js', 'docs/SECURITY.md']) {
+  for (const f of ['supabase/schema.sql', '.env', '.git/config', 'tools/build.js', 'docs/SECURITY.md', 'gateway/worker.js', 'gateway/wrangler.toml', 'content/', 'build/patterns.sql']) {
     const r = await get(`${base}/${f}${bust}`);
     if (r.status === 200 && r.body.length && !/<!doctype html/i.test(r.body.slice(0, 200).toString())) problems.push(`EXPOSED ${f} is publicly readable`);
   }
