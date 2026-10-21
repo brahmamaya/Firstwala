@@ -87,11 +87,11 @@ try { const l = lsGet(STORE); sess = JSON.parse(l || ssGet(STORE) || 'null'); re
 const save = s => { sess = s; lsSet(STORE, null); ssSet(STORE, null); if (s) (remember ? lsSet : ssSet)(STORE, JSON.stringify(s)); };
 const now = () => Math.floor(Date.now() / 1000);
 
-async function raw(path, { method = 'GET', body, token } = {}) {
+async function raw(path, { method = 'GET', body, token, keepalive } = {}) {
   const headers = { apikey: KEY, 'Content-Type': 'application/json' };
   if (token) headers.Authorization = 'Bearer ' + token;
   let r;
-  try { r = await fetch(SUPA + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) }); }
+  try { r = await fetch(SUPA + path, { method, headers, keepalive: !!keepalive, body: body === undefined ? undefined : JSON.stringify(body) }); }
   catch { throw err('network'); }
   const txt = await r.text();
   let data = null;
@@ -116,59 +116,70 @@ async function api(path, opts = {}) {
   try { return await raw(path, { ...opts, token: sess.access_token }); }
   catch (e) { if (e.status !== 401) throw e; await refresh(); return raw(path, { ...opts, token: sess.access_token }); }
 }
-const rpc = (fn, args) => api('/rest/v1/rpc/' + fn, { method: 'POST', body: args || {} });
+const rpc = (fn, args, keepalive) => api('/rest/v1/rpc/' + fn, { method: 'POST', body: args || {}, keepalive });
 const sendCode = email => raw('/auth/v1/otp', { method: 'POST', body: { email, create_user: true } });
 const verifyCode = async (email, code, keep) => { const d = await raw('/auth/v1/verify', { method: 'POST', body: { type: 'email', email, token: code } }); remember = !!keep; adopt(d); };
 const signOut = (everywhere) => { const t = sess && sess.access_token; save(null); if (t) raw('/auth/v1/logout' + (everywhere ? '?scope=global' : ''), { method: 'POST', token: t }).catch(() => {}); };
 
 /* ---------- styles (theme variables come from styles.css) ---------- */
 const CSS = `
-.ps-ov{position:fixed;inset:0;z-index:100000;background:var(--bg);color:var(--text);overflow:auto;font-family:inherit;-webkit-overflow-scrolling:touch}
+.ps-ov{position:fixed;inset:0;z-index:2147483100;background:var(--bg);color:var(--text);overflow:auto;font-family:inherit;-webkit-overflow-scrolling:touch}
 .ps-bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--chrome);border-bottom:1px solid var(--line)}
-.ps-bar b{letter-spacing:.04em}.ps-bar .ps-sp{flex:1}.ps-bar small{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
-.ps-main{max-width:920px;margin:0 auto;padding:20px 16px 60px}
+.ps-bar b{letter-spacing:.04em}.ps-bar .ps-sp{flex:1}
+.ps-main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+.ps-full .ps-bar{display:none}.ps-full .ps-main{max-width:none;padding:0}
 .ps-ov h1,.ps-ov h2,.ps-ov h3{margin:.2em 0 .5em;line-height:1.25}
-.ps-ov{--ps-ok:#59e08f;--ps-err:#ff8a93;--ps-warn:#ffb347;--ps-link:var(--blue)}
-:root[data-theme="light"] .ps-ov{--ps-ok:#0b6b3a;--ps-err:#b3261e;--ps-warn:#8a5300;--ps-link:#1a4fb8}
-.ps-ov a,.ps-ov button.ps-link{color:var(--ps-link)}
-.ps-ov [hidden]{display:none!important}
-.ps-lbl{display:block;margin:.6em 0 .35em;font-weight:600}
+.ps-ov{--ps-ok:#59e08f;--ps-err:#ff8a93;--ps-warn:#ffb347;--ps-link:var(--blue);--ps-s0:#2a3a4a;--ps-s0t:#eff8ff;--ps-s0b:#5b7186;--ps-s1:#c62828;--ps-s2:#2e7d32;--ps-s3:#6a1b9a}
+:root[data-theme="light"] .ps-ov{--ps-ok:#0b6b3a;--ps-err:#b3261e;--ps-warn:#8a5300;--ps-link:#1a4fb8;--ps-s0:#e6e9ee;--ps-s0t:#1b2530;--ps-s0b:#9aa6b4}
 .ps-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
 .ps-ov button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);padding:9px 14px}
 .ps-ov button:hover:not(:disabled){border-color:var(--mint)}.ps-ov button:disabled{opacity:.5;cursor:default}
 .ps-ov button.ps-go{background:var(--mint);color:var(--on-mint);border-color:var(--mint);font-weight:700}
 .ps-ov input[type=text],.ps-ov input[type=email],.ps-ov input[type=number],.ps-ov input[inputmode]{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--text);font:inherit}
 .ps-ov :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.ps-ov a,.ps-ov button.ps-link{color:var(--ps-link)}
+.ps-ov button.ps-link{background:none!important;border:0!important;padding:0!important;text-decoration:underline;cursor:pointer}
+.ps-ov [hidden]{display:none!important}
+.ps-lbl{display:block;margin:.6em 0 .35em;font-weight:600}
 .ps-muted{color:var(--muted)}.ps-err{color:var(--ps-err);min-height:1.4em}.ps-ok{color:var(--ps-ok)}
 .ps-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.ps-row>.ps-sp{flex:1}
 .ps-pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid var(--line2);color:var(--muted)}
+.ps-pill.free{color:var(--ps-ok);border-color:var(--ps-ok)}.ps-pill.paid{color:var(--ps-warn);border-color:var(--ps-warn)}
 .ps-narrow{max-width:420px;margin:30px auto}
-.ps-opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;cursor:pointer;background:var(--bg2)}
-.ps-opt.sel{border-color:var(--mint);background:var(--active)}.ps-opt.right{border-color:var(--ps-ok)}.ps-opt.wrong{border-color:var(--ps-err)}
-.ps-opt input{margin-top:4px}
-.ps-q{white-space:pre-wrap;font-size:1.05em;margin:.6em 0}
-.ps-timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.1em}.ps-timer.low{color:var(--ps-err)}
-.ps-pal{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
-.ps-pal button{width:40px;padding:7px 0;text-align:center;border-radius:8px}
-.ps-pal button.done{background:var(--mint);color:var(--on-mint);border-color:var(--mint)}
-.ps-pal button.rev{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-.ps-pal button.cur{outline:2px solid var(--blue);outline-offset:1px}
 .ps-banner{padding:8px 12px;border-radius:10px;border:1px solid var(--ps-warn);color:var(--ps-warn);margin:8px 0}
 .ps-sub{color:var(--muted);font-size:.9em;margin-top:6px}
-.ps-ov sub,.ps-ov sup{font-size:.75em;line-height:0}
-
 .ps-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ps-ov sub,.ps-ov sup{font-size:.75em;line-height:0}
+.ps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+.ps-tile{display:grid;gap:4px;text-align:left;padding:18px!important}.ps-tile b{font-size:1.1em}
+.ps-tcard{margin:0!important;display:flex;flex-direction:column;gap:6px}.ps-tcard.soon{border-style:dashed;background:transparent}
+.ps-ct{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ps-tcard button{width:100%}.ps-tcard button.done{border-color:var(--ps-ok)}.ps-soon{margin:6px 0 0;font-size:.9em}
+.ps-st{display:inline-grid;place-items:center;width:34px;height:30px;font-weight:700;font-size:13px;color:#fff;flex:none;position:relative}
+.ps-st.s0{background:var(--ps-s0);color:var(--ps-s0t);border:1px solid var(--ps-s0b);border-radius:4px}
+.ps-st.s1{background:var(--ps-s1);clip-path:polygon(0 0,100% 0,100% 68%,50% 100%,0 68%)}
+.ps-st.s2{background:var(--ps-s2);clip-path:polygon(50% 0,100% 28%,100% 100%,0 100%,0 28%)}
+.ps-st.s3{background:var(--ps-s3);border-radius:50%}
+.ps-st.s4{background:var(--ps-s3);border-radius:50%}.ps-st.s4::after{content:'\\2713';position:absolute;right:-4px;bottom:-4px;width:14px;height:14px;border-radius:50%;background:var(--ps-s2);color:#fff;font-size:10px;line-height:14px;text-align:center}
+.ps-legend{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.ps-lg{display:flex;gap:10px;align-items:flex-start}
+.ps-scroll{overflow-x:auto}.ps-tbl{border-collapse:collapse;width:100%;min-width:560px}.ps-tbl th,.ps-tbl td{border:1px solid var(--line);padding:6px 8px;text-align:left}.ps-tbl th{background:var(--panel2)}
+.ps-score{text-align:center}.ps-big2{font-size:3rem;font-weight:800;line-height:1.1}.ps-big2 small{font-size:1.2rem;font-weight:500;color:var(--muted)}.ps-big{font-weight:800}
+.ps-bar2{height:10px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:8px 0}.ps-bar2 i{display:block;height:100%;background:var(--mint)}
+.ps-sec{border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:8px 12px}.ps-sec>summary{cursor:pointer;font-weight:700}
+.ps-q2{border-top:1px solid var(--line);margin-top:8px;padding-top:6px}.ps-q2>summary{cursor:pointer}.ps-q2.right>summary{color:var(--ps-ok)}.ps-q2.wrong>summary{color:var(--ps-err)}
+.ps-q{white-space:pre-wrap;font-size:1.05em;margin:.6em 0}
+.ps-opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--bg2)}
+.ps-opt.right{border-color:var(--ps-ok)}.ps-opt.wrong{border-color:var(--ps-err)}
+.ps-fig{max-width:100%;height:auto;background:#fff;border-radius:8px;margin:8px 0;min-height:40px}
 .ps-ov::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:5;background-image:var(--ps-mark,none)}
 .ps-ov.ps-exam .ps-q,.ps-ov.ps-exam .ps-opt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.ps-ov button.ps-link{background:none!important;border:0!important;padding:0!important;text-decoration:underline;cursor:pointer}
-.ps-danger{border-color:var(--ps-err)!important;color:var(--ps-err)!important}
 @media print{.ps-ov{display:none!important}}
-@media(max-width:560px){.ps-bar small{display:none}.ps-pal button{width:36px}}
+@media(max-width:560px){.ps-bar small{display:none}}
 `;
 
 /* ---------- shell ---------- */
 let ov = null, main = null, userEl = null, outBtn = null, onLeave = null, idleTimer = null, lastActive = Date.now(), opener = null, deviceNoted = false;
-let examLive = false;
+let examLive = false, curExam = null, profileName = '';
 
 function ensureShell() {
   if (ov) return;
@@ -183,7 +194,7 @@ function ensureShell() {
     main);
   // Keep the lab's global shortcuts (Space, R, X, F, arrows ...) from firing while typing answers.
   for (const t of ['keydown', 'keyup', 'keypress']) ov.addEventListener(t, e => e.stopPropagation());
-  ov.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  ov.addEventListener('keydown', e => { if (e.key === 'Escape' && !examLive) close(); });
   ov.addEventListener('keydown', e => {                  // keep keyboard focus inside the dialog
     if (e.key !== 'Tab') return;
     const f = [...ov.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])')].filter(x => !x.closest('[hidden]') && x.offsetParent !== null);
@@ -205,7 +216,8 @@ function leaveOk() {
   return !examLive || confirm('Leave the exam screen? Your timer keeps running and your saved answers are kept. You can resume from the test list.');
 }
 let onCopy = null;
-function open() {
+function open(opts) {
+  if (opts && opts.exam) curExam = opts.exam;
   opener = document.activeElement;
   ensureShell();
   window['ga-disable-' + GA_ID] = true;          // no analytics inside the exam area, ever (students may be minors)
@@ -233,8 +245,8 @@ function close() {
 function show(...nodes) {
   if (onLeave) { onLeave(); onLeave = null; }
   examLive = false;
-  main.replaceChildren(...nodes.flat());
-  ov.classList.remove('ps-exam');
+  main.replaceChildren(...nodes.flat().filter(x => x != null && x !== false));
+  ov.classList.remove('ps-exam', 'ps-full');
   const email = sess && sess.user && sess.user.email;
   userEl.textContent = email || ''; userEl.hidden = !email;
   outBtn.hidden = !email;
@@ -272,7 +284,8 @@ async function view() {
     const rows = await api('/rest/v1/profiles?select=display_name,is_minor,parent_consent_at,parent_email,terms_version&id=eq.' + encodeURIComponent(sess.user.id));
     const p = rows && rows[0];
     if (!p || p.is_minor == null || (p.is_minor && !(p.parent_consent_at && p.parent_email)) || p.terms_version !== TERMS) return profileView(p);
-    listView();
+    profileName = p.display_name || '';
+    hubView(curExam);
   } catch (e) { fatal(e); }
 }
 
@@ -349,7 +362,7 @@ function profileView(p) {
       if (minor == null) { msg.textContent = 'Please tell us if you are under 18.'; return; }
       if (!terms.checked) { msg.textContent = 'Please accept the Terms and the Privacy Policy to continue.'; return; }
       go.disabled = true; msg.textContent = '';
-      try { await rpc('save_profile', { p_name: name.value, p_is_minor: minor, p_parent_consent: consent.checked, p_parent_email: minor ? parent.value : null, p_terms_version: TERMS }); listView(); }
+      try { await rpc('save_profile', { p_name: name.value, p_is_minor: minor, p_parent_consent: consent.checked, p_parent_email: minor ? parent.value : null, p_terms_version: TERMS }); view(); }
       catch (e) { msg.textContent = say(e); go.disabled = false; }
     } }, h('label', { class: 'ps-lbl', for: 'ps-name' }, 'Your name'), name,
       h('p', { class: 'ps-muted' }, 'Are you…'), radio(false, '18 or older'), radio(true, 'Under 18'), minorBox,
@@ -358,168 +371,120 @@ function profileView(p) {
       h('p', null, go)), msg));
 }
 
-async function listView() {
-  loading('Loading tests…');
-  try {
-    const [tests, attempts, enr, devs] = await Promise.all([
-      api('/rest/v1/tests?select=id,title,exam,duration_min,is_free,opens_at,closes_at&published=eq.true&order=created_at.desc'),
-      api('/rest/v1/attempts?select=id,test_id,submitted_at,score,deadline'),
-      api('/rest/v1/enrollments?select=test_id'),
-      rpc('list_devices', { p_device: deviceId() }),
-    ]);
-    const newDeviceBanner = recentOtherDevice(devs);
-    const mine = new Map(attempts.map(a => [a.test_id, a]));
-    function recentOtherDevice(list) {
-      const seen = Number(lsGet('physica-dev-ack') || 0);
-      const fresh = (list || []).find(d => !d.current && Date.parse(d.first_seen) > Date.now() - 7 * 864e5 && Date.parse(d.first_seen) > seen);
-      if (!fresh || list.length < 2) return null;
-      return h('div', { class: 'ps-banner', role: 'alert' }, h('b', null, 'New sign-in: '), 'your account was used on another device on ' + new Date(fresh.first_seen).toLocaleString() + '. If that was not you, ',
-        h('button', { type: 'button', class: 'ps-link', onclick: () => { signOut(true); view(); } }, 'log out everywhere'), ' now. ',
-        h('button', { type: 'button', class: 'ps-link', onclick: ev => { lsSet('physica-dev-ack', String(Date.now())); ev.currentTarget.parentNode.remove(); } }, 'This was me'));
-    }
-    const owned = new Set(enr.map(e => e.test_id));
-    const msg = h('p', { class: 'ps-err', role: 'alert' });
-    const cards = tests.map(t => {
-      const a = mine.get(t.id), t0 = Date.now();
-      const opens = t.opens_at && Date.parse(t.opens_at) > t0, closed = t.closes_at && Date.parse(t.closes_at) < t0;
-      const locked = !t.is_free && !owned.has(t.id);
-      let action;
-      if (a && a.submitted_at) action = h('button', { type: 'button', class: 'ps-go', onclick: () => resultView(a.id) }, `View result (${a.score})`);
-      else if (a) action = h('button', { type: 'button', class: 'ps-go', onclick: () => examView(a.id) }, 'Resume test');
-      else if (locked) action = h('button', { type: 'button', disabled: true }, 'Locked (paid)');
-      else if (opens) action = h('button', { type: 'button', disabled: true }, 'Opens ' + new Date(t.opens_at).toLocaleString());
-      else if (closed) action = h('button', { type: 'button', disabled: true }, 'Closed');
-      else action = h('button', { type: 'button', class: 'ps-go', onclick: async ev => {
-        const b = ev.currentTarget; b.disabled = true; msg.textContent = '';
-        if (!confirm(`Start "${t.title}"? The ${t.duration_min}-minute timer starts now and cannot be paused.`)) { b.disabled = false; return; }
-        try { examView(await rpc('start_attempt', { p_test_id: t.id })); } catch (e) { if (e.code === 'terms_outdated' || e.code === 'profile_incomplete') return view(); msg.textContent = say(e); b.disabled = false; }
-      } }, 'Start test');
-      return h('div', { class: 'ps-card' },
-        rt('h3', t.title),
-        h('div', { class: 'ps-row ps-muted' }, h('span', { class: 'ps-pill' }, EXAMS[t.exam] || t.exam), h('span', null, t.duration_min + ' min'),
-          h('span', { class: 'ps-pill' }, t.is_free ? 'Free' : 'Paid')),
-        h('p', null, action));
-    });
-    show(h('h1', null, 'Tests'), statusMsg ? h('div', { class: 'ps-banner', role: 'status' }, statusMsg) : null, newDeviceBanner, cards.length ? cards : h('p', { class: 'ps-muted' }, 'No tests are published yet. Check back soon.'), msg);
-  } catch (e) { fatal(e, listView); }
+/* ---------- exam hub: the 30 full-length tests of one exam ---------- */
+const NAME = { JEE_MAIN: 'JEE Main', JEE_ADV: 'JEE Advanced', NEET: 'NEET' };
+const ICON = { JEE_MAIN: '⚛️', JEE_ADV: '🚀', NEET: '🧬' };
+const SUBJ = { PHYSICS: 'Physics', CHEMISTRY: 'Chemistry', MATHS: 'Mathematics', BOTANY: 'Botany', ZOOLOGY: 'Zoology' };
+const KIND = { MCQ: 'Single correct', MULTI: 'One or more correct', NUM: 'Numerical value' };
+const dur = min => { const hr = Math.floor(min / 60), m = Math.round(min % 60); return (hr ? hr + ' h' : '') + (hr && m ? ' ' : '') + (m || !hr ? m + ' min' : ''); };
+const secLabel = s => { const sj = SUBJ[s.s] || s.s; return s.nm === sj ? sj : sj + ' · ' + s.nm; };
+const minus = n => (n < 0 ? '−' + Math.abs(n) : (n > 0 ? '+' + n : '0'));
+
+function pickView() {
+  show(h('h1', null, 'Full-length test series'), h('p', { class: 'ps-muted' }, 'Choose your exam. Each has 30 tests in the real exam pattern; the first 3 are free.'),
+    h('div', { class: 'ps-grid' }, Object.keys(NAME).map(k => h('button', { type: 'button', class: 'ps-tile', onclick: () => hubView(k) }, h('b', null, ICON[k] + ' ' + NAME[k]), h('small', null, '30 tests')))));
 }
 
-/* ---------- exam ---------- */
-async function examView(attemptId) {
-  loading('Opening your test…');
-  let d;
-  try { d = await rpc('get_attempt', { p_attempt: attemptId }); } catch (e) { return fatal(e, () => examView(attemptId)); }
-  if (d.submitted) return resultView(attemptId);
-
-  const qs = d.questions, answers = { ...d.answers };
-  const deadline = Date.parse(d.deadline), skew = Date.parse(d.server_now) - Date.now();
-  const marked = new Set();
-  const pending = new Map();
-  let i = 0, inflight = false, retry = null, debounce = null, finishing = false, tick = null;
-
-  const timer = h('span', { class: 'ps-timer', role: 'timer', 'aria-label': 'Time left' });
-  const sr = h('div', { class: 'ps-sr', 'aria-live': 'polite', role: 'status' });
-  const said = new Set();
-  const banner = h('div', { class: 'ps-banner', role: 'alert', hidden: true }, 'Connection problem: your latest answers are not saved yet. Keep this page open; we will retry.');
-  const pal = h('div', { class: 'ps-pal' });
-  const card = h('div', { class: 'ps-card' });
-  const msg = h('p', { class: 'ps-err', role: 'alert' });
-  const has = q => answers[q.id] != null && answers[q.id] !== '';
-
-  function drawPal() {
-    pal.replaceChildren(...qs.map((q, k) => h('button', { type: 'button', 'aria-label': `Question ${k + 1}`,
-      class: [has(q) ? 'done' : '', marked.has(q.id) ? 'rev' : '', k === i ? 'cur' : ''].join(' ').trim(), onclick: () => go(k) }, String(k + 1))));
-  }
-  function drawQ() {
-    const q = qs[i];
-    const body = [
-      h('div', { class: 'ps-muted' }, `Q${i + 1} of ${qs.length} · ${q.subject} · +${q.marks}${q.negative ? ' / −' + q.negative : ''}`),
-      rt('div', q.body, 'ps-q'),
-    ];
-    if (q.type === 'MCQ') {
-      (q.options || []).forEach((o, k) => {
-        const on = answers[q.id] === String(k);
-        body.push(h('label', { class: 'ps-opt' + (on ? ' sel' : '') },
-          h('input', { type: 'radio', name: 'ps-q-' + q.id, checked: on, onchange: () => { put(q.id, String(k)); drawQ(); drawPal(); } }),
-          rt('span', o)));
-      });
-    } else {
-      body.push(h('input', { type: 'number', step: 'any', inputmode: 'decimal', 'aria-label': 'Numerical answer', placeholder: 'Type your numerical answer',
-        value: answers[q.id] ?? '', oninput: ev => { putSoon(q.id, ev.target.value === '' ? null : ev.target.value); } }));
+async function hubView(exam) {
+  if (!exam) return pickView();
+  curExam = exam; loading('Loading tests…');
+  try {
+    const [d, devs] = await Promise.all([rpc('list_tests', { p_exam: exam }), rpc('list_devices', { p_device: deviceId() })]);
+    const byN = new Map(); for (const t of d.tests) { if (!byN.has(t.n)) byN.set(t.n, []); byN.get(t.n).push(t); }
+    const any = d.tests.length ? d.pat[d.tests[0].pat] : null;
+    const msg = h('p', { class: 'ps-err', role: 'alert' });
+    const note = h('div', { class: 'ps-banner', role: 'status', hidden: true });
+    const nDone = d.tests.filter(t => t.d).length;
+    const when = s => new Date(s).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    const testBtn = t => {
+      const pat = d.pat[t.pat], tag = pat.pp > 1 ? `Paper ${t.p}: ` : '', now2 = Date.now();
+      let text, go = null, cls = '';
+      if (t.d) { text = `${tag}Result ${t.s}/${pat.mx}`; go = () => resultView(t.a); cls = 'done'; }
+      else if (t.a) { text = tag + 'Resume'; go = () => runExam(t.a); cls = 'ps-go'; }
+      else if (t.lk) { text = tag + '🔒 Locked'; go = () => { note.hidden = false; note.textContent = 'Tests 4 to 30 are paid. Online payment is not open yet; we will announce it here and on the official Physica WhatsApp channel. Tests 1 to 3 are free.'; note.focus(); }; cls = 'locked'; }
+      else if (t.op && Date.parse(t.op) > now2) { text = `${tag}Opens ${when(t.op)}`; }
+      else if (t.cl && Date.parse(t.cl) < now2) { text = tag + 'Closed'; }
+      else { text = tag + 'Start'; go = () => instructionsView(t, pat); cls = 'ps-go'; }
+      return h('button', { type: 'button', class: cls, disabled: !go, onclick: go, 'aria-label': `${NAME[exam]} Test ${t.n}${pat.pp > 1 ? ', paper ' + t.p : ''}: ${text}` }, text);
+    };
+    const cards = [];
+    for (let n = 1; n <= 30; n++) {
+      const free = n <= 3, ts = byN.get(n);
+      cards.push(h('div', { class: 'ps-card ps-tcard' + (ts ? '' : ' soon') },
+        h('div', { class: 'ps-ct' }, h('b', null, 'Test ' + n), h('span', { class: 'ps-pill ' + (free ? 'free' : 'paid') }, free ? 'FREE' : 'PAID')),
+        ts ? ts.map(testBtn) : h('p', { class: 'ps-muted ps-soon' }, 'Coming soon')));
     }
-    body.push(h('p', { class: 'ps-row' },
-      h('button', { type: 'button', disabled: i === 0, onclick: () => go(i - 1) }, '← Previous'),
-      h('button', { type: 'button', onclick: () => { put(q.id, null); drawQ(); drawPal(); } }, 'Clear'),
-      h('button', { type: 'button', 'aria-pressed': String(marked.has(q.id)), onclick: () => { marked.has(q.id) ? marked.delete(q.id) : marked.add(q.id); drawQ(); drawPal(); } },
-        marked.has(q.id) ? '★ Marked' : '☆ Mark for review'),
-      h('button', { type: 'button', class: 'ps-go', disabled: i === qs.length - 1, onclick: () => go(i + 1) }, 'Next →')));
-    card.replaceChildren(...body);
-  }
-  const go = k => { flushDebounce(); i = k; drawQ(); drawPal(); };
+    const recent = (() => { const seen = Number(lsGet('physica-dev-ack') || 0); const f = (devs || []).find(x => !x.current && Date.parse(x.first_seen) > Date.now() - 7 * 864e5 && Date.parse(x.first_seen) > seen);
+      if (!f || devs.length < 2) return null;
+      return h('div', { class: 'ps-banner', role: 'alert' }, h('b', null, 'New sign-in: '), 'your account was used on another device on ' + new Date(f.first_seen).toLocaleString() + '. If that was not you, ',
+        h('button', { type: 'button', class: 'ps-link', onclick: () => { signOut(true); view(); } }, 'log out everywhere'), ' now. ',
+        h('button', { type: 'button', class: 'ps-link', onclick: ev => { lsSet('physica-dev-ack', String(Date.now())); ev.currentTarget.parentNode.remove(); } }, 'This was me')); })();
+    show(h('h1', null, ICON[exam] + ' ' + NAME[exam] + ' full-length tests'),
+      any ? h('p', { class: 'ps-muted' }, `${any.q} questions · ${any.mx} marks · ${dur(any.m)} · real exam pattern${any.pp > 1 ? ' · 2 papers per test' : ''}. Tests 1–3 free, 4–30 paid.`) : h('p', { class: 'ps-muted' }, 'Tests are being added. Check back soon.'),
+      h('p', { class: 'ps-sub' }, `${nDone} of 30 attempted`),
+      statusMsg ? h('div', { class: 'ps-banner', role: 'status' }, statusMsg) : null, recent, note, msg,
+      h('div', { class: 'ps-grid ps-tests' }, cards),
+      h('p', { class: 'ps-sub' }, 'Pattern follows the officially announced format; rules can change each year. ', h('a', { href: 'terms.html', target: '_blank', rel: 'noopener' }, 'Terms')));
+  } catch (e) { fatal(e, () => hubView(exam)); }
+}
 
-  /* answers are saved to the server one by one; failures are retried, never lost */
-  function put(qid, val) { answers[qid] = val; pending.set(qid, val); flush(); }
-  function putSoon(qid, val) {
-    answers[qid] = val; pending.set(qid, val); drawPal();
-    clearTimeout(debounce); debounce = setTimeout(flush, 500);
-  }
-  function flushDebounce() { if (debounce) { clearTimeout(debounce); debounce = null; flush(); } }
-  async function flush() {
-    if (inflight) return;
-    inflight = true; clearTimeout(retry);
-    try {
-      while (pending.size) {
-        const [qid, val] = pending.entries().next().value;
-        try { await rpc('save_answer', { p_attempt: attemptId, p_question: qid, p_answer: val }); if (pending.get(qid) === val) pending.delete(qid); banner.hidden = true; }
-        catch (e) {
-          if (e.code === 'attempt_closed') { pending.clear(); inflight = false; return finish(true); }
-          if (e.code === 'signed_out' || e.status === 401) { banner.hidden = false; break; }
-          banner.hidden = false; retry = setTimeout(flush, 3000); break;
-        }
-      }
-    } finally { inflight = false; }
-  }
-  const online = () => flush();
-  window.addEventListener('online', online);
-  const warn = ev => { if (pending.size) { ev.preventDefault(); ev.returnValue = ''; } };
-  window.addEventListener('beforeunload', warn);
+/* ---------- general instructions (like the real exam, shown before the timer starts) ---------- */
+function instructionsView(t, pat) {
+  loadExam().catch(() => {});                          // fetch the exam screen while the student reads
+  const legend = [['ps-st s0', 'Not Visited', 'You have not visited the question yet.'], ['ps-st s1', 'Not Answered', 'You have visited the question but not answered it.'],
+    ['ps-st s2', 'Answered', 'You have answered the question and saved it.'], ['ps-st s3', 'Marked for Review', 'You want to look at this again; it is not counted as answered.'],
+    ['ps-st s4', 'Answered & Marked for Review', 'Answered and marked; the answer IS evaluated.']];
+  const rows = pat.s.map(s => h('tr', null, h('td', null, SUBJ[s.s] || s.s), h('td', null, s.nm === (SUBJ[s.s] || s.s) ? '—' : s.nm), h('td', null, KIND[s.t]), h('td', null, String(s.n)), h('td', null, '+' + s.c), h('td', null, minus(s.w)),
+    h('td', null, s.t === 'MULTI' ? (s.p ? '+' + s.p + ' per right option' : 'none') : '—')));
+  const chk = h('input', { type: 'checkbox', id: 'ps-read' });
+  const msg = h('p', { class: 'ps-err', role: 'alert' });
+  const go = h('button', { type: 'button', class: 'ps-go', disabled: true, onclick: async () => {
+    go.disabled = true; msg.textContent = '';
+    try { try { await document.documentElement.requestFullscreen?.(); } catch {} runExam(await rpc('start_attempt', { p_test_id: t.id })); }
+    catch (e) { if (e.code === 'terms_outdated' || e.code === 'profile_incomplete') return view(); msg.textContent = say(e); go.disabled = false; }
+  } }, 'I am ready to begin');
+  chk.onchange = () => { go.disabled = !chk.checked; };
+  show(h('button', { type: 'button', class: 'ps-link', onclick: () => hubView(curExam) }, '← All tests'),
+    h('h1', null, `${pat.l} · Test ${t.n}${pat.pp > 1 ? ' · Paper ' + t.p : ''}`),
+    h('div', { class: 'ps-card' }, h('h2', null, 'General instructions'),
+      h('ul', null,
+        h('li', null, `The test has ${pat.q} questions, ${pat.mx} marks and lasts `, h('b', null, dur(pat.m)), '. The timer runs on our server from the moment you click “I am ready to begin”. It does not stop if you close the page.'),
+        h('li', null, 'You can attempt each test once. You can leave and come back: your saved answers are kept and the timer keeps running.'),
+        h('li', null, 'To answer: choose an option (or type the number), then click ', h('b', null, 'Save & Next'), '. An answer is recorded only when you click ', h('b', null, 'Save & Next'), ' or ', h('b', null, 'Mark for Review & Next'), '.'),
+        h('li', null, h('b', null, 'Clear Response'), ' removes your answer. Use the subject tabs and the numbered palette to move between questions.'),
+        h('li', null, 'Your answers are sent to our server automatically. If your internet drops, keep going; they are sent when it returns.'),
+        h('li', null, 'Switching tabs and copying are recorded. Please do not share these questions.'),
+        h('li', null, 'At the end click ', h('b', null, 'Submit'), '. A summary is shown first. After submitting you cannot change anything.'))),
+    h('div', { class: 'ps-card' }, h('h3', null, 'Question palette'), h('div', { class: 'ps-legend' }, legend.map(([c, a, b]) => h('div', { class: 'ps-lg' }, h('span', { class: c, 'aria-hidden': 'true' }, '7'), h('span', null, h('b', null, a), ' ' + b))))),
+    h('div', { class: 'ps-card ps-scroll' }, h('h3', null, 'Marking scheme'), h('table', { class: 'ps-tbl' },
+      h('thead', null, h('tr', null, ['Subject', 'Section', 'Type', 'Questions', 'Correct', 'Wrong', 'Partly right'].map(x => h('th', { scope: 'col' }, x)))), h('tbody', null, rows)),
+      h('p', { class: 'ps-sub' }, 'Unanswered questions score 0. Marks are for each question of that section.')),
+    h('label', { class: 'ps-row', for: 'ps-read' }, chk, h('span', null, 'I have read and understood the instructions.')),
+    h('p', null, go), msg);
+}
 
-  async function finish(auto) {
-    if (finishing) return;
-    finishing = true; clearInterval(tick); clearTimeout(debounce); msg.textContent = '';
-    for (let n = 0; n < 5 && pending.size; n++) { await flush(); if (pending.size) await sleep(1000); }
-    if (pending.size && !auto && !confirm('Some answers could not be saved (check your internet). Submit anyway?')) { finishing = false; tick = setInterval(draw, 1000); return; }
-    try { await rpc('submit_attempt', { p_attempt: attemptId }); }
-    catch (e) { if (e.code !== 'attempt_closed' && !auto) { msg.textContent = say(e); finishing = false; tick = setInterval(draw, 1000); return; } }
-    resultView(attemptId);
-  }
-  function draw() {
-    const left = Math.max(0, Math.floor((deadline - (Date.now() + skew)) / 1000));
-    const hh = Math.floor(left / 3600), mm = Math.floor(left % 3600 / 60), ss = left % 60;
-    timer.textContent = (hh ? hh + ':' : '') + String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
-    timer.classList.toggle('low', left <= 300);
-    for (const m of [600, 300, 60, 30]) if (left <= m && !said.has(m)) { said.add(m); if (left > 0 && left > m - 5) sr.textContent = m >= 60 ? `${m / 60} minute${m > 60 ? 's' : ''} left` : `${m} seconds left`; }
-    if (left <= 0) finish(true);
-  }
-
-  show(h('div', { class: 'ps-row' }, rt('h2', d.title), h('span', { class: 'ps-sp' }), timer), sr, h('p', { class: 'ps-sub' }, 'Exam rules: one attempt, server timer. Switching tabs and copying are recorded. Do not share these questions.'), banner, card, pal,
-    h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: () => {
-      const left = qs.filter(q => !has(q)).length;
-      if (confirm(left ? `${left} question(s) are unanswered. Submit the test? You cannot change answers afterwards.` : 'Submit the test? You cannot change answers afterwards.')) finish(false);
-    } }, 'Submit test')), msg);
-  examLive = true;
-  ov.classList.add('ps-exam');
-  // advisory integrity signals for the admin (never alter a score automatically)
-  const sig = (kind) => { if (!finishing) rpc('log_event', { p_attempt: attemptId, p_kind: kind, p_meta: {} }).catch(() => {}); };
-  const vis = () => sig(document.hidden ? 'tab_hidden' : 'tab_visible');
-  const off = () => sig('offline'), on = () => sig('online');
-  let lastCopy = 0;
-  onCopy = () => { if (Date.now() - lastCopy > 10000) { lastCopy = Date.now(); sig('copy_attempt'); } };
-  document.addEventListener('visibilitychange', vis); window.addEventListener('offline', off); window.addEventListener('online', on);
-  onLeave = () => { clearInterval(tick); clearTimeout(debounce); clearTimeout(retry); window.removeEventListener('online', online); window.removeEventListener('beforeunload', warn);
-    document.removeEventListener('visibilitychange', vis); window.removeEventListener('offline', off); window.removeEventListener('online', on); onCopy = null; };
-  drawQ(); drawPal(); draw();
-  tick = setInterval(draw, 1000);
+/* ---------- the exam screen is a separate chunk, fetched only when a test starts ---------- */
+let examWait = null;
+const loadExam = () => window.PhysicaSeriesExam ? Promise.resolve() : examWait || (examWait = new Promise((ok, no) => {
+  const s = document.createElement('script'); s.src = '__SERIES_EXAM_URL__'; s.async = true; s.onload = ok; s.onerror = () => { examWait = null; s.remove(); no(err('network')); }; document.head.append(s);
+}));
+const kit = {
+  h, rt, rich, rpc, say, sleep, SUPA, EXAM_NAME: NAME, SUBJ, KIND, minus, dur, secLabel,
+  name: () => profileName || 'Candidate', email: () => sess && sess.user && sess.user.email,
+  full: on => ov.classList.toggle('ps-full', !!on),
+  live: on => { examLive = !!on; ov.classList.toggle('ps-exam', !!on); },
+  mount: (...nodes) => { main.replaceChildren(...nodes.flat().filter(x => x != null && x !== false)); ov.scrollTop = 0; },
+  leave: fn => { onLeave = fn; }, copy: fn => { onCopy = fn; },
+  done: id => { kit.full(false); kit.live(false); resultView(id); },
+  hub: () => { kit.full(false); kit.live(false); hubView(curExam); },
+};
+async function runExam(attemptId) {
+  loading('Opening your test…');
+  try {
+    const [d] = await Promise.all([rpc('get_attempt', { p_attempt: attemptId }), loadExam()]);
+    if (d.submitted) return resultView(attemptId);
+    window.PhysicaSeriesExam.run(d, kit);
+  } catch (e) { fatal(e, () => runExam(attemptId)); }
 }
 
 /* ---------- account: data rights (DPDP Act 2023) ---------- */
@@ -552,7 +517,7 @@ function accountView() {
   } }, 'Delete my account');
   show(h('h1', null, 'Your account'),
     h('div', { class: 'ps-card' }, h('p', null, 'Signed in as ', h('b', null, email || '')),
-      h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: listView }, '← Tests'), everywhere)),
+      h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: () => hubView(curExam) }, '← Tests'), everywhere)),
     devCard,
     h('div', { class: 'ps-card' }, h('h3', null, 'Your data'),
       h('p', { class: 'ps-muted' }, 'Get a copy of everything Physica holds about you (profile, tests, answers). Machine-readable JSON.'), h('p', null, exportBtn)),
@@ -562,28 +527,51 @@ function accountView() {
     h('p', { class: 'ps-sub' }, 'Questions or complaints: easy@physica.in · ', h('a', { href: 'privacy.html', target: '_blank', rel: 'noopener' }, 'Privacy Policy'), ' · ', h('a', { href: 'terms.html', target: '_blank', rel: 'noopener' }, 'Terms')), msg);
 }
 
-/* ---------- result ---------- */
+/* ---------- result: scorecard, subject and section analysis, answer review on demand ---------- */
 async function resultView(attemptId) {
-  loading('Loading result…');
+  loading('Loading your scorecard…');
   let r;
   try { r = await rpc('get_result', { p_attempt: attemptId }); } catch (e) { return fatal(e, () => resultView(attemptId)); }
-  const bySub = {};
-  for (const q of r.questions) bySub[q.subject] = (bySub[q.subject] || 0) + q.points;
-  const attempted = r.questions.filter(q => q.your_answer != null && q.your_answer !== '').length;
-  const correct = r.questions.filter(q => q.points > 0).length;
-  const items = r.questions.map(q => {
-    const mine = q.your_answer;
-    const kids = [h('div', { class: 'ps-muted' }, `Q${q.position} · ${q.subject} · ${q.points > 0 ? '+' : ''}${q.points} marks`), rt('div', q.body, 'ps-q')];
-    if (q.type === 'MCQ') (q.options || []).forEach((o, k) => kids.push(h('div', { class: 'ps-opt' + (String(k) === q.correct_answer ? ' right' : String(k) === mine ? ' wrong' : '') },
-      rt('span', o), String(k) === q.correct_answer ? h('b', { class: 'ps-ok' }, ' ✓ correct') : String(k) === mine ? h('b', { class: 'ps-err' }, ' ✗ your answer') : null)));
-    else kids.push(h('p', null, 'Your answer: ', h('b', null, mine ?? '—'), ' · Correct: ', h('b', { class: 'ps-ok' }, q.correct_answer)));
-    if (q.explanation) kids.push(h('p', { class: 'ps-sub' }, h('b', null, 'Solution: '), rich(h('span'), q.explanation)));
-    return h('div', { class: 'ps-card' }, kids);
+  const clock = s => { const m = Math.round(s / 60); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} m` : `${m} m`; };
+  const bySub = new Map();
+  r.sections.forEach((s, i) => { const k = s.s; const o = bySub.get(k) || { sc: 0, mx: 0, ok: 0, bad: 0, skip: 0, tm: 0 }; o.sc += s.sc; o.mx += s.mx; o.ok += s.ok; o.bad += s.bad; o.skip += s.skip; o.tm += s.tm; bySub.set(k, o); });
+  const top = r.of > 1 ? Math.max(1, Math.ceil(r.rank / r.of * 100)) : null;
+  const subjectCards = [...bySub].map(([k, o]) => h('div', { class: 'ps-card ps-sub-card' },
+    h('div', { class: 'ps-ct' }, h('b', null, SUBJ[k] || k), h('span', { class: 'ps-big' }, `${o.sc}/${o.mx}`)),
+    h('div', { class: 'ps-bar2', role: 'img', 'aria-label': `${SUBJ[k] || k}: ${o.sc} of ${o.mx} marks` }, h('i', { style: `width:${Math.max(0, Math.min(100, o.sc / o.mx * 100))}%` })),
+    h('div', { class: 'ps-muted' }, `✓ ${o.ok} right · ✗ ${o.bad} wrong · ${o.skip} skipped · ${clock(o.tm)}`)));
+  const reviewBox = h('div', { class: 'ps-card' }, h('h2', null, 'Review your answers'), h('p', { class: 'ps-muted' }, 'Open a section to see the key, your answer and the solution for each question.'));
+  r.sections.forEach((s, i) => {
+    const body = h('div', { class: 'ps-rev' }); let loaded = false;
+    const det = h('details', { class: 'ps-sec', ontoggle: async () => {
+      if (!det.open || loaded) return; loaded = true; body.textContent = 'Loading…';
+      try { const items = await rpc('get_review', { p_attempt: attemptId, p_section: i }); body.replaceChildren(...items.map(it => reviewItem(it, s))); }
+      catch (e) { loaded = false; body.replaceChildren(h('p', { class: 'ps-err', role: 'alert' }, say(e))); }
+    } }, h('summary', null, `${secLabel(s)} · ${s.sc}/${s.mx}`), body);
+    reviewBox.append(det);
   });
-  show(rt('h1', r.title),
-    h('div', { class: 'ps-card' }, h('h2', null, `Score: ${r.score} / ${r.total}`),
-      h('p', { class: 'ps-muted' }, `${attempted} attempted · ${correct} correct · `, Object.entries(bySub).map(([s, v]) => `${s}: ${v}`).join(' · '))),
-    items, h('p', null, h('button', { type: 'button', class: 'ps-go', onclick: listView }, '← Back to tests')));
+  show(h('button', { type: 'button', class: 'ps-link', onclick: () => hubView(curExam) }, '← All tests'),
+    h('h1', null, `${r.l} · Test ${r.n}${r.p > 1 ? ' · Paper ' + r.p : ''}`),
+    h('div', { class: 'ps-card ps-score' }, h('div', { class: 'ps-big2' }, `${r.score}`, h('small', null, ` / ${r.total}`)),
+      h('p', null, r.of > 1 ? `Rank ${r.rank} of ${r.of} who have taken this test${top ? ` · top ${top}%` : ''}` : 'You are the first to finish this test.'),
+      h('p', { class: 'ps-muted' }, `Time used: ${clock(r.used * 60)} of ${dur(r.min)}`)),
+    h('div', { class: 'ps-grid' }, subjectCards), reviewBox);
+}
+function reviewItem(it, sec) {
+  const q = it.q || {}, correct = it.k === '*' ? 'bonus' : it.k, mine = it.y == null ? '' : it.y, pt = it.pt;
+  const state = it.y == null ? 'skipped' : pt > 0 ? 'right' : 'wrong';
+  const tag = it.k === '*' ? 'bonus' : state;
+  const body = h('div', { class: 'ps-rb' });
+  const det = h('details', { class: 'ps-q2 ' + state, ontoggle: () => {
+    if (!det.open || body.firstChild) return;
+    body.append(rt('div', q.b, 'ps-q'));
+    if (q.f) body.append(h('img', { class: 'ps-fig', src: `${SUPA}/storage/v1/object/public/q/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
+    if (q.o) q.o.forEach((o, j) => { const L = 'ABCDEF'[j], isK = correct !== 'bonus' && correct.includes(L), isY = mine.includes(L);
+      body.append(h('div', { class: 'ps-opt' + (isK ? ' right' : isY ? ' wrong' : '') }, h('b', null, L + '. '), rt('span', o), isK ? h('b', { class: 'ps-ok' }, ' ✓ correct') : null, isY && !isK ? h('b', { class: 'ps-err' }, ' ✗ yours') : (isY ? h('b', { class: 'ps-muted' }, ' (yours)') : null))); });
+    else body.append(h('p', null, 'Your answer: ', h('b', null, mine || '—'), ' · Correct: ', h('b', { class: 'ps-ok' }, correct === 'bonus' ? 'bonus (full marks to all)' : correct.replace(':', ' to '))));
+    if (it.e) body.append(h('p', { class: 'ps-sub' }, h('b', null, 'Solution: '), rich(h('span'), it.e)));
+  } }, h('summary', null, `Q${it.i} · ${tag === 'right' ? '✓' : tag === 'wrong' ? '✗' : tag === 'bonus' ? '★' : '–'} ${pt > 0 ? '+' + pt : pt} · ${Math.round((it.t || 0) / 6) / 10} min`), body);
+  return det;
 }
 
 window.PhysicaSeries = { open, close };

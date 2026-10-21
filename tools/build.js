@@ -19,7 +19,9 @@ fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js'
 bundle(EXAM,'physica-exam.min.js');
 bundle(['rank-pyq-jee.js','rank-pyq-kin.js','rank-pyq-lom.js','rank-pyq-wep.js','rank-pyq-rot.js','rank-pyq-grav.js','rank-pyq-prop.js','rank-pyq-thermo.js','rank-pyq-ktg.js','rank-pyq-osc.js','rank-pyq-es.js'],'physica-pyq.min.js');
 bundle(['rank-export.js'],'physica-export.min.js');
-bundle(['series.js'],'physica-series.min.js'); // Test Series (Supabase login + exam), fetched when a student opens it
+bundle(['series-exam.js'],'physica-series-exam.min.js'); // the exam screen, fetched when a test starts
+bundle(['series.js'],'physica-series.min.js');           // Test Series hub, login, results; fetched when a student opens it
+{const sp=path.join(root,'physica-series.min.js');fs.writeFileSync(sp,fs.readFileSync(sp,'utf8').replace('__SERIES_EXAM_URL__','./physica-series-exam.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-series-exam.min.js'))).digest('hex').slice(0,8)))}
 bundle(['phys-fig.js','rank-figs.js','rank-units.js','rank-units-jee.js','rank-kin-jee.js','rank-lom-jee.js','rank-wep-jee.js','rank-rot-jee.js','rank-grav-jee.js','rank-prop-jee.js','rank-thermo-jee.js','rank-ktg-jee.js','rank-osc-jee.js','rank-electro-jee.js','rank-neet.js'],'physica-rank.min.js');
 {const rp=path.join(root,'physica-rank.min.js'),ph=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-pyq.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('__PYQ_URL__','./physica-pyq.min.js?v='+ph).replace('__EXPORT_URL__','./physica-export.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-export.min.js'))).digest('hex').slice(0,8)))}
 {const box={};require('vm').runInNewContext(fs.readFileSync(path.join(root,'tutor-exam.js'),'utf8'),{window:box});fs.writeFileSync(path.join(root,'.examidx.tmp.js'),'window.PhysicaExamChapters='+JSON.stringify(Object.keys(box.PhysicaExam))+';')}

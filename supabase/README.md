@@ -1,7 +1,7 @@
 # Physica Test Series – Supabase backend
 
 1. Create a project at supabase.com (region: Mumbai / `ap-south-1`).
-2. SQL editor → run `schema.sql`, then (optionally) `seed.sql`.
+2. SQL editor → run `schema.sql`. Then load the exam patterns and your tests (see "Adding tests" below).
 3. Authentication → Providers → Email: enabled. Then **Authentication → Emails → Templates**: edit both "Magic Link" and "Confirm signup"
    so the body shows the code, e.g. `Your Physica login code is <b>{{ .Token }}</b>` (the default templates only send a link, and the app asks for the 6-digit code).
    Authentication → Sign In / Providers → set the OTP length to 6 and expiry to 600 s.
@@ -25,3 +25,13 @@ stub `anon` / `authenticated` roles and an `auth.users` table + `auth.uid()` –
 ## Security, tests and launch checklist
 See `../docs/SECURITY.md` (threat model, how to run the suites, dashboard hardening, legal checklist).
 Quick tests: `bash tests/run-local.sh` and `bash tests/stress/run.sh`.
+
+## Adding tests (JEE Main, JEE Advanced, NEET: 30 each)
+Patterns live in `patterns.json` (single source). Content is one JSON file per test, validated before it can go live:
+```bash
+node tools/series-import.js patterns | psql "$DATABASE_URL"                 # exam patterns (re-run after editing patterns.json)
+node tools/series-import.js check content/                                   # validates every file, lists every problem
+node tools/series-import.js sql content/ --publish > build/import.sql        # then:  psql "$DATABASE_URL" -f build/import.sql
+node tools/series-import.js sample /tmp/samples                              # synthetic SAMPLE tests, for trying the app (never publish them)
+```
+Full format and writing rules: `docs/CONTENT-GUIDE.md`. Series 1-3 of each exam are free, 4-30 paid (derived from the series number).

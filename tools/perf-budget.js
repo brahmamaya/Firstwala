@@ -3,7 +3,7 @@
 'use strict';
 const fs = require('fs'), zlib = require('zlib'), path = require('path');
 const root = path.join(__dirname, '..');
-const BUDGET = { 'physica-series.min.js': 14000, 'ga.js': 4000, 'physica-core.min.js': 12500, 'physica.min.js': 350000, 'styles.min.css': 33000, 'index.html': 8000 };
+const BUDGET = { 'physica-series.min.js': 16000, 'physica-series-exam.min.js': 12000, 'ga.js': 4000, 'physica-core.min.js': 12500, 'physica.min.js': 350000, 'styles.min.css': 33000, 'index.html': 8000 };
 let bad = 0;
 for (const [f, max] of Object.entries(BUDGET)) {
   const gz = zlib.gzipSync(fs.readFileSync(path.join(root, f)), { level: 9 }).length;

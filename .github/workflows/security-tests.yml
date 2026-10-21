@@ -3,9 +3,9 @@ name: Security tests
 # to the test-series backend or front-end. Fails the build if any assertion fails.
 on:
   push:
-    paths: ['supabase/**', 'series.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', '.github/workflows/security-tests.yml']
+    paths: ['supabase/**', 'series.js', 'series-exam.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', 'tools/series-import*.js', 'tools/perf-budget.js', '.github/workflows/security-tests.yml']
   pull_request:
-    paths: ['supabase/**', 'series.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', '.github/workflows/security-tests.yml']
+    paths: ['supabase/**', 'series.js', 'series-exam.js', 'series-loader.js', 'ga.js', 'tools/secret-guard.js', 'tools/watchdog*.js', 'tools/series-import*.js', 'tools/perf-budget.js', '.github/workflows/security-tests.yml']
 permissions:
   contents: read
 jobs:
@@ -31,6 +31,8 @@ jobs:
         run: node -e "require('./tools/secret-guard.js')('.')"
       - name: Performance budget
         run: node tools/perf-budget.js
+      - name: Content tool self-test
+        run: node tools/series-import.test.js
       - name: Watchdog self-test (does it catch tampering / outages?)
         run: node tools/watchdog.test.js
       - name: Database security suite + stress/fuzz

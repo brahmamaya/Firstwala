@@ -42,6 +42,10 @@ There is no application server of ours to patch: all logic runs inside Postgres 
 | 16 | Unauthorised login / forced login / stolen session | Email-code login (no passwords to stuff), auth rate limits, new-device alerts + audit, "log out everywhere", per-account **lock** and global **panic** that act within seconds (even before the JWT expires), idle logout, tab-scoped tokens | suite M, e2e §10 | Email account compromise is outside our control (students are told to secure it) |
 | 17 | Site defaced / malicious script injected via hosting or pipeline | Strict CSP, watchdog compares every live file to the published build every 30 min, alert issue + email, exposed-file checks, branch protection (owner step) | `tools/watchdog.test.js` | Detection is within 30 min, not instant |
 | 18 | Operator mistakes / slow response | Runbook `docs/INCIDENT-RESPONSE.md`, one-line SQL tools, drills, DoD checklist | n/a | The human in the loop |
+| 19 | Paid papers read without paying | Free/paid derived from series number in the database; `start_attempt` checks enrolment; questions only returned for the caller's own attempt; direct API call test | suite D, e2e §4 | A paying student can still photograph or share questions: watermark + integrity log make it traceable |
+| 20 | Broken or half-typed test goes live | Publish gate validates counts, options, keys, figure alt text; live edits re-validated at commit; `series-import.js check` | suite H, `tools/series-import.test.js` | Wrong *content* (a wrong key) can't be detected by software: use the second-person checklist in CONTENT-GUIDE |
+| 21 | Scoring errors / unfair rank | One scoring function; cross-checked against an independent JS implementation on random full-length attempts of all 3 patterns; save-vs-submit lock | stress P, e2e | Pattern numbers (negative marking etc.) must match the official bulletin: edit `supabase/patterns.json` |
+| 22 | Figure URLs shared | Random 16-64 char names in a public CDN bucket; only learned by students who open that test | n/a | Anyone who has the URL can open the image; acceptable for diagrams, never put answers in images |
 | 15 | Data-subject rights | `export_my_data`, `delete_my_account`, inactive-account purge, audit purge | suite J, K | Backups keep deleted data for the provider's backup window |
 
 ## 3b. Visitor statistics without tracking people
@@ -60,8 +64,8 @@ select key as simulation, sum(n) as views from public.analytics_daily where even
 ```bash
 bash supabase/tests/run-local.sh                       # ~120 assertions on a throwaway Postgres
 bash supabase/tests/stress/run.sh                      # concurrency, lock race, 1500-call fuzz (npm i inside stress/ once)
-node tools/watchdog.test.js && node tools/perf-budget.js
-(cd supabase/tests/e2e && npm i && bash db.sh && node e2e.js)   # browser: login, exam, XSS, axe accessibility, incidents, slow-4G speed (~95 checks)
+node tools/watchdog.test.js && node tools/series-import.test.js && node tools/perf-budget.js
+(cd supabase/tests/e2e && npm i && bash db.sh && node e2e.js)   # browser: login, exam, XSS, axe accessibility, incidents, slow-4G speed (~140 checks)
 ```
 CI (`.github/workflows/security-tests.yml`) runs the first two on every push that touches the backend or front-end.
 
