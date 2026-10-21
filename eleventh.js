@@ -86,25 +86,7 @@ add({base:'lens',id:'prism-deviation',flat:true,title:'Prism: angle of minimum d
  presets:[['Near minimum deviation',{i:50,A:60,n:1.52}],['Grazing incidence',{i:78,A:60,n:1.52}]],
  metrics:p=>{const m=prismModel(p);if(!m.ok)return[N('Angle of incidence',p.i,'°',1),N('Angle of emergence','No emergent ray'),N('Angle of deviation','—'),N('Status','Total internal reflection at the second face')];
   return[N('Angle of incidence',p.i,'°',1),N('Angle of emergence',deg(m.e),'°',1),N('Angle of deviation δ',deg(m.dev),'°',1),N('Inside the prism',`r₁ = ${f(deg(m.r1),1)}°, r₂ = ${f(deg(m.r2),1)}°`)]},
- draw:(c,p,t)=>{const m=prismModel(p),s=P3.scene(c,{scale:54,cy:250}),H=3.4,A=rad(p.A),b=H*Math.tan(A/2),top=[0,1.7],L=[-b,-1.7],Rr=[b,-1.7];
-  s.poly([[top[0],top[1],0],[L[0],L[1],0],[Rr[0],Rr[1],0]],C.glass,{alpha:.28,normal:[0,0,1]});s.path([[...top,0],[...L,0],[...Rr,0],[...top,0]],'#bfe8ff',2);
-  const len=Math.hypot(b,H),n1=[-H/len,b/len],n2=[H/len,b/len],M1=[(top[0]+L[0])/2,(top[1]+L[1])/2];
-  // incident ray: angle i with the inward normal, arriving from below the normal
-  const inw=[-n1[0],-n1[1]],ci=Math.cos(rad(p.i)),si=Math.sin(rad(p.i)),d=[inw[0]*ci-inw[1]*si,inw[0]*si+inw[1]*ci],S0=[M1[0]-d[0]*3.2,M1[1]-d[1]*3.2];
-  s.seg([...S0,0],[...M1,0],C.gold,2.6);s.arrow([S0[0]+d[0]*1.4,S0[1]+d[1]*1.4,0],[S0[0]+d[0]*1.9,S0[1]+d[1]*1.9,0],C.gold,2.6,9);
-  s.seg([M1[0]+n1[0]*1.2,M1[1]+n1[1]*1.2,0],[M1[0]-n1[0]*1.2,M1[1]-n1[1]*1.2,0],C.muted,1.2,[5,5]);
-  const d2=refr(d,n1,1/p.n);if(d2){
-   // ray inside meets the right face (line top–R)
-   const ex=[Rr[0]-top[0],Rr[1]-top[1]],den=d2[0]*ex[1]-d2[1]*ex[0],tt=((top[0]-M1[0])*ex[1]-(top[1]-M1[1])*ex[0])/den,M2=[M1[0]+d2[0]*tt,M1[1]+d2[1]*tt];
-   s.seg([...M1,0],[...M2,0],C.gold,2.6);s.seg([M2[0]+n2[0]*1.2,M2[1]+n2[1]*1.2,0],[M2[0]-n2[0]*1.2,M2[1]-n2[1]*1.2,0],C.muted,1.2,[5,5]);
-   const d3=refr(d2,[-n2[0],-n2[1]],p.n);
-   if(d3){const E=[M2[0]+d3[0]*3.2,M2[1]+d3[1]*3.2];s.seg([...M2,0],[...E,0],C.gold,2.6);s.arrow([M2[0]+d3[0]*1.6,M2[1]+d3[1]*1.6,0],[M2[0]+d3[0]*2.1,M2[1]+d3[1]*2.1,0],C.gold,2.6,9);
-    s.seg([...M1,0],[M1[0]+d[0]*4,M1[1]+d[1]*4,0],C.gold+'66',1.4,[6,6]);
-    s.label([M2[0]+n2[0]*1.35,M2[1]+n2[1]*1.35,0],'e = '+f(deg(m.e),1)+'°',C.white,12)}
-   else{const rf=[d2[0]-2*(d2[0]*n2[0]+d2[1]*n2[1])*n2[0],d2[1]-2*(d2[0]*n2[0]+d2[1]*n2[1])*n2[1]];s.seg([...M2,0],[M2[0]+rf[0]*1.4,M2[1]+rf[1]*1.4,0],C.red,2,[5,4])}}
-  s.label([M1[0]+n1[0]*1.35,M1[1]+n1[1]*1.35,0],'i = '+f(p.i,1)+'°',C.white,12);s.label([0,1.2,0],'A',C.white,13);
-  s.render();
-  tag(c,m.ok?`deviation δ = ${f(deg(m.dev),1)}°  (dashed: the undeviated path)`:'No emergent ray: total internal reflection at the second face',44,98,m.ok?C.muted:C.red,13)},
+ draw:(c,p,t)=>window.PhysicaOpt3D.prism(c,p,t),
  assumption:'Monochromatic light (sodium yellow); thin rays; the prism is in air.'});
 
 done();
