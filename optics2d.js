@@ -63,7 +63,7 @@ make('concave-mirror',(c,p,t)=>{const ppc=6,u=p.u,F=p.f,MX=600,cy=250,h=30,v=u*F
   for(const [k,l] of[[1,'F'],[2,'C']]){const x=MX-k*F*ppc;if(x>40){c.fillStyle='#ffd43b';c.beginPath();c.arc(x,cy,2.5,0,TAU);c.fill();txt(c,l,x,cy-10,'#ffd43b',9,'center',700)}}
   post(c,ox,cy,BY);candle(c,ox,cy,h,1,false,t);const top=[ox,cy-h];
   if(real){const it=[ix,cy-h*m],fx=MX-F*ppc,hit=[MX,it[1]];ray(c,[top,[MX,cy-h],ext([MX,cy-h],it,sx)],'#ffc65a',1.5);ray(c,[top,ext(top,[fx,cy],MX),[sx,it[1]]],'#ffc65a',1.5);ray(c,[top,[MX,cy],ext([MX,cy],it,sx)],'#ffc65a',1.5);if(ix>40&&Math.abs(ix-sx)>6)candle(c,ix,cy,h,m,true,t)}
-  else{ray(c,[top,[MX,cy-h],[ox-40,cy-h-(h/(F*ppc))*(MX-ox+40)]],'#ffc65a',1.5);ray(c,[[MX,cy-h],[ix,cy-h*m]],'#ffc65a',1,[4,4]);candle(c,ix,cy,h,m,true,t);txt(c,'virtual image behind the mirror — none on screen',Math.min(560,ix),Math.max(122,cy-h*m-16),'#e9f6ff',10,'center',700)}
+  else{ray(c,[top,[MX,cy-h],[ox-40,cy-h+(h/(F*ppc))*(MX-ox+40)]],'#ffc65a',1.5);ray(c,[[MX,cy-h],[ix,cy-h*m]],'#ffc65a',1,[4,4]);candle(c,ix,cy,h,m,true,t);txt(c,'virtual image behind the mirror — none on screen',Math.min(560,ix),Math.max(122,cy-h*m-16),'#e9f6ff',10,'center',700)}
   post(c,sx,cy+70,BY);screenCard(c,sx,cy+4,cy+70,real?Math.abs(sx-ix)*.2:16,()=>candle(c,sx+12,cy,h,real?m:-1,false,t));
   dragDot(c,ox,BY-10,'candle');dragDot(c,sx+12,cy+86,'');panel(c,[`v = ${f(-v,1)} cm`,`1/v + 1/u = 1/f · f = −${F} cm`,`m = ${f(m,2)}`])},
  (q,p)=>q.y<150?null:Math.abs(q.x-SCR.mirror-12)<20&&q.y>254?'scr':'obj',(q,p,md)=>{if(md==='scr')SCR.mirror=clamp(Math.round(q.x-12),50,560);else p.u=clamp(snap((600-q.x)/6,1),5,60)});
@@ -82,7 +82,7 @@ make('total-internal-reflection',(c,p,t)=>boundary(c,p,t,p.n1,p.n2,p.th),q=>q.y<
 /* ---- real and apparent depth ---- */
 make('apparent-depth',(c,p,t)=>{const X=330,top=170,k=70,d=p.d,da=d/p.n;hint(c,'Drag the coin deeper or shallower');c.save();const g=c.createLinearGradient(0,top,0,top+230);g.addColorStop(0,'rgba(120,190,240,.35)');g.addColorStop(1,'rgba(30,90,150,.45)');c.fillStyle=g;c.fillRect(150,top,360,230);c.restore();c.strokeStyle='rgba(220,245,255,.8)';c.strokeRect(150,top-30,360,260);
   const cyR=top+d*k,cyA=top+da*k;c.save();c.fillStyle='#e0a930';c.beginPath();c.ellipse(X,cyR,24,6,0,0,TAU);c.fill();c.globalAlpha=.45;c.setLineDash([3,3]);c.strokeStyle='#ffd43b';c.beginPath();c.ellipse(X,cyA,24,6,0,0,TAU);c.stroke();c.restore();
-  ray(c,[[X+10,cyR],[X+40,top],[X+120,top-90]],'#ffd43b',1.6);ray(c,[[X+40,top],[X+10,cyA]],'#ffd43b',1,[4,4]);txt(c,'👁',X+128,top-98,'#e9f6ff',18,'center');txt(c,`real depth ${f(d,2)} m`,X-60,cyR,'#e0a930',10,'right',700);txt(c,`appears at ${f(da,2)} m`,X-60,cyA,'#ffd43b',10,'right',700);
+  const ea=Math.hypot(30,cyA-top),ex=X+30+30/ea*130,ey=top-(cyA-top)/ea*130;ray(c,[[X,cyR],[X+30,top],[ex,ey]],'#ffd43b',1.6);ray(c,[[X+30,top],[X,cyA]],'#ffd43b',1,[4,4]);txt(c,'👁',ex+6,ey-8,'#e9f6ff',18,'center');txt(c,`real depth ${f(d,2)} m`,X-60,cyR,'#e0a930',10,'right',700);txt(c,`appears at ${f(da,2)} m`,X-60,cyA,'#ffd43b',10,'right',700);
   dragDot(c,X,cyR,'coin');panel(c,[`apparent depth ${f(da,2)} m`,`d′ = d / n · n = ${p.n}`,`shift ${f(d-da,2)} m`])},
  q=>q.y>150?'c':null,(q,p)=>{p.d=clamp(snap((q.y-170)/70,.05),.2,3)});
 
