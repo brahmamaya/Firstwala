@@ -13,7 +13,6 @@ const arrowObj=(s,x,h,col)=>{s.arrow([x,0,0],[x,h,0],col,4,10)};
 const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
 
 /* ---------- Electromagnetic Waves ---------- */
-reg('emwave',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.65,pitch:.25}),k=TAU/(.6+p.wavelength*.6),E=[],B=[];for(let i=0;i<=90;i++){const x=-3.4+6.8*i/90,v=Math.sin(k*x-t*3)*.6*p.amplitude;E.push([x,v,0]);B.push([x,0,v*.8]);if(i%3===0){s.seg([x,0,0],[x,v,0],'#ffc36b88',1.2);s.seg([x,0,0],[x,0,v*.8],'#7baaff66',1.1)}}s.curve(E,C.gold,2.6,6);s.curve(B,C.blue,2,6);s.arrow([-3.4,0,0],[3.6,0,0],C.muted,1.5,11,'travel at c = 3×10⁸ m/s');s.label([-3,1.4*p.amplitude*.6+.3,0],'E',C.gold,14);s.label([-3,0,1.2*p.amplitude*.6+.2],'B',C.blue,14);s.render()});
 // EM spectrum: a source emits the selected radiation in 3D; λ in ångström and f in hertz. Entering visible light the
 // camera zooms into the 7 colours (VIBGYOR) with their names and wavelength / frequency ranges.
 const EMB=[[-14,-11,'Gamma rays','#be4bdb'],[-11,-8,'X-rays','#7950f2'],[-8,-6.42,'Ultraviolet','#4c6ef5'],[-6.42,-6.12,'Visible light',''],[-6.12,-3,'Infrared','#e8590c'],[-3,-1,'Microwaves','#f08c00'],[-1,3,'Radio waves','#fab005']],
@@ -45,8 +44,6 @@ reg('spectrum',(c,p,t)=>{const e=p.exponent,lam=10**e,nm=lam*1e9,vis=nm>=380&&nm
     tag(c,`Visible light: 3800–7600 Å  ·  3.95–7.89 × 10¹⁴ Hz`,44,138,C.white,14,'left','700')}
   else tag(c,`Range: ${ang(10**Math.max(band[0],-12))} – ${ang(10**band[1])}`,44,114,'#c9d6e6',14)});
 reg('radiation-pressure',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.5}),mir=p.surface==='mirror',Pr=(mir?2:1)*p.intensity/3e8,a=.5+Math.sqrt(p.area)*4;s.box([1.6,0,0],[.1,a,a],mir?'#e9f6ff':'#212529');for(let i=0;i<8;i++){const y=(hash(i)-.5)*a*.8,z=(hash(i+3)-.5)*a*.8,q=cycle(t*.8+i/8,1);s.ball([-3+4.5*Math.min(q*1.2,1),y,z],.05,'#ffd43b',{glow:true,flat:true});if(mir&&q>.83)s.ball([1.5-(q-.83)*8,y,z],.05,'#ffd43b',{flat:true})}for(let i=0;i<5;i++)s.seg([-3,(i-2)*.3,0],[1.55,(i-2)*.3,0],'#ffd43b44',2);s.arrow([1.7,0,0],[1.7+.3+Pr*2e5,0,0],C.red,4,11,`F = ${f(Pr*p.area,3)} N`);s.render();tag(c,mir?'Mirror: momentum reverses → twice the push':'Absorber: photons stop → push',44,98,C.gold,14)});
-reg('displacement-current',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.4}),ph=Math.sin(TAU*p.frequency*t*.5),a=.4+Math.sqrt(p.area)*3;for(const x of[-.3,.3])s.cyl([x,0,0],[1,0,0],a,.06,x<0?'#ff857e':'#7baaff');s.cyl([-1.9,0,0],[1,0,0],.04,3.2,'#d9844a');s.cyl([1.9,0,0],[1,0,0],.04,3.2,'#d9844a');for(let i=0;i<4;i++){const y=(i-1.5)*.25;s.arrow([-.25,y,0],[-.25+.5*Math.abs(ph)+.01,y,0],'#ffc36b'+Math.round(80+170*Math.abs(ph)).toString(16).padStart(2,'0'),1.5,6,i===3?`I_d = ${f(p.current*Math.abs(ph),2)} nA`:'')}for(const x of[-1.6,0,1.6])s.ring([x,0,0],[1,0,0],a*.6+.2,'#42d9ca'+Math.round(60+180*Math.abs(Math.cos(TAU*p.frequency*t*.5))).toString(16).padStart(2,'0'),2);s.render();tag(c,'mint rings: B field — present around the wire AND around the gap',44,98,C.muted,13)});
-reg('photon-energy',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.5,pitch:.2}),fq=Math.pow(10,p.exponent),lam=3e8/fq*1e9,col=lam>=380&&lam<=780?spec(lam):lam<380?'#be4bdb':'#e8590c',k=TAU/clamp(4-(p.exponent-6)*.25,.2,4),x0=-3+cycle(t*.6,1)*4;s.curve(Array.from({length:81},(_,i)=>{const x=-3.4+6.8*i/80;return[x,.6*Math.exp(-((x-x0)**2)/.8)*Math.sin(k*x-t*6),0]}),col,2.6,8);s.render();tag(c,`f = ${fq.toExponential(2)} Hz`,44,98,C.gold,15)});
 reg('em-field-intensity',(c,p,t)=>{const s=P3.scene(c,{scale:56,yaw:.6}),I=.5*8.854e-12*3e8*p.electric**2,a=.4+Math.sqrt(p.area)*.15,E=[],k=TAU/1.2;for(let i=0;i<=60;i++){const x=-3.4+4.4*i/60;E.push([x,.5*Math.sin(k*x-t*3)*clamp(p.electric/500,.2,1.6),0])}s.curve(E,C.gold,2.4,6);s.box([1.4,0,0],[.06,a*2,a*2],'#42d9ca',{alpha:clamp(.15+I/2000,.15,.9)});s.render();tag(c,`I = ½ε₀cE₀² = ${f(I,1)} W/m²`,44,98,C.gold,15)});
 
 /* ---------- Ray Optics ---------- */
@@ -296,4 +293,45 @@ reg('zener-regulator',(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.5,cy:290}),V
 reg('iv-curve',(c,p,t)=>{const s=P3.scene(c,{scale:58,cx:220,pitch:.3}),I=v=>v>0?Math.exp((v-p.knee)/.05)*.01:-.0005,on=p.voltage>p.knee;s.cyl([0,0,0],[1,0,0],.35,1.6,'#1a1a1a');s.cyl([.6,0,0],[1,0,0],.36,.14,'#c9d3da');s.cyl([-1.5,0,0],[1,0,0],.04,1.4,'#adb5bd');s.cyl([1.5,0,0],[1,0,0],.04,1.4,'#adb5bd');if(on)for(let i=0;i<8;i++){const q=cycle(t*.8+i/8,1);s.ball([-2.2+4.4*q,.0,0],.05,'#ffc36b',{flat:true,glow:true})}s.render();
   chart(c,430,96,226,170,{title:'Diode I–V',xl:'V',xmin:-1,xmax:1,ymin:-.2,ymax:1,series:[{fn:v=>clamp(I(v),-.1,1),col:C.gold}],marker:[p.voltage,clamp(I(p.voltage),-.1,1)]})});
 reg('transistor-switch',(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.4}),ib=Math.max(0,(p.input-.7)/(p.baseR*1000)),ic=Math.min(p.gain*ib,4.8/220),on=ic>0;s.box([0,-.12,0],[6,.16,3],'#16404a');s.lathe([0,0,0],[[.3,0],[.3,.7],[0,.72]],'#1a1a1a',{segs:16});for(const x of[-.15,0,.15])s.cyl([x,-.05,.2],[0,1,0],.02,.2,'#adb5bd');s.label([0,1,0],'NPN',C.white,12);s.cyl([-1.6,.12,0],[1,0,0],.1,.7,'#c9a36b');s.label([-1.6,.45,0],'R_B',C.muted,11);s.ball([1.6,.4,0],.25,on?'#ffd43b':'#495057',{glow:on});s.label([1.6,.9,0],'load',C.muted,11);s.render();tag(c,on?(p.gain*ib>=4.8/220?'Saturated: switch ON':'Active region'):'Cut off: switch OFF',44,98,on?C.mint:C.muted,14)});
+const K6=window.PhysicaKit6,{wire:wire6,mint:mintL}=K6;
+// shared bits for the realistic wave scenes
+const sheet=(s,fn,x0,x1,n,mk,col,al)=>{let prev=null;for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,q=mk(x,fn(x));if(prev)s.poly([prev[0],prev[1],q[1],q[0]],col,{alpha:al,shade:false,z:undefined});prev=q}};
+const tripod=(s,x,y0,z=0)=>{s.box([x,y0+.08,z],[.9,.16,.9],'#3b4148');s.cyl([x,y0+.8,z],[0,1,0],.05,1.4,'#c3c9cf',{seg:8})};
+reg('emwave',(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.15,pitch:-.05,cy:262}),lam=.6+p.wavelength*.6,k=TAU/lam,A=.62*p.amplitude,W=t*3,Y0=-1.55,E=x=>Math.sin(k*x-W)*A;
+  s.box([0,Y0-.1,0],[8.4,.2,3.2],'#2c333a',{ground:true});
+  // transmitting dipole antenna on the left, receiving rod on the right
+  s.box([-3.9,Y0+.12,0],[.7,.24,.7],'#3b4148');s.cyl([-3.9,Y0+.9,0],[0,1,0],.05,1.4,'#c3c9cf',{seg:8});s.cyl([-3.9,Y0+1.1,0],[0,1,0],.07,.1,'#d98a4b',{seg:8});s.ball([-3.9,Y0+1.62,0],.07,'#ffd27a',{glow:true,flat:true});
+  const base=[-3.4,3.7];s.arrow([base[0],0,0],[base[1]+.2,0,0],'#8ca6b9',1.8,11);
+  sheet(s,E,-3.4,3.6,70,(x,v)=>[[x,0,0],[x,v,0]],'#ffc36b',.3);sheet(s,x=>E(x)*.9,-3.4,3.6,70,(x,v)=>[[x,0,0],[x,0,v]],'#7baaff',.3);
+  const Ep=[],Bp=[];for(let i=0;i<=90;i++){const x=-3.4+7*i/90,v=E(x);Ep.push([x,v,0]);Bp.push([x,0,v*.9])}s.curve(Ep,C.gold,2.8,6);s.curve(Bp,'#8fb8ff',2.4,6);
+  for(let i=0;i<=14;i++){const x=-3.2+i*.46,v=E(x);if(Math.abs(v)>.12){s.arrow([x,0,0],[x,v,0],'#ffd8a0',1.4,6);s.arrow([x,0,0],[x,0,v*.9],'#a9c8ff',1.3,6)}}
+  const x1=-3.4+(((W+PI/2)/k)%lam+lam)%lam+0*lam;let xc=x1;while(xc<-3.4)xc+=lam;if(xc+lam<3.5){s.seg([xc,-A-.35,.45],[xc+lam,-A-.35,.45],C.mint,2);s.seg([xc,-A-.28,.45],[xc,-A-.42,.45],C.mint,2);s.seg([xc+lam,-A-.28,.45],[xc+lam,-A-.42,.45],C.mint,2);s.callout([xc+lam/2,-A-.35,.45],`λ = ${p.wavelength} m`,C.mint,0,45,12)}
+  s.callout([-2.2,A+.1,0],'E (electric): up and down',C.gold,-20,-45,12);s.callout([-1.6,0,A*.9+.1],'B (magnetic): in and out',C.blue,-50,40,12);s.callout([3.5,0,0],'travels at c = 3×10⁸ m/s',C.muted,0,-52,11);
+  s.render();tag(c,'E and B oscillate in step, at right angles to each other and to the direction of travel',44,98,C.muted,13)});
+reg('displacement-current',(c,p,t)=>{const s=P3.scene(c,{scale:50,yaw:.3,cy:262}),w=TAU*p.frequency*t*.5,sn=Math.sin(w),cs=Math.cos(w),a=.45+Math.sqrt(p.area)*2.6,Y=-1.9;
+  s.box([0,Y-.1,0],[6.6,.2,3.2],'#2c333a',{ground:true});
+  // two circular metal plates with an air gap between them
+  for(const x of[-.35,.35])s.cyl([x,0,0],[1,0,0],a,.07,'#c3c9cf',{cap:'#e1e5e9',seg:32});
+  s.cyl([-1.5,0,0],[1,0,0],.04,2.3,'#d98a4b');s.cyl([1.5,0,0],[1,0,0],.04,2.3,'#d98a4b');
+  s.box([0,Y+.3,0],[1.5,.6,.8],'#2f353b');s.engrave([0,Y+.32,.41],'~ AC source','#ffd27a',11);wire6(s,[[-.39,0,0],[-2.6,0,0],[-2.6,Y+.4,0],[-.75,Y+.4,0]],'#d64541');wire6(s,[[.39,0,0],[2.6,0,0],[2.6,Y+.4,0],[.75,Y+.4,0]],'#2b2b2b');
+  // plate charge ∝ sin, conduction current in the wires and displacement current in the gap ∝ cos
+  const nq=Math.round(10*Math.abs(sn));for(let i=0;i<nq;i++){const ang=TAU*hash(i+9),r=a*.8*Math.sqrt(hash(i+31));for(const [x,sg] of[[-.4,1],[.4,-1]])s.ball([x*(1+.06),r*Math.cos(ang),r*Math.sin(ang)],.05,(sg*Math.sign(sn))>0?'#ff6b5e':'#5d8bff',{flat:true})}
+  const sgn=Math.sign(cs)||1,ia=Math.abs(cs);for(let i=0;i<5;i++){const y=(i-2)*a*.25;s.arrow([-.3*sgn,y,0],[.3*sgn,y,0],'#ffc36b'+Math.round(60+190*ia).toString(16).padStart(2,'0'),2,7)}
+  for(const [x,d] of[[-2.0,1],[2.0,-1]])s.arrow([x-.3*d*sgn*ia,0,0],[x+.3*d*sgn*ia+.02,0,0],'#ffc36b',3,9);
+  for(const x of[-1.1,0,1.1]){const R=(x===0?a*.55:.28)+.1,al=Math.round(60+190*ia).toString(16).padStart(2,'0'),pts=Array.from({length:37},(_,i)=>[x,R*Math.cos(TAU*i/36),R*Math.sin(TAU*i/36)]);s.path(pts,'#42d9ca'+al,2.2);for(const th of[.8,3.9]){const a2=th+.35*sgn;s.arrow([x,R*Math.cos(th),R*Math.sin(th)],[x,R*Math.cos(a2),R*Math.sin(a2)],'#42d9ca',1.8,7)}}
+  mintL(s,[0,a,0],'parallel metal plates (air gap)',-30,-60);mintL(s,[-2.0,0,0],'conduction current I in wire',-40,-50);s.callout([0,-.15,0],`displacement current I_d = ${f(p.current*Math.abs(cs),2)} nA`,C.gold,60,70,12);
+  s.render();tag(c,'no charge crosses the gap, yet B rings appear there: a changing E field acts like a current',44,98,C.muted,13)});
+reg('photon-energy',(c,p,t)=>{const s=P3.scene(c,{scale:48,yaw:.3,pitch:.15,cy:262}),e=p.exponent,fq=10**e,lam=3e8/fq*1e9,col=lam>=380&&lam<=780?spec(lam):lam<380?'#c77dff':'#ff7a45',k=TAU/clamp(3.6-(e-6)*.24,.18,3.6),x0=-2.9+cycle(t*.5,1)*5.8,eV=6.626e-34*fq/1.602e-19;
+  s.box([0,-1.75,0],[8.2,.2,3.4],'#2c333a',{ground:true});
+  // the spectrum strip, with a marker at the chosen frequency
+  const BD=[[6,9.5,'Radio','#e8b923'],[9.5,11.5,'Micro','#f08c00'],[11.5,14.6,'Infra-red','#e8590c'],[14.6,14.9,'',''],[14.9,16.5,'UV','#5c7cfa'],[16.5,19.5,'X-ray','#7950f2'],[19.5,20,'γ','#be4bdb']],X=q=>-3.4+6.8*(q-6)/14;
+  for(const [a,b,n,bc] of BD){if(!n){for(let i=0;i<6;i++)s.box([X(a)+(X(b)-X(a))*(i+.5)/6,-1.55,.9],[(X(b)-X(a))/6,.25,.5],spec(700-i*55));continue}s.box([(X(a)+X(b))/2,-1.55,.9],[X(b)-X(a),.25,.5],bc);s.engrave([(X(a)+X(b))/2,-1.41,1.15],n,'#101418',9)}
+  s.poly([[X(e),-1.1,.9],[X(e)-.15,-.8,.9],[X(e)+.15,-.8,.9]],'#ffffff',{normal:[0,0,1],shade:false});
+  // source on the left, photon packet travelling right
+  s.cyl([-3.6,-.2,0],[1,0,0],.35,.9,'#4a5159',{cap:col,seg:16});s.box([-3.6,-.75,0],[.5,.5,.5],'#2f353b');s.ball([-3.1,-.2,0],.15,col,{glow:true,flat:true});
+  const env=x=>Math.exp(-((x-x0)**2)/.7),pk=[];for(let i=0;i<=120;i++){const x=-3+6.2*i/120;pk.push([x,.85*env(x)*Math.sin(k*x*4-t*7),0])}s.curve(pk,col+'55',9,6);s.curve(pk,col,3,6);s.ball([x0,0,0],.14,'#ffffff',{glow:true,flat:true});
+  s.seg([-3,0,0],[3.4,0,0],'#ffffff22',1);
+  s.callout([x0,.9*1,0],`one photon: E = hf = ${eV<1e3?f(eV,eV<.01?5:3):eV.toExponential(2)} eV`,C.gold,0,-55,12);s.callout([X(e),-.8,.9],`f = 10^${e} Hz`,'#fff',0,-50,12);mintL(s,[-3.6,-.2,0],'source',-10,-50);
+  s.render();tag(c,`f = ${fq.toExponential(2)} Hz  ·  λ = ${lam<1?lam.toExponential(1):f(lam,lam>100?0:1)} nm`,44,98,C.gold,15)});
+
 })();
