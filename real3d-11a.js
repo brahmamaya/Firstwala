@@ -221,20 +221,24 @@ R['braking']=(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.36,yaw:.42,cx:330,cy:
   callout(s,[x0+dR*k/2,0,-.1],`reaction ${f(dR,1)} m`,-20,60);callout(s,[x0+dR*k+dB*k/2,0,-.1],`braking ${f(dB,1)} m`,20,70);callout(s,[xs,.6,-.45],'stop',30,-40);
   s.render();tag(c,'gold: reaction distance · red: braking distance',44,98,C.muted,13)};
 
-R['vertical-throw']=(c,p,t)=>{const s=P3.scene(c,{scale:44,cy:272,yaw:.2,pitch:.22}),T=(p.speed+Math.sqrt(p.speed**2+2*G*p.height))/G,tt=Math.min(cycle(t,T+1),T),y=p.height+p.speed*tt-.5*G*tt*tt,v=p.speed-G*tt,Hm=p.height+p.speed**2/(2*G),k=4.4/Math.max(Hm,1),g0=-1.6,yb=g0+y*k+.13;
+R['vertical-throw']=(c,p,t)=>{const s=P3.scene(c,{scale:44,cy:272,yaw:.2,pitch:.22,cx:320}),T=(p.speed+Math.sqrt(p.speed**2+2*G*p.height))/G,tt=Math.min(cycle(t,T+1),T),y=p.height+p.speed*tt-.5*G*tt*tt,v=p.speed-G*tt,Hm=p.height+p.speed**2/(2*G),k=4.4/Math.max(Hm,1),g0=-1.6,bx=.55,yb=g0+y*k+.13;
   grass(s,-4,4,-2.2,1.6,g0);
-  if(p.height>0){const H=p.height*k;s.box([.15,g0+H/2,0],[1.4,H,1.1],'#9a8f84');for(let i=0;i<Math.floor(H/.35);i++)for(const dx of[-.3,.3])s.box([.15+dx,g0+.2+i*.35,.56],[.26,.18,.01],'#6fa3c7');s.box([.15,g0+H+.03,.1],[1.5,.06,1.3],'#7d746b');for(const dx of[-.6,.85])s.cyl([dx,g0+H+.18,.6],[0,1,0],.02,.3,ST);s.cyl([.12,g0+H+.33,.6],[1,0,0],.02,1.45,ST)}
+  // concrete building with window bands; the ball is thrown from its edge (balcony) and falls past its face
+  if(p.height>0){const H=p.height*k,bw=1.7,cx0=bx+.15+bw/2;s.box([cx0,g0+H/2,0],[bw,H,1.2],'#b9b0a4');
+    for(let i=0;i<Math.floor((H-.2)/.4);i++)for(const dx of[-.5,0,.5]){s.box([cx0+dx,g0+.35+i*.4,.61],[.3,.22,.012],'#5f93b8');s.box([cx0+dx,g0+.35+i*.4-.12,.62],[.34,.025,.014],'#e9e4da')}
+    s.box([cx0,g0+H+.04,0],[bw+.1,.08,1.3],'#7d746b');s.box([cx0-bw/2+.02,g0+H+.17,.55],[.04,.2,.04],ST);s.box([cx0-bw/2+.02,g0+H+.27,0],[.04,.04,1.1],ST)}
   pole(s,-1.4,0,g0,g0+Math.ceil(Hm/5)*5*k,5*k);s.label([-1.75,g0+Math.ceil(Hm/5)*5*k,0],`${Math.ceil(Hm/5)*5} m`,C.white,11,'right');s.label([-1.75,g0+5*k,0],'5 m',C.white,11,'right');
-  seamBall(s,[0,yb,.6],.16,'#b3201c','#f4f4ee',tt*8);s.shadow([0,0,.6],.13,g0,.4);
-  s.seg([-.9,g0+Hm*k+.13,.6],[.9,g0+Hm*k+.13,.6],C.mint,1.5,[4,4]);s.label([1.4,g0+Hm*k+.13,.6],'turning point',C.mint,12,'left');
-  if(Math.abs(v)>.3)s.arrow([.35,yb,.6],[.35,yb+clamp(v*.06,-1.2,1.2),.6],C.gold,3,10,`v = ${f(v,1)} m/s`);s.arrow([-.35,yb+.25,.6],[-.35,yb-.35,.6],C.red,2.5,9,'g');
-  callout(s,[-1.4,g0+2.5*k,0],'surveyor pole (5 m bands)',-30,40);if(p.height>0)callout(s,[.8,g0+p.height*k,.6],'balcony',50,10);
+  s.seg([bx,g0,.55],[bx,g0+Hm*k+.13,.55],'#ffffff44',1,[3,4]);
+  seamBall(s,[bx,yb,.55],.16,'#b3201c','#f4f4ee',tt*8);s.shadow([bx,0,.55],.13,g0,.4);
+  s.seg([bx-.5,g0+Hm*k+.13,.55],[bx+.5,g0+Hm*k+.13,.55],C.mint,1.5,[4,4]);s.label([bx-.6,g0+Hm*k+.13,.55],`highest point ${f(Hm,1)} m`,C.mint,12,'right');
+  if(Math.abs(v)>.3)s.arrow([bx+.35,yb,.55],[bx+.35,yb+clamp(v*.06,-1.2,1.2),.55],C.gold,3,10,`v = ${f(v,1)} m/s`);s.arrow([bx-.35,yb+.25,.55],[bx-.35,yb-.35,.55],C.red,2.5,9,'g');
+  callout(s,[-1.4,g0+2.5*k,0],'surveyor pole (5 m bands)',-30,40);if(p.height>0)callout(s,[bx+.2,g0+p.height*k,.3],'balcony edge',60,-25);
   s.render()};
 
 R['vt-area']=(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.3,yaw:.42,cx:300,cy:285}),tt=Math.min(cycle(t,p.time+1),p.time),vf=v=>Math.max(0,p.u+p.a*v),x=(()=>{let d=0;const n=60;for(let i=0;i<n;i++)d+=vf(tt*(i+.5)/n)*tt/n;return d})(),tot=(()=>{let d=0;const n=80;for(let i=0;i<n;i++)d+=vf(p.time*(i+.5)/n)*p.time/n;return d})(),k=6.4/Math.max(tot,1),X=-3.2+x*k;
   bench(s,0,-.24,8.8,2.6,'#6f4a2c');alTrack(s,-3.7,3.7,0,0,{n:20,step:6.4/20,every:5,off:.5,lab:i=>f(tot*i/20,0)});
   s.poly([[-3.2,.002,-.3],[X,.002,-.3],[X,.002,-.5],[-3.2,.002,-.5]].reverse(),C.mint,{alpha:.35,normal:[0,1,0],z:-4e5});trolley(s,[X,0,0],'#2f6db5',1,-X/.09,true);
-  s.arrow([X,.95,0],[X+.25+vf(tt)*.06,.95,0],C.gold,3,11,`v = ${f(vf(tt),1)} m/s`);s.label([X,.02,-.75],`s = ${f(x,1)} m`,C.mint,12);
+  s.arrow([X,.95,0],[X+.25+vf(tt)*.06,.95,0],C.gold,3,11,`v = ${f(vf(tt),1)} m/s`);s.label([X,.02,.85],`s = ${f(x,1)} m`,C.mint,12);
   callout(s,[X,.55,0],'trolley with card',-60,-40);callout(s,[3.64,.12,0],'end stop',20,-40);
   s.render();
   chart(c,420,96,236,150,{title:'v–t (area = displacement)',xl:'t',xmin:0,xmax:p.time,ymin:0,series:[{fn:vf,col:C.gold},{pts:[[0,0],[0,vf(0)],[tt,vf(tt)],[tt,0]],col:C.mint,dash:[3,3]}],marker:[tt,vf(tt)]})};
@@ -244,7 +248,7 @@ R['catch-up']=(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.36,yaw:.42,cx:330,cy
   const XA=x0+xs*k,XB=x0+xf*k;car(s,[XA+.6,0,-.47],'#2b8a3e',.85,-XA/.13);car(s,[XB+.6,0,.47],'#c92a2a',.85,-XB/.13);
   const xm=x0+p.slow*tc*k+.6;s.cyl([xm,.6,-1.15],[0,1,0],.03,1.2,ST);s.poly([[xm,1.2,-1.15],[xm+.45,1.08,-1.15],[xm,.96,-1.15]],C.gold,{cull:false,normal:[0,0,1]});s.label([xm,1.45,-1.15],'catch-up point',C.gold,12);
   s.seg([xm,.005,-.95],[xm,.005,.95],C.gold,2,[6,4],-5.8e5);
-  s.arrow([XA+.6,.95,-.47],[XA+.6+p.slow*.07,.95,-.47],C.mint,3,10,`target ${p.slow} m/s`);if(tt>p.delay)s.arrow([XB+.6,.95,.47],[XB+.6+vf*.07,.95,.47],C.red,3,10,`pursuer ${vf} m/s`);else s.label([XB+.6,1.05,.47],`starts in ${f(p.delay-tt,1)} s`,C.red,12);
+  s.arrow([XA+.6,1.35,-.47],[XA+.6+p.slow*.07,1.35,-.47],C.mint,3,10,`target ${p.slow} m/s`);if(tt>p.delay)s.arrow([XB+.6,.95,.47],[XB+.6+vf*.07,.95,.47],C.red,3,10,`pursuer ${vf} m/s`);else s.label([XB+.6,1.05,.47],`starts in ${f(p.delay-tt,1)} s`,C.red,12);
   callout(s,[x0,0,.8],'start line',-30,50);
   s.render()};
 
@@ -291,7 +295,7 @@ R['circular-motion']=(c,p,t)=>{const s=P3.scene(c,{scale:40,pitch:.45,cy:262}),R
   s.ring([0,.005,0],[0,1,0],R0,'#42d9ca66',1.5,[5,5]);s.cyl([0,.05,0],[0,1,0],.25,.1,'#596066');s.cyl([0,.22,0],[0,1,0],.06,.36,CH);s.cyl([0,.17,0],[0,1,0],.1,.06,BRASS);
   s.seg([0,.17,0],b,'#f1ead8',1.8);s.ball(b,.17,'#c9ced3');s.shadow([b[0],0,b[2]],.17,0,.45);
   s.arrow(b,V.add(b,V.mul([-Math.sin(a),0,Math.cos(a)],.25+p.speed*.12)),C.mint,3,11,`v = ${p.speed} m/s`);s.arrow(b,[b[0]*.65,.17,b[2]*.65],C.red,3,11,`a = v²/r = ${f(p.speed**2/p.radius,2)} m/s²`);
-  callout(s,[0,.4,0],'pivot with bearing',-60,-50);callout(s,[-2.6,0,1.4],'smooth table',-30,40);callout(s,[b[0]*.5,.17,b[2]*.5],'string',0,-60);
+  callout(s,[0,.05,0],'pivot with bearing',-90,-70);callout(s,[2.3,0,1.2],'smooth table',40,50);callout(s,[b[0]*.5,.17,b[2]*.5],'string',70,-75);
   s.render();tag(c,'mint: velocity (tangent) · red: centripetal acceleration',44,98,C.muted,13)};
 
 // Motor boat with hull, deck, windscreen and outboard engine; d = forward unit vector in x-z.
@@ -302,21 +306,21 @@ function boat(s,p,d,k=1){const side=[d[2],0,-d[0]],L=(f0,s0,y)=>V.add(p,V.add(V.
   for(let i=0;i<deck.length;i++){const j=(i+1)%deck.length;s.seg(L(...deck[i],.06),L(...deck[j],.06),'#c92a2a',2)}
   s.poly([L(.08,-.12,.12),L(.08,.12,.12),L(.02,.11,.24),L(.02,-.11,.24)],GLASS,{alpha:.8,spec:.8});s.box(L(-.36,0,.13),[.08*k,.2*k,.08*k],'#1d1f22',{rotY:Math.atan2(-d[2],d[0])});s.cyl(L(-.38,0,-.02),[0,1,0],.02*k,.2*k,'#3b4046')}
 
-R['river-crossing']=(c,p,t)=>{const s=P3.scene(c,{scale:44,pitch:.5,cy:270}),h=rad(p.heading),vx=p.current-p.boat*Math.sin(h),vz=p.boat*Math.cos(h),W=3.4,k=.35,tc=W/Math.max(vz*k,.05),q=Math.min(cycle(t,tc+1),tc),pos=[-1+vx*k*q,0,-W/2+vz*k*q];
+R['river-crossing']=(c,p,t)=>{const s=P3.scene(c,{scale:48,pitch:.5,cy:262,cx:340}),h=rad(p.heading),vx=p.current-p.boat*Math.sin(h),vz=p.boat*Math.cos(h),W=3.4,k=.35,tc=W/Math.max(vz*k,.05),q=Math.min(cycle(t,tc+1),tc),pos=[-1+vx*k*q,0,-W/2+vz*k*q];
   s.poly([[-4,-.12,W/2],[4,-.12,W/2],[4,-.12,-W/2],[-4,-.12,-W/2]],'#1f5f8b',{normal:[0,1,0],z:-6e5,spec:.4});
   for(let i=0;i<16;i++){const x=-3.8+((t*p.current*.4+i*1.37)%7.6),z=-W/2+.2+(i*.61)%(W-.4);s.seg([x,-.1,z],[x+.35,-.1,z],'#a5d8ff88',1.5,[],-5.9e5)}
   for(const z of[-W/2-.45,W/2+.45]){s.box([0,-.06,z],[8,.24,.9],'#4b8a3c',{ground:true});s.box([0,-.1,z-Math.sign(z)*.47],[8,.16,.06],'#c2a878',{ground:true})}
   for(const [x,sc] of[[-3,1],[-1.6,.8],[1.8,1.1],[3.2,.9]]){const zz=-W/2-.6;s.cyl([x,.2,zz],[0,1,0],.05*sc,.4*sc,'#6b4a2b');s.lathe([x,.35*sc,zz],[[.32*sc,0],[.22*sc,.35*sc],[0,.7*sc]],'#2f6b2a',{segs:10,spec:.1})}
   s.box([-1,-.02,W/2+.2],[.4,.06,.8],'#8a5a36');for(const dx of[-.17,.17])s.cyl([-1+dx,-.05,W/2-.15],[0,1,0],.03,.25,'#5c3a21');
-  const fw=V.norm([-Math.sin(h),0,Math.cos(h)]);s.path([[-1,-.1,-W/2],[-1+vx*k*tc,-.1,W/2]],C.gold,1.5,[4,4]);boat(s,V.add(pos,[0,-.12,0]),fw,1.1);
-  for(const sg of[1,-1]){const back=V.sub(pos,V.mul(fw,.45));s.seg([back[0],-.1,back[2]],V.add(V.sub(back,V.mul(fw,.5)),[sg*.18*fw[2],-.1,-sg*.18*fw[0]]),'#e9f6ffaa',1.5)}
+  const fw=V.norm([-Math.sin(h),0,Math.cos(h)]);s.path([[-1,-.1,-W/2],[-1+vx*k*tc,-.1,W/2]],C.gold,1.5,[4,4]);boat(s,V.add(pos,[0,-.12,0]),fw,1.8);
+  for(const sg of[1,-1]){const back=V.sub(pos,V.mul(fw,.75));s.seg([back[0],-.1,back[2]],V.add(V.sub(back,V.mul(fw,.5)),[sg*.18*fw[2],-.1,-sg*.18*fw[0]]),'#e9f6ffaa',1.5)}
   s.arrow(V.add(pos,[0,.4,0]),V.add(pos,[vx*.25,.4,vz*.25]),C.mint,3,11,`v = ${f(Math.hypot(vx,vz),2)} m/s`);s.arrow(V.add(pos,[0,.4,0]),V.add(pos,V.add(V.mul(fw,p.boat*.25),[0,.4,0])),C.gold,2,9);
   s.arrow([2.2,-.08,-.3],[2.2+p.current*.3,-.08,-.3],'#a5d8ff',2.5,9,`river ${p.current} m/s`);
-  callout(s,[-1,0,W/2+.4],'jetty (start)',-40,40);callout(s,V.add(pos,[0,.1,0]),'motor boat',-60,-30);
+  callout(s,[-1,0,W/2+.4],'jetty (start)',-70,25);callout(s,V.add(pos,[0,.1,0]),'motor boat',70,-45);
   s.render();tag(c,'dashed: path over ground · mint: ground velocity · gold: heading',44,98,C.muted,13)};
 
 // Force table: degree-scaled top, pulleys clamped at the rim, strings to slotted-mass hangers.
-R['vector-addition']=(c,p,t)=>{const s=P3.scene(c,{scale:64,pitch:.36,cy:200,cx:320}),th=rad(p.angle),k=.21,A=[p.a*k,0,0],B=[p.b*k*Math.cos(th),0,-p.b*k*Math.sin(th)],Rv=V.add(A,B),Rm=Math.hypot(p.a+p.b*Math.cos(th),p.b*Math.sin(th)),o=[0,.03,0],Rt=2;
+R['vector-addition']=(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.36,cy:212,cx:330}),th=rad(p.angle),k=.21,A=[p.a*k,0,0],B=[p.b*k*Math.cos(th),0,-p.b*k*Math.sin(th)],Rv=V.add(A,B),Rm=Math.hypot(p.a+p.b*Math.cos(th),p.b*Math.sin(th)),o=[0,.03,0],Rt=2;
   s.cyl([0,-1.1,0],[0,1,0],.08,2.1,ST);for(let i=0;i<3;i++){const q=TAU*i/3+.4;s.tube([[0,-2.1,0],[.9*Math.cos(q),-2.2,.9*Math.sin(q)]],.05,DK,{segs:6})}
   s.cyl([0,-.05,0],[0,1,0],Rt,.1,'#9aa1a8',{cap:'#cfd4d9'});const zt=zf(s,[0,0,0])+.05;
   for(let d=0;d<360;d+=5){const a=rad(d),q=[Rt*Math.cos(a),.001,-Rt*Math.sin(a)];s.seg(q,[(Rt-(d%30?.08:.18))*Math.cos(a),.001,-(Rt-(d%30?.08:.18))*Math.sin(a)],'#1b1f23',d%30?.8:1.3,[],zt);if(d%30===0)s.engrave([(Rt-.32)*Math.cos(a),.001,-(Rt-.32)*Math.sin(a)],String(d),'#1b1f23',8,zt)}
@@ -362,12 +366,15 @@ R['air-drag-projectile']=(c,p,t)=>{const r=memo('drag11a'+p.v+p.th+p.k,()=>dragP
 function dragPath(p){const k=p.k,ux=p.v*Math.cos(rad(p.th)),uy=p.v*Math.sin(rad(p.th)),X=t=>ux/k*(1-Math.exp(-k*t)),Y=t=>(uy/k+G/k/k)*(1-Math.exp(-k*t))-G*t/k;let lo=1e-3,hi=2*uy/G+1;for(let i=0;i<60;i++){const m=(lo+hi)/2;Y(m)>0?lo=m:hi=m}const T=lo;return{T,range:X(T),pts:Array.from({length:81},(_,i)=>[X(T*i/80),Math.max(0,Y(T*i/80))])}}
 
 R['conical-pendulum']=(c,p,t)=>{const ct=Math.cos(rad(p.th)),w=Math.sqrt(G/(p.L*ct)),Ls=.9+p.L*.55,r=Ls*Math.sin(rad(p.th)),h=Ls*ct,py=1.75,piv=[0,py,0],a=w*t,b=[r*Math.cos(a),py-h,r*Math.sin(a)],g0=-1.6;
-  const s=P3.scene(c,{scale:50,cy:262});tiles(s,-3,3,-2,1.5,g0);
-  s.box([0,py+.32,0],[4.6,.3,.4],'#8a5a36');s.box([0,py+.15,0],[.5,.04,.5],'#868e96');for(const dx of[-.18,.18])for(const dz of[-.18,.18])s.cyl([dx,py+.18,dz],[0,1,0],.03,.03,DK);s.cyl([0,py+.07,0],[0,1,0],.05,.12,CH);s.ball(piv,.04,CH);
-  s.ring([0,py-h,0],[0,1,0],r,'#42d9ca66',1.5,[5,5]);s.seg(piv,[0,g0,0],'#8ca6b966',1,[4,4]);
+  const s=P3.scene(c,{scale:50,cy:262,cx:330,yaw:.5});
+  // lab bench with a retort stand whose horizontal arm carries the pendulum
+  bench(s,0,g0,7.4,3.6);stand(s,[-2.7,g0,-.6],py+.45,py+.12,.1,0);s.cyl([0,py+.12,-.3],[0,0,1],.03,.6,CH);s.box([0,py+.12,0],[.1,.07,.1],'#5a6068');s.cyl([0,py+.06,0],[0,1,0],.025,.1,DK);s.ball(piv,.035,CH);
+  s.ring([0,g0+.004,0],[0,1,0],r,'#42d9ca88',1.5,[5,5]);s.seg(piv,[0,g0,0],'#8ca6b966',1,[4,4]);s.ring([0,py-h,0],[0,1,0],r,'#42d9ca66',1.5,[5,5]);
+  for(let i=0;i<6;i++){const q=TAU*i/6+.3;s.seg(piv,[r*Math.cos(q),py-h,r*Math.sin(q)],'#8ca6b933',1)}
   const rb=.08+.08*Math.cbrt(p.m),bc=V.add(b,V.mul(V.norm(V.sub(b,piv)),rb));s.seg(piv,b,'#f1ead8',1.8);s.cyl(b,V.sub(b,piv),.018,.05,ST);s.ball(bc,rb,BRASS);s.shadow([bc[0],g0,bc[2]],rb,g0,.4);
   const cen=V.mul([-Math.cos(a),0,-Math.sin(a)],.6);s.arrow(bc,V.add(bc,cen),C.red,2.5,11,`F_c = mg tanθ = ${f(p.m*9.8*Math.tan(p.th*Math.PI/180),2)} N`);s.arrow(bc,[bc[0],bc[1]-.6,bc[2]],C.blue,2.5,11,`W = ${f(p.m*9.8,2)} N`);
-  callout(s,[1.6,py+.3,.2],'ceiling beam',40,-20);callout(s,[0,py+.1,.2],'swivel hook',-60,-20);callout(s,bc,'brass bob',-50,40);
+  s.label([-.2,py-h/2,.1],`L = ${p.L} m`,C.muted,11,'right');
+  callout(s,[-2.7,g0+1.2,-.6],'retort stand',-30,-20);callout(s,[0,py+.1,0],'clamp on rod',60,-40);callout(s,bc,'brass bob',60,50);
   s.render();tag(c,'red: centripetal (net) force   blue: weight',44,98,C.muted,13)};
 
 })();
