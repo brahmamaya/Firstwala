@@ -107,20 +107,20 @@ function scene(c,o={}){
     shadow(p,r,y=0,k=.35){const Q=P([p[0],y,p[2]]),E=P([p[0]+r,y,p[2]]),F=P([p[0],y,p[2]+r]);const rx=Math.max(2,Math.hypot(E[0]-Q[0],E[1]-Q[1])),ry=Math.max(1,Math.abs(F[1]-Q[1])+rx*.15);const lift=Math.max(.15,1-(p[1]-y)*.18);push(-1e5,()=>{if(!ON())return;const R=raw(c);R.save();R.translate(Q[0],Q[1]);R.scale(1,ry/rx);const g=R.createRadialGradient(0,0,0,0,0,rx*1.25);g.addColorStop(0,`rgba(0,0,0,${(k*lift).toFixed(3)})`);g.addColorStop(1,'rgba(0,0,0,0)');R.fillStyle=g;R.beginPath();R.arc(0,0,rx*1.25,0,TAU);R.fill();R.restore();R.beginPath()});return S},
     // Name a part: a thin leader line from the 3D point to a screen offset (dx, dy) with the label at its end.
     callout(p,text,col='#e9f6ff',dx=40,dy=-30,size=12){const Q=P(p);push(1e6-2,()=>{const k=window.PhysicaTextScale||1,L=9,X0=34,X1=656;c.save();c.font=`700 ${Math.round(size*k)}px system-ui, sans-serif`;const tw=c.measureText(String(text)).width;c.restore();
-      let right=dx>=0,x=Q[0]+dx*k,y=Math.max(112,Math.min(396,Q[1]+dy*k));
+      let right=dx>=0,x=Q[0]+dx*k,y=Math.max(118,Math.min(396,Q[1]+dy*k));
       // Keep every label inside the stage (left edge and the live-measurements panel on the right).
       if(right&&x+L+tw>X1){const alt=Q[0]-Math.abs(dx)*k;if(alt-L-tw>=X0){right=false;x=alt}else x=X1-L-tw}
       if(!right&&x-L-tw<X0){const alt=Q[0]+Math.abs(dx)*k;if(alt+L+tw<=X1){right=true;x=alt}else x=X0+L+tw}
       // Nudge the label vertically until it no longer overlaps an earlier label in this frame.
       const h=size*k+4,box=yy=>right?[x+L-2,yy-h/2,x+L+tw+2,yy+h/2]:[x-L-tw-2,yy-h/2,x-L+2,yy+h/2],hit=b=>S._rects.some(r=>b[0]<r[2]&&b[2]>r[0]&&b[1]<r[3]&&b[3]>r[1]);
-      const tryY=()=>{if(!hit(box(y)))return true;for(let i=1;i<16;i++){const yy=y+(i%2?1:-1)*Math.ceil(i/2)*h;if(yy>=112&&yy<=396&&!hit(box(yy))){y=yy;return true}}return false};
-      if(!tryY()){const alt=right?Q[0]-Math.abs(dx)*k:Q[0]+Math.abs(dx)*k,ok=right?alt-L-tw>=X0:alt+L+tw<=X1;if(ok){right=!right;x=alt;y=Math.max(112,Math.min(396,Q[1]+dy*k));tryY()}}S._rects.push(box(y));
+      const tryY=()=>{if(!hit(box(y)))return true;for(let i=1;i<16;i++){const yy=y+(i%2?1:-1)*Math.ceil(i/2)*h;if(yy>=118&&yy<=396&&!hit(box(yy))){y=yy;return true}}return false};
+      if(!tryY()){const alt=right?Q[0]-Math.abs(dx)*k:Q[0]+Math.abs(dx)*k,ok=right?alt-L-tw>=X0:alt+L+tw<=X1;if(ok){right=!right;x=alt;y=Math.max(118,Math.min(396,Q[1]+dy*k));tryY()}}S._rects.push(box(y));
       c.save();c.strokeStyle=col;c.globalAlpha=.85;c.lineWidth=1.2;c.beginPath();c.moveTo(Q[0],Q[1]);c.lineTo(x,y);c.lineTo(x+(right?6:-6),y);c.stroke();c.globalAlpha=1;c.fillStyle=col;c.beginPath();c.arc(Q[0],Q[1],2.4,0,TAU);c.fill();c.restore();S._label(x+(right?L:-L),y,text,col,size,right?'left':'right')});return S},
     // Callout pushed radially away from a centre point, so labels fan out around a model.
     part(p,text,col='#dbe7f0',size=11,center,len=72){const Q=P(p),C0=center?P(center):[cx,cy];let dx=Q[0]-C0[0],dy=Q[1]-C0[1];const m=Math.hypot(dx,dy);if(m<1){dx=1;dy=-1}const n=Math.hypot(dx,dy);return S.callout(p,text,col,dx/n*len,dy/n*len*.8,size)},
     // Engraved / printed text on a surface: no halo, depth-sorted with the part it sits on.
     engrave(p,txt,col='#1b2129',size=10,zo){const Q=P(p);push(zo??Q[2]+.02,()=>{const k=window.PhysicaTextScale||1;c.save();c.font=`700 ${Math.round(size*Q[3]*k)}px system-ui, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillStyle=col;c.fillText(String(txt),Q[0],Q[1]);c.restore()});return S},
-    label(p,s,col='#e9f6ff',size=14,align='center'){const Q=P(p);push(1e6,()=>S._label(Q[0],Q[1],s,col,size,align));return S},
+    label(p,s,col='#e9f6ff',size=14,align='center'){const Q=P(p);push(1e6-3,()=>{const k=window.PhysicaTextScale||1,h=size*k+4;c.save();c.font=`700 ${Math.round(size*k)}px system-ui, sans-serif`;const w=c.measureText(String(s)).width+4;c.restore();const x0=align==='left'?Q[0]:align==='right'?Q[0]-w:Q[0]-w/2;S._rects.push([x0,Q[1]-h/2,x0+w,Q[1]+h/2])});push(1e6,()=>S._label(Q[0],Q[1],s,col,size,align));return S},
     _label(x,y,s,col,size,align='center'){size=Math.round(size*(window.PhysicaTextScale||1));c.save();c.font=`700 ${size}px system-ui, sans-serif`;c.textAlign=align;c.textBaseline='middle';c.lineJoin='round';c.lineWidth=Math.max(3,size*.28);c.strokeStyle='#081624e6';c.strokeText(String(s),x,y);c.fillStyle=col;c.fillText(String(s),x,y);c.restore()},
     axes(len=1,o=[0,0,0]){S.arrow(o,add(o,[len,0,0]),'#ff857e',2,8).arrow(o,add(o,[0,len,0]),'#42d9ca',2,8).arrow(o,add(o,[0,0,len]),'#7baaff',2,8);S.label(add(o,[len*1.12,0,0]),'x','#ff857e',12).label(add(o,[0,len*1.12,0]),'y','#42d9ca',12).label(add(o,[0,0,len*1.12]),'z','#7baaff',12);return S},
     // Coil of `turns` loops along an axis, sorted in chunks so it wraps around what it encloses.
