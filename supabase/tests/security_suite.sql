@@ -538,7 +538,7 @@ reset role;
 select t.ok((select count(*) from private.ops_storage()) = 7 and (select mb from private.ops_storage() where what = 'whole database') > 0, 'ops_storage reports database and table sizes');
 update public.app_settings set max_users = (select count(*) from public.profiles);
 select t.err($q$insert into auth.users (email) values ('cap@x.test')$q$, 'signups_closed', 'account cap (free-plan guard) blocks new sign-ups at max_users');
-update public.app_settings set max_users = 10000;
+update public.app_settings set max_users = 30000;
 insert into auth.users (email) values ('cap2@x.test');
 select t.ok(exists (select 1 from auth.users where email = 'cap2@x.test'), 'sign-ups work again below the cap');
 \echo
