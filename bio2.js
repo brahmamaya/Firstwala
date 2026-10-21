@@ -12,7 +12,7 @@ const smooth=x=>x*x*(3-2*x);
 const ORG={nucleus:['Double membrane (nuclear envelope with pores)','Both','Contains chromatin (DNA); controls the cell'],mito:['Double membrane; inner folds = cristae','Both','Site of aerobic respiration — “power house”; has own DNA and 70S ribosomes'],chloro:['Double membrane; thylakoids stacked as grana','Plant only','Photosynthesis; has own DNA and 70S ribosomes'],
   er:['Single membrane network','Both','RER (with ribosomes): proteins; SER: lipids (steroids)'],golgi:['Single-membrane flat cisternae','Both','Packages materials; forms glycoproteins and glycolipids'],ribo:['No membrane (RNA + protein)','Both','Protein synthesis; 80S in eukaryotes (60S + 40S)'],
   vacuole:['Single membrane (tonoplast)','Large in plants','Stores sap; up to 90% of plant cell volume'],lyso:['Single membrane','Animal (mainly)','Hydrolytic enzymes, active at acidic pH'],centro:['No membrane; two centrioles (9 triplet microtubules)','Animal only','Forms spindle poles in cell division'],wall:['Rigid, non-living layer','Plant only','Cellulose, hemicellulose, pectins; gives shape and protection']};
-add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-explorer',title:'3D cell explorer',
+add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-explorer',title:'Cell explorer',
  description:'Fly around an animal or plant cell and highlight each organelle to learn its structure and job.',
  formula:'Eukaryotic cell = plasma membrane + cytoplasm + membrane-bound organelles + nucleus',
  observe:'Plant cells have a cell wall, chloroplasts and a large central vacuole; animal cells have centrioles.',
@@ -119,7 +119,7 @@ add({...ch(9,'Biomolecules',U3),id:'bio-protein-structure',title:'Levels of prot
 
 /* ---------- Chapter 10: Cell Cycle and Cell Division ---------- */
 const MIT=[['Interphase (G₂)','Chromosomes not visible; DNA already doubled'],['Prophase','Chromatin condenses into chromosomes; spindle begins to form'],['Metaphase','Chromosomes line up at the metaphase plate'],['Anaphase','Centromeres split; sister chromatids move to opposite poles'],['Telophase','Nuclear envelopes reform around two sets of chromosomes'],['Cytokinesis','Cytoplasm divides into two daughter cells']];
-add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-mitosis',title:'Mitosis in 3D',
+add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-mitosis',title:'Mitosis, stage by stage',
  description:'Watch the chromosomes of an animal cell condense, line up, separate and form two identical nuclei.',
  formula:'2n → 2n + 2n (equational division)',
  observe:'Each daughter cell receives an exact copy of the parent’s chromosomes.',

@@ -1,7 +1,7 @@
 {
  "name": "Physica – Interactive Lab",
  "short_name": "Physica",
- "description": "386 interactive Class 11 & 12 simulations for Physics, Chemistry, Botany and Zoology in 2D, 3D and Ultra-Realistic views.",
+ "description": "386 interactive Class 11 & 12 simulations for Physics, Chemistry, Botany and Zoology in 2D and Ultra-Realistic views.",
  "id": "./",
  "start_url": "./",
  "scope": "./",
