@@ -26,6 +26,8 @@ jobs:
         run: node tools/secret-guard.js
       - name: Collect public files
         run: node tools/publish.js
+      - name: Private-file guard
+        run: node tools/private-guard.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

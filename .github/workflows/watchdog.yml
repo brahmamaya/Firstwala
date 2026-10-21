@@ -1,0 +1,35 @@
+name: Watchdog
+# Every 30 minutes: is the live site byte-for-byte what main publishes, is it up, is TLS healthy, is the backend answering?
+# On a problem the run fails (GitHub emails the repo owner) and an issue is opened/updated so there is a visible alert.
+# Enable by setting the repository VARIABLE  WATCHDOG_URL  (Settings -> Secrets and variables -> Actions -> Variables), e.g. https://physica.in
+on:
+  schedule: [{ cron: '*/30 * * * *' }]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  watch:
+    if: ${{ vars.WATCHDOG_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: node tools/publish.js
+      - id: wd
+        run: |
+          set +e
+          node tools/watchdog.js "${{ vars.WATCHDOG_URL }}" _site 2> problems.txt | tee result.json
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Open / update an alert issue on failure
+        if: steps.wd.outputs.code != '0'
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          body="Watchdog found a problem at $(date -u +%FT%TZ):\n\n$(cat problems.txt)\n\nFollow docs/INCIDENT-RESPONSE.md. Close this issue when resolved."
+          n=$(gh issue list --label watchdog --state open --json number --jq '.[0].number')
+          if [ -n "$n" ]; then gh issue comment "$n" --body "$(printf "$body")"; else gh issue create --title "ALERT: Physica watchdog failed" --label watchdog --body "$(printf "$body")" || gh issue create --title "ALERT: Physica watchdog failed" --body "$(printf "$body")"; fi
+      - name: Fail the run so the owner is emailed
+        if: steps.wd.outputs.code != '0'
+        run: cat problems.txt; exit 1

@@ -30,3 +30,9 @@ details{border:1px solid var(--line);background:var(--card);border-radius:12px;p
 :root[data-theme="light"] .qform input,:root[data-theme="light"] .qform select,:root[data-theme="light"] .qform textarea{background:#ffffff}
 :root[data-theme="light"] .qform button{background:#0c1626;color:#ffffff}
 :root[data-theme="light"] .qmsg.ok{color:#0b7a45}:root[data-theme="light"] .qmsg.err{color:#b3261e}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;color:#d3dae6}th{background:var(--card);color:#fff}
+:root[data-theme="light"] th,:root[data-theme="light"] td{color:#2b3a4f}:root[data-theme="light"] th{color:#0c1626}
+@media(max-width:640px){table,thead,tbody,tr,th,td{display:block}thead{display:none}tr{border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:6px}td{border:0;padding:6px 8px}}
+#analytics-choice button{font:inherit;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:transparent;color:var(--text);cursor:pointer}
+main b{color:inherit}

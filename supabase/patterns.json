@@ -1,0 +1,40 @@
+{
+  "_readme": "Single source of truth for exam patterns. Edit here, then run: node tools/series-import.js patterns > build/patterns.sql and run that file in Supabase. Section keys: id, s=subject, nm=name, t=type (MCQ single | MULTI multiple-correct | NUM numerical), n=number of questions, c=marks if correct, w=marks if wrong (negative number or 0), p=marks per correct option when partly right (MULTI only; default 0 = no partial credit). Questions of a test are stored in this exact order, section after section.",
+  "_verify": "Targets: NEET (UG) 2027, JEE (Main) 2027 (January session), JEE (Advanced) 2027. Patterns follow publicly reported formats and are NOT yet confirmed by the agencies (JEE Main: 75 Q / 300 marks, Section B numerical marking and attempt rules have been reported inconsistently; NEET: 180 compulsory Q / 720 marks, duration unconfirmed; JEE Advanced: indicative, changes every year). Check each against the official NTA / JEE Advanced information bulletin once released and edit the numbers here if they differ.",
+  "patterns": {
+    "JEE_MAIN_2027": {
+      "exam": "JEE_MAIN", "label": "JEE (Main) 2027", "minutes": 180, "papers": 1,
+      "sections": [
+        { "id": "P-A", "s": "PHYSICS",   "nm": "Section A", "t": "MCQ", "n": 20, "c": 4, "w": -1 },
+        { "id": "P-B", "s": "PHYSICS",   "nm": "Section B", "t": "NUM", "n": 5,  "c": 4, "w": -1 },
+        { "id": "C-A", "s": "CHEMISTRY", "nm": "Section A", "t": "MCQ", "n": 20, "c": 4, "w": -1 },
+        { "id": "C-B", "s": "CHEMISTRY", "nm": "Section B", "t": "NUM", "n": 5,  "c": 4, "w": -1 },
+        { "id": "M-A", "s": "MATHS",     "nm": "Section A", "t": "MCQ", "n": 20, "c": 4, "w": -1 },
+        { "id": "M-B", "s": "MATHS",     "nm": "Section B", "t": "NUM", "n": 5,  "c": 4, "w": -1 }
+      ]
+    },
+    "NEET_2027": {
+      "exam": "NEET", "label": "NEET (UG) 2027", "minutes": 180, "papers": 1,
+      "sections": [
+        { "id": "P", "s": "PHYSICS",   "nm": "Physics",   "t": "MCQ", "n": 45, "c": 4, "w": -1 },
+        { "id": "C", "s": "CHEMISTRY", "nm": "Chemistry", "t": "MCQ", "n": 45, "c": 4, "w": -1 },
+        { "id": "B", "s": "BOTANY",    "nm": "Botany",    "t": "MCQ", "n": 45, "c": 4, "w": -1 },
+        { "id": "Z", "s": "ZOOLOGY",   "nm": "Zoology",   "t": "MCQ", "n": 45, "c": 4, "w": -1 }
+      ]
+    },
+    "JEE_ADV_2027": {
+      "exam": "JEE_ADV", "label": "JEE (Advanced) 2027", "minutes": 180, "papers": 2,
+      "sections": [
+        { "id": "P-1", "s": "PHYSICS",   "nm": "Section 1", "t": "MCQ",   "n": 4, "c": 3, "w": -1 },
+        { "id": "P-2", "s": "PHYSICS",   "nm": "Section 2", "t": "MULTI", "n": 4, "c": 4, "w": -2, "p": 1 },
+        { "id": "P-3", "s": "PHYSICS",   "nm": "Section 3", "t": "NUM",   "n": 8, "c": 4, "w": 0 },
+        { "id": "C-1", "s": "CHEMISTRY", "nm": "Section 1", "t": "MCQ",   "n": 4, "c": 3, "w": -1 },
+        { "id": "C-2", "s": "CHEMISTRY", "nm": "Section 2", "t": "MULTI", "n": 4, "c": 4, "w": -2, "p": 1 },
+        { "id": "C-3", "s": "CHEMISTRY", "nm": "Section 3", "t": "NUM",   "n": 8, "c": 4, "w": 0 },
+        { "id": "M-1", "s": "MATHS",     "nm": "Section 1", "t": "MCQ",   "n": 4, "c": 3, "w": -1 },
+        { "id": "M-2", "s": "MATHS",     "nm": "Section 2", "t": "MULTI", "n": 4, "c": 4, "w": -2, "p": 1 },
+        { "id": "M-3", "s": "MATHS",     "nm": "Section 3", "t": "NUM",   "n": 8, "c": 4, "w": 0 }
+      ]
+    }
+  }
+}
