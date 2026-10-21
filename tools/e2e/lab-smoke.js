@@ -21,7 +21,7 @@ const srv = http.createServer((q, r) => { const p = decodeURIComponent(new URL(q
   const blank = () => page.evaluate(() => { const c = document.getElementById('simulation'), g = c.getContext('2d'), d = g.getImageData(0, 0, c.width, c.height).data, seen = new Set(); for (let i = 0; i < d.length; i += 4 * 211) { seen.add((d[i] >> 4) * 256 + (d[i + 1] >> 4) * 16 + (d[i + 2] >> 4)); if (seen.size > 6) return false; } return true; });
   const texts = () => page.evaluate(() => (document.querySelector('.lab-layout') || document.body).innerText.split('\n').filter(t => /NaN|Infinity|undefined|\[object|null\b/.test(t)).slice(0, 3));
   const setSliders = which => page.evaluate(w => { for (const el of document.querySelectorAll('#controls input[type=range]')) { el.value = w === 'min' ? el.min : w === 'max' ? el.max : el.defaultValue; el.dispatchEvent(new Event('input', { bubbles: true })); } for (const s of document.querySelectorAll('#controls select')) { s.selectedIndex = w === 'max' ? s.options.length - 1 : 0; s.dispatchEvent(new Event('change', { bubbles: true })); } }, which);
-  for (const mode of ['2d', 'ultra']) {
+  for (const mode of (process.env.MODES || '2d,ultra').split(',')) {
     await page.evaluate(m => { document.getElementById('mode-' + m).click(); }, mode);
     for (const s of list) {
       n++; const before = errs.length;
