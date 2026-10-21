@@ -69,8 +69,8 @@ select t.ok(not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p
                            and not coalesce(array_to_string(p.proconfig, ',') ilike '%search_path=""%', false)), 'every SECURITY DEFINER function pins search_path to empty');
 select t.ok(not exists (select 1 from information_schema.role_table_grants where grantee = 'anon' and table_schema in ('public', 'private')), 'anon holds no table privileges');
 select t.ok((select array_agg(routine_name::text order by routine_name::text) from information_schema.role_routine_grants
-              where grantee in ('anon', 'public', 'PUBLIC') and routine_schema in ('public', 'private') and routine_name <> 'handle_new_user') = array['track'],
-            'the ONLY function anon / PUBLIC can execute is public.track (anonymous counters)');
+              where grantee in ('anon', 'public', 'PUBLIC') and routine_schema in ('public', 'private') and routine_name <> 'handle_new_user') = array['get_status','track'],
+            'the ONLY functions anon / PUBLIC can execute are public.track and public.get_status');
 select t.ok(not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'
                          and p.proname in ('finalize', 'score_answer', 'to_num', 'rate_limit', 'audit', 'purge_inactive', 'current_terms')), 'internal helpers are not in the API-exposed schema');
 select t.ok(not exists (select 1 from information_schema.role_routine_grants where grantee = 'authenticated' and routine_schema = 'private'), 'authenticated cannot execute private.*');
@@ -315,6 +315,106 @@ set role anon; select public.track('view', 'brand-new-key'); reset role;
 select t.ok((select n from public.analytics_daily where key = 'other') = 1 and not exists (select 1 from public.analytics_daily where key = 'brand-new-key'), 'distinct-key cap: new keys fold into "other" once 3000 exist for the day');
 truncate private.rate_limits; set role anon;
 do $$ begin for i in 1..1200 loop perform public.track('visit'); end loop; perform t.err('select public.track(''visit'')', 'rate_limited', 'track is globally rate limited (1200/min)'); end $$;
+reset role;
+
+\echo
+\echo '=== M. incident response: kill switches, locks, devices, detection ==='
+reset role; truncate private.rate_limits;
+select t.ok((select array_agg(routine_name::text order by routine_name::text) from information_schema.role_routine_grants where grantee = 'authenticated' and routine_schema = 'private') is null, 'no private.* function (incl. ops tools) is executable by students');
+select t.as_user(:adult);
+select t.err('select private.ops_panic(true)', 'permission denied', 'student cannot press the panic button');
+select t.err('select private.ops_lock_user(''x@y.z'')', 'permission denied', 'student cannot lock users');
+select t.err('select private.ops_set_status(true)', 'permission denied', 'student cannot change maintenance status');
+reset role;
+set role anon; select t.ok((public.get_status() ->> 'lockdown') = 'false', 'anyone can read the public status');
+select t.err('select * from public.app_settings', 'permission denied', 'app_settings is not readable via the API');
+reset role;
+
+\echo '--- device tracking ---'
+select t.as_user(:other);
+select t.err('select public.note_device(''short'')', 'invalid_device', 'bad device id rejected');
+select t.err('select public.note_device(''has spaces and symbols !!!!!!!!!'')', 'invalid_device', 'device id charset enforced');
+select t.ok((public.note_device('AAAAAAAAAAAAAAAAAAAAAAAAAA') ->> 'new_device') = 'false', 'first device is not flagged (nothing to compare)');
+select t.ok((public.note_device('AAAAAAAAAAAAAAAAAAAAAAAAAA') ->> 'new_device') = 'false', 'same device again: not new');
+select t.ok((public.note_device('BBBBBBBBBBBBBBBBBBBBBBBBBB') ->> 'new_device') = 'true', 'a second device is flagged as new');
+reset role;
+select t.ok(exists (select 1 from public.audit_log where action = 'login.new_device' and actor = :other), 'new device is audited');
+select t.as_user(:other);
+select t.ok(jsonb_array_length(public.list_devices('AAAAAAAAAAAAAAAAAAAAAAAAAA')) = 2 and (public.list_devices('AAAAAAAAAAAAAAAAAAAAAAAAAA') #>> '{1,current}') in ('true', 'false'), 'list_devices returns this user''s devices');
+select t.ok(public.list_devices('AAAAAAAAAAAAAAAAAAAAAAAAAA')::text !~ '[0-9a-f]{40}', 'device hashes are never sent to the browser');
+do $$ declare i int; begin for i in 1..25 loop perform public.note_device(rpad('D' || i, 30, 'x')); end loop; end $$;
+select t.ok(jsonb_array_length(public.list_devices(null)) = 20, 'device list is capped at 20 per account');
+reset role; truncate private.rate_limits;
+
+\echo '--- account lock ---'
+select t.as_user(:other); select public.save_answer(:'a3', :Q9, '1'); reset role;
+select t.ok(private.ops_lock_user('OTHER@x.test', 'test') like 'locked%', 'ops_lock_user locks by email (case-insensitive)');
+select t.ok((select banned_until is not null from auth.users where id = :other) and not exists (select 1 from auth.sessions where user_id = :other), 'login ban set and sessions killed');
+select t.as_user(:other);
+select t.err(format('select public.save_answer(%L, %L, ''1'')', :'a3', :Q9), 'account_locked', 'locked user: save_answer refused at once');
+select t.err('select public.start_attempt(''aaaaaaaa-0000-0000-0000-000000000004'')', 'account_locked', 'locked user: start_attempt refused');
+select t.err(format('select public.get_attempt(%L)', :'a3'), 'account_locked', 'locked user: get_attempt refused');
+select t.err(format('select public.log_event(%L, ''tab_hidden'')', :'a3'), 'account_locked', 'locked user: log_event refused');
+select t.err('select public.note_device(''CCCCCCCCCCCCCCCCCCCCCCCCCC'')', 'account_locked', 'locked user: cannot register a device');
+select t.ok(public.export_my_data() is not null, 'a locked user can still export their data (right of access)');
+reset role; select t.ok(private.ops_unlock_user('other@x.test') like 'unlocked%', 'ops_unlock_user');
+select t.as_user(:other); select public.save_answer(:'a3', :Q9, '1'); select t.ok(true, 'after unlock the user works again'); reset role;
+select t.ok(private.ops_revoke_sessions('other@x.test') = 0 and exists (select 1 from public.audit_log where action = 'ops.lock_user') and exists (select 1 from public.audit_log where action = 'ops.unlock_user'), 'lock / unlock / revoke are audited');
+
+\echo '--- maintenance and pause ---'
+select private.ops_set_status(true, null, null, 'Short maintenance');
+select t.ok((public.get_status() ->> 'message') = 'Short maintenance' and (public.get_status() ->> 'maintenance') = 'true', 'maintenance message is published');
+select t.as_user(:adult);
+select t.err('select public.start_attempt(''aaaaaaaa-0000-0000-0000-000000000004'')', 'exams_paused', 'no NEW test can start during maintenance');
+select t.ok(public.get_attempt(:'a4') is not null, 'but a test already in progress keeps working');
+reset role; select private.ops_set_status(false, null, null, null);
+select private.ops_set_status(null, null, false, null);
+select t.err($q$insert into auth.users (email) values ('late@x.test')$q$, 'signups_closed', 'signup switch blocks new accounts');
+select private.ops_set_status(null, null, true, null);
+insert into auth.users (email) values ('late2@x.test');
+select t.ok(exists (select 1 from auth.users where email = 'late2@x.test'), 'signups reopen');
+
+\echo '--- PANIC / lockdown ---'
+insert into auth.sessions (user_id) values (:adult), (:other), (:admin);
+select private.ops_panic(true) as pr \gset
+select t.ok(:'pr' like 'LOCKDOWN ON%' and (select count(*) from auth.sessions) = 0, 'panic kills every session');
+select t.ok((public.get_status() ->> 'lockdown') = 'true' and (public.get_status() ->> 'message') like '%security check%', 'public status shows the lockdown notice');
+select t.as_user(:adult);
+select t.err(format('select public.get_attempt(%L)', :'a4'), 'lockdown', 'lockdown: get_attempt refused');
+select t.err(format('select public.save_answer(%L, %L, ''1'')', :'a4', :Q9), 'lockdown', 'lockdown: save_answer refused');
+select t.err('select public.export_my_data()', 'lockdown', 'lockdown: even export is refused');
+select t.err('select public.start_attempt(''aaaaaaaa-0000-0000-0000-000000000004'')', 'lockdown', 'lockdown: start refused');
+reset role;
+select t.err($q$insert into auth.users (email) values ('x2@x.test')$q$, 'signups_closed', 'lockdown also closes signups');
+select private.ops_panic(false) as pr2 \gset
+select t.ok(:'pr2' = 'lockdown off' and (public.get_status() ->> 'lockdown') = 'false' and (public.get_status() ->> 'exams_open') = 'true', 'panic off restores normal service');
+select t.as_user(:adult); select t.ok(public.get_attempt(:'a4') is not null, 'users work again after panic off'); reset role;
+
+\echo '--- detection helpers ---'
+select t.ok((select count(*) from private.ops_events(24) where action = 'ops.panic') = 1, 'ops_events summarises recent security actions');
+insert into public.audit_log (actor, action) select :other, 'login.new_device' from generate_series(1, 3);
+select t.ok(exists (select 1 from private.ops_suspicious(24) where kind = 'new_devices' and subject = :other::text), 'ops_suspicious flags many new devices');
+insert into public.tests (id, title, exam, duration_min) values ('aaaaaaaa-0000-0000-0000-0000000000a1', 'Speed', 'NEET', 60);
+insert into public.questions (id, test_id, position, subject, type, body, options) values ('bbbbbbbb-0000-0000-0000-0000000000a1', 'aaaaaaaa-0000-0000-0000-0000000000a1', 1, 'PHYSICS', 'MCQ', 'q', '["a","b"]');
+insert into public.question_keys values ('bbbbbbbb-0000-0000-0000-0000000000a1', '0', 'e');
+update public.tests set published = true where id = 'aaaaaaaa-0000-0000-0000-0000000000a1';
+insert into public.attempts (id, user_id, test_id, deadline, submitted_at, score, started_at) values ('cccccccc-0000-0000-0000-0000000000a1', :adult, 'aaaaaaaa-0000-0000-0000-0000000000a1', now() + interval '1 hour', now(), 4, now() - interval '1 minute');
+insert into public.responses values ('cccccccc-0000-0000-0000-0000000000a1', 'bbbbbbbb-0000-0000-0000-0000000000a1', '0');
+select t.ok(exists (select 1 from private.ops_suspicious(24) where kind = 'too_fast'), 'ops_suspicious flags an attempt finished in a fraction of the time');
+
+\echo '--- pre-built question payload ---'
+truncate private.rate_limits; update public.app_settings set exams_open = true, maintenance = false;
+select t.as_user(:other); select public.start_attempt('aaaaaaaa-0000-0000-0000-0000000000a1') as ap \gset
+select t.ok(jsonb_array_length(public.get_attempt(:'ap') -> 'questions') = 1, 'payload has the 1 question');
+reset role;
+insert into public.questions (id, test_id, position, subject, type, body, options) values ('bbbbbbbb-0000-0000-0000-0000000000a2', 'aaaaaaaa-0000-0000-0000-0000000000a1', 2, 'PHYSICS', 'NUMERICAL', 'second', '[]');
+update public.questions set body = 'edited' where id = 'bbbbbbbb-0000-0000-0000-0000000000a1';
+select t.as_user(:other);
+select t.ok(jsonb_array_length(public.get_attempt(:'ap') -> 'questions') = 2 and public.get_attempt(:'ap')::text like '%edited%', 'payload follows question inserts and edits');
+reset role; delete from public.questions where id = 'bbbbbbbb-0000-0000-0000-0000000000a2'; select t.as_user(:other);
+select t.ok(jsonb_array_length(public.get_attempt(:'ap') -> 'questions') = 1, 'payload follows deletes');
+select t.ok(public.get_attempt(:'ap')::text !~* 'correct|explanation', 'payload never contains answers');
+select t.err('select * from private.test_payloads', 'permission denied', 'payload table is not readable by students');
 reset role;
 
 \echo

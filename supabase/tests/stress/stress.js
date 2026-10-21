@@ -103,6 +103,36 @@ const KNOWN = /^(not_authenticated|rate_limited|attempt_not_found|attempt_closed
   const tables = (await su("select count(*)::int c from information_schema.tables where table_schema='public'")).rows[0].c;
   ok(tables === tablesBefore && tables >= 10, `all ${tablesBefore} public tables still exist after SQL-injection payloads`);
 
+  console.log('\n=== N. load: 300 students start a 90-question test together ===');
+  const LT = 'aaaaaaaa-0000-0000-0000-0000000000b1';
+  await su(`insert into public.tests (id,title,exam,duration_min,published) values ($1,'Load','JEE_MAIN',180,true)`, [LT]);
+  await su(`insert into public.questions (id,test_id,position,subject,type,body,options,marks,negative)
+     select gen_random_uuid(), $1, g, (array['PHYSICS','CHEMISTRY','MATHS'])[1+g%3], case when g%5=0 then 'NUMERICAL' else 'MCQ' end,
+            'Question '||g||repeat(' lorem ipsum dolor sit amet',25), case when g%5=0 then '[]'::jsonb else '["option a","option b","option c","option d"]'::jsonb end, 4, 1 from generate_series(1,90) g`, [LT]);
+  await su(`insert into public.question_keys select id, case when type='NUMERICAL' then '5' else '1' end, 'explanation' from public.questions where test_id=$1`, [LT]);
+  await su(`insert into auth.users (id,email) select gen_random_uuid(), 'load'||g||'@x.test' from generate_series(1,300) g`);
+  await su(`update public.profiles set is_minor=false, display_name='L', terms_version='2026-10-21', terms_accepted_at=now() where id in (select id from auth.users where email like 'load%')`);
+  const lids = (await su("select id from auth.users where email like 'load%'")).rows.map(r => r.id);
+  const lat = { start: [], get: [], save: [], submit: [] };
+  const timed = async (k, fn) => { const t0 = performance.now(); const r = await fn(); lat[k].push(performance.now() - t0); return r; };
+  const student = async uid => {
+    const a = (await timed('start', () => call(uid, 'select public.start_attempt($1) as id', [LT]))).rows[0].id;
+    const g = await timed('get', () => call(uid, 'select public.get_attempt($1) as j', [a])); const qs = g.rows[0].j.questions;
+    for (let i = 0; i < 15; i++) await timed('save', () => call(uid, 'select public.save_answer($1,$2,$3)', [a, qs[i].id, qs[i].type === 'MCQ' ? '1' : '5']));
+    await timed('submit', () => call(uid, 'select public.submit_attempt($1)', [a]));
+  };
+  const t0 = performance.now(); let next = 0;
+  await Promise.all(Array.from({ length: 60 }, async () => { while (next < lids.length) await student(lids[next++]); }));
+  const secs = (performance.now() - t0) / 1000;
+  const pct = (a, p) => { const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(b.length * p))]; };
+  for (const k of Object.keys(lat)) console.log(`   ${k.padEnd(6)} n=${String(lat[k].length).padStart(4)}  p50=${pct(lat[k], .5).toFixed(0)}ms  p95=${pct(lat[k], .95).toFixed(0)}ms  max=${Math.max(...lat[k]).toFixed(0)}ms`);
+  console.log(`   total ${secs.toFixed(1)}s  ->  ${(300 * 18 / secs).toFixed(0)} API calls/s`);
+  const done = (await su("select count(*)::int c from public.attempts where test_id=$1 and submitted_at is not null", [LT])).rows[0].c;
+  ok(done === 300, 'all 300 students finished: 300 attempts started, answered and submitted with no errors');
+  ok(pct(lat.get, .95) < 400, `get_attempt p95 ${pct(lat.get, .95).toFixed(0)}ms < 400ms (the exam-start spike)`);
+  ok(pct(lat.save, .95) < 250, `save_answer p95 ${pct(lat.save, .95).toFixed(0)}ms < 250ms`);
+  ok(pct(lat.start, .95) < 400 && pct(lat.submit, .95) < 500, `start p95 ${pct(lat.start, .95).toFixed(0)}ms and submit p95 ${pct(lat.submit, .95).toFixed(0)}ms within budget`);
+
   await pool.end();
   console.log(fails ? `\n${fails} FAILED` : '\nALL STRESS CHECKS PASSED');
   process.exit(fails ? 1 : 0);

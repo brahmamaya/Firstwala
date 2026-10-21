@@ -34,6 +34,8 @@ create table if not exists public.profiles (
   is_minor          boolean,
   parent_email      text check (parent_email is null or (char_length(parent_email) <= 254 and parent_email ~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$')),
   parent_consent_at timestamptz,
+  locked_at         timestamptz,            -- set by private.ops_lock_user(); all student API calls are refused
+  lock_reason       text,
   terms_version     text,
   terms_accepted_at timestamptz,
   created_at        timestamptz not null default now()
@@ -127,6 +129,33 @@ create table if not exists public.analytics_daily (
   primary key (day, event, key)
 );
 
+-- Incident-response switches (one row). Changed only from the SQL editor via private.ops_* (never from the browser).
+create table if not exists public.app_settings (
+  id           boolean primary key default true check (id),
+  maintenance  boolean not null default false,        -- show a notice; block STARTING new tests
+  exams_open   boolean not null default true,         -- false: no new test can be started
+  signups_open boolean not null default true,         -- false: no new account can be created
+  lockdown     boolean not null default false,        -- PANIC: every student API call is refused
+  message      text check (message is null or char_length(message) <= 300),
+  updated_at   timestamptz not null default now()
+);
+insert into public.app_settings (id) values (true) on conflict do nothing;
+
+-- Devices that signed in, as one-way hashes of a random id kept in the browser (not a fingerprint, no IP/user-agent).
+create table if not exists private.devices (
+  user_id    uuid not null references auth.users (id) on delete cascade,
+  device     text not null,
+  first_seen timestamptz not null default now(),
+  last_seen  timestamptz not null default now(),
+  primary key (user_id, device)
+);
+
+-- Pre-built question list per test (no answers) so exam-start spikes read one row instead of aggregating.
+create table if not exists private.test_payloads (
+  test_id uuid primary key references public.tests (id) on delete cascade,
+  payload jsonb not null
+);
+
 create unlogged table if not exists private.rate_limits (
   key          text not null,
   window_start timestamptz not null,
@@ -147,6 +176,7 @@ create index if not exists audit_actor_idx        on public.audit_log (actor);
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
+  if not (select signups_open from public.app_settings where id) then raise exception 'signups_closed' using errcode = 'P0001'; end if;
   insert into public.profiles (id) values (new.id) on conflict do nothing;
   return new;
 end $$;
@@ -226,6 +256,47 @@ begin
   return s;
 end $$;
 
+-- Every student-facing RPC starts here: platform lockdown and locked accounts are refused immediately,
+-- even though the user's access token stays cryptographically valid for up to an hour.
+create or replace function private.assert_ok(p_uid uuid, p_allow_locked boolean default false) returns void
+language plpgsql stable security definer set search_path = '' as $$
+declare s public.app_settings; locked timestamptz;
+begin
+  select * into s from public.app_settings where id;
+  if s.lockdown then raise exception 'lockdown' using errcode = 'P0001'; end if;
+  if not p_allow_locked then
+    select locked_at into locked from public.profiles where id = p_uid;
+    if locked is not null then raise exception 'account_locked' using errcode = 'P0001'; end if;
+  end if;
+end $$;
+
+create or replace function private.rebuild_payload(p_test uuid) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not exists (select 1 from public.tests where id = p_test) then return; end if;
+  insert into private.test_payloads (test_id, payload)
+  select p_test, coalesce(jsonb_agg(jsonb_build_object(
+      'id', q.id, 'position', q.position, 'subject', q.subject, 'type', q.type,
+      'body', q.body, 'options', q.options, 'marks', q.marks, 'negative', q.negative) order by q.position), '[]'::jsonb)
+    from public.questions q where q.test_id = p_test
+  on conflict (test_id) do update set payload = excluded.payload;
+end $$;
+create or replace function private.payload_trigger() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if tg_op in ('UPDATE', 'DELETE') then perform private.rebuild_payload(old.test_id); end if;
+  if tg_op in ('INSERT', 'UPDATE') and (tg_op = 'INSERT' or new.test_id is distinct from old.test_id) then perform private.rebuild_payload(new.test_id); end if;
+  return coalesce(new, old);
+end $$;
+drop trigger if exists payload_questions on public.questions;
+create trigger payload_questions after insert or update or delete on public.questions for each row execute function private.payload_trigger();
+create or replace function private.payload_test_trigger() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin perform private.rebuild_payload(new.id); return new; end $$;
+drop trigger if exists payload_tests on public.tests;
+create trigger payload_tests after insert on public.tests for each row execute function private.payload_test_trigger();
+do $$ declare r record; begin for r in select id from public.tests loop perform private.rebuild_payload(r.id); end loop; end $$;
+
 -- ============================================================ RLS
 alter table public.profiles         enable row level security;
 alter table public.tests            enable row level security;
@@ -237,6 +308,7 @@ alter table public.responses        enable row level security;
 alter table public.integrity_events enable row level security;
 alter table public.audit_log        enable row level security;
 alter table public.analytics_daily  enable row level security;
+alter table public.app_settings     enable row level security;   -- no policy, no grant: only SECURITY DEFINER code reads it
 
 drop policy if exists profiles_self_read   on public.profiles;
 drop policy if exists profiles_self_update on public.profiles;
@@ -274,7 +346,7 @@ create policy audit_admin on public.audit_log for select to authenticated using 
 
 -- Table privileges: deny by default, then grant the minimum (RLS still applies on top).
 revoke all on public.profiles, public.tests, public.questions, public.question_keys, public.enrollments,
-              public.attempts, public.responses, public.integrity_events, public.audit_log, public.analytics_daily from anon, authenticated;
+              public.attempts, public.responses, public.integrity_events, public.audit_log, public.analytics_daily, public.app_settings from anon, authenticated;
 revoke all on private.rate_limits from anon, authenticated;
 grant select on public.profiles, public.tests, public.enrollments, public.attempts, public.responses to authenticated;
 grant select on public.integrity_events, public.audit_log, public.analytics_daily to authenticated;                       -- admin-only via RLS
@@ -290,6 +362,7 @@ returns void language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid());
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('profile:' || uid, 20, interval '1 hour');
   if p_name is null or btrim(p_name) = '' or char_length(p_name) > 80 then raise exception 'invalid_name' using errcode = '22023'; end if;
   if p_is_minor is null then raise exception 'invalid_age' using errcode = '22023'; end if;
@@ -317,7 +390,9 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid()); t public.tests; existing uuid; new_id uuid;
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('start:' || uid, 30, interval '1 hour');
+  if exists (select 1 from public.app_settings where id and (maintenance or not exams_open)) then raise exception 'exams_paused' using errcode = 'P0001'; end if;
   select * into t from public.tests where id = p_test_id and published;
   if not found then raise exception 'test_not_found' using errcode = 'P0002'; end if;
   if not exists (select 1 from public.profiles p where p.id = uid and p.is_minor is not null
@@ -355,6 +430,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid()); a public.attempts; t public.tests;
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('getattempt:' || uid, 120, interval '1 minute');
   select * into a from public.attempts where id = p_attempt and user_id = uid;
   if not found then raise exception 'attempt_not_found' using errcode = 'P0002'; end if;
@@ -372,12 +448,7 @@ begin
     'title', t.title,
     'deadline', a.deadline,
     'server_now', now(),
-    'questions', (
-      select coalesce(jsonb_agg(jsonb_build_object(
-        'id', q.id, 'position', q.position, 'subject', q.subject, 'type', q.type,
-        'body', q.body, 'options', q.options, 'marks', q.marks, 'negative', q.negative
-      ) order by q.position), '[]'::jsonb)
-      from public.questions q where q.test_id = a.test_id),
+    'questions', coalesce((select tp.payload from private.test_payloads tp where tp.test_id = a.test_id), '[]'::jsonb),
     'answers', (
       select coalesce(jsonb_object_agg(r.question_id, r.answer), '{}'::jsonb)
       from public.responses r where r.attempt_id = a.id)
@@ -389,6 +460,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid()); a public.attempts; q public.questions;
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('save:' || uid, 300, interval '1 minute');
   -- FOR SHARE conflicts with finalize()'s FOR UPDATE: a save either lands before the score is computed (and counts)
   -- or sees the attempt as submitted (and is rejected). The stored answers can never disagree with the score.
@@ -417,6 +489,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid());
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('submit:' || uid, 30, interval '1 minute');
   if not exists (select 1 from public.attempts where id = p_attempt and user_id = uid) then
     raise exception 'attempt_not_found' using errcode = 'P0002';
@@ -430,6 +503,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid()); a public.attempts; t public.tests;
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('result:' || uid, 60, interval '1 minute');
   select * into a from public.attempts where id = p_attempt and user_id = uid;
   if not found then raise exception 'attempt_not_found' using errcode = 'P0002'; end if;
@@ -457,6 +531,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid());
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
   perform private.rate_limit('event:' || uid, 120, interval '1 minute');
   if p_kind not in ('tab_hidden', 'tab_visible', 'copy_attempt', 'offline', 'online') then raise exception 'invalid_event' using errcode = '22023'; end if;
   if p_meta is null or jsonb_typeof(p_meta) <> 'object' or octet_length(p_meta::text) > 200 then raise exception 'invalid_event' using errcode = '22023'; end if;
@@ -472,6 +547,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid()); out jsonb;
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid, true);       -- a locked user may still export (data-access right)
   perform private.rate_limit('export:' || uid, 5, interval '1 day');
   select jsonb_build_object(
     'exported_at', now(),
@@ -496,6 +572,7 @@ language plpgsql security definer set search_path = '' as $$
 declare uid uuid := (select auth.uid());
 begin
   if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid, true);       -- ... and may still erase their data
   perform private.rate_limit('delete:' || uid, 3, interval '1 day');
   perform private.audit('account.delete');
   delete from auth.users where id = uid;
@@ -563,6 +640,125 @@ begin
   return n;
 end $$;
 
+-- Public status for the banner / maintenance screen. Contains nothing sensitive.
+create or replace function public.get_status() returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object('maintenance', maintenance, 'exams_open', exams_open, 'signups_open', signups_open,
+                            'lockdown', lockdown, 'message', message)
+    from public.app_settings where id;
+$$;
+
+-- Register this browser as a sign-in device. A device never seen before (on an account that already had one)
+-- is audited as 'login.new_device'; the app then warns the owner so a stolen login is noticed quickly.
+create or replace function public.note_device(p_device text) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare uid uuid := (select auth.uid()); h text; had int; is_new boolean;
+begin
+  if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid);
+  perform private.rate_limit('device:' || uid, 60, interval '1 hour');
+  if p_device is null or p_device !~ '^[A-Za-z0-9_-]{22,64}$' then raise exception 'invalid_device' using errcode = '22023'; end if;
+  h := encode(sha256(convert_to(p_device || ':' || uid::text, 'UTF8')), 'hex');
+  select count(*) into had from private.devices where user_id = uid;
+  insert into private.devices (user_id, device) values (uid, h)
+  on conflict (user_id, device) do update set last_seen = now()
+  returning (xmax = 0) into is_new;
+  delete from private.devices where user_id = uid and device not in
+    (select device from private.devices where user_id = uid order by last_seen desc limit 20);
+  if is_new and had > 0 then perform private.audit('login.new_device', 'profile', uid::text); end if;
+  return jsonb_build_object('new_device', is_new and had > 0);
+end $$;
+
+-- The caller's devices (hashes are never returned). 'current' marks this browser.
+create or replace function public.list_devices(p_device text default null) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare uid uuid := (select auth.uid()); h text;
+begin
+  if uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  perform private.assert_ok(uid, true);
+  if p_device is not null and p_device ~ '^[A-Za-z0-9_-]{22,64}$' then h := encode(sha256(convert_to(p_device || ':' || uid::text, 'UTF8')), 'hex'); end if;
+  return coalesce((select jsonb_agg(jsonb_build_object('first_seen', first_seen, 'last_seen', last_seen, 'current', device = h) order by last_seen desc)
+                     from private.devices where user_id = uid), '[]'::jsonb);
+end $$;
+
+-- ================= operator tools: run from the Supabase SQL editor (owner / postgres). Not callable from the API. =================
+-- Lock one account: refuse every API call at once, block new logins, kill its sessions.
+create or replace function private.ops_lock_user(p_email text, p_reason text default 'security') returns text
+language plpgsql security definer set search_path = '' as $$
+declare uid uuid;
+begin
+  select id into uid from auth.users where lower(email) = lower(btrim(p_email));
+  if uid is null then return 'no such user'; end if;
+  update public.profiles set locked_at = now(), lock_reason = left(p_reason, 200) where id = uid;
+  update auth.users set banned_until = 'infinity' where id = uid;
+  delete from auth.sessions where user_id = uid;
+  insert into public.audit_log (action, entity, entity_id, meta) values ('ops.lock_user', 'profile', uid::text, jsonb_build_object('reason', left(p_reason, 200)));
+  return 'locked ' || uid;
+end $$;
+create or replace function private.ops_unlock_user(p_email text) returns text
+language plpgsql security definer set search_path = '' as $$
+declare uid uuid;
+begin
+  select id into uid from auth.users where lower(email) = lower(btrim(p_email));
+  if uid is null then return 'no such user'; end if;
+  update public.profiles set locked_at = null, lock_reason = null where id = uid;
+  update auth.users set banned_until = null where id = uid;
+  insert into public.audit_log (action, entity, entity_id) values ('ops.unlock_user', 'profile', uid::text);
+  return 'unlocked ' || uid;
+end $$;
+-- Sign one user out everywhere (e.g. "my account was used by someone else").
+create or replace function private.ops_revoke_sessions(p_email text) returns int
+language plpgsql security definer set search_path = '' as $$
+declare uid uuid; n int;
+begin
+  select id into uid from auth.users where lower(email) = lower(btrim(p_email));
+  if uid is null then return 0; end if;
+  with d as (delete from auth.sessions where user_id = uid returning 1) select count(*) into n from d;
+  insert into public.audit_log (action, entity, entity_id, meta) values ('ops.revoke_sessions', 'profile', uid::text, jsonb_build_object('sessions', n));
+  return n;
+end $$;
+-- PANIC BUTTON. on: every student API call is refused and every session is killed. off: back to normal.
+create or replace function private.ops_panic(p_on boolean, p_message text default 'Physica is temporarily offline for a security check. Your saved answers are safe.') returns text
+language plpgsql security definer set search_path = '' as $$
+declare n int := 0;
+begin
+  update public.app_settings set lockdown = p_on, maintenance = p_on, exams_open = not p_on, signups_open = not p_on,
+         message = case when p_on then left(p_message, 300) else null end, updated_at = now() where id;
+  if p_on then with d as (delete from auth.sessions returning 1) select count(*) into n from d; end if;
+  insert into public.audit_log (action, meta) values ('ops.panic', jsonb_build_object('on', p_on, 'sessions_killed', n));
+  return case when p_on then 'LOCKDOWN ON; sessions killed: ' || n else 'lockdown off' end;
+end $$;
+create or replace function private.ops_set_status(p_maintenance boolean default null, p_exams_open boolean default null, p_signups_open boolean default null, p_message text default null) returns text
+language plpgsql security definer set search_path = '' as $$
+begin
+  update public.app_settings set maintenance = coalesce(p_maintenance, maintenance), exams_open = coalesce(p_exams_open, exams_open),
+         signups_open = coalesce(p_signups_open, signups_open), message = coalesce(left(p_message, 300), message), updated_at = now() where id;
+  insert into public.audit_log (action, meta) values ('ops.set_status', jsonb_build_object('maintenance', p_maintenance, 'exams_open', p_exams_open, 'signups_open', p_signups_open));
+  return 'ok';
+end $$;
+-- What happened in the last N hours (counts per action). First thing to run when something feels wrong.
+create or replace function private.ops_events(p_hours int default 24) returns table (action text, events bigint, distinct_actors bigint, last_at timestamptz)
+language sql stable security definer set search_path = '' as $$
+  select a.action, count(*), count(distinct a.actor), max(a.at) from public.audit_log a
+   where a.at > now() - make_interval(hours => least(greatest(p_hours, 1), 720)) group by a.action order by count(*) desc;
+$$;
+-- Accounts that signed in from many new devices recently (account-sharing or takeover signal).
+create or replace function private.ops_suspicious(p_hours int default 24) returns table (kind text, subject text, detail text)
+language sql stable security definer set search_path = '' as $$
+  select 'new_devices'::text, l.actor::text, count(*)::text || ' new devices'
+    from public.audit_log l where l.action = 'login.new_device' and l.at > now() - make_interval(hours => least(greatest(p_hours, 1), 720))
+   group by l.actor having count(*) >= 3
+  union all
+  select 'integrity_spike', i.attempt_id::text, count(*)::text || ' tab/copy/offline events'
+    from public.integrity_events i where i.at > now() - make_interval(hours => least(greatest(p_hours, 1), 720)) group by i.attempt_id having count(*) >= 10
+  union all
+  select 'too_fast', a.id::text, 'finished in ' || round(extract(epoch from (a.submitted_at - a.started_at)) / 60)::text || ' min of ' || t.duration_min::text
+    from public.attempts a join public.tests t on t.id = a.test_id
+   where a.submitted_at > now() - make_interval(hours => least(greatest(p_hours, 1), 720))
+     and extract(epoch from (a.submitted_at - a.started_at)) < t.duration_min * 60 * 0.1
+     and (select count(*) from public.responses r where r.attempt_id = a.id and r.answer is not null) >= (select count(*) from public.questions q where q.test_id = a.test_id) * 0.8;
+$$;
+
 -- ============================================================ function privileges
 revoke all on all functions in schema private from public, anon, authenticated;
 revoke all on function public.handle_new_user() from public, anon, authenticated;
@@ -570,9 +766,10 @@ revoke all on function public.is_admin() from public, anon;
 revoke all on function public.save_profile(text, boolean, boolean, text, text), public.start_attempt(uuid), public.get_attempt(uuid),
                        public.save_answer(uuid, uuid, text), public.submit_attempt(uuid), public.get_result(uuid),
                        public.log_event(uuid, text, jsonb), public.export_my_data(), public.delete_my_account(),
-                       public.track(text, text), public.admin_stats(int) from public, anon;
-grant execute on function public.track(text, text) to anon, authenticated;
-grant execute on function public.is_admin(), public.admin_stats(int), public.save_profile(text, boolean, boolean, text, text), public.start_attempt(uuid),
+                       public.track(text, text), public.admin_stats(int), public.get_status(),
+                       public.note_device(text), public.list_devices(text) from public, anon;
+grant execute on function public.track(text, text), public.get_status() to anon, authenticated;
+grant execute on function public.is_admin(), public.admin_stats(int), public.note_device(text), public.list_devices(text), public.save_profile(text, boolean, boolean, text, text), public.start_attempt(uuid),
                           public.get_attempt(uuid), public.save_answer(uuid, uuid, text), public.submit_attempt(uuid),
                           public.get_result(uuid), public.log_event(uuid, text, jsonb), public.export_my_data(),
                           public.delete_my_account() to authenticated;
