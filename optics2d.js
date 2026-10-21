@@ -47,7 +47,7 @@ const snap=(v,step)=>Math.round(v/step)*step;
 
 /* ---- convex lens on the optical bench ---- */
 const BY=330,LX=380;
-make('lens',(c,p,t)=>{const ppc=4,u=p.objectDistance,F=p.focalLength,v=u*F/(u-F),m=-v/u,ox=LX-u*ppc,cy=250,h=34,ix=LX+v*ppc,sx=SCR.lens,real=u>F;hint(c,'Drag the candle, then slide the white screen until the image is sharp');bench(c,40,660,BY,LX,ppc);
+make('lens',(c,p,t)=>{const ppc=4,u=p.objectDistance+(p.objectDistance===p.focalLength?.01:0),F=p.focalLength,v=u*F/(u-F),m=-v/u,ox=LX-u*ppc,cy=250,h=34,ix=LX+v*ppc,sx=SCR.lens,real=u>F;hint(c,'Drag the candle, then slide the white screen until the image is sharp');bench(c,40,660,BY,LX,ppc);
   for(const sg of[-1,1]){c.fillStyle='#ffd43b';c.beginPath();c.arc(LX+sg*F*ppc,cy,2.5,0,TAU);c.fill();txt(c,'F',LX+sg*F*ppc,cy+11,'#ffd43b',9,'center',700)}
   const top=[ox,cy-h],it=[ix,cy-h*m];let beams;if(real)beams=[[top,[LX,cy-h],ext([LX,cy-h],it,sx)],[top,[LX,cy],ext([LX,cy],it,sx)],[top,[LX,it[1]],[sx,it[1]]]];else{const fp=[LX+F*ppc,cy];beams=[[top,[LX,cy-h],ext([LX,cy-h],fp,sx)],[top,[LX,cy],ext(top,[LX,cy],sx)]]}
   post(c,sx,cy+76,BY);post(c,LX,cy+66,BY);post(c,ox,cy,BY);candle(c,ox,cy,h,1,false,t);for(const b of beams)ray(c,b,'#ffc65a',1.5);lens(c,LX,cy,62,10);
@@ -58,7 +58,7 @@ make('lens',(c,p,t)=>{const ppc=4,u=p.objectDistance,F=p.focalLength,v=u*F/(u-F)
  (q,p)=>q.y<150?null:Math.abs(q.x-SCR.lens-12)<22?'scr':'obj',(q,p,md)=>{if(md==='scr')SCR.lens=clamp(Math.round(q.x-12),LX+24,632);else p.objectDistance=clamp(snap((LX-q.x)/4,1),15,80)});
 
 /* ---- concave mirror on the bench ---- */
-make('concave-mirror',(c,p,t)=>{const ppc=6,u=p.u,F=p.f,MX=600,cy=250,h=30,v=u*F/(u-F),m=-v/u,ox=MX-u*ppc,ix=MX-v*ppc,sx=SCR.mirror,real=u>F;hint(c,'Drag the candle; slide the small screen (below the axis) to catch a sharp image');bench(c,40,660,BY,MX,-ppc);
+make('concave-mirror',(c,p,t)=>{const ppc=6,u=p.u+(p.u===p.f?.01:0),F=p.f,MX=600,cy=250,h=30,v=u*F/(u-F),m=-v/u,ox=MX-u*ppc,ix=MX-v*ppc,sx=SCR.mirror,real=u>F;hint(c,'Drag the candle; slide the small screen (below the axis) to catch a sharp image');bench(c,40,660,BY,MX,-ppc);
   c.save();const R=2*F*ppc;c.lineWidth=8;const g=c.createLinearGradient(MX-8,0,MX+6,0);g.addColorStop(0,'#ffffff');g.addColorStop(.4,'#ced4da');g.addColorStop(1,'#343a40');c.strokeStyle=g;c.shadowColor='rgba(200,230,255,.5)';c.shadowBlur=10;c.beginPath();c.arc(MX-R,cy,R,-Math.asin(Math.min(1,70/R)),Math.asin(Math.min(1,70/R)));c.stroke();c.restore();post(c,MX,cy+70,BY);
   for(const [k,l] of[[1,'F'],[2,'C']]){const x=MX-k*F*ppc;if(x>40){c.fillStyle='#ffd43b';c.beginPath();c.arc(x,cy,2.5,0,TAU);c.fill();txt(c,l,x,cy-10,'#ffd43b',9,'center',700)}}
   post(c,ox,cy,BY);candle(c,ox,cy,h,1,false,t);const top=[ox,cy-h];
