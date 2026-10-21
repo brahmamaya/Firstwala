@@ -8,16 +8,3 @@
 secrets*
 
 _site
-
-node_modules/
-package-lock.json.bak
-
-# private: question banks, generated SQL, local secrets. The repo is public, so these must never be committed.
-content/
-build/
-private/
-*.private.*
-.dev.vars
-.wrangler/
-supabase/.temp/
-*.sql.private

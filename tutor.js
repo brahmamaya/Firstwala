@@ -53,7 +53,6 @@ function rankSoon(k,title){rankOv?.remove();const ov=el('div','rank-ov rank-'+k)
   const back=btn('rank-back','← Back',close);const c=el('div','rank-card');
   const cr=hammer('rank-logo big');
   c.append(cr,el('h1','','Rank mode'),el('h2','',title),el('p','rank-soon','Coming soon'),el('p','rank-line','Completely focused on aspirants.'));
-  if(k==='jeeadv'){const sb=btn('rk-btn','📝 Test Series',()=>{});sb.dataset.seriesExam='JEE_ADV';sb.dataset.testid='rk-series';sb.setAttribute('aria-label','Open the full-length JEE Advanced Test Series');c.append(sb)}
   ov.append(back,c);document.body.append(ov);document.body.classList.add('rank-open');rankOv=ov;back.focus()}
 const goBtn=document.getElementById('landing-go');
 if(goBtn){goBtn.hidden=true;const st=el('div','landing-step3');const h=el('h2','landing-step');h.append(document.createTextNode('Choose your mode'));st.append(h,sw,simSub,rankSub);goBtn.before(st)}
