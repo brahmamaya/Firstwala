@@ -1,5 +1,6 @@
 -- (a sequential scan of a tiny temp helper table is fine; only scans of the big tables count)
 -- 100,000 students, 200,000 attempts (half submitted), 1,000,000 audit rows, 300,000 integrity rows.
+update public.app_settings set max_users = 10000000;   -- the audit seeds 100k accounts; lift the free-plan cap for this scratch database
 insert into auth.users (id, email) select gen_random_uuid(), 'u' || g || '@x.test' from generate_series(1, 100000) g;
 insert into public.profiles (id) select id from auth.users on conflict do nothing;
 do $$ begin if (select count(*) from public.tests) < 2 then raise exception 'need published tests'; end if; end $$;
