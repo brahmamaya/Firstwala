@@ -269,7 +269,7 @@ add({base:'induction',id:'flux-angle',title:'Magnetic flux through a tilted coil
  tryText:'Spin the coil and watch the induced EMF peak when the flux is zero.',
  controls:[R('B','Magnetic field',.1,1,.05,.4,'T',2),R('A','Coil area',10,400,10,100,'cm²'),R('N','Turns',1,200,1,50),R('th','Tilt angle θ',0,180,1,30,'°'),S('spin','Coil','fixed',[['fixed','Held at angle θ'],['spin','Rotating at 1 rev/s']])],
  metrics:(p,t)=>{const th=p.spin==='spin'?TAU*t:rad(p.th),A=p.A*1e-4,Phi=p.N*p.B*A*Math.cos(th);return[N('Flux linkage NΦ',Phi*1000,'mWb',2),N('θ now',deg(th)%360,'°',0),N('EMF if rotating at 1 rev/s',p.spin==='spin'?p.N*p.B*A*TAU*Math.sin(th):'—','V',3)]},
- draw:(c,p,t)=>{const th=p.spin==='spin'?TAU*t*.25:rad(p.th),s=P3.scene(c,{scale:60,cx:240}),w=.5+Math.sqrt(p.A)*.07,n=[Math.sin(th),Math.cos(th),0];
+ draw:(c,p,t)=>{const th=p.spin==='spin'?TAU*t:rad(p.th),s=P3.scene(c,{scale:60,cx:240}),w=.5+Math.sqrt(p.A)*.07,n=[Math.sin(th),Math.cos(th),0];
   for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)s.arrow([i*.6,-1.8,j*.6],[i*.6,1.8,j*.6],'#7baaff55',1.2,7,i===2&&j===-2?`B = ${p.B} T`:'');const u=[Math.cos(th),-Math.sin(th),0],v=[0,0,1],cor=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>V.add(V.mul(u,a*w),V.mul(v,b*w)));
   s.poly(cor,'#ffc36b',{alpha:.25,cull:false,stroke:C.copper,lw:4});s.arrow([0,0,0],V.mul(n,1.2),C.mint,3,11,`n̂ (θ = ${f(deg(th)%360,0)}°)`);s.render();const A=p.A*1e-4;
   chart(c,440,96,216,150,{title:'Flux vs θ',xl:'θ (°)',xmin:0,xmax:360,ymin:-p.N*p.B*A*1000*1.1,ymax:p.N*p.B*A*1000*1.1,series:[{fn:x=>p.N*p.B*A*Math.cos(rad(x))*1000,col:C.gold}],marker:[deg(th)%360,p.N*p.B*A*Math.cos(th)*1000]})},
