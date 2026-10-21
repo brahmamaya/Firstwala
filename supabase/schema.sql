@@ -148,7 +148,7 @@ create table if not exists public.app_settings (
   updated_at   timestamptz not null default now()
 );
 alter table public.app_settings add column if not exists gateway_hash text;
-alter table public.app_settings add column if not exists max_users int not null default 10000 check (max_users > 0);
+alter table public.app_settings add column if not exists max_users int not null default 30000 check (max_users > 0);
 insert into public.app_settings (id) values (true) on conflict do nothing;
 
 -- Devices that signed in, as one-way hashes of a random id kept in the browser (not a fingerprint, no IP/user-agent).
@@ -181,7 +181,7 @@ create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
   if not (select signups_open from public.app_settings where id) then raise exception 'signups_closed' using errcode = 'P0001'; end if;
-  -- free-plan guard: no more than max_users accounts (default 10,000). Raise it with: update public.app_settings set max_users = 20000;
+  -- free-plan guard: no more than max_users accounts (default 30,000 total, about 10,000 new per month). Raise it with: update public.app_settings set max_users = 20000;
   if (select count(*) from public.profiles) >= (select max_users from public.app_settings where id) then raise exception 'signups_closed' using errcode = 'P0001'; end if;
   insert into public.profiles (id) values (new.id) on conflict do nothing;
   return new;
