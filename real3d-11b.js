@@ -289,7 +289,7 @@ R['rolling']=(c,p,t)=>{const s=P3.scene(c,{scale:60,pitch:.15,yaw:.35,cy:285,cx:
   bench(s,-3.7,3.7,0,-.9,.9);wheel(s,[x,Rw,0],Rw,ang-PI/2);s.cyl([x,Rw,0],[0,0,1],.03,.5,CHROME);
   const tr=[];for(let i=0;i<=60;i++){const xx=-3+(x+3)*i/60,a=(xx+3)/Rw;tr.push([xx-Rw*.78*Math.sin(a),Rw-Rw*.78*Math.cos(a),.09])}s.path(tr,C.gold,2);
   s.arrow([x,2*Rw+.08,.12],[x+.25+p.speed*.25,2*Rw+.08,.12],C.mint,3,11,`top: 2v = ${f(2*p.speed,1)} m/s`);s.arrow([x,Rw,.15],[x+.12+p.speed*.125,Rw,.15],C.blue,3,10,`v = ${p.speed} m/s`);s.ball([x,.01,.1],.05,C.red,{flat:true});s.label([x,-.25,.5],'contact point: v = 0',C.red,11);
-  part(s,[x-Rw*.75,Rw*.4,.08],'rubber tyre',-40,50);part(s,[x,Rw,.1],'hub',-50,-70);
+  part(s,[x-Rw*.95,Rw*.9,.08],'rubber tyre',-85,10);part(s,[x,Rw,.1],'hub',-50,-70);
   s.render();tag(c,'gold: path of a rim point (cycloid) · contact point at rest',44,98,C.muted,13)};
 
 R['angular-momentum']=(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.35,cy:275}),w=p.omega*(p.initialRadius/p.radius)**2,a=t*Math.min(6,w),r=.4+p.radius*1.05,ri=.4+p.initialRadius*1.05,yb=-1.3,h=.6;
