@@ -2,9 +2,9 @@
    Physica uses no APIs and no keys; this keeps it that way even by accident. */
 'use strict';
 const fs=require('fs'),path=require('path'),{execFileSync}=require('child_process');
-const PATTERNS=[[/AIza[0-9A-Za-z_-]{30,}/,'Google API key'],[/sk-ant-[A-Za-z0-9_-]{10,}/,'Anthropic key'],[/\bsk-[A-Za-z0-9]{32,}/,'OpenAI-style key'],
+const PATTERNS=[[/cfut_[A-Za-z0-9]{30,}/,'Cloudflare API token'],[/GATEWAY_KEY\s*[=:]\s*['"][A-Za-z0-9+\/_-]{24,}['"]/,'gateway secret'],[/AIza[0-9A-Za-z_-]{30,}/,'Google API key'],[/sk-ant-[A-Za-z0-9_-]{10,}/,'Anthropic key'],[/\bsk-[A-Za-z0-9]{32,}/,'OpenAI-style key'],
   [/gh[pousr]_[A-Za-z0-9]{30,}/,'GitHub token'],[/xox[baprs]-[0-9A-Za-z-]{10,}/,'Slack token'],[/AKIA[0-9A-Z]{16}/,'AWS key'],
-  [/-----BEGIN [A-Z ]*PRIVATE KEY-----/,'private key'],[/\b(api[_-]?key|secret[_-]?key|access[_-]?token)\s*[:=]\s*['"][^'"]{12,}['"]/i,'hard-coded key']];
+  [/-----BEGIN [A-Z ]*PRIVATE KEY-----/,'private key'],[/sb_secret_[A-Za-z0-9_-]{16,}/,'Supabase secret key'],[/"role"\s*:\s*"service_role"/,'Supabase service_role key'],[/eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]*c2VydmljZV9yb2xl/,'Supabase service_role JWT'],[/\b(api[_-]?key|secret[_-]?key|access[_-]?token)\s*[:=]\s*['"][^'"]{12,}['"]/i,'hard-coded key']];
 module.exports=function guard(root){
   let files;try{files=execFileSync('git',['ls-files','-co','--exclude-standard'],{cwd:root}).toString().split('\n').filter(Boolean)}catch{files=fs.readdirSync(root)}
   const hits=[];
