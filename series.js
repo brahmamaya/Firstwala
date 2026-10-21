@@ -1,17 +1,9 @@
-/* Physica Test Series: email-code login, test list, timed exam and results on top of Supabase.
-   Loaded on demand (series-loader.js -> physica-series.min.js). No SDK: the site CSP allows only 'self' scripts, so this talks to
-   Supabase's REST API directly. Only the PUBLIC publishable key lives here; everything secret (answers, timer, scoring, who may
-   start a test) is enforced inside Postgres, see supabase/schema.sql. Never put a service_role / secret key in this repo. */
+/* Physica Test Series: full-length exam practice that runs entirely on the student's device. No login, no server, no database.
+   Tests are plain JSON files under /tests (built by tools/series-import.js, see docs/CONTENT-GUIDE.md). Answers and results are kept
+   in this browser only (localStorage). Loaded on demand (series-loader.js -> physica-series.min.js). */
 (() => {
 'use strict';
-const SUPA = 'https://lbyqvwkichjvrrzcddtq.supabase.co';
-const GW = '';                          // API gateway address (see gateway/README.md). Empty = talk to Supabase directly.
-const BASE = GW || SUPA;
-const KEY = 'sb_publishable_E3vG7C6UN13-1PoWwJNauA_uq7zvZxi';
-const STORE = 'physica-series-auth';
-const TERMS = '2026-10-21';            // must equal private.current_terms() in supabase/schema.sql
 const GA_ID = 'G-Z1BGVQBEJ6';
-const IDLE_MS = 30 * 60 * 1000;         // sign out an unattended shared-device session
 const EXAMS = { JEE_MAIN: 'JEE Main', JEE_ADV: 'JEE Advanced', NEET: 'NEET' };
 const MSG = {
   network: 'No internet connection. Check your network and try again.',
@@ -60,13 +52,6 @@ const h = (tag, a, ...kids) => {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
-const b64 = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-// A random id kept in this browser (not a fingerprint). Only its salted hash is stored on the server, to spot logins from new devices.
-function deviceId() {
-  let d = lsGet('physica-device');
-  if (!d || !/^[A-Za-z0-9_-]{22,64}$/.test(d)) { d = b64(crypto.getRandomValues(new Uint8Array(24))); lsSet('physica-device', d); }
-  return d;
-}
 const err = (code, status) => Object.assign(new Error(code), { code, status });
 
 /* Text -> DOM with real subscripts / superscripts (x_2, v_{0}, m^2, 10^-3). Only text nodes, <sub> and <sup> are created. */
@@ -84,52 +69,115 @@ function rich(el, text) {
 }
 const rt = (tag, text, cls) => rich(h(tag, cls ? { class: cls } : null), text);
 
-/* ---------- auth + REST ---------- */
-const ssGet = k => { try { return sessionStorage.getItem(k); } catch { return null; } };
-const ssSet = (k, v) => { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch {} };
-let sess = null, remember = false;
-try { const l = lsGet(STORE); sess = JSON.parse(l || ssGet(STORE) || 'null'); remember = !!l; } catch { sess = null; }
-// Default: the login lives only in this tab (gone when it closes), which is safe on shared / cyber-cafe computers.
-// "Keep me signed in" (own device) stores it in localStorage instead.
-const save = s => { sess = s; lsSet(STORE, null); ssSet(STORE, null); if (s) (remember ? lsSet : ssSet)(STORE, JSON.stringify(s)); };
-const now = () => Math.floor(Date.now() / 1000);
-
-async function raw(path, { method = 'GET', body, token, keepalive } = {}) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (!GW) headers.apikey = KEY;               // behind the gateway the key is added there
-  if (token) headers.Authorization = 'Bearer ' + token;
+/* ---------- local backend: the same calls the exam screens used to make to a server, answered on this device ---------- */
+const DB = 'physica-ps-v1', secTotal = secs => secs.reduce((a, x) => a + x.n, 0), secMax = secs => secs.reduce((a, x) => a + x.n * x.c, 0);
+const dbLoad = () => { try { return JSON.parse(lsGet(DB) || '{}'); } catch { return {}; } };
+const dbSave = d => lsSet(DB, JSON.stringify(d));
+async function getJSON(path, fresh) {
   let r;
-  try { r = await fetch(BASE + path, { method, headers, keepalive: !!keepalive, body: body === undefined ? undefined : JSON.stringify(body) }); }
-  catch { throw err('network'); }
-  const txt = await r.text();
-  let data = null;
-  try { data = txt ? JSON.parse(txt) : null; } catch {}
-  if (!r.ok) throw err((data && (data.error_code || data.error || data.message || data.msg)) || 'http_' + r.status, r.status);
-  return data;
+  try { r = await fetch(path, fresh ? { cache: 'no-cache' } : undefined); } catch { throw err('network'); }
+  if (!r.ok) throw err(r.status === 404 ? 'test_not_found' : 'http_' + r.status, r.status);
+  try { return await r.json(); } catch { throw err('test_not_found'); }
 }
-
-function adopt(d) {
-  save({ access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || now() + d.expires_in, user: { id: d.user.id, email: d.user.email } });
+let ixP = null;
+const index = () => ixP || (ixP = getJSON('tests/index.json', true).catch(e => { ixP = null; if (e.code === 'test_not_found') return { patterns: {}, tests: [] }; throw e; }));
+const file = (t, key) => `tests/${t.exam}/${String(t.n).padStart(2, '0')}-${t.p}${key ? '.key' : ''}.json`;
+const memo = new Map();
+const getFile = (t, key) => { const k = file(t, key); if (!memo.has(k)) memo.set(k, getJSON(k).catch(e => { memo.delete(k); throw e; })); return memo.get(k); };
+const types = secs => secs.flatMap(x => Array(x.n).fill(x.t));
+function points(t, c, w, p, ans, key) {              // same rules as the real exam: see docs/CONTENT-GUIDE.md
+  if (key === '*') return c;
+  if (ans == null || String(ans).trim() === '') return 0;
+  if (t === 'MCQ') return ans === key ? c : w;
+  if (t === 'MULTI') return [...ans].some(ch => !key.includes(ch)) ? w : ans === key ? c : p * ans.length;
+  const v = Number(ans); if (!isFinite(v)) return w;
+  const [lo, hi] = key.includes(':') ? key.split(':').map(Number) : [Number(key), Number(key)];
+  return v >= lo - 1e-6 && v <= hi + 1e-6 ? c : w;
 }
-let refreshing = null;
-function refresh() {
-  if (!sess) return Promise.reject(err('signed_out', 401));
-  return refreshing || (refreshing = raw('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: sess.refresh_token } })
-    .then(adopt, e => { if (e.status && e.status < 500) save(null); throw e; })
-    .finally(() => { refreshing = null; }));
+async function findTest(id) { const t = (await index()).tests.find(x => x.id === id); if (!t) throw err('test_not_found'); return t; }
+async function finalize(a, t, ix) {
+  if (a.done) return a.score;
+  const secs = ix.patterns[t.pat].sections, ks = (await getFile(t, true)).ks;
+  let off = 0, total = 0; const det = [];
+  for (const sec of secs) {
+    let sc = 0, ok = 0, bad = 0, skip = 0, tm = 0;
+    for (let i = 0; i < sec.n; i++) {
+      const g = off + i, y = a.ans[g], pts = points(sec.t, sec.c, sec.w, sec.p || 0, y, ks[g].k);
+      sc += pts; tm += a.tm[g] || 0;
+      if (y == null || String(y).trim() === '') { skip++; if (pts > 0) ok++; } else if (pts > 0) ok++; else bad++;
+    }
+    det.push([sc, ok, bad, skip, tm]); total += sc; off += sec.n;
+  }
+  Object.assign(a, { done: 1, score: total, det, end: Date.now() });
+  return total;
 }
-async function api(path, opts = {}) {
-  if (!sess) throw err('signed_out', 401);
-  if (sess.expires_at - 30 < now()) await refresh();
-  try { return await raw(path, { ...opts, token: sess.access_token }); }
-  catch (e) { if (e.status !== 401) throw e; await refresh(); return raw(path, { ...opts, token: sess.access_token }); }
-}
-let stAt = 0, stVal = null;               // status is the same for everyone: reuse it for 20 s instead of asking again on every screen
-const status = async () => { if (stVal && Date.now() - stAt < 20000) return stVal; const v = await raw('/rest/v1/rpc/get_status', { method: 'POST', body: {} }); stVal = v && !v.lockdown && !v.maintenance ? v : null; stAt = Date.now(); return v; };   // only a normal status is reused
-const rpc = (fn, args, keepalive) => api('/rest/v1/rpc/' + fn, { method: 'POST', body: args || {}, keepalive });
-const sendCode = email => raw('/auth/v1/otp', { method: 'POST', body: { email, create_user: true } });
-const verifyCode = async (email, code, keep) => { const d = await raw('/auth/v1/verify', { method: 'POST', body: { type: 'email', email, token: code } }); remember = !!keep; adopt(d); };
-const signOut = (everywhere) => { const t = sess && sess.access_token; save(null); if (t) raw('/auth/v1/logout' + (everywhere ? '?scope=global' : ''), { method: 'POST', token: t }).catch(() => {}); };
+const HEX = a => a.map(b => b.toString(16).padStart(2, '0')).join('');
+const LOCAL = {
+  async list_tests({ p_exam }) {
+    const ix = await index(), mine = dbLoad().a || {}, pat = {};
+    const ts = ix.tests.filter(t => t.exam === p_exam);
+    for (const t of ts) { const p = ix.patterns[t.pat]; pat[t.pat] = pat[t.pat] || { l: p.label, m: p.minutes, pp: p.papers, q: secTotal(p.sections), mx: secMax(p.sections), s: p.sections }; }
+    return { pat, tests: ts.map(t => { const a = mine[t.id]; return { id: t.id, n: t.n, p: t.p, pat: t.pat, f: true, lk: false, t: t.t || undefined, a: a ? a.id : undefined, s: a && a.done ? a.score : undefined, d: !!(a && a.done) }; }) };
+  },
+  async start_attempt({ p_test_id }) {
+    const ix = await index(), t = await findTest(p_test_id), db = dbLoad(); db.a = db.a || {};
+    if (db.a[t.id]) return db.a[t.id].id;
+    const pat = ix.patterns[t.pat], n = secTotal(pat.sections), now = Date.now();
+    db.a[t.id] = { id: t.id, start: now, dl: now + pat.minutes * 60000, ans: Array(n).fill(null), fl: Array(n).fill(0), tm: Array(n).fill(0) };
+    dbSave(db); return t.id;
+  },
+  async get_attempt({ p_attempt }) {
+    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
+    const t = await findTest(p_attempt), pat = ix.patterns[t.pat];
+    if (!a.done && Date.now() > a.dl) { await finalize(a, t, ix); dbSave(db); }
+    if (a.done) return { submitted: true, attempt_id: a.id };
+    const paper = await getFile(t);
+    return { submitted: false, attempt_id: a.id, n: t.n, p: t.p, title: t.t, pat: { l: pat.label, m: pat.minutes, s: pat.sections },
+      deadline: new Date(a.dl).toISOString(), server_now: new Date().toISOString(), qs: paper.qs, state: { ans: a.ans, fl: HEX(a.fl), tm: a.tm } };
+  },
+  async save_state({ p_attempt, p_items }) {
+    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
+    if (a.done || Date.now() > a.dl + 5000) throw err('attempt_closed');
+    const t = await findTest(p_attempt), ty = types(ix.patterns[t.pat].sections);
+    if (!Array.isArray(p_items) || p_items.length > 100) throw err('invalid_answer');
+    for (const it of p_items) {
+      if (!Array.isArray(it) || it.length !== 4) throw err('invalid_answer');
+      const [i, v, f, sec] = it;
+      if (!Number.isInteger(i) || i < 1 || i > ty.length || !Number.isInteger(f) || f < 0 || f > 3) throw err('invalid_answer');
+      if (v != null) {
+        if (typeof v !== 'string') throw err('invalid_answer');
+        if (ty[i - 1] === 'MCQ' ? !/^[A-F]$/.test(v) : ty[i - 1] === 'MULTI' ? !/^[A-F]{1,6}$/.test(v) || [...v].sort().join('') !== v || new Set(v).size !== v.length : v.length > 24 || !/^-?\d+(\.\d+)?$/.test(v)) throw err('invalid_answer');
+      }
+      a.ans[i - 1] = v == null ? null : v; a.fl[i - 1] = f; a.tm[i - 1] = Math.min(32000, a.tm[i - 1] + Math.min(Math.max(Number(sec) || 0, 0), 3600));
+    }
+    dbSave(db);
+  },
+  async submit_attempt({ p_attempt }) {
+    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
+    const sc = await finalize(a, await findTest(p_attempt), ix); dbSave(db); return sc;
+  },
+  async get_result({ p_attempt }) {
+    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
+    if (!a.done) throw err('attempt_in_progress');
+    const t = await findTest(p_attempt), pat = ix.patterns[t.pat];
+    return { l: pat.label, n: t.n, p: t.p, title: t.t, score: a.score, total: secMax(pat.sections), min: pat.minutes, used: Math.round((a.end - a.start) / 60000), rank: 1, of: 1,
+      sections: pat.sections.map((x, i) => ({ nm: x.nm, s: x.s, t: x.t, n: x.n, sc: a.det[i][0], mx: x.n * x.c, ok: a.det[i][1], bad: a.det[i][2], skip: a.det[i][3], tm: a.det[i][4] })) };
+  },
+  async get_review({ p_attempt, p_section }) {
+    const ix = await index(), db = dbLoad(), a = db.a && db.a[p_attempt]; if (!a) throw err('attempt_not_found');
+    if (!a.done) throw err('attempt_in_progress');
+    const t = await findTest(p_attempt), secs = ix.patterns[t.pat].sections, sec = secs[p_section]; if (!sec) throw err('invalid_section');
+    const [paper, key] = await Promise.all([getFile(t), getFile(t, true)]);
+    let off = 0; for (let i = 0; i < p_section; i++) off += secs[i].n;
+    return Array.from({ length: sec.n }, (_, k) => { const g = off + k, y = a.ans[g], ky = key.ks[g];
+      const o = { i: g + 1, q: paper.qs[g], k: ky.k, t: a.tm[g], pt: points(sec.t, sec.c, sec.w, sec.p || 0, y, ky.k) };
+      if (ky.e) o.e = ky.e; if (y != null) o.y = y; return o; });
+  },
+  async log_event() {},
+};
+const rpc = (fn, args) => LOCAL[fn] ? LOCAL[fn](args || {}) : Promise.reject(err('unsupported'));
+let sess = null;
+const signOut = () => {};
 
 /* ---------- styles (theme variables come from styles.css) ---------- */
 const CSS = `
@@ -237,10 +285,6 @@ function open(opts) {
   // modal semantics: the lab behind the dialog must not be reachable by keyboard or screen reader
   for (const el of document.body.children) if (el !== ov && !el.hasAttribute('inert') && el.tagName !== 'SCRIPT') { el.setAttribute('inert', ''); el.dataset.psInert = '1'; }
   lastActive = Date.now();
-  clearInterval(idleTimer);
-  idleTimer = setInterval(() => {                // shared-device safety: drop an unattended, non-remembered login
-    if (sess && !remember && !examLive && Date.now() - lastActive > IDLE_MS) { signOut(); if (ov && !ov.hidden) view(); }
-  }, 30000);
   view();
 }
 function close() {
@@ -248,7 +292,6 @@ function close() {
   if (onLeave) { onLeave(); onLeave = null; }
   examLive = false;
   ov.hidden = true;
-  clearInterval(idleTimer);
   document.documentElement.style.overflow = '';
   for (const el of document.querySelectorAll('[data-ps-inert]')) { el.removeAttribute('inert'); delete el.dataset.psInert; }
   if (opener && opener.focus) try { opener.focus(); } catch {}
@@ -274,7 +317,6 @@ function paintMark(email) {
 }
 const loading = what => show(h('p', { class: 'ps-muted', role: 'status' }, what || 'Loading…'));
 function fatal(e, retry) {
-  if (e && (e.code === 'signed_out' || e.status === 401)) { save(null); return view(); }
   if (e && (e.code === 'account_locked' || e.code === 'lockdown')) {
     return show(h('div', { class: 'ps-card ps-narrow' }, h('h2', null, e.code === 'lockdown' ? 'Back soon' : 'Account locked'), h('p', { role: 'alert' }, say(e)),
       h('p', { class: 'ps-row' }, e.code === 'lockdown' ? h('button', { type: 'button', class: 'ps-go', onclick: view }, 'Try again') : null,
@@ -287,98 +329,8 @@ function fatal(e, retry) {
 /* ---------- views ---------- */
 let statusMsg = null;
 async function view() {
-  try { const st = await status(); statusMsg = st && st.message && !st.lockdown ? st.message : null; if (st && st.lockdown) return fatal(err('lockdown')); } catch {}
-  if (!sess) return loginView();
-  loading();
-  try {
-    if (!deviceNoted) { await rpc('note_device', { p_device: deviceId() }); deviceNoted = true; }
-    const p = await rpc('get_my_profile');
-    if (!p || p.is_minor == null || (p.is_minor && !(p.parent_consent_at && p.parent_email)) || p.terms_version !== TERMS) return profileView(p);
-    profileName = p.display_name || '';
-    hubView(curExam);
-  } catch (e) { fatal(e); }
-}
-
-function loginView() {
-  let email = '', step = 'email', cooldown = 0, timer = null, keep = false;
-  const keepBox = h('input', { type: 'checkbox', id: 'ps-keep', onchange: ev => { keep = ev.target.checked; } });
-  const msg = h('p', { class: 'ps-err', role: 'alert' });
-  const card = h('div', { class: 'ps-card ps-narrow' });
-  const stop = () => { clearInterval(timer); timer = null; };
-  const done = btn => (on, label) => { btn.disabled = on; if (label) btn.textContent = label; };
-  function paint() {
-    msg.textContent = '';
-    if (step === 'email') {
-      const input = h('input', { type: 'email', id: 'ps-email', autocomplete: 'email', placeholder: 'you@example.com', required: true, value: email });
-      const go = h('button', { class: 'ps-go', type: 'submit' }, 'Email me a code');
-      card.replaceChildren(h('h2', null, 'Login or sign up'),
-        h('p', { class: 'ps-muted' }, 'No password. We email you a 6-digit code.'),
-        h('form', { onsubmit: async ev => {
-          ev.preventDefault(); email = input.value.trim().toLowerCase(); const set = done(go); set(true, 'Sending…');
-          try { await sendCode(email); step = 'code'; startCooldown(); paint(); } catch (e) { msg.textContent = say(e); set(false, 'Email me a code'); }
-        } }, h('label', { class: 'ps-lbl', for: 'ps-email' }, 'Email'), input,
-          h('label', { class: 'ps-row ps-sub', for: 'ps-keep' }, keepBox, h('span', null, 'Keep me signed in on this device. Tick only on your own phone or laptop, never on a shared or cyber-cafe computer.')),
-          h('p', null, go)), msg);
-      input.focus();
-    } else {
-      const input = h('input', { type: 'text', id: 'ps-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]{6}', placeholder: '123456', required: true });
-      const go = h('button', { class: 'ps-go', type: 'submit' }, 'Verify');
-      const resend = h('button', { type: 'button', onclick: async () => {
-        try { await sendCode(email); startCooldown(); msg.textContent = ''; } catch (e) { msg.textContent = say(e); }
-      } }, 'Resend code');
-      card.replaceChildren(h('h2', null, 'Enter your code'),
-        h('p', { class: 'ps-muted' }, 'We sent a 6-digit code to ', h('b', null, email), '. Check spam if you don’t see it.'),
-        h('form', { onsubmit: async ev => {
-          ev.preventDefault(); const set = done(go); set(true, 'Checking…');
-          try { await verifyCode(email, input.value.trim(), keep); stop(); view(); } catch (e) { msg.textContent = say(e); set(false, 'Verify'); }
-        } }, h('label', { class: 'ps-lbl', for: 'ps-code' }, '6-digit code'), input, h('p', { class: 'ps-row' }, go, resend,
-          h('button', { type: 'button', onclick: () => { step = 'email'; stop(); paint(); } }, 'Change email'))), msg);
-      resend.disabled = cooldown > 0; resend.textContent = cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code';
-      card._resend = resend;
-      input.focus();
-    }
-  }
-  function startCooldown() {
-    stop(); cooldown = 30;
-    timer = setInterval(() => {
-      cooldown--; const b = card._resend;
-      if (b && b.isConnected) { b.disabled = cooldown > 0; b.textContent = cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'; }
-      if (cooldown <= 0) stop();
-    }, 1000);
-  }
-  show(card);
-  onLeave = stop;
-  paint();
-}
-
-function profileView(p) {
-  let minor = p && p.is_minor != null ? p.is_minor : null;
-  const msg = h('p', { class: 'ps-err', role: 'alert' });
-  const name = h('input', { type: 'text', id: 'ps-name', maxlength: '80', autocomplete: 'name', required: true, value: (p && p.display_name) || '' });
-  const parent = h('input', { type: 'email', id: 'ps-parent', maxlength: '254', autocomplete: 'off', placeholder: 'parent@example.com', value: (p && p.parent_email) || '' });
-  const consent = h('input', { type: 'checkbox', id: 'ps-consent' });
-  const terms = h('input', { type: 'checkbox', id: 'ps-terms' });
-  const minorBox = h('div', { hidden: minor !== true },
-    h('p', { class: 'ps-sub' }, 'Because you are under 18, a parent or guardian must agree before you use Test Series. We keep their email only so we can reach them about your account.'),
-    h('label', { class: 'ps-lbl', for: 'ps-parent' }, 'Parent or guardian email'), parent,
-    h('label', { class: 'ps-row', for: 'ps-consent' }, consent, h('span', null, 'My parent or guardian has agreed to my using Physica Test Series and to Physica storing my name, email and test results as described in the Privacy Policy.')));
-  const radio = (val, label) => h('label', { class: 'ps-row' }, h('input', { type: 'radio', name: 'ps-age', value: String(val), checked: minor === val,
-    onchange: () => { minor = val; minorBox.hidden = !val; } }), label);
-  const go = h('button', { class: 'ps-go', type: 'submit' }, 'Continue');
-  const link = (href, t) => h('a', { href, target: '_blank', rel: 'noopener' }, t);
-  show(h('div', { class: 'ps-card ps-narrow' }, h('h2', null, p && p.terms_version && p.terms_version !== TERMS ? 'We updated our terms' : 'Almost there'),
-    h('form', { onsubmit: async ev => {
-      ev.preventDefault();
-      if (minor == null) { msg.textContent = 'Please tell us if you are under 18.'; return; }
-      if (!terms.checked) { msg.textContent = 'Please accept the Terms and the Privacy Policy to continue.'; return; }
-      go.disabled = true; msg.textContent = '';
-      try { await rpc('save_profile', { p_name: name.value, p_is_minor: minor, p_parent_consent: consent.checked, p_parent_email: minor ? parent.value : null, p_terms_version: TERMS }); view(); }
-      catch (e) { msg.textContent = say(e); go.disabled = false; }
-    } }, h('label', { class: 'ps-lbl', for: 'ps-name' }, 'Your name'), name,
-      h('p', { class: 'ps-muted' }, 'Are you…'), radio(false, '18 or older'), radio(true, 'Under 18'), minorBox,
-      h('label', { class: 'ps-row', for: 'ps-terms' }, terms, h('span', null, 'I have read and accept the ', link('terms.html', 'Terms of Use'), ' and the ', link('privacy.html', 'Privacy Policy'), '.')),
-      h('p', { class: 'ps-sub' }, 'We collect only what a test series needs. You can download or delete your data any time from your account.'),
-      h('p', null, go)), msg));
+  profileName = 'Student';
+  hubView(curExam);
 }
 
 /* ---------- exam hub: the 30 full-length tests of one exam ---------- */
@@ -399,7 +351,7 @@ async function hubView(exam) {
   if (!exam) return pickView();
   curExam = exam; loading('Loading tests…');
   try {
-    const [d, devs] = await Promise.all([rpc('list_tests', { p_exam: exam }), rpc('list_devices', { p_device: deviceId() })]);
+    const d = await rpc('list_tests', { p_exam: exam });
     const byN = new Map(); for (const t of d.tests) { if (!byN.has(t.n)) byN.set(t.n, []); byN.get(t.n).push(t); }
     const any = d.tests.length ? d.pat[d.tests[0].pat] : null;
     const msg = h('p', { class: 'ps-err', role: 'alert' });
@@ -424,11 +376,7 @@ async function hubView(exam) {
         h('div', { class: 'ps-ct' }, h('b', null, 'Test ' + n), h('span', { class: 'ps-pill ' + (free ? 'free' : 'paid') }, free ? 'FREE' : 'PAID')),
         ts ? ts.map(testBtn) : h('p', { class: 'ps-muted ps-soon' }, 'Coming soon')));
     }
-    const recent = (() => { const seen = Number(lsGet('physica-dev-ack') || 0); const f = (devs || []).find(x => !x.current && Date.parse(x.first_seen) > Date.now() - 7 * 864e5 && Date.parse(x.first_seen) > seen);
-      if (!f || devs.length < 2) return null;
-      return h('div', { class: 'ps-banner', role: 'alert' }, h('b', null, 'New sign-in: '), 'your account was used on another device on ' + new Date(f.first_seen).toLocaleString() + '. If that was not you, ',
-        h('button', { type: 'button', class: 'ps-link', onclick: () => { signOut(true); view(); } }, 'log out everywhere'), ' now. ',
-        h('button', { type: 'button', class: 'ps-link', onclick: ev => { lsSet('physica-dev-ack', String(Date.now())); ev.currentTarget.parentNode.remove(); } }, 'This was me')); })();
+    const recent = null;
     show(h('h1', null, ICON[exam] + ' ' + NAME[exam] + ' full-length tests'),
       any ? h('p', { class: 'ps-muted' }, `${any.q} questions · ${any.mx} marks · ${dur(any.m)} · real exam pattern${any.pp > 1 ? ' · 2 papers per test' : ''}. Tests 1–3 free, 4–30 paid.`) : h('p', { class: 'ps-muted' }, 'Tests are being added. Check back soon.'),
       h('p', { class: 'ps-sub' }, `${nDone} of 30 attempted`),
@@ -479,12 +427,12 @@ function instructionsView(t, pat) {
     quoteCard(t.n),
     h('div', { class: 'ps-card' }, h('h2', null, 'General instructions'),
       h('ul', null,
-        h('li', null, `The test has ${pat.q} questions, ${pat.mx} marks and lasts `, h('b', null, dur(pat.m)), '. The timer runs on our server from the moment you click “I am ready to begin”. It does not stop if you close the page.'),
+        h('li', null, `The test has ${pat.q} questions, ${pat.mx} marks and lasts `, h('b', null, dur(pat.m)), '. The timer runs on this device from the moment you click “I am ready to begin”. It does not stop if you close the page.'),
         h('li', null, 'You can attempt each test once. You can leave and come back: your saved answers are kept and the timer keeps running.'),
         h('li', null, 'To answer: choose an option (or type the number), then click ', h('b', null, 'Save & Next'), '. An answer is recorded only when you click ', h('b', null, 'Save & Next'), ' or ', h('b', null, 'Mark for Review & Next'), '.'),
         h('li', null, h('b', null, 'Clear Response'), ' removes your answer. Use the subject tabs and the numbered palette to move between questions.'),
-        h('li', null, 'Your answers are sent to our server automatically. If your internet drops, keep going; they are sent when it returns.'),
-        h('li', null, 'Switching tabs and copying are recorded. Please do not share these questions.'),
+        h('li', null, 'Your answers are saved on this device automatically, so a dropped internet connection does not matter once the test has opened.'),
+        h('li', null, 'Please do not share these questions.'),
         h('li', null, 'At the end click ', h('b', null, 'Submit'), '. A summary is shown first. After submitting you cannot change anything.'))),
     h('div', { class: 'ps-card' }, h('h3', null, 'Question palette'), h('div', { class: 'ps-legend' }, legend.map(([c, a, b]) => h('div', { class: 'ps-lg' }, h('span', { class: c, 'aria-hidden': 'true' }, '7'), h('span', null, h('b', null, a), ' ' + b))))),
     h('div', { class: 'ps-card ps-scroll' }, h('h3', null, 'Marking scheme'), h('table', { class: 'ps-tbl' },
@@ -500,7 +448,7 @@ const loadExam = () => window.PhysicaSeriesExam ? Promise.resolve() : examWait |
   const s = document.createElement('script'); s.src = '__SERIES_EXAM_URL__'; s.async = true; s.onload = ok; s.onerror = () => { examWait = null; s.remove(); no(err('network')); }; document.head.append(s);
 }));
 const kit = {
-  h, rt, rich, rpc, say, sleep, SUPA: BASE, EXAM_NAME: NAME, SUBJ, KIND, minus, dur, secLabel,
+  h, rt, rich, rpc, say, sleep, SUPA: '', EXAM_NAME: NAME, SUBJ, KIND, minus, dur, secLabel,
   name: () => profileName || 'Candidate', email: () => sess && sess.user && sess.user.email,
   full: on => ov.classList.toggle('ps-full', !!on),
   live: on => { examLive = !!on; ov.classList.toggle('ps-exam', !!on); },
@@ -518,46 +466,6 @@ async function runExam(attemptId) {
   } catch (e) { fatal(e, () => runExam(attemptId)); }
 }
 
-/* ---------- account: data rights (DPDP Act 2023) ---------- */
-function accountView() {
-  const msg = h('p', { role: 'status', class: 'ps-muted' });
-  const email = sess && sess.user && sess.user.email;
-  const note = (t, bad) => { msg.className = bad ? 'ps-err' : 'ps-ok'; msg.textContent = t; };
-  const exportBtn = h('button', { type: 'button', onclick: async () => {
-    exportBtn.disabled = true;
-    try {
-      const data = await rpc('export_my_data');
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-      const a = h('a', { href: url, download: 'physica-my-data.json' }); document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-      note('Your data was downloaded as physica-my-data.json.');
-    } catch (e) { note(say(e), true); }
-    exportBtn.disabled = false;
-  } }, 'Download my data');
-  const everywhere = h('button', { type: 'button', onclick: () => { signOut(true); view(); } }, 'Log out on all devices');
-  const devCard = h('div', { class: 'ps-card' }, h('h3', null, 'Devices that signed in'), h('p', { class: 'ps-muted' }, 'Loading…'));
-  rpc('list_devices', { p_device: deviceId() }).then(list => devCard.replaceChildren(h('h3', null, 'Devices that signed in'),
-    h('p', { class: 'ps-muted' }, 'If you see a device you do not recognise, use “Log out on all devices” and sign in again.'),
-    h('ul', null, (list || []).map(d => h('li', null, (d.current ? 'This device' : 'Another device') + ' · first seen ' + new Date(d.first_seen).toLocaleDateString() + ' · last used ' + new Date(d.last_seen).toLocaleString()))))).catch(() => devCard.remove());
-  const confirmBox = h('input', { type: 'text', id: 'ps-del', autocomplete: 'off', placeholder: 'Type DELETE to confirm' });
-  const delBtn = h('button', { type: 'button', class: 'ps-danger', onclick: async () => {
-    if (confirmBox.value.trim() !== 'DELETE') return note('Type DELETE in the box first.', true);
-    if (!confirm('Permanently delete your account, results and profile? This cannot be undone.')) return;
-    delBtn.disabled = true;
-    try { await rpc('delete_my_account'); save(null); view(); } catch (e) { note(say(e), true); delBtn.disabled = false; }
-  } }, 'Delete my account');
-  show(h('h1', null, 'Your account'),
-    h('div', { class: 'ps-card' }, h('p', null, 'Signed in as ', h('b', null, email || '')),
-      h('p', { class: 'ps-row' }, h('button', { type: 'button', class: 'ps-go', onclick: () => hubView(curExam) }, '← Tests'), everywhere)),
-    devCard,
-    h('div', { class: 'ps-card' }, h('h3', null, 'Your data'),
-      h('p', { class: 'ps-muted' }, 'Get a copy of everything Physica holds about you (profile, tests, answers). Machine-readable JSON.'), h('p', null, exportBtn)),
-    h('div', { class: 'ps-card' }, h('h3', null, 'Delete my account'),
-      h('p', { class: 'ps-muted' }, 'Erases your profile, answers, results and parent contact. Only a minimal security log (an anonymous id and the action name) is kept as required for security records.'),
-      h('label', { class: 'ps-lbl', for: 'ps-del' }, 'Confirmation'), confirmBox, h('p', null, delBtn)),
-    h('p', { class: 'ps-sub' }, 'Questions or complaints: easy@physica.in · ', h('a', { href: 'privacy.html', target: '_blank', rel: 'noopener' }, 'Privacy Policy'), ' · ', h('a', { href: 'terms.html', target: '_blank', rel: 'noopener' }, 'Terms')), msg);
-}
-
 /* ---------- result: scorecard, subject and section analysis, answer review on demand ---------- */
 async function resultView(attemptId) {
   loading('Loading your scorecard…');
@@ -566,7 +474,6 @@ async function resultView(attemptId) {
   const clock = s => { const m = Math.round(s / 60); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} m` : `${m} m`; };
   const bySub = new Map();
   r.sections.forEach((s, i) => { const k = s.s; const o = bySub.get(k) || { sc: 0, mx: 0, ok: 0, bad: 0, skip: 0, tm: 0 }; o.sc += s.sc; o.mx += s.mx; o.ok += s.ok; o.bad += s.bad; o.skip += s.skip; o.tm += s.tm; bySub.set(k, o); });
-  const top = r.of > 1 ? Math.max(1, Math.ceil(r.rank / r.of * 100)) : null;
   const subjectCards = [...bySub].map(([k, o]) => h('div', { class: 'ps-card ps-sub-card' },
     h('div', { class: 'ps-ct' }, h('b', null, SUBJ[k] || k), h('span', { class: 'ps-big' }, `${o.sc}/${o.mx}`)),
     h('div', { class: 'ps-bar2', role: 'img', 'aria-label': `${SUBJ[k] || k}: ${o.sc} of ${o.mx} marks` }, h('i', { style: `width:${Math.max(0, Math.min(100, o.sc / o.mx * 100))}%` })),
@@ -584,7 +491,7 @@ async function resultView(attemptId) {
   show(h('button', { type: 'button', class: 'ps-link', onclick: () => hubView(curExam) }, '← All tests'),
     h('h1', null, `${r.l} · Test ${r.n}${r.p > 1 ? ' · Paper ' + r.p : ''}`),
     h('div', { class: 'ps-card ps-score' }, h('div', { class: 'ps-big2' }, `${r.score}`, h('small', null, ` / ${r.total}`)),
-      h('p', null, r.of > 1 ? `Rank ${r.rank} of ${r.of} who have taken this test${top ? ` · top ${top}%` : ''}` : 'You are the first to finish this test.'),
+      h('p', null, 'Your score is saved on this device only (no account, no rank list).'),
       h('p', { class: 'ps-muted' }, `Time used: ${clock(r.used * 60)} of ${dur(r.min)}`)),
     h('p', { class: 'ps-card ps-quote' }, r.score >= r.total * 0.6 ? 'Strong attempt. Read the review below, fix the few slips, and push the next one higher.' : 'Every score is data, not a verdict. Open the review, find the two or three topics that cost you most marks, and fix those first.'),
     h('div', { class: 'ps-grid' }, subjectCards), reviewBox);
@@ -597,7 +504,7 @@ function reviewItem(it, sec) {
   const det = h('details', { class: 'ps-q2 ' + state, ontoggle: () => {
     if (!det.open || body.firstChild) return;
     body.append(rt('div', q.b, 'ps-q'));
-    if (q.f) body.append(h('img', { class: 'ps-fig', src: `${BASE}/storage/v1/object/public/q/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
+    if (q.f) body.append(h('img', { class: 'ps-fig', src: `tests/img/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
     if (q.o) q.o.forEach((o, j) => { const L = 'ABCDEF'[j], isK = correct !== 'bonus' && correct.includes(L), isY = mine.includes(L);
       body.append(h('div', { class: 'ps-opt' + (isK ? ' right' : isY ? ' wrong' : '') }, h('b', null, L + '. '), rt('span', o), isK ? h('b', { class: 'ps-ok' }, ' ✓ correct') : null, isY && !isK ? h('b', { class: 'ps-err' }, ' ✗ yours') : (isY ? h('b', { class: 'ps-muted' }, ' (yours)') : null))); });
     else body.append(h('p', null, 'Your answer: ', h('b', null, mine || '—'), ' · Correct: ', h('b', { class: 'ps-ok' }, correct === 'bonus' ? 'bonus (full marks to all)' : correct.replace(':', ' to '))));

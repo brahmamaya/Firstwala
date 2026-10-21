@@ -13,7 +13,7 @@ for (const f of tracked) if (BAD.some(re => re.test(f))) problems.push('tracked 
 for (const f of tracked) {
   if (!/\.(sql|json)$/.test(f) || !fs.existsSync(path.join(root, f))) continue;
   const st = fs.statSync(path.join(root, f));
-  if (st.size > 400000 && !/^supabase\/schema\.sql$/.test(f)) problems.push(`large data file (is it a question bank?): ${f} (${Math.round(st.size / 1024)} KB)`);
+  if (st.size > 400000 && !false) problems.push(`large data file (is it a question bank?): ${f} (${Math.round(st.size / 1024)} KB)`);
 }
 /* nothing from these folders may reach the public site */
 const pub = path.join(root, '_site');

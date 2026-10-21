@@ -45,7 +45,7 @@ let styled = false, live = null;
 
 function run(d, K) {
   if (live) live.stop();
-  const { h, rt, rpc, say, SUPA } = K;
+  const { h, rt, rpc, say } = K;
   if (!styled) { document.head.append(h('style', { id: 'px-style' }, CSS)); styled = true; }
   const attemptId = d.attempt_id, sections = d.pat.s, qs = d.qs;
   const secOf = [], secStart = []; let N = 0;
@@ -128,7 +128,7 @@ function run(d, K) {
     qMeta.textContent = `${s.nm === sj ? sj : sj + ' · ' + s.nm} · ${K.KIND[s.t]}`;
     qMark.replaceChildren(...['Marks: ', h('span', { class: 'p' }, '+' + s.c), ' / ', h('span', { class: 'n' }, K.minus(s.w)), s.t === 'MULTI' && s.p ? h('span', { class: 'px-meta' }, ` (+${s.p} per right option if partly right)`) : ''].filter(x => x !== ''));
     const parts = [rt('div', q.b, 'ps-q px-qt')];
-    if (q.f) parts.push(h('img', { class: 'ps-fig', src: `${SUPA}/storage/v1/object/public/q/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
+    if (q.f) parts.push(h('img', { class: 'ps-fig', src: `tests/img/${q.f}.webp`, alt: q.a || '', loading: 'lazy', decoding: 'async' }));
     if (s.t === 'MCQ' || s.t === 'MULTI') {
       const multi = s.t === 'MULTI', set = new Set((draft || '').split(''));
       const fs = h('fieldset', { style: 'border:0;padding:0;margin:0' }, h('legend', { class: 'ps-sr' }, multi ? 'Choose all options that are correct' : 'Choose one option'));

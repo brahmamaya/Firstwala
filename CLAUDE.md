@@ -8,28 +8,27 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 - `index.html`, `*.js` sources, `tools/build.js`: static lab. Build with `ESBUILD=<esbuild 0.24.2> node tools/build.js` (that version reproduces the committed minified files byte-for-byte).
 - `series.js` (+ `series-loader.js`) -> `physica-series.min.js`: Test Series UI. Never use `innerHTML`; build DOM with `textContent`/`createElement`.
 - `ga.js`: anonymous first-party counters + opt-in Google Analytics (18+). Never enable analytics for minors.
-- `supabase/schema.sql`: the whole backend (RLS + RPC). Exam patterns: `supabase/patterns.json`. Content tool: `tools/series-import.js`. `supabase/tests/`: security suite, stress/fuzz/load, browser e2e. `docs/`: security, incident response, content guide, cost/storage.
+- No backend: Physica is static (GitHub Pages). Test Series runs on the student's device from public JSON in `tests/` (free tests 1-3 only; see `docs/CONTENT-GUIDE.md`). Exam patterns: `tools/patterns.json`. Content tool: `tools/series-import.js`. Browser e2e: `tools/e2e/`. `docs/`: security, content guide, private files.
 - Test Series files: `series.js` (hub, login, results) + `series-exam.js` (the exam screen, loaded only when a test starts) + `series-loader.js` (entry points: Rank-mode pills, landing notice).
 - `tools/watchdog.js`: live-site integrity monitor. `tools/perf-budget.js`: size budget. `tools/secret-guard.js`: blocks secrets.
 
 ## Commands that must pass before pushing
 ```
-bash supabase/tests/run-local.sh            # ~170 DB security assertions
-bash supabase/tests/stress/run.sh           # concurrency, lock race, fuzz, 300-student load
+node tools/series-import.test.js            # content tool
 node tools/watchdog.test.js                 # watchdog catches tamper/outage
 node tools/perf-budget.js                   # gzip size budgets
+node tools/private-guard.js                 # nothing private tracked
 node -e "require('./tools/secret-guard.js')('.')"
 ```
-Browser e2e + axe + speed (~160 checks, ~4 min): `cd supabase/tests/e2e && npm i && bash db.sh && node e2e.js`.
+Browser e2e + axe + phone (~60 checks, ~3 min): `cd tools/e2e && npm i && node e2e.js` (needs Chromium).
 
 ## Design rules for the Test Series
 - Real-exam feel first: Save & Next semantics, 5-status palette, subject/section tabs, instructions page, submit summary. Keep the exam chunk small (see `tools/perf-budget.js`).
-- Cost/storage: one compact row per attempt; marks live in the exam pattern; no per-answer rows; batch saves. See `docs/COST-AND-STORAGE.md` before touching `attempts`.
-- Free vs paid is derived from `series_no` (1-3 free). Never trust the screen for it: the server decides.
+- No server, so everything in `tests/` is public: only free tests 1-3 may be published (the tool enforces it); the answer file is fetched only after submit.
+- Results live only in the student's localStorage; never add a network call that sends student data anywhere.
 
 ## Hard rules
-- Never commit a Supabase `sb_secret_*` / `service_role` key or any token. Only the publishable key is public.
-- Correct answers/solutions never reach the browser before submission. Admin power requires MFA (aal2).
-- Keep `private.current_terms()` (SQL), `TERMS` (series.js) and the version line in `privacy.html` / `terms.html` identical.
-- `[[PLACEHOLDER]]` text in legal pages must be filled by the owner and reviewed by a lawyer before launch; never invent legal facts.
+- Never commit a token or key. Never commit private question banks (`content/`).
+- The answer file of a test is not requested before submission.
+- Legal pages: never invent legal facts (names, addresses, cities); a lawyer should review them before launch.
 - Do not claim a thing was tested unless it was run. Report failures plainly.

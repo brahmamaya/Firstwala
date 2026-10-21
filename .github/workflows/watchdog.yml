@@ -1,5 +1,5 @@
 name: Watchdog
-# Every 30 minutes: is the live site byte-for-byte what main publishes, is it up, is TLS healthy, is the backend answering?
+# Every 30 minutes: is the live site byte-for-byte what main publishes, is it up, is TLS healthy
 # On a problem the run fails (GitHub emails the repo owner) and an issue is opened/updated so there is a visible alert.
 # Enable by setting the repository VARIABLE  WATCHDOG_URL  (Settings -> Secrets and variables -> Actions -> Variables), e.g. https://physica.in
 on:
@@ -27,7 +27,7 @@ jobs:
         if: steps.wd.outputs.code != '0'
         env: { GH_TOKEN: '${{ github.token }}' }
         run: |
-          body="Watchdog found a problem at $(date -u +%FT%TZ):\n\n$(cat problems.txt)\n\nFollow docs/INCIDENT-RESPONSE.md. Close this issue when resolved."
+          body="Watchdog found a problem at $(date -u +%FT%TZ):\n\n$(cat problems.txt)\n\nCheck the Actions log and docs/SECURITY.md. Close this issue when resolved."
           n=$(gh issue list --label watchdog --state open --json number --jq '.[0].number')
           if [ -n "$n" ]; then gh issue comment "$n" --body "$(printf "$body")"; else gh issue create --title "ALERT: Physica watchdog failed" --label watchdog --body "$(printf "$body")" || gh issue create --title "ALERT: Physica watchdog failed" --body "$(printf "$body")"; fi
       - name: Fail the run so the owner is emailed

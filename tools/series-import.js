@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 /* Test Series content tool. No dependencies.
-     node tools/series-import.js patterns                 -> SQL that creates/updates the exam patterns (from supabase/patterns.json)
-     node tools/series-import.js check  <dir>             -> validate every content file under <dir>, print problems, exit 1 on any
-     node tools/series-import.js sql    <dir> [--publish] -> SQL that loads every test under <dir> (add --publish to also make them live)
-     node tools/series-import.js sample <dir> [exam ...]  -> write synthetic full-size SAMPLE tests (for demos / tests only, never publish them)
-   Run the printed SQL in Supabase with:  psql "$DATABASE_URL" -f out.sql     (the SQL editor also works for small files)
-   One file per test, e.g. content/NEET/04.json, content/JEE_ADV/07-p2.json:
-     { "exam": "NEET", "series": 4, "paper": 1, "pattern": "NEET_2027", "title": null, "price": null,
+     node tools/series-import.js check  <dir>              -> validate every content file under <dir>, print problems, exit 1 on any
+     node tools/series-import.js static <dir> [--out tests] -> validate, then write the public site files: tests/index.json, tests/<EXAM>/<NN>-<paper>.json (questions),
+                                                              tests/<EXAM>/<NN>-<paper>.key.json (answers + solutions, fetched only after submit), tests/img/*.webp
+     node tools/series-import.js sample <dir> [exam ...]   -> write synthetic full-size SAMPLE tests (for demos / tests only, never publish them)
+   GitHub-only mode: everything under tests/ is public (anyone can read the answers), so ONLY free tests 1-3 are accepted. Paid tests need a server.
+   One file per test, e.g. content/NEET/01.json, content/JEE_ADV/02-p2.json:
+     { "exam": "NEET", "series": 1, "paper": 1, "pattern": "NEET_2027", "title": null,
        "q": [ { "b": "question text", "o": ["opt A","opt B","opt C","opt D"], "k": "B", "e": "solution", "f": "figure-key", "fa": "figure alt text" }, ... ] }
    k: MCQ "B" | MULTI "AC" (sorted) | NUM "12.5" or a range "12.3:12.7" | "*" = bonus (everyone gets the marks).
-   Text rules: plain text. Write x_2 / x^2 / v_{0} for sub/superscripts, use Unicode for symbols (α ∫ √ ≤ ½ ²). No HTML. */
+   Text rules: plain text. Write x_2 / x^2 / v_{0} for sub/superscripts, use Unicode for symbols (α ∫ √ ≤ ½ ²). No HTML.
+   Figures: put <dir>/img/<figure-key>.webp (small, 10-40 KB); it is copied to tests/img/. */
 'use strict';
 const fs = require('fs'), path = require('path');
-const PAT = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'supabase', 'patterns.json'), 'utf8')).patterns;
-const lit = s => "'" + String(s).replace(/'/g, "''") + "'";
+const PAT = JSON.parse(fs.readFileSync(path.join(__dirname, 'patterns.json'), 'utf8')).patterns;
+let FREE_ONLY = false;
 const total = p => p.sections.reduce((a, s) => a + s.n, 0);
 
 function* walk(d) { for (const f of fs.readdirSync(d).sort()) { const p = path.join(d, f); fs.statSync(p).isDirectory() ? yield* walk(p) : /\.json$/.test(f) && (yield p); } }
@@ -23,6 +24,7 @@ function validate(t, file) {
   const pat = PAT[t.pattern]; if (!pat) { E(`unknown pattern "${t.pattern}"`); return errs; }
   if (pat.exam !== t.exam) E(`pattern ${t.pattern} is for ${pat.exam}, not ${t.exam}`);
   if (!Number.isInteger(t.series) || t.series < 1 || t.series > 30) E('series must be 1..30');
+  else if (t.series > 3 && FREE_ONLY) E('series ' + t.series + ' is a paid test: GitHub-only mode publishes answers to everyone, so only free tests 1-3 are accepted');
   const paper = t.paper || 1; if (paper < 1 || paper > pat.papers) E(`paper must be 1..${pat.papers}`);
   if (!Array.isArray(t.q)) { E('"q" must be an array'); return errs; }
   if (t.q.length !== total(pat)) E(`needs exactly ${total(pat)} questions for ${t.pattern}, has ${t.q.length}`);
@@ -52,21 +54,6 @@ function validate(t, file) {
   return errs;
 }
 
-function testSql(t, publish) {
-  const pat = PAT[t.pattern], paper = t.paper || 1, tag = '$j' + Math.random().toString(36).slice(2, 8) + '$';
-  const qs = t.q.map(q => { const o = { b: q.b }; if (q.o) o.o = q.o; if (q.f) { o.f = q.f; o.a = q.fa; } return o; });
-  const ks = t.q.map(q => { const o = { k: q.k }; if (q.e) o.e = q.e; return o; });
-  const q1 = JSON.stringify(qs), k1 = JSON.stringify(ks);
-  if (q1.includes(tag) || k1.includes(tag)) throw new Error('dollar tag clash');
-  const sel = `(select id from public.tests where exam = ${lit(t.exam)} and series_no = ${t.series} and paper = ${paper})`;
-  return `-- ${t.exam} test ${t.series}${paper > 1 ? ' paper ' + paper : ''}\n` +
-    `insert into public.tests (exam, pattern_id, series_no, paper, title, price_paise) values (${lit(t.exam)}, ${lit(t.pattern)}, ${t.series}, ${paper}, ${t.title ? lit(t.title) : 'null'}, ${t.price == null ? 'null' : Math.round(t.price * 100)})\n` +
-    `  on conflict (exam, series_no, paper) do update set pattern_id = excluded.pattern_id, title = excluded.title, price_paise = excluded.price_paise;\n` +
-    `insert into public.test_content (test_id, qs) values (${sel}, ${tag}${q1}${tag}::jsonb) on conflict (test_id) do update set qs = excluded.qs;\n` +
-    `insert into public.test_keys (test_id, ks) values (${sel}, ${tag}${k1}${tag}::jsonb) on conflict (test_id) do update set ks = excluded.ks;\n` +
-    (publish ? `update public.tests set published = true where id = ${sel};\n` : '') + '\n';
-}
-
 function sample(dir, exams) {
   const rnd = (seed => () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296)(7);
   const jobs = [['JEE_MAIN', 'JEE_MAIN_2027'], ['NEET', 'NEET_2027'], ['JEE_ADV', 'JEE_ADV_2027']].filter(j => !exams.length || exams.includes(j[0]));
@@ -90,22 +77,37 @@ function sample(dir, exams) {
 }
 
 const [cmd, dir, ...rest] = process.argv.slice(2);
-if (cmd === 'patterns') {
-  let out = '-- exam patterns (generated by tools/series-import.js from supabase/patterns.json)\n';
-  for (const [id, p] of Object.entries(PAT)) {
-    for (const s of p.sections) if (!['MCQ', 'MULTI', 'NUM'].includes(s.t) || s.w > 0 || s.n < 1) { console.error(`bad section ${id}/${s.id}`); process.exit(1); }
-    out += `insert into public.exam_patterns (id, exam, label, minutes, papers, sections) values (${lit(id)}, ${lit(p.exam)}, ${lit(p.label)}, ${p.minutes}, ${p.papers}, $s$${JSON.stringify(p.sections)}$s$::jsonb)\n  on conflict (id) do update set exam = excluded.exam, label = excluded.label, minutes = excluded.minutes, papers = excluded.papers, sections = excluded.sections;\n`;
-  }
-  process.stdout.write(out);
-} else if (cmd === 'check' || cmd === 'sql') {
+if (cmd === 'check' || cmd === 'static') {
   if (!dir) { console.error('give the content folder'); process.exit(2); }
-  const errs = []; let sql = '-- generated by tools/series-import.js\nbegin;\n', n = 0; const keys = new Set();
+  FREE_ONLY = cmd === 'static';
+  const errs = [], good = []; const keys = new Set();
   for (const f of walk(dir)) {
     let t; try { t = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { errs.push(`${f}: not valid JSON (${e.message})`); continue; }
     const id = `${t.exam}/${t.series}/${t.paper || 1}`; if (keys.has(id)) errs.push(`${f}: duplicate test ${id}`); keys.add(id);
-    const e = validate(t, path.relative(dir, f)); errs.push(...e); if (!e.length) { sql += testSql(t, rest.includes('--publish')); n++; }
+    const e = validate(t, path.relative(dir, f)); errs.push(...e);
+    if (!e.length) {
+      for (const q of t.q) if (q.f && cmd === 'static' && !fs.existsSync(path.join(dir, 'img', q.f + '.webp'))) errs.push(`${path.relative(dir, f)}: figure file img/${q.f}.webp not found`);
+      good.push(t);
+    }
   }
   if (errs.length) { console.error(errs.join('\n') + `\n\n${errs.length} problem(s). Nothing was written.`); process.exit(1); }
-  if (cmd === 'check') console.log(`OK: ${n} test file(s) are valid.`); else process.stdout.write(sql + 'commit;\n');
+  if (cmd === 'check') console.log(`OK: ${good.length} test file(s) are valid.`);
+  else {
+    const oi = rest.indexOf('--out'), out = oi >= 0 ? rest[oi + 1] : 'tests';
+    fs.rmSync(out, { recursive: true, force: true });
+    const patterns = {}, tests = [];
+    for (const t of good.sort((a, b) => a.exam.localeCompare(b.exam) || a.series - b.series || (a.paper || 1) - (b.paper || 1))) {
+      const p = t.paper || 1, nn = String(t.series).padStart(2, '0'), pat = PAT[t.pattern];
+      patterns[t.pattern] = { label: pat.label, minutes: pat.minutes, papers: pat.papers, sections: pat.sections };
+      fs.mkdirSync(path.join(out, t.exam), { recursive: true });
+      fs.writeFileSync(path.join(out, t.exam, `${nn}-${p}.json`), JSON.stringify({ qs: t.q.map(q => { const o = { b: q.b }; if (q.o) o.o = q.o; if (q.f) { o.f = q.f; o.a = q.fa; } return o; }) }));
+      fs.writeFileSync(path.join(out, t.exam, `${nn}-${p}.key.json`), JSON.stringify({ ks: t.q.map(q => { const o = { k: q.k }; if (q.e) o.e = q.e; return o; }) }));
+      tests.push({ id: `${t.exam}-${t.series}-${p}`, exam: t.exam, n: t.series, p, pat: t.pattern, t: t.title || undefined });
+      for (const q of t.q) if (q.f) { fs.mkdirSync(path.join(out, 'img'), { recursive: true }); fs.copyFileSync(path.join(dir, 'img', q.f + '.webp'), path.join(out, 'img', q.f + '.webp')); }
+    }
+    fs.mkdirSync(out, { recursive: true });
+    fs.writeFileSync(path.join(out, 'index.json'), JSON.stringify({ patterns, tests }));
+    console.log(`${good.length} test(s) written to ${out}/`);
+  }
 } else if (cmd === 'sample') { if (!dir) { console.error('give an output folder'); process.exit(2); } sample(dir, rest); console.log('sample tests written to ' + dir); }
-else { console.error(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 8).join('\n')); process.exit(2); }
+else { console.error(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 6).join('\n')); process.exit(2); }

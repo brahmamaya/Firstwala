@@ -4,11 +4,7 @@
    - on the landing page a short notice (10 s) tells new visitors that the Test Series exists and exactly where to find it */
 (() => {
 'use strict';
-const SUPA = 'https://lbyqvwkichjvrrzcddtq.supabase.co';
-// Switch: set to true only AFTER supabase/schema.sql has been applied to the live project (see docs/GO-LIVE.md).
-// Until then the buttons say "opens soon" and the landing notice stays hidden. Tests may force it with window.__PS_LIVE.
-const LIVE = false;
-const on = () => LIVE || window.__PS_LIVE === true;
+const on = () => true;
 let wait = null;
 const load = () => window.PhysicaSeries ? Promise.resolve() : wait || (wait = new Promise((ok, no) => {
   const s = document.createElement('script');
@@ -28,7 +24,6 @@ window.PhysicaSeriesOpen = open;
 // Warm up: start fetching the pack (and open the connection to the server) as soon as someone points at / touches the button.
 const warm = e => {
   if (!on() || !(e.target.closest && e.target.closest('[data-series-exam]'))) return;
-  if (!document.querySelector('link[data-ps-pc]')) { const l = document.createElement('link'); l.rel = 'preconnect'; l.href = SUPA; l.dataset.psPc = '1'; document.head.append(l); }
   load().catch(() => {});
 };
 for (const t of ['pointerover', 'focusin', 'touchstart']) document.addEventListener(t, warm, { passive: true });
