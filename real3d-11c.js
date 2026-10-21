@@ -74,7 +74,7 @@ R['gravity-depth']=(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:230,yaw:.3,pitch:-.
   part(s,[0,Rr*.97,.02],'crust',20,-26);part(s,[-Rr*.75,-.3,.02],'mantle',-40,30);part(s,[-Rr*.4,.5,.02],'core',-50,-20);part(s,V.add(pr,[0,.1,0]),'probe',10,-60);
   s.render();chart(c,430,96,226,150,{title:'g vs distance from centre',xl:'r / R',xmin:0,xmax:1.7,ymin:0,ymax:1.05,series:[{fn:x=>x<1?x:1/(x*x),col:C.gold}],marker:[r/Rr,r<Rr?r/Rr:(Rr/r)**2]});tag(c,'Uniform-density model: g ∝ r inside, ∝ 1/r² outside',44,98,C.muted,13)};
 
-R['orbital-energy']=(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:220,pitch:.1}),r=6371+p.altitude,Rr=1.2,ro=Rr*r/6371*1.1,a=t*.5;
+R['orbital-energy']=(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:220,pitch:.1}),r=6371+p.altitude,Rr=1.2,ro=Rr*r/6371*1.1,a=t*.5*Math.pow(6571/r,1.5);
   stars(c,50,11);halo(c,s,[0,0,0],Rr);earth(s,[0,0,0],Rr,t*.1);s.ring([0,0,0],[0,1,0],ro,'#42d9ca66',1.2,[5,5]);const q=[ro*Math.cos(a),0,ro*Math.sin(a)];sat(s,q,a,.65);
   const v=Math.sqrt(3.986e14/(r*1e3));s.arrow(q,V.add(q,V.mul([-Math.sin(a),0,Math.cos(a)],.6)),C.mint,2.5,10,`v = ${f(v/1000,2)} km/s`);part(s,V.add(q,[0,.25,0]),'satellite (1000 kg)',30,-40);part(s,[-Rr*.6,Rr*.7,.3],'Earth',-40,-40);
   s.render();const GMm=3.986e14*1000/(r*1e3),KE=GMm/2/1e9,PE=-GMm/1e9;

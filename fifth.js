@@ -84,7 +84,7 @@ add('gravity', 'weight-planets', 'Your weight across the Solar System', 'See how
 add('gravity', 'orbital-energy', 'Energy of a circular orbit', 'Raise a satellite and split its energy into kinetic and potential parts.', 'E = −GMm/2r', 'A higher orbit has more total energy but a slower speed.', 'Raise the altitude and watch the total energy climb toward zero.',
   [R('altitude', 'Altitude', 200, 3000, 100, 800, 'km')],
   p => { const r = 6371 + p.altitude, mu = 3.986e5; return [N('Orbital speed', `${F(Math.sqrt(mu / r))} km/s`), N('Total energy /kg', `${F(-mu / (2 * r) * 1e6 / 1e6)} MJ/kg`)]; },
-  (c, p, t) => { const r = 6371 + p.altitude, mu = 3.986e5, rad = 90 + (p.altitude - 200) / 25, cx = 330, cy = 250, a = t * .4; dot(c, cx, cy, 60, C.blue); arc(c, cx, cy, rad, 0, TAU, '#456679', 2); dot(c, cx + rad * Math.cos(a), cy + rad * Math.sin(a), 9, C.gold, true); text(c, `v = ${F(Math.sqrt(mu / r))} km/s`, 70, 110, C.white, 20); text(c, `altitude ${p.altitude} km`, 70, 142, C.mint, 15); }
+  (c, p, t) => { const r = 6371 + p.altitude, mu = 3.986e5, rad = 90 + (p.altitude - 200) / 25, cx = 330, cy = 250, a = t * .4 * Math.pow(6571 / r, 1.5); dot(c, cx, cy, 60, C.blue); arc(c, cx, cy, rad, 0, TAU, '#456679', 2); dot(c, cx + rad * Math.cos(a), cy + rad * Math.sin(a), 9, C.gold, true); text(c, `v = ${F(Math.sqrt(mu / r))} km/s`, 70, 110, C.white, 20); text(c, `altitude ${p.altitude} km`, 70, 142, C.mint, 15); }
 );
 
 /* ===== Mechanical properties of solids ===== */
@@ -104,7 +104,7 @@ add('buoyancy', 'hydraulic-lift', 'Hydraulic lift (Pascal)', 'Press a small pist
 /* ===== Thermal properties ===== */
 add('expansion', 'specific-heat', 'Heating with specific heat', 'Add heat to a substance and compute its temperature rise.', 'Q = mcΔT', 'Water needs far more heat than metals for the same temperature rise.', 'Compare water with iron for the same heat input.',
   [R('mass', 'Mass', .1, 3, .1, 1, 'kg', 1), R('heat', 'Heat added', 1, 200, 5, 40, 'kJ'), S('mat', 'Material', 4186, [[4186, 'Water'], [900, 'Aluminium'], [385, 'Copper'], [450, 'Iron']])],
-  p => { const dT = p.heat * 1000 / (p.mass * Number(p.mat)); return [N('Temperature rise', `${F(dT, 1)} °C`), N('Specific heat', `${p.mat} J/kg·K`)]; },
+  p => { const dT = p.heat * 1000 / (p.mass * Number(p.mat)); return [N('Temperature rise', `${F(dT, 1)} °C`), N('Specific heat', `${p.mat} J/kg·K`), N('Final temperature (start 20 °C)', 20 + dT > { 4186: 100, 900: 660, 385: 1085, 450: 1538 }[Number(p.mat)] ? `${F(20 + dT, 0)} °C: beyond boiling/melting, formula invalid` : `${F(20 + dT, 1)} °C`)]; },
   (c, p, t) => { const dT = p.heat * 1000 / (p.mass * Number(p.mat)), h = clamp(dT, 0, 80); rr(c, 260, 150, 140, 220, '#142d40', C.line, 6); rr(c, 270, 360 - h * 2.4, 120, h * 2.4, C.red + '77', null, 3); for (let i = 0; i < 12; i++) dot(c, 285 + mod(i * 43 + t * dT, 100), 200 + mod(i * 57 + t * 40, 150), 2, C.gold); text(c, `ΔT = ${F(dT, 1)} °C`, 90, 110, C.white, 22); text(c, `${p.heat} kJ into ${p.mass} kg`, 90, 145, C.muted, 15); }
 );
 

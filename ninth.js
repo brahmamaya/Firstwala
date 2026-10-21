@@ -116,7 +116,7 @@ add({base:'circuit',id:'kirchhoff-loops',title:'Kirchhoff’s laws: two-loop cir
  metrics:p=>{const r=kirch(p);return[N('I₁ (left branch)',r.I1,'A',3),N('I₂ (right branch)',r.I2,'A',3),N('I₃ (middle)',r.I3,'A',3),N('Voltage across R₃',r.I3*p.R3,'V',2)]},
  draw:(c,p,t)=>{const r=kirch(p),s=P3.scene(c,{scale:56,pitch:.55,cy:280});board(s);const L=[[0,-1.3],[-2.6,-1.3],[-2.6,1.3],[0,1.3]],Rg=[[0,-1.3],[2.6,-1.3],[2.6,1.3],[0,1.3]],M=[[0,1.3],[0,-1.3]];wire(s,L);wire(s,Rg);wire(s,M);
   cell(s,[-2.6,0],'z','E₁');cell(s,[2.6,0],'z','E₂');resistor(s,[-1.3,-1.3],'x','R₁');resistor(s,[1.3,-1.3],'x','R₂');resistor(s,[0,0],'z','R₃');
-  flow(s,[[-2.6,1.3],[-2.6,-1.3],[0,-1.3]],r.I1,t);flow(s,[[2.6,1.3],[2.6,-1.3],[0,-1.3]],r.I2,t);flow(s,M.slice().reverse(),r.I3,t,C.mint,6);s.render();tag(c,'dot speed ∝ current; mint = shared branch',44,98,C.muted,13)},
+  flow(s,[[0,-1.3],[-2.6,-1.3],[-2.6,1.3]],r.I1,t);flow(s,[[0,-1.3],[2.6,-1.3],[2.6,1.3]],r.I2,t);flow(s,M,r.I3,t,C.mint,6);s.render();tag(c,'dot speed ∝ current; mint = shared branch',44,98,C.muted,13)},
  assumption:'Ideal cells (no internal resistance), ideal wires; positive current directions are from each cell towards the shared branch.'});
 function kirch(p){const a=p.R1+p.R3,b=p.R3,c2=p.R3,d=p.R2+p.R3,det=a*d-b*c2,I1=(p.E1*d-b*p.E2)/det,I2=(a*p.E2-c2*p.E1)/det;return{I1,I2,I3:I1+I2}}
 
