@@ -58,7 +58,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   { const X = await newPage(browser); await X.page.goto(BASE, { waitUntil: 'load' });
     await X.page.waitForSelector('[data-testid=series-note]'); const t = await X.page.textContent('[data-testid=series-note]');
     ok(/Rank mode/.test(t) && /Test Series/.test(t) && /2027/.test(t), 'notice says the Test Series exists, names 2027 exams and the path (Rank mode -> exam -> Test Series)');
-    await X.page.hover('[data-testid=series-note]'); await sleep(11000); ok(await X.page.locator('[data-testid=series-note]').count() === 1, 'it pauses while the pointer is on it');
+    await X.page.hover('[data-testid=series-note]', { force: true }); await sleep(11000); ok(await X.page.locator('[data-testid=series-note]').count() === 1, 'it pauses while the pointer is on it');
     await X.page.mouse.move(5, 5); await X.page.waitForSelector('[data-testid=series-note]', { state: 'detached', timeout: 14000 }); ok(true, 'and disappears by itself');
     ok(X.st.ext.length === 0, 'landing page: no external requests'); await X.ctx.close(); }
 
