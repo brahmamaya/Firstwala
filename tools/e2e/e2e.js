@@ -163,7 +163,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
   console.log('\n=== 7. accessibility (axe, WCAG 2.1 AA, both themes) ===');
   { const axeSrc = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'); const X = await newPage(browser, { bypassCSP: true });
     const axe = async (label, scope = '.ps-ov:not([hidden])') => { for (const theme of ['dark', 'light']) {
-      await X.page.evaluate(t => { document.documentElement.dataset.theme = t; }, theme); await sleep(400);
+      await X.page.evaluate(t => { document.documentElement.dataset.theme = t; }, theme); await sleep(1500);
       const res = await X.page.evaluate(async sc => { const r = await axe.run(document.querySelector(sc) || document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } }); return r.violations.map(v => ({ id: v.id, impact: v.impact, sample: v.nodes[0].html.slice(0, 120) })); }, scope);
       ok(res.length === 0, `axe ${label} [${theme}]` + (res.length ? ' -> ' + res.map(v => `${v.id} ${v.sample}`).join(' | ') : '')); } };
     await X.page.goto(BASE, { waitUntil: 'load' }); await X.page.addScriptTag({ content: axeSrc });
