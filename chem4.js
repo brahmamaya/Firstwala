@@ -28,9 +28,17 @@ add({...ch(1,'Solutions',PH),id:'chem-osmosis',title:'Osmosis and osmotic pressu
  tryText:'Find π for 0.1 M glucose at 300 K. Then apply a larger pressure.',
  controls:[R('c','Concentration',.01,.5,.01,.1,'mol/L',2),R('i','van ’t Hoff factor i',1,3,1,1),R('T','Temperature',273,350,1,300,'K'),R('Pa','Applied pressure',0,30,.5,0,'atm',1)],
  metrics:p=>{const pi=p.i*p.c*.0821*p.T;return[N('Osmotic pressure π',pi,'atm',2),N('Water flow',p.Pa>pi+.01?'Out of the solution (reverse osmosis)':p.Pa<pi-.01?'Into the solution (osmosis)':'None (balanced)')]},
- draw:(c,p,t)=>{const pi=p.i*p.c*.0821*p.T,dir=Math.sign(pi-p.Pa),h=clamp(dir*.5*Math.min(1,cycle(t,6)/3),-.5,.5),s=P3.scene(c,{scale:54,cx:260,cy:300});s.tube([[-1.6,1.4,0],[-1.6,-1.2,0],[1.6,-1.2,0],[1.6,1.4,0]],.55,'#e9f6ff',{alpha:.12,segs:14});s.cyl([-1.6,-.4-h/2,0],[0,1,0],.5,2.4-h,'#d0ebff',{alpha:.45});s.cyl([1.6,-.4+h/2,0],[0,1,0],.5,2.4+h,'#74c0fc',{alpha:.5});
-  s.box([0,-1.2,0],[.06,1.1,1.1],'#ffd43b',{alpha:.6});for(let i=0;i<Math.round(p.c*40*p.i);i++)s.ball([1.6+(hash(i)-.5)*.7,-1+hash(i+5)*2,(hash(i+9)-.5)*.7],.06,'#9775fa',{flat:true});for(let i=0;i<5;i++){const u=cycle(t*.4+i/5,1),x=dir>=0?-.6+u*1.2:.6-u*1.2;s.ball([x,-1.2,(i-2)*.15],.05,'#4dabf7',{flat:true,glow:true})}
-  if(p.Pa>0)s.arrow([1.6,2.3,0],[1.6,1.6+h/2,0],'#ff8787',3,9,`${p.Pa} atm`);s.callout([0,-1.2,.55],'semipermeable membrane','#ffd43b',-40,60);s.callout([1.6,.4,.5],'solution','#9775fa',60,-40);s.callout([-1.6,.4,.5],'pure water','#d0ebff',-60,-40);s.render();tag(c,`π = ${p.i} × ${p.c} × 0.0821 × ${p.T} = ${f(pi,2)} atm`,44,98,C.gold,14)},
+ draw:(c,p,t)=>{const pi=p.i*p.c*.0821*p.T,dir=Math.sign(pi-p.Pa),h=clamp(dir*.5*Math.min(1,cycle(t,6)/3),-.5,.5),s=P3.scene(c,{scale:60,cx:240,cy:262,yaw:.1,pitch:.1}),W=2.5,D=.7,y0=-1.3,top=0,yl=top-h*.9,yr=top+h*.9;
+  s.box([0,y0-.06,0],[2*W+.2,.12,D*2+.2],'#868e96',{alpha:.5});
+  s.box([-W/2,(y0+yl)/2,0],[W,yl-y0,D*2],'#a5d8ff',{alpha:.34,spec:.4});s.box([W/2,(y0+yr)/2,0],[W,yr-y0,D*2],'#74c0fc',{alpha:.46,spec:.4});
+  s.box([0,y0+1.25,0],[2*W,2.5,D*2],'#e9f6ff',{alpha:.07,spec:.7});
+  s.seg([-W,yl,D],[0,yl,D],'#ffffffaa',1.4);s.seg([0,yr,D],[W,yr,D],'#ffffffaa',1.4);s.seg([-W,y0+2.5,D],[W,y0+2.5,D],'#ffffff88',1.2);
+  s.box([0,y0+1.25,0],[.07,2.5,D*2],'#ffd43b',{alpha:.38});for(let k=0;k<7;k++)for(let m=0;m<3;m++)s.ball([0,y0+.3+k*.4,(m-1)*.5],.04,'#fff3bf',{flat:true});
+  const ns=Math.min(60,Math.round(p.c*40*p.i)),yTop=yr-.15;for(let i=0;i<ns;i++){const u=t*(.6+hash(i)*.5)+i*3.1;s.ball([.25+hash(i+2)*(W-.5)+.12*Math.sin(u),y0+.2+hash(i+5)*(yTop-y0-.3)+.1*Math.cos(u*1.3),(hash(i+9)-.5)*(D*1.7)+.1*Math.sin(u*.8)],.075,'#9775fa',{spec:.6})}
+  for(let i=0;i<14;i++){const side=i<7?-1:1,u=t*.5+hash(i+20)*3;s.ball([side*(.3+hash(i+30)*(W-.4))+.1*Math.sin(u),y0+.25+hash(i+33)*((side<0?yl:yr)-y0-.5),(hash(i+36)-.5)*D*1.6],.045,'#e7f5ff',{flat:true,alpha:.85})}
+  for(let i=0;i<6;i++){const u=cycle(t*.4+i/6,1),x=dir>=0?-.7+u*1.4:.7-u*1.4;s.ball([x,y0+.5+((i*.37)%1.5),((i%3)-1)*.45],.055,'#4dabf7',{glow:true})}
+  if(p.Pa>0){s.box([W/2,yr+.1,0],[W-.1,.14,D*2-.1],'#adb5bd',{spec:.6});s.arrow([W/2,yr+1.1,0],[W/2,yr+.3,0],'#ff8787',3,9,`${p.Pa} atm`)}
+  s.callout([0,y0+2.5,0],'semipermeable membrane','#ffd43b',0,-34);s.callout([W-.3,yr,D],'solution','#b197fc',20,-50);s.callout([-W+.3,yl,D],'pure water','#a5d8ff',-20,-50);s.render();tag(c,`π = ${p.i} × ${p.c} × 0.0821 × ${p.T} = ${f(pi,2)} atm`,44,98,C.gold,14)},
  assumption:'Dilute ideal solution; the height change is illustrative.'});
 
 /* 2 Electrochemistry */
