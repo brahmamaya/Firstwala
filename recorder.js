@@ -53,10 +53,10 @@ async function tour(){
     const was=tourOn;tourOn=false;if(was&&rec)stop()}
 }
 const menu=document.createElement('div');menu.className='rec-menu';menu.hidden=true;menu.setAttribute('role','dialog');menu.setAttribute('aria-label','Recording mode');
-const mk=(id,title,sub)=>{const b=document.createElement('button');b.type='button';b.dataset.testid='rec-'+id;const t=document.createElement('b');t.textContent=title;const u=document.createElement('small');u.textContent=sub;b.append(t,u);b.addEventListener('click',()=>{menu.hidden=true;mode=id;start();if(id==='auto')tour()});return b};
+const mk=(id,title,sub)=>{const b=document.createElement('button');b.type='button';b.dataset.testid='rec-'+id;b.title=sub;b.setAttribute('aria-label',title+': '+sub);b.textContent=title;b.addEventListener('click',()=>{menu.hidden=true;mode=id;start();if(id==='auto')tour()});return b};
 const closeMenu=()=>{menu.hidden=true;btn.setAttribute('aria-expanded','false')};
 wrap.append(menu);btn.setAttribute('aria-haspopup','dialog');btn.setAttribute('aria-expanded','false');
-btn.addEventListener('click',()=>{if(rec){tourOn=false;stop();return}menu.replaceChildren(mk('manual','Manual','You change the controls and rotate the view yourself'),mk('auto','Auto','Records a tour: turns the view and sweeps every control (about '+estimate()+' s)'));menu.hidden=!menu.hidden;btn.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden)menu.querySelector('button')?.focus()});
+btn.addEventListener('click',()=>{if(rec){tourOn=false;stop();return}menu.replaceChildren(mk('manual','Manual','You change the controls and rotate the view yourself'),mk('auto','Auto · '+estimate()+' s','Records a tour: turns the view and sweeps every control'));menu.hidden=!menu.hidden;btn.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden)menu.querySelector('button')?.focus()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){closeMenu();btn.focus()}});
 document.addEventListener('pointerdown',e=>{if(!menu.hidden&&!wrap.contains(e.target))closeMenu()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&rec)stop()});
