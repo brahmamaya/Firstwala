@@ -19,12 +19,35 @@ add({...ch(1,'Sexual Reproduction in Flowering Plants',U6),id:'bio-double-fertil
  tryText:'Pause at triple fusion. Which three nuclei fuse?',
  controls:[R('speed','Speed',.3,2,.1,1,'×',1)],
  metrics:(p,t)=>{const k=Math.min(4,Math.floor(cycle(t*p.speed,15)/3));return[N('Stage',DF[k][0]),N('What happens',DF[k][1]),N('Zygote','Diploid (2n)'),N('Primary endosperm nucleus','Triploid (3n)')]},
- draw:(c,p,t)=>{const T=cycle(t*p.speed,15),k=Math.min(4,Math.floor(T/3)),q=(T%3)/3,s=P3.scene(c,{scale:58,cy:262});s.mesh([0,-1.2,0],[1.1,1.0,1.0],'#c0eb75',{alpha:.25});s.tube([[0,-.25,0],[0,1.6,0]],.18,'#d8f5a2',{alpha:.3});s.mesh([0,1.75,0],[.42,.18,.42],'#ffd43b',{alpha:.6});
-  s.mesh([.2,-1.3,0],[.5,.62,.42],'#ffe066',{alpha:.3});const es=[.2,-1.3,0];const tubePath=[[0,1.8,.1],[0,1.0,.05],[0,0,0],[.05,-.6,.05],[.18,-.85,.0]];
-  if(k===0)s.ball([.15,1.95-.2*(1-q),.1],.13,'#f59f00',{label:'pollen'});else{s.ball([.15,1.95,.1],.13,'#f59f00');const reach=k===1?q:1;s.tube(tubePath.filter((_,i)=>i<=Math.ceil(reach*4)),.04,'#fab005',{segs:6})}
-  s.ball(V.add(es,[0,.35,0]),.09,BC.female,{label:k<3?'egg':''});for(const z of[-.15,.15])s.ball(V.add(es,[.1,.4,z]),.06,'#e599f7');for(const y of[.05,-.05])s.ball(V.add(es,[0,y,0]),.07,'#b197fc');for(let i=0;i<3;i++)s.ball(V.add(es,[(i-1)*.12,-.45,0]),.05,'#adb5bd');
-  if(k===3){const g1=V.add(V.mul([.18,-.85,0],1-q),V.mul(V.add(es,[0,.35,0]),q)),g2=V.add(V.mul([.18,-.85,0],1-q),V.mul(es,q));s.ball(g1,.06,BC.male,{glow:true});s.ball(g2,.06,BC.male,{glow:true})}
-  if(k===4){s.ball(V.add(es,[0,.35,0]),.13,'#e64980',{label:'zygote (2n)'});s.ball(es,.12,'#9775fa',{label:'PEN (3n)'})}const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L([.35,1.78,0],'stigma','#ffd43b',60,-30);L([.12,.9,0],'style','#d8f5a2',70,0);L([-1.0,-1.0,.2],'ovary','#c0eb75',-50,20);L([.65,-1.2,0],'ovule: embryo sac','#ffe066',60,20);if(k>=1&&k<4)L([0,.4,.04],'pollen tube','#fab005',-70,-30);if(k<3){L(V.add(es,[.1,.4,.15]),'synergids','#e599f7',60,50);L(V.add(es,[0,.05,0]),'2 polar nuclei','#b197fc',70,-10);L(V.add(es,[.12,-.45,0]),'antipodals','#adb5bd',60,-40)}s.render();tag(c,DF[k][0],44,98,C.gold,15)},
+ draw:(c,p,t)=>{const T=cycle(t*p.speed,15),k=Math.min(4,Math.floor(T/3)),q=(T%3)/3,s=P3.scene(c,{scale:56,cx:305,cy:248,pitch:.02}),AX=-2.5,E=[2.1,-.15,0],E3=(a,b)=>[E[0]+a,E[1]+b,0.12];
+  /* A: whole pistil, ovary cut open to show an ovule */
+  s.mesh([AX,-1.05,0],[.78,.8,.3],'#bfe38a',{alpha:.5,rings:12,segs:18,spec:.3});s.mesh([AX,-1.1,0],[.62,.62,.28],'#e8f6c8',{alpha:.5,rings:10,segs:14});s.mesh([AX,-.95,.05],[.2,.28,.12],'#f3e2a6',{rings:8,segs:12});
+  s.tube([[AX,-.35,0],[AX,.95,0]],.12,'#cdeea0',{alpha:.7,segs:10});s.mesh([AX,1.12,0],[.34,.14,.2],'#ffd43b',{rings:8,segs:12,spec:.4});
+  const tp=[[AX,1.2,.1],[AX,.5,.08],[AX,-.3,.08],[AX,-.7,.1]],reach=k===0?0:k===1?q:1;
+  for(let i=0;i<3;i++)s.ball([AX-.2+i*.2,1.26+.02*(i%2),.1],.07,'#f59f00',{flat:true,lift:2});
+  if(reach>0){const n=Math.max(2,Math.ceil(reach*3)),pts=[];for(let i=0;i<=n;i++){const f2=Math.min(1,i/3*1+0);pts.push(tp[Math.min(3,i)])}s.tube(pts.slice(0,Math.max(2,Math.floor(reach*3)+1)),.035,'#e8a317',{segs:6})}
+  s.callout([AX+.3,1.15,.1],'stigma','#ffd43b',45,-20);s.callout([AX+.1,.4,0],'style','#cdeea0',50,0);s.callout([AX-.5,-1.35,.2],'ovary','#bfe38a',-35,25);if(k===0)s.callout([AX-.2,1.28,.1],'pollen grains','#f59f00',-55,-25);else if(k===1)s.callout([AX,.2,.1],'pollen tube','#fab005',-60,10);
+  /* magnification lines */
+  s.seg([AX+.2,-.85,0],[E[0]-1.4,E[1]+1.2,0],'#8ca6b966',1,[3,3]);s.seg([AX+.2,-1.15,0],[E[0]-1.4,E[1]-1.2,0],'#8ca6b966',1,[3,3]);
+  /* B: ovule — integuments with the micropyle, nucellus, embryo sac */
+  s.mesh([E[0],E[1],-.1],[1.35,1.75,.3],'#c9a35a',{alpha:.38,rings:14,segs:24,spec:.3});s.mesh([E[0],E[1],-.05],[1.18,1.6,.3],'#e3c987',{alpha:.35,rings:14,segs:24});s.mesh([E[0],E[1],0],[.95,1.4,.25],'#f3e5b0',{alpha:.4,rings:14,segs:24});
+  s.tube([[E[0],E[1]+1.5,.1],[E[0],E[1]+1.8,.1]],.1,'#6b4f20',{segs:8,alpha:.8});
+  s.mesh([E[0],E[1]+.0,.08],[.68,1.15,.2],'#fff7c9',{alpha:.9,rings:14,segs:22,lift:1});
+  /* egg apparatus (micropylar end), central cell with polar nuclei, antipodals (chalazal end) */
+  for(const z of[-1,1]){const b=E3(z*.3,.78);s.ball(b,.17,'#e0b7f5',{spec:.4});s.ball([b[0],b[1]-.03,.2],.06,'#9c36b5',{flat:true,lift:2});for(let i=-1;i<=1;i++)s.seg([b[0]+i*.05,b[1]+.17,.12],[b[0]+i*.05,b[1]+.3,.12],'#b27fd1',1.2)}
+  const eg=E3(0,.55);s.ball(eg,.22,k===4?'#e64980':'#f783ac',{spec:.4});s.ball([eg[0],eg[1]-.04,.2],.085,k===4?'#a61e4d':'#c2255c',{flat:true,lift:2});
+  s.mesh([E[0],E[1]-.12,.06],[.55,.5,.12],'#fff2a8',{alpha:.5,rings:8,segs:14});
+  const pn=[E3(-.1,.0),E3(.1,-.1)];if(k<4){for(const q2 of pn)s.ball(q2,.09,'#845ef7',{spec:.4,lift:2})}else s.ball(E3(0,-.05),.17,'#9775fa',{spec:.4,lift:2});
+  for(let i=0;i<3;i++){const b=E3((i-1)*.3,-.95+.04*(i%2));s.ball(b,.15,'#adb5bd',{spec:.3});s.ball([b[0],b[1],.2],.055,'#6c757d',{flat:true,lift:2})}
+  /* pollen tube enters the micropyle and a synergid; two male gametes are released */
+  const syn=E3(-.3,.78);if(k===2){const tipY=E[1]+2.2-q*1.3,pts=[[E[0],E[1]+2.3,.1],[E[0],E[1]+1.8,.1],[E[0]-.02,Math.max(tipY,E[1]+.95),.1]];if(tipY<E[1]+.95)pts.push([syn[0]+.1,Math.max(tipY,syn[1]),.1]);s.tube(pts,.05,'#e8a317',{segs:6})}
+  if(k>=3){s.tube([[E[0],E[1]+2.3,.1],[E[0],E[1]+1.8,.1],[E[0]-.02,E[1]+.95,.1],[syn[0]+.1,syn[1],.1]],.05,'#e8a317',{segs:6,alpha:k===3?1:.5});
+   if(k===3){const o=[syn[0]+.1,syn[1],.2];const g1=V.add(V.mul(o,1-q),V.mul(eg,q)),g2=V.add(V.mul(o,1-q),V.mul([E[0],E[1]-.05,.2],q));s.ball(g1,.07,BC.male,{glow:true,lift:4});s.ball(g2,.07,BC.male,{glow:true,lift:4})}}
+  const L=(pt,txt,col,dx,dy)=>s.callout(pt,txt,col,dx,dy);L([E[0],E[1]+1.7,.1],'micropyle','#d8b36a',65,-10);L([E[0]+1.2,E[1]+.6,0],'integuments','#c9a35a',50,-20);
+  if(k<3){L([E[0]+.3,E[1]+.8,.2],'synergids','#e0b7f5',90,-40);L([E[0]+.2,E[1]+.5,.25],'egg','#f783ac',95,-10);L([E[0]+.1,E[1]-.1,.2],'2 polar nuclei','#b197fc',100,15);L([E[0]+.3,E[1]-.95,.2],'3 antipodals','#adb5bd',90,35)}
+  else if(k===4){L(eg,'zygote (2n)','#ff8fb7',100,-5);L(E3(0,-.05),'PEN (3n)','#c5b3ff',100,25)}
+  else L([E[0]+.3,E[1]+.0,.2],'embryo sac (7 cells, 8 nuclei)','#ffe066',85,45);
+  s.render();tag(c,DF[k][0],44,98,C.gold,15)},
  assumption:'Schematic pistil and one ovule; polar nuclei shown at the centre of the embryo sac.'});
 
 const ES=[['Megaspore mother cell (2n)',1,1],['Meiosis → 4 megaspores (n)',4,4],['3 degenerate; 1 functional megaspore',1,1],['Mitosis 1 → 2 nuclei',2,1],['Mitosis 2 → 4 nuclei',4,1],['Mitosis 3 → 8 nuclei',8,1],['Mature embryo sac: 7 cells, 8 nuclei',8,7]];
@@ -35,10 +58,23 @@ add({...ch(1,'Sexual Reproduction in Flowering Plants',U6),id:'bio-embryo-sac',t
  tryText:'Count the nuclei and the cells at the final stage.',
  controls:[R('stage','Stage',1,7,1,7)],
  metrics:p=>{const d=ES[p.stage-1];return[N('Stage',d[0]),N('Nuclei',d[1],'',0),N('Cells',d[2],'',0),N('Ploidy','Haploid nuclei (n) after meiosis')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62}),st=p.stage;s.mesh([0,0,0],[1.6,1.1,1.0],'#d8f5a2',{alpha:.25});s.mesh([0,0,0],[1.15,.62,.55],'#ffe066',{alpha:.25});s.label([-1.8,0,0],'micropyle',C.muted,11);s.label([1.8,0,0],'chalaza',C.muted,11);
-  if(st===1)s.ball([0,0,0],.25,'#9775fa');else if(st===2)for(let i=0;i<4;i++)s.ball([-.6+i*.4,0,0],.17,'#b197fc');else if(st===3){for(let i=0;i<3;i++)s.ball([-.7+i*.35,0,0],.12,'#868e96');s.ball([.6,0,0],.22,'#9775fa')}
-  else if(st<7){const n=2**(st-3);for(let i=0;i<n;i++){const side=i<n/2?-1:1,j=i%(n/2);s.ball([side*.7,(j-(n/4-.5))*.25,0],.1,'#9775fa',{glow:true})}}
-  else{s.ball([-.85,0,0],.12,'#e64980',{label:'egg'});s.ball([-.95,.25,.1],.09,'#e599f7');s.ball([-.95,-.25,.1],.09,'#e599f7');s.ball([0,.08,0],.09,'#b197fc');s.ball([0,-.08,0],.09,'#b197fc');s.label([0,.5,0],'2 polar nuclei',C.purple,11);for(let i=0;i<3;i++)s.ball([.9,(i-1)*.25,0],.09,'#adb5bd');s.label([.9,.55,0],'antipodals',C.muted,11);s.label([-1,.55,0],'synergids','#f783ac',11)}s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:300,cy:252,pitch:.02}),st=p.stage,E=[0,-.05,0],P=(a,b,z=.12)=>[E[0]+a,E[1]+b,z],NU=(q,r,col)=>{s.ball(q,r*1.25,col,{spec:.4,lift:2});},CELL=(q,r,col)=>s.ball(q,r*1.3,col,{spec:.3});
+  /* ovule: two integuments leave the micropyle open; nucellus inside; funicle at the chalazal end */
+  s.mesh([E[0],E[1],-.1],[1.45,1.85,.3],'#c9a35a',{alpha:.38,rings:14,segs:24,spec:.3});s.mesh([E[0],E[1],-.05],[1.28,1.7,.3],'#e3c987',{alpha:.35,rings:14,segs:24});s.mesh([E[0],E[1],0],[1.05,1.5,.25],'#f3e5b0',{alpha:.3,rings:14,segs:24});
+  s.tube([[E[0],E[1]+1.6,.1],[E[0],E[1]+1.95,.1]],.1,'#6b4f20',{segs:8,alpha:.8});s.tube([[E[0]+.3,E[1]-1.7,0],[E[0]+.7,E[1]-2.1,0]],.14,'#cdeea0',{segs:8,alpha:.8});
+  const sy=[0,.35,.55,.55,.75,1.0,1.25][st-1],sx=[0,.2,.2,.3,.4,.55,.8][st-1];
+  if(st>=4)s.mesh([E[0],E[1]-.05,.08],[sx,sy,.2],'#fff7c9',{alpha:.92,rings:14,segs:22,lift:1});
+  if(st>=4&&st<7)s.mesh([E[0],E[1]-.05,.1],[sx*.55,sy*.5,.15],'#dff1ff',{alpha:.8,rings:10,segs:16,lift:2});
+  if(st===1){CELL(P(0,.85),.3,'#e3d3ff');NU(P(0,.85,.22),.14,'#7048e8')}
+  else if(st===2){for(let i=0;i<4;i++){const q=P(0,1.0-i*.38);CELL(q,.18,'#e3d3ff');NU([q[0],q[1],.2],.08,'#845ef7')}}
+  else if(st===3){for(let i=0;i<3;i++)CELL(P(0,1.0-i*.3),.1-i*.01,'#bfc4c9');const q=P(0,-.3);CELL(q,.26,'#e3d3ff');NU([q[0],q[1],.22],.12,'#845ef7')}
+  else if(st<7){const pos=st===4?[[0,sy*.72],[0,-sy*.72]]:st===5?[[-.14,sy*.7],[.14,sy*.7],[-.14,-sy*.7],[.14,-sy*.7]]:[[-.17,sy*.8],[.17,sy*.8],[-.17,sy*.6],[.17,sy*.6],[-.17,-sy*.6],[.17,-sy*.6],[-.17,-sy*.8],[.17,-sy*.8]];for(const [a,b] of pos)NU(P(a,b-.05,.2),st===6?.075:.095,'#845ef7')}
+  else{for(const z of[-1,1]){const b=P(z*.3,.8);CELL(b,.17,'#e0b7f5');NU([b[0],b[1]-.03,.2],.06,'#9c36b5')}const eg=P(0,.55);CELL(eg,.22,'#f783ac');NU([eg[0],eg[1]-.04,.2],.085,'#c2255c');s.mesh(P(0,-.1,.06),[.55,.5,.12],'#fff2a8',{alpha:.5,rings:8,segs:14});NU(P(-.1,.0,.2),.09,'#845ef7');NU(P(.1,-.1,.2),.09,'#845ef7');for(let i=0;i<3;i++){const b=P((i-1)*.3,-.95+.04*(i%2));CELL(b,.15,'#adb5bd');NU([b[0],b[1],.2],.055,'#6c757d')}}
+  const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L([E[0],E[1]+1.9,.1],'micropyle (top)','#d8b36a',70,-5);L([E[0]+.4,E[1]-1.95,0],'chalaza (base)','#cdeea0',70,5);L([E[0]+1.3,E[1]+.6,0],'integuments','#c9a35a',45,-30);L([E[0]-1.0,E[1]+.5,0],'nucellus','#f3e5b0',-60,-20);
+  if(st===1)L(P(0,.85,.3),'megaspore mother cell (2n)','#c5b3ff',-110,-10);else if(st===2)L(P(0,.4,.2),'4 megaspores (n)','#c5b3ff',-90,15);else if(st===3){L(P(0,.7,.2),'3 degenerate','#bfc4c9',-85,0);L(P(0,-.3,.3),'functional megaspore','#c5b3ff',-95,25)}
+  else if(st<7)L(P(0,-sy*.3,.2),'embryo sac: free nuclei','#ffe066',-95,60);
+  else{L(P(.3,.8),'synergids','#e0b7f5',90,-30);L(P(0,.55,.25),'egg','#f783ac',-90,-10);L(P(.1,-.1,.25),'2 polar nuclei','#b197fc',-110,30);L(P(.3,-.95,.2),'3 antipodals','#adb5bd',90,15)}
+  s.render();tag(c,ES[st-1][0],44,98,C.gold,14)},
  assumption:'Polygonum type (monosporic) embryo sac, as described in NCERT.'});
 
 const POLL={auto:['Autogamy','Pollen to stigma of the same flower','Genetically identical (selfing)'],geit:['Geitonogamy','Pollen to another flower of the same plant','Functionally cross, genetically self'],xeno:['Xenogamy','Pollen to a flower of a different plant','Brings genetically different pollen']};
@@ -49,10 +85,23 @@ add({...ch(1,'Sexual Reproduction in Flowering Plants',U6),id:'bio-pollination',
  tryText:'Switch to wind and see how much pollen misses.',
  controls:[S('type','Type','xeno',Object.keys(POLL).map(k=>[k,POLL[k][0]])),S('agent','Agent','insect',[['insect','Insect (bee)'],['wind','Wind']])],
  metrics:p=>{const d=POLL[p.type];return[N('Type',d[0]),N('Pollen goes to',d[1]),N('Genetics',d[2]),N('Agent features',p.agent==='wind'?'Light pollen, feathery stigma, often no nectar':'Colour, scent, nectar; sticky pollen')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:300,pitch:.2}),plant=(x,flowers)=>{s.tube([[x,-1.6,0],[x,.6,0]],.05,BC.stem,{segs:8});flowers.forEach(([dx,dy],i)=>{const q=[x+dx,dy,0];s.tube([[x,dy-.3,0],q],.03,BC.stem,{segs:5});for(let k=0;k<5;k++){const a=TAU*k/5;petal(s,q,[Math.cos(a),.5,Math.sin(a)],.32,.12,p.agent==='wind'?'#d8f5a2':'#ff8fab')}s.ball(q,.07,'#fab005')})};
-  plant(-1.8,[[-.4,.6],[.4,1.0]]);plant(1.8,[[.3,.8]]);const src=[-2.2,.6,0],dst={auto:[-2.2,.6,0],geit:[-1.4,1.0,0],xeno:[2.1,.8,0]}[p.type],q=cycle(t*.25,1);
-  if(p.agent==='insect'){const pos=p.type==='auto'?V.add(src,[.3*Math.cos(t*3),.3+.1*Math.sin(t*5),.3*Math.sin(t*3)]):V.add(V.add(src,V.mul(V.sub(dst,src),q)),[0,.7*Math.sin(PI*q),.2*Math.sin(t*9)]);critter(s,'insect',V.add(pos,[0,.05,0]),.3,t);s.ball(V.add(pos,[0,.1,.05]),.03,'#ffd43b',{flat:true})}
-  else for(let i=0;i<24;i++){const qq=cycle(t*.25+i/24,1),pos=V.add(V.add(src,[qq*5,(hash(i)-.5)*1.5*qq,(hash(i+3)-.5)*2*qq]),[0,.3*Math.sin(qq*6+i),0]);s.ball(pos,.03,'#ffd43b',{flat:true})}s.callout([-2.2,.6,0],'anther → pollen source','#fab005',-40,-60);s.callout(dst,p.type==='auto'?'stigma of the same flower':p.type==='geit'?'another flower, same plant':'flower of a different plant','#ff8fab',40,-60);s.callout([1.8,-1,0],p.agent==='wind'?'wind: light, dry pollen; dull flowers':'insect: colourful, scented flowers with nectar','#e9f6ff',40,40);s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:330,cy:262,pitch:.02}),wind=p.agent==='wind',F1=[-2.4,.9,0],F2=[-1.35,1.45,0],F3=[2.2,1.15,0];
+  /* ground and two plants with leaves */
+  s.poly([[-3.6,-1.75,-.2],[3.6,-1.75,-.2],[3.6,-2.1,-.2],[-3.6,-2.1,-.2]],'#6d4c2f',{cull:false});
+  const stem=(pts)=>s.tube(pts,.055,'#5b8f3a',{segs:8}),lf=(q,dir,len)=>leafShape(s,q,dir,len),leafShape=(S,q,d,len)=>{S.mesh(V.add(q,V.mul(d,len*.5)),[len*.5,len*.17,.05],'#4ea24a',{rings:6,segs:10,rot:[0,0,Math.atan2(d[1],d[0])],spec:.3})};
+  stem([[-2.0,-1.75,0],[-2.05,-.5,0],[-2.3,.4,0],F1.map((v,i)=>i===1?v-.28:v)]);stem([[-2.05,-.3,0],[-1.8,.5,0],[F2[0]-.05,F2[1]-.3,0]]);stem([[2.0,-1.75,0],[2.05,-.4,0],[F3[0]-.05,F3[1]-.3,0]]);
+  lf([-2.05,-1.1,0],[-1,.5,0],.9);lf([-2.05,-.7,0],[1,.45,0],.9);lf([2.05,-1.2,0],[-1,.5,0],.9);lf([2.05,-.8,0],[1,.45,0],.9);
+  /* flowers: petals + stamens (filament and anther) around a central pistil with stigma */
+  const flower=(q,anthers)=>{const pc=wind?'#c5d99a':'#ff8fab',pl=wind?.26:.46;for(let k=0;k<6;k++){const a=TAU*k/6+.3;petal(s,q,[Math.cos(a),Math.sin(a),.12],pl,wind?.09:.24,pc)}
+   for(let k=0;k<5;k++){const a=TAU*k/5+.1,r=wind?.5:.2,e=V.add(q,[Math.cos(a)*r,Math.sin(a)*r-(wind?.12:0),.18]);s.tube([V.add(q,[0,0,.1]),e],.012,'#d9e2a0',{segs:4});s.ball(e,wind?.06:.045,anthers?'#f59f00':'#ffd43b',{spec:.4,lift:2})}
+   s.tube([V.add(q,[0,-.1,0]),V.add(q,[0,.1,.2])],.025,'#a8d86a',{segs:5});if(wind){for(let k=0;k<5;k++){const a=-.9+k*.45;s.seg(V.add(q,[0,.1,.2]),V.add(q,[Math.sin(a)*.18,.1+Math.cos(a)*.18,.22]),'#e9f5c0',1.6)}}else s.ball(V.add(q,[0,.12,.2]),.065,'#ff6b9a',{flat:true,lift:3,spec:.5})};
+  flower(F1,true);flower(F2,false);flower(F3,false);
+  const dst={auto:F1,geit:F2,xeno:F3}[p.type],q=cycle(t*.25,1);
+  if(!wind){const base=p.type==='auto'?V.add(F1,[.35*Math.cos(t*3),.4+.1*Math.sin(t*5),0]):V.add(V.add(F1,V.mul(V.sub(dst,F1),q)),[0,.7*Math.sin(PI*q)+.35,0]),fl=Math.sin(t*50),dirx=p.type==='auto'?Math.sign(Math.cos(t*3))||1:Math.sign(dst[0]-F1[0])||1,bx=(a,b,z=0)=>V.add(base,[a*dirx*.9,b*.9,z]);
+   s.mesh(bx(0,0),[.19,.15,.15],'#3d3027',{rings:6,segs:10});s.mesh(bx(-.22,0),[.22,.17,.17],'#f2b01e',{rings:6,segs:10,spec:.4});s.mesh(bx(-.5,-.01),[.18,.15,.15],'#2b2b2b',{rings:6,segs:10});s.mesh(bx(-.7,-.03),[.15,.12,.12],'#f2b01e',{rings:6,segs:10});s.mesh(bx(.2,.03),[.1,.09,.1],'#3d3027',{rings:5,segs:8});
+   for(const z of[-1,1])s.mesh(bx(-.2,.25+.04*fl,z*.05),[.3,.1+.06*fl*fl,.04],'#dfeaff',{alpha:.55,rings:5,segs:10,rot:[0,0,.5*dirx]});s.ball(bx(-.3,-.16),.04,'#ffd43b',{flat:true,lift:2})}
+  else for(let i=0;i<26;i++){const qq=cycle(t*.25+i/26,1),pos=V.add(V.add(F1,[0,.1,.3]),V.add(V.mul(V.sub(dst===F1?V.add(F1,[1.2,0,0]):dst,F1),qq),[0,(hash(i)-.5)*.5*qq+.25*Math.sin(qq*6+i)+.2*qq,0]));s.ball(pos,.035,'#ffd43b',{flat:true,lift:2})}
+  s.callout(V.add(F1,[0,.2,.2]),'anther → pollen source','#fab005',-85,-20);s.callout(V.add(dst,[0,.1,.2]),p.type==='auto'?'stigma of the same flower':p.type==='geit'?'another flower, same plant':'flower of a different plant','#ff8fab',60,-70);s.render();tag(c,wind?'wind: light, dry pollen; dull flowers, feathery stigma':'insect: colourful, scented flowers with nectar',44,98,'#e9f6ff',13)},
  assumption:'Two plants of the same species; pollen paths are illustrative.'});
 
 /* ---------- Chapter 2: Human Reproduction ---------- */
@@ -63,9 +112,22 @@ add({...ch(2,'Human Reproduction',U6),id:'bio-menstrual-cycle',title:'Menstrual 
  tryText:'Move to day 14. Which hormone peaks?',
  controls:[R('day','Day of cycle',1,28,1,14,'day')],
  metrics:p=>{const r=mens(p.day);return[N('Phase',r.phase),N('Ovary',r.ovary),N('Uterus (endometrium)',r.uterus),N('Hormone in the lead',r.lead)]},
- draw:(c,p,t)=>{const r=mens(p.day),s=P3.scene(c,{scale:58,cx:230});s.mesh([-1.5,0,0],[.8,.55,.5],'#ffc9c9',{alpha:.5});const fol=p.day<14?.1+.3*p.day/14:p.day===14?.42:0;if(fol)s.mesh([-1.3,.05,.2],fol,'#ffe066',{alpha:.7});if(p.day>=14&&p.day<=16)s.ball([-1.3+.4*(p.day-13),.5,.3],.08,'#f783ac',{glow:true,label:'ovum'});if(p.day>14)s.mesh([-1.3,.05,.2],.3*(p.day<24?1:(28-p.day)/4),'#fab005');
-  const th=p.day<=5?.35*(1-p.day/5)+.08:p.day<=14?.08+.32*(p.day-5)/9:.4+.15*Math.min(1,(p.day-14)/7)*(p.day<26?1:.4);s.lathe([1.4,-.8,0],[[.05,0],[.6,.3],[.85,1.2],[.75,1.6],[.3,1.7]],'#ffa8a8',{alpha:.35});s.lathe([1.4,-.8,0],[[.05,.1],[.6-th*.6,.35],[.85-th,1.15],[.7-th,1.5]],'#c92a2a',{alpha:.6});s.callout([1.4+.8,.4,0],'uterus wall','#ffa8a8',40,-60);s.callout([1.4,.1,.25],p.day<=5?'endometrium shed (menses)':'endometrium thickening','#ff6b6b',50,50);s.callout([-1.5,.5,0],'ovary','#ffc9c9',-40,-50);if(fol)s.callout([-1.3,.05,.2+fol],p.day===14?'Graafian follicle ruptures':'growing follicle','#ffe066',-60,50);if(p.day>14&&p.day<28)s.callout([-1.3,.05,.5],'corpus luteum (progesterone)','#fab005',-50,50);s.render();
-  chart(c,410,96,246,190,{title:'Hormones (relative)',xl:'day',xmin:1,xmax:28,ymin:0,ymax:1.05,series:[{fn:d=>hormone(d,'LH'),col:'#ff6b6b'},{fn:d=>hormone(d,'FSH'),col:'#4dabf7'},{fn:d=>hormone(d,'E'),col:'#ffd43b'},{fn:d=>hormone(d,'P'),col:'#69db7c'}],marker:[p.day,hormone(p.day,r.key)]});tag(c,'LH red · FSH blue · oestrogen yellow · progesterone green',420,278,C.muted,10)},
+ draw:(c,p,t)=>{const r=mens(p.day),s=P3.scene(c,{scale:52,cx:205,cy:255,pitch:.02}),d=p.day,U=[0,-1.25,0],O=[-1.95,1.0,0],th=d<=5?.35*(1-d/5)+.08:d<=14?.08+.32*(d-5)/9:.4+.15*Math.min(1,(d-14)/7)*(d<26?1:.4),f=Math.min(.8,th*1.6),
+  W=[[.05,0],[.2,.05],[.24,.5],[.3,.8],[.55,1.2],[.8,1.6],[.88,1.9],[.7,2.15],[.4,2.28],[.05,2.3]];
+  /* uterus: muscular wall, endometrium, lumen (thickness follows the day of the cycle) */
+  s.lathe(U,W,'#ef9a9a',{alpha:.45,segs:28,spec:.3});const side=(k)=>W.map(([rr,y])=>[U[0]+k*rr,U[1]+y,.3]),ring=(k,m)=>W.map(([rr,y],i)=>[U[0]+k*(i<2?rr*.2:rr*m),U[1]+y,.3]);
+  const poly2=(m,col,al)=>s.poly([...ring(-1,m),...ring(1,m).reverse()],col,{cull:false,alpha:al,z:1e5});poly2(.82,'#cf3b3b',.95);poly2(.82*(1-f),'#4a0f1a',.95);s.path(side(-1).concat(side(1).reverse()),'#d98080',1.5,[],1e5);
+  /* fallopian tubes sweep from the uterine horns to the ovaries and end in fimbriae */
+  for(const z of[-1,1]){const T=[[z*.62,U[1]+2.05,0],[z*1.1,U[1]+2.35,0],[z*1.55,U[1]+2.3,0],[z*1.85,U[1]+2.0,0],[z*2.0,U[1]+1.7,0]];s.tube(T,u=>.07+.06*u,'#e59a8f',{segs:8});for(let i=0;i<6;i++){const a=-1.2+i*.5;s.seg(T[4],[T[4][0]+z*.16*Math.cos(a)-.0,T[4][1]+.18*Math.sin(a)-.1,0],'#d7776b',2.2)}}
+  /* ovaries; the left one is shown in section with the cycle's follicle */
+  s.mesh([-1.7,.55,0],[.6,.45,.35],'#f3b9a6',{rings:12,segs:18,spec:.4,shape:(u,v)=>1+.05*Math.sin(7*v+u)});s.mesh([1.7,.55,0],[.6,.45,.35],'#f3b9a6',{rings:12,segs:18,spec:.4});
+  const OV=[-1.7,.55,0],fol=d<14?.1+.2*d/14:d===14?.32:0;for(let i=0;i<4;i++)s.ball([OV[0]-.2+i*.15,OV[1]-.2+.07*(i%2),.34],.045,'#fff1f0',{flat:true});
+  if(fol){const fp=[OV[0]+.18+.1*Math.min(1,d/14),OV[1]+.05+.08*Math.min(1,d/14),.12];s.mesh(fp,[fol,fol,fol*.9],'#ffe08a',{alpha:.85,rings:10,segs:14,spec:.5,lift:1});s.mesh(fp,[fol*.7,fol*.7,fol*.65],'#fff7d6',{alpha:.7,rings:8,segs:12,lift:2});s.ball([fp[0]+fol*.15,fp[1]+fol*.1,.3],.05,'#f783ac',{flat:true,lift:3})}
+  if(d>=14&&d<=16){const q=(d-14)/2.5,tip=[-2.0,U[1]+1.65,0],pos=[OV[0]-.1+(tip[0]-OV[0]+.1)*q,OV[1]+.3+(tip[1]-OV[1]-.3)*q,.3];s.ball(pos,.09,'#f783ac',{glow:true,lift:4})}
+  if(d>14){const cl=.28*(d<24?1:(28-d)/4);if(cl>0)s.mesh([OV[0]+.2,OV[1]+.08,.15],[cl,cl,cl*.9],'#f2a900',{rings:10,segs:14,spec:.4,lift:1})}
+  s.callout([OV[0]-.3,OV[1]-.3,.3],'ovary','#ffc9c9',-45,35);if(fol)s.callout([OV[0]+.25,OV[1]+.1,.4],d===14?'Graafian follicle ruptures':'growing follicle','#ffe066',-70,-55);if(d>14&&d<28)s.callout([OV[0]+.2,OV[1]+.08,.4],'corpus luteum (progesterone)','#fab005',-80,-55);if(d>=14&&d<=16)s.callout([-1.95,U[1]+1.7,.3],'ovum','#f783ac',-45,-35);
+  s.callout([1.85,U[1]+2.1,0],'fallopian tube','#e59a8f',45,-25);s.callout([.55,U[1]+1.3,.4],'uterus wall','#ffa8a8',55,15);s.callout([0,U[1]+1.1,.5],d<=5?'endometrium shed (menses)':'endometrium','#ff6b6b',80,45);s.render();
+  chart(c,410,96,246,190,{title:'Hormones (relative)',xl:'day',xmin:1,xmax:28,ymin:0,ymax:1.05,series:[{fn:x=>hormone(x,'LH'),col:'#ff6b6b'},{fn:x=>hormone(x,'FSH'),col:'#4dabf7'},{fn:x=>hormone(x,'E'),col:'#ffd43b'},{fn:x=>hormone(x,'P'),col:'#69db7c'}],marker:[d,hormone(d,r.key)]});tag(c,'LH red · FSH blue · oestrogen yellow · progesterone green',420,278,C.muted,10)},
  assumption:'Idealised 28-day cycle; hormone curves are schematic shapes, not measured concentrations.'});
 function mens(d){if(d<=5)return{phase:'Menstrual phase',ovary:'New follicles begin to develop',uterus:'Lining breaks down and is shed',lead:'Low oestrogen and progesterone',key:'FSH'};if(d<14)return{phase:'Follicular (proliferative) phase',ovary:'Primary follicle grows into a Graafian follicle',uterus:'Endometrium regenerates by proliferation',lead:'FSH, LH rising; oestrogen rising',key:'E'};if(d===14)return{phase:'Ovulation',ovary:'Graafian follicle ruptures, releasing the ovum',uterus:'Thickening continues',lead:'LH surge',key:'LH'};return{phase:'Luteal (secretory) phase',ovary:'Ruptured follicle becomes corpus luteum',uterus:'Endometrium maintained for implantation',lead:'Progesterone',key:'P'}}
 function hormone(d,h){const g=(m,w)=>Math.exp(-(((d-m)/w)**2));if(h==='LH')return .15+.85*g(14,1.2);if(h==='FSH')return .2+.35*g(3,3)+.45*g(13.5,1.5);if(h==='E')return .15+.7*g(12.5,2.5)+.35*g(21,3.5);return .05+.9*g(21,3.5)}
@@ -77,10 +139,20 @@ add({...ch(2,'Human Reproduction',U6),id:'bio-gametogenesis',title:'Spermatogene
  tryText:'Switch to oogenesis. Where does the second meiotic division finish?',
  controls:[S('type','Process','sperm',[['sperm','Spermatogenesis'],['oo','Oogenesis']]),R('cells','Primary cells',1,4,1,1)],
  metrics:p=>p.type==='sperm'?[N('Gametes per primary cell',4,'',0),N('Total gametes',4*p.cells,'',0),N('Chromosomes','46 → 23'),N('Where','Seminiferous tubules (testis)')]:[N('Ova per primary cell',1,'',0),N('Polar bodies','2 (first may divide → 3)'),N('Meiosis II','Completed only after sperm entry'),N('Chromosomes','46 → 23')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.1}),sp=p.type==='sperm',n=p.cells;for(let k=0;k<n;k++){const ox=(k-(n-1)/2)*(sp?2:1.8);s.ball([ox,1.8,0],.3,'#9775fa',{label:k===0?'2n':''});
-   const lv1=sp?[[-.5,.7],[.5,.7]]:[[-.4,.7],[.5,.7]];lv1.forEach(([dx,y],i)=>{const r=sp?.22:(i?.08:.3);s.ball([ox+dx,y,0],r,sp?'#b197fc':(i?'#ced4da':'#f783ac'));s.seg([ox,1.5,0],[ox+dx,y+r,0],'#adb5bd',1.5)});
-   if(sp)for(let i=0;i<4;i++){const x=ox-.75+i*.5,y=-.6;s.ball([x,y,0],.12,'#74c0fc');s.tube([[x,y-.12,0],[x+.05*Math.sin(t*6+i),y-.6,0]],.02,'#74c0fc',{segs:4});s.seg([ox+(i<2?-.5:.5),.5,0],[x,y+.12,0],'#adb5bd',1.5)}
-   else{s.ball([ox-.4,-.6,0],.32,'#e64980',{label:k===0?'ovum (n)':''});s.ball([ox+.2,-.6,0],.08,'#ced4da');s.seg([ox-.4,.4,0],[ox-.4,-.28,0],'#adb5bd',1.5)}}s.label([-3,1.8,0],'primary',C.muted,11);s.label([-3,.7,0],'meiosis I',C.muted,11);s.label([-3,-.6,0],'meiosis II',C.muted,11);s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:300,cy:240,pitch:.02}),sp=p.type==='sperm',n=p.cells,Y=[1.7,.4,-.95];
+  /* a cell: membrane ring, cytoplasm, nucleus with chromosome rods */
+  const cell=(x,y,r,col,nu,nr)=>{s.ball([x,y,0],r,col,{spec:.4});s.ball([x,y,.1],r*nr,nu,{flat:false,lift:1});for(let i=0;i<3;i++){const a=i*2.1+x;s.seg([x+Math.cos(a)*r*nr*.4,y+Math.sin(a)*r*nr*.4-r*nr*.2,.2],[x+Math.cos(a)*r*nr*.4,y+Math.sin(a)*r*nr*.4+r*nr*.2,.2],'#1f1147',2,[],1e5)}},
+  sperm=(x,y,i)=>{s.mesh([x,y,0],[.11,.075,.075],'#4aa3ff',{rings:6,segs:10,spec:.5});s.mesh([x,y+.07,0],[.07,.035,.07],'#e8f4ff',{rings:4,segs:8,lift:1});s.tube([[x,y-.08,0],[x,y-.3,0]],.04,'#ffa94d',{segs:6});s.tube([[x,y-.3,0],[x+.04*Math.sin(t*6+i),y-.55,0],[x-.04*Math.sin(t*6+i),y-.8,0],[x+.03*Math.sin(t*6+i),y-1.0,0]],.014,'#8fc7ff',{segs:4})};
+  for(let k=0;k<n;k++){const ox=(k-(n-1)/2)*(sp?2.4:2.0);
+   if(sp){cell(ox,Y[0],.36,'#c9b8ff','#6741d9',.55);for(const dx of[-.55,.55]){cell(ox+dx,Y[1],.27,'#b7a3ff','#5f3dc4',.5);s.seg([ox,Y[0]-.34,0],[ox+dx,Y[1]+.27,0],'#adb5bd',1.5)}
+    for(let i=0;i<4;i++){const x=ox+(i-1.5)*.38;sperm(x,Y[2]+.1,i);s.seg([ox+(i<2?-.55:.55),Y[1]-.26,0],[x,Y[2]+.19,0],'#adb5bd',1)}}
+   else{cell(ox,Y[0],.44,'#f6a8c6','#c2255c',.5);cell(ox-.25,Y[1],.34,'#f783ac','#a61e4d',.5);cell(ox+.45,Y[1]+.05,.1,'#ced4da','#868e96',.5);s.seg([ox-.1,Y[0]-.42,0],[ox-.2,Y[1]+.34,0],'#adb5bd',1.5);s.seg([ox+.2,Y[0]-.3,0],[ox+.42,Y[1]+.12,0],'#adb5bd',1.2);
+    cell(ox-.35,Y[2],.34,'#f783ac','#a61e4d',.5);cell(ox+.12,Y[2]-.05,.1,'#ced4da','#868e96',.5);cell(ox+.45,Y[2]+.1,.1,'#ced4da','#868e96',.5);s.seg([ox-.25,Y[1]-.34,0],[ox-.33,Y[2]+.34,0],'#adb5bd',1.5);s.seg([ox-.2,Y[1]-.3,0],[ox+.1,Y[2]+.05,0],'#adb5bd',1)}}
+  const lx=-3.4;s.label([lx,Y[0],0],'primary',C.muted,11);s.label([lx,Y[1],0],'meiosis I',C.muted,11);s.label([lx,Y[2],0],'meiosis II',C.muted,11);
+  const x0=(0-(n-1)/2)*(sp?2.4:2.0);
+  if(sp){s.callout([x0+.36,Y[0],0],'primary spermatocyte (2n)','#c9b8ff',65,-5);s.callout([x0+.55+.27,Y[1],0],'secondary spermatocyte (n)','#b7a3ff',65,10);s.callout([x0+.57,Y[2]+.1,0],'spermatids → sperms (n)','#8fc7ff',70,30)}
+  else{s.callout([x0+.44,Y[0],0],'primary oocyte (2n)','#f6a8c6',70,-5);s.callout([x0-.25,Y[1]+.34,0],'secondary oocyte (n)','#f783ac',-80,-25);s.callout([x0+.45,Y[1]+.05,0],'1st polar body','#ced4da',70,-5);s.callout([x0-.35,Y[2]-.2,0],'ovum (n)','#ff8fb7',-70,35);s.callout([x0+.12,Y[2]-.05,0],'2nd polar body','#ced4da',55,40)}
+  s.render()},
  assumption:'One primary cell per column; spermiogenesis (spermatid → sperm) merged into the last row.'});
 
 const EMB=[[0,'Zygote','Ampullary region of fallopian tube',1],[1,'2-cell stage (cleavage)','Fallopian tube',2],[2,'4-cell stage','Fallopian tube',4],[3,'8–16 cells: morula','Moving towards uterus',16],[5,'Blastocyst','Uterus',64],[7,'Implantation','Embedded in endometrium',100]];
@@ -91,8 +163,27 @@ add({...ch(2,'Human Reproduction',U6),id:'bio-early-development',title:'From zyg
  tryText:'Move to day 5. Which two parts does the blastocyst have?',
  controls:[R('day','Days after fertilisation',0,7,.5,3,'days',1)],
  metrics:p=>{const e=[...EMB].reverse().find(x=>p.day>=x[0]);return[N('Stage',e[1]),N('Location',e[2]),N('Approximate cells',e[3]<100?e[3]:'Many','',0),N('Next',p.day<5?'Cleavage continues':'Trophoblast attaches to uterine wall')]},
- draw:(c,p,t)=>{const e=[...EMB].reverse().find(x=>p.day>=x[0]),s=P3.scene(c,{scale:54,pitch:.2}),path=[[-3,1.2,0],[-2,1.4,0],[-1,1.0,0],[0,.4,0],[1.2,-.4,0],[2.2,-.9,0]];s.tube(path,.35,'#ffc9c9',{alpha:.3});s.lathe([2.6,-2.4,0],[[.1,0],[.9,.5],[1.1,1.4],[.6,1.8]],'#ffa8a8',{alpha:.35});
-  const pos=along(path,Math.min(1,p.day/6)),n=e[3];if(p.day>=5){s.mesh(pos,.32,'#ffc078',{alpha:.5});s.mesh(V.add(pos,[.12,.08,0]),.14,'#e8590c');s.callout(V.add(pos,[0,.3,0]),'blastocyst: trophoblast','#ffc078',-40,-50);s.callout(V.add(pos,[.12,.08,.1]),'inner cell mass → embryo','#e8590c',60,-40)}else if(n===1)s.ball(pos,.25,'#ffc078');else{const k=Math.min(16,n);for(let i=0;i<k;i++){const y=1-2*(i+.5)/k,r=Math.sqrt(1-y*y),a=i*2.4;s.ball(V.add(pos,[.17*r*Math.cos(a),.17*y,.17*r*Math.sin(a)]),.25/Math.cbrt(k)*1.2,'#ffc078')}}s.callout([-2.5,1.35,.3],'fallopian tube (fertilisation in ampulla)','#ffc9c9',-20,-60);s.callout([2.6,-1.3,.9],'uterus: implantation in endometrium','#ffa8a8',30,40);if(p.day<5)s.callout(pos,`${e[1]||'embryo'}`,'#ffc078',50,50);s.render()},
+ draw:(c,p,t)=>{const e=[...EMB].reverse().find(x=>p.day>=x[0]),s=P3.scene(c,{scale:50,cx:285,cy:245,pitch:.02}),d=p.day,n=e[3],UC=[-1.5,-2.1,0],
+  W=[[.05,0],[.2,.05],[.22,.5],[.28,.8],[.5,1.2],[.72,1.6],[.8,1.9],[.65,2.1],[.38,2.2],[.05,2.22]].map(([r,y])=>[r*.85,y*.85]);
+  /* tract: uterus (coronal section) with cavity, fallopian tubes and ovary */
+  s.lathe(UC,W,'#ef9a9a',{alpha:.45,segs:24});const ring=(k,m)=>W.map(([r,y],i)=>[UC[0]+k*(i<2?r*.2:r*m),UC[1]+y,.3]);s.poly([...ring(-1,.8),...ring(1,.8).reverse()],'#cf3b3b',{cull:false,alpha:.95,z:1e5});s.poly([...ring(-1,.45),...ring(1,.45).reverse()],'#4a0f1a',{cull:false,alpha:.9,z:1e5});
+  const L=[[-2.05,-.4,0],[-2.5,.1,0],[-3.0,.35,0],[-3.3,.15,0]],R=[[-.95,-.4,0],[-.5,.1,0],[0,.35,0],[.3,.15,0]];s.tube(L,u=>.07+.05*u,'#e59a8f',{segs:8});s.tube(R,u=>.07+.05*u,'#e59a8f',{segs:8});for(let i=0;i<5;i++){const a=-1.0+i*.5;s.seg(L[3],[L[3][0]-.14*Math.cos(a),L[3][1]+.14*Math.sin(a)-.08,0],'#d7776b',2)}
+  s.mesh([-3.35,-.35,0],[.42,.3,.25],'#f3b9a6',{rings:10,segs:14,spec:.4});s.mesh([.5,-.35,0],[.42,.3,.25],'#f3b9a6',{rings:10,segs:14});
+  const path=[[-3.3,.1,0],[-3.0,.35,0],[-2.5,.1,0],[-2.05,-.4,0],[-1.9,-.9,0],[-1.6,-1.2,0]],pos=d>=7?[-1.45,-.75,0]:along(path,Math.min(1,d/6));s.ball([pos[0],pos[1],.35],.1,'#ffc078',{glow:true,lift:5});s.seg([pos[0]+.1,pos[1],.3],[.55,.4,0],'#8ca6b9',1,[3,3]);
+  s.callout([-3.35,-.35,.2],'ovary','#ffc9c9',-5,50);s.callout([-2.6,.12,0],'fallopian tube','#ffc9c9',-25,-45);s.callout([-1.9,-1.6,.4],'uterus','#ffa8a8',-65,25);
+  /* magnified embryo */
+  const M=[2.1,.45,0],R0=1.25;s.ball([M[0],M[1],-.4],R0*1.18,'#0f1b2d',{alpha:.45});s.ball([M[0],M[1],-.4],R0*1.18,'#3b556d',{alpha:.2});
+  const cellc='#ffc078',tro='#ffb066',cell=(q,r,col,nu)=>{s.ball(q,r,col,{spec:.4});if(nu!==false)s.ball([q[0],q[1],q[2]+r*.3],r*.38,'#e8590c',{flat:true,lift:1})};
+  if(d>=5){const bc=d>=7?[M[0],M[1]+.25,0]:M,N=40,Rb=1.0;s.mesh(bc,[Rb*.9,Rb*.9,Rb*.9],'#bfe3ff',{alpha:.28,rings:10,segs:16});
+   for(let i=0;i<N;i++){const y=1-2*(i+.5)/N,rr=Math.sqrt(1-y*y),a=i*2.4;if(d>=7&&y<-.5)continue;cell([bc[0]+Rb*rr*Math.cos(a),bc[1]+Rb*y,Rb*rr*Math.sin(a)*.8],.16,tro,false)}
+   for(let i=0;i<6;i++){const a=i*1.1,r2=.14+.06*(i%2);cell([bc[0]-.45+.28*Math.cos(a)*.9,bc[1]+.35+.24*Math.sin(a)*.9,.1+.08*Math.sin(a*2)],.17,'#e8590c',false)}
+   if(d>=7){s.poly([[M[0]-1.4,M[1]-.55,-.3],[M[0]+1.4,M[1]-.55,-.3],[M[0]+1.4,M[1]-1.4,-.3],[M[0]-1.4,M[1]-1.4,-.3]],'#c0392b',{cull:false,z:-1e5});s.callout([M[0]+.9,M[1]-1.0,0],'endometrium','#ff8a80',30,25)}
+   s.callout([M[0]+.8,M[1]+.7,.4],'trophoblast','#ffc078',45,-25);s.callout([M[0]-.5,M[1]+.4,.4],'inner cell mass → embryo','#ff922b',-75,-45);s.callout([M[0]+.2,M[1]-.3,.3],'blastocoel (cavity)','#bfe3ff',60,35)}
+  else if(n===1){cell(M,.65,cellc)}
+  else if(n===2){cell([M[0]-.5,M[1],0],.55,cellc);cell([M[0]+.5,M[1],0],.55,cellc)}
+  else if(n===4){for(let i=0;i<4;i++)cell([M[0]+(i%2?.5:-.5),M[1]+(i<2?.5:-.5),0],.5,cellc)}
+  else{for(let i=0;i<16;i++){const y=1-2*(i+.5)/16,rr=Math.sqrt(1-y*y),a=i*2.4;cell([M[0]+.62*rr*Math.cos(a),M[1]+.62*y,.62*rr*Math.sin(a)],.3,cellc)}}
+  if(d<5)s.callout([M[0]+.2,M[1]+.7,.3],e[1],'#ffc078',55,-35);s.render()},
  assumption:'Typical human timeline; implantation begins about a week after fertilisation.'});
 
 /* ---------- Chapter 3: Reproductive Health ---------- */
@@ -103,7 +194,12 @@ add({...ch(3,'Reproductive Health',U6),id:'bio-population-growth-rate',title:'Po
  tryText:'Compare 1.7% per year with 1% per year over 50 years.',
  controls:[R('r','Growth rate',.5,3,.1,1.7,'% per year',1),R('years','Years ahead',0,100,1,30,'years'),R('N0','Starting population',100,1400,10,1210,'million')],
  metrics:p=>{const Nn=p.N0*Math.exp(p.r/100*p.years);return[N('Population after',Nn,'million',0),N('Doubling time',Math.log(2)/(p.r/100),'years',1),N('India at independence','≈ 350 million'),N('Census 2011','> 1.2 billion')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:320,pitch:.25}),steps=6;for(let i=0;i<=steps;i++){const y=p.years*i/steps,Nn=p.N0*Math.exp(p.r/100*y),h=Nn/4000*3.5;s.box([-2.4+i*.8,-1.6+h/2,0],[.55,h,.55],i===steps?'#ffa94d':'#4dabf7');s.label([-2.4+i*.8,-1.9,0],'+'+Math.round(y),C.muted,10)}for(let i=0;i<6;i++)critter(s,'human',[-3.4,-1.6,-1+i*.4],.45,t);s.render();tag(c,'columns: population every few years (height ∝ size)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const k=p.r/100,Nn=p.N0*Math.exp(k*p.years),cnt=Math.min(40,Math.round(10*Nn/p.N0)),per=10,x0=56,y0=140,dx=34,dy=48,dbl=Math.log(2)/k,ymax=Math.max(2.2*p.N0,p.N0*Math.exp(k*100)*1.03);
+  /* crowd of people: each figure stands for N0/10 million people (blue = starting population, orange = added) */
+  for(let i=0;i<cnt;i++){const col=i<10?'#4dabf7':'#ffa94d',x=x0+(i%per)*dx+(Math.floor(i/per)%2?6:0),y=y0+Math.floor(i/per)*dy;c.save();c.fillStyle=col;c.beginPath();c.arc(x,y,6.5,0,TAU);c.fill();c.beginPath();c.moveTo(x-10,y+27);c.quadraticCurveTo(x-11,y+10,x,y+10);c.quadraticCurveTo(x+11,y+10,x+10,y+27);c.closePath();c.fill();c.restore()}
+  tag(c,'each figure ≈ '+Math.round(p.N0/10)+' million people',44,98,C.muted,12);tag(c,'blue: starting population · orange: added',44,114,C.muted,12);
+  tag(c,Nn>=2*p.N0?'population has more than doubled (doubling time '+dbl.toFixed(1)+' years)':'doubling time '+dbl.toFixed(1)+' years — not yet doubled',44,y0+Math.min(3,Math.floor((cnt-1)/per))*dy+50,C.gold,12);
+  chart(c,420,96,236,170,{title:'Population (million)',xl:'years ahead',xmin:0,xmax:100,ymin:0,ymax:ymax,series:[{fn:y=>p.N0*Math.exp(k*y),col:C.gold},{fn:()=>2*p.N0,col:'#8ca6b9',dash:[4,4]}],marker:[p.years,Nn]});tag(c,'dashed: twice the starting population',420,278,C.muted,10)},
  assumption:'Constant exponential growth for illustration; real rates change with time.'});
 
 /* ---------- Chapter 4: Principles of Inheritance and Variation ---------- */
@@ -115,8 +211,20 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-monohybrid-cr
  tryText:'Increase the number of offspring and watch the observed ratio approach 3 : 1.',
  controls:[S('p1','Parent 1','Tt',MONO),S('p2','Parent 2','Tt',MONO),R('n','Offspring grown',4,200,4,40),R('seed','Sample number',1,20,1,1)],
  metrics:p=>{const g=cross1(p.p1,p.p2),tall=g.TT+g.Tt,obs=sample1(p);return[N('Expected genotypes',`TT ${g.TT*4}/4 · Tt ${g.Tt*4}/4 · tt ${g.tt*4}/4`),N('Expected phenotypes',`${tall*100}% tall, ${g.tt*100}% dwarf`),N('Observed in sample',`${obs.tall} tall : ${obs.dwarf} dwarf`),N('Observed ratio',obs.dwarf?f(obs.tall/obs.dwarf,2)+' : 1':'All tall')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cy:290,pitch:.45}),g1=p.p1.split(''),g2=p.p2.split('');for(let i=0;i<2;i++)for(let j=0;j<2;j++){const geno=[g1[i],g2[j]].sort().join(''),tall=geno.includes('T');s.box([-3+i*1.1,-1.6,-1+j*1.1],[1,.1,1],'#20c997');pea(s,[-3+i*1.1,-1.55,-1+j*1.1],tall,.7,t);s.label([-3+i*1.1,-1.3,-.6+j*1.1],geno,C.white,12)}
-  const obs=sample1(p),cols=Math.ceil(Math.sqrt(p.n*1.6));for(let k=0;k<Math.min(p.n,120);k++){const x=-1+(k%cols)*.32,z=-1.4+Math.floor(k/cols)*.32;pea(s,[x,-1.6,z],obs.list[k],.4,t)}s.render();tag(c,'left: Punnett square · right: random offspring sample',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const g1=p.p1.split(''),g2=p.p2.split(''),obs=sample1(p),GX=122,GY=168,CW=88,CH=86,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  /* a pea plant icon: tall (long stem, 4 leaf pairs) or dwarf (short stem, 2 leaf pairs) */
+  plant=(x,y,tall,sc)=>{const h=(tall?44:19)*sc,nl=tall?4:2,col=tall?'#37b24d':'#94d82d';c.save();c.lineCap='round';c.strokeStyle='#2b8a3e';c.lineWidth=Math.max(1.4,2.2*sc);c.beginPath();c.moveTo(x,y);c.lineTo(x,y-h);c.stroke();c.fillStyle=col;for(let i=0;i<nl;i++){const yy=y-h*(.25+.7*i/nl),w=(7-(i>1&&tall?1:0))*sc;for(const sg of[-1,1]){c.beginPath();c.ellipse(x+sg*w*.9,yy-w*.25*(sg>0?1:.2),w,w*.42,sg*-.5,0,TAU);c.fill()}}c.fillStyle=tall?'#ffe066':'#fcc2d7';c.beginPath();c.arc(x,y-h-2*sc,3.2*sc,0,TAU);c.fill();c.restore()},
+  gam=(a,x,y)=>{c.save();c.beginPath();c.arc(x,y,13,0,TAU);c.fillStyle=a==='T'?'#ffd43b':'#4dabf7';c.fill();c.restore();txt(a,x,y+1,'#10243a',15)};
+  /* Punnett square: gametes of parent 1 across the top, of parent 2 down the side */
+  txt('gametes of parent 1 ('+p.p1+')',GX+CW,GY-48,C.muted,11);txt('parent 2',GX-70,GY+CH-10,C.muted,11);txt('('+p.p2+')',GX-72,GY+CH+6,C.muted,11);
+  for(let i=0;i<2;i++){gam(g1[i],GX+CW*(i+.5),GY-26);gam(g2[i],GX-28,GY+CH*(i+.5))}
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const geno=[g1[i],g2[j]].sort().join(''),tall=geno.includes('T'),x=GX+i*CW,y=GY+j*CH;c.save();c.fillStyle=tall?'rgba(55,178,77,.18)':'rgba(148,216,45,.16)';c.strokeStyle='rgba(180,200,215,.5)';c.lineWidth=1.2;c.beginPath();c.rect(x,y,CW,CH);c.fill();c.stroke();c.restore();plant(x+CW/2,y+CH-24,tall,.95);txt(geno,x+CW/2,y+CH-10,C.white,13)}
+  txt('green: tall (TT, Tt)   lime: dwarf (tt)',GX+CW,GY+2*CH+14,C.muted,10);
+  /* random offspring sample */
+  const n=Math.min(p.n,120),FX=350,FY=140,FW=290,FH=190,cols=Math.ceil(Math.sqrt(n*FW/FH)),rows=Math.ceil(n/cols),dx=FW/cols,dy=FH/rows,sc=Math.min(dx/22,dy/50,1.05);
+  txt('offspring sample ('+n+' plants)',FX,FY-12,C.muted,11,'left');for(let k=0;k<n;k++)plant(FX+dx*(k%cols+.5),FY+dy*(Math.floor(k/cols)+.95),obs.list[k],sc);
+  txt(obs.tall+' tall : '+obs.dwarf+' dwarf',FX,FY+FH+22,C.gold,13,'left')},
  assumption:'Complete dominance; offspring drawn at random with Mendelian probabilities (reproducible for each sample number).'});
 function pea(s,p,tall,k,t){const h=(tall?1.6:.55)*k;s.tube([p,V.add(p,[0,h,0])],.03*k+.01,'#5c940d',{segs:5});leaf(s,V.add(p,[0,h*.5,0]),[1,.4,0],.35*k,.1*k);leaf(s,V.add(p,[0,h*.8,0]),[-1,.4,.2],.3*k,.1*k)}
 function cross1(a,b){const r={TT:0,Tt:0,tt:0};for(const x of a)for(const y of b){const g=[x,y].sort().join('');r[g==='Tt'||g==='tT'?'Tt':g]+=.25}return r}
@@ -130,8 +238,16 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-dihybrid-cros
  tryText:'Make a test cross (RrYy × rryy). What ratio appears?',
  controls:[S('p1','Parent 1','RrYy',DIH),S('p2','Parent 2','RrYy',DIH)],
  metrics:p=>{const r=cross2(p.p1,p.p2);return[N('Round yellow',r.RY,'/16',0),N('Round green',r.Ry,'/16',0),N('Wrinkled yellow',r.rY,'/16',0),N('Wrinkled green',r.ry,'/16',0)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:48,pitch:.6}),g1=gam(p.p1),g2=gam(p.p2);for(let i=0;i<4;i++)for(let j=0;j<4;j++){const a=g1[i],b=g2[j],round=a[0]==='R'||b[0]==='R',yel=a[1]==='Y'||b[1]==='Y',q=[-1.65+i*1.1,0,-1.65+j*1.1];s.box(V.add(q,[0,-.1,0]),[1,.08,1],(i+j)%2?'#1c3a4f':'#21445b');
-   s.mesh(V.add(q,[0,.25,0]),.3,yel?'#ffd43b':'#69db7c',{shape:round?undefined:(u,v)=>1+.12*Math.sin(5*v)*Math.cos(3*u),rings:10,segs:16})}for(let i=0;i<4;i++){s.label([-1.65+i*1.1,.2,-2.5],g1[i],C.gold,13);s.label([-2.5,.2,-1.65+i*1.1],g2[i],C.blue,13)}s.render()},
+ draw:(c,p,t)=>{const g1=gam(p.p1),g2=gam(p.p2),r=cross2(p.p1,p.p2),GX=150,GY=150,CS=54,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  /* seed icon: round = smooth disc, wrinkled = dented outline; yellow or green cotyledons */
+  seed=(x,y,round,yel,rad)=>{c.save();c.beginPath();for(let i=0;i<=36;i++){const a=TAU*i/36,k=round?1:1-.14*Math.abs(Math.sin(a*3+.6))-.05*Math.sin(a*5);const px=x+Math.cos(a)*rad*k,py=y+Math.sin(a)*rad*k;i?c.lineTo(px,py):c.moveTo(px,py)}c.closePath();const gr=c.createRadialGradient(x-rad*.35,y-rad*.4,rad*.1,x,y,rad*1.1);gr.addColorStop(0,yel?'#fff0a0':'#c3f0b0');gr.addColorStop(.6,yel?'#ffd43b':'#69db7c');gr.addColorStop(1,yel?'#d6a50f':'#2f9e44');c.fillStyle=gr;c.fill();c.lineWidth=1;c.strokeStyle='rgba(0,0,0,.25)';c.stroke();c.restore()};
+  txt('gametes of parent 1 ('+p.p1+')',GX+2*CS,GY-48,C.gold,11);txt('parent 2',GX-70,GY+2*CS-8,C.blue,11);txt('('+p.p2+')',GX-70,GY+2*CS+8,C.blue,11);
+  for(let i=0;i<4;i++){txt(g1[i],GX+CS*(i+.5),GY-22,C.gold,13);txt(g2[i],GX-26,GY+CS*(i+.5),C.blue,13)}
+  for(let i=0;i<4;i++)for(let j=0;j<4;j++){const a=g1[i],b=g2[j],round=a[0]==='R'||b[0]==='R',yel=a[1]==='Y'||b[1]==='Y',x=GX+i*CS,y=GY+j*CS;c.save();c.fillStyle=(i+j)%2?'rgba(28,58,79,.9)':'rgba(33,68,91,.9)';c.fillRect(x,y,CS,CS);c.strokeStyle='rgba(180,200,215,.25)';c.strokeRect(x,y,CS,CS);c.restore();seed(x+CS/2,y+CS/2-4,round,yel,15);txt(a[0]+b[0]!==''?[a[0],b[0]].sort().join('')+[a[1],b[1]].sort().join(''):'',x+CS/2,y+CS-6,C.muted,9)}
+  /* phenotype key with expected counts */
+  const key=[['round yellow',true,true,r.RY],['round green',true,false,r.Ry],['wrinkled yellow',false,true,r.rY],['wrinkled green',false,false,r.ry]];txt('phenotypes (out of 16)',420,GY-12,C.muted,11,'left');
+  key.forEach((k,i)=>{const y=GY+26+i*46;seed(432,y,k[1],k[2],14);txt(k[0],458,y,C.white,13,'left');txt(k[3]+' / 16',600,y,C.gold,14,'right')})},
  assumption:'Genes on different chromosomes (independent assortment) with complete dominance of R and Y.'});
 function gam(g){return[g[0]+g[2],g[0]+g[3],g[1]+g[2],g[1]+g[3]]}
 function cross2(a,b){const r={RY:0,Ry:0,rY:0,ry:0};for(const x of gam(a))for(const y of gam(b)){const R=(x[0]==='R'||y[0]==='R')?'R':'r',Y=(x[1]==='Y'||y[1]==='Y')?'Y':'y';r[R+Y]++}return r}
@@ -143,7 +259,24 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-incomplete-co
  tryText:'Self the pink F₁ (Rr × Rr). What fraction of flowers are pink?',
  controls:[S('mode','Example','snap',[['snap','Snapdragon flower colour'],['abo','ABO blood group']]),S('p1','Parent 1','Rr',[['RR','RR / IᴬIᴬ'],['Rr','Rr / IᴬIᴮ'],['rr','rr / ii']]),S('p2','Parent 2','Rr',[['RR','RR / IᴮIᴮ'],['Rr','Rr / IᴬIᴮ'],['rr','rr / ii']])]
  ,metrics:p=>{const kids=codom(p);const cnt={};kids.forEach(k=>cnt[k.name]=(cnt[k.name]||0)+1);return[N('Offspring (of 4)',Object.entries(cnt).map(([k,v])=>`${k}: ${v}`).join(', ')),N('Pattern',p.mode==='snap'?'Incomplete dominance':'Co-dominance (Iᴬ, Iᴮ) + recessive i'),N('Key idea',p.mode==='snap'?'Heterozygote is intermediate':'Both alleles expressed together')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cy:300,pitch:.25}),kids=codom(p);kids.forEach((k,i)=>{const x=-2.1+i*1.4;s.cyl([x,-1.55,0],[0,1,0],.5,.12,'#29475b');if(p.mode==='snap'){s.tube([[x,-1.5,0],[x,.2,0]],.04,BC.stem,{segs:6});for(let j=0;j<3;j++){const y=-.2+j*.35;for(let m=0;m<4;m++){const a=TAU*m/4+j;petal(s,[x,y,0],[Math.cos(a),.6,Math.sin(a)],.22,.1,k.col)}}}else{s.mesh([x,-.6,0],[.45,.16,.45],'#c92a2a',{rot:[PI/2*.6,0,0]});k.ag.forEach((a,j)=>{for(let m=0;m<4;m++){const an=TAU*(m/4+j/8);s.ball([x+.45*Math.cos(an),-.6+.1,.45*Math.sin(an)],.06,a==='A'?'#ffd43b':'#4dabf7',{flat:true})}})}s.label([x,-1.95,0],k.name,C.white,12)});s.render()},
+ draw:(c,p,t)=>{const kids=codom(p),snap=p.mode==='snap',GX=122,GY=168,CW=88,CH=86,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  shade=(h,k)=>{const n=parseInt(h.slice(1),16),f=v=>Math.max(0,Math.min(255,Math.round(v*k)));return'rgb('+f(n>>16)+','+f((n>>8)&255)+','+f(n&255)+')'},
+  /* snapdragon spike: stem, leaves and two-lipped florets in the phenotype colour */
+  flower=(x,y,col,sc)=>{c.save();c.lineCap='round';c.strokeStyle='#2b8a3e';c.lineWidth=2.2*sc;c.beginPath();c.moveTo(x,y);c.lineTo(x,y-50*sc);c.stroke();c.fillStyle='#37b24d';for(const sg of[-1,1]){c.beginPath();c.ellipse(x+sg*8*sc,y-8*sc,8*sc,3.2*sc,sg*-.5,0,TAU);c.fill()}
+   for(let k=0;k<3;k++){const fy=y-24*sc-k*11*sc,w=(11-k*1.5)*sc;c.fillStyle=col;c.strokeStyle='rgba(0,0,0,.3)';c.lineWidth=1;c.beginPath();c.ellipse(x,fy-3*sc,w,w*.62,0,0,TAU);c.fill();c.stroke();c.fillStyle=shade(col==='#f8f9fa'?'#dfe3e8':col,.86);c.beginPath();c.ellipse(x,fy+w*.42,w*.78,w*.45,0,0,TAU);c.fill();c.stroke()}c.restore()},
+  rbc=(x,y,ag,sc)=>{c.save();for(let m=0;m<12;m++){const a=TAU*m/12,col=ag.length?({A:'#ffd43b',B:'#4dabf7'})[ag[m%ag.length]]:null;if(!col)continue;c.strokeStyle=col;c.lineWidth=1.6;c.beginPath();c.moveTo(x+Math.cos(a)*17*sc,y+Math.sin(a)*17*sc);c.lineTo(x+Math.cos(a)*23*sc,y+Math.sin(a)*23*sc);c.stroke();c.fillStyle=col;c.beginPath();c.arc(x+Math.cos(a)*24*sc,y+Math.sin(a)*24*sc,2.6*sc,0,TAU);c.fill()}
+   const gr=c.createRadialGradient(x,y,2,x,y,17*sc);gr.addColorStop(0,'#8e2340');gr.addColorStop(.45,'#d6303a');gr.addColorStop(1,'#ff6b6b');c.fillStyle=gr;c.beginPath();c.arc(x,y,17*sc,0,TAU);c.fill();c.restore()},
+  AL={RR:snap?['R','R']:['Iᴬ','Iᴬ'],Rr:snap?['R','r']:['Iᴬ','Iᴮ'],rr:snap?['r','r']:['i','i']},AL2={RR:snap?['R','R']:['Iᴮ','Iᴮ'],Rr:snap?['R','r']:['Iᴬ','Iᴮ'],rr:snap?['r','r']:['i','i']},
+  gcol=a=>snap?(a==='R'?'#e03131':'#f1f3f5'):(a==='Iᴬ'?'#ffd43b':a==='Iᴮ'?'#4dabf7':'#adb5bd'),
+  gam=(a,x,y)=>{c.save();c.beginPath();c.arc(x,y,14,0,TAU);c.fillStyle=gcol(a);c.fill();c.restore();txt(a,x,y+1,'#10243a',a.length>1?12:15)};
+  txt('gametes of parent 1 ('+p.p1+')',GX+CW,GY-48,C.muted,11);txt('parent 2',GX-70,GY+CH-10,C.muted,11);txt('('+p.p2+')',GX-70,GY+CH+6,C.muted,11);
+  for(let i=0;i<2;i++){gam(AL[p.p1][i],GX+CW*(i+.5),GY-26);gam(AL2[p.p2][i],GX-28,GY+CH*(i+.5))}
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const k=kids[i*2+j],x=GX+i*CW,y=GY+j*CH;c.save();c.fillStyle='rgba(33,68,91,.8)';c.strokeStyle='rgba(180,200,215,.5)';c.lineWidth=1.2;c.beginPath();c.rect(x,y,CW,CH);c.fill();c.stroke();c.restore();if(snap)flower(x+CW/2,y+CH-22,k.col,.95);else rbc(x+CW/2,y+CH/2-6,k.ag,.95);txt(k.name,x+CW/2,y+CH-9,C.white,13)}
+  /* what the offspring are */
+  const cnt={};kids.forEach(k=>{(cnt[k.name]=cnt[k.name]||{n:0,k})[`n`]++});txt('offspring (of 4)',360,GY-12,C.muted,11,'left');
+  Object.values(cnt).forEach((e,i)=>{const y=GY+32+i*60;if(snap)flower(380,y+22,e.k.col,.9);else rbc(380,y+8,e.k.ag,.9);txt(e.k.name+':  '+e.n+' / 4',420,y+4,C.white,14,'left')});
+  txt(snap?'heterozygote (Rr) is intermediate: pink':'Iᴬ and Iᴮ are both expressed: group AB',360,GY+2*CH+14,C.gold,12,'left')},
  assumption:'Simple one-gene examples from NCERT Chapter 4.'});
 function codom(p){const out=[];if(p.mode==='snap'){for(const a of p.p1)for(const b of p.p2){const g=[a,b].sort().join('');out.push(g==='RR'?{name:'Red',col:'#e03131'}:g==='rr'?{name:'White',col:'#f8f9fa'}:{name:'Pink',col:'#f783ac'})}return out}
   const m1={RR:['A','A'],Rr:['A','B'],rr:['i','i']},m2={RR:['B','B'],Rr:['A','B'],rr:['i','i']};for(const a of m1[p.p1])for(const b of m2[p.p2]){const set=[...new Set([a,b].filter(v=>v!=='i'))].sort();out.push({name:set.length===2?'AB':set.length?set[0]:'O',ag:set})}return out}
@@ -156,8 +289,23 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-sex-linked',t
  tryText:'What happens with a normal mother and an affected father?',
  controls:[S('m','Mother','XXc',XL.mother),S('f','Father','XY',XL.father),S('trait','Trait','haem',[['haem','Haemophilia'],['cb','Colour blindness']])],
  metrics:p=>{const r=xcross(p);return[N('Daughters affected',r.dA,'%',0),N('Daughters carriers',r.dC,'%',0),N('Sons affected',r.sA,'%',0),N('Chance child is a son',50,'%',0)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:300,pitch:.2}),r=xcross(p),kids=xkids(p);critter(s,'human',[-1,0,-1.2],.75,t);critter(s,'human',[1,0,-1.2],.75,t);s.label([-1,1.6,-1.2],'mother '+p.m.replace('Xc','Xᶜ').replace('Xc','Xᶜ'),'#f783ac',12);s.label([1,1.6,-1.2],'father '+p.f.replace('Xc','Xᶜ'),C.blue,12);
-  kids.forEach((k,i)=>{const x=-2.1+i*1.4,col=k.state==='affected'?'#fa5252':k.state==='carrier'?'#ffd43b':'#69db7c';s.cyl([x,-1.55,.9],[0,1,0],.45,.1,col);critter(s,'human',[x,-1.5,.9],.55,t);s.label([x,-1.85,.9],`${k.sex} · ${k.state}`,col,11)});s.render();tag(c,`${p.trait==='haem'?'Haemophilia':'Colour blindness'} (X-linked recessive) · red: affected   yellow: carrier   green: normal`,44,98,C.muted,13)},
+ draw:(c,p,t)=>{const kids=xkids(p),mx=p.m==='XX'?['X','X']:p.m==='XXc'?['X','Xc']:['Xc','Xc'],fx=p.f==='XY'?'X':'Xc',GX=215,GY=170,CW=92,CH=84,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  /* chromosomes: X (with the recessive allele marked in red), Y */
+  chrom=(x,y,kind,sc)=>{c.save();c.lineCap='round';c.lineWidth=4.2*sc;c.strokeStyle='#b9c6d2';c.beginPath();if(kind==='Y'){c.moveTo(x-5*sc,y-9*sc);c.lineTo(x,y);c.lineTo(x+5*sc,y-9*sc);c.moveTo(x,y);c.lineTo(x,y+10*sc)}else{c.moveTo(x-6*sc,y-10*sc);c.lineTo(x+6*sc,y+10*sc);c.moveTo(x+6*sc,y-10*sc);c.lineTo(x-6*sc,y+10*sc)}c.stroke();if(kind==='Xc'){c.fillStyle='#ff4d4d';c.beginPath();c.arc(x+5*sc,y-8.5*sc,3.4*sc,0,TAU);c.fill()}c.restore()},
+  chromLabel=k=>k==='Xc'?'Xᶜ':k,
+  /* pedigree symbol: circle = female, square = male; solid red = affected, yellow dot = carrier */
+  sym=(x,y,female,state,r)=>{c.save();c.lineWidth=2;c.strokeStyle=state==='affected'?'#ff6b6b':state==='carrier'?'#ffd43b':'#69db7c';c.fillStyle=state==='affected'?'#fa5252':'rgba(16,36,58,.9)';c.beginPath();if(female)c.arc(x,y,r,0,TAU);else c.rect(x-r,y-r,2*r,2*r);c.fill();c.stroke();if(state==='carrier'){c.fillStyle='#ffd43b';c.beginPath();c.arc(x,y,r*.32,0,TAU);c.fill()}c.restore()};
+  /* parents */
+  txt('mother',62,GY-8,'#f783ac',11);sym(62,GY+22,true,p.m==='XX'?'normal':p.m==='XXc'?'carrier':'affected',17);mx.forEach((k,i)=>chrom(40+i*44,GY+66,k,1));txt(p.m.replace(/Xc/g,'Xᶜ'),62,GY+94,C.muted,11);
+  txt('father',62,GY+120,C.blue,11);sym(62,GY+148,false,p.f==='XY'?'normal':'affected',16);chrom(40,GY+190,p.f==='XY'?'X':'Xc',1);chrom(84,GY+190,'Y',1);
+  /* Punnett grid: mother's gametes across, father's gametes down */
+  txt("mother's gametes",GX+CW,GY-40,C.muted,11);txt("father's",GX-62,GY+CH-12,C.muted,11);txt('gametes',GX-62,GY+CH+4,C.muted,11);
+  mx.forEach((k,i)=>{chrom(GX+CW*(i+.5),GY-20,k,1)});chrom(GX-24,GY+CH*.5,fx,1);chrom(GX-24,GY+CH*1.5,'Y',1);
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const k=kids[i*2+j],x=GX+i*CW,y=GY+j*CH;c.save();c.fillStyle='rgba(33,68,91,.8)';c.strokeStyle='rgba(180,200,215,.5)';c.lineWidth=1.2;c.beginPath();c.rect(x,y,CW,CH);c.fill();c.stroke();c.restore();sym(x+CW/2,y+34,k.sex==='daughter',k.state,19);txt(k.sex+' · '+k.state,x+CW/2,y+CH-12,k.state==='affected'?'#ff8787':k.state==='carrier'?'#ffd43b':'#8ce99a',11)}
+  /* key */
+  txt('key',470,GY-14,C.muted,11,'left');sym(480,GY+16,true,'normal',11);txt('female',500,GY+16,C.white,12,'left');sym(480,GY+46,false,'normal',10);txt('male',500,GY+46,C.white,12,'left');sym(480,GY+78,true,'carrier',11);txt('carrier (female)',500,GY+78,C.white,12,'left');sym(480,GY+110,true,'affected',11);txt('affected',500,GY+110,C.white,12,'left');
+  txt((p.trait==='haem'?'Haemophilia':'Colour blindness')+' · X-linked recessive',470,GY+146,C.gold,12,'left')},
  assumption:'Single X-linked recessive allele, complete penetrance; each of the four combinations is equally likely.'});
 function xkids(p){const mx=p.m==='XX'?['X','X']:p.m==='XXc'?['X','Xc']:['Xc','Xc'],fx=p.f==='XY'?'X':'Xc',out=[];for(const m of mx){out.push({sex:'daughter',state:m==='Xc'&&fx==='Xc'?'affected':(m==='Xc'||fx==='Xc')?'carrier':'normal'});out.push({sex:'son',state:m==='Xc'?'affected':'normal'})}return out}
 function xcross(p){const k=xkids(p),d=k.filter(x=>x.sex==='daughter'),s2=k.filter(x=>x.sex==='son');return{dA:100*d.filter(x=>x.state==='affected').length/d.length,dC:100*d.filter(x=>x.state==='carrier').length/d.length,sA:100*s2.filter(x=>x.state==='affected').length/s2.length}}
@@ -284,10 +432,20 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-lac-operon',title:'The
  tryText:'Add lactose. Which three enzymes are now produced?',
  controls:[S('lac','Lactose in medium','yes',[['yes','Present'],['no','Absent']])],
  metrics:p=>p.lac==='yes'?[N('Repressor','Bound to inducer — inactive'),N('Operator','Free'),N('Transcription','ON'),N('Enzymes made','β-galactosidase (z), permease (y), transacetylase (a)')]:[N('Repressor','Bound to operator'),N('Operator','Blocked'),N('Transcription','OFF'),N('Enzymes made','None (only basal level)')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:.3}),on=p.lac==='yes',genes=[['i',-3,'#ced4da'],['p',-1.8,'#ffd43b'],['o',-1.1,'#ff8787'],['z',.2,'#4dabf7'],['y',1.6,'#69db7c'],['a',2.8,'#b197fc']];s.cyl([0,0,0],[1,0,0],.18,7,'#868e96');genes.forEach(([n,x,col],i)=>{const w=i>2?1.2:.6;s.cyl([x,0,0],[1,0,0],.22,w,col);s.label([x,.5,0],n,col,14)});
-  const rep=on?[-1.1+.8,1.4+.2*Math.sin(t),0]:[-1.1,.45,0];s.mesh(rep,[.35,.25,.3],'#e8590c',{label:'repressor'});s.label(V.add(rep,[0,.45,0]),'repressor',C.gold,11);s.tube([[-3,0,0],[-3,.6,.2],[-2.6,.9,.2]],.04,'#ced4da',{segs:5});
-  if(on){for(let i=0;i<5;i++)s.ball([-2+hash(i)*4,1.6+hash(i+3)*.6,(hash(i+6)-.5)],.09,'#ffe066',{flat:true});s.ball(V.add(rep,[.25,.2,0]),.09,'#ffe066');const px=-1.8+cycle(t*.3,1)*5;s.mesh([px,.3,0],[.4,.3,.35],'#20c997',{alpha:.8});s.path(Array.from({length:12},(_,i)=>[px-i*.15,.4+.05*Math.sin(i+t*4),-.4]),'#ffa94d',2);s.label([px,.85,0],'RNA polymerase',C.mint,11)}
-  else s.mesh([-1.9,.35,0],[.4,.3,.35],'#20c997',{alpha:.5});s.render();tag(c,on?'yellow: lactose (inducer)':'Repressor sits on the operator',44,98,on?C.gold:C.red,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:335,cy:262,pitch:.03}),on=p.lac==='yes',genes=[['i',-3,'#ced4da',.6],['p',-1.85,'#ffd43b',.6],['o',-1.2,'#ff8787',.6],['z',.2,'#4dabf7',1.2],['y',1.4,'#69db7c',1.2],['a',2.6,'#b197fc',1.2]];
+  /* DNA: gene blocks, double strand with rungs */
+  for(const [n,x,col,w] of genes){s.poly([[x-w/2,-.34,-.1],[x+w/2,-.34,-.1],[x+w/2,.34,-.1],[x-w/2,.34,-.1]],col,{cull:false,alpha:.85,z:-1e5});s.label([x,-.62,0],n,col,14)}
+  const xs=Array.from({length:44},(_,i)=>-3.4+i*.158);s.tube(xs.map((x,i)=>[x,.2+.03*Math.sin(i*.9),0]),.035,'#cfd8e0',{segs:5});s.tube(xs.map((x,i)=>[x,-.2-.03*Math.sin(i*.9),0]),.035,'#9aa8b5',{segs:5});for(let i=0;i<xs.length;i+=1)s.seg([xs[i],.17,0],[xs[i],-.17,0],i%2?'#ff8787':'#4dabf7',1.6);
+  /* repressor: bound to the operator without lactose, floating free with lactose attached when lactose is present */
+  const rep=on?[-.3,1.25+.12*Math.sin(t*1.5),.1]:[-1.2,.55,.1];s.mesh(rep,[.42,.3,.28],'#e8590c',{rings:10,segs:16,spec:.5,lift:2});s.mesh([rep[0]-.1,rep[1]+.05,rep[2]+.1],[.2,.14,.15],'#ff922b',{rings:6,segs:10,lift:3});
+  if(!on){for(const dx of[-.15,.15])s.tube([[rep[0]+dx,rep[1]-.2,.1],[rep[0]+dx,.28,.05]],.045,'#e8590c',{segs:6});s.label([.9,.95,0],'repressor binds operator',C.gold,11)}
+  else{for(let i=0;i<2;i++){const q=[rep[0]+.3+i*.12,rep[1]+.1-i*.2,.2];s.ball(q,.07,'#ffe066',{glow:true,lift:4});s.ball([q[0]+.1,q[1]+.05,.2],.06,'#ffd43b',{flat:true,lift:4})}s.label([rep[0],rep[1]+.5,0],'repressor + lactose (inactive)',C.gold,11);
+   for(let i=0;i<6;i++){const q=[-3.2+hash(i)*3.2+.3*Math.sin(t+i),1.5+hash(i+3)*.7,(hash(i+6)-.5)*.4];s.ball(q,.07,'#ffe066',{flat:true,glow:true});s.ball([q[0]+.1,q[1]+.04,q[2]],.055,'#ffd43b',{flat:true})}}
+  /* RNA polymerase: blocked at the promoter, or moving through z, y, a leaving one mRNA */
+  if(on){const px=-1.85+cycle(t*.3,1)*5,mr=Array.from({length:Math.max(2,Math.floor((px+1.85)/.2)+2)},(_,i)=>[-1.85+i*.2,.42+.07*Math.sin(i*1.2+t*3),.15]);s.mesh([px,.36,.05],[.42,.3,.3],'#20c997',{alpha:.85,rings:8,segs:12,spec:.4,lift:2});s.path(mr,'#ffa94d',2.5,[],1e5);s.label([px,.85,0],'RNA polymerase',C.mint,11);
+   s.label([.2,-1.05,0],'β-galactosidase',C.blue,10);s.label([1.4,-1.05,0],'permease','#69db7c',10);s.label([2.6,-1.05,0],'transacetylase','#b197fc',10);for(const [x,col] of[[.2,'#4dabf7'],[1.4,'#69db7c'],[2.6,'#b197fc']])s.mesh([x,-1.3+.04*Math.sin(t*2+x),.1],[.28,.2,.2],col,{rings:8,segs:12,spec:.4})}
+  else{s.mesh([-1.85,.4,.05],[.42,.3,.3],'#20c997',{alpha:.5,rings:8,segs:12});s.label([-2.7,1.0,0],'RNA polymerase blocked',C.red,11)}
+  s.render();tag(c,'i regulator gene · p promoter · o operator · z, y, a structural genes',44,114,C.muted,11);tag(c,on?'yellow: lactose (inducer) · genes z, y, a transcribed':'No lactose: repressor sits on the operator, genes OFF',44,98,on?C.gold:C.red,13)},
  assumption:'Negative regulation as described in NCERT; catabolite (glucose) control not included.'});
 
 add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-dna-fingerprinting',title:'DNA fingerprinting with VNTRs',
@@ -297,8 +455,19 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-dna-fingerprinting',ti
  tryText:'Which alleged father shares all the non-maternal bands with the child?',
  controls:[S('case','Case','pat',[['pat','Paternity test'],['for','Forensic match']])],
  metrics:p=>p.case==='pat'?[N('Mother','Explains half the child’s bands'),N('Alleged father 1','Does not explain the rest'),N('Alleged father 2','Matches all remaining bands'),N('Conclusion','Father 2 is the biological father')]:[N('Crime scene sample','Reference'),N('Suspect 1','Different pattern'),N('Suspect 2','Identical pattern — match'),N('Technique','Restriction digest → electrophoresis → blotting → probe')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.55}),lanes=p.case==='pat'?[['Mother',[1,4,7]],['Child',[1,5,7,9]],['Father 1',[2,6,8]],['Father 2',[5,9,3]]]:[['Scene',[2,5,6,9]],['Suspect 1',[1,4,6,8]],['Suspect 2',[2,5,6,9]],['Suspect 3',[3,4,7,9]]];
-  s.box([0,-.1,0],[5.6,.16,4.2],'#d0ebff',{alpha:.8});lanes.forEach(([n,b],i)=>{const x=-2.1+i*1.4;s.box([x,0,-1.9],[.8,.12,.15],'#343a40');s.label([x,.4,-2.3],n,C.white,12);const k=Math.min(1,cycle(t,8)/4);b.forEach(y=>s.box([x,.03,-1.7+y*.37*k],[.8,.06,.1],'#7048e8',{alpha:.9}))});s.label([-2.8,.3,2],'+ (anode)',C.red,12);s.label([-2.8,.3,-2.1],'− wells',C.muted,12);s.render()},
+ draw:(c,p,t)=>{const pat=p.case==='pat',lanes=pat?[['Mother',[1,4,7]],['Child',[1,5,7,9]],['Father 1',[2,6,8]],['Father 2',[5,9,3]]]:[['Crime scene',[2,5,6,9]],['Suspect 1',[1,4,6,8]],['Suspect 2',[2,5,6,9]],['Suspect 3',[3,4,7,9]]],GX=88,GY=140,GW=336,GH=212,LW=80,k=Math.min(1,cycle(t,8)/4),k2=1-(1-k)*(1-k),
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  col=(li,b)=>{if(pat){const m=lanes[0][1],f=lanes[3][1];if(li===1)return m.includes(b)?'#4dabf7':f.includes(b)?'#ffd43b':'#9775fa';if(li===0)return m.some(x=>lanes[1][1].includes(x)&&x===b)?'#4dabf7':'#9775fa';if(li===3)return lanes[1][1].includes(b)?'#ffd43b':'#9775fa';return '#7a6cc0'}const s0=lanes[0][1];return s0.includes(b)?'#51cf66':'#9775fa'},
+  by=b=>GY+26+b*(GH-48)/10*k2;
+  /* gel slab with wells */
+  c.save();const g=c.createLinearGradient(0,GY,0,GY+GH);g.addColorStop(0,'rgba(120,190,210,.35)');g.addColorStop(1,'rgba(70,140,170,.25)');c.fillStyle=g;c.strokeStyle='rgba(180,220,235,.55)';c.lineWidth=1.5;c.beginPath();c.roundRect?c.roundRect(GX,GY,GW,GH,10):c.rect(GX,GY,GW,GH);c.fill();c.stroke();c.restore();
+  lanes.forEach(([n,bands],li)=>{const x=GX+14+li*LW;c.save();c.fillStyle='#0b1622';c.fillRect(x,GY+10,60,9);c.restore();txt(n,x+30,GY-10,C.white,12);
+   bands.forEach(b=>{const y=by(b),cc=col(li,b);c.save();c.shadowColor=cc;c.shadowBlur=9;c.fillStyle=cc;c.beginPath();c.roundRect?c.roundRect(x+3,y-3.5,54,7,3):c.rect(x+3,y-3.5,54,7);c.fill();c.restore()})});
+  if(k>.95)lanes[1][1].forEach(b=>{c.save();c.strokeStyle='rgba(255,255,255,.18)';c.setLineDash([3,4]);c.beginPath();c.moveTo(GX+8,by(b));c.lineTo(GX+GW-8,by(b));c.stroke();c.restore()});
+  txt('− wells',GX-4,GY+14,C.muted,11,'right');txt('+ anode',GX-4,GY+GH-12,C.red,11,'right');c.save();c.strokeStyle='#ff8787';c.lineWidth=2;c.beginPath();c.moveTo(GX-20,GY+34);c.lineTo(GX-20,GY+GH-34);c.stroke();c.beginPath();c.moveTo(GX-26,GY+GH-42);c.lineTo(GX-20,GY+GH-32);c.lineTo(GX-14,GY+GH-42);c.stroke();c.restore();
+  /* key */
+  txt(pat?'each child band comes':'a match needs every band',446,GY+4,C.muted,11,'left');txt(pat?'from one parent':'to line up',446,GY+19,C.muted,11,'left');
+  [pat?['#4dabf7','from the mother']:['#51cf66','matches the scene'],pat?['#ffd43b','from Father 2']:['#9775fa','no match'],pat?['#9775fa','other bands']:null].filter(Boolean).forEach((e,i)=>{c.save();c.fillStyle=e[0];c.shadowColor=e[0];c.shadowBlur=6;c.fillRect(446,GY+54+i*30-3,26,7);c.restore();txt(e[1],480,GY+54+i*30,C.white,12,'left')})},
  assumption:'Band positions are illustrative; real profiles use several VNTR probes.'});
 
 /* ---------- Chapter 6: Evolution ---------- */
@@ -309,8 +478,19 @@ add({...ch(6,'Evolution',U7),id:'bio-hardy-weinberg',title:'Hardy–Weinberg equ
  tryText:'Set s = 0. Do the frequencies change over generations?',
  controls:[R('p0','Initial frequency p (allele A)',.05,.95,.01,.5,'',2),R('s','Selection against aa (s)',0,1,.05,.3,'',2),R('gen','Generations',0,100,1,20)],
  metrics:p=>{const q=hwq(p,p.gen),pp=1-q;return[N('p (A)',pp,'',3),N('q (a)',q,'',3),N('AA : Aa : aa',`${f(pp*pp,2)} : ${f(2*pp*q,2)} : ${f(q*q,2)}`),N('In equilibrium?',p.s===0?'Yes — no change':'No — selection acting')]},
- draw:(c,p,t)=>{const q=hwq(p,p.gen),pp=1-q,s=P3.scene(c,{scale:50,cy:300,pitch:.4,cx:230}),n=100,fa=pp*pp,fh=2*pp*q;for(let i=0;i<n;i++){const x=-2.2+(i%10)*.48,z=-1.6+Math.floor(i/10)*.36,f2=(i+.5)/n,col=f2<fa?'#4dabf7':f2<fa+fh?'#9775fa':'#ff6b6b';s.mesh([x,-1.5,z],[.17,.1,.13],col,{rings:6,segs:10})}s.render();
-  chart(c,420,96,236,170,{title:'Allele frequency q over time',xl:'generations',xmin:0,xmax:100,ymin:0,ymax:1,series:[{pts:Array.from({length:101},(_,g)=>[g,hwq(p,g)]),col:C.red},{pts:Array.from({length:101},(_,g)=>[g,1-hwq(p,g)]),col:C.blue}],marker:[p.gen,q]});tag(c,'blue AA · purple Aa · red aa',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const q=hwq(p,p.gen),pp=1-q,fa=pp*pp,fh=2*pp*q,fr=q*q,n=100,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  gc=['#4dabf7','#9775fa','#ff6b6b'],
+  /* 100 individuals: each circle is one organism coloured by genotype */
+  org=(x,y,col)=>{const gr=c.createRadialGradient(x-3,y-3,1,x,y,9);gr.addColorStop(0,'#fff8');gr.addColorStop(.25,col);gr.addColorStop(1,col);c.save();c.fillStyle=col;c.beginPath();c.arc(x,y,8.2,0,TAU);c.fill();c.fillStyle='rgba(255,255,255,.28)';c.beginPath();c.arc(x-2.5,y-2.8,3,0,TAU);c.fill();c.restore()};
+  for(let i=0;i<n;i++){const f2=(i+.5)/n;org(50+(i%10)*19,138+Math.floor(i/10)*19.5,f2<fa?gc[0]:f2<fa+fh?gc[1]:gc[2])}
+  txt('population of 100 individuals',58,118,C.muted,11,'left');
+  const bar=(x,y,w,parts,label)=>{txt(label,x,y-12,C.muted,11,'left');let cx=x;for(const [v,col,tx] of parts){const ww=w*v;c.save();c.fillStyle=col;c.fillRect(cx,y,ww,18);c.restore();if(ww>34)txt(tx,cx+ww/2,y+9,'#10243a',11);cx+=ww}c.save();c.strokeStyle='rgba(180,200,215,.5)';c.strokeRect(x,y,w,18);c.restore()};
+  bar(258,156,150,[[pp,gc[0],'A '+f(pp,2)],[q,gc[2],'a '+f(q,2)]],'allele frequencies  p + q = 1');
+  bar(258,214,150,[[fa,gc[0],'AA'],[fh,gc[1],'Aa'],[fr,gc[2],'aa']],'genotypes  p² + 2pq + q² = 1');
+  txt('AA '+f(fa,2)+'   Aa '+f(fh,2)+'   aa '+f(fr,2),258,246,C.white,12,'left');
+  txt(p.s===0?'no selection: frequencies stay constant':'selection against aa: q falls',258,276,p.s===0?C.mint:C.red,12,'left');
+  chart(c,420,96,236,170,{title:'Allele frequency q over time',xl:'generations',xmin:0,xmax:100,ymin:0,ymax:1,series:[{pts:Array.from({length:101},(_,g)=>[g,hwq(p,g)]),col:C.red},{pts:Array.from({length:101},(_,g)=>[g,1-hwq(p,g)]),col:C.blue}],marker:[p.gen,q]});tag(c,'blue AA · purple Aa · red aa',44,98,C.muted,12)},
  assumption:'Large random-mating population; selection acts only on the recessive homozygote (fitness 1 − s).'});
 function hwq(p,g){let q=1-p.p0;for(let i=0;i<g;i++)q=q*(1-p.s*q)/(1-p.s*q*q);return q}
 
@@ -322,7 +502,14 @@ add({...ch(6,'Evolution',U7),id:'bio-natural-selection',title:'Natural selection
  tryText:'Choose directional selection and run 20 generations.',
  controls:[S('type','Selection','dir',Object.keys(SEL).map(k=>[k,SEL[k][0]])),R('gen','Generations',0,30,1,10)],
  metrics:p=>{const d=selDist(p);return[N('Type',SEL[p.type][0]),N('Effect',SEL[p.type][1]),N('Mean trait value',d.mean,'',2),N('Spread (s.d.)',d.sd,'',2)]},
- draw:(c,p,t)=>{const d=selDist(p),s=P3.scene(c,{scale:50,cy:300,pitch:.25,cx:230});for(let i=0;i<40;i++){const x=d.sample[i],col=`#${[0,0,0].map(()=>Math.round(230-200*clamp(x,0,1)).toString(16).padStart(2,'0')).join('')}`;s.mesh([-2.4+(i%8)*.62,-1.4+Math.floor(i/8)*.05,-1.6+Math.floor(i/8)*.75],[.22,.04,.14],col,{rings:4,segs:8});for(const z of[-1,1])s.poly([[-2.4+(i%8)*.62,-1.35+Math.floor(i/8)*.05,-1.6+Math.floor(i/8)*.75],[-2.4+(i%8)*.62-.15,-1.33+Math.floor(i/8)*.05,-1.6+Math.floor(i/8)*.75+z*.28],[-2.4+(i%8)*.62+.12,-1.33+Math.floor(i/8)*.05,-1.6+Math.floor(i/8)*.75+z*.22]],col,{cull:false})}s.render();
+ draw:(c,p,t)=>{const d=selDist(p),PX=46,PY=118,PW=350,PH=214,cols=8,
+  mix=(v)=>{const k=clamp(v,0,1),a=Math.round(232-196*k),b=Math.round(226-196*k),e=Math.round(214-190*k);return'rgb('+a+','+b+','+e+')'},
+  /* bark panel with vertical grain and lichen patches */
+  bark=()=>{c.save();const g=c.createLinearGradient(PX,0,PX+PW,0);g.addColorStop(0,'#aaa291');g.addColorStop(.5,'#b9b19f');g.addColorStop(1,'#a49b8a');c.fillStyle=g;c.beginPath();c.roundRect?c.roundRect(PX,PY,PW,PH,10):c.rect(PX,PY,PW,PH);c.fill();c.clip();c.strokeStyle='rgba(50,44,36,.35)';c.lineWidth=1.4;for(let i=0;i<22;i++){const x=PX+i*PW/22+hash(i)*10;c.beginPath();c.moveTo(x,PY);for(let y=PY;y<PY+PH;y+=26)c.lineTo(x+(hash(i*7+y)-.5)*7,y+26);c.stroke()}c.fillStyle='rgba(190,205,160,.35)';for(let i=0;i<9;i++){c.beginPath();c.ellipse(PX+hash(i+40)*PW,PY+hash(i+50)*PH,10+hash(i)*16,6+hash(i+9)*9,hash(i)*3,0,TAU);c.fill()}c.restore()},
+  moth=(x,y,v,r,i)=>{c.save();c.translate(x,y);c.rotate(r);const wc=mix(v),dark=v>.5;c.fillStyle=wc;c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=.8;for(const sg of[-1,1]){c.beginPath();c.moveTo(0,-3);c.bezierCurveTo(sg*8,-14,sg*21,-9,sg*19,2);c.bezierCurveTo(sg*16,9,sg*6,9,0,6);c.closePath();c.fill();c.stroke();c.fillStyle=dark?'rgba(255,255,255,.35)':'rgba(40,36,32,.55)';for(let m=0;m<7;m++){c.beginPath();c.arc(sg*(4+hash(i*13+m)*14),-6+hash(i*7+m+3)*13,.9+hash(m+i)*.8,0,TAU);c.fill()}c.fillStyle=wc}
+   c.fillStyle='#3a2f28';c.beginPath();c.ellipse(0,1.5,2.6,8,0,0,TAU);c.fill();c.beginPath();c.arc(0,-8,2.4,0,TAU);c.fill();c.strokeStyle='#3a2f28';c.lineWidth=.8;c.beginPath();c.moveTo(-1,-9.5);c.lineTo(-5,-15);c.moveTo(1,-9.5);c.lineTo(5,-15);c.stroke();c.restore()};
+  bark();for(let i=0;i<40;i++)moth(PX+30+(i%cols)*(PW-52)/(cols-1)+(hash(i)-.5)*8,PY+28+Math.floor(i/cols)*(PH-56)/4+(hash(i+5)-.5)*8,d.sample[i],(hash(i+11)-.5)*1.6,i);
+  tag(c,'40 moths sampled from the population · lighter ↔ darker wings',PX,PY-12,C.muted,11);
   chart(c,420,96,236,170,{title:'Trait distribution',xl:'wing darkness →',xmin:0,xmax:1,ymin:0,series:[{fn:x=>selDist({...p,gen:0}).pdf(x),col:'#8ca6b9',dash:[4,4]},{fn:d.pdf,col:C.gold}]})},
  assumption:'Trait modelled as a normal distribution re-weighted each generation by a fitness function; moth colour = trait value.'});
 function selDist(p){let m=.35,sd=.15,m2=null;for(let g=0;g<p.gen;g++){if(p.type==='dir')m=Math.min(.85,m+.02);else if(p.type==='stab')sd=Math.max(.05,sd*.96);}if(p.type==='dis'){const k=Math.min(1,p.gen/20);m2=[.35-.2*k,.35+.25*k];sd=.15-.06*k}

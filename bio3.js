@@ -58,7 +58,21 @@ function body(s,p,k=1,alpha=.14){const A=(x,y,z)=>V.add(p,[x*k,y*k,z*k]),col='#f
   s.mesh(A(0,1.3,0),[.3*k,.78*k,.5*k],col,{...o,shape:(u)=>.86+.16*Math.sin(u)+.06*Math.sin(3*u)});s.mesh(A(0,.5,0),[.28*k,.26*k,.44*k],col,o);
   for(const z of[-1,1]){s.tube([A(0,1.92,z*.52),A(0,1.32,z*.68),A(.06,.74,z*.72)],u=>(.11-.03*u)*k,col,so);s.ball(A(.07,.62,z*.72),.085*k,col,{alpha:o.alpha,flat:true});
     s.tube([A(0,.42,z*.24),A(.02,-.42,z*.25),A(0,-1.16,z*.25)],u=>(.16-.06*u)*k,col,so);s.mesh(A(.1,-1.23,z*.25),[.17*k,.06*k,.08*k],col,o)}}
-const lungPair=(s,c0,k,col='#ff8fab',alpha)=>{for(const z of[-1,1])s.mesh(V.add(c0,[0,0,z*.42*k]),[.38*k,.62*k,.3*k],col,{alpha,shape:(u,v)=>1-.12*Math.max(0,Math.sin(v)*z)-.2*Math.max(0,Math.sin(u))*Math.max(0,-Math.sin(v)*z)})};
+/* anatomical lungs (front view): flat medial face, narrow apex, concave base, cardiac notch on the left lung, fissures, ringed trachea and bronchial tree */
+const LUNG=sg=>{const f=(u,v)=>{const nx=Math.cos(u)*Math.cos(v),ny=Math.sin(u),mx=-sg*nx;let k=1-.3*Math.max(0,mx)**2-.2*Math.max(0,ny)**2-.14*Math.max(0,-ny)**3;if(sg>0&&mx>.25&&ny<.1&&ny>-.9)k*=1-.34*Math.min(1,(mx-.25)/.4)*Math.exp(-(((ny+.35)/.45)**2));return k};
+ return{f,pt:(c0,A,u,v,o)=>{const k=f(u,v)*o;return[c0[0]+A[0]*k*Math.cos(u)*Math.cos(v),c0[1]+A[1]*k*Math.sin(u),c0[2]+A[2]*k*Math.cos(u)*Math.sin(v)]}}};
+const LU=[LUNG(-1),LUNG(1)];
+const lungPair=(s,c0,k,col='#f0a3b4',alpha=.86,o={})=>{
+ const bc='#e4d9cf',P=(a,b)=>[c0[0]+a*k,c0[1]+b*k,c0[2]];
+ if(!o.noTrachea){s.tube([P(0,1.75),P(0,.85)],.105*k,'#d9cfc3',{segs:10});for(let i=0;i<7;i++){const y=1.68-i*.12;s.seg(P(-.1,y),P(.1,y),'#a89c8f',2)}}
+ for(const z of[-1,1]){s.tube([P(0,.85),P(z*.22,.7),P(z*.45,.5)],.07*k,bc,{segs:8});s.tube([P(z*.45,.5),P(z*.62,.25),P(z*.7,-.1),P(z*.72,-.5)],.05*k,bc,{segs:8});
+  s.tube([P(z*.55,.4),P(z*.7,.62),P(z*.78,.95)],.035*k,bc,{segs:6});s.tube([P(z*.66,.15),P(z*.9,.1),P(z*1.0,-.05)],.035*k,bc,{segs:6});s.tube([P(z*.72,-.35),P(z*.9,-.55),P(z*.95,-.8)],.03*k,bc,{segs:6})}
+ for(let i=0;i<2;i++){const sg=i?1:-1,A=[.62*k,.98*k,.42*k],cc=P(sg*.66,-.05);
+  s.mesh(cc,A,col,{alpha,rings:16,segs:26,spec:.55,shape:LU[i].f});
+  const F=(pts,w)=>s.path(pts.map(([u,v])=>LU[i].pt(cc,A,u,v,1.02)),'#c4627c',w||1.6,[],1e5),ob=[];
+  for(let j=0;j<=6;j++){const t=j/6;ob.push([.5-t,Math.PI/2-sg*(.7-t)])}F(ob);
+  if(sg<0){const h=[];for(let j=0;j<=5;j++)h.push([.12,Math.PI/2+.8-j*.22]);F(h)}}
+ return s};
 
 /* ---------- Chapter 14: Breathing and Exchange of Gases ---------- */
 add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-lung-volumes',title:'Spirometer: lung volumes and capacities',
@@ -69,7 +83,7 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-lung-volumes',title:'Sp
  controls:[R('TV','Tidal volume TV',300,800,10,500,'mL'),R('IRV','Inspiratory reserve IRV',2000,3500,50,2750,'mL'),R('ERV','Expiratory reserve ERV',800,1300,10,1050,'mL'),R('RV','Residual volume RV',900,1400,10,1150,'mL'),R('rate','Breaths per minute',8,24,1,12)],
  metrics:p=>[N('Vital capacity',p.ERV+p.TV+p.IRV,'mL',0),N('Total lung capacity',p.ERV+p.TV+p.IRV+p.RV,'mL',0),N('Inspiratory capacity',p.TV+p.IRV,'mL',0),N('Functional residual capacity',p.ERV+p.RV,'mL',0),N('Minute volume',p.TV*p.rate,'mL/min',0)],
  draw:(c,p,t)=>{const vol=x=>{const per=60/p.rate,k=cycle(x,per*6),n=Math.floor(k/per),q=(k%per)/per;if(n===3)return p.RV+p.ERV+p.TV*.5+(p.IRV+p.TV*.5)*Math.sin(PI*q);if(n===4)return p.RV+p.ERV+p.TV*.5-(p.ERV+p.TV*.5)*Math.sin(PI*q);return p.RV+p.ERV+p.TV*(.5-.5*Math.cos(TAU*q))},v=vol(t),tlc=p.ERV+p.TV+p.IRV+p.RV;
-  const s=P3.scene(c,{scale:56,cx:220,cy:270}),k=.75+.45*(v-p.RV)/(tlc-p.RV);s.tube([[0,1.6,0],[0,.8,0]],.1,'#e9ecef',{segs:10});for(const z of[-1,1])s.tube([[0,.8,0],[0,.55,z*.3]],.07,'#e9ecef',{segs:8});lungPair(s,[0,0,0],k);s.callout([0,1.4,0],'trachea','#e9ecef',50,-30);s.callout([0,.62,.25],'bronchi','#e9ecef',60,-10);s.callout([0,-.2,.42*k+.3],'lungs','#ff8fab',60,30);s.render();
+  const s=P3.scene(c,{scale:64,cx:200,cy:236,pitch:.04}),k=.82+.34*(v-p.RV)/(tlc-p.RV);lungPair(s,[0,0,0],k);const dy=-1.02*k;s.mesh([0,dy-.1,0],[1.55*k,.36,.5],'#b5524a',{alpha:.9,rings:8,segs:24,shape:u=>u<0?0:1});s.callout([0,1.6*k,0],'trachea','#e9ecef',50,-30);s.callout([-.2,.7*k,.1],'bronchi','#e9ecef',-70,-30);s.callout([.9*k,.1,.42*k],'lungs','#ff8fab',70,30);s.callout([.9*k,dy,.3],'diaphragm','#e08a80',50,30);s.render();
   const per=60/p.rate;chart(c,400,96,256,190,{title:'Spirogram',xl:'time',xmin:0,xmax:per*6,ymin:0,ymax:tlc*1.05,series:[{fn:vol,col:C.mint},{fn:()=>p.RV,col:'#ff8787',dash:[4,4]},{fn:()=>tlc,col:'#8ca6b9',dash:[4,4]}],marker:[cycle(t,per*6),v]});tag(c,'red dashed: RV   grey dashed: TLC',412,276,C.muted,11)},
  assumption:'Typical adult values from NCERT; one maximal inspiration and expiration are inserted after three quiet breaths.'});
 
@@ -108,11 +122,17 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-gas-exchange',title:'Ex
  tryText:'Switch to tissues: in which direction does each gas move now?',
  controls:[S('site','Site','lungs',[['lungs','Alveolus (lungs)'],['tissue','Body tissue']]),R('x','Position along capillary',0,100,1,30,'%')],
  metrics:p=>{const k=1-Math.exp(-p.x/18);let o2,co2;if(p.site==='lungs'){o2=40+(95-40)*k;co2=45-(45-40)*k}else{o2=95-(95-40)*k;co2=40+(45-40)*k}return[N('pO₂ in blood',o2,'mm Hg',0),N('pCO₂ in blood',co2,'mm Hg',0),N(p.site==='lungs'?'Alveolar air':'Tissue',p.site==='lungs'?'pO₂ 104, pCO₂ 40':'pO₂ 40, pCO₂ 45'),N('Diffusion membrane','3 thin layers, ≪ 1 mm')]},
- draw:(c,p,t)=>{const lung=p.site==='lungs',s=P3.scene(c,{scale:58,pitch:.3});if(lung)s.mesh([0,1,0],[1.8,1.1,1.2],'#ffc9c9',{alpha:.3});else for(let i=0;i<10;i++)s.mesh([-2.5+i*.55,1.1,(hash(i)-.5)*.6],.32,'#ffc9c9',{alpha:.5});
-  const pts=Array.from({length:30},(_,i)=>[-3.4+i*.235,-.1+.12*Math.sin(i*.5),0]);s.tube(pts,.32,(u)=>{const k=1-Math.exp(-u*100/18),r=lung?k:1-k;return r>.5?'#e03131':'#7048e8'},{alpha:.75,segs:12});
-  for(let i=0;i<10;i++){const q=cycle(t*.25+i/10,1),x=-3.4+q*6.8;s.mesh([x,-.1,0],[.16,.06,.16],'#c92a2a',{rot:[PI/2,0,0],rings:6,segs:10})}
-  for(let i=0;i<6;i++){const q=cycle(t*.7+i/6,1),x=-2.8+i;s.ball([x,lung?.9-q*.9:-.1+q*.9,.3],.06,'#4dabf7',{flat:true});s.ball([x+.4,lung?-.1+q*.9:.9-q*.9,-.3],.06,'#adb5bd',{flat:true})}
-  const xp=-3.4+p.x/100*6.8;s.cyl([xp,-.1,0],[1,0,0],.36,.04,'#ffd43b',{alpha:.6});s.callout(lung?[-1.2,1.6,.6]:[-2.5,1.4,0],lung?'alveolus (air sac)':'body tissue cells','#ffc9c9',-40,-40);s.callout([2.5,.2,.2],'blood capillary','#ff8787',40,-50);s.callout([-3.4+cycle(t*.25,1)*6.8,-.1,.15],'RBC','#ff6b6b',30,60);s.callout([-2.8,lung?.9-cycle(t*.7,1)*.9:-.1+cycle(t*.7,1)*.9,.3],lung?'O₂ → blood':'O₂ → tissue','#4dabf7',-60,-30);s.callout([xp,.3,0],'probe','#ffd43b',30,-50);s.render();tag(c,'blue: O₂   grey: CO₂   yellow ring: probe',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const lung=p.site==='lungs',s=P3.scene(c,{scale:58,pitch:.05,cx:335,cy:275}),Y=0,TOP=.52,st=x=>{const u=(x+3.4)/6.8,k=1-Math.exp(-u*100/18);return lung?k:1-k};
+  /* air sac (cut open) or body tissue, sitting above the capillary */
+  if(lung){s.mesh([0,TOP,0],[3.5,1.55,.5],'#f2a7b5',{alpha:.55,rings:12,segs:30,shape:u=>u<0?0:1});s.mesh([0,TOP,0],[3.38,1.42,.45],'#e6f3ff',{alpha:.4,rings:12,segs:30,shape:u=>u<0?0:1})}
+  else for(let i=0;i<5;i++){const x=-2.8+i*1.4,y=TOP+.75+.08*Math.sin(i*2);s.mesh([x,y,0],[.7,.55,.3],'#f6c1b0',{alpha:.7,rings:9,segs:14});s.mesh([x+.08,y+.05,.05],[.22,.2,.2],'#7b5cc4',{rings:7,segs:10});s.ball([x-.35,y-.15,.2],.06,'#e8743b',{flat:true});s.ball([x+.3,y-.22,.2],.06,'#e8743b',{flat:true})}
+  /* respiratory membrane: epithelium + fused basement membrane (+ capillary endothelium wall) */
+  s.poly([[-3.5,TOP+.1,0],[3.5,TOP+.1,0],[3.5,TOP+.04,0],[-3.5,TOP+.04,0]],'#f4b6c2',{cull:false});s.poly([[-3.5,TOP+.04,0],[3.5,TOP+.04,0],[3.5,TOP-.02,0],[-3.5,TOP-.02,0]],'#d8c3a0',{cull:false});
+  const pts=Array.from({length:30},(_,i)=>[-3.4+i*.235,Y,0]);s.tube(pts,.46,u=>st(-3.4+u*6.8)>.5?'#e8505b':'#7a4fd0',{alpha:.4,segs:14});
+  for(let i=0;i<8;i++){const q=cycle(t*.25+i/8,1),x=-3.3+q*6.6,o=st(x);s.mesh([x,Y+.04*Math.sin(i*3),0],[.27,.16,.1],o>.5?'#d6303a':'#8e2340',{rings:7,segs:12})}
+  for(let i=0;i<6;i++){const q=cycle(t*.7+i/6,1),x=-2.8+i,yo=lung?TOP+.7-q*.9:Y+.1+q*1.05;s.ball([x,yo,.3],.07,'#4dabf7',{flat:true,glow:true});const yc=lung?Y+.1+q*1.05:TOP+.7-q*.9;s.ball([x+.4,yc,-.3],.06,'#adb5bd',{flat:true})}
+  const xp=-3.4+p.x/100*6.8;s.cyl([xp,Y,0],[1,0,0],.5,.05,'#ffd43b',{alpha:.55});
+  s.callout(lung?[-2.4,TOP+.9,0]:[-2.8,TOP+1.05,0],lung?'alveolus (air sac)':'body tissue cells','#ffc9c9',-20,-30);s.callout([2.7,Y-.4,.2],'blood capillary','#ff8787',0,40);s.callout([-3.3+cycle(t*.25,1)*6.6,Y-.1,.1],'RBC','#ff6b6b',0,50);s.callout([3.1,TOP+.04,0],lung?'3-layer membrane':'diffusion barrier','#f4b6c2',30,-30);s.callout([xp,Y-.46,0],'probe','#ffd43b',-30,45);s.render();tag(c,'blue: O₂   grey: CO₂   yellow ring: probe',290,372,C.muted,12)},
  assumption:'Partial pressures from NCERT Table 14.1; equilibration along the capillary modelled as exponential.'});
 
 add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-oxygen-dissociation',title:'Oxygen–haemoglobin dissociation curve',
@@ -122,8 +142,16 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-oxygen-dissociation',ti
  tryText:'Raise pCO₂ and temperature together. What happens to saturation at 40 mm Hg?',
  controls:[R('pO2','pO₂',0,120,1,40,'mm Hg'),R('pCO2','pCO₂',20,70,1,40,'mm Hg'),R('T','Temperature',34,42,.1,37,'°C',1),R('pH','pH',7.0,7.7,.01,7.4,'',2)],
  metrics:p=>{const S0=sat({pO2:p.pO2,pCO2:40,T:37,pH:7.4}),S1=sat(p);return[N('Saturation now',S1*100,'%',0),N('Normal at this pO₂',S0*100,'%',0),N('P50 (half saturation)',p50(p),'mm Hg',1),N('O₂ delivered','≈ 5 mL per 100 mL blood (rest)')]},
- draw:(c,p,t)=>{const S1=sat(p),s=P3.scene(c,{scale:58,cx:220});const sub=[[-.45,.45,.3],[.45,.45,-.3],[-.45,-.45,-.3],[.45,-.45,.3]];sub.forEach((q,i)=>{s.mesh(q,[.45,.42,.4],i<2?'#ff8787':'#e03131',{shape:(u,v)=>1+.08*Math.sin(3*v+i)});const filled=i<Math.round(S1*4+.01);s.ball(V.add(q,[0,0,.42*Math.sign(q[2]||1)]),.12,filled?'#ff2b2b':'#5f3dc4',{glow:filled,lift:3})});s.callout([-.45,.85,.3],'α subunit','#ff8787',-50,-40);s.callout([.45,-.85,.3],'β subunit','#e03131',50,40);s.callout(V.add(sub[0],[0,0,.42]),Math.round(S1*4)>0?'haem + O₂ (oxyhaemoglobin)':'haem (empty)','#ff6b6b',-70,30);s.render();
-  chart(c,400,96,256,190,{title:'% saturation vs pO₂',xl:'pO₂ (mm Hg)',xmin:0,xmax:120,ymin:0,ymax:1.02,series:[{fn:x=>sat({pO2:x,pCO2:40,T:37,pH:7.4}),col:'#8ca6b9',dash:[4,4]},{fn:x=>sat({...p,pO2:x}),col:C.red}],marker:[p.pO2,S1]});tag(c,'haem sites filled: '+Math.round(S1*4)+' of 4',44,98,C.gold,14)},
+ draw:(c,p,t)=>{const S1=sat(p),s=P3.scene(c,{scale:74,cx:205,cy:255,pitch:.04});const sub=[[-.52,.5,.05],[.52,.5,-.05],[-.52,-.5,-.05],[.52,-.5,.05]],nF=Math.round(S1*4+.01);
+  sub.forEach((q,i)=>{const alpha=i===0||i===3,col=alpha?'#f08a8a':'#c0392b';
+   /* globin subunit: lumpy helical body */
+   s.mesh(q,[.52,.48,.42],col,{rings:16,segs:28,spec:.5,shape:(u,v)=>1+.07*Math.sin(4*v+i+2*u)*Math.cos(u)+.05*Math.sin(7*u+v)});
+   /* haem group in its pocket: porphyrin plate + Fe */
+   const hq=V.add(q,[q[0]>0?-.14:.14,q[1]>0?-.05:.05,.4]),on=i<nF;
+   s.mesh(hq,[.2,.2,.04],on?'#8b1a24':'#3a2a52',{rings:6,segs:14,lift:2});s.ball(hq,.065,on?'#ffb199':'#adb5bd',{flat:true,lift:3});
+   if(on){const a=V.add(hq,[0,0,.16]);s.seg(hq,a,'#ff6b6b',2.5,[],1e5);s.ball(V.add(a,[-.05,0,.02]),.06,'#ff2b2b',{glow:true,lift:4});s.ball(V.add(a,[.05,0,.02]),.06,'#ff2b2b',{glow:true,lift:4})}});
+  s.callout([-.75,.95,.2],'α subunit','#f08a8a',-35,-25);s.callout([.75,.95,.1],'β subunit','#e8695a',35,-25);s.callout([.38,-.7,.5],nF>0?'haem + O₂':'haem (empty)','#ff6b6b',50,50);s.render();
+  chart(c,400,96,256,190,{title:'% saturation vs pO₂',xl:'pO₂ (mm Hg)',xmin:0,xmax:120,ymin:0,ymax:1.02,series:[{fn:x=>sat({pO2:x,pCO2:40,T:37,pH:7.4}),col:'#8ca6b9',dash:[4,4]},{fn:x=>sat({...p,pO2:x}),col:C.red}],marker:[p.pO2,S1]});tag(c,'haem sites filled: '+nF+' of 4  (red balls = O₂ bound to Fe)',44,98,C.gold,13)},
  assumption:'Hill equation (n = 2.7, normal P50 = 26.8 mm Hg) with illustrative Bohr and temperature shifts. Dashed: normal curve.'});
 function p50(p){return 26.8*Math.pow(10,.48*(7.4-p.pH))*Math.exp(.024*(p.T-37))*(1+.004*(p.pCO2-40))}
 function sat(p){const P=p50(p),n=2.7;return p.pO2<=0?0:p.pO2**n/(P**n+p.pO2**n)}
@@ -195,10 +223,23 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-blood-groups',title:'Blood 
  tryText:'Give Rh-positive blood to an Rh-negative recipient. What does NCERT warn about?',
  controls:[S('d','Donor','O-',['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(x=>[x,x])),S('r','Recipient','A+',['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(x=>[x,x]))],
  metrics:p=>{const r=compat(p);return[N('Compatible?',r.ok?(r.sens?'ABO: yes. Rh: sensitisation risk':'Yes'):'No — agglutination risk'),N('Donor RBC antigens',r.ag.join(', ')||'None (A/B)'),N('Recipient plasma antibodies',r.ab.join(', ')||'None'),N('Rh',r.rh)]},
- draw:(c,p,t)=>{const r=compat(p),s=P3.scene(c,{scale:58});for(let i=0;i<9;i++){const home=[-2.4+(i%3)*.6,-.8+Math.floor(i/3)*.8,(hash(i)-.5)*.6],clump=[(i%3)*.3-.3,(Math.floor(i/3)-1)*.3,(hash(i)-.5)*.3],k=r.ok?0:Math.min(1,cycle(t,6)/3),q=V.add(V.mul(home,1-k),V.mul(V.add(clump,[1.2,0,0]),k));
-   s.mesh(q,[.28,.1,.28],'#c92a2a',{rot:[PI/2*.8,i,0],rings:8,segs:14,shape:(u)=>1-.2*Math.exp(-(u*u)*5)});r.ag.forEach((a,j)=>{for(let m=0;m<3;m++){const an=TAU*(m/3+j/6);s.ball(V.add(q,[.3*Math.cos(an),.05,.3*Math.sin(an)]),.05,a==='A'?'#ffd43b':a==='B'?'#4dabf7':'#69db7c',{flat:true})}})}
-  r.ab.forEach((a,j)=>{for(let m=0;m<5;m++){const q=[1.4+(hash(m+j*5)-.5)*2,(hash(m+j*5+3)-.5)*2,(hash(m+j*9)-.5)];s.tube([q,V.add(q,[0,.18,0]),V.add(q,[-.1,.3,0])],.025,a==='anti-A'?'#fab005':'#1c7ed6',{segs:4});s.tube([V.add(q,[0,.18,0]),V.add(q,[.1,.3,0])],.025,a==='anti-A'?'#fab005':'#1c7ed6',{segs:4})}});s.render();
-  s.callout([-2.4,-.8,.2],`donor RBCs with ${r.ag.length?r.ag.join(' + ')+' antigen'+(r.ag.length>1?'s':''):'no A/B antigens'}`,'#ff8787',-40,50);if(r.ab.length)s.callout([1.4+(hash(0)-.5)*2,(hash(3)-.5)*2+.25,(hash(0)-.5)],`recipient plasma: ${r.ab.join(', ')}`,'#74c0fc',50,-50);if(!r.ok)s.callout([1.2,0,0],'antibodies bind antigens → clumps','#ff6b6b',60,50);
+ draw:(c,p,t)=>{const r=compat(p),s=P3.scene(c,{scale:58,cx:335,cy:240,pitch:.03}),k=r.ok?0:Math.min(1,cycle(t,8)/3.5),AC={A:'#ffd43b',B:'#4dabf7',Rh:'#69db7c'},ABC={'anti-A':'#f59f00','anti-B':'#1c7ed6'};
+  /* plasma compartment (recipient) */
+  s.poly([[.1,-1.5,0],[3.5,-1.5,0],[3.5,1.5,0],[.1,1.5,0]],'#f6d98f',{cull:false,alpha:.16,stroke:'#f6d98f66',lw:1.2,z:-1e5});
+  const Y=(q,col,a,sc=1)=>{const ca=Math.cos(a),sa=Math.sin(a),R=(x,y)=>[q[0]+x*ca-y*sa,q[1]+x*sa+y*ca,q[2]],w=.032;s.tube([R(0,0),R(0,.2*sc)],w,col,{segs:5});s.tube([R(0,.2*sc),R(-.13*sc,.38*sc)],w,col,{segs:5});s.tube([R(0,.2*sc),R(.13*sc,.38*sc)],w,col,{segs:5})};
+  /* donor red cells: biconcave discs with antigen spikes on the surface */
+  const HEX=[[0,0],[.82,0],[-.82,0],[.41,.72],[-.41,.72],[.41,-.72],[-.41,-.72]],home=[-2.35,0],cl=[1.8,0],cells=[];
+  for(let i=0;i<7;i++){const h=HEX[i],hx=home[0]+h[0]*1.02,hy=home[1]+h[1]*1.02,cx2=cl[0]+h[0]*.92,cy2=cl[1]+h[1]*.92,x=hx+(cx2-hx)*k,y=hy+(cy2-hy)*k;cells.push([x,y]);
+   s.mesh([x,y,0],[.4,.14,.4],'#d6303a',{rot:[PI/2,0,0],rings:10,segs:18,spec:.5,shape:u=>1-.55*Math.exp(-(((PI/2-Math.abs(u))*2.6)**2))});
+   const n=r.ag.length;for(let m=0;m<12&&n;m++){const a=TAU*m/12+i,j=m%n,col=AC[r.ag[j]];s.seg([x+.4*Math.cos(a),y+.4*Math.sin(a),.05],[x+.52*Math.cos(a),y+.52*Math.sin(a),.05],col,2);s.ball([x+.54*Math.cos(a),y+.54*Math.sin(a),.06],.055,col,{flat:true})}}
+  /* recipient antibodies */
+  if(r.ok){r.ab.forEach((a,j)=>{for(let m=0;m<5;m++){const q=[.6+hash(m*3+j*17)*2.5,(hash(m*5+j*11+2)-.5)*2.4,0];Y(q,ABC[a],(hash(m+j*7)-.5)*2.6+Math.sin(t*.6+m)*.15)}})}
+  else{const pr=[[1,2],[1,3],[1,5],[2,4],[3,4],[5,6],[3,0],[4,0],[0,5]];let m=0;for(const [a,b] of pr){const A=cells[a],B=cells[b],mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2,col=r.ab.length?ABC[r.ab[m%r.ab.length]]:'#adb5bd';if(k>.7)Y([mx,my,.1],col,Math.atan2(B[1]-A[1],B[0]-A[0])-PI/2,1.3);m++}
+   for(let m2=0;m2<4;m2++)Y([2.9+hash(m2)*.4,-1.2+hash(m2+4)*.5+(m2%2)*1.8,0],ABC[r.ab[m2%r.ab.length]]||'#aaa',hash(m2)*3)}
+  s.render();
+  tag(c,'donor red cells',150,118,'#ff8787',12);tag(c,'recipient plasma',345,118,'#f6d98f',12);
+  r.ab.length?tag(c,'Y = '+r.ab.join(' / ')+' antibodies',150,356,ABC[r.ab[0]],12):tag(c,'recipient has no anti-A / anti-B antibodies',150,356,C.muted,12);
+  tag(c,r.ag.length?'antigens on donor cells: '+r.ag.join(', ')+'   (spikes)':'donor cells carry no A/B/Rh antigens',150,372,C.muted,12);
   tag(c,r.ok?(r.sens?'No clumping now; recipient may form anti-Rh':'No clumping'):'Clumping (agglutination)',44,98,r.ok?(r.sens?C.gold:C.mint):C.red,15)},
  assumption:'ABO and Rh only; real cross-matching also checks other antigens. Y-shapes are antibodies.'});
 function compat(p){const [dg,dr]=[p.d.slice(0,-1),p.d.slice(-1)],[rg,rr]=[p.r.slice(0,-1),p.r.slice(-1)],ag=ABO[dg][0],ab=ABO[rg][1],aboOK=!ag.some(a=>ab.includes('anti-'+a)),rhOK=!(dr==='+'&&rr==='-');return{ok:aboOK,sens:aboOK&&!rhOK,ag:dr==='+'?[...ag,'Rh']:ag,ab,rh:rhOK?'Compatible':'Rh+ into Rh− recipient: no anti-Rh yet, so no clumping the first time, but the recipient may start making anti-Rh antibodies (a later Rh+ transfusion or pregnancy is then at risk)'}}
@@ -282,9 +323,17 @@ add({...ch(16,'Excretory Products and their Elimination'),id:'bio-countercurrent
  tryText:'Move the probe to the bottom of the loop. Why can urine become concentrated there?',
  controls:[R('depth','Depth into medulla',0,100,1,60,'%'),S('limb','Limb','desc',[['desc','Descending limb'],['asc','Ascending limb']])],
  metrics:p=>{const osm=300+900*p.depth/100;return[N('Interstitial osmolarity',osm,'mOsmol/L',0),N('Filtrate in this limb',p.limb==='desc'?`≈ ${f(osm,0)} (water leaves)`:'Becoming dilute (salts leave)'),N('Permeable to',p.limb==='desc'?'Water':'Electrolytes (NaCl), not water'),N('Helped by','Vasa recta and urea')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.15}),H=3.4,top=1.6;for(let i=0;i<8;i++){const y=top-H*(i+.5)/8,k=i/7;s.box([0,y,-.6],[4.6,H/8,.2],`#${Math.round(255-60*k).toString(16)}${Math.round(230-150*k).toString(16)}${Math.round(140-100*k).toString(16)}`,{alpha:.5});s.label([2.6,y,-.6],f(300+900*(i+.5)/8,0),C.muted,11)}
-  const loop=[[-.6,top,0],[-.6,top-H,0],[-.3,top-H-.3,0],[0,top-H,0],[0,top,0]];s.tube(loop,.13,'#a5d8ff',{segs:10});s.tube([[.7,top,.3],[.7,top-H,.3],[1.0,top-H-.25,.3],[1.3,top-H,.3],[1.3,top,.3]],.07,'#ff8787',{segs:8,alpha:.8});s.label([1,top+.3,.3],'vasa recta',C.red,12);
-  for(let i=0;i<8;i++){const y=top-.2-i*.4;s.arrow([-.75,y,0],[-1.25,y,0],'#4dabf7',2,7,i===0?'H₂O out':'');s.arrow([.15,y,0],[.65,y,0],'#ffd43b',2,7,i===0?'NaCl out':'')}const y=top-H*p.depth/100,x=p.limb==='desc'?-.6:0;s.ball([x,y,.2],.12,C.white,{glow:true,lift:3});s.render();tag(c,'blue arrows: water out of descending limb · yellow: NaCl out of ascending limb',44,98,C.muted,12)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.06,cx:335,cy:268}),H=3.0,top=1.6,mix=(a,b,k)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join('')};
+  for(let i=0;i<8;i++){const y=top-H*(i+.5)/8,k=i/7;s.box([0,y,-.6],[4.8,H/8,.2],mix('#f3d9a4','#9c4a3a',k),{alpha:.55});s.label([2.7,y,-.6],f(300+900*(i+.5)/8,0),C.muted,11)}
+  s.label([-2.75,top-.2,-.6],'cortex',C.muted,12);s.label([-2.75,top-1.2,-.6],'outer medulla',C.muted,12);s.label([-2.75,top-2.4,-.6],'inner medulla',C.muted,12);
+  /* hairpin of Henle: rounded bend, filtrate darkens in the descending limb and thins again in the ascending limb */
+  const bend=[];for(let i=0;i<=8;i++){const a=PI+PI*i/8;bend.push([-.3+.3*Math.cos(a),top-H+.3*Math.sin(a),0])}
+  const dl=[[-.6,top,0],[-.6,top-H*.5,0],...bend.slice(0,5)],al=[...bend.slice(4),[0,top-H*.5,0],[0,top,0]];
+  s.tube(dl,.12,u=>mix('#d7ecff','#2f5fc0',u),{segs:10});s.tube(al,.12,u=>mix('#2f5fc0','#d7ecff',u),{segs:10});
+  s.tube([[.7,top,.3],[.7,top-H,.3],[.85,top-H-.2,.3],[1.0,top-H,.3]],.065,'#e8505b',{segs:8,alpha:.9});s.tube([[1.0,top-H,.3],[1.0,top,.3]],.065,'#7b8cde',{segs:8,alpha:.9});s.label([1.5,top+.3,.3],'vasa recta',C.red,12);
+  for(let i=0;i<8;i++){const y=top-.2-i*.4;s.arrow([-.75,y,0],[-1.25,y,0],'#4dabf7',2,7,i===0?'H₂O out':'');s.arrow([.15,y,0],[.65,y,0],'#ffd43b',2,7,i===0?'NaCl out':'')}
+  s.label([-.8,top+.3,0],'descending',C.muted,11);s.label([.35,top+.3,0],'ascending',C.muted,11);
+  const y=top-H*p.depth/100,x=p.limb==='desc'?-.6:0;s.ball([x,y,.2],.14,C.white,{glow:true,lift:3});s.render();tag(c,'blue arrows: water out of descending limb · yellow: NaCl out of ascending limb',44,98,C.muted,12)},
  assumption:'Linear interstitial gradient for teaching; numbers from NCERT Chapter 16.'});
 
 add({...ch(16,'Excretory Products and their Elimination'),id:'bio-adh-regulation',title:'ADH and water balance',
@@ -294,9 +343,26 @@ add({...ch(16,'Excretory Products and their Elimination'),id:'bio-adh-regulation
  tryText:'Switch on diabetes insipidus and compare the urine volume.',
  controls:[R('intake','Water intake',.5,5,.1,2,'L/day',1),S('di','Condition','normal',[['normal','Normal'],['di','Diabetes insipidus (no ADH)']])],
  metrics:p=>{const r=adh(p);return[N('ADH level (relative)',r.adh*100,'%',0),N('Urine volume',r.vol,'L/day',2),N('Urine osmolarity',r.osm,'mOsmol/L',0),N('Status',r.note)]},
- draw:(c,p,t)=>{const r=adh(p),s=P3.scene(c,{scale:56,cx:230,yaw:-.75});body(s,[0,-2.2,0],1.25,.1);s.mesh([0,.99,0],.14,'#b197fc');s.callout([0,.99,0],'hypothalamus → posterior pituitary (ADH)','#c9b6ff',60,-40);
-  for(const z of[-1,1])s.mesh([-.15,-1.2,z*.4],[.18,.3,.14],'#a61e4d',{shape:(u,v)=>1-.25*Math.max(0,Math.sin(v)*-z)});s.mesh([0,-1.6,0],[.2+.12*r.vol/5,.2+.12*r.vol/5,.2+.12*r.vol/5],'#ffe066',{alpha:.7});
-  for(let i=0;i<Math.round(r.adh*8);i++){const q=cycle(t*.4+i/8,1);s.ball([0,.9-q*2.1,(hash(i)-.5)*.3],.05,'#b197fc',{flat:true,glow:true})}s.callout([-.15,-1.2,.45],'kidneys: ADH → more water reabsorbed','#ff8787',60,-20);s.callout([0,-1.6,.25],`bladder: ${f(r.vol,2)} L urine/day`,'#ffe066',60,40);s.render();
+ draw:(c,p,t)=>{const r=adh(p),s=P3.scene(c,{scale:52,cx:250,cy:262,pitch:.03}),Bn=[-1.5,1.4,0],K=[.45,-.5,0],BL=[-.75,-1.85,0],vk=Math.min(1,r.vol/12),ur=pm=>pm,amb=vk<.3?'#ffe27a':vk<.7?'#f6d34a':'#fff0a8';
+  /* brain in sagittal section: cerebrum with gyri, cerebellum, brainstem, hypothalamus and pituitary */
+  s.mesh(Bn,[.95,.7,.18],'#f1b6bd',{rings:14,segs:26,spec:.4,shape:(u,v)=>1+.05*Math.sin(9*v+3*u)+.04*Math.sin(11*u)});
+  s.mesh([Bn[0]+.55,Bn[1]-.5,0],[.32,.2,.16],'#d98c9a',{rings:8,segs:14});s.tube([[Bn[0]+.05,Bn[1]-.2,0],[Bn[0]+.12,Bn[1]-.55,0],[Bn[0]+.2,Bn[1]-.85,0]],.08,'#e7a6b0',{segs:8});
+  s.mesh([Bn[0]-.1,Bn[1]-.18,.05],[.2,.14,.12],'#9775fa',{rings:8,segs:12,lift:2});
+  s.tube([[Bn[0]-.08,Bn[1]-.3,.05],[Bn[0]-.05,Bn[1]-.5,.05]],.025,'#b197fc',{segs:6});s.mesh([Bn[0]-.05,Bn[1]-.58,.05],[.1,.08,.09],'#e599f7',{rings:7,segs:10});s.mesh([Bn[0]-.0,Bn[1]-.6,.05],[.11,.08,.09],'#7048e8',{rings:7,segs:10});
+  /* ADH carried in the blood to the kidney */
+  const vs=[[Bn[0],Bn[1]-.7,0],[-.9,.4,0],[-.2,.15,0],[.2,0,0]];s.tube(vs,.04,'#e8505b',{segs:6});
+  for(let i=0;i<Math.max(1,Math.round(r.adh*8));i++){const q=cycle(t*.35+i/8,1),n=q*3,j=Math.min(2,Math.floor(n)),f2=n-j;s.ball([vs[j][0]+(vs[j+1][0]-vs[j][0])*f2,vs[j][1]+(vs[j+1][1]-vs[j][1])*f2,.1],.06,'#b197fc',{flat:true,glow:true,lift:3})}
+  /* kidney in coronal section: cortex, medullary pyramids, pelvis */
+  s.mesh(K,[.62,.95,.3],'#b9545c',{rings:16,segs:26,spec:.5,shape:(u,v)=>{const nx=Math.cos(u)*Math.cos(v),ny=Math.sin(u);return 1-.42*Math.exp(-((nx+1)**2)*10-ny*ny*7)}});
+  for(let i=0;i<5;i++){const a=(-.8+i*.4)*PI*.75+PI*.05,cx0=K[0]+.5*Math.cos(a+PI*1.0)*-1,cy0=K[1]+.78*Math.sin(a);const ap=[K[0]-.12,K[1]+.02*i,.3],b1=[K[0]+.42*Math.cos(a)*1.0,K[1]+.74*Math.sin(a)+.1,.3],b2=[K[0]+.42*Math.cos(a)*1.0,K[1]+.74*Math.sin(a)-.1,.3];s.poly([ap,b1,b2],'#8c2f3d',{cull:false,z:1e5})}
+  s.ball([K[0]-.2,K[1],.32],.16,'#f6d58a',{flat:true,lift:5});
+  s.tube([[K[0]-.3,K[1]-.05,.1],[-.3,-1.0,0],[BL[0]+.05,BL[1]+.3,0]],.04,'#f1d77a',{segs:6});
+  for(let i=0;i<1+Math.round(r.vol/3);i++){const q=cycle(t*.5+i*.31,1);s.ball([K[0]-.3+(BL[0]+.05-K[0]+.3)*q*.9-q*.5*.5,K[1]-.05+(BL[1]+.3-K[1]+.05)*q,.12],.045,amb,{flat:true,lift:3})}
+  /* water returned to blood: more with more ADH */
+  for(let i=0;i<Math.round(1+r.adh*4);i++)s.arrow([K[0]+.5,K[1]+.5-i*.3,.2],[K[0]+1.05,K[1]+.5-i*.3,.2],'#4dabf7',2,7,i===0?'H₂O reabsorbed':'');
+  /* bladder: wall bag, urine level follows volume */
+  const bs=.28+.3*Math.min(1,r.vol/20);s.mesh(BL,[bs,bs*.85,.2],'#e4a8a0',{alpha:.55,rings:12,segs:18,spec:.3});s.mesh([BL[0],BL[1]-bs*.1,0],[bs*.82,bs*.68,.16],amb,{alpha:.75,rings:10,segs:16});
+  s.callout([Bn[0]-.1,Bn[1]-.18,.15],'hypothalamus','#c9b6ff',50,-40);s.callout([Bn[0],Bn[1]-.6,.15],'posterior pituitary → ADH','#c9b6ff',55,10);s.callout([K[0]+.4,K[1]-.5,.3],'kidney','#ff8787',55,-5);s.callout([BL[0]+bs,BL[1],.2],`bladder: ${f(r.vol,2)} L urine/day`,'#ffe066',45,0);s.render();
   chart(c,430,96,226,150,{title:'Urine volume vs water intake',xl:'intake (L/day)',xmin:.5,xmax:5,ymin:0,ymax:20,series:[{fn:x=>adh({intake:x,di:p.di}).vol,col:C.gold}],marker:[p.intake,r.vol]})},
  assumption:'Illustrative model: ~0.9 L/day lost by other routes, ~600 mOsmol solute per day, urine osmolarity limited to 50–1200 mOsmol/L.'});
 function adh(p){const solute=600;if(p.di==='di'){const vol=Math.max(p.intake*.9,solute/60);return{adh:0,vol:Math.min(vol,20),osm:solute/Math.min(vol,20),note:'Dilute urine, excessive thirst'}}const vol=clamp(p.intake-.9,solute/1200,solute/50),osm=solute/vol,adhL=clamp((osm-50)/1150,0,1);return{adh:adhL,vol,osm,note:adhL>.6?'Water conserved (concentrated urine)':adhL<.2?'Excess water removed (dilute urine)':'Balanced'}}
@@ -309,10 +375,19 @@ add({...ch(17,'Locomotion and Movement'),id:'bio-sliding-filament',title:'Slidin
  tryText:'Contract fully. Which band disappears first?',
  controls:[R('con','Contraction',0,100,1,30,'%'),S('ca','Ca²⁺ released?','yes',[['yes','Yes (stimulated)'],['no','No (relaxed)']])],
  metrics:p=>{const L=sarcL(p);return[N('Sarcomere length',L,'μm',2),N('A band',1.6,'μm',2),N('I band',Math.max(0,L-1.6),'μm',2),N('H zone',Math.max(0,L-2),'μm',2)]},
- draw:(c,p,t)=>{const L=sarcL(p),s=P3.scene(c,{scale:62,pitch:.25}),k=2.4,half=L*k/2,act=1*k,myo=1.6*k/2;for(const sg of[-1,1])s.box([sg*half,0,0],[.06,2,1.4],'#ced4da');
-  for(let r=0;r<3;r++)for(let q=0;q<2;q++){const y=-.6+r*.6,z=-.3+q*.6;s.cyl([0,y,z],[1,0,0],.08,myo*2,'#e03131');for(let i=-6;i<=6;i++){if(Math.abs(i)<1)continue;const x=i*myo/6.5,sw=p.ca==='yes'&&p.con>0?.12*Math.sin(t*8+i):0;s.seg([x,y,z],[x+Math.sign(i)*(.1+sw),y+.18,z],'#ffa8a8',2)}}
-  for(const sg of[-1,1])for(let r=0;r<4;r++)for(let q=0;q<3;q++){const y=-.9+r*.6,z=-.45+q*.45;s.tube([[sg*half,y,z],[sg*(half-act),y,z]],.035,'#4dabf7',{segs:6})}
-  s.callout([0,.6,.3],'myosin (thick filament) = A band','#ff8787',-40,-70);s.callout([half-act*.3,-.3,.45],'actin (thin filament)','#74c0fc',40,60);s.callout([half,.9,.7],'Z line','#ced4da',30,-50);s.callout([-myo*.6,.78,.3],p.ca==='yes'?'cross-bridges pull actin (Ca²⁺ + ATP)':'cross-bridges (need Ca²⁺)','#ffa8a8',-60,-30);if(half-myo>.05)s.callout([half-(half-myo)/2,-1.0,-.45],'I band','#74c0fc',30,50);s.render()},
+ draw:(c,p,t)=>{const L=sarcL(p),s=P3.scene(c,{scale:62,pitch:.02,cx:345,cy:218}),k=2.4,half=L*k/2,act=1*k,myo=1.6*k/2,on=p.ca==='yes'&&p.con>0,MY=[-.75,-.15,.45],AY=[-1.05,-.45,.15,.75];
+  /* Z discs */
+  for(const sg of[-1,1]){s.box([sg*half,-.15,0],[.12,2.25,.5],'#8e9aa6',{spec:.4});s.box([sg*half,-.15,0],[.04,2.25,.52],'#c3ccd4')}
+  /* thin filaments: actin strands anchored in the Z disc, drawn as beaded chains */
+  for(const sg of[-1,1])for(const y of AY){s.tube([[sg*half,y,0],[sg*(half-act),y,0]],.032,'#4a8fe0',{segs:6});for(let i=1;i<=9;i++){const x=sg*(half-act*i/9.5);s.ball([x,y+.025*Math.sin(i*1.7),.02],.055,'#74b7ff',{flat:true})}}
+  /* thick filaments: myosin shaft with a bare central zone and paired heads */
+  for(const y of MY){s.tube([[-myo,y,0],[myo,y,0]],.075,'#d9363e',{segs:8});s.ball([-myo,y,0],.075,'#d9363e',{flat:true});s.ball([myo,y,0],.075,'#d9363e',{flat:true});
+   for(const sg of[-1,1])for(let i=1;i<=6;i++){const x=sg*(.22+(myo-.3)*i/6.4),sw=on?.1*Math.sin(t*7+i+y*3):0,d=sg*(on?.13+sw:.04);for(const u of[-1,1]){s.seg([x,y+u*.07,0],[x+d,y+u*.25,0],'#ff8d92',3);s.ball([x+d,y+u*.26,.02],.045,'#ff6a72',{flat:true})}}}
+  s.box([0,-.15,0],[.04,1.7,.4],'#ffd6d6',{alpha:.5});
+  /* band strip: I | A (with H zone) | I */
+  const by=-1.55,hz=Math.max(0,half-act);s.poly([[-half,by,0],[-myo,by,0],[-myo,by-.16,0],[-half,by-.16,0]],'#8cc0ff',{cull:false});s.poly([[myo,by,0],[half,by,0],[half,by-.16,0],[myo,by-.16,0]],'#8cc0ff',{cull:false});s.poly([[-myo,by,0],[myo,by,0],[myo,by-.16,0],[-myo,by-.16,0]],'#e5484d',{cull:false});if(hz>.02)s.poly([[-hz,by,0],[hz,by,0],[hz,by-.16,0],[-hz,by-.16,0]],'#ffc9cb',{cull:false});
+  s.label([0,by-.42,0],'A band',C.red,12);if(half-myo>.25){s.label([-(half+myo)/2,by-.42,0],'I band',C.cyan||'#74c0fc',12);s.label([(half+myo)/2,by-.42,0],'I band','#74c0fc',12)}if(hz>.3)s.label([0,by+.38,0],'H zone',C.muted,11);
+  s.callout([-half,1.15,.1],'Z line','#ced4da',-15,-40);s.callout([myo*.6,.45+.07,0],on?'myosin heads pull actin (Ca²⁺ + ATP)':'myosin heads (need Ca²⁺)','#ffa8a8',50,-80);s.callout([-myo*.9,.75,0],'myosin (thick)','#ff8787',-30,-48);s.callout([half-act*.4,.75,.05],'actin (thin)','#74c0fc',120,-50);s.render()},
  assumption:'Typical lengths: actin 1.0 μm on each side, myosin 1.6 μm; sarcomere 2.6 → 1.8 μm on full contraction.'});
 function sarcL(p){return p.ca==='yes'?2.6-.8*p.con/100:2.6}
 
@@ -324,16 +399,40 @@ add({...ch(17,'Locomotion and Movement'),id:'bio-synovial-joints',title:'Synovia
  tryText:'Try both sliders on a hinge joint. Which one does nothing?',
  controls:[S('j','Joint','ball',Object.keys(JOINT).map(k=>[k,JOINT[k][0]])),R('a','Movement 1',-60,60,1,30,'°'),R('b','Movement 2',-60,60,1,0,'°')],
  metrics:p=>{const d=JOINT[p.j];return[N('Joint',d[0]),N('Example',d[1]),N('Range',d[2])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.25}),a=rad(p.a),b=rad(p.b),bone='#ede3c8';s.tube([[0,-2.2,0],[0,-.35,0]],.22,bone,{segs:12});
-  if(p.j==='ball'){s.mesh([0,-.2,0],[.55,.35,.55],'#dee2e6',{alpha:.4,shape:(u)=>u>0?.6:1});s.ball([0,0,0],.38,bone);const d=[Math.sin(a)*Math.cos(b),Math.cos(a)*Math.cos(b),Math.sin(b)];s.tube([[0,0,0],V.mul(d,2.2)],.2,bone,{segs:12})}
-  else if(p.j==='hinge'){s.cyl([0,0,0],[0,0,1],.35,.8,bone);const d=[Math.sin(a),Math.cos(a),0];s.tube([V.mul(d,.2),V.mul(d,2.2)],.2,bone,{segs:12});s.label([0,0,.6],'axis',C.muted,12)}
-  else if(p.j==='pivot'){s.ring([0,.2,0],[0,1,0],.35,'#adb5bd',5);s.tube([[0,-.3,0],[0,2,0]],.16,bone,{segs:12});for(let i=0;i<4;i++){const q=a+i*PI/2;s.box([.35*Math.cos(q),1.5,.35*Math.sin(q)],[.3,.25,.12],'#ced4da',{rotY:-q})}}
-  else if(p.j==='gliding'){for(let i=0;i<4;i++)s.box([-.6+(i%2)*.75+(i===1?p.a/120:0),-.1+Math.floor(i/2)*.65,(i===2?p.b/120:0)],[.7,.6,.7],bone)}
-  else{s.mesh([0,0,0],[.45,.25,.45],bone,{shape:(u,v)=>1+.4*Math.cos(2*v)*Math.sin(u)});const d=[Math.sin(a),Math.cos(a)*Math.cos(b),Math.sin(b)];s.tube([V.mul(d,.3),V.mul(d,2)],.16,bone,{segs:12})}
-  if(p.j!=='gliding'){s.mesh([0,0,0],[.78,.62,.78],'#ffc9c9',{alpha:.16,rings:10,segs:16});s.callout([.7,.25,.2],'synovial capsule + fluid','#ffc9c9',60,-30)}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:p.j==='gliding'?96:64,pitch:.04,cx:300,cy:p.j==='gliding'?215:250}),a=rad(p.a),b=rad(p.b),bone='#ede3c8',bone2='#dccfae',cart='#a8d8ee',
+  /* long bone: flared ends, shaft narrower */
+  LB=(pts,r,col)=>s.tube(pts,u=>r*(1+.75*Math.exp(-((u/.13)**2))+.5*Math.exp(-(((1-u)/.13)**2))),col,{segs:12,spec:.4}),
+  SQ=(u,v)=>1/Math.pow(Math.abs(Math.cos(u)*Math.cos(v))**4+Math.abs(Math.sin(u))**4+Math.abs(Math.cos(u)*Math.sin(v))**4,.25);
+  if(p.j==='ball'){
+   /* scapula blade with glenoid cup holding the humeral head */
+   s.mesh([-.75,-1.5,-.1],[.55,1.15,.1],bone2,{rings:12,segs:20,rot:[0,0,.35]});
+   s.mesh([0,-.12,0],[.62,.42,.5],bone,{rings:10,segs:18,shape:u=>u>.15?.0:1});s.mesh([0,-.1,.02],[.55,.36,.44],cart,{rings:10,segs:18,alpha:.85,shape:u=>u>.15?.0:1});
+   const d=[Math.sin(a)*Math.cos(b),Math.cos(a)*Math.cos(b),Math.sin(b)];s.tube([V.mul(d,.3),V.mul(d,2.5)],.17,bone,{segs:12,spec:.4});LB([V.mul(d,.5),V.mul(d,2.6)],.14,bone);
+   s.ball([0,0,0],.4,bone,{spec:.5});s.ball([0,0,0],.43,cart,{alpha:.5});s.tube([V.mul(d,.25),V.mul(d,.7)],.22,bone,{segs:10})}
+  else if(p.j==='hinge'){
+   /* humerus ends in a spool (trochlea); ulna with olecranon hooks around it */
+   LB([[0,-2.4,0],[0,-.35,0]],.17,bone);s.cyl([0,0,0],[0,0,1],.34,.75,bone,{seg:22});s.cyl([0,0,0],[0,0,1],.37,.55,cart,{seg:22});
+   const d=[Math.sin(a),Math.cos(a),0],n=[-Math.cos(a),Math.sin(a),0];LB([V.mul(d,.25),V.mul(d,2.5)],.14,bone2);s.mesh(V.add(V.mul(d,-.05),V.mul(n,-.0)),[.3,.35,.28],bone2,{rings:8,segs:14});
+   s.label([.62,-.5,.3],'axis',C.muted,12)}
+  else if(p.j==='pivot'){
+   /* axis vertebra with odontoid peg; atlas ring rotates around it */
+   s.mesh([0,-.95,0],[.95,.45,.8],bone2,{rings:10,segs:20,spec:.4,shape:SQ});s.lathe([0,-.55,0],[[.3,0],[.26,.5],[.2,.95],[.14,1.2],[0,1.3]],bone,{segs:16,spec:.4});
+   const an=[];for(let i=0;i<=24;i++){const q=a+TAU*i/24;an.push([.62*Math.cos(q),.3,.62*Math.sin(q)])}s.tube(an,u=>.15+.04*Math.sin(u*TAU),cart,{segs:8,alpha:.9});s.tube(an,.1,bone,{segs:8});
+   s.tube([[.1*Math.cos(a+PI*.5)+.0,.3,.0],[0,.3,0]],.01,bone,{segs:3});s.ball([.62*Math.cos(a+PI*.5),.3,.62*Math.sin(a+PI*.5)],.14,'#ffd43b',{flat:true,lift:3})}
+  else if(p.j==='gliding'){
+   /* carpals: rounded blocks separated by a thin cartilage and fluid layer */
+   for(let i=0;i<4;i++){const x=-.45+(i%2)*.95+(i===1?p.a/120:0),y=-.45+Math.floor(i/2)*.9+(i===2?p.b/120:0);s.mesh([x,y,0],[.42,.4,.4],i%2?bone2:bone,{rings:10,segs:16,spec:.4,shape:SQ});s.mesh([x,y,.0],[.45,.43,.43],cart,{rings:8,segs:14,alpha:.25,shape:SQ})}}
+  else{
+   /* saddle joint: trapezium and metacarpal base are each concave in one plane and convex in the other */
+   LB([[-.2,-2.3,0],[0,-.5,0]],.2,bone2);s.mesh([0,-.2,0],[.6,.38,.5],bone2,{rings:12,segs:22,spec:.4,shape:(u,v)=>1+.4*Math.cos(2*v)*Math.sin(u)*(u>0?1:.3)});
+   const d=[Math.sin(a),Math.cos(a)*Math.cos(b),Math.sin(b)];s.mesh([0,.12,0],[.5,.3,.45],bone,{rings:10,segs:20,spec:.4,shape:(u,v)=>1-.35*Math.cos(2*v)*Math.sin(u)*(u<0?1:.3)});LB([V.mul(d,.3),V.mul(d,2.3)],.15,bone)}
+  if(p.j!=='gliding'){s.mesh([0,0,0],[.85,.7,.82],'#ffc9c9',{alpha:.14,rings:10,segs:18});s.callout([.8,.35,.2],'synovial capsule + fluid','#ffc9c9',55,-35)}
   const J={ball:['head of humerus','socket (glenoid cavity)','movement in all planes (shoulder, hip)'],hinge:['trochlea of humerus','ulna moves in one plane','elbow, knee'],pivot:['odontoid process of axis','atlas rotates round it','neck: atlas–axis'],gliding:['carpals slide on each other','flat surfaces glide','wrist (carpals)'],saddle:['saddle-shaped surfaces','two planes of movement','thumb: carpal–metacarpal']}[p.j];
-  if(p.j==='ball'){s.ball([0,0,0],.4,'#cfe8ff',{alpha:.35});s.callout([.1,.3,.2],J[0],'#ede3c8',-70,-50);s.callout([.4,-.3,.2],J[1],'#dee2e6',60,40);s.callout([-.3,.1,.3],'articular cartilage','#cfe8ff',-70,20)}
-  else s.callout([0,0,.3],J[0],'#ede3c8',-70,-40);s.callout([0,-1.6,0],J[2],'#ffd43b',-60,30);s.render()},
+  if(p.j==='ball'){s.callout([-.15,.3,.3],J[0],'#ede3c8',-85,-30);s.callout([-.35,-.3,.3],J[1],'#dee2e6',-85,40);s.callout([.3,-.1,.4],'articular cartilage','#a8d8ee',70,55)}
+  else if(p.j==='pivot')s.callout([.1,.9,0],J[0],'#ede3c8',70,-30);
+  else if(p.j==='gliding')s.callout([-.45,.45,.3],J[0],'#ede3c8',-80,-40);
+  else s.callout([0,0,.3],J[0],'#ede3c8',-85,-40);
+  s.label([0,-2.6,0],J[2],'#ffd43b',13);s.render()},
  assumption:'Bones simplified to cylinders and spheres; ligaments and synovial membrane omitted.'});
 
 /*BEGIN skelkit*/
@@ -538,8 +637,20 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-myelinated-conduction',
  tryText:'Double the axon diameter for both types and compare the speeds.',
  controls:[R('d','Axon diameter',1,20,.5,10,'μm',1)],
  metrics:p=>{const vm=6*p.d,vu=Math.sqrt(p.d);return[N('Myelinated speed',vm,'m/s',0),N('Non-myelinated speed',vu,'m/s',1),N('Time for 1 m (myelinated)',1000/vm,'ms',1),N('Time for 1 m (non-myelinated)',1000/vu,'ms',0)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.2}),vm=6*p.d,vu=Math.sqrt(p.d),r=.08+p.d*.008;for(const [z,my] of [[-.9,true],[.9,false]]){s.tube([[-3.4,0,z],[3.4,0,z]],r,'#ffe8cc',{segs:10});if(my)for(let i=0;i<8;i++)s.cyl([-3+i*.86,0,z],[1,0,0],r+.12,.7,'#f1f3f5',{alpha:.85});
-   const x=my?-3+Math.floor(cycle(t*vm/40,1)*8)*.86-.43:-3.4+cycle(t*vu/12,1)*6.8;s.ball([x,0,z],r+.12,'#ffd43b',{glow:true,flat:true,lift:4});s.label([-3.6,.6,z],my?'myelinated':'non-myelinated',C.white,12)}s.callout([-3+.86,r+.12,-.9],'myelin sheath (Schwann cell)','#f1f3f5',-30,-60);s.callout([-3+.43,0,-.9],'node of Ranvier: impulse jumps here','#ffd43b',40,-80);s.callout([1,r,.9],'axon: impulse travels continuously','#ffe8cc',30,60);s.render();tag(c,'animation speeds are relative, not real time',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:.02,cx:345,cy:250}),vm=6*p.d,vu=Math.sqrt(p.d),r=.1+p.d*.012,ro=r*1.9+.06,Y1=.95,Y2=-.95,SK=(u,v)=>{const q=Math.cos(u)*Math.cos(v);return 1/Math.sqrt(Math.abs(q)**6+1-q*q)},
+  mix=(a,b,k)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join('')},
+  nodes=[-2,-1,0,1,2],xm=nodes[Math.min(4,Math.floor(cycle(t*vm/40,1)*5))],xu=-3.4+cycle(t*vu/12,1)*6.8;
+  /* myelinated fibre: axon core, sheath segments with nodes of Ranvier between them */
+  s.tube([[-3.4,Y1,0],[3.4,Y1,0]],r,u=>mix('#ffe0a8','#ffd43b',Math.max(0,1-Math.abs(-3.4+u*6.8-xm)*3)),{segs:10});
+  for(let i=0;i<6;i++){const x=-2.5+i;s.mesh([x,Y1,0],[.43,ro,ro],'#f4eee0',{alpha:.88,rings:8,segs:12,spec:.5,shape:SK});s.mesh([x,Y1,0],[.4,ro*.78,ro*.78],'#e2d6bd',{alpha:.5,rings:6,segs:10,shape:SK})}
+  s.mesh([-.5,Y1+ro*.85,.05],[.2,.12,.14],'#8e6bd8',{rings:6,segs:10,lift:2});
+  for(const x of nodes)for(const sg of[-1,1])s.ball([x,Y1+sg*(r+.02),.1],.04,'#4dabf7',{flat:true});
+  s.ball([xm,Y1,.1],r+.1,'#ffd43b',{glow:true,flat:true,lift:4});
+  /* non-myelinated fibre: bare axon, depolarised region travels continuously */
+  s.tube([[-3.4,Y2,0],[3.4,Y2,0]],r,u=>mix('#ffe0a8','#ffd43b',Math.max(0,1-Math.abs(-3.4+u*6.8-xu)*1.6)),{segs:10});s.tube([[-3.4,Y2,0],[3.4,Y2,0]],r*1.25,'#ffe8cc',{alpha:.25,segs:10});
+  s.ball([xu,Y2,.1],r+.1,'#ffd43b',{glow:true,flat:true,lift:4});
+  s.label([-2.6,Y1+ro+.55,0],'myelinated fibre',C.white,12);s.label([-2.4,Y2+.6,0],'non-myelinated fibre',C.white,12);
+  s.callout([-1.5,Y1+ro*.8,0],'myelin sheath (Schwann cell)','#f1f3f5',-60,-35);s.callout([nodes[2],Y1-ro*.9,.1],'node of Ranvier: impulse jumps here','#ffd43b',70,45);s.callout([1.5,Y2,0],'axon: impulse travels continuously','#ffe8cc',30,28);s.callout([-.5,Y1+ro*.95,.1],'Schwann cell nucleus','#b79cf0',45,-50);s.render();tag(c,'animation speeds are relative, not real time',44,392,C.muted,12)},
  assumption:'Rule-of-thumb speeds: myelinated ≈ 6 m/s per μm of diameter; non-myelinated ≈ √d m/s (d in μm).'});
 
 /* ---------- Chapter 19: Chemical Coordination and Integration ---------- */
@@ -550,9 +661,19 @@ add({...ch(19,'Chemical Coordination and Integration'),id:'bio-glucose-homeostas
  tryText:'Compare the normal and diabetic curves after the same meal.',
  controls:[R('carb','Carbohydrate in meal',0,150,5,75,'g'),R('min','Time after meal',0,240,1,45,'min'),S('cond','Condition','normal',[['normal','Normal'],['dm','Diabetes mellitus']])],
  metrics:p=>{const g=gluc(p,p.min),i=insul(p,p.min);return[N('Blood glucose',g,'mg/dL',0),N('Insulin (relative)',i*100,'%',0),N('Glucagon',g<85?'Rising':'Low'),N('Liver','Glycogenesis when glucose is high')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,cx:230}),ins=insul(p,p.min);for(let i=0;i<40;i++){const y=1-2*(i+.5)/40,r=Math.sqrt(1-y*y),a=i*2.4,rr=i<28?.65:1.05,q=[rr*r*Math.cos(a),rr*y,rr*r*Math.sin(a)];s.ball(q,.2,i<28?'#69db7c':'#ff8787')}
-  for(let i=0;i<Math.round(ins*14);i++){const q=cycle(t*.5+i/14,1);s.ball([1.3+q*1.8,(hash(i)-.5)*1.5,(hash(i+4)-.5)],.06,'#69db7c',{flat:true,glow:true})}s.callout([0,1.05,.2],'islet of Langerhans','#e9f6ff',-40,-50);s.callout([.3,.3,.55],'β-cells: insulin','#69db7c',-80,30);s.callout([.9,-.4,.4],'α-cells: glucagon','#ff8787',40,50);if(ins>.05)s.callout([2.2,0,0],'insulin → liver, muscle take up glucose','#69db7c',20,-70);s.render();
-  chart(c,420,96,236,170,{title:'Blood glucose (mg/dL)',xl:'minutes',xmin:0,xmax:240,ymin:60,ymax:420,series:[{fn:m=>gluc({...p,cond:'normal'},m),col:'#8ca6b9',dash:[4,4]},{fn:m=>gluc(p,m),col:C.gold}],marker:[p.min,gluc(p,p.min)]});tag(c,'green: β-cells (insulin)   red: α-cells (glucagon)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:240,cy:255,pitch:.03}),ins=insul(p,p.min),g=gluc(p,p.min),C0=[-.2,.25,0];
+  /* exocrine (acinar) tissue around the islet */
+  for(let i=0;i<44;i++){const a=i*2.399,rr=1.3+.85*Math.sqrt(i/44),q=[C0[0]+rr*Math.cos(a)*1.2,C0[1]+rr*Math.sin(a)*.95,-.35];s.ball(q,.22,'#f2d3b0',{alpha:.7});s.ball([q[0]+.03,q[1],-.3],.07,'#b9926a',{flat:true})}
+  /* islet: β-cells in the core, α-cells in the mantle; each cell has a nucleus */
+  for(let i=0;i<40;i++){const core=i<28,k=core?i:i-28,y=core?1-2*(k+.5)/28:1-2*(k+.5)/12,rd=Math.sqrt(1-y*y),a=i*2.4,rr=core?.55:.92,q=[C0[0]+rr*rd*Math.cos(a)*1.1,C0[1]+rr*y*.9,rr*rd*Math.sin(a)*.6];
+   s.ball(q,core?.21:.19,core?'#69db7c':'#ff8787',{spec:.4});s.ball([q[0]+.03,q[1]+.02,q[2]+.12],.07,core?'#2f9e44':'#c92a2a',{flat:true,lift:1})}
+  /* capillary around the islet carrying hormones to liver and muscle */
+  const cap=[[-2.3,-1.3,.1],[-1.4,-1.55,.1],[-.3,-1.45,.1],[.8,-1.1,.1],[1.8,-.6,.1],[2.7,-.5,.1]];s.tube(cap,.06,'#e8505b',{segs:8,alpha:.85});
+  for(let i=0;i<5;i++){const q=cycle(t*.15+i/5,1)*5,j=Math.min(4,Math.floor(q)),f2=q-j;s.mesh([cap[j][0]+(cap[j+1][0]-cap[j][0])*f2,cap[j][1]+(cap[j+1][1]-cap[j][1])*f2,.1],[.07,.03,.07],'#9c1d2a',{rings:4,segs:8,rot:[PI/2,0,0]})}
+  for(let i=0;i<Math.round(ins*14);i++){const q=cycle(t*.5+i/14,1),h=hash(i)*5,j=Math.min(4,Math.floor(h)),P=cap[j],st=[C0[0]+(hash(i+4)-.5)*.7,C0[1]-.2+(hash(i+9)-.5)*.6];s.ball([st[0]+(P[0]-st[0])*q,st[1]+(P[1]-st[1])*q,.15],.06,'#40c057',{flat:true,glow:true,lift:3})}
+  if(g<95)for(let i=0;i<4;i++){const q=cycle(t*.5+i/4,1),P=cap[1+(i%3)],st=[C0[0]+.2*i-.3,C0[1]-.9];s.ball([st[0]+(P[0]-st[0])*q,st[1]+(P[1]-st[1])*q,.15],.055,'#ff6b6b',{flat:true,glow:true,lift:3})}
+  s.callout([C0[0]-.35,C0[1]+.05,.35],'β-cells: insulin','#69db7c',-70,20);s.callout([C0[0]+.9,C0[1]-.3,.2],'α-cells: glucagon','#ff8787',75,-5);s.callout([C0[0]-.5,C0[1]+1.5,-.35],'islet of Langerhans','#e9f6ff',-40,-35);s.callout([cap[0][0]+.2,cap[0][1]-.1,.1],'blood capillary','#ff8787',-40,40);if(ins>.05)s.callout([cap[4][0],cap[4][1]-.1,.1],'insulin → liver, muscle','#69db7c',20,45);s.render();
+  chart(c,420,96,236,170,{title:'Blood glucose (mg/dL)',xl:'minutes',xmin:0,xmax:240,ymin:60,ymax:420,series:[{fn:m=>gluc({...p,cond:'normal'},m),col:'#8ca6b9',dash:[4,4]},{fn:m=>gluc(p,m),col:C.gold}],marker:[p.min,g]});tag(c,'green: β-cells (insulin)   red: α-cells (glucagon)   tan: exocrine cells',44,392,C.muted,12)},
  assumption:'Illustrative response curves (fasting 90 mg/dL normal, 140 diabetic; the normal curve dips slightly below fasting about 2 hours after a meal, when glucagon rises); not a clinical model.'});
 function gluc(p,m){const dm=p.cond==='dm',base=dm?140:90,tau=dm?95:32,A=p.carb*(dm?1.8:.6),dip=dm?0:10*Math.min(1,p.carb/75)*(m/110)*Math.exp(1-m/110);return base+A*(m/tau)*Math.exp(1-m/tau)-dip}
 function insul(p,m){if(p.cond==='dm')return .15;const tau=40;return clamp(.1+.9*(p.carb/150)*(m/tau)*Math.exp(1-m/tau),0,1)}
@@ -566,7 +687,28 @@ add({...ch(19,'Chemical Coordination and Integration'),id:'bio-endocrine-glands'
  tryText:'Which gland sits on top of each kidney, and what does its medulla secrete?',
  controls:[S('g','Gland','thyroid',Object.keys(GL).map(k=>[k,GL[k][0]]))],
  metrics:p=>{const d=GL[p.g];return[N('Gland',d[0]),N('Main hormones',d[1])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cy:290,yaw:-.75+.5*Math.sin(t*.3)});body(s,[0,-1.5,0],1.15,.1);for(const [k,d] of Object.entries(GL)){const on=k===p.g,q=V.add(d[2].map(v=>v*1.15),[0,-1.5,0]);if(k==='thyroid'){for(const z of[-1,1])s.mesh(V.add(q,[0,0,z*.1]),[.06,.11,.06],on?'#ffd43b':'#e64980');}else if(k==='adrenal'||k==='gonads'){for(const z of[-1,1])s.mesh(V.add(q,[0,0,z*.3-(k==='adrenal'?.3:0)]),.07,on?'#ffd43b':'#e64980')}else s.mesh(q,k==='pancreas'?[.22,.06,.06]:.07,on?'#ffd43b':'#e64980');s.part(q,d[0],on?'#ffd43b':'#dbe7f0',on?13:10,[0,.4,0],on?80:62)}s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:46,cx:190,cy:268,pitch:.02}),on=k=>k===p.g,col=(k,a)=>on(k)?'#ffd43b':a,SK='#fbe6d6';
+  const L=(k,q,dx,dy)=>s.callout(q,GL[k][0],on(k)?'#ffd43b':'#cfdde8',dx,dy,on(k)?13:10),HL=(k,q,r)=>{if(on(k))s.ball(q,r*.55,'#ffd43b',{glow:true,flat:true,lift:6})};
+  /* body outline: head, neck, torso, arms (translucent so the glands show through) */
+  s.mesh([0,2.7,0],[.5,.62,.4],SK,{alpha:.4,rings:12,segs:18});s.tube([[0,2.2,0],[0,1.85,0]],.17,SK,{alpha:.3,segs:10});
+  s.mesh([0,.35,0],[1.2,1.75,.5],SK,{alpha:.26,rings:14,segs:22,shape:(u,v)=>{const q=Math.cos(u)*Math.cos(v),n=Math.sin(u);return(1/Math.pow(Math.abs(q)**4+Math.abs(n)**4+.0001,.25)*.88)*(1-.1*Math.exp(-(((n+.1)*2.2)**2))*Math.abs(q))}});
+  for(const z of[-1,1]){s.tube([[z*1.1,1.5,0],[z*1.45,.7,0],[z*1.55,-.3,0]],.17,SK,{alpha:.26,segs:8})}
+  /* inset: sagittal section of the brain with the three glands of the head */
+  const B=[3.05,2.3,0];s.mesh(B,[1.0,.75,.1],'#f1b6bd',{rings:14,segs:26,spec:.4,shape:(u,v)=>1+.04*Math.sin(9*v+3*u)});s.mesh([B[0]+.55,B[1]-.6,0],[.38,.25,.1],'#d98c9a',{rings:8,segs:14});s.tube([[B[0]+.02,B[1]-.3,0],[B[0]+.12,B[1]-.7,0],[B[0]+.2,B[1]-1.0,0]],.1,'#e7a6b0',{segs:8});
+  s.seg([.45,3.0,0],[2.15,2.95,0],'#8ca6b9',1,[3,3]);s.seg([.45,2.4,0],[2.2,1.65,0],'#8ca6b9',1,[3,3]);
+  const hy=[B[0]-.15,B[1]-.2,.1],pi=[B[0]-.1,B[1]-.62,.1],pn=[B[0]+.35,B[1]-.02,.1];
+  s.mesh(hy,[.17,.12,.1],col('hypo','#9775fa'),{rings:8,segs:12,lift:2});s.tube([[hy[0],hy[1]-.1,.1],[pi[0],pi[1]+.1,.1]],.03,col('pit','#b197fc'),{segs:6});s.mesh([pi[0]-.04,pi[1],.1],[.1,.1,.09],col('pit','#e599f7'),{rings:7,segs:10});s.mesh([pi[0]+.08,pi[1],.1],[.1,.1,.09],col('pit','#9c36b5'),{rings:7,segs:10});s.mesh(pn,[.09,.07,.07],col('pineal','#38d9a9'),{rings:7,segs:10,lift:2});
+  HL('hypo',hy,.3);HL('pit',pi,.3);HL('pineal',pn,.22);L('hypo',hy,-70,-35);L('pit',pi,75,45);L('pineal',pn,55,-45);
+  /* neck and chest: thyroid with parathyroids, thymus, (heart for context) */
+  const th=[0,1.95,.2];for(const z of[-1,1]){s.mesh([z*.15,1.95,.2],[.12,.22,.09],col('thyroid','#e8a548'),{rings:8,segs:12,rot:[0,0,z*.25]});s.ball([z*.24,2.05,.28],.035,col('para','#7cc97a'),{flat:true,lift:3});s.ball([z*.24,1.84,.28],.035,col('para','#7cc97a'),{flat:true,lift:3})}s.tube([[-.12,1.9,.2],[.12,1.9,.2]],.05,col('thyroid','#e8a548'),{segs:6});
+  HL('thyroid',th,.35);HL('para',[.24,1.95,.3],.28);L('thyroid',[-.2,1.95,.2],-95,-5);L('para',[.26,2.05,.3],45,30);
+  s.mesh([.0,1.35,.05],[.1,.1,.1],'#c0392b',{alpha:0,rings:3,segs:4});for(const z of[-1,1])s.mesh([z*.17,1.5,.1],[.19,.3,.1],col('thymus','#f5d9a0'),{rings:8,segs:12,rot:[0,0,z*-.15]});s.mesh([.12,.95,0],[.32,.36,.22],'#9b2c3a',{alpha:.45,rings:8,segs:12});HL('thymus',[0,1.5,.1],.4);L('thymus',[.25,1.55,.1],95,10);
+  /* kidneys with the adrenal caps, pancreas, ovaries */
+  for(const z of[-1,1]){s.mesh([z*.6,.1,-.05],[.2,.34,.14],'#a8454f',{alpha:.7,rings:8,segs:12});s.mesh([z*.58,.5,-.02],[.2,.1,.1],col('adrenal','#e8c05a'),{rings:6,segs:10,rot:[0,0,z*.4],lift:2})}
+  HL('adrenal',[-.58,.5,0],.3);L('adrenal',[-.62,.52,0],-80,-20);
+  s.tube([[.5,.15,.08],[.15,.3,.08],[-.2,.38,.08],[-.55,.5,.08]],u=>.09*(1.1-.5*u),col('pancreas','#f3c36b'),{segs:8});HL('pancreas',[0,.33,.1],.4);L('pancreas',[.4,.2,.1],80,35);
+  for(const z of[-1,1]){s.mesh([z*.5,-.85,.05],[.12,.08,.07],col('gonads','#f783ac'),{rings:6,segs:10,lift:2})}HL('gonads',[.5,-.85,.1],.25);L('gonads',[.55,-.88,.1],80,25);
+  s.render();tag(c,'highlighted gland: '+GL[p.g][0]+'   (ovaries shown; testes lie in the scrotum)',44,392,C.muted,12)},
  assumption:'Gland positions approximate; hormone lists from NCERT Chapter 19.'});
 
 add({...ch(19,'Chemical Coordination and Integration'),id:'bio-thyroid-feedback',title:'Thyroid feedback and iodine',
@@ -576,8 +718,20 @@ add({...ch(19,'Chemical Coordination and Integration'),id:'bio-thyroid-feedback'
  tryText:'Lower iodine intake below 50 μg/day. What happens to TSH and gland size?',
  controls:[R('iod','Iodine intake',10,300,5,150,'μg/day')],
  metrics:p=>{const r=thy(p);return[N('Thyroid hormone (T₄) level',r.t4*100,'% of normal',0),N('TSH level',r.tsh*100,'% of normal',0),N('Thyroid size',r.size,'× normal',2),N('Condition',r.t4<.75?'Hypothyroidism, goitre risk':'Normal')]},
- draw:(c,p,t)=>{const r=thy(p),s=P3.scene(c,{scale:62,cx:240});s.tube([[0,-1.6,0],[0,.6,0]],.6,'#ffd8c2',{alpha:.3});for(const z of[-1,1])s.mesh([.45,-.4,z*.32*r.size],[.18*r.size,.42*r.size,.2*r.size],'#e64980');s.tube([[.5,-.5,-.3],[.55,-.55,0],[.5,-.5,.3]],.08*r.size,'#e64980');
-  for(let i=0;i<9;i++)s.cyl([.15,-1.4+i*.22,0],[0,1,0],.2,.08,'#dee2e6');s.cyl([.15,-.4,0],[0,1,0],.18,2.1,'#adb5bd',{alpha:.5});s.mesh([0,1.6,0],.18,'#b197fc');s.mesh([.1,1.3,0],.12,'#748ffc');s.callout([0,1.65,0],'hypothalamus (TRH)','#c9b6ff',60,-30);s.callout([.1,1.3,0],'anterior pituitary (TSH)','#91a7ff',70,10);s.callout([.5,-.4,.32*r.size],r.size>1.2?'enlarged thyroid (goitre)':'thyroid gland (T₃, T₄)','#e64980',70,40);s.callout([.15,-1.2,.2],'trachea','#dee2e6',-60,30);for(let i=0;i<Math.round(r.tsh*5);i++){const q=cycle(t*.6+i/5,1);s.ball([.2,1.2-q*1.5,.1],.05,'#748ffc',{flat:true,glow:true})}for(let i=0;i<Math.round(r.t4*5);i++){const q=cycle(t*.5+i/5,1);s.ball([-.2,-.3+q*1.5,-.1],.05,'#ffd43b',{flat:true})}s.render();tag(c,'blue: TSH down · yellow: T₄ up (feedback)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const r=thy(p),s=P3.scene(c,{scale:46,cx:250,cy:268,pitch:.03}),X=-.4,
+  along=(P,q)=>{const n=P.length-1,k=q*n,j=Math.min(n-1,Math.floor(k)),f2=k-j;return[P[j][0]+(P[j+1][0]-P[j][0])*f2,P[j][1]+(P[j+1][1]-P[j][1])*f2,.15]},
+  pTSH=[[X-.2,1.2],[-1.8,1.2],[-1.8,-.9],[X-.5,-.9]],pT4=[[X+.5,-.9],[1.2,-.9],[1.2,1.7],[X+.35,1.7]];
+  /* brain (sagittal): hypothalamus, pituitary on its stalk */
+  s.mesh([X,2.0,0],[.95,.7,.14],'#f1b6bd',{rings:14,segs:26,spec:.4,shape:(u,v)=>1+.04*Math.sin(9*v+3*u)});s.mesh([X+.5,1.45,0],[.3,.2,.12],'#d98c9a',{rings:8,segs:12});s.tube([[X+.1,1.85,0],[X+.15,1.5,0],[X+.25,1.2,0]],.09,'#e7a6b0',{segs:8});
+  s.mesh([X-.2,1.7,.1],[.17,.12,.1],'#9775fa',{rings:8,segs:12,lift:2});s.tube([[X-.2,1.62,.1],[X-.2,1.38,.1]],.03,'#b197fc',{segs:6});s.mesh([X-.2,1.25,.1],[.12,.1,.09],'#5c7cfa',{rings:7,segs:10,lift:2});
+  /* trachea with cartilage rings and the thyroid lobes + isthmus that wrap it */
+  s.tube([[X,.1,0],[X,-1.9,0]],.22,'#dcd3c8',{segs:10});for(let i=0;i<10;i++){const y=.0-i*.2;s.seg([X-.2,y,.2],[X+.2,y,.2],'#a89c8f',2)}
+  const sz=r.size,gc=sz>1.25?'#d6336c':'#f06595';for(const z of[-1,1])s.mesh([X+z*.3*(.85+.15*sz),-.9,.08],[.17*sz,.36*sz,.14*sz],gc,{rings:10,segs:14,spec:.5,rot:[0,0,z*.2]});s.tube([[X-.2,-.8,.15],[X+.2,-.8,.15]],.06*sz,gc,{segs:8});
+  /* hormone paths: TSH down the left, T₄ up the right with negative feedback onto the brain */
+  s.path(pTSH.map(q=>[q[0],q[1],.1]),'#748ffc',2,[5,4],1e5);s.arrow([X-.9,-.9,.1],[X-.5,-.9,.1],'#748ffc',2,8);
+  s.path(pT4.map(q=>[q[0],q[1],.1]),'#ffd43b',2,[5,4],1e5);s.seg([X+.35,1.6,.1],[X+.35,1.8,.1],'#ff6b6b',4,[],1e5);s.path([[1.2,1.2,.1],[X+.35,1.2,.1]],'#ff6b6b',1.5,[3,3],1e5);s.seg([X+.35,1.1,.1],[X+.35,1.3,.1],'#ff6b6b',4,[],1e5);
+  for(let i=0;i<Math.round(r.tsh*5);i++)s.ball(along(pTSH,cycle(t*.25+i/5,1)),.07,'#748ffc',{flat:true,glow:true,lift:3});for(let i=0;i<Math.round(r.t4*5);i++)s.ball(along(pT4,cycle(t*.25+i/5,1)),.07,'#ffd43b',{flat:true,glow:true,lift:3});
+  s.callout([X-.2,1.75,.1],'hypothalamus (TRH)','#c9b6ff',-90,-25);s.callout([X-.2,1.25,.1],'anterior pituitary (TSH)','#91a7ff',-90,30);s.callout([X+.4,-.7,.1],sz>1.2?'enlarged thyroid (goitre)':'thyroid gland (T₃, T₄)','#f783ac',55,40);s.callout([X+.2,-1.3,.2],'trachea','#dee2e6',70,0);s.callout([1.2,.4,.1],'negative feedback ⊣','#ff6b6b',20,0);s.render();tag(c,'blue: TSH (more when T₄ is low)  ·  yellow: T₄  ·  red ⊣: feedback inhibits',44,392,C.muted,12)},
  assumption:'Toy steady-state model (T₄ ∝ √(iodine supply), TSH ∝ 1/T₄); adult requirement taken as ~150 μg/day.'});
 function thy(p){const i=Math.min(1,p.iod/150),t4=Math.sqrt(i),tsh=1/t4;return{t4,tsh,size:1+Math.max(0,tsh-1)*.6}}
 

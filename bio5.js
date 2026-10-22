@@ -17,8 +17,17 @@ add({...ch(7,'Human Health and Disease',U8),id:'bio-immune-response',title:'Prim
  tryText:'Move the second exposure earlier or later. Does the secondary response still appear?',
  controls:[R('second','Second exposure on day',20,80,1,40,'day'),R('day','Day now',0,120,1,55,'day')],
  metrics:p=>{const a=abLevel(p,p.day);return[N('Antibody level (relative)',a,'',1),N('Primary peak (≈ day 12)',abLevel(p,12),'',1),N('Secondary peak',abLevel(p,p.second+6),'',1),N('Memory','B and T memory cells formed in primary response')]},
- draw:(c,p,t)=>{const a=abLevel(p,p.day),s=P3.scene(c,{scale:56,cx:220});for(let i=0;i<8;i++){const q=[(hash(i)-.5)*3,(hash(i+3)-.5)*2.4,(hash(i+6)-.5)*1.5];s.ball(q,.22,'#e64980');for(let k=0;k<8;k++){const u=hash(i*8+k)*2-1,ph=TAU*hash(i*8+k+1),r=Math.sqrt(1-u*u);s.ball(V.add(q,[.26*r*Math.cos(ph),.26*u,.26*r*Math.sin(ph)]),.05,'#ffa8a8',{flat:true})}}
-  for(let i=0;i<Math.min(24,Math.round(a*2));i++){const q=[(hash(i+40)-.5)*3.4,(hash(i+50)-.5)*2.6+.1*Math.sin(t*2+i),(hash(i+60)-.5)*1.6];antibody(s,q,.5,'#74c0fc',hash(i)*TAU)}s.callout([(hash(0)-.5)*3,(hash(3)-.5)*2.4+.22,(hash(6)-.5)*1.5],'antigen (pathogen surface)','#ff8fab',-50,-50);if(a>.5)s.callout([(hash(40)-.5)*3.4,(hash(50)-.5)*2.6+.1*Math.sin(t*2),(hash(60)-.5)*1.6],'antibodies (IgG) from plasma B cells','#74c0fc',50,50);s.render();
+ draw:(c,p,t)=>{const a=abLevel(p,p.day),s=P3.scene(c,{scale:56,cx:235,cy:262,pitch:.02}),PL=[-1.9,.55,0],
+  /* pathogens (bacteria-like cells) coated with surface antigens; antibodies bind them */
+  PA=[[.4,.9],[1.7,.4],[.9,-.7],[2.1,-1.0],[-.3,-.9]],nAb=Math.min(24,Math.round(a*2));
+  PA.forEach(([x,y],i)=>{const q=[x+.04*Math.sin(t+i),y+.05*Math.cos(t*.8+i),0];s.mesh(q,[.34,.24,.24],'#e0457b',{rings:10,segs:16,spec:.5,rot:[0,0,hash(i)*3]});s.mesh(q,[.26,.17,.17],'#b3245b',{rings:6,segs:10,rot:[0,0,hash(i)*3]});
+    for(let k=0;k<9;k++){const an=TAU*k/9+i,rr=[.34*Math.cos(an),.24*Math.sin(an)],ca=Math.cos(hash(i)*3),sa=Math.sin(hash(i)*3),e=[q[0]+rr[0]*ca-rr[1]*sa,q[1]+rr[0]*sa+rr[1]*ca,.05],d=V.norm([e[0]-q[0],e[1]-q[1],0]),tip=V.add(e,V.mul(d,.1));s.seg(e,tip,'#ffa8a8',1.6);s.ball(tip,.04,'#ffd8d8',{flat:true})}});
+  /* plasma B cell: eccentric nucleus, rough ER, secreting antibodies */
+  s.mesh(PL,[.62,.55,.5],'#e7a9c4',{alpha:.6,rings:12,segs:18,spec:.5});s.mesh([PL[0]-.15,PL[1]+.05,.1],[.26,.26,.24],'#5f3dc4',{rings:8,segs:12,lift:6});for(let i=0;i<4;i++){s.ring([PL[0]+.12,PL[1]-.1,.15],[0,0,1],.12+i*.07,'#2f7fc4',2,[],24)}
+  for(let i=0;i<Math.min(6,Math.ceil(nAb/4));i++){const q=cycle(t*.35+i/6,1);antibody(s,[PL[0]+.7+q*1.2,PL[1]-.1+(hash(i)-.5)*.7*q,.1],.34,'#74c0fc',-.8+hash(i)*1.6)}
+  /* free antibodies in the plasma */
+  for(let i=0;i<nAb;i++){const q=[-1.1+hash(i+40)*3.5,-1.5+hash(i+50)*2.9+.08*Math.sin(t*2+i),(hash(i+60)-.5)*.5];if(Math.hypot(q[0]-PL[0],q[1]-PL[1])<.9)continue;antibody(s,q,.36,'#74c0fc',hash(i)*TAU)}
+  s.callout([PL[0]-.4,PL[1]-.35,.3],'plasma B cell','#f3c4d6',-35,40);s.callout([PA[0][0],PA[0][1]+.28,.1],'antigen (pathogen surface)','#ff8fab',-10,-50);if(a>.5)s.callout([1.2,-1.4,.2],'antibodies (IgG)','#74c0fc',40,35);s.render();
   chart(c,420,96,236,170,{title:'Antibody level vs time',xl:'days',xmin:0,xmax:120,ymin:0,ymax:abLevel(p,p.second+6)*1.1,series:[{fn:d=>abLevel(p,d),col:C.gold}],marker:[p.day,a]})},
  assumption:'Schematic antibody curves: primary peak ≈ 1 unit at day 12; secondary ≈ 10× higher, peaking about 6 days after re-exposure.'});
 function abLevel(p,d){const e0=Math.exp(-.7),g=(t0,lag,peak,w)=>{const x=d-t0-lag;if(x<0)return 0;if(x<=w)return peak*(Math.exp(-(((x-w)/w)**2)*.7)-e0)/(1-e0);return peak*Math.exp(-(((x-w)/w)**2)*.7)*Math.exp(-(x-w)/40)};return g(0,4,1,8)+(d>=p.second?g(p.second,1.5,10,5):0)}
@@ -43,10 +52,32 @@ add({...ch(7,'Human Health and Disease',U8),id:'bio-malaria-cycle',title:'Life c
  tryText:'Step to the RBC stage. Why does fever come in cycles?',
  controls:[R('stage','Stage',1,6,1,1)],
  metrics:p=>{const d=MAL[p.stage-1];return[N('Stage',d[0]),N('What happens',d[1]),N('Host',d[2]),N('Pathogen','Plasmodium (e.g. P. vivax, P. falciparum)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.3}),st=p.stage,pts=[[-2.6,1.4,0],[-2.6,-.4,0],[-1,-1.4,0],[1,-1.4,0],[2.6,-.4,0],[2.6,1.4,0]];s.path([...pts,pts[0]],'#29475b',3,[5,5]);
-  critter(s,'human',[-3.4,-1.7,-1.3],.8,t);critter(s,'insect',[3,0,-1.3],1.2,t);s.mesh(pts[1],[.5,.3,.35],'#a61e4d',{label:'liver'});for(let i=0;i<5;i++)s.mesh(V.add(pts[2],[(i-2)*.25,.1*Math.sin(i),0]),[.18,.07,.18],'#c92a2a',{rot:[PI/2,0,0],rings:6,segs:10});s.mesh(pts[4],[.45,.25,.3],'#ffc078',{alpha:.6});s.mesh(pts[5],[.25,.3,.25],'#ffd8a8',{alpha:.6});
-  const q=cycle(t*.5,1),pos=V.add(pts[st-1],V.mul(V.sub(pts[st%6],pts[st-1]),q));for(let i=0;i<5;i++)s.ball(V.add(pos,[(hash(i)-.5)*.3,(hash(i+2)-.5)*.3,0]),.05,'#be4bdb',{glow:true,flat:true});
-  s.label([-2.6,1.8,0],'bite',C.muted,11);s.label([-1.3,-1.8,0],'RBCs',C.red,11);s.label([2.6,1.8,0],'salivary glands',C.muted,11);s.label([2.9,-.85,0],'mosquito gut',C.muted,11);s.render();tag(c,MAL[st-1][0],44,98,C.gold,15)},
+ draw:(c,p,t)=>{const st=p.stage,CX=340,CY=252,RX=248,RY=92,ANG=[212,152,104,52,-22,-92],R=36,
+  P=ANG.map(a=>[CX+RX*Math.cos(a*Math.PI/180),CY+RY*Math.sin(a*Math.PI/180)]),
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  disc=(x,y,r,col,hi)=>{const g=c.createRadialGradient(x-r*.3,y-r*.35,r*.1,x,y,r);g.addColorStop(0,hi||'#fff4');g.addColorStop(.3,col);g.addColorStop(1,col);c.save();c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();c.fillStyle='rgba(255,255,255,.22)';c.beginPath();c.arc(x-r*.28,y-r*.32,r*.35,0,TAU);c.fill();c.restore()},
+  rbc=(x,y,r,col)=>{c.save();c.fillStyle=col||'#d6303a';c.beginPath();c.arc(x,y,r,0,TAU);c.fill();c.fillStyle='rgba(120,10,25,.55)';c.beginPath();c.arc(x,y,r*.45,0,TAU);c.fill();c.restore()},
+  para=(x,y,r)=>{c.save();c.fillStyle='#c77dff';c.strokeStyle='#7048e8';c.lineWidth=1;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();c.stroke();c.restore()},
+  icons=[
+   /* 1 mosquito bite: body, wing, proboscis and drop of saliva with sporozoites */
+   (x,y)=>{c.save();c.fillStyle='#3b3f45';c.beginPath();c.ellipse(x+3,y-2,10,4.2,-.35,0,TAU);c.fill();c.beginPath();c.arc(x-8,y+1,3.4,0,TAU);c.fill();c.strokeStyle='#3b3f45';c.lineWidth=1.4;c.beginPath();c.moveTo(x-10,y+3);c.lineTo(x-18,y+11);c.stroke();c.fillStyle='rgba(200,225,255,.75)';c.beginPath();c.ellipse(x+1,y-10,9,3.4,.6,0,TAU);c.fill();c.strokeStyle='#3b3f45';c.lineWidth=1;for(let i=0;i<3;i++){c.beginPath();c.moveTo(x+6-i*3,y+1);c.lineTo(x+9-i*5,y+11);c.stroke()}c.restore();for(let i=0;i<3;i++)para(x-20+i*1.5,y+14+i*1.5,1.8)},
+   /* 2 liver: lobed organ with parasites in the cells */
+   (x,y)=>{c.save();const g=c.createLinearGradient(x-18,y-12,x+18,y+12);g.addColorStop(0,'#c0504d');g.addColorStop(1,'#7a1f2a');c.fillStyle=g;c.beginPath();c.moveTo(x-19,y-3);c.bezierCurveTo(x-16,y-17,x+8,y-17,x+19,y-8);c.bezierCurveTo(x+22,y+2,x+10,y+13,x-4,y+11);c.bezierCurveTo(x-14,y+10,x-21,y+4,x-19,y-3);c.fill();c.strokeStyle='rgba(60,0,10,.5)';c.beginPath();c.moveTo(x+2,y-12);c.quadraticCurveTo(x+4,y,x-3,y+10);c.stroke();c.restore();for(let i=0;i<5;i++)para(x-10+i*5,y-4+3*Math.sin(i*2),1.9)},
+   /* 3 RBC stage: infected red cells (ring forms) and one bursting */
+   (x,y)=>{rbc(x-12,y-6,8);rbc(x+9,y-8,8);rbc(x-2,y+8,8);c.save();c.strokeStyle='#c77dff';c.lineWidth=1.6;c.beginPath();c.arc(x-12,y-6,3.2,0,TAU);c.stroke();c.beginPath();c.arc(x+9,y-8,3.2,0,TAU);c.stroke();c.strokeStyle='#ffd43b';c.lineWidth=1.3;for(let i=0;i<8;i++){const a=TAU*i/8;c.beginPath();c.moveTo(x-2+Math.cos(a)*9.5,y+8+Math.sin(a)*9.5);c.lineTo(x-2+Math.cos(a)*14,y+8+Math.sin(a)*14);c.stroke()}c.restore()},
+   /* 4 gametocytes: red cell containing a crescent gametocyte */
+   (x,y)=>{rbc(x-6,y,12);c.save();c.strokeStyle='#be4bdb';c.lineWidth=4.2;c.lineCap='round';c.beginPath();c.arc(x-6,y,6.5,.5,TAU-.9);c.stroke();c.restore();rbc(x+14,y-9,6);c.save();c.strokeStyle='#be4bdb';c.lineWidth=2.4;c.beginPath();c.arc(x+14,y-9,3,.3,TAU-1);c.stroke();c.restore()},
+   /* 5 mosquito gut: wall with oocysts */
+   (x,y)=>{c.save();c.fillStyle='#e8c78a';c.strokeStyle='#a1783a';c.lineWidth=1.4;c.beginPath();c.ellipse(x,y,20,12,0,0,TAU);c.fill();c.stroke();c.restore();for(let i=0;i<4;i++){c.save();c.fillStyle='#fff3c9';c.strokeStyle='#a1783a';c.beginPath();c.arc(x-11+i*7,y+9-Math.abs(i-1.5)*2,3.6,0,TAU);c.fill();c.stroke();c.restore()}para(x-3,y-3,3.4);para(x+5,y-2,3.4)},
+   /* 6 salivary glands: acini with sporozoites in the duct */
+   (x,y)=>{c.save();c.fillStyle='#ffd8a8';c.strokeStyle='#d9843a';c.lineWidth=1.2;for(let i=0;i<5;i++){c.beginPath();c.arc(x-12+i*6.5,y-4+(i%2)*7,6.2,0,TAU);c.fill();c.stroke()}c.strokeStyle='#9c6b3c';c.lineWidth=2.2;c.beginPath();c.moveTo(x-14,y+10);c.lineTo(x+16,y+10);c.stroke();c.restore();for(let i=0;i<4;i++)para(x-6+i*5,y+10,1.6)}];
+  /* flow arrows between consecutive stages (curved along the loop) */
+  c.save();c.lineWidth=2;for(let i=0;i<6;i++){const a=P[i],b=P[(i+1)%6],on=i===st-1,mid=[(a[0]+b[0])/2+(CX-(a[0]+b[0])/2)*.0,(a[1]+b[1])/2],ang=Math.atan2(b[1]-a[1],b[0]-a[0]),d=Math.hypot(b[0]-a[0],b[1]-a[1]),sx=a[0]+Math.cos(ang)*(R+5),sy=a[1]+Math.sin(ang)*(R+5),ex=b[0]-Math.cos(ang)*(R+9),ey=b[1]-Math.sin(ang)*(R+9);c.strokeStyle=on?'#ffd43b':'#3c5a70';c.fillStyle=on?'#ffd43b':'#3c5a70';c.setLineDash(on?[]:[5,4]);c.beginPath();c.moveTo(sx,sy);c.lineTo(ex,ey);c.stroke();c.setLineDash([]);c.beginPath();c.moveTo(ex,ey);c.lineTo(ex-Math.cos(ang-.45)*9,ey-Math.sin(ang-.45)*9);c.lineTo(ex-Math.cos(ang+.45)*9,ey-Math.sin(ang+.45)*9);c.closePath();c.fill()}c.restore();
+  const names=['mosquito bite','liver stage','RBC stage','gametocytes','mosquito gut','salivary glands'],lab=[[0,-1],[0,1],[0,1],[0,1],[0,-1],[0,-1]];
+  P.forEach(([x,y],i)=>{const on=i===st-1,mos=i>=4;c.save();c.fillStyle=on?'rgba(255,212,59,.18)':'rgba(16,36,58,.9)';c.strokeStyle=on?'#ffd43b':mos?'#ffa94d':'#4dabf7';c.lineWidth=on?3.5:2;c.beginPath();c.arc(x,y,R,0,TAU);c.fill();c.stroke();c.restore();c.save();c.beginPath();c.arc(x,y,R-2,0,TAU);c.clip();c.translate(x,y);c.scale(1.45,1.45);icons[i](0,0);c.restore();const L=lab[i];txt((i+1)+'  '+names[i],x+L[0]*(R+10),y+L[1]*(R+16),on?C.gold:C.white,on?15:14,L[0]<0?'right':L[0]>0?'left':'center')});
+  /* moving parasite along the arrow of the current stage */
+  {const a=P[st-1],b=P[st%6],q=cycle(t*.5,1);for(let i=0;i<4;i++)para(a[0]+(b[0]-a[0])*Math.min(1,q+i*.03)*.85+(hash(i)-.5)*7,a[1]+(b[1]-a[1])*Math.min(1,q+i*.03)*.85+(hash(i+2)-.5)*7,3.4)}
+  tag(c,MAL[st-1][0],44,98,C.gold,16);txt('blue ring: in human   orange ring: in female Anopheles   purple: parasite',44,120,C.muted,12,'left')},
  assumption:'Simplified cycle from NCERT Chapter 7; purple dots are parasites.'});
 
 /* ---------- Chapter 8: Microbes in Human Welfare ---------- */
@@ -57,10 +88,31 @@ add({...ch(8,'Microbes in Human Welfare',U8),id:'bio-sewage-treatment',title:'Se
  tryText:'How long must the sewage be aerated to remove 90% of its BOD?',
  controls:[R('bod0','BOD of incoming sewage',100,500,10,300,'mg/L'),R('h','Aeration time',0,12,.1,4,'h',1)],
  metrics:p=>{const k=.3,b=p.bod0*Math.exp(-k*p.h);return[N('BOD after aeration',b,'mg/L',0),N('BOD removed',(1-b/p.bod0)*100,'%',0),N('Stage now',p.h<.5?'Primary treatment (settling)':'Secondary treatment (aeration)'),N('Microbes','Aerobic bacteria and fungi forming flocs')]},
- draw:(c,p,t)=>{const k=.3,b=p.bod0*Math.exp(-k*p.h),s=P3.scene(c,{scale:50,pitch:.4});const tank=(x,w,col,lab)=>{s.box([x,-.5,0],[w,1.4,2],'#adb5bd',{alpha:.25});s.box([x,-.65,0],[w*.96,1.05,1.92],col,{alpha:.55});s.label([x,.6,1.1],lab,C.white,12)};
-  tank(-2.5,1.6,'#8d6e4f','primary');tank(0,2,`#${Math.round(90+80*(1-b/p.bod0)).toString(16)}${Math.round(110+60*(1-b/p.bod0)).toString(16)}60`,'aeration');tank(2.5,1.6,'#4dabf7','settling');for(let i=0;i<14;i++){const q=cycle(t*.6+i/14,1);s.ball([-.8+hash(i)*1.6,-1.1+q*1.1,(hash(i+3)-.5)*1.6],.05,'#e7f5ff',{flat:true})}
-  for(let i=0;i<10;i++)s.mesh([-.7+hash(i+20)*1.4,-.8+hash(i+25)*.6,(hash(i+30)-.5)*1.4],[.12,.08,.1],'#a0782b',{shape:(u,v)=>1+.3*Math.sin(5*v+i)});s.render();
-  chart(c,420,300,236,100,{title:'BOD (mg/L)',xmin:0,xmax:12,ymin:0,ymax:p.bod0,series:[{fn:x=>p.bod0*Math.exp(-k*x),col:C.gold}],marker:[p.h,b]})},
+ draw:(c,p,t)=>{const k=.3,b=p.bod0*Math.exp(-k*p.h),rem=1-b/p.bod0,TY=170,TH=170,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  rr=(x,y,w,h,r)=>{c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)},
+  mixc=(a,b2,k2)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b2.slice(i,i+2),16));return'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*k2)).join(',')+')'},
+  /* tank: concrete wall, water of a given colour, with a water line */
+  tank=(x,w,col,lab,wl)=>{c.save();c.fillStyle='rgba(120,135,150,.35)';rr(x-6,TY-6,w+12,TH+12,8);c.fill();const g=c.createLinearGradient(0,TY,0,TY+TH);g.addColorStop(0,col);g.addColorStop(1,'#0b1622');c.fillStyle=g;rr(x,TY+wl,w,TH-wl,4);c.fill();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;c.beginPath();c.moveTo(x,TY+wl);c.lineTo(x+w,TY+wl);c.stroke();c.restore();txt(lab,x+w/2,TY-22,C.white,13)},
+  pipe=(x1,y1,x2,y2)=>{c.save();c.strokeStyle='#7f93a5';c.lineWidth=8;c.lineCap='butt';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.strokeStyle='#a9bccd';c.lineWidth=3;c.beginPath();c.moveTo(x1,y1-1);c.lineTo(x2,y2-1);c.stroke();c.restore()},
+  X1=46,W1=106,X2=182,W2=132,X3=346,W3=96;
+  pipe(10,TY+34,X1,TY+34);pipe(X1+W1,TY+40,X2,TY+40);pipe(X2+W2,TY+40,X3,TY+40);pipe(X3+W3,TY+34,X3+W3+22,TY+34);
+  /* 1 primary: bar screen, grit/sludge settling at the bottom, scum on top */
+  tank(X1,W1,'#8d7254','primary',14);c.save();c.fillStyle='#5b4632';c.beginPath();c.moveTo(X1,TY+TH);c.lineTo(X1,TY+TH-22);c.quadraticCurveTo(X1+W1/2,TY+TH-48,X1+W1,TY+TH-22);c.lineTo(X1+W1,TY+TH);c.fill();c.fillStyle='rgba(210,190,150,.8)';rr(X1+10,TY+10,W1-20,5,2);c.fill();c.strokeStyle='#cfd8e0';c.lineWidth=2;for(let i=0;i<6;i++){c.beginPath();c.moveTo(X1+8+i*5,TY+18);c.lineTo(X1+8+i*5,TY+TH-70)}c.stroke();c.restore();
+  for(let i=0;i<9;i++){const q=cycle(t*.25+i/9,1);c.save();c.fillStyle='#6b563d';c.beginPath();c.arc(X1+30+hash(i)*(W1-50),TY+30+q*(TH-80),2.6,0,TAU);c.fill();c.restore()}
+  txt('debris, grit and',X1+W1/2,TY+TH+20,C.muted,10);txt('sludge settle out',X1+W1/2,TY+TH+34,C.muted,10);
+  /* 2 aeration: clear-to-brown colour by BOD, flocs, diffusers and bubbles */
+  tank(X2,W2,mixc('#8a7a3e','#4f8f6c',rem),'secondary: aeration',14);c.save();c.fillStyle='#cfd8e0';for(let i=0;i<6;i++){c.fillRect(X2+18+i*26,TY+TH-10,14,6)}c.restore();
+  for(let i=0;i<14;i++){const f=cycle(t*.5+i/14,1);c.save();c.fillStyle='rgba(230,245,255,.75)';c.beginPath();c.arc(X2+25+(i%6)*26+3*Math.sin(f*9+i),TY+TH-12-f*(TH-30),2+hash(i)*1.8,0,TAU);c.fill();c.restore()}
+  for(let i=0;i<10;i++){const x=X2+20+hash(i+20)*(W2-40),y=TY+50+hash(i+25)*(TH-90);c.save();c.fillStyle='#a0782b';c.strokeStyle='#6b4f1d';c.lineWidth=1;c.beginPath();for(let a=0;a<=16;a++){const th=TAU*a/16,rr2=(9+hash(i+7)*5)*(1+.3*Math.sin(5*th+i));const px=x+Math.cos(th)*rr2,py=y+Math.sin(th)*rr2*.7;a?c.lineTo(px,py):c.moveTo(px,py)}c.closePath();c.fill();c.stroke();c.fillStyle='#e7cf9a';for(let m=0;m<3;m++){c.beginPath();c.arc(x-4+m*4,y+(m%2)*2-1,1.4,0,TAU);c.fill()}c.restore()}
+  txt('flocs: bacteria + fungi',X2+W2/2,TY+TH+24,C.muted,10);txt('air in',X2+W2/2,TY+TH+8,'#cfe9ff',10);
+  /* 3 settling tank: clear effluent above, activated sludge below and recycled */
+  tank(X3,W3,'#4d96d6','settling tank',14);c.save();c.fillStyle='#8a6a2a';c.beginPath();c.moveTo(X3,TY+TH);c.lineTo(X3,TY+TH-30);c.quadraticCurveTo(X3+W3/2,TY+TH-50,X3+W3,TY+TH-30);c.lineTo(X3+W3,TY+TH);c.fill();c.restore();txt('effluent',X3+W3/2,TY+60,'#e7f5ff',12);txt('activated sludge',X3+W3/2,TY+TH-16,'#f3e5b0',11);
+  c.save();c.strokeStyle='#d9a441';c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();c.moveTo(X3+W3/2,TY+TH+4);c.lineTo(X3+W3/2,TY+TH+50);c.lineTo(X2+W2/2,TY+TH+50);c.lineTo(X2+W2/2,TY+TH+28);c.stroke();c.setLineDash([]);c.restore();txt('part returned as inoculum',(X2+X3+W2)/2+34,TY+TH+41,'#d9a441',10);
+  txt('sludge → anaerobic digester → biogas',470,296,'#a8e063',10,'left');
+  /* flow particles through the pipes */
+  for(let i=0;i<8;i++){const q=cycle(t*.35+i/8,1),x=10+q*(X3+W3+22-10);c.save();c.fillStyle=q<.35?'#9c7f5a':q<.7?'#7aa07c':'#9fd3ff';c.beginPath();c.arc(x,(q<.35?TY+34:TY+40),3.2,0,TAU);c.fill();c.restore()}
+  chart(c,470,112,190,150,{title:'BOD (mg/L)',xmin:0,xmax:12,ymin:0,ymax:p.bod0,series:[{fn:x=>p.bod0*Math.exp(-k*x),col:C.gold}],marker:[p.h,b]})},
  assumption:'First-order BOD decay with k = 0.3 per hour (illustrative); real plants vary widely.'});
 
 add({...ch(8,'Microbes in Human Welfare',U8),id:'bio-biogas-plant',title:'Biogas plant',
@@ -70,10 +122,32 @@ add({...ch(8,'Microbes in Human Welfare',U8),id:'bio-biogas-plant',title:'Biogas
  tryText:'Increase the dung fed per day and see the gas holder rise faster.',
  controls:[R('dung','Dung fed per day',10,200,5,50,'kg'),R('T','Digester temperature',15,40,1,32,'°C')],
  metrics:p=>{const y=.04*p.dung*Math.exp(-(((p.T-35)/12)**2));return[N('Biogas per day',y,'m³',2),N('Methane (≈ 60%)',y*.6,'m³',2),N('Microbes','Methanogens, e.g. Methanobacterium'),N('Spent slurry','Used as fertiliser')]},
- draw:(c,p,t)=>{const y=.04*p.dung*Math.exp(-(((p.T-35)/12)**2)),s=P3.scene(c,{scale:54,cy:280,pitch:.25});s.box([0,-1.85,0],[7,.3,3],'#6d4c2f',{ground:true});s.cyl([0,-.9,0],[0,1,0],1.2,1.8,'#868e96',{alpha:.35,caps:false});s.cyl([0,-1.1,0],[0,1,0],1.15,1.4,'#6d4c2f',{alpha:.75});
-  const rise=Math.min(.9,cycle(t*y*.1,1)*.9);s.cyl([0,.05+rise,0],[0,1,0],1.05,.9,'#ced4da');s.tube([[0,.5+rise,0],[0,1.2+rise,0],[1.5,1.2+rise,0]],.05,'#495057',{segs:6});s.ball([1.6,1.2+rise,0],.12,'#4dabf7',{glow:true,flat:true});
-  s.tube([[-2.6,.4,0],[-2.6,-1.2,0],[-1.2,-1.5,0]],.12,'#a0782b',{segs:8});s.tube([[1.2,-1.5,0],[2.6,-1.2,0],[2.6,.2,0]],.12,'#8d6e4f',{segs:8});s.label([-2.6,.8,0],'dung slurry in',C.gold,12);s.label([2.6,.6,0],'spent slurry out',C.muted,12);s.label([0,1.5+rise,0],'gas holder',C.white,12);
-  for(let i=0;i<10;i++){const q=cycle(t*.5+i/10,1);s.ball([(hash(i)-.5)*1.6,-1.5+q*1.2,(hash(i+4)-.5)*1.6],.05,'#e7f5ff',{flat:true})}s.render()},
+ draw:(c,p,t)=>{const y=.04*p.dung*Math.exp(-(((p.T-35)/12)**2)),rise=Math.min(.9,cycle(t*y*.1,1)*.9),GY=190,
+  txt=(s2,x,yy,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,yy);c.restore()},
+  /* ground with soil layers; the digester is a cut-away masonry pit */
+  gr=c.createLinearGradient(0,GY,0,GY+210);gr.addColorStop(0,'#7a5a3a');gr.addColorStop(1,'#3f2c1c');
+  c.save();c.fillStyle=gr;c.fillRect(24,GY,610,210);c.fillStyle='#6fae4f';c.fillRect(24,GY-5,610,8);c.restore();
+  const DX=262,DW=140,DT=GY+4,DB=GY+196;
+  c.save();c.fillStyle='#b5503a';c.strokeStyle='#7a2f22';c.lineWidth=1.5;c.beginPath();c.rect(DX-DW/2-9,DT,9,DB-DT);c.rect(DX+DW/2,DT,9,DB-DT);c.fill();c.stroke();c.fillStyle='#8a3d2d';for(let r=0;r<10;r++){c.fillRect(DX-DW/2-9,DT+r*19,9,1.4);c.fillRect(DX+DW/2,DT+r*19,9,1.4)}c.restore();
+  /* slurry in the digester with a dark sludge layer and bubbles */
+  const sl=c.createLinearGradient(0,DT+30,0,DB);sl.addColorStop(0,'#8a6a2a');sl.addColorStop(1,'#3b2a14');c.save();c.fillStyle=sl;c.fillRect(DX-DW/2,DT+34,DW,DB-DT-34);c.restore();
+  c.save();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;c.beginPath();c.moveTo(DX-DW/2,DT+34);c.lineTo(DX+DW/2,DT+34);c.stroke();c.restore();
+  for(let i=0;i<14;i++){const q=cycle(t*.5+i/14,1);c.save();c.fillStyle='rgba(231,245,255,.8)';c.beginPath();c.arc(DX-DW/2+16+hash(i)*(DW-32)+3*Math.sin(q*10+i),DB-8-q*(DB-DT-44),1.8+hash(i+3)*1.6,0,TAU);c.fill();c.restore()}
+  for(let i=0;i<6;i++){c.save();c.fillStyle='#d4b36a';c.beginPath();c.ellipse(DX-DW/2+20+hash(i+9)*(DW-40),DT+70+hash(i+12)*(DB-DT-100),5,2.2,hash(i)*3,0,TAU);c.fill();c.restore()}
+  /* floating gas holder (drum): rises as gas collects; guide frame */
+  const GH=60,gtop=DT+34-GH-rise*52,gx=DX-DW/2+3,gw=DW-6;
+  c.save();c.strokeStyle='#8fa3b5';c.lineWidth=3;c.beginPath();c.moveTo(DX,gtop-26);c.lineTo(DX,DT-4);c.stroke();c.restore();
+  c.save();const dg=c.createLinearGradient(gx,0,gx+gw,0);dg.addColorStop(0,'#98a6b3');dg.addColorStop(.35,'#e3e9ee');dg.addColorStop(1,'#7f8d9a');c.fillStyle=dg;c.strokeStyle='#5d6b78';c.lineWidth=1.5;c.beginPath();c.rect(gx,gtop,gw,GH+8);c.fill();c.stroke();c.fillStyle='rgba(120,200,255,.18)';c.fillRect(gx+2,gtop+GH-24,gw-4,26);c.fillStyle='#aebbc6';c.beginPath();c.ellipse(DX,gtop,gw/2,6,0,0,TAU);c.fill();c.stroke();c.restore();
+  txt('gas',DX,gtop+GH-12,'#b8e1ff',11);
+  /* gas outlet pipe to a stove burner */
+  c.save();c.strokeStyle='#4a5560';c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(DX,gtop-8);c.lineTo(DX,gtop-30);c.lineTo(DX+110,gtop-30);c.lineTo(DX+110,GY-34);c.stroke();c.restore();
+  c.save();c.fillStyle='#37424d';c.fillRect(DX+84,GY-34,52,12);c.fillStyle='#ff9f43';c.beginPath();c.moveTo(DX+110,GY-40);c.quadraticCurveTo(DX+104,GY-50,DX+110,GY-60);c.quadraticCurveTo(DX+116,GY-50,DX+110,GY-40);c.fill();c.fillStyle='#4dabf7';c.beginPath();c.arc(DX+110,GY-41,2.5,0,TAU);c.fill();c.restore();txt('gas used for cooking',DX+112,GY-76,'#ffd7a0',11);
+  /* inlet (mixing pit) and outlet (overflow tank) */
+  c.save();c.fillStyle='#9c6a2c';c.fillRect(80,GY-26,70,24);c.strokeStyle='#5e3f19';c.strokeRect(80,GY-26,70,24);c.restore();txt('mixing tank',115,GY-40,C.white,11);
+  c.save();c.strokeStyle='#a0782b';c.lineWidth=14;c.lineCap='butt';c.beginPath();c.moveTo(115,GY-2);c.lineTo(115,GY+95);c.lineTo(DX-DW/2-9,GY+150);c.stroke();c.restore();
+  c.save();c.strokeStyle='#8a6a40';c.lineWidth=14;c.beginPath();c.moveTo(DX+DW/2+9,GY+150);c.lineTo(500,GY+110);c.lineTo(500,GY+12);c.stroke();c.restore();c.save();c.fillStyle='#7d6a52';c.fillRect(470,GY-26,60,28);c.strokeStyle='#4d3f2f';c.strokeRect(470,GY-26,60,28);c.restore();
+  txt('dung + water slurry in',115,GY-58,C.gold,12);txt('spent slurry out',500,GY-40,C.muted,12);txt('(fertiliser)',500,GY-12,'#f2e8d9',10);txt('digester (anaerobic)',DX,DB-12,'#ffe0a8',11);txt('floating gas holder',DX-8,gtop-36,C.white,11,'right');
+  txt('bubbles: CH₄ + CO₂ released by methanogens',44,98,C.muted,12,'left')},
  assumption:'Illustrative yield ≈ 0.04 m³ biogas per kg fresh dung at the optimum (~35 °C).'});
 
 /* ---------- Chapter 9: Biotechnology: Principles and Processes ---------- */
@@ -84,9 +158,28 @@ add({...ch(9,'Biotechnology: Principles and Processes',U9),id:'bio-pcr',title:'P
  tryText:'How many copies from one DNA molecule after 30 ideal cycles?',
  controls:[R('n','Number of cycles',0,35,1,10),R('eff','Efficiency per cycle',60,100,1,100,'%'),R('n0','Starting copies',1,100,1,1)],
  metrics:(p,t)=>{const copies=p.n0*(1+p.eff/100)**p.n,st=pcrStep(t);return[N('DNA copies',copies,'',copies<1e5?0:3),N('Step (animation)',st.name),N('Temperature',st.T,'°C',0),N('Enzyme','Taq polymerase')]},
- draw:(c,p,t)=>{const st=pcrStep(t),s=P3.scene(c,{scale:56,cx:230});s.lathe([0,-1.5,0],[[.0,0],[.35,.3],[.45,.8],[.45,2.8],[.5,2.9]],'#e9f6ff',{alpha:.18});const sep=st.k===0?.3:.18;
-  for(let m=0;m<Math.min(4,2**Math.min(p.n,2));m++){const x=(m%2-.5)*.4,z=(Math.floor(m/2)-.5)*.3;s.tube([[x-sep/2,-1,z],[x-sep/2,1.2,z]],.04,'#4dabf7',{segs:5});s.tube([[x+sep/2,-1,z],[x+sep/2,1.2,z]],.04,st.k===2?'#ff8787':'#4dabf7',{segs:5});if(st.k>=1)s.tube([[x+sep/2,-1,z],[x+sep/2,-.6,z]],.05,'#ffd43b',{segs:5})}const x0=-.2,z0=-.15;s.callout([x0-sep/2,.8,z0],st.k===0?'denaturation 94 °C: strands separate':'template DNA strand','#4dabf7',-60,-50);if(st.k>=1)s.callout([x0+sep/2,-.8,z0],'primer annealed (55 °C)','#ffd43b',-70,40);if(st.k===2)s.callout([x0+sep/2,.6,z0],'Taq polymerase extends new strand (72 °C)','#ff8787',60,-40);s.callout([.45,1.3,0],'PCR tube in thermal cycler','#e9f6ff',50,-40);s.render();
-  chart(c,420,96,236,90,{title:'Temperature profile',xmin:0,xmax:3,ymin:40,ymax:100,series:[{pts:[[0,94],[1,94],[1,55],[2,55],[2,72],[3,72]],col:C.red}],marker:[cycle(t,3),st.T]});chart(c,420,196,236,90,{title:'Copies (log scale)',xl:'cycles',xmin:0,xmax:35,ymin:0,ymax:12,series:[{fn:x=>Math.log10(p.n0*(1+p.eff/100)**x),col:C.gold}],marker:[p.n,Math.log10(p.n0*(1+p.eff/100)**p.n)]});tag(c,'yellow: primers',44,98,C.gold,13)},
+ draw:(c,p,t)=>{const st=pcrStep(t),T3=cycle(t,3),q=T3-st.k,X0=50,X1=390,YT=170,YB=262,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  strand=(y,col,x0,x1,w,wob)=>{c.save();c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();for(let x=x0;x<=x1;x+=4){const yy=y+(wob?3*Math.sin(x*.13+t*3):0);x===x0?c.moveTo(x,yy):c.lineTo(x,yy)}c.stroke();c.restore()},
+  rungs=(ya,yb,x0,x1,n)=>{c.save();c.lineWidth=2;for(let i=0;i<n;i++){const x=x0+(x1-x0)*i/(n-1);c.strokeStyle=i%2?'#ff8787':'#4dabf7';c.beginPath();c.moveTo(x,ya+2);c.lineTo(x,yb-2);c.stroke()}c.restore()},
+  gap=st.k===0?56:62+8*Math.sin(t*2),ya=YT-(gap-30)/2*(st.k===0?1:1)+30-30,yb=YB+(gap-92)/2;
+  /* panel */
+  c.save();c.fillStyle='rgba(16,36,58,.65)';c.strokeStyle='rgba(120,160,190,.3)';c.beginPath();c.roundRect?c.roundRect(34,126,372,190,12):c.rect(34,126,372,190);c.fill();c.stroke();c.restore();
+  const A=st.k===0?YT-8*q:YT,B=st.k===0?YB+8*q:YB;
+  if(st.k===0){const open=Math.min(1,q*3);rungs(YT+open*0,YT+open*0,0,0,0);const mid=(YT+YB)/2;for(let i=0;i<14;i++){const x=X0+20+i*(X1-X0-40)/13,half=(YB-YT)/2*(1-open*.0);c.save();c.strokeStyle=i%2?'#ff8787':'#4dabf7';c.lineWidth=2;c.beginPath();c.moveTo(x,YT+4+open*-4);c.lineTo(x,YT+4+(1-open)*(YB-YT-8)*.5+ (1-open)*0);c.moveTo(x,YB-4+open*4);c.lineTo(x,YB-4-(1-open)*(YB-YT-8)*.5);c.stroke();c.restore()}}
+  const ty=st.k===0?YT-6*Math.min(1,q*3):YT-6,by=st.k===0?YB+6*Math.min(1,q*3):YB+6;
+  strand(ty,'#4dabf7',X0,X1,6,st.k===0);strand(by,'#4dabf7',X0,X1,6,st.k===0);
+  txt("5'",X0-10,ty,C.white,12,'right');txt("3'",X1+8,ty,C.white,12,'left');txt("3'",X0-10,by,C.white,12,'right');txt("5'",X1+8,by,C.white,12,'left');
+  /* primers anneal at the 3' ends of each template (yellow), extension adds a new strand (red) */
+  const pl=44;
+  if(st.k>=1){const aq=st.k===1?Math.min(1,q*2.5):1;c.save();c.globalAlpha=aq;strand(ty+9,'#ffd43b',X1-pl-20,X1-20,5,false);strand(by-9,'#ffd43b',X0+20,X0+20+pl,5,false);c.restore();if(st.k===1){txt('primer',X1-pl/2-20,ty+23,'#ffd43b',11);txt('primer',X0+20+pl/2,by-23,'#ffd43b',11)}}
+  if(st.k===2){const ex=Math.min(1,q*1.1),xe=X1-20-pl-(X1-20-pl-X0-18)*ex,xe2=X0+20+pl+(X1-20-pl-X0-18)*ex;strand(ty+9,'#ff6b6b',xe,X1-20,5,false);strand(by-9,'#ff6b6b',X0+20,xe2,5,false);
+   const px=xe,qx=xe2;c.save();for(const [x,y] of[[px,ty+22],[qx,by-22]]){const g=c.createRadialGradient(x-3,y-3,2,x,y,15);g.addColorStop(0,'#aef0c4');g.addColorStop(1,'#20a35a');c.fillStyle=g;c.beginPath();c.arc(x,y,13,0,TAU);c.fill()}c.restore();txt('Taq',px,ty+22,'#06361c',10);txt('Taq',qx,by-22,'#06361c',10)}
+  txt(st.k===0?'1  Denaturation 94 °C: strands separate':st.k===1?'2  Annealing 55 °C: primers bind':'3  Extension 72 °C: Taq adds nucleotides',X0,146,C.white,13,'left');
+  txt('template strands (blue) · primers (yellow) · new strands (red)',X0,300,C.muted,11,'left');
+  /* step chips */
+  ['94 °C','55 °C','72 °C'].forEach((l,i)=>{const on=i===st.k;c.save();c.fillStyle=on?'rgba(255,212,59,.2)':'rgba(16,36,58,.9)';c.strokeStyle=on?'#ffd43b':'rgba(120,160,190,.4)';c.lineWidth=on?2.5:1;c.beginPath();c.roundRect?c.roundRect(50+i*112,332,100,34,8):c.rect(50+i*112,332,100,34);c.fill();c.stroke();c.restore();txt(['denature','anneal','extend'][i]+' '+l,100+i*112,349,on?C.gold:C.muted,12)});
+  chart(c,420,96,236,90,{title:'Temperature profile',xmin:0,xmax:3,ymin:40,ymax:100,series:[{pts:[[0,94],[1,94],[1,55],[2,55],[2,72],[3,72]],col:C.red}],marker:[T3,st.T]});chart(c,420,196,236,90,{title:'Copies (log scale)',xl:'cycles',xmin:0,xmax:35,ymin:0,ymax:12,series:[{fn:x=>Math.log10(p.n0*(1+p.eff/100)**x),col:C.gold}],marker:[p.n,Math.log10(p.n0*(1+p.eff/100)**p.n)]})},
  assumption:'Typical temperatures: 94 °C denaturation, 50–60 °C annealing, 72 °C extension.'});
 function pcrStep(t){const k=Math.floor(cycle(t,3));return[{k:0,name:'Denaturation',T:94},{k:1,name:'Annealing of primers',T:55},{k:2,name:'Extension by Taq polymerase',T:72}][k]}
 
@@ -98,8 +191,20 @@ add({...ch(9,'Biotechnology: Principles and Processes',U9),id:'bio-gel-electroph
  tryText:'Increase the run time. Do small fragments run off the gel first?',
  controls:[R('time','Run time',0,60,1,35,'min'),R('V','Voltage',50,150,5,100,'V'),R('cut','Your sample: fragment size',200,9000,50,1500,'bp')],
  metrics:p=>{const d=gelDist(p,p.cut);return[N('Your fragment moved',d*10,'mm',1),N('Direction','Towards the anode (+)'),N('Stain','Ethidium bromide (orange under UV)'),N('Matrix','Agarose (from seaweed)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.6}),L=4.4;s.box([0,-.15,0],[3.2,.2,L+.6],'#d0ebff',{alpha:.85});s.box([0,-.05,-L/2-.25],[3.4,.3,.15],'#1c1c1c');s.box([0,-.05,L/2+.25],[3.4,.3,.15],'#e03131');s.label([1.9,.3,L/2+.25],'+',C.red,18);s.label([1.9,.3,-L/2-.25],'−',C.white,18);
-  const lane=(x,sizes,col)=>{s.box([x,.0,-L/2+.1],[.6,.08,.12],'#343a40');sizes.forEach(bp=>{const d=Math.min(L-.2,gelDist(p,bp));s.box([x,.0,-L/2+.15+d],[.6,.06,.08],col,{alpha:.9})})};lane(-.8,LADDER,'#ffa94d');lane(.8,[p.cut],'#ff922b');s.label([-.8,.3,-L/2-.6],'ladder',C.muted,12);s.label([.8,.3,-L/2-.6],'sample',C.muted,12);s.render()},
+ draw:(c,p,t)=>{const GX=215,GY=140,GW=220,GH=208,L=4.4,pxu=(GH-30)/L,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  rr=(x,y,w,h,r)=>{c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)};
+  /* buffer tank with electrodes: cathode (−, black) at the wells end, anode (+, red) at the far end */
+  c.save();c.fillStyle='rgba(120,160,190,.18)';c.strokeStyle='rgba(170,200,225,.55)';c.lineWidth=2;rr(GX-30,GY-30,GW+60,GH+60,12);c.fill();c.stroke();c.restore();
+  c.save();c.fillStyle='#202428';rr(GX-30,GY-22,GW+60,8,3);c.fill();c.fillStyle='#d83b3b';rr(GX-30,GY+GH+14,GW+60,8,3);c.fill();c.restore();
+  txt('− cathode',GX+GW+34,GY-18,C.white,12,'left');txt('+ anode',GX+GW+34,GY+GH+18,C.red,12,'left');
+  /* agarose gel slab with wells */
+  c.save();const g=c.createLinearGradient(GX,GY,GX+GW,GY+GH);g.addColorStop(0,'rgba(170,215,235,.9)');g.addColorStop(1,'rgba(120,180,210,.85)');c.fillStyle=g;c.strokeStyle='rgba(220,240,250,.7)';c.lineWidth=1.5;rr(GX,GY,GW,GH,8);c.fill();c.stroke();c.restore();
+  const lanes=[[GX+GW*.28,LADDER,'ladder'],[GX+GW*.72,[p.cut],'your sample']];
+  lanes.forEach(([x,sizes,name])=>{c.save();c.fillStyle='#0f2030';rr(x-26,GY+8,52,10,3);c.fill();c.restore();txt(name,x,GY-42,C.muted,12);
+   sizes.forEach(bp=>{const d=Math.min(L-.2,gelDist(p,bp)),y=GY+24+d*pxu,off=d>=L-.2-1e-6,col=name==='ladder'?'#ffa94d':'#ffd08a';c.save();c.shadowColor='#ff8f1f';c.shadowBlur=off?0:10;c.globalAlpha=off?.35:1;c.fillStyle=col;rr(x-24,y-3,48,6,3);c.fill();c.restore();if(name==='ladder')txt(bp>=1000?(bp/1000)+' kb':bp+' bp',x-32,y,C.muted,10,'right');else txt(bp+' bp',x+30,y,C.gold,11,'left')})});
+  txt('smaller fragments run farther',GX-22,GY+GH+34,C.muted,11,'left');
+  c.save();c.strokeStyle='#8fd3ff';c.fillStyle='#8fd3ff';c.lineWidth=2;c.beginPath();c.moveTo(GX-52,GY+40);c.lineTo(GX-52,GY+GH-30);c.stroke();c.beginPath();c.moveTo(GX-58,GY+GH-36);c.lineTo(GX-52,GY+GH-26);c.lineTo(GX-46,GY+GH-36);c.stroke();c.restore();txt('DNA (negative)',GX-62,GY+GH*.42,'#8fd3ff',11,'right');txt('moves to the anode',GX-62,GY+GH*.42+14,'#8fd3ff',11,'right')},
  assumption:'Mobility model d ∝ V·t·(log₁₀ 20000 − log₁₀ bp), illustrative; bands that pass the end leave the gel.'});
 function gelDist(p,bp){return Math.max(0,p.V*p.time/3500*(Math.log10(20000)-Math.log10(bp))*1.2)}
 
@@ -111,10 +216,39 @@ add({...ch(9,'Biotechnology: Principles and Processes',U9),id:'bio-recombinant-d
  tryText:'Choose blue–white screening. What colour are recombinant colonies?',
  controls:[R('step','Step',1,4,1,1),S('screen','Screening method','bw',[['bw','Blue–white (lacZ, β-galactosidase)'],['tet','Insertional inactivation of tetᴿ (pBR322)']])],
  metrics:p=>{const d=CLONE[p.step-1];return[N('Step',d[0]),N('What happens',d[1]),N('Recombinant colonies',p.screen==='bw'?'White (lacZ inactivated)':'Ampicillin-resistant but tetracycline-sensitive'),N('Vector features','ori, selectable marker, cloning sites')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.4}),st=p.step;if(st<=2){const gap=st===1?.6:.0,segs=36;for(let i=0;i<segs;i++){const a0=TAU*i/segs,a1=TAU*(i+1)/segs;if(st===1&&(a0>TAU-.25||a1<.25))continue;const col=a0<1.2?'#ff8787':a0<2.6?'#69db7c':a0<4?'#4dabf7':'#ced4da';s.tube([[1.2*Math.cos(a0),0,1.2*Math.sin(a0)],[1.2*Math.cos(a1),0,1.2*Math.sin(a1)]],.12,col,{segs:8})}
-   const ins=st===1?[[2.6,0,-.5],[2.6,0,.5]]:[[1.2,0,-.25],[1.45,0,0],[1.2,0,.25]];s.tube(ins,.12,'#ffd43b',{segs:8});s.label([1.2,.5,-1.6],'ampᴿ',C.red,12);s.label([-1.4,.5,0],'ori',C.muted,12);s.label([st===1?2.6:1.6,.5,0],'foreign DNA',C.gold,12)}
-  else if(st===3){capsule(s,[-1.6,0,0],[1.6,0,0],.8,'#a9e34b');s.ring([0,0,0],[0,1,0],.4,'#ffd43b',4);s.ring([.7,0,.2],[0,1,0],.25,'#ff8787',3)}
-  else{s.lathe([0,-.4,0],[[0,0],[2.2,0],[2.2,.25]],'#ffe8cc',{alpha:.7});for(let i=0;i<22;i++){const a=TAU*hash(i),r=1.9*Math.sqrt(hash(i+3)),rec=hash(i+7)<.35;s.mesh([r*Math.cos(a),-.1,r*Math.sin(a)],[.15,.06,.15],p.screen==='bw'?(rec?'#f8f9fa':'#1c7ed6'):(rec?'#ffd43b':'#adb5bd'))}}s.render();tag(c,CLONE[st-1][0]+(st===4?(p.screen==='bw'?' — white = recombinant':' — yellow = recombinant'):''),44,98,C.gold,14)},
+ draw:(c,p,t)=>{const st=p.step,bw=p.screen==='bw',
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  SEG=[[.15,1.3,'#ff6b6b','ampᴿ'],[1.45,2.6,'#69db7c',bw?'lacZ':'tetᴿ'],[2.75,4.0,'#4dabf7','ori'],[4.15,5.4,'#ced4da','other']],
+  arc=(x,y,r,a0,a1,col,w)=>{c.save();c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.arc(x,y,r,a0,a1);c.stroke();c.restore()},
+  /* plasmid: circular DNA with labelled regions; gap (open) at angle -π/2 when cut */
+  plasmid=(x,y,r,open,ins)=>{const AM=.455;for(const [a0,a1,col,lab] of SEG){arc(x,y,r,a0-Math.PI/2,a1-Math.PI/2,col,12)}
+   if(open){c.save();c.fillStyle='#0f2030';c.beginPath();c.arc(x+Math.cos(AM)*r,y+Math.sin(AM)*r,11,0,TAU);c.fill();c.restore()}
+   if(ins){arc(x,y,r,AM-.3,AM+.3,'#ffd43b',12)}
+   for(const [a0,a1,col,lab] of SEG){const am=(a0+a1)/2-Math.PI/2;txt(lab,x+Math.cos(am)*(r+34),y+Math.sin(am)*(r+34),col,12)}};
+  const gc=(x,y)=>{c.save();c.strokeStyle='#f1f3f5';c.lineWidth=1.2;c.setLineDash([2,3]);c.beginPath();c.moveTo(x,y-34);c.lineTo(x,y+34);c.stroke();c.restore()};
+  if(st===1){plasmid(180,260,70,true,false);
+   /* EcoRI cut: GAATTC site with staggered sticky ends */
+   txt('vector (plasmid)',180,376,C.white,12);txt('EcoRI site G^AATTC',298,332,'#ffe08a',11,'left');
+   c.save();c.strokeStyle='#ffe08a';c.lineWidth=1.4;c.beginPath();c.moveTo(250,298);c.lineTo(296,328);c.stroke();c.restore();
+   c.save();c.lineCap='round';c.lineWidth=6;c.strokeStyle='#ffd43b';c.beginPath();c.moveTo(344,236);c.lineTo(400,236);c.moveTo(452,236);c.lineTo(580,236);c.stroke();c.strokeStyle='#ffd43b';c.beginPath();c.moveTo(344,252);c.lineTo(414,252);c.moveTo(438,252);c.lineTo(580,252);c.stroke();
+   c.strokeStyle='#ff8787';c.lineWidth=3;c.beginPath();c.moveTo(400,236);c.lineTo(400,246);c.moveTo(452,236);c.lineTo(452,246);c.stroke();c.restore();
+   txt('foreign DNA (with gene of interest)',470,176,C.gold,12);txt("sticky ends: single-strand overhangs 5'-AATT-3'",460,280,'#ff9d9d',11);
+   c.save();c.strokeStyle='#e9ecef';c.lineWidth=2.4;c.lineCap='round';for(const [x,y] of[[420,222],[426,222]]){c.beginPath();c.moveTo(x-8,y-9);c.lineTo(x+8,y+9);c.stroke();c.beginPath();c.moveTo(x+8,y-9);c.lineTo(x-8,y+9);c.stroke()}c.restore();txt('EcoRI cuts both DNAs',470,198,C.white,11)}
+  else if(st===2){plasmid(230,258,76,false,true);txt('recombinant plasmid',230,384,C.white,12);txt('foreign DNA inserted inside the marker gene',330,318,'#ffd43b',11,'left');
+   c.save();c.strokeStyle='#ffd43b';c.lineWidth=1.4;c.beginPath();c.moveTo(296,288);c.lineTo(328,312);c.stroke();c.restore();
+   txt('1  sticky ends pair by H-bonds',420,216,C.white,13,'left');txt('2  DNA ligase seals the sugar–phosphate backbone',420,246,C.white,13,'left');txt('→ recombinant DNA',420,278,C.gold,14,'left')}
+  else if(st===3){
+   /* bacterium: rod-shaped cell with nucleoid and the incoming plasmid */
+   c.save();const g=c.createLinearGradient(0,200,0,330);g.addColorStop(0,'#c5e87a');g.addColorStop(1,'#6a9a1d');c.fillStyle=g;c.strokeStyle='#4d7513';c.lineWidth=3;c.beginPath();c.roundRect?c.roundRect(250,190,330,150,75):c.rect(250,190,330,150);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.roundRect?c.roundRect(290,200,250,30,15):c.rect(290,200,250,30);c.fill();c.restore();
+   c.save();c.strokeStyle='#f8e9a0';c.lineWidth=2;c.lineJoin='round';c.beginPath();for(let i=0;i<=70;i++){const a=i*.45,r=14+i*.5,x=395+Math.cos(a)*r*1.9*(i/70*.6+.4),y=268+Math.sin(a)*r*.7*.8;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();c.restore();txt('chromosome (nucleoid)',395,320,'#2f4a0a',11);
+   const q=cycle(t*.3,1),px=130+q*190,py=262;arc(px,py,24,0,TAU,'#4dabf7',6);c.save();c.strokeStyle='#ffd43b';c.lineWidth=6;c.beginPath();c.arc(px,py,24,-1.3,-.6);c.stroke();c.restore();arc(470,262,18,0,TAU,'#4dabf7',5);c.save();c.strokeStyle='#ffd43b';c.lineWidth=5;c.beginPath();c.arc(470,262,18,-1.3,-.6);c.stroke();c.restore();
+   txt('recombinant plasmid',130,222,C.white,12);txt('competent E. coli (host)',415,164,C.white,13);txt('plasmid inside',470,298,C.white,11);txt('enters after heat shock / CaCl₂',130,310,C.muted,11)}
+  else{/* petri dish with colonies */
+   c.save();const g=c.createRadialGradient(300,270,10,300,270,120);g.addColorStop(0,'rgba(255,236,200,.9)');g.addColorStop(1,'rgba(240,200,140,.85)');c.fillStyle=g;c.strokeStyle='rgba(220,235,245,.8)';c.lineWidth=4;c.beginPath();c.arc(300,270,118,0,TAU);c.fill();c.stroke();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=2;c.beginPath();c.arc(300,270,108,.2,1.2);c.stroke();c.restore();
+   for(let i=0;i<22;i++){const a=TAU*hash(i),r=92*Math.sqrt(hash(i+3)),rec=hash(i+7)<.35,x=300+r*Math.cos(a),y=270+r*Math.sin(a),col=bw?(rec?'#f8f9fa':'#1c7ed6'):(rec?'#ffd43b':'#adb5bd');c.save();const gg=c.createRadialGradient(x-2,y-2,1,x,y,8);gg.addColorStop(0,'#fff7');gg.addColorStop(.35,col);gg.addColorStop(1,col);c.fillStyle=col;c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=1;c.beginPath();c.arc(x,y,7.5,0,TAU);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.arc(x-2.2,y-2.4,2.4,0,TAU);c.fill();c.restore()}
+   txt('plate with ampicillin',300,396,C.muted,11);
+   const L=bw?[['#f8f9fa','white = recombinant'],['#1c7ed6','blue = non-recombinant']]:[['#ffd43b','yellow = recombinant'],['#adb5bd','grey = non-recombinant']];L.forEach((e,i)=>{c.save();c.fillStyle=e[0];c.strokeStyle='rgba(0,0,0,.4)';c.beginPath();c.arc(448,224+i*34,9,0,TAU);c.fill();c.stroke();c.restore();txt(e[1],464,224+i*34,C.white,12,'left')})}
+  tag(c,CLONE[st-1][0]+(st===4?(bw?' — white = recombinant':' — yellow = recombinant'):''),44,98,C.gold,14)},
  assumption:'Generic cloning workflow from NCERT Chapter 9; plasmid map simplified.'});
 
 /* ---------- Chapter 10: Biotechnology and its Applications ---------- */
