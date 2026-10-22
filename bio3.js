@@ -142,8 +142,16 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-oxygen-dissociation',ti
  tryText:'Raise pCO₂ and temperature together. What happens to saturation at 40 mm Hg?',
  controls:[R('pO2','pO₂',0,120,1,40,'mm Hg'),R('pCO2','pCO₂',20,70,1,40,'mm Hg'),R('T','Temperature',34,42,.1,37,'°C',1),R('pH','pH',7.0,7.7,.01,7.4,'',2)],
  metrics:p=>{const S0=sat({pO2:p.pO2,pCO2:40,T:37,pH:7.4}),S1=sat(p);return[N('Saturation now',S1*100,'%',0),N('Normal at this pO₂',S0*100,'%',0),N('P50 (half saturation)',p50(p),'mm Hg',1),N('O₂ delivered','≈ 5 mL per 100 mL blood (rest)')]},
- draw:(c,p,t)=>{const S1=sat(p),s=P3.scene(c,{scale:58,cx:220});const sub=[[-.45,.45,.3],[.45,.45,-.3],[-.45,-.45,-.3],[.45,-.45,.3]];sub.forEach((q,i)=>{s.mesh(q,[.45,.42,.4],i<2?'#ff8787':'#e03131',{shape:(u,v)=>1+.08*Math.sin(3*v+i)});const filled=i<Math.round(S1*4+.01);s.ball(V.add(q,[0,0,.42*Math.sign(q[2]||1)]),.12,filled?'#ff2b2b':'#5f3dc4',{glow:filled,lift:3})});s.callout([-.45,.85,.3],'α subunit','#ff8787',-50,-40);s.callout([.45,-.85,.3],'β subunit','#e03131',50,40);s.callout(V.add(sub[0],[0,0,.42]),Math.round(S1*4)>0?'haem + O₂ (oxyhaemoglobin)':'haem (empty)','#ff6b6b',-70,30);s.render();
-  chart(c,400,96,256,190,{title:'% saturation vs pO₂',xl:'pO₂ (mm Hg)',xmin:0,xmax:120,ymin:0,ymax:1.02,series:[{fn:x=>sat({pO2:x,pCO2:40,T:37,pH:7.4}),col:'#8ca6b9',dash:[4,4]},{fn:x=>sat({...p,pO2:x}),col:C.red}],marker:[p.pO2,S1]});tag(c,'haem sites filled: '+Math.round(S1*4)+' of 4',44,98,C.gold,14)},
+ draw:(c,p,t)=>{const S1=sat(p),s=P3.scene(c,{scale:74,cx:205,cy:255,pitch:.04});const sub=[[-.52,.5,.05],[.52,.5,-.05],[-.52,-.5,-.05],[.52,-.5,.05]],nF=Math.round(S1*4+.01);
+  sub.forEach((q,i)=>{const alpha=i===0||i===3,col=alpha?'#f08a8a':'#c0392b';
+   /* globin subunit: lumpy helical body */
+   s.mesh(q,[.52,.48,.42],col,{rings:16,segs:28,spec:.5,shape:(u,v)=>1+.07*Math.sin(4*v+i+2*u)*Math.cos(u)+.05*Math.sin(7*u+v)});
+   /* haem group in its pocket: porphyrin plate + Fe */
+   const hq=V.add(q,[q[0]>0?-.14:.14,q[1]>0?-.05:.05,.4]),on=i<nF;
+   s.mesh(hq,[.2,.2,.04],on?'#8b1a24':'#3a2a52',{rings:6,segs:14,lift:2});s.ball(hq,.065,on?'#ffb199':'#adb5bd',{flat:true,lift:3});
+   if(on){const a=V.add(hq,[0,0,.16]);s.seg(hq,a,'#ff6b6b',2.5,[],1e5);s.ball(V.add(a,[-.05,0,.02]),.06,'#ff2b2b',{glow:true,lift:4});s.ball(V.add(a,[.05,0,.02]),.06,'#ff2b2b',{glow:true,lift:4})}});
+  s.callout([-.75,.95,.2],'α subunit','#f08a8a',-35,-25);s.callout([.75,.95,.1],'β subunit','#e8695a',35,-25);s.callout([.38,-.7,.5],nF>0?'haem + O₂':'haem (empty)','#ff6b6b',50,50);s.render();
+  chart(c,400,96,256,190,{title:'% saturation vs pO₂',xl:'pO₂ (mm Hg)',xmin:0,xmax:120,ymin:0,ymax:1.02,series:[{fn:x=>sat({pO2:x,pCO2:40,T:37,pH:7.4}),col:'#8ca6b9',dash:[4,4]},{fn:x=>sat({...p,pO2:x}),col:C.red}],marker:[p.pO2,S1]});tag(c,'haem sites filled: '+nF+' of 4  (red balls = O₂ bound to Fe)',44,98,C.gold,13)},
  assumption:'Hill equation (n = 2.7, normal P50 = 26.8 mm Hg) with illustrative Bohr and temperature shifts. Dashed: normal curve.'});
 function p50(p){return 26.8*Math.pow(10,.48*(7.4-p.pH))*Math.exp(.024*(p.T-37))*(1+.004*(p.pCO2-40))}
 function sat(p){const P=p50(p),n=2.7;return p.pO2<=0?0:p.pO2**n/(P**n+p.pO2**n)}
