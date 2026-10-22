@@ -146,9 +146,16 @@ add({...ch(8,'Aldehydes, Ketones and Carboxylic Acids',OR),id:'chem-nucleophilic
  tryText:'Which compound reacts fastest with HCN?',
  controls:[R('i','Carbonyl compound',1,3,1,2),R('prog','Progress',0,100,1,40,'%')],
  metrics:p=>[N('Compound',CARB[p.i-1][0]),N('Relative reactivity',['','low','medium','high'][CARB[p.i-1][1]]),N('Reason',CARB[p.i-1][2])],
- draw:(c,p,t)=>{const q=p.prog/100,s=P3.scene(c,{scale:62,cx:250,pitch:.3,yaw:.3}),Cc=[0,0,0],O=[0,1.15,0];bond(s,Cc,O,q<.5?2:1);atom(s,Cc,'C');atom(s,O,'O');const g=p.i===1?['H','H']:p.i===2?['C','H']:['C','C'];
-  [[-1,-.6,0],[1,-.6,0]].forEach((u,k)=>{const r=V.mul(u,1);bond(s,Cc,r);atom(s,r,g[k]==='C'?'C':'H',g[k]==='C'?1:1)});const nu=[0,-.3,2.4-q*1.4];atom(s,nu,'C',.9);atom(s,V.add(nu,[0,0,.45]),'N',.9);bond(s,nu,V.add(nu,[0,0,.45]),3);if(q>.6){bond(s,Cc,nu);atom(s,V.add(O,[.3,.35,0]),'H',.8)}
-  s.callout(Cc,'δ+ carbonyl carbon','#e9f6ff',-70,40);s.callout(nu,'CN⁻ nucleophile','#4c6ef5',50,50);s.callout(O,q>.6?'O becomes –OH':'δ− oxygen','#ff8787',40,-50);s.render();tag(c,`${CARB[p.i-1][0]}: ${CARB[p.i-1][2]}`,44,98,C.gold,14)},
+ draw:(c,p,t)=>{const q=p.prog/100,s=P3.scene(c,{scale:50,cx:262,cy:268,pitch:.25,yaw:.2}),cz=Math.cos(.8),sz=Math.sin(.8),T=a=>[a[0]*cz+a[2]*sz,a[1],-a[0]*sz+a[2]*cz],pyr=clamp((q-.45)/.45,0,1),b=pyr*.34,pre=q<.6;
+  const Cc=[0,0,0],O=[0,1.15,-b*.9],g=p.i===1?['H','H']:p.i===2?['C','H']:['C','C'],R1=[-1,-.6,-b],R2=[1,-.6,-b],nz=pre?2.3-q*1.3:1.5,nuC=[0,0,nz],nuN=[0,0,nz+1],W=a=>T(a),sd=T([1,0,0]);
+  if(pre){s.ball(W(Cc),.45,'#4dabf7',{alpha:.16});s.seg(W([0,0,1.9]),W([0,0,.5]),'#4c6ef5aa',1.3,[4,4]);const gz=-1.9;atom(s,W([0,0,gz]),'C',.9,{alpha:.22});atom(s,W([0,0,gz-1]),'N',.9,{alpha:.22});s.seg(W([0,0,gz+.4]),W([0,0,-.5]),'#4c6ef566',1.3,[4,4]);s.label(W([0,-.8,gz-.6]),'or attack from this face','#adb5bd',11)}
+  stick(s,W(Cc),W(O),q<.5?2:1,{ca:'C',cb:'O',side:sd});[[R1,0],[R2,1]].forEach(([r,k])=>{stick(s,W(Cc),W(r),1,{ca:'C',cb:g[k]});atom(s,W(r),g[k]==='C'?'C':'H')});
+  atom(s,W(Cc),'C');atom(s,W(O),'O');atom(s,W(nuC),'C',.9);atom(s,W(nuN),'N',.9);stick(s,W(nuC),W(nuN),3,{ca:'C',cb:'N',r:.06});
+  if(!pre){stick(s,W(Cc),W(nuC),1,{ca:'C',cb:'C'});atom(s,V.add(W(O),[.32,.35,0]),'H',.8)}
+  if(pre){const arc=(a,m,e)=>Array.from({length:11},(_,k)=>{const u=k/10,w=1-u;return W([w*w*a[0]+2*w*u*m[0]+u*u*e[0],w*w*a[1]+2*w*u*m[1]+u*u*e[1],w*w*a[2]+2*w*u*m[2]+u*u*e[2]])});
+   const a1=arc([0,.25,nz-.1],[0,1.25,(nz+.4)/2],[0,.12,.38]);s.curve(a1,'#ffd43b',2.6,12);s.arrow(a1[9],a1[10],'#ffd43b',2.6,9);
+   const a2=arc([.08,.6,0],[.85,1.15,.1],[.12,1.2,.3]);s.curve(a2,'#ff8787',2.2,12);s.arrow(a2[9],a2[10],'#ff8787',2.2,8)}
+  s.callout(W(Cc),pre?'δ+ carbonyl carbon':'tetrahedral carbon (sp³)','#e9f6ff',-80,60);s.callout(W(nuN),'CN⁻ nucleophile','#74a0ff',45,40);s.callout(W(O),q>.6?'O becomes –OH':'δ− oxygen','#ff8787',60,-30);s.render();tag(c,`${CARB[p.i-1][0]}: ${CARB[p.i-1][2]}`,44,98,C.gold,14)},
  assumption:'Schematic mechanism (attack, then protonation); hydrogens on methyl groups omitted.'});
 
 /* 9 Amines */
