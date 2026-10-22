@@ -375,10 +375,19 @@ add({...ch(17,'Locomotion and Movement'),id:'bio-sliding-filament',title:'Slidin
  tryText:'Contract fully. Which band disappears first?',
  controls:[R('con','Contraction',0,100,1,30,'%'),S('ca','Ca²⁺ released?','yes',[['yes','Yes (stimulated)'],['no','No (relaxed)']])],
  metrics:p=>{const L=sarcL(p);return[N('Sarcomere length',L,'μm',2),N('A band',1.6,'μm',2),N('I band',Math.max(0,L-1.6),'μm',2),N('H zone',Math.max(0,L-2),'μm',2)]},
- draw:(c,p,t)=>{const L=sarcL(p),s=P3.scene(c,{scale:62,pitch:.25}),k=2.4,half=L*k/2,act=1*k,myo=1.6*k/2;for(const sg of[-1,1])s.box([sg*half,0,0],[.06,2,1.4],'#ced4da');
-  for(let r=0;r<3;r++)for(let q=0;q<2;q++){const y=-.6+r*.6,z=-.3+q*.6;s.cyl([0,y,z],[1,0,0],.08,myo*2,'#e03131');for(let i=-6;i<=6;i++){if(Math.abs(i)<1)continue;const x=i*myo/6.5,sw=p.ca==='yes'&&p.con>0?.12*Math.sin(t*8+i):0;s.seg([x,y,z],[x+Math.sign(i)*(.1+sw),y+.18,z],'#ffa8a8',2)}}
-  for(const sg of[-1,1])for(let r=0;r<4;r++)for(let q=0;q<3;q++){const y=-.9+r*.6,z=-.45+q*.45;s.tube([[sg*half,y,z],[sg*(half-act),y,z]],.035,'#4dabf7',{segs:6})}
-  s.callout([0,.6,.3],'myosin (thick filament) = A band','#ff8787',-40,-70);s.callout([half-act*.3,-.3,.45],'actin (thin filament)','#74c0fc',40,60);s.callout([half,.9,.7],'Z line','#ced4da',30,-50);s.callout([-myo*.6,.78,.3],p.ca==='yes'?'cross-bridges pull actin (Ca²⁺ + ATP)':'cross-bridges (need Ca²⁺)','#ffa8a8',-60,-30);if(half-myo>.05)s.callout([half-(half-myo)/2,-1.0,-.45],'I band','#74c0fc',30,50);s.render()},
+ draw:(c,p,t)=>{const L=sarcL(p),s=P3.scene(c,{scale:62,pitch:.02,cx:345,cy:218}),k=2.4,half=L*k/2,act=1*k,myo=1.6*k/2,on=p.ca==='yes'&&p.con>0,MY=[-.75,-.15,.45],AY=[-1.05,-.45,.15,.75];
+  /* Z discs */
+  for(const sg of[-1,1]){s.box([sg*half,-.15,0],[.12,2.25,.5],'#8e9aa6',{spec:.4});s.box([sg*half,-.15,0],[.04,2.25,.52],'#c3ccd4')}
+  /* thin filaments: actin strands anchored in the Z disc, drawn as beaded chains */
+  for(const sg of[-1,1])for(const y of AY){s.tube([[sg*half,y,0],[sg*(half-act),y,0]],.032,'#4a8fe0',{segs:6});for(let i=1;i<=9;i++){const x=sg*(half-act*i/9.5);s.ball([x,y+.025*Math.sin(i*1.7),.02],.055,'#74b7ff',{flat:true})}}
+  /* thick filaments: myosin shaft with a bare central zone and paired heads */
+  for(const y of MY){s.tube([[-myo,y,0],[myo,y,0]],.075,'#d9363e',{segs:8});s.ball([-myo,y,0],.075,'#d9363e',{flat:true});s.ball([myo,y,0],.075,'#d9363e',{flat:true});
+   for(const sg of[-1,1])for(let i=1;i<=6;i++){const x=sg*(.22+(myo-.3)*i/6.4),sw=on?.1*Math.sin(t*7+i+y*3):0,d=sg*(on?.13+sw:.04);for(const u of[-1,1]){s.seg([x,y+u*.07,0],[x+d,y+u*.25,0],'#ff8d92',3);s.ball([x+d,y+u*.26,.02],.045,'#ff6a72',{flat:true})}}}
+  s.box([0,-.15,0],[.04,1.7,.4],'#ffd6d6',{alpha:.5});
+  /* band strip: I | A (with H zone) | I */
+  const by=-1.55,hz=Math.max(0,half-act);s.poly([[-half,by,0],[-myo,by,0],[-myo,by-.16,0],[-half,by-.16,0]],'#8cc0ff',{cull:false});s.poly([[myo,by,0],[half,by,0],[half,by-.16,0],[myo,by-.16,0]],'#8cc0ff',{cull:false});s.poly([[-myo,by,0],[myo,by,0],[myo,by-.16,0],[-myo,by-.16,0]],'#e5484d',{cull:false});if(hz>.02)s.poly([[-hz,by,0],[hz,by,0],[hz,by-.16,0],[-hz,by-.16,0]],'#ffc9cb',{cull:false});
+  s.label([0,by-.42,0],'A band',C.red,12);if(half-myo>.25){s.label([-(half+myo)/2,by-.42,0],'I band',C.cyan||'#74c0fc',12);s.label([(half+myo)/2,by-.42,0],'I band','#74c0fc',12)}if(hz>.3)s.label([0,by+.38,0],'H zone',C.muted,11);
+  s.callout([-half,1.15,.1],'Z line','#ced4da',-15,-40);s.callout([myo*.6,.45+.07,0],on?'myosin heads pull actin (Ca²⁺ + ATP)':'myosin heads (need Ca²⁺)','#ffa8a8',50,-80);s.callout([-myo*.9,.75,0],'myosin (thick)','#ff8787',-30,-48);s.callout([half-act*.4,.75,.05],'actin (thin)','#74c0fc',120,-50);s.render()},
  assumption:'Typical lengths: actin 1.0 μm on each side, myosin 1.6 μm; sarcomere 2.6 → 1.8 μm on full contraction.'});
 function sarcL(p){return p.ca==='yes'?2.6-.8*p.con/100:2.6}
 
