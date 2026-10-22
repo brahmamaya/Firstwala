@@ -1208,7 +1208,7 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .landing-ic.wa{background:#e6faee;border-color:#25d366;color:#0b6b36}
 
 /* Rank mode: hand-drawn note figures (handwriting labels, paper-like card) and side-by-side figure sets */
-.rk-ov svg.rk-hand text{font-family:'Segoe Print','Bradley Hand','Chalkboard SE','Comic Sans MS','Marker Felt',cursive!important}
+.rk-ov svg.rk-hand text,.rk-ov svg text{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif!important;font-style:normal!important}
 .rk-bigfig.rk-hand{background:var(--s-0a0a0a);border-color:var(--t-2a2a2a);max-width:380px}
 .rk-figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px;margin:8px 0}
 .rk-figgrid .rk-bigfig{margin:0;max-width:none}
