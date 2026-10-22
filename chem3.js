@@ -15,8 +15,8 @@ add({...ch(1,'Some Basic Concepts of Chemistry',PH),id:'chem-dilution',title:'Mo
  tryText:'Make 100 mL of 1 M solution and dilute it to 250 mL. What is the new molarity?',
  controls:[R('n','Moles of NaCl',.01,.5,.01,.1,'mol',2),R('V1','Starting volume',50,250,5,100,'mL'),R('add','Water added',0,500,10,150,'mL')],
  metrics:p=>{const M1=p.n/(p.V1/1000),V2=p.V1+p.add;return[N('Initial molarity',M1,'M',3),N('Final volume',V2,'mL',0),N('Final molarity',p.n/(V2/1000),'M',3),N('Mass of NaCl',p.n*58.44,'g',2),N('Initial solution',M1>6.1?'Above NaCl solubility (~6.1 M): would not all dissolve':'Fully dissolved')]},
- draw:(c,p,t)=>{const V2=p.V1+p.add,s=P3.scene(c,{scale:54,cx:280,cy:300}),M=p.n/(V2/1000),fill=clamp(V2/750,.08,.95),tint=clamp(M/2,0,1);beaker(s,[0,-1.9,0],1.3,3.2,tint>.5?'#4dabf7':tint>.2?'#74c0fc':'#d0ebff',fill);
-  for(let i=0;i<Math.round(p.n*60);i++)s.ball([(hash(i)-.5)*2,-1.8+hash(i+7)*3.1*fill,(hash(i+13)-.5)*1.6],.06,i%2?'#9775fa':'#40c057',{flat:true});for(let i=0;i<=5;i++)s.seg([1.28,-1.9+i*.64*.75*(4/3)*.75,0],[1.12,-1.9+i*.64*.75*(4/3)*.75,0],'#e9f6ff',1.2);
+ draw:(c,p,t)=>{const V2=p.V1+p.add,s=P3.scene(c,{scale:50,cx:280,cy:272}),M=p.n/(V2/1000),fill=clamp(V2/750,.08,.95),tint=clamp(M/2,0,1);glassBeaker(s,[0,-1.9,0],1.3,3.2,tint>.5?'#4dabf7':tint>.2?'#74c0fc':'#d0ebff',fill,{alpha:.38});
+  for(let i=0;i<Math.round(p.n*60);i++)s.ball([(hash(i)-.5)*2+.05*Math.sin(t*1.5+i),-1.8+hash(i+7)*(3.2*fill-.25)+.04*Math.cos(t*1.2+i),(hash(i+13)-.5)*1.6],i%2?.07:.09,i%2?'#9775fa':'#40c057',{spec:.7});
   s.callout([1.3,-1.9+3.2*fill,0],`${V2} mL, ${f(M,3)} M`,'#74c0fc',50,-40);s.callout([0,-1.2,.6],'Na⁺ (purple) and Cl⁻ (green) ions','#e9f6ff',-80,40);s.render();tag(c,`M₁V₁ = ${f(p.n/(p.V1/1000),3)} × ${p.V1} = M₂ × ${V2}`,44,98,C.gold,14)},
  assumption:'Volumes are taken as additive for dilute aqueous solutions.'});
 
@@ -28,7 +28,8 @@ add({...ch(1,'Some Basic Concepts of Chemistry',PH),id:'chem-empirical-formula',
  tryText:'Try 52.2 % C, 13.0 % H, 34.8 % O. Which compound could it be?',
  controls:[R('C','Carbon',0,100,.1,40,'%',1),R('H','Hydrogen',0,20,.1,6.7,'%',1),R('N','Nitrogen',0,60,.1,0,'%',1)],
  metrics:p=>{const r=emp(p);return[N('Oxygen (by difference)',r.O,'%',1),N('Mole ratio C : H : O : N',r.ratio.map(x=>f(x,2)).join(' : ')),N('Empirical formula',r.formula)]},
- draw:(c,p,t)=>{const r=emp(p),s=P3.scene(c,{scale:54,cx:280,yaw:t*.2,pitch:.3});let i=0;const tot=r.whole.reduce((a,b)=>a+b,0);r.whole.forEach((n,k)=>{for(let j=0;j<n;j++){const a=TAU*i/Math.max(1,tot),R0=.6+.08*tot;atom(s,[R0*Math.cos(a),(k-1.5)*.15,R0*Math.sin(a)],EF[k][0],1.2);i++}});s.render();tag(c,`Empirical formula: ${r.formula}`,44,98,C.gold,16)},
+ draw:(c,p,t)=>{const r=emp(p),s=P3.scene(c,{scale:56,cx:280,cy:290,pitch:.08,yaw:.1});r.whole.forEach((n,k)=>{const y=1.7-k*1.0;if(!n)return;s.label([-2.8,y,0],`${EF[k][0]} × ${n}`,C.muted,14);const w=Math.min(.8,4.2/Math.max(1,n));for(let j=0;j<n;j++)atom(s,[-1.6+j*w+.04*Math.sin(t*2+j+k),y+.04*Math.cos(t*1.7+j),0],EF[k][0],1.25)});s.render();
+  tag(c,`Empirical formula: ${r.formula}`,44,98,C.gold,16)},
  assumption:'Oxygen is taken by difference; ratios within 0.1 of a half or third are scaled up before rounding.'});
 function emp(p){const O=Math.max(0,100-p.C-p.H-p.N),pc=[p.C,p.H,O,p.N],mol=pc.map((v,i)=>v/EF[i][2]),pos=mol.filter(x=>x>1e-6),mn=Math.min(...pos),ratio=mol.map(x=>x/mn);let mult=1;for(const m of[1,2,3,4,5,6]){if(ratio.every(x=>Math.abs(x*m-Math.round(x*m))<.12)){mult=m;break}}const whole=ratio.map(x=>Math.round(x*mult)),sub=n=>n>1?String(n).split('').map(d=>'₀₁₂₃₄₅₆₇₈₉'[d]).join(''):'';return{O,ratio,whole,formula:whole.map((n,i)=>n?EF[i][0]+sub(n):'').join('')||'—'}}
 
