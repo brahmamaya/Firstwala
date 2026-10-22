@@ -34,17 +34,19 @@ function heart(s,p,k=1,o={}){HV=HV||{aorta:smooth3([[.04,.42,0],[.1,1.05,.02],[.
 /* Lungs with lobes (right: upper, middle, lower; left: upper with lingula, lower), bronchial tree and alveoli.
    World frame of the circulation scene: body faces +x, patient's right = +z. */
 function lungs(s,c0,k,col='#ffc9c9',alpha=.5){const A=(x,y,z)=>V.add(c0,[x*k,y*k,z*k]);
-  const lobe=(g,x,y,r,cc,ex)=>{const pos=A(x,y,g*.4),shape=(u,v)=>(1-.24*Math.max(0,-g*Math.sin(v))**1.5)*(ex?ex(u,v):1);s.mesh(pos,[r[0]*k,r[1]*k,r[2]*k],cc,{alpha,rings:7,segs:12,shape,spec:.3})};
+  const lobe=(g,x,y,r,cc,ex)=>{const pos=A(x,y,g*.72),shape=(u,v)=>(1-.24*Math.max(0,-g*Math.sin(v))**1.5)*(ex?ex(u,v):1);s.mesh(pos,[r[0]*k,r[1]*k,r[2]*k],cc,{alpha,rings:7,segs:12,shape,spec:.3})};
   const ap=u=>1-.22*Math.max(0,Math.sin(u))**2-.12*Math.max(0,-Math.sin(u))**2;
-  lobe(1,.0,.32,[.36,.28,.27],'#ff9eab',ap);lobe(1,.1,-.02,[.28,.14,.25],'#ff7f95');lobe(1,-.02,-.3,[.36,.3,.27],'#ffb0ba',ap);
-  lobe(-1,.0,.32,[.36,.3,.26],'#ff9eab',(u,v)=>ap(u)*(1-.14*Math.max(0,Math.cos(v))*Math.max(0,-Math.sin(u))));lobe(-1,-.02,-.28,[.36,.32,.26],'#ffb0ba',ap);
+  /* one smooth lung outline with the lobes drawn slightly inset, so the fissures read as grooves */
+  for(const g of[-1,1])s.mesh(A(0,0,g*.72),[.36*k,.78*k,.31*k],col,{alpha:.22,rings:9,segs:14,shape:(u,v)=>(1-.2*Math.max(0,-g*Math.sin(v))**1.5)*(1-.1*Math.max(0,Math.sin(u))**2)});
+  lobe(1,.0,.4,[.29,.3,.25],'#f0809b',ap);lobe(1,.1,.02,[.26,.12,.22],'#f6a77a');lobe(1,-.02,-.36,[.31,.3,.25],'#d96a8c',ap);
+  lobe(-1,.0,.38,[.29,.34,.25],'#f0809b',(u,v)=>ap(u)*(1-.14*Math.max(0,Math.cos(v))*Math.max(0,-Math.sin(u))));lobe(-1,-.02,-.3,[.31,.34,.25],'#d96a8c',ap);
   s.tube([A(0,1.0,0),A(0,.62,0),A(0,.5,0)],.055*k,'#f1f3f5',{segs:8});
-  for(const g of[-1,1]){const br=[A(0,.5,0),A(.0,.4,g*.15),A(.0,.32,g*.34)];s.tube(br,.04*k,'#f1f3f5',{segs:6});
-    for(const [dy,dx,dz,r] of[[.32,.06,.2,.026],[.1,-.04,.18,.024],[-.2,.0,.2,.024],[.12,.15,.1,.02]]){const m=A(.0,.32-.05,g*.3),e=A(dx*1.4,.32+dy,g*(.34+dz*.4));s.tube([m,V.add(m,V.mul(V.sub(e,m),.55)),e],r*k,'#f4f6f8',{segs:4});for(let i=0;i<3;i++)s.ball(V.add(e,[(hash(i+g*3)-.5)*.1*k,(hash(i+7)-.5)*.1*k,(hash(i+11)-.5)*.08*k]),.03*k,'#ff8fa3',{alpha:.85,flat:true})}}}
+  for(const g of[-1,1]){const br=[A(0,.5,0),A(.0,.4,g*.22),A(.0,.32,g*.6)];s.tube(br,.04*k,'#f1f3f5',{segs:6});
+    for(const [dy,dx,dz,r] of[[.32,.06,.2,.026],[.1,-.04,.18,.024],[-.2,.0,.2,.024],[.12,.15,.1,.02]]){const m=A(.0,.27,g*.56),e=A(dx*1.4,.32+dy,g*(.6+dz*.4));s.tube([m,V.add(m,V.mul(V.sub(e,m),.55)),e],r*k,'#f4f6f8',{segs:4});for(let i=0;i<3;i++)s.ball(V.add(e,[(hash(i+g*3)-.5)*.1*k,(hash(i+7)-.5)*.1*k,(hash(i+11)-.5)*.08*k]),.03*k,'#ff8fa3',{alpha:.85,flat:true})}}}
 /* Cut-away torso shell for the circulation scene (organs show through) and a small capillary plexus. */
-function torsoShell(s){const col='#f1c7a8',o={alpha:.13,rings:12,segs:18};
-  s.mesh([0,-.6,0],[.46,1.7,1.0],col,{...o,shape:u=>.88+.12*Math.sin(u)-.17*Math.exp(-(((u+.35)/.45)**2))});s.tube([[0,.95,0],[0,1.12,0]],.17,col,{alpha:.18,segs:10});
-  for(const g of[-1,1]){s.ball([0,.72,g*.96],.2,col,{alpha:.16,flat:true});s.tube([[0,.72,g*.96],[.03,-.1,g*1.12],[.08,-.9,g*1.1]],.15,col,{alpha:.16,segs:8});s.tube([[0,-1.9,g*.35],[.02,-2.35,g*.36]],.34,col,{alpha:.16,segs:8})}}
+function torsoShell(s){const col='#f1c7a8',o={alpha:.1,rings:12,segs:18};
+  s.mesh([0,-.6,0],[.46,1.7,1.15],col,{...o,shape:u=>.88+.12*Math.sin(u)-.17*Math.exp(-(((u+.35)/.45)**2))});s.tube([[0,.95,0],[0,1.12,0]],.17,col,{alpha:.18,segs:10});
+}
 function plexus(s,c0,rx,ry,rz,c1,c2){for(let k=0;k<5;k++){const pts=[];for(let i=0;i<=12;i++){const a=i*.75+k*1.3;pts.push([c0[0]+rx*.5*Math.sin(2.1*a+k),c0[1]+ry*Math.sin(1.3*a+k*2.1),c0[2]+rz*.5*Math.sin(a+k*1.7)])}s.tube(pts,.014,u=>u<.5?c1:c2,{segs:4})}}
 /*END heartkit*/
 // Translucent human body for locating organs.
@@ -162,10 +164,10 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-double-circulation',title:'
  controls:[S('loop','Highlight','both',[['both','Both circuits'],['pul','Pulmonary circuit'],['sys','Systemic circuit']]),R('hr','Heart rate',50,150,1,72,'beats/min')],
  metrics:p=>[N('Pulmonary circuit','RV → pulmonary artery → lungs → pulmonary veins → LA'),N('Systemic circuit','LV → aorta → body → venae cavae → RA'),N('Unusual vessels','Pulmonary artery: deoxygenated; pulmonary vein: oxygenated')],
 /*BEGIN dcdraw*/
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:80,cy:206,pitch:.04,yaw:-.9}),beat=1+.07*Math.max(0,Math.sin(t*p.hr/60*TAU)),hl=k=>p.loop==='both'||p.loop===k;
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:80,cy:206,pitch:.04,yaw:-1.38,pitch:.1}),beat=1+.07*Math.max(0,Math.sin(t*p.hr/60*TAU)),hl=k=>p.loop==='both'||p.loop===k;
   torsoShell(s);heart(s,[.07,-.07,0],.588*beat,{rotY:PI/2});lungs(s,[0,.2,0],1.1);
   /* Paths start/end at the heart model's own vessel stumps (heart rotY=PI/2: patient's right = +z, left = -z). circ(): path, index of the capillary bed (colour switch). */
-  const T=[.217,.577,-.029],pulL=[T,[.14,.62,-.3],[.1,.52,-.5],[.06,.3,-.62],[.04,.1,-.62],[0,.05,-.6],[-.06,.2,-.5],[-.1,.25,-.33]],pulR=[T,[.14,.62,.2],[.1,.5,.5],[.06,.3,.64],[.04,.1,.64],[0,.1,.55],[-.12,.3,.3],[-.12,.3,-.1],[-.1,.25,-.33]],
+  const T=[.217,.577,-.029],pulL=[T,[.14,.62,-.3],[.1,.52,-.5],[.06,.3,-.62],[.04,.1,-.62],[0,.05,-.6],[-.06,.2,-.5],[-.1,.25,-.33]],pulR=[T,[.14,.62,.2],[.1,.5,.5],[.06,.3,.64],[.04,.1,.64],[0,.1,.55],[-.14,.3,.4],[-.3,.3,.15],[-.28,.28,-.15],[-.1,.25,-.33]],
   sys=[[.08,.4,-.04],[.082,.547,-.059],[.011,.8,-.118],[-.136,.8,-.25],[-.27,.55,-.235],[-.294,.05,-.176],[-.28,-.6,-.15],[-.22,-1.3,-.1],[-.1,-1.9,-.05],[.02,-1.9,.2],[0,-1.2,.3],[-.018,-.6,.353],[-.018,-.1,.353],[.07,.15,.34]];
   const circ=(path,m,r,c1,c2)=>{s.tube(path.slice(0,m+1),r,c1,{segs:8});s.tube(path.slice(m),r,c2,{segs:8})};
   if(hl('pul')){circ(pulL,4,.036,'#4263eb','#e03131');circ(pulR,4,.036,'#4263eb','#e03131');plexus(s,[.04,.1,-.62],.1,.16,.1,'#4263eb','#e03131');plexus(s,[.04,.1,.64],.1,.16,.1,'#4263eb','#e03131')}
