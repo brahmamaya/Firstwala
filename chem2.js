@@ -2,11 +2,13 @@
 (() => {
 'use strict';
 const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
-const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,{add,done}=pack();
+const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,glassBeaker,stick}=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const particles=(s,n,box,col,r=.07,seed=0,t=0)=>{for(let i=0;i<n;i++)s.ball([box[0]+(hash(i+seed)-.5)*box[3]+.05*Math.sin(t*2+i),box[1]+(hash(i+seed+31)-.5)*box[4],box[2]+(hash(i+seed+67)-.5)*box[5]],r,col,{flat:true})};
 
+// point at fraction u (0..1) along a polyline
+const along=(pts,u)=>{let L=0;const ls=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1],pts[i][2]-pts[i-1][2]);ls.push(l);L+=l}let d=u*L;for(let i=0;i<ls.length;i++){if(d<=ls[i]||i===ls.length-1){const k=Math.min(1,d/ls[i]),a=pts[i],b=pts[i+1];return[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,a[2]+(b[2]-a[2])*k]}d-=ls[i]}};
 /* ---------- 1 Solutions ---------- */
 add({...ch(1,'Solutions',PH),id:'chem-raoult',title:'Raoult’s law: vapour pressure of a mixture',
  description:'Mix benzene and toluene and see how the total and partial vapour pressures depend on the mole fraction.',
@@ -41,10 +43,21 @@ add({...ch(2,'Electrochemistry',PH),id:'chem-daniell-cell',title:'Daniell cell a
  tryText:'Make [Cu²⁺] 100 times smaller than [Zn²⁺]. By how much does the voltage fall?',
  controls:[R('zn','[Zn²⁺]',.001,2,.001,1,'M',3),R('cu','[Cu²⁺]',.001,2,.001,1,'M',3)],
  metrics:p=>{const E=1.10-.0591/2*Math.log10(p.zn/p.cu);return[N('E°cell',1.10,'V',2),N('E cell',E,'V',3),N('ΔG = −nFE',-2*96485*E/1000,'kJ/mol',1),N('Anode / cathode','Zn (−) / Cu (+)')]},
- draw:(c,p,t)=>{const E=1.10-.0591/2*Math.log10(p.zn/p.cu),s=P3.scene(c,{scale:50,cx:300,cy:300});beaker(s,[-1.8,-2,0],1,2.4,'#e9ecef',.7);beaker(s,[1.8,-2,0],1,2.4,'#4dabf7',.7);s.box([-1.8,-.6,0],[.35,2.4,.08],'#adb5bd');s.box([1.8,-.6,0],[.35,2.4,.08],'#d9844a');
-  s.tube([[-1.3,-1.2,0],[-1.3,.4,0],[1.3,.4,0],[1.3,-1.2,0]],.13,'#fff3bf',{alpha:.7,segs:10});s.tube([[-1.8,.6,0],[-1.8,1.6,0],[-.4,1.6,0]],.03,'#495057',{segs:5});s.tube([[1.8,.6,0],[1.8,1.6,0],[.4,1.6,0]],.03,'#495057',{segs:5});s.box([0,1.6,0],[.8,.6,.3],'#212529');s.engrave([0,1.6,.16],`${f(E,3)} V`,'#69db7c',13,9e5);
-  const q=cycle(t*.4,1);for(let k=0;k<3;k++){const u=(q+k/3)%1;s.ball(u<.5?[-1.8+0*u,1.6,0].map((v,j)=>j===0?-1.8+u*2*1.4:v):[-.4+(u-.5)*2*2.2,1.6,0],.06,'#ffd43b',{flat:true,glow:true})}
-  s.arrow([-1.2,2.1,0],[1.2,2.1,0],'#ffd43b',2.5,8,'e⁻ flow');s.callout([-1.8,0,.05],'Zn anode (−): Zn → Zn²⁺ + 2e⁻','#ced4da',-40,-70);s.callout([1.8,0,.05],'Cu cathode (+): Cu²⁺ + 2e⁻ → Cu','#e8590c',40,-70);s.callout([0,.4,0],'salt bridge (KCl)','#fff3bf',40,40);s.render()},
+ draw:(c,p,t)=>{const E=1.10-.0591/2*Math.log10(p.zn/p.cu),s=P3.scene(c,{scale:50,cx:300,cy:300}),q=cycle(t*.35,1);
+  glassBeaker(s,[-1.9,-2,0],1.05,2.4,'#e9ecef',.7,{alpha:.22});glassBeaker(s,[1.9,-2,0],1.05,2.4,'#339af0',.7,{alpha:clamp(.22+.2*Math.log10(p.cu*1000)/3.3,.2,.45)});
+  s.box([-1.9,-.75,0],[.5,1.9,.06],'#adb5bd');s.box([1.9,-.75,0],[.5,1.9,.06],'#d9844a');
+  // salt bridge: glass U-tube filled with KCl gel, cotton plugs at the ends
+  const sb=[[-1.4,-1.4,.4],[-1.4,-.1,.4]];for(let i=1;i<=10;i++){const a=PI-PI*i/10;sb.push([1.4*Math.cos(a),-.1+.7*Math.sin(a),.4])}sb.push([1.4,-1.4,.4]);
+  s.tube(sb,.15,'#e9f6ff',{alpha:.28,segs:8});s.tube(sb,.1,'#f3ecc8',{alpha:.85,segs:6});s.ball([-1.4,-1.4,.4],.12,'#fff',{flat:true});s.ball([1.4,-1.4,.4],.12,'#fff',{flat:true});
+  // external circuit: wires to a voltmeter (Zn terminal black/−, Cu terminal red/+)
+  const wl=[[-1.9,.2,0],[-1.9,1.5,0],[-.55,1.5,0]],wr=[[1.9,.2,0],[1.9,1.5,0],[.55,1.5,0]];s.tube(wl,.03,'#212529',{segs:5});s.tube(wr,.03,'#e03131',{segs:5});
+  s.box([-1.9,.25,0],[.16,.2,.12],'#212529');s.box([1.9,.25,0],[.16,.2,.12],'#e03131');
+  s.box([0,1.5,0],[1.1,.7,.4],'#343a40');s.box([0,1.55,.21],[.9,.36,.02],'#0b3d2e');s.engrave([0,1.55,.24],`${f(E,3)} V`,'#69db7c',11,9e5);
+  for(let k=0;k<4;k++){const u=(q+k/4)%1,pt=along([wl[0],wl[1],wl[2]],u);s.ball(pt,.06,'#ffd43b',{flat:true,glow:true});const pr=along([wr[2],wr[1],wr[0]],u);s.ball(pr,.06,'#ffd43b',{flat:true,glow:true})}
+  // ions: Zn²⁺ leave the zinc plate; Cu²⁺ drift to the copper plate; anions toward the anode, K⁺ toward the cathode
+  for(let k=0;k<5;k++){const u=(q+k/5)%1;s.ball([-1.9-.35-u*.45,-1.4+hash(k)*1.2,(hash(k+3)-.5)*.5],.08*(1-u*.4),'#ced4da',{flat:true});s.ball([2.9-u*.7,-1.4+hash(k+9)*1.2,(hash(k+13)-.5)*.5],.08,'#4dabf7',{flat:true,glow:true});
+    const w=along(sb.slice(1,12),u);s.ball(V.add(w,[0,0,0]),.045,'#9775fa',{flat:true});s.ball(along(sb.slice(1,12),1-((u+.5)%1)),.045,'#69db7c',{flat:true})}
+  s.arrow([-1.2,2.15,0],[1.2,2.15,0],'#ffd43b',2.5,8,'e⁻ flow');s.callout([-1.9,-1.1,.05],'Zn anode (−): Zn → Zn²⁺ + 2e⁻','#ced4da',-30,95);s.callout([1.9,-.2,.05],'Cu cathode (+): Cu²⁺ + 2e⁻ → Cu','#e8590c',50,-45);s.callout([0,.6,.4],'salt bridge (KCl)','#fff3bf',0,-45);s.render()},
  assumption:'298 K, activities taken equal to molar concentrations.'});
 
 const MET={Cu:['Copper',63.5,2],Ag:['Silver',107.9,1],Al:['Aluminium',27.0,3]};
@@ -55,9 +68,17 @@ add({...ch(2,'Electrochemistry',PH),id:'chem-faraday-electrolysis',title:'Electr
  tryText:'Pass 2 A for 30 minutes through CuSO₄. How much copper is deposited?',
  controls:[S('met','Metal ion','Cu',Object.keys(MET).map(k=>[k,MET[k][0]+(k==='Al'?' (from molten Al₂O₃, not aqueous)':'')])),R('I','Current',.1,5,.1,2,'A',1),R('t','Time',1,120,1,30,'min')],
  metrics:p=>{const [n0,M,n]=MET[p.met],Q=p.I*p.t*60;return[N('Charge passed',Q,'C',0),N('Moles of electrons',Q/96485,'mol',4),N('Mass deposited',M*Q/(n*96485),'g',3)]},
- draw:(c,p,t)=>{const [n0,M,n]=MET[p.met],m=M*p.I*p.t*60/(n*96485),s=P3.scene(c,{scale:56,cx:260,cy:300});beaker(s,[0,-2,0],1.6,2.6,p.met==='Cu'?'#4dabf7':'#e9ecef',.7);s.box([-.9,-.8,0],[.3,2.4,.6],'#868e96');s.box([.9,-.8,0],[.3+clamp(m*.05,0,.4),2.4,.6+clamp(m*.05,0,.4)],p.met==='Cu'?'#d9844a':p.met==='Ag'?'#dee2e6':'#ced4da');
-  s.box([0,1.3,0],[1,.5,.5],'#212529');s.tube([[-.9,.4,0],[-.9,1.3,0],[-.5,1.3,0]],.03,'#e03131',{segs:5});s.tube([[.9,.4,0],[.9,1.3,0],[.5,1.3,0]],.03,'#343a40',{segs:5});for(let k=0;k<8;k++){const u=cycle(t*.5+k/8,1);s.ball([-.7+u*1.4,-1.4+hash(k)*1.6,(hash(k+4)-.5)*.6],.07,'#69db7c',{flat:true})}
-  s.callout([-.9,0,.3],'anode (+)','#ff8787',-50,-50);s.callout([.9,0,.3],`cathode (−): ${f(m,3)} g ${n0.toLowerCase()} deposited`,'#e9f6ff',40,-60);s.callout([0,-1,.3],`${p.met}${['','⁺','²⁺','³⁺'][n]} ions move to the cathode`,'#69db7c',50,50);s.render();tag(c,`m = ${M} × ${p.I} × ${p.t*60} / (${n} × 96485) = ${f(m,3)} g`,44,98,C.gold,14)},
+ draw:(c,p,t)=>{const [n0,M,n]=MET[p.met],m=M*p.I*p.t*60/(n*96485),s=P3.scene(c,{scale:56,cx:260,cy:300}),q=cycle(t*.5,1),cu=p.met==='Cu',mc=cu?'#d9844a':p.met==='Ag'?'#dee2e6':'#ced4da',col=cu?'#339af0':p.met==='Al'?'#ffd8a8':'#e9ecef';
+  glassBeaker(s,[0,-2,0],1.6,2.6,col,.7,{alpha:cu?.4:.3});
+  // inert anode (graphite rod, +) and cathode (steel plate that gets coated with metal)
+  s.cyl([-.9,-.65,0],[0,1,0],.12,2.3,'#343a40',{seg:10});const th=clamp(m*.05,0,.4)+.01;s.box([.9,-.8,0],[.3,2.4,.06],'#868e96');s.box([.9,-.8,0],[.3+th,2.4+th,.06+th],mc);
+  const wa=[[-.9,.5,0],[-.9,1.3,0],[-.5,1.3,0]],wc=[[.9,.5,0],[.9,1.3,0],[.5,1.3,0]];s.box([0,1.3,0],[1,.5,.5],'#212529');s.box([-.5,1.3,0],[.1,.18,.18],'#e03131');s.box([.5,1.3,0],[.1,.18,.18],'#868e96');s.engrave([-.28,1.3,.26],'+','#ff8787',13,9e5);s.engrave([.28,1.3,.26],'−','#e9ecef',13,9e5);
+  s.tube(wa,.03,'#e03131',{segs:5});s.tube(wc,.03,'#343a40',{segs:5});
+  for(let k=0;k<4;k++){const u=(q+k/4)%1,pa=along([wa[0],wa[1],wa[2]],u*.5+.0);if(u<.5)s.ball(along(wa,u*2),.055,'#ffd43b',{flat:true,glow:true});else s.ball(along([wc[2],wc[1],wc[0]],(u-.5)*2),.055,'#ffd43b',{flat:true,glow:true})}
+  // bubbles of O₂ rising from the anode; cations drift to the cathode, anions to the anode
+  for(let k=0;k<7;k++){const u=cycle(t*.4+hash(k),1);s.ball([-.9+(hash(k+5)-.5)*.35+.05*Math.sin(t*3+k),-1.2+u*1.8,(hash(k+8)-.5)*.3+.15],.045+.03*hash(k+2),'#f1f3f5',{alpha:.7})}
+  for(let k=0;k<8;k++){const u=cycle(t*.35+k/8,1),y=-1.4+hash(k)*1.4,z=(hash(k+4)-.5)*.6;s.ball([-.7+u*1.4,y,z],.07,'#ffa94d',{flat:true,glow:true});s.ball([.7-cycle(t*.35+k/8+.3,1)*1.4,-1.35+hash(k+20)*1.4,(hash(k+24)-.5)*.6],.07,'#69db7c',{flat:true})}
+  s.callout([-.9,-.2,.1],'anode (+)','#ff8787',-50,-50);s.callout([.9,-.2,.1],`cathode (−): ${f(m,3)} g ${n0.toLowerCase()} deposited`,'#e9f6ff',40,-60);s.callout([0,-1.3,.5],`${p.met}${['','⁺','²⁺','³⁺'][n]} ions move to the cathode`,'#ffa94d',50,50);s.render();tag(c,`m = ${M} × ${p.I} × ${p.t*60} / (${n} × 96485) = ${f(m,3)} g`,44,98,C.gold,14)},
  assumption:'100 % current efficiency; only metal deposition occurs at the cathode. Aluminium is never deposited from aqueous solution (water is reduced instead); it is made by electrolysis of molten Al₂O₃ in cryolite.'});
 
 /* ---------- 3 Chemical Kinetics ---------- */

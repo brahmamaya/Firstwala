@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
-const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,{add,done}=pack();
+const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:11,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3+i*6/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.6,h,.6],on?'#ffd43b':col);s.engrave([x,h+.25,.32],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
@@ -68,9 +68,9 @@ add({...ch(4,'Chemical Bonding and Molecular Structure',PH),id:'chem-hybridisati
  controls:[S('h','Hybridisation','sp3',[['sp','sp'],['sp2','sp²'],['sp3','sp³']])],
  metrics:p=>{const d=HYB[p.h];return[N('Hybridisation',d[0]),N('Example',d[1]),N('Bond angle',`${d[2]}°`),N('s-character',d[3],'%',1),N('Unhybridised p orbitals',p.h==='sp'?2:p.h==='sp2'?1:0,'',0)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:260,yaw:t*.3,pitch:.3}),dirs={sp:[[1,0,0],[-1,0,0]],sp2:[[1,0,0],[-.5,0,.866],[-.5,0,-.866]],sp3:[[0,1,0],[.943,-.333,0],[-.471,-.333,.816],[-.471,-.333,-.816]]}[p.h];atom(s,[0,0,0],'C',1.1);
-  dirs.forEach((u,i)=>{s.mesh(V.mul(u,.6),[.5,.5,.5],'#4dabf7',{alpha:.35,rings:10,segs:14,shape:()=>1,rot:[0,0,0]});const q=V.mul(u,1.35),cc=p.h!=='sp3'&&i===0;bond(s,[0,0,0],q,cc?(p.h==='sp'?3:2):1);atom(s,q,cc?'C':'H')});
-  if(p.h!=='sp3')for(const sg of[1,-1])s.mesh([0,sg*.65,0],[.22,.55,.22],'#ff8787',{alpha:.35,rings:10,segs:12});if(p.h==='sp')for(const sg of[1,-1])s.mesh([0,0,sg*.65],[.22,.22,.55],'#ff8787',{alpha:.35,rings:10,segs:12});
-  s.callout(V.mul(dirs[0],.6),`${HYB[p.h][0]} hybrid orbital`,'#74c0fc',50,-60);if(p.h!=='sp3')s.callout([0,.9,0],'unhybridised p (forms π bond)','#ff8787',-60,-50);s.render();tag(c,`${HYB[p.h][0]}: bond angle ${HYB[p.h][2]}°`,44,98,C.gold,15)},
+  dirs.forEach((u,i)=>{PC.lobe(s,[0,0,0],u,1.2,.43,'#4dabf7',.4,{rings:8,segs:12});const q=V.mul(u,1.35),cc=p.h!=='sp3'&&i===0;PC.stick(s,[0,0,0],q,cc?(p.h==='sp'?3:2):1,{ca:'C',cb:cc?'C':'H',side:[0,1,0]});atom(s,q,cc?'C':'H')});
+  const pz=p.h==='sp'?[[0,1,0],[0,0,1]]:p.h==='sp2'?[[0,1,0]]:[];for(const u of pz)for(const sg of[1,-1])PC.lobe(s,[0,0,0],V.mul(u,sg),.95,.3,sg>0?'#ff8787':'#ffc9c9',.42,{rings:8,segs:12});
+  s.callout(V.mul(dirs[0],.7),`${HYB[p.h][0]} hybrid orbital`,'#74c0fc',50,-60);if(p.h!=='sp3')s.callout([0,.8,0],'unhybridised p (forms π bond)','#ff8787',-60,-50);s.render();tag(c,`${HYB[p.h][0]}: bond angle ${HYB[p.h][2]}°`,44,98,C.gold,15)},
  assumption:'Hybrid lobes drawn schematically; one carbon of ethyne (C≡C) or ethene (C=C) is shown with the other carbon at the first position; sp³ is methane.'});
 
 const DIP=[['CO₂','linear',[['O',1],['O',-1]],0],['H₂O','bent',[['H',104.5]],1.85],['NH₃','pyramidal',[['H',107]],1.47],['NF₃','pyramidal',[['F',102]],.23],['BF₃','trigonal planar',[['F',120]],0],['CH₄','tetrahedral',[['H',109.5]],0],['CHCl₃','tetrahedral',[['Cl',109.5]],1.04]];
