@@ -323,9 +323,17 @@ add({...ch(16,'Excretory Products and their Elimination'),id:'bio-countercurrent
  tryText:'Move the probe to the bottom of the loop. Why can urine become concentrated there?',
  controls:[R('depth','Depth into medulla',0,100,1,60,'%'),S('limb','Limb','desc',[['desc','Descending limb'],['asc','Ascending limb']])],
  metrics:p=>{const osm=300+900*p.depth/100;return[N('Interstitial osmolarity',osm,'mOsmol/L',0),N('Filtrate in this limb',p.limb==='desc'?`≈ ${f(osm,0)} (water leaves)`:'Becoming dilute (salts leave)'),N('Permeable to',p.limb==='desc'?'Water':'Electrolytes (NaCl), not water'),N('Helped by','Vasa recta and urea')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.15}),H=3.4,top=1.6;for(let i=0;i<8;i++){const y=top-H*(i+.5)/8,k=i/7;s.box([0,y,-.6],[4.6,H/8,.2],`#${Math.round(255-60*k).toString(16)}${Math.round(230-150*k).toString(16)}${Math.round(140-100*k).toString(16)}`,{alpha:.5});s.label([2.6,y,-.6],f(300+900*(i+.5)/8,0),C.muted,11)}
-  const loop=[[-.6,top,0],[-.6,top-H,0],[-.3,top-H-.3,0],[0,top-H,0],[0,top,0]];s.tube(loop,.13,'#a5d8ff',{segs:10});s.tube([[.7,top,.3],[.7,top-H,.3],[1.0,top-H-.25,.3],[1.3,top-H,.3],[1.3,top,.3]],.07,'#ff8787',{segs:8,alpha:.8});s.label([1,top+.3,.3],'vasa recta',C.red,12);
-  for(let i=0;i<8;i++){const y=top-.2-i*.4;s.arrow([-.75,y,0],[-1.25,y,0],'#4dabf7',2,7,i===0?'H₂O out':'');s.arrow([.15,y,0],[.65,y,0],'#ffd43b',2,7,i===0?'NaCl out':'')}const y=top-H*p.depth/100,x=p.limb==='desc'?-.6:0;s.ball([x,y,.2],.12,C.white,{glow:true,lift:3});s.render();tag(c,'blue arrows: water out of descending limb · yellow: NaCl out of ascending limb',44,98,C.muted,12)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,pitch:.06,cx:335,cy:268}),H=3.0,top=1.6,mix=(a,b,k)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join('')};
+  for(let i=0;i<8;i++){const y=top-H*(i+.5)/8,k=i/7;s.box([0,y,-.6],[4.8,H/8,.2],mix('#f3d9a4','#9c4a3a',k),{alpha:.55});s.label([2.7,y,-.6],f(300+900*(i+.5)/8,0),C.muted,11)}
+  s.label([-2.75,top-.2,-.6],'cortex',C.muted,12);s.label([-2.75,top-1.2,-.6],'outer medulla',C.muted,12);s.label([-2.75,top-2.4,-.6],'inner medulla',C.muted,12);
+  /* hairpin of Henle: rounded bend, filtrate darkens in the descending limb and thins again in the ascending limb */
+  const bend=[];for(let i=0;i<=8;i++){const a=PI+PI*i/8;bend.push([-.3+.3*Math.cos(a),top-H+.3*Math.sin(a),0])}
+  const dl=[[-.6,top,0],[-.6,top-H*.5,0],...bend.slice(0,5)],al=[...bend.slice(4),[0,top-H*.5,0],[0,top,0]];
+  s.tube(dl,.12,u=>mix('#d7ecff','#2f5fc0',u),{segs:10});s.tube(al,.12,u=>mix('#2f5fc0','#d7ecff',u),{segs:10});
+  s.tube([[.7,top,.3],[.7,top-H,.3],[.85,top-H-.2,.3],[1.0,top-H,.3]],.065,'#e8505b',{segs:8,alpha:.9});s.tube([[1.0,top-H,.3],[1.0,top,.3]],.065,'#7b8cde',{segs:8,alpha:.9});s.label([1.5,top+.3,.3],'vasa recta',C.red,12);
+  for(let i=0;i<8;i++){const y=top-.2-i*.4;s.arrow([-.75,y,0],[-1.25,y,0],'#4dabf7',2,7,i===0?'H₂O out':'');s.arrow([.15,y,0],[.65,y,0],'#ffd43b',2,7,i===0?'NaCl out':'')}
+  s.label([-.8,top+.3,0],'descending',C.muted,11);s.label([.35,top+.3,0],'ascending',C.muted,11);
+  const y=top-H*p.depth/100,x=p.limb==='desc'?-.6:0;s.ball([x,y,.2],.14,C.white,{glow:true,lift:3});s.render();tag(c,'blue arrows: water out of descending limb · yellow: NaCl out of ascending limb',44,98,C.muted,12)},
  assumption:'Linear interstitial gradient for teaching; numbers from NCERT Chapter 16.'});
 
 add({...ch(16,'Excretory Products and their Elimination'),id:'bio-adh-regulation',title:'ADH and water balance',
