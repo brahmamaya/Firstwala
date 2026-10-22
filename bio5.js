@@ -21,7 +21,7 @@ add({...ch(7,'Human Health and Disease',U8),id:'bio-immune-response',title:'Prim
   for(let i=0;i<Math.min(24,Math.round(a*2));i++){const q=[(hash(i+40)-.5)*3.4,(hash(i+50)-.5)*2.6+.1*Math.sin(t*2+i),(hash(i+60)-.5)*1.6];antibody(s,q,.5,'#74c0fc',hash(i)*TAU)}s.callout([(hash(0)-.5)*3,(hash(3)-.5)*2.4+.22,(hash(6)-.5)*1.5],'antigen (pathogen surface)','#ff8fab',-50,-50);if(a>.5)s.callout([(hash(40)-.5)*3.4,(hash(50)-.5)*2.6+.1*Math.sin(t*2),(hash(60)-.5)*1.6],'antibodies (IgG) from plasma B cells','#74c0fc',50,50);s.render();
   chart(c,420,96,236,170,{title:'Antibody level vs time',xl:'days',xmin:0,xmax:120,ymin:0,ymax:abLevel(p,p.second+6)*1.1,series:[{fn:d=>abLevel(p,d),col:C.gold}],marker:[p.day,a]})},
  assumption:'Schematic antibody curves: primary peak ≈ 1 unit at day 12; secondary ≈ 10× higher, peaking about 6 days after re-exposure.'});
-function abLevel(p,d){const g=(t0,lag,peak,w)=>d<t0+lag?0:peak*Math.exp(-(((d-t0-lag-w)/w)**2)*.7)*(d>t0+lag+w?Math.exp(-(d-t0-lag-w)/40):1);return g(0,4,1,8)+(d>=p.second?g(p.second,1.5,10,5):0)}
+function abLevel(p,d){const e0=Math.exp(-.7),g=(t0,lag,peak,w)=>{const x=d-t0-lag;if(x<0)return 0;if(x<=w)return peak*(Math.exp(-(((x-w)/w)**2)*.7)-e0)/(1-e0);return peak*Math.exp(-(((x-w)/w)**2)*.7)*Math.exp(-(x-w)/40)};return g(0,4,1,8)+(d>=p.second?g(p.second,1.5,10,5):0)}
 
 const AB={IgG:[1,'Most common; crosses the placenta'],IgA:[2,'In secretions such as colostrum'],IgM:[5,'First antibody made; pentamer'],IgE:[1,'Involved in allergy']};
 add({...ch(7,'Human Health and Disease',U8),id:'bio-antibody-structure',title:'Structure of an antibody',
