@@ -122,11 +122,17 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-gas-exchange',title:'Ex
  tryText:'Switch to tissues: in which direction does each gas move now?',
  controls:[S('site','Site','lungs',[['lungs','Alveolus (lungs)'],['tissue','Body tissue']]),R('x','Position along capillary',0,100,1,30,'%')],
  metrics:p=>{const k=1-Math.exp(-p.x/18);let o2,co2;if(p.site==='lungs'){o2=40+(95-40)*k;co2=45-(45-40)*k}else{o2=95-(95-40)*k;co2=40+(45-40)*k}return[N('pO₂ in blood',o2,'mm Hg',0),N('pCO₂ in blood',co2,'mm Hg',0),N(p.site==='lungs'?'Alveolar air':'Tissue',p.site==='lungs'?'pO₂ 104, pCO₂ 40':'pO₂ 40, pCO₂ 45'),N('Diffusion membrane','3 thin layers, ≪ 1 mm')]},
- draw:(c,p,t)=>{const lung=p.site==='lungs',s=P3.scene(c,{scale:58,pitch:.3});if(lung)s.mesh([0,1,0],[1.8,1.1,1.2],'#ffc9c9',{alpha:.3});else for(let i=0;i<10;i++)s.mesh([-2.5+i*.55,1.1,(hash(i)-.5)*.6],.32,'#ffc9c9',{alpha:.5});
-  const pts=Array.from({length:30},(_,i)=>[-3.4+i*.235,-.1+.12*Math.sin(i*.5),0]);s.tube(pts,.32,(u)=>{const k=1-Math.exp(-u*100/18),r=lung?k:1-k;return r>.5?'#e03131':'#7048e8'},{alpha:.75,segs:12});
-  for(let i=0;i<10;i++){const q=cycle(t*.25+i/10,1),x=-3.4+q*6.8;s.mesh([x,-.1,0],[.16,.06,.16],'#c92a2a',{rot:[PI/2,0,0],rings:6,segs:10})}
-  for(let i=0;i<6;i++){const q=cycle(t*.7+i/6,1),x=-2.8+i;s.ball([x,lung?.9-q*.9:-.1+q*.9,.3],.06,'#4dabf7',{flat:true});s.ball([x+.4,lung?-.1+q*.9:.9-q*.9,-.3],.06,'#adb5bd',{flat:true})}
-  const xp=-3.4+p.x/100*6.8;s.cyl([xp,-.1,0],[1,0,0],.36,.04,'#ffd43b',{alpha:.6});s.callout(lung?[-1.2,1.6,.6]:[-2.5,1.4,0],lung?'alveolus (air sac)':'body tissue cells','#ffc9c9',-40,-40);s.callout([2.5,.2,.2],'blood capillary','#ff8787',40,-50);s.callout([-3.4+cycle(t*.25,1)*6.8,-.1,.15],'RBC','#ff6b6b',30,60);s.callout([-2.8,lung?.9-cycle(t*.7,1)*.9:-.1+cycle(t*.7,1)*.9,.3],lung?'O₂ → blood':'O₂ → tissue','#4dabf7',-60,-30);s.callout([xp,.3,0],'probe','#ffd43b',30,-50);s.render();tag(c,'blue: O₂   grey: CO₂   yellow ring: probe',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const lung=p.site==='lungs',s=P3.scene(c,{scale:58,pitch:.05,cx:335,cy:275}),Y=0,TOP=.52,st=x=>{const u=(x+3.4)/6.8,k=1-Math.exp(-u*100/18);return lung?k:1-k};
+  /* air sac (cut open) or body tissue, sitting above the capillary */
+  if(lung){s.mesh([0,TOP,0],[3.5,1.55,.5],'#f2a7b5',{alpha:.55,rings:12,segs:30,shape:u=>u<0?0:1});s.mesh([0,TOP,0],[3.38,1.42,.45],'#e6f3ff',{alpha:.4,rings:12,segs:30,shape:u=>u<0?0:1})}
+  else for(let i=0;i<5;i++){const x=-2.8+i*1.4,y=TOP+.75+.08*Math.sin(i*2);s.mesh([x,y,0],[.7,.55,.3],'#f6c1b0',{alpha:.7,rings:9,segs:14});s.mesh([x+.08,y+.05,.05],[.22,.2,.2],'#7b5cc4',{rings:7,segs:10});s.ball([x-.35,y-.15,.2],.06,'#e8743b',{flat:true});s.ball([x+.3,y-.22,.2],.06,'#e8743b',{flat:true})}
+  /* respiratory membrane: epithelium + fused basement membrane (+ capillary endothelium wall) */
+  s.poly([[-3.5,TOP+.1,0],[3.5,TOP+.1,0],[3.5,TOP+.04,0],[-3.5,TOP+.04,0]],'#f4b6c2',{cull:false});s.poly([[-3.5,TOP+.04,0],[3.5,TOP+.04,0],[3.5,TOP-.02,0],[-3.5,TOP-.02,0]],'#d8c3a0',{cull:false});
+  const pts=Array.from({length:30},(_,i)=>[-3.4+i*.235,Y,0]);s.tube(pts,.46,u=>st(-3.4+u*6.8)>.5?'#e8505b':'#7a4fd0',{alpha:.4,segs:14});
+  for(let i=0;i<8;i++){const q=cycle(t*.25+i/8,1),x=-3.3+q*6.6,o=st(x);s.mesh([x,Y+.04*Math.sin(i*3),0],[.27,.16,.1],o>.5?'#d6303a':'#8e2340',{rings:7,segs:12})}
+  for(let i=0;i<6;i++){const q=cycle(t*.7+i/6,1),x=-2.8+i,yo=lung?TOP+.7-q*.9:Y+.1+q*1.05;s.ball([x,yo,.3],.07,'#4dabf7',{flat:true,glow:true});const yc=lung?Y+.1+q*1.05:TOP+.7-q*.9;s.ball([x+.4,yc,-.3],.06,'#adb5bd',{flat:true})}
+  const xp=-3.4+p.x/100*6.8;s.cyl([xp,Y,0],[1,0,0],.5,.05,'#ffd43b',{alpha:.55});
+  s.callout(lung?[-2.4,TOP+.9,0]:[-2.8,TOP+1.05,0],lung?'alveolus (air sac)':'body tissue cells','#ffc9c9',-20,-30);s.callout([2.7,Y-.4,.2],'blood capillary','#ff8787',0,40);s.callout([-3.3+cycle(t*.25,1)*6.6,Y-.1,.1],'RBC','#ff6b6b',0,50);s.callout([3.1,TOP+.04,0],lung?'3-layer membrane':'diffusion barrier','#f4b6c2',30,-30);s.callout([xp,Y-.46,0],'probe','#ffd43b',-30,45);s.render();tag(c,'blue: O₂   grey: CO₂   yellow ring: probe',290,372,C.muted,12)},
  assumption:'Partial pressures from NCERT Table 14.1; equilibration along the capillary modelled as exponential.'});
 
 add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-oxygen-dissociation',title:'Oxygen–haemoglobin dissociation curve',
