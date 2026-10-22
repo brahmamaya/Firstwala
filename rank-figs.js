@@ -309,5 +309,384 @@ function share(){const s=svg(340,252,'Two conducting spheres of radii R1 and R2 
   text(s,20,244,'spheres far apart; some energy is lost as heat',12,DIM,'start');
   return s}
 
-window.PhysicaRankFigs={acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share};
+/* ---- Hand-drawn notes style: thin strokes, handwriting labels, paper-like card. Electrostatics set. ---- */
+const hs=(w,h,alt)=>{const s=svg(w,h,alt);s.classList.add('rk-hand');return fin(s)};
+const ht=(p,x,y,t,c=INK,anc='middle',sz=15)=>text(p,x,y,t,sz,c,anc,400);
+const hl=(p,x1,y1,x2,y2,c=INK,d)=>line(p,x1,y1,x2,y2,c,1.3,d);
+const dsh=(p,x1,y1,x2,y2)=>hl(p,x1,y1,x2,y2,DIM,'4 3');
+const hv=(p,x1,y1,x2,y2,c=HI,w=2)=>{line(p,x1,y1,x2,y2,c,w);const a=Math.atan2(y2-y1,x2-x1);mk(p,'polygon',{points:`${x2},${y2} ${x2-9*Math.cos(a-.4)},${y2-9*Math.sin(a-.4)} ${x2-9*Math.cos(a+.4)},${y2-9*Math.sin(a+.4)}`,fill:c})};
+const dot=(p,x,y,c=INK,r=3)=>mk(p,'circle',{cx:x,cy:y,r,fill:c});
+const pt=(cx,cy,r,a)=>[cx+r*Math.sin(a*Math.PI/180),cy-r*Math.cos(a*Math.PI/180)];
+const arcp=(p,cx,cy,r,a1,a2,c=INK,w=1.3)=>{const [x1,y1]=pt(cx,cy,r,a1),[x2,y2]=pt(cx,cy,r,a2);return mk(p,'path',{d:`M${x1} ${y1}A${r} ${r} 0 ${Math.abs(a2-a1)>180?1:0} ${a2>a1?1:0} ${x2} ${y2}`,fill:'none',stroke:c,'stroke-width':w})};
+const pls=(p,x,y,s='+')=>text(p,x,y,s,14,s==='+'?RED:BLUE,'middle',700);
+const dim=(p,x1,y1,x2,y2,t,tx,ty)=>{hv(p,(x1+x2)/2,(y1+y2)/2,x2,y2,DIM,1.1);hv(p,(x1+x2)/2,(y1+y2)/2,x1,y1,DIM,1.1);ht(p,tx,ty,t,DIM)};
+const fin=s=>{s.setAttribute('viewBox',s.getAttribute('viewBox').replace(/\S+$/,Math.ceil((s._m||0)+8)));return s};
+const cp=(p,y,t,c=INK)=>{const w=+p.getAttribute('viewBox').split(' ')[2],n=Math.floor((w-20)/7),L=[];for(const seg of t.split('|')){let l='';for(const x of seg.split(' ')){if(l&&(l+' '+x).length>n){L.push(l);l=x}else l=l?l+' '+x:x}L.push(l)}if(p._m!=null)y=p._m+18;L.forEach((x,k)=>ht(p,12,y+16*k,x,c,'start',13.5));p._m=y+16*(L.length-1)};
+const ELL={fill:'#17314f',stroke:BLUE,'stroke-width':2};
+/* ring on its axis: E = kQx/(R²+x²)^(3/2) */
+function ringAxis(){const s=hs(260,224,'Ring of charge Q and radius R with its axis. A point P on the axis at distance x from the centre is at distance the square root of R squared plus x squared from every element of the ring. The field is along the axis, away from the ring.');
+  mk(s,'ellipse',{cx:70,cy:92,rx:16,ry:52,fill:'none',stroke:BLUE,'stroke-width':2.4});
+  for(const t of [0.6,1.7,2.6,3.7,4.6,5.6])pls(s,70+27*Math.cos(t),96+52*Math.sin(t));
+  dsh(s,14,92,200,92);dot(s,70,92);dot(s,190,92);ht(s,190,112,'P');ht(s,60,106,'O',DIM);
+  dsh(s,70,92,70,40);ht(s,92,68,'R',INK,'start');
+  hl(s,70,40,190,92);ht(s,164,56,'√(R²+x²)',INK,'middle',13);
+  hv(s,190,92,246,92);ht(s,230,82,'E');hv(s,190,92,226,107.5,DIM,1.2);ht(s,238,114,'dE',DIM);
+  arcp(s,190,92,34,270,293.4);ht(s,146,88,'θ');
+  dsh(s,70,146,70,172);dsh(s,190,96,190,172);dim(s,70,168,190,168,'x',130,160);
+  cp(s,196,'E = kQx / (R²+x²)^(3/2)|cosθ = x / √(R²+x²)');cp(s,230,'E = 0 at the centre; max at x = R/√2',DIM);return fin(s)}
+/* disc: cone angle */
+function discAxis(){const s=hs(260,224,'Disc of radius R and surface charge density sigma, with a point P on its axis at distance x. The lines from P to the rim make the cone half angle alpha with the axis. The field is along the axis.');
+  mk(s,'ellipse',{cx:70,cy:92,rx:14,ry:52,...ELL});
+  for(const y of [66,92,118])pls(s,70,y+4);
+  dsh(s,14,92,200,92);dot(s,190,92);ht(s,190,112,'P');
+  hl(s,70,40,190,92);hl(s,70,144,190,92);dsh(s,70,92,70,40);ht(s,58,70,'R',INK,'end');
+  arcp(s,190,92,42,247,293.4);ht(s,138,94,'α',INK,'middle',17);
+  hv(s,190,92,246,92);ht(s,230,82,'E');
+  dsh(s,70,148,70,172);dsh(s,190,96,190,172);dim(s,70,168,190,168,'x',130,160);
+  cp(s,196,'E = (σ/2ε₀)(1 − cosα)|cosα = x / √(x²+R²)');cp(s,230,'V = (σ/2ε₀)(√(x²+R²) − x)|x ≪ R (α → 90°): E → σ/2ε₀',DIM);return fin(s)}
+/* arc of angle 2α: field at the centre */
+function arcCentre(){const s=hs(240,214,'Charged arc of radius R that subtends an angle 2 alpha at its centre O. The field at O points away from the arc along the line of symmetry, with magnitude 2 k lambda sine alpha over R.');
+  arcp(s,120,110,70,-50,50,BLUE,3.2);
+  for(const a of [-36,-18,0,18,36]){const [x,y]=pt(120,110,82,a);pls(s,x,y+5)}
+  const [ax,ay]=pt(120,110,70,-50),[bx,by]=pt(120,110,70,50);hl(s,120,110,ax,ay,INK,'4 3');hl(s,120,110,bx,by,INK,'4 3');dsh(s,120,110,120,30);
+  arcp(s,120,110,30,0,50);ht(s,138,84,'α',INK,'middle',16);arcp(s,120,110,40,-50,0,DIM);ht(s,102,78,'α',DIM,'middle',16);
+  ht(s,162,104,'R');dot(s,120,110);ht(s,108,126,'O',DIM);
+  hv(s,120,112,120,162);ht(s,132,156,'E');
+  cp(s,186,'E = 2kλ sinα / R = kQ sinα / (αR²)');cp(s,204,'semicircle (α = 90°): E = 2kλ/R',DIM);return fin(s)}
+/* uniformly charged hemispherical shell */
+function hemi(){const s=hs(240,214,'Hollow hemispherical shell of radius R and surface charge density sigma, seen from the side. At the centre O of its flat face the field is sigma over 4 epsilon naught, along the axis, away from the shell.');
+  arcp(s,120,104,70,-90,90,BLUE,3);
+  for(const a of [-72,-48,-24,0,24,48,72]){const [x,y]=pt(120,104,82,a);pls(s,x,y+5)}
+  hl(s,50,104,190,104,INK,'4 3');dsh(s,120,26,120,104);dot(s,120,104);ht(s,106,122,'O',DIM);
+  hl(s,120,104,190,104,INK);ht(s,156,98,'R');
+  hv(s,120,106,120,162);ht(s,134,156,'E');
+  cp(s,186,'E (at O) = σ / 4ε₀, along the axis');cp(s,204,'V (at O) = kQ/R = σR / 2ε₀',DIM);return fin(s)}
+/* infinite sheet */
+function sheet(){const s=hs(240,176,'Infinite sheet of positive charge seen edge on, with equal arrows away from it on both sides, near and far. The field is sigma over 2 epsilon naught at every distance.');
+  line(s,120,12,120,128,BLUE,3);for(const y of [28,56,84,112])pls(s,111,y+5);
+  for(const [a,b,y] of [[130,170,40],[110,70,40],[190,230,96],[50,10,96]])hv(s,a,y,b,y);
+  ht(s,150,30,'near',DIM,'middle',13);ht(s,210,86,'far',DIM,'middle',13);ht(s,100,20,'σ',BLUE,'middle',15);
+  cp(s,150,'E = σ / 2ε₀ on each side, same at any distance');cp(s,168,'(field lines leave +σ; they enter −σ)',DIM);return fin(s)}
+function plates(){const s=hs(240,176,'Two large parallel sheets, plus sigma on the left and minus sigma on the right. Between them the field is sigma over epsilon naught from the positive to the negative sheet; outside the field is zero.');
+  line(s,80,14,80,114,RED,3);line(s,160,14,160,114,BLUE,3);
+  for(const y of [30,60,90])pls(s,70,y+5);for(const y of [30,60,90])pls(s,170,y+5,'−');
+  for(const y of [36,64,92])hv(s,90,y,150,y);ht(s,120,28,'E',HI,'middle',16);ht(s,36,70,'E = 0',INK,'middle',14);ht(s,206,70,'E = 0',INK,'middle',14);
+  dim(s,80,128,160,128,'d',120,124);
+  cp(s,150,'E = σ/ε₀ between the sheets, 0 outside');cp(s,168,'V = Ed',DIM);return fin(s)}
+/* solid (insulating) sphere */
+function solidSph(){const s=hs(260,226,'Uniformly charged solid sphere of radius R. Point A is inside at distance r from the centre where the field is k Q r over R cubed. Point B is outside at distance r where the field is k Q over r squared.');
+  mk(s,'circle',{cx:95,cy:92,r:60,...ELL});
+  for(const [x,y] of [[66,66],[118,116],[130,100],[60,96],[88,128],[76,84],[104,50]])pls(s,x,y+5);
+  dot(s,95,92);ht(s,86,106,'O',DIM,'end',13);
+  const [ax,ay]=pt(95,92,30,60),[bx,by]=pt(95,92,98,120);
+  hl(s,95,92,ax,ay,INK,'4 3');hv(s,ax,ay,ax+24,ay-14,HI,1.8);dot(s,ax,ay);ht(s,ax-2,ay-8,'A',INK,'end');
+  dsh(s,95,92,bx,by);hv(s,bx,by,bx+22,by+13,HI,1.8);dot(s,bx,by);ht(s,bx+4,by-8,'B');
+  const [rx,ry]=pt(95,92,60,225);hl(s,95,92,rx,ry);ht(s,60,112,'R',INK,'end');
+  cp(s,184,'A (r < R):  E = kQr/R³ = ρr/3ε₀');cp(s,202,'B (r ≥ R):  E = kQ/r²');cp(s,220,'V: centre 3kQ/2R, surface kQ/R',DIM);return fin(s)}
+/* hollow cylinder, end view */
+function cylHollow(){const s=hs(240,214,'End view of a long hollow charged cylinder of radius R. Inside, the field is zero. Outside, at distance r from the axis, the field points radially away with magnitude lambda over 2 pi epsilon naught r.');
+  mk(s,'circle',{cx:120,cy:100,r:38,fill:'none',stroke:BLUE,'stroke-width':2.6});
+  for(let a=0;a<360;a+=30){const [x,y]=pt(120,100,48,a);pls(s,x,y+5)}
+  for(let a=0;a<360;a+=45){const [x1,y1]=pt(120,100,60,a),[x2,y2]=pt(120,100,78,a);hv(s,x1,y1,x2,y2,HI,1.6)}
+  mk(s,'circle',{cx:120,cy:100,r:88,fill:'none',stroke:DIM,'stroke-width':1.1,'stroke-dasharray':'4 3'});
+  ht(s,120,86,'E = 0');const [rx,ry]=pt(120,100,38,135),[qx,qy]=pt(120,100,96,2100);
+  hl(s,120,100,rx,ry);ht(s,147,136,'R');dsh(s,120,100,qx,qy);ht(s,64,76,'r',INK,'end');
+  cp(s,204,'r < R: E = 0|r ≥ R: E = λ / 2πε₀r|dashed circle = Gaussian cylinder, radius r');return fin(s)}
+/* Coulomb */
+function coul(){const s=hs(260,176,'Two point charges a distance r apart. Like charges repel, so each force points away from the other. Unlike charges attract, so each force points towards the other. The two forces are equal and opposite.');
+  const row=(y,a,b,sg)=>{for(const [x,pp] of [[90,a],[170,b]]){mk(s,'circle',{cx:x,cy:y,r:9,fill:'#17314f',stroke:pp==='+'?RED:BLUE,'stroke-width':1.6});pls(s,x,y+5,pp)}
+    if(sg){hv(s,79,y,44,y);hv(s,181,y,216,y)}else{hv(s,100,y,124,y);hv(s,160,y,136,y)}
+    ht(s,sg?36:112,sg?y+5:y-10,'F',HI,sg?'end':'middle',16);ht(s,sg?224:148,sg?y+5:y-10,'F',HI,sg?'start':'middle',16)};
+  row(34,'+','+',1);row(104,'+','−',0);dim(s,90,54,170,54,'r',130,70);ht(s,130,18,'like: repel',DIM,'middle',13);ht(s,130,132,'unlike: attract',DIM,'middle',13);
+  cp(s,158,'F = kq₁q₂ / r²|k = 9 × 10⁹ N m²/C²');cp(s,192,'equal and opposite (third law); divide by K in a medium',DIM);return fin(s)}
+/* charged balls on strings */
+function balls(){const s=hs(250,216,'Two identical charged balls hang from one point on strings of length L. Each string makes an angle theta with the vertical. On the right ball the weight mg acts down, the tension T acts along the string and the Coulomb force F acts horizontally outwards. The balls are a distance x apart.');
+  const L=122,sn=Math.sin(.35),cs=Math.cos(.35),X=125,Y=18,bx=X+L*sn,by=Y+L*cs;
+  line(s,X-30,Y,X+30,Y,INK,2.4);dsh(s,X,Y,X,by+10);
+  for(const k of [-1,1]){hl(s,X,Y,X+k*L*sn,by);mk(s,'circle',{cx:X+k*L*sn,cy:by,r:9,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});pls(s,X+k*L*sn,by+5)}
+  arcp(s,X,Y,44,0,20);ht(s,X+11,Y+68,'θ');
+  hv(s,bx,by+10,bx,by+44);ht(s,bx+6,by+50,'mg',HI,'start',14);hv(s,bx+10,by,bx+48,by);ht(s,bx+40,by-8,'F',HI,'middle',15);
+  hv(s,bx,by-10,bx-sn*40,by-10-cs*40,DIM,1.8);ht(s,bx-2,by-44,'T',DIM,'start',15);
+  ht(s,X+L*sn/2+14,Y+L*cs/2-34,'L',INK,'start',14);
+  dim(s,X-L*sn,by+26,bx,by+26,'x',X,by+44);
+  cp(s,196,'tanθ = F/mg, F = kq²/x²|x = 2L sinθ');cp(s,230,'T cosθ = mg, T sinθ = F',DIM);return fin(s)}
+/* two equal charges: field on the bisector */
+function bis(){const s=hs(240,216,'Two equal positive charges q at distance a on either side of the midpoint O. A point P on the perpendicular bisector at height y has the two fields along the lines away from each charge. Their sideways parts cancel and the resultant field points along y, away from O.');
+  for(const x of [60,180]){mk(s,'circle',{cx:x,cy:168,r:9,fill:'#17314f',stroke:RED,'stroke-width':1.6});pls(s,x,173)}
+  dot(s,120,168,DIM);ht(s,128,186,'O',DIM,'start',13);dsh(s,120,168,120,84);dot(s,120,84);ht(s,132,90,'P',INK,'start',14);ht(s,110,130,'y',INK,'end');
+  hl(s,66,160,120,84,INK,'4 3');hl(s,174,160,120,84,INK,'4 3');
+  hv(s,120,84,141,55,DIM,1.5);hv(s,120,84,99,55,DIM,1.5);ht(s,150,52,'E₁',DIM,'start',13);ht(s,92,50,'E₂',DIM,'end',13);
+  hv(s,120,84,120,26,HI,2.2);ht(s,132,36,'E',HI,'start',16);
+  dim(s,60,198,120,198,'a',90,214);dim(s,120,198,180,198,'a',150,214);dsh(s,60,178,60,198);dsh(s,180,178,180,198);
+  cp(s,236,'E = 2kqy / (a²+y²)^(3/2)|along y;  max at y = a/√2');return fin(s)}
+/* charged particle between plates */
+function defl(){const s=hs(260,180,'An electron enters the space between two charged plates with speed v0, parallel to them. The field E points down, so the force on the electron is up and it follows a parabola, deflecting by y over plate length l.');
+  line(s,30,26,200,26,RED,3);line(s,30,124,200,124,BLUE,3);ht(s,16,32,'+',RED,'middle',16);ht(s,16,130,'−',BLUE,'middle',16);
+  mk(s,'path',{d:'M30 78Q115 78 200 40',fill:'none',stroke:INK,'stroke-width':1.6});
+  mk(s,'circle',{cx:30,cy:78,r:6,fill:'#17314f',stroke:BLUE,'stroke-width':1.5});hv(s,6,78,24,78,DIM,1.6);ht(s,12,68,'v₀',DIM,'middle',14);
+  hv(s,70,40,70,70,HI,2);ht(s,82,60,'E',HI,'start',16);
+  dsh(s,200,78,236,78);dim(s,230,78,230,40,'y',246,62);dim(s,30,138,200,138,'l',115,154);
+  cp(s,174,'a = qE/m (up, as q is negative)|y = ½ (qE/m)(l/v₀)²');return fin(s)}
+/* flux */
+function flux(){const s=hs(240,188,'A plane of area A in a uniform field E. The normal n to the plane makes an angle theta with the field. The flux through the plane is E A cos theta.');
+  for(const x of [50,190])hv(s,x,162,x,24,DIM,1.2);
+  line(s,76,138,174,72,BLUE,3);ht(s,170,98,'A',BLUE,'start',16);
+  hv(s,125,105,125,24,HI,2);ht(s,134,34,'E',HI,'start',16);
+  hv(s,125,105,88,50,INK,1.8);ht(s,76,48,'n̂',INK,'end',16);arcp(s,125,105,40,-33.7,0);ht(s,112,70,'θ');
+  cp(s,184,'Φ = EA cosθ  (θ between E and the normal)');return fin(s)}
+/* parallel plate capacitor */
+function ppc(){const s=hs(250,196,'Parallel plate capacitor: two plates of area A a distance d apart, plus Q on the top plate and minus Q on the bottom plate. The field between them is uniform and points from the positive to the negative plate.');
+  line(s,50,36,190,36,RED,3);line(s,50,108,190,108,BLUE,3);
+  for(const x of [66,98,130,162])pls(s,x,28);for(const x of [66,98,130,162])pls(s,x,128,'−');
+  ht(s,214,34,'+Q',RED,'start',14);ht(s,214,112,'−Q',BLUE,'start',14);
+  for(const x of [76,120,164])hv(s,x,46,x,98);ht(s,132,76,'E',HI,'start',16);
+  dim(s,22,36,22,108,'d',12,76);ht(s,120,150,'area A of each plate',DIM,'middle',13);
+  cp(s,172,'C = ε₀A / d,  Q = CV|E = σ/ε₀ = V/d');cp(s,190,'valid when d is much smaller than the plate size',DIM);return fin(s)}
+/* spherical capacitor */
+function sphcap(){const s=hs(250,210,'Spherical capacitor: an inner sphere of radius a with charge plus Q inside a concentric shell of radius b that is earthed. The field in the gap points radially outwards.');
+  mk(s,'circle',{cx:105,cy:92,r:74,fill:'none',stroke:BLUE,'stroke-width':2.2});mk(s,'circle',{cx:105,cy:92,r:28,...ELL});
+  ht(s,105,97,'+Q',RED,'middle',13);
+  for(const a of [0,60,180,300]){const [x1,y1]=pt(105,92,36,a),[x2,y2]=pt(105,92,64,a);hv(s,x1,y1,x2,y2,HI,1.5)}
+  const [ax,ay]=pt(105,92,28,235),[bx,by]=pt(105,92,74,125);hl(s,...pt(105,92,14,235),ax,ay);ht(s,72,98,'a',INK,'end');hl(s,...pt(105,92,28,125),bx,by);ht(s,140,140,'b');
+  ht(s,198,36,'earthed',DIM,'start',13);ht(s,198,52,'shell',DIM,'start',13);
+  cp(s,184,'C = 4πε₀ab / (b − a)|b → ∞: C = 4πε₀a');cp(s,202,'V between = kQ(1/a − 1/b)',DIM);return fin(s)}
+/* RC charging and discharging */
+function rcg(){const s=hs(260,200,'Charge against time for a capacitor in an RC circuit. Charging rises to Q0 equals C V, reaching 63 percent at t equals tau equals R C. Discharging falls from Q0, reaching 37 percent at t equals tau.');
+  line(s,40,150,240,150,INK,1.4);line(s,40,150,40,16,INK,1.4);ht(s,244,154,'t',INK,'start',15);ht(s,34,16,'q',INK,'end',15);
+  dsh(s,40,30,236,30);ht(s,36,34,'CV',INK,'end',13);
+  let a='M40 150',b='M40 30';for(let x=4;x<=196;x+=4){const e=Math.exp(-x/40);a+=`L${40+x} ${150-120*(1-e)}`;b+=`L${40+x} ${150-120*e}`}
+  mk(s,'path',{d:a,fill:'none',stroke:HI,'stroke-width':1.8});mk(s,'path',{d:b,fill:'none',stroke:BLUE,'stroke-width':1.8});
+  dsh(s,80,150,80,74);dot(s,80,74.2,HI);dot(s,80,105.8,BLUE);ht(s,80,166,'τ = RC');
+  ht(s,74,66,'63%',HI,'end',13);ht(s,88,102,'37%',BLUE,'start',13);ht(s,170,56,'charging',HI,'middle',14);ht(s,170,140,'discharging',BLUE,'middle',14);
+  cp(s,190,'charging: q = CV(1 − e^(−t/τ))|discharging: q = Q₀e^(−t/τ)');return fin(s)}
+/* rod: point at distance r from the rod */
+function rodSide(){const s=hs(240,224,'Finite rod of charge density lambda and a point P at perpendicular distance r from the rod. The angles theta one and theta two are measured from the perpendicular PO to the lines from P to the two ends. The perpendicular field points away from the rod.');
+  line(s,45,36,195,36,BLUE,4);for(const x of [65,90,130,170])pls(s,x,28);ht(s,215,40,'λ',BLUE,'start',16);
+  dsh(s,110,36,110,128);dot(s,110,36,DIM);ht(s,100,52,'O',DIM,'end',13);hl(s,110,128,45,36);hl(s,110,128,195,36);
+  dot(s,110,128);ht(s,96,144,'P',INK,'end',16);ht(s,116,70,'r',INK,'start',16);
+  arcp(s,110,128,36,-37.4,0);arcp(s,110,128,36,0,45);ht(s,90,86,'θ₁',INK,'middle',14);ht(s,134,86,'θ₂',INK,'middle',14);
+  hv(s,110,130,110,172);ht(s,122,168,'E⊥',HI,'start',15);
+  cp(s,194,'E⊥ = (kλ/r)(sinθ₁ + sinθ₂)');cp(s,212,'infinite rod: θ₁ = θ₂ = 90°|E = 2kλ/r',DIM);return fin(s)}
+/* rod: point on the axis */
+function rodAxis(){const s=hs(240,150,'Rod of length L and total charge Q lying along a line. The point P is on the axis of the rod at distance d from its near end. The field is along the axis, away from the rod.');
+  line(s,100,40,215,40,BLUE,4);for(const x of [120,150,180,205])pls(s,x,32);dot(s,30,40);ht(s,30,26,'P',INK,'middle',15);
+  hv(s,28,40,6,40);ht(s,16,58,'E',HI,'middle',15);
+  dsh(s,100,44,100,76);dsh(s,215,44,215,76);dsh(s,30,44,30,76);dim(s,30,70,100,70,'d',65,64);dim(s,100,70,215,70,'L',158,64);
+  cp(s,102,'E = kQ / [d(d + L)]|Q = total charge on the rod');cp(s,122,'far away (d ≫ L): E → kQ/d²',DIM);return fin(s)}
+
+/* ---- Hand-drawn notes: mechanics, properties of matter, heat, waves ---- */
+const poly=(p,pts,a)=>mk(p,'polygon',{points:pts.map(q=>q.join(',')).join(' '),...a});
+const pln=(p,pts)=>mk(p,'polyline',{points:pts.map(q=>q.join(',')).join(' '),fill:'none',stroke:INK,'stroke-width':1.6});
+const box=(p,x,y,w,h,t,c=BLUE)=>{mk(p,'rect',{x,y,width:w,height:h,fill:'#17314f',stroke:c,'stroke-width':1.6});if(t)ht(p,x+w/2,y+h/2+5,t,INK,'middle',13)};
+const ground=(p,x1,x2,y)=>{hl(p,x1,y,x2,y);for(let x=x1+6;x<x2;x+=10)hl(p,x,y,x-6,y+7,DIM)};
+const zig=(p,x1,x2,y,n=8,h=8)=>{let d=`M${x1} ${y}`;const w=(x2-x1-16)/n;d+=`L${x1+8} ${y}`;for(let i=0;i<n;i++)d+=`L${x1+8+w*(i+.5)} ${y+(i%2?h:-h)}`;d+=`L${x2-8} ${y}L${x2} ${y}`;mk(p,'path',{d,fill:'none',stroke:INK,'stroke-width':1.4})};
+/* vector addition */
+function vecAdd(){const s=hs(260,210,'Two vectors A and B drawn from the same point with angle theta between them. Completing the parallelogram, the resultant R is the diagonal. The angle between R and A is beta.');
+  const O=[40,160],A=[150,160],B=[85.9,94.5],Rt=[195.9,94.5];
+  dsh(s,...A,...Rt);dsh(s,...B,...Rt);hv(s,...O,...A,BLUE,2);hv(s,...O,...B,RED,2);hv(s,...O,...Rt,HI,2.4);
+  arcp(s,40,160,30,35,90);ht(s,78,138,'θ',INK,'middle',16);arcp(s,40,160,56,67.2,90,DIM);ht(s,106,146,'β',DIM,'middle',14);
+  ht(s,98,177,'A',BLUE,'middle',16);ht(s,52,118,'B',RED,'end',16);ht(s,134,106,'R',HI,'middle',17);
+  cp(s,196,'R = √(A² + B² + 2AB cosθ)|tanβ = B sinθ / (A + B cosθ)');cp(s,0,'difference: √(A² + B² − 2AB cosθ)',DIM);return fin(s)}
+/* river and boat */
+function river(){const s=hs(260,210,'A river with the current flowing to the right and a boat crossing it. The boat heads straight across with velocity v b, the river carries it along with v r, and its path on the ground is along the resultant, drifting downstream by x over the width d.');
+  line(s,12,36,248,36,INK,1.6);line(s,12,150,248,150,INK,1.6);for(const x of [120,150,180]){hv(s,x,92,x+26,92,BLUE,1.2)}ht(s,200,86,'current',BLUE,'start',12);
+  dsh(s,70,150,161,36);dsh(s,70,150,70,36);dim(s,28,150,28,36,'d',16,96);
+  hv(s,70,150,70,100,INK,2);ht(s,60,120,'v_b',INK,'end',15);hv(s,70,150,112,150,DIM,2);ht(s,96,166,'v_r',DIM,'middle',15);hv(s,70,150,112,100,HI,2.2);ht(s,118,110,'v',HI,'start',16);
+  dim(s,70,26,161,26,'x (drift)',116,18);dot(s,70,150);
+  cp(s,186,'head across: t = d/v_b (least), drift = v_r t');cp(s,0,'shortest path: sinθ = v_r/v_b upstream, t = d/√(v_b² − v_r²)',DIM);return fin(s)}
+/* rain and umbrella */
+function rain(){const s=hs(260,206,'A man walking right with speed u while rain falls vertically at speed v. To the man the rain seems to come slanting from the front, at angle theta to the vertical with tan theta equal to u over v, so he tilts the umbrella forward by theta.');
+  const t=35,ca=Math.cos(t*Math.PI/180),sa=Math.sin(t*Math.PI/180);
+  line(s,90,104,90,146,INK,2);mk(s,'circle',{cx:90,cy:94,r:9,fill:'none',stroke:INK,'stroke-width':1.6});line(s,90,146,80,172,INK,2);line(s,90,146,102,172,INK,2);
+  const T=[90+46*sa,100-46*ca];line(s,90,100,...T,INK,1.6);hl(s,T[0]-26*ca,T[1]-26*sa,T[0]+26*ca,T[1]+26*sa,BLUE);line(s,T[0]-26*ca,T[1]-26*sa,T[0]+26*ca,T[1]+26*sa,BLUE,3);
+  dsh(s,90,100,90,50);arcp(s,90,100,30,0,t);ht(s,101,72,'θ',INK,'middle',15);
+  for(const [x,y] of [[186,22],[214,52],[150,12]])hv(s,x,y,x-23,y+34,HI,1.6);ht(s,208,34,'rain',HI,'start',13);ht(s,250,80,'(relative)',DIM,'end',12);
+  hv(s,60,186,120,186,DIM,2);ht(s,90,201,'u',DIM,'middle',15);
+  cp(s,222,'tanθ = u/v from the vertical|relative speed = √(u² + v²)');return fin(s)}
+/* horizontal projection */
+function horiz(){const s=hs(260,206,'A ball thrown horizontally with speed u from a height h. Its path is half a parabola. It lands a horizontal distance x away after a time root of 2 h over g.');
+  line(s,40,30,40,160,INK,1.6);ground(s,40,250,160);mk(s,'circle',{cx:40,cy:30,r:6,fill:'#17314f',stroke:BLUE,'stroke-width':1.6});
+  mk(s,'path',{d:'M40 30Q110 30 180 160',fill:'none',stroke:INK,'stroke-width':1.6,'stroke-dasharray':'5 3'});hv(s,48,30,82,30,HI,2);ht(s,66,20,'u',HI,'middle',15);
+  hv(s,160,124,180,160,RED,2);ht(s,150,122,'v',RED,'end',15);dim(s,22,30,22,160,'h',12,96);dim(s,40,178,180,178,'x',110,194);
+  cp(s,214,'t = √(2h/g),  x = u√(2h/g)');cp(s,0,'v = √(u² + 2gh)',DIM);return fin(s)}
+/* Lami */
+function lami(){const s=hs(260,190,'A point in equilibrium under three forces F1, F2 and F3. The angle alpha is opposite F1, beta is opposite F2 and gamma is opposite F3. Each force is proportional to the sine of the angle opposite to it.');
+  const O=[130,86],L=[[325,69,'F₁'],[50,52,'F₂'],[180,90,'F₃']];
+  for(const [a,l,n] of L){const [x,y]=pt(...O,l,a),[tx,ty]=pt(...O,l+16,a);hv(s,...O,x,y,HI,2);ht(s,tx,ty+5,n,HI,'middle',15)}
+  arcp(s,...O,22,325-360,50);ht(s,...pt(...O,36,7.5).map((v,i)=>v+(i?5:0)),'γ',INK,'middle',14);arcp(s,...O,22,50,180);ht(s,...pt(...O,36,115).map((v,i)=>v+(i?5:0)),'α',INK,'middle',14);arcp(s,...O,22,180,325);ht(s,...pt(...O,36,252).map((v,i)=>v+(i?5:0)),'β',INK,'middle',14);dot(s,...O);
+  cp(s,224,'F₁/sinα = F₂/sinβ = F₃/sinγ');cp(s,0,'each angle is opposite its force',DIM);return fin(s)}
+/* block on table with hanging mass */
+function table(){const s=hs(260,210,'A block of mass m1 on a smooth table joined by a string over a pulley at the edge to a hanging mass m2. Both move with the same acceleration a; the string tension T is the same throughout.');
+  line(s,20,100,158,100,INK,2.4);box(s,50,66,48,34,'m₁');mk(s,'circle',{cx:162,cy:92,r:10,fill:'none',stroke:INK,'stroke-width':1.6});
+  hl(s,98,83,162,82);hl(s,172,92,172,146);box(s,158,146,28,28,'m₂');
+  hv(s,60,52,100,52,HI,2);ht(s,80,44,'a',HI,'middle',15);hv(s,196,150,196,176,HI,2);ht(s,206,168,'a',HI,'start',15);ht(s,124,76,'T',DIM,'middle',14);ht(s,184,130,'T',DIM,'start',14);hv(s,172,174,172,198,DIM,1.6);ht(s,184,196,'m₂g',DIM,'start',13);
+  cp(s,222,'a = m₂g/(m₁ + m₂)|T = m₁m₂g/(m₁ + m₂)');cp(s,0,'with friction μ on m₁:|a = (m₂ − μm₁)g/(m₁ + m₂)',DIM);return fin(s)}
+/* block on a rough incline */
+function roughInc(){const s=hs(260,210,'A block on a rough incline of angle theta. Weight mg acts down, the normal force N acts at right angles to the slope and friction f acts up the slope. Sliding down: a equals g times sine theta minus mu cos theta. It just slides when tan theta equals mu.');
+  const th=30,u=[.866,-.5],n=[-.5,-.866],B=[30,170];poly(s,[B,[220,170],[220,170-190*.5774]],{fill:'none',stroke:INK,'stroke-width':1.5});
+  const c0=[B[0]+110*u[0],B[1]+110*u[1]],C=[c0[0]+12*n[0],c0[1]+12*n[1]];
+  poly(s,[[c0[0]-20*u[0],c0[1]-20*u[1]],[c0[0]+20*u[0],c0[1]+20*u[1]],[c0[0]+20*u[0]+24*n[0],c0[1]+20*u[1]+24*n[1]],[c0[0]-20*u[0]+24*n[0],c0[1]-20*u[1]+24*n[1]]],{fill:'#17314f',stroke:BLUE,'stroke-width':1.6});
+  hv(s,...C,C[0],C[1]+48,HI,2);ht(s,C[0]+4,C[1]+62,'mg',HI,'start',15);hv(s,...C,C[0]+44*n[0],C[1]+44*n[1],INK,2);ht(s,C[0]+44*n[0]-4,C[1]+44*n[1]-4,'N',INK,'end',15);
+  hv(s,...c0,c0[0]+40*u[0],c0[1]+40*u[1],RED,2);ht(s,c0[0]+40*u[0]+8,c0[1]+40*u[1]-6,'f',RED,'start',15);
+  arcp(s,...B,50,60,90);ht(s,86,160,'θ',INK,'middle',15);
+  cp(s,196,'down: a = g(sinθ − μ cosθ)|up: a = −g(sinθ + μ cosθ)');cp(s,0,'starts to slide when tanθ = μ|(θ = angle of repose = angle of friction)',DIM);return fin(s)}
+/* banked road */
+function bank(){const s=hs(260,210,'A car on a road banked at angle theta. The road is higher on the outside, so the normal force N tilts towards the centre of the curve on the left. The horizontal part of N supplies the centripetal force m v squared over r.');
+  const th=25,u=[.9063,-.4226],n=[-.4226,-.9063],B=[24,160];poly(s,[B,[220,160],[220,160-196*.4663]],{fill:'none',stroke:INK,'stroke-width':1.5});
+  const c0=[B[0]+110*u[0],B[1]+110*u[1]];poly(s,[[c0[0]-24*u[0],c0[1]-24*u[1]],[c0[0]+24*u[0],c0[1]+24*u[1]],[c0[0]+24*u[0]+22*n[0],c0[1]+24*u[1]+22*n[1]],[c0[0]-24*u[0]+22*n[0],c0[1]-24*u[1]+22*n[1]]],{fill:'#17314f',stroke:BLUE,'stroke-width':1.6});
+  const C=[c0[0]+11*n[0],c0[1]+11*n[1]];hv(s,...C,C[0],C[1]+46,HI,2);ht(s,C[0]+4,C[1]+60,'mg',HI,'start',15);hv(s,...C,C[0]+50*n[0],C[1]+50*n[1],INK,2);ht(s,C[0]+50*n[0]-4,C[1]+50*n[1]-4,'N',INK,'end',15);
+  dsh(s,C[0],C[1],C[0]-70,C[1]);hv(s,C[0]-20,C[1],C[0]-60,C[1],RED,1.8);ht(s,C[0]-76,C[1]+4,'to centre',DIM,'end',12);ht(s,C[0]-40,C[1]-8,'mv²/r',RED,'middle',13);
+  arcp(s,...B,50,65,90);ht(s,84,156,'θ',INK,'middle',15);
+  cp(s,196,'smooth road: tanθ = v²/rg');cp(s,0,'with friction:|v_max = √(rg(μ + tanθ) / (1 − μ tanθ))',DIM);return fin(s)}
+/* conical pendulum */
+function conical(){const s=hs(260,214,'A conical pendulum: a bob on a string of length L moves in a horizontal circle of radius r, the string making angle theta with the vertical. The tension T has a vertical part balancing mg and a horizontal part towards the centre.');
+  const P=[130,16],L=110,th=30,b=[130+L*.5,16+L*.866];line(s,100,16,160,16,INK,2.4);hl(s,...P,...b);dsh(s,130,16,130,b[1]+34);mk(s,'ellipse',{cx:130,cy:b[1],rx:55,ry:12,fill:'none',stroke:DIM,'stroke-width':1.1,'stroke-dasharray':'4 3'});
+  dsh(s,130,b[1],...b);ht(s,152,b[1]+16,'r',DIM,'middle',14);mk(s,'circle',{cx:b[0],cy:b[1],r:9,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});
+  hv(s,b[0]-2,b[1]-8,b[0]-2-.5*50,b[1]-8-.866*50,DIM,1.8);ht(s,b[0]+2,b[1]-46,'T',DIM,'start',15);hv(s,b[0],b[1]+10,b[0],b[1]+46,HI,2);ht(s,b[0]+6,b[1]+50,'mg',HI,'start',14);hv(s,b[0]-10,b[1],b[0]-48,b[1],RED,1.8);ht(s,b[0]-30,b[1]-10,'F',RED,'middle',13);
+  arcp(s,...P,42,0,30);ht(s,142,66,'θ',INK,'middle',15);ht(s,168,44,'L',INK,'start',14);
+  cp(s,200,'tanθ = v²/rg = ω²r/g,  T cosθ = mg');cp(s,0,'period t = 2π√(L cosθ / g)',DIM);return fin(s)}
+/* spring work */
+function springW(){const s=hs(260,200,'Force against extension for a spring: a straight line through the origin, F equals k x. The area under the line up to x is a triangle, which is the work done, half k x squared.');
+  line(s,44,140,240,140,INK,1.4);line(s,44,140,44,16,INK,1.4);ht(s,244,144,'x',INK,'start',15);ht(s,38,22,'F',INK,'end',15);
+  poly(s,[[44,140],[190,140],[190,40]],{fill:HI,'fill-opacity':.22,stroke:'none'});hl(s,44,140,190,40,HI);line(s,44,140,190,40,HI,2);
+  dsh(s,190,40,190,140);dsh(s,44,40,190,40);ht(s,190,156,'x',INK,'middle',15);ht(s,40,44,'kx',INK,'end',14);ht(s,138,122,'W = ½kx²',INK,'middle',15);ht(s,118,76,'F = kx',HI,'end',14);
+  cp(s,184,'work = area under the F–x line = ½kx²');cp(s,0,'W(spring) = −½k(x₂² − x₁²)',DIM);return fin(s)}
+/* block leaving a hemisphere */
+function hemiBlock(){const s=hs(260,200,'A block slides from rest off the top of a smooth hemisphere of radius R. It leaves the surface when the radius to it makes an angle theta with the vertical, where cos theta is two thirds, at a height two R over three above the base.');
+  const C=[110,150],R=84,th=48.19;arcp(s,...C,R,-90,90,INK,1.6);line(s,20,150,200,150,INK,1.6);const Pp=pt(...C,R,th);
+  box(s,C[0]-11,C[1]-R-14,22,14,'');dsh(s,...C,C[0],C[1]-R-24);dsh(s,...C,...Pp);arcp(s,...C,42,0,th);ht(s,129,100,'θ',INK,'middle',15);ht(s,152,128,'R',INK,'end',15);
+  dot(s,...Pp,RED);hv(s,...Pp,Pp[0]+.667*40,Pp[1]+.745*40,HI,2);ht(s,Pp[0]+34,Pp[1]+8,'v',HI,'start',15);dsh(s,...Pp,226,Pp[1]);dsh(s,226,Pp[1],226,150);dim(s,226,Pp[1],226,150,'h',238,Pp[1]+34);
+  cp(s,174,'leaves where cosθ = 2/3 (θ from the vertical)');cp(s,0,'v² = 2gR/3,  h = 2R/3,  N = mg(3cosθ − 2)',DIM);return fin(s)}
+/* ballistic pendulum */
+function ballistic(){const s=hs(260,206,'A bullet of mass m and speed u embeds in a block of mass M hanging from a string. The block and bullet swing up through a height h with common speed V just after the impact.');
+  const P=[120,18],Lh=100,x2=120+Lh*Math.sin(.6),y2=18+Lh*Math.cos(.6);line(s,90,18,150,18,INK,2.4);hl(s,...P,120,118);dsh(s,...P,x2,y2);box(s,106,118,28,22,'M');mk(s,'rect',{x:x2-14,y:y2,width:28,height:22,fill:'none',stroke:DIM,'stroke-width':1.3,'stroke-dasharray':'4 3'});
+  mk(s,'circle',{cx:44,cy:129,r:4,fill:HI});hv(s,52,129,98,129,HI,2);ht(s,28,120,'m',INK,'middle',14);ht(s,72,119,'u',HI,'middle',15);
+  dsh(s,x2+18,129,x2+34,129);dsh(s,x2+18,y2+11,x2+34,y2+11);dim(s,x2+30,129,x2+30,y2+11,'h',x2+44,121);
+  cp(s,174,'V = mu/(m + M),  h = V²/2g');cp(s,0,'u = ((m + M)/m)√(2gh)',DIM);return fin(s)}
+/* torque */
+function torque(){const s=hs(260,236,'A force F applied at point P at distance r from the pivot O. The angle between r and F is theta. The torque is r F sine theta, which is F times the perpendicular distance r sine theta from O to the line of action of F.');
+  const O=[50,120],P=[170,120],d=[.643,-.766],F=[P[0]+60*d[0],P[1]+60*d[1]],foot=[P[0]-77.2*d[0],P[1]-77.2*d[1]];
+  line(s,...O,...P,INK,3);dot(s,...O,INK,4);ht(s,40,136,'O',INK,'end',15);dot(s,...P);hv(s,...P,...F,HI,2.2);ht(s,F[0]+4,F[1]+2,'F',HI,'start',16);
+  dsh(s,...foot,P[0]-d[0]*0,P[1]);hl(s,...foot,...P,DIM,'4 3');dsh(s,...O,...foot);ht(s,66,170,'r sinθ',DIM,'middle',14);ht(s,110,112,'r',INK,'middle',15);
+  arcp(s,...P,30,40,90);ht(s,P[0]+38,P[1]-8,'θ',INK,'middle',15);
+  cp(s,214,'τ = r × F,  τ = rF sinθ');cp(s,0,'= F × (perpendicular distance from the axis)',DIM);return fin(s)}
+/* parallel and perpendicular axes */
+function parAx(){const s=hs(260,196,'Parallel axes: a disc seen face on, with the axis through its centre of mass and a parallel axis at distance d. Perpendicular axes: for a flat body, the moment of inertia about z is the sum of those about x and y in its plane.');
+  mk(s,'circle',{cx:70,cy:70,r:50,...ELL});mk(s,'circle',{cx:70,cy:70,r:5,fill:'none',stroke:INK,'stroke-width':1.4});dot(s,70,70,INK,1.5);mk(s,'circle',{cx:120,cy:70,r:5,fill:'none',stroke:HI,'stroke-width':1.4});dot(s,120,70,HI,1.5);
+  ht(s,70,90,'cm',INK,'middle',13);hl(s,70,70,120,70,DIM,'3 2');ht(s,95,62,'d',DIM,'middle',14);ht(s,128,92,'axis ⟂ page',HI,'start',12);
+  hv(s,180,100,240,100,INK,1.4);ht(s,244,104,'x',INK,'start',14);hv(s,210,130,210,70,INK,1.4);ht(s,214,66,'y',INK,'start',14);hv(s,210,100,236,76,RED,1.4);ht(s,242,76,'z',RED,'start',14);
+  cp(s,150,'I = I_cm + Md²  (parallel axes)');cp(s,0,'I_z = I_x + I_y  (flat bodies only)',DIM);return fin(s)}
+/* massive pulley */
+function pulleyM(){const s=hs(260,206,'A massive pulley of moment of inertia I and radius r with masses m1 and m2 hanging on a string over it, m1 heavier. m1 accelerates down, m2 up, with the same a. The tensions T1 and T2 are different.');
+  mk(s,'circle',{cx:130,cy:50,r:26,...ELL});dot(s,130,50);ht(s,130,36,'I, r',DIM,'middle',12);line(s,100,18,160,18,INK,2.4);hl(s,130,18,130,24);
+  hl(s,104,50,104,120);hl(s,156,50,156,96);box(s,88,120,32,30,'m₁');box(s,142,96,28,26,'m₂');
+  hv(s,86,128,86,160,HI,2);ht(s,78,150,'a',HI,'end',15);hv(s,184,118,184,88,HI,2);ht(s,192,104,'a',HI,'start',15);ht(s,98,84,'T₁',DIM,'end',14);ht(s,164,74,'T₂',DIM,'start',14);
+  cp(s,184,'a = (m₁ − m₂)g / (m₁ + m₂ + I/r²)');cp(s,0,'T₁ − T₂ = Ia/r²;  disc: I/r² = M/2',DIM);return fin(s)}
+/* rod hinged at one end */
+function rodHinge(){const s=hs(260,236,'A uniform rod of length L hinged at one end, released from the horizontal. At release its angular acceleration is 3 g over 2 L. It swings down through a quarter circle to the vertical, where its angular speed is the square root of 3 g over L.');
+  poly(s,[[50,50],[42,66],[58,66]],{fill:'none',stroke:INK,'stroke-width':1.5});line(s,50,50,190,50,BLUE,4);dot(s,50,50,INK,3);ht(s,110,72,'cm',DIM,'end',12);dot(s,120,50,DIM,2.5);
+  hv(s,120,52,120,92,HI,2);ht(s,132,88,'mg',HI,'start',14);dim(s,50,34,190,34,'L',120,26);
+  dsh(s,50,50,50,190);arcp(s,50,50,140,90,180,DIM,1.2);hv(s,170,160,150,174,DIM,1.2);ht(s,170,186,'ω',DIM,'middle',15);
+  cp(s,214,'at release: α = 3g/2L,  a(cm) = 3g/4');cp(s,0,'hinge force = Mg/4;  at the vertical ω = √(3g/L)',DIM);return fin(s)}
+/* rolling down an incline */
+function rollInc(){const s=hs(260,206,'A disc rolling without slipping down an incline of angle theta. Weight mg acts down, the acceleration a is down the slope and the static friction acts up the slope at the contact point.');
+  const u=[.866,-.5],n=[-.5,-.866],B=[26,168];poly(s,[B,[226,168],[226,168-200*.5774]],{fill:'none',stroke:INK,'stroke-width':1.5});
+  const c0=[B[0]+120*u[0],B[1]+120*u[1]],C=[c0[0]+24*n[0],c0[1]+24*n[1]];mk(s,'circle',{cx:C[0],cy:C[1],r:24,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});hl(s,...C,C[0]+24*Math.cos(.5),C[1]-24*Math.sin(.5));dot(s,...C);
+  hv(s,...C,C[0],C[1]+48,HI,2);ht(s,C[0]+6,C[1]+60,'mg',HI,'start',14);hv(s,...C,C[0]-40*u[0],C[1]-40*u[1],DIM,2);ht(s,C[0]-46*u[0]-6,C[1]-46*u[1],'a',DIM,'end',15);
+  hv(s,...c0,c0[0]+40*u[0],c0[1]+40*u[1],RED,2);ht(s,c0[0]+48*u[0]+4,c0[1]+40*u[1]-8,'f',RED,'start',15);
+  arcp(s,...B,50,60,90);ht(s,86,164,'θ',INK,'middle',15);
+  cp(s,196,'a = g sinθ / (1 + I/MR²)');cp(s,0,'ring ½, disc ⅔, solid sphere 5/7 of g sinθ',DIM);cp(s,0,'friction acts up the slope',DIM);return fin(s)}
+/* satellite */
+function sat(){const s=hs(260,206,'A satellite in a circular orbit of radius r around a planet. Gravity points to the centre and the velocity is along the tangent. Gravity supplies the centripetal force.');
+  const C=[110,100];mk(s,'circle',{cx:C[0],cy:C[1],r:70,fill:'none',stroke:DIM,'stroke-width':1.1,'stroke-dasharray':'4 3'});mk(s,'circle',{cx:C[0],cy:C[1],r:28,...ELL});ht(s,...C,'M',INK,'middle',15);
+  const S=pt(...C,70,60);mk(s,'circle',{cx:S[0],cy:S[1],r:6,fill:'#17314f',stroke:RED,'stroke-width':1.6});hv(s,S[0]+4,S[1]+8,S[0]+4+.5*40,S[1]+8+.866*40,HI,2);ht(s,S[0]+44,S[1]+56,'v',HI,'start',16);
+  hv(s,S[0]-5,S[1]+3,S[0]-5-.866*34,S[1]+3+.5*34,RED,2);ht(s,S[0]-18,S[1]+4,'F',RED,'end',15);hl(s,...C,...pt(...C,70,300),INK,'4 3');ht(s,C[0]-34,C[1]-26,'r',INK,'middle',15);const Q=pt(...C,28,230);hl(s,...C,...Q);ht(s,C[0]-28,C[1]+36,'R',INK,'end',14);
+  cp(s,194,'v = √(GM/r) = R√(g/r);  T = 2π√(r³/GM)');cp(s,0,'near the surface: v = √(gR) = 7.9 km/s',DIM);return fin(s)}
+/* g at height and depth */
+function gHD(){const s=hs(260,206,'The Earth of radius R with a point at height h above the surface where g is g times one plus h over R to the minus two, and a point at depth d below the surface where g is g times one minus d over R. At the centre g is zero.');
+  mk(s,'circle',{cx:100,cy:112,r:70,...ELL});dot(s,100,112);ht(s,100,134,'centre: g = 0',DIM,'middle',12);
+  dot(s,100,18,RED);dsh(s,100,18,100,42);dim(s,100,42,100,18,'h',112,34);ht(s,86,22,'P',INK,'end',14);hl(s,100,112,170,112);ht(s,150,106,'R',INK,'middle',14);
+  dot(s,100,72,RED);ht(s,86,70,'Q',INK,'end',14);dim(s,60,42,60,72,'d',50,60);dsh(s,60,42,100,42);dsh(s,60,72,100,72);
+  cp(s,200,'height: g′ = g(1 + h/R)⁻² ≈ g(1 − 2h/R)');cp(s,0,'depth: g′ = g(1 − d/R)',DIM);return fin(s)}
+/* hydraulic lift */
+function hydr(){const s=hs(260,206,'A hydraulic lift. A small force F1 on a small piston of area A1 produces a large force F2 on a large piston of area A2, because pressure is transmitted equally through the liquid.');
+  poly(s,[[40,106],[70,106],[70,130],[110,130],[110,92],[200,92],[200,152],[40,152]],{fill:BLUE,'fill-opacity':.25,stroke:'none'});
+  for(const [a,b,c,d] of [[40,50,40,152],[70,50,70,130],[110,130,110,60],[200,60,200,152],[40,152,200,152],[70,130,110,130]])line(s,a,b,c,d,INK,1.4);
+  line(s,40,106,70,106,INK,4);line(s,110,92,200,92,INK,4);hv(s,55,60,55,100,HI,2);ht(s,66,72,'F₁',HI,'start',15);hv(s,155,88,155,48,HI,2.2);ht(s,166,66,'F₂',HI,'start',15);
+  ht(s,55,170,'A₁',INK,'middle',15);ht(s,155,170,'A₂',INK,'middle',15);
+  cp(s,194,'F₁/A₁ = F₂/A₂,  F₂ = F₁(A₂/A₁)');cp(s,0,'F₁d₁ = F₂d₂ (work in = work out)',DIM);return fin(s)}
+/* pipe: continuity and Bernoulli */
+function pipe(){const s=hs(260,208,'A horizontal pipe that narrows. In the wide part the speed v1 is low and the pressure P1 is high; in the narrow part the speed v2 is higher and the pressure P2 is lower, shown by the lower liquid level in the pressure tube.');
+  pln(s,[[16,60],[90,60],[120,80],[244,80]]);pln(s,[[16,150],[90,150],[120,130],[244,130]]);
+  hv(s,26,105,76,105,HI,2);ht(s,52,96,'v₁',HI,'middle',15);hv(s,140,105,226,105,HI,2.4);ht(s,184,96,'v₂',HI,'middle',15);ht(s,56,128,'A₁',INK,'middle',15);ht(s,184,124,'A₂',INK,'middle',15);
+  for(const [x,y0,lv] of [[50,60,26],[190,80,44]]){line(s,x-5,y0,x-5,18,INK,1.2);line(s,x+5,y0,x+5,18,INK,1.2);hl(s,x-5,lv,x+5,lv,BLUE);mk(s,'rect',{x:x-5,y:lv,width:10,height:y0-lv,fill:BLUE,'fill-opacity':.3})}
+  ht(s,72,32,'P₁',INK,'start',14);ht(s,210,48,'P₂',INK,'start',14);
+  cp(s,174,'A₁v₁ = A₂v₂;  P + ½ρv² + ρgh = constant');cp(s,0,'narrow part: faster flow, lower pressure',DIM);return fin(s)}
+/* Torricelli */
+function torri(){const s=hs(260,206,'An open tank of water. A hole at depth h below the free surface, at height H minus h above the ground, throws a jet out horizontally with speed root of 2 g h, which follows a parabola and lands at range R.');
+  pln(s,[[60,24],[60,152],[130,152],[130,24]]);mk(s,'rect',{x:61,y:36,width:68,height:116,fill:BLUE,'fill-opacity':.2});hl(s,61,36,129,36,BLUE);ground(s,20,252,152);
+  mk(s,'rect',{x:127,y:70,width:6,height:12,fill:'#17314f',stroke:'none'});mk(s,'path',{d:'M130 76Q190 76 250 152',fill:'none',stroke:BLUE,'stroke-width':2});hv(s,134,76,160,76,HI,2);ht(s,162,70,'v = √(2gh)',HI,'start',13);
+  dim(s,96,36,96,76,'h',108,60);dim(s,34,36,34,152,'H',22,98);dim(s,130,168,250,168,'R',190,184);dsh(s,130,152,130,168);dsh(s,250,152,250,168);
+  cp(s,214,'R = 2√(h(H − h)),  largest at h = H/2');return fin(s)}
+/* Stokes */
+function stokes(){const s=hs(260,196,'A sphere falling at terminal velocity in a liquid. Its weight mg acts down; the buoyant force B and the viscous drag 6 pi eta r v act up and together balance the weight.');
+  hl(s,20,20,240,20,BLUE,'6 3');ht(s,226,14,'liquid',BLUE,'end',12);mk(s,'circle',{cx:110,cy:84,r:24,...ELL});ht(s,110,89,'m',INK,'middle',14);
+  hv(s,110,108,110,160,HI,2.2);ht(s,120,150,'mg',HI,'start',15);hv(s,96,62,96,30,RED,2);ht(s,86,42,'B',RED,'end',15);hv(s,124,62,124,30,RED,2);ht(s,132,42,'6πηrv',RED,'start',14);
+  hv(s,190,60,190,110,DIM,2);ht(s,200,92,'v_T',DIM,'start',15);
+  cp(s,184,'mg = B + 6πηrv_T');cp(s,0,'v_T = 2r²(ρ − σ)g / 9η',DIM);return fin(s)}
+/* conduction */
+function cond(){const s=hs(260,230,'Heat conduction along a rod of length L and area A with ends at temperatures T1 and T2, lagged at the sides. Below, two rods in series share the same heat flow and their thermal resistances add.');
+  mk(s,'rect',{x:50,y:34,width:150,height:28,fill:'#17314f',stroke:BLUE,'stroke-width':1.6});hv(s,60,22,190,22,HI,1.6);ht(s,125,16,'dQ/dt',HI,'middle',13);ht(s,36,53,'T₁',RED,'end',15);ht(s,214,53,'T₂',BLUE,'start',15);dim(s,50,76,200,76,'L',125,92);ht(s,125,52,'k, A',INK,'middle',14);
+  line(s,20,104,240,104,DIM,.8);mk(s,'rect',{x:50,y:124,width:74,height:26,fill:'#17314f',stroke:RED,'stroke-width':1.6});mk(s,'rect',{x:124,y:124,width:76,height:26,fill:'#17314f',stroke:BLUE,'stroke-width':1.6});ht(s,87,142,'k₁',INK,'middle',14);ht(s,162,142,'k₂',INK,'middle',14);
+  ht(s,36,143,'T₁',RED,'end',15);ht(s,214,143,'T₂',BLUE,'start',15);ht(s,124,118,'T',INK,'middle',14);hv(s,60,166,190,166,HI,1.6);ht(s,125,184,'same heat flow in series',DIM,'middle',13);
+  cp(s,206,'dQ/dt = kA(T₁ − T₂)/L,  R = L/kA');cp(s,0,'series: R = R₁ + R₂;  T = (k₁T₁ + k₂T₂)/(k₁ + k₂)',DIM);return fin(s)}
+/* heat engine and refrigerator */
+function eng(rev){const s=hs(260,206,rev?'A refrigerator: work W is supplied to the device, which takes heat Q2 from the cold sink at T2 and delivers Q1 to the hot reservoir at T1.':'A heat engine: it absorbs heat Q1 from the hot source at T1, does work W and rejects heat Q2 to the cold sink at T2.');
+  box(s,40,10,140,28,'');ht(s,110,29,'hot T₁',RED,'middle',15);box(s,40,160,140,28,'');ht(s,110,179,'cold T₂',BLUE,'middle',15);mk(s,'circle',{cx:110,cy:99,r:26,fill:'#17314f',stroke:INK,'stroke-width':1.6});ht(s,110,104,rev?'fridge':'engine',INK,'middle',13);
+  if(rev){hv(s,110,160,110,127,HI,2);ht(s,122,146,'Q₂',HI,'start',15);hv(s,110,72,110,40,HI,2);ht(s,122,60,'Q₁',HI,'start',15);hv(s,200,99,138,99,RED,2);ht(s,206,104,'W',RED,'start',16)}
+  else{hv(s,110,38,110,70,HI,2);ht(s,122,58,'Q₁',HI,'start',15);hv(s,110,127,110,160,HI,2);ht(s,122,148,'Q₂',HI,'start',15);hv(s,138,99,200,99,RED,2);ht(s,206,104,'W',RED,'start',16)}
+  if(rev){cp(s,214,'β = Q₂/W = Q₂/(Q₁ − Q₂);  Carnot: β = T₂/(T₁ − T₂)');cp(s,0,'heat pump: COP = Q₁/W = β + 1',DIM)}else{cp(s,214,'W = Q₁ − Q₂,  η = W/Q₁ = 1 − Q₂/Q₁');cp(s,0,'a cycle: ΔU = 0;  Carnot: η = 1 − T₂/T₁',DIM)}return fin(s)}
+const engine=()=>eng(0),fridge=()=>eng(1);
+/* Maxwell distribution */
+function maxwell(){const s=hs(260,206,'Maxwell distribution of molecular speeds at two temperatures. The curve for the lower temperature T1 is taller and narrower with the peak at lower speed; the curve for the higher temperature T2 is lower and broader with the peak further right. The areas are equal.');
+  line(s,40,150,246,150,INK,1.4);line(s,40,150,40,16,INK,1.4);ht(s,248,154,'v',INK,'start',15);ht(s,34,20,'f(v)',INK,'end',13);
+  const g=(v,q)=>4/Math.sqrt(Math.PI)*v*v*Math.exp(-v*v/q)/Math.pow(q,1.5);
+  for(const [q,c] of [[1,BLUE],[1.9,HI]]){let d='M40 150';for(let x=1;x<=206;x+=3){const v=x/62;d+=`L${40+x} ${150-125*g(v,q)}`}mk(s,'path',{d,fill:'none',stroke:c,'stroke-width':1.8})}
+  dsh(s,102,150,102,48);ht(s,102,166,'v_mp',INK,'middle',13);ht(s,70,44,'T₁',BLUE,'middle',15);ht(s,172,74,'T₂ > T₁',HI,'start',15);
+  cp(s,188,'f(v) ∝ v² e^(−mv²/2kT)|v_mp < v_avg < v_rms;  area = N (same)');return fin(s)}
+/* SHM and the reference circle */
+function shmCircle(){const s=hs(260,216,'Simple harmonic motion as the projection of uniform circular motion of radius A on a diameter. The reference point is at angle theta from the vertical, and its displacement from the mean position is x equals A sine theta.');
+  const C=[110,100],A=72,th=40,P=pt(...C,A,th);mk(s,'circle',{cx:C[0],cy:C[1],r:A,fill:'none',stroke:BLUE,'stroke-width':1.6});line(s,24,100,196,100,INK,1.3);dsh(s,...C,C[0],C[1]-A-8);hl(s,...C,...P);dot(s,...P,RED,4);dsh(s,P[0],P[1],P[0],100);dot(s,P[0],100,HI,4);
+  arcp(s,...C,30,0,th);ht(s,124,82,'θ',INK,'middle',15);ht(s,138,94,'x',HI,'middle',15);ht(s,34,116,'−A',DIM,'middle',13);ht(s,188,116,'+A',DIM,'middle',13);ht(s,C[0]+4,C[1]+14,'mean',DIM,'start',12);ht(s,146,74,'A',INK,'start',14);
+  cp(s,196,'x = A sinθ,  θ = ωt;  t = (θ₂ − θ₁)/ω');cp(s,0,'mean → A/2: T/12;  → A/√2: T/8;  → A: T/4',DIM);return fin(s)}
+/* spring-mass oscillator */
+function springMass(){const s=hs(260,190,'A block on a smooth surface joined to a wall by a spring of constant k. The block is displaced by x from the mean position; the restoring force is minus k x towards the mean position. Extremes are at plus and minus A.');
+  line(s,24,56,24,110,INK,3);for(const y of [64,78,92,106])hl(s,24,y,16,y+6,DIM);zig(s,24,128,84);box(s,128,66,42,36,'m');line(s,20,102,244,102,INK,1.5);
+  dsh(s,114,40,114,124);ht(s,114,138,'x = 0',INK,'middle',13);dsh(s,66,110,66,124);ht(s,66,138,'−A',DIM,'middle',13);dsh(s,176,40,176,124);ht(s,176,138,'+A',DIM,'middle',13);
+  dim(s,114,52,150,52,'x',132,44);hv(s,128,84,100,84,RED,2);ht(s,100,70,'F = −kx',RED,'end',13);
+  cp(s,170,'T = 2π√(m/k),  ω = √(k/m)');cp(s,0,'does not depend on A or on g',DIM);return fin(s)}
+/* simple pendulum */
+function pendulum(){const s=hs(260,206,'A simple pendulum: a bob on a string of length L displaced by a small angle theta. The weight mg has a component mg sine theta along the path, back towards the mean position. The period is 2 pi root L over g.');
+  const P=[120,14],Lh=120,th=.4363,b=[120+Lh*Math.sin(th),14+Lh*Math.cos(th)];line(s,90,14,150,14,INK,2.4);hl(s,...P,...b);dsh(s,120,14,120,150);arcp(s,...P,44,0,25);ht(s,129,66,'θ',INK,'middle',15);ht(s,152,56,'L',INK,'start',14);
+  mk(s,'circle',{cx:b[0],cy:b[1],r:9,fill:'#17314f',stroke:BLUE,'stroke-width':1.8});hv(s,...b,b[0],b[1]+44,HI,2);ht(s,b[0]+6,b[1]+46,'mg',HI,'start',14);hv(s,...b,b[0]-Math.cos(th)*34,b[1]+Math.sin(th)*34,RED,1.8);ht(s,b[0]-40,b[1]+30,'mg sinθ',RED,'end',12);
+  cp(s,182,'T = 2π√(L/g),  small θ (about 10° or less)');cp(s,0,'independent of mass and of amplitude',DIM);return fin(s)}
+/* string fixed at both ends */
+function stringHarm(){const s=hs(260,250,'A string fixed at both ends vibrating in its first three harmonics: one, two and three loops. The wavelength is 2 L over n and the frequency is n v over 2 L.');
+  [['n = 1','λ = 2L, f₁ = v/2L'],['n = 2','λ = L, f = 2f₁'],['n = 3','λ = 2L/3, f = 3f₁']].forEach(([a,b],i)=>{const y=30+i*66,n=i+1;let d1=`M30 ${y}`,d2=d1;for(let x=2;x<=200;x+=2){const e=22*Math.sin(n*Math.PI*x/200);d1+=`L${30+x} ${y-e}`;d2+=`L${30+x} ${y+e}`}mk(s,'path',{d:d1,fill:'none',stroke:BLUE,'stroke-width':1.6});mk(s,'path',{d:d2,fill:'none',stroke:BLUE,'stroke-width':1.6});for(let k=0;k<=n;k++)dot(s,30+200*k/n,y,RED,3);ht(s,130,y+36,a+':  '+b,DIM,'middle',12)});
+  dim(s,30,222,230,222,'L',130,238);cp(s,256,'f_n = nv/2L = (n/2L)√(T/μ),  λ = 2L/n');return fin(s)}
+/* open and closed organ pipes */
+function pipes(){const s=hs(260,236,'Fundamental modes of an open pipe and a closed pipe. The open pipe has displacement antinodes at both ends and a node in the middle, so the wavelength is 2 L. The closed pipe has a node at the closed end and an antinode at the open end, so the wavelength is 4 L.');
+  ht(s,12,16,'open',DIM,'start',13);line(s,40,30,220,30,INK,1.6);line(s,40,76,220,76,INK,1.6);let d1='M40 53',d2='M40 53';for(let x=2;x<=180;x+=2){const e=20*Math.cos(Math.PI*x/180);d1+=`L${40+x} ${53-e}`;d2+=`L${40+x} ${53+e}`}mk(s,'path',{d:d1,fill:'none',stroke:BLUE,'stroke-width':1.6});mk(s,'path',{d:d2,fill:'none',stroke:BLUE,'stroke-width':1.6});
+  ht(s,40,98,'A',RED,'middle',14);ht(s,130,98,'N',INK,'middle',14);ht(s,220,98,'A',RED,'middle',14);
+  ht(s,12,126,'closed',DIM,'start',13);line(s,40,140,220,140,INK,1.6);line(s,40,186,220,186,INK,1.6);line(s,40,140,40,186,INK,4);let e1='M40 163',e2='M40 163';for(let x=2;x<=180;x+=2){const e=20*Math.sin(Math.PI*x/360);e1+=`L${40+x} ${163-e}`;e2+=`L${40+x} ${163+e}`}mk(s,'path',{d:e1,fill:'none',stroke:BLUE,'stroke-width':1.6});mk(s,'path',{d:e2,fill:'none',stroke:BLUE,'stroke-width':1.6});
+  ht(s,40,208,'N',INK,'middle',14);ht(s,220,208,'A',RED,'middle',14);
+  cp(s,230,'open: f = nv/2L, all harmonics|closed: f = (2n−1)v/4L, odd only');return fin(s)}
+/* Doppler effect */
+function doppler(){const s=hs(260,200,'A moving source S emitting circular wavefronts. In front of the source, towards the right, the wavefronts are crowded together, so the observer there hears a higher frequency; behind it they are spread out, giving a lower frequency.');
+  for(let k=1;k<=4;k++)mk(s,'circle',{cx:100-9*k,cy:84,r:14*k,fill:'none',stroke:BLUE,'stroke-width':1.2});
+  mk(s,'circle',{cx:100,cy:84,r:6,fill:'#17314f',stroke:RED,'stroke-width':1.8});ht(s,100,112,'S',RED,'middle',15);hv(s,108,84,146,84,HI,2);ht(s,130,74,'v_s',HI,'middle',14);
+  mk(s,'circle',{cx:206,cy:84,r:6,fill:'#17314f',stroke:INK,'stroke-width':1.6});ht(s,206,112,'O',INK,'middle',15);ht(s,130,46,'crowded: f′ > f',BLUE,'start',12);ht(s,10,160,'spread out: f′ < f',BLUE,'start',12);
+  cp(s,178,'f′ = f (v − v_o)/(v − v_s)  (S → O positive)');cp(s,0,'S approaching: fv/(v − v_s);  receding: fv/(v + v_s)',DIM);return fin(s)}
+
+window.PhysicaRankFigs={vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share};
 })();

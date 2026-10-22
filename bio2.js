@@ -6,7 +6,9 @@ const {R,S,N,f,clamp,rad,deg,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
 const P3=window.Physica3D,V=P3.vec,{BC,hash,critter,leaf,cell,capsule,chromosome,helix}=window.PhysicaBio,{add,done}=pack();
 const U3='CELL: STRUCTURE AND FUNCTIONS',U4='PLANT PHYSIOLOGY';
 const ch=(no,chapter,group)=>({grade:11,chapterNo:no,chapter,group});
-const smooth=x=>x*x*(3-2*x);
+// Oriented rectangular slab (6 lit faces) centred at c with unit axes ax/ay/az and half-sizes h; optional alpha.
+const slab=(s,c,ax,ay,az,h,col,alpha,zb)=>{const A=[V.mul(ax,h[0]),V.mul(ay,h[1]),V.mul(az,h[2])],F=[[0,1],[0,-1],[1,1],[1,-1],[2,1],[2,-1]],O=[[1,2],[2,1],[2,0],[0,2],[0,1],[1,0]];
+  F.forEach(([k,sg],i)=>{const [p,q]=O[i],m=V.add(c,V.mul(A[k],sg)),e=A[p],g=A[q],n=V.mul(V.norm(A[k]),sg);s.poly([V.add(V.add(m,e),g),V.add(V.sub(m,e),g),V.sub(V.sub(m,e),g),V.sub(V.add(m,e),g)],col,{normal:n,cull:true,spec:.4,shine:30,alpha,bias:zb})})};const smooth=x=>x*x*(3-2*x);
 
 /* ---------- Chapter 8: Cell: The Unit of Life ---------- */
 const ORG={nucleus:['Double membrane (nuclear envelope with pores)','Both','Contains chromatin (DNA); controls the cell'],mito:['Double membrane; inner folds = cristae','Both','Site of aerobic respiration — “power house”; has own DNA and 70S ribosomes'],chloro:['Double membrane; thylakoids stacked as grana','Plant only','Photosynthesis; has own DNA and 70S ribosomes'],
@@ -119,31 +121,64 @@ add({...ch(9,'Biomolecules',U3),id:'bio-protein-structure',title:'Levels of prot
 
 /* ---------- Chapter 10: Cell Cycle and Cell Division ---------- */
 const MIT=[['Interphase (G₂)','Chromosomes not visible; DNA already doubled'],['Prophase','Chromatin condenses into chromosomes; spindle begins to form'],['Metaphase','Chromosomes line up at the metaphase plate'],['Anaphase','Centromeres split; sister chromatids move to opposite poles'],['Telophase','Nuclear envelopes reform around two sets of chromosomes'],['Cytokinesis','Cytoplasm divides into two daughter cells']];
-add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-mitosis',title:'Mitosis, stage by stage',
+// One chromatid: a rod bent at its centromere (constriction), rounded ends. dA/dB are the unit directions of the two arms.
+const chromatid=(s,C,dA,dB,La,Lb,r,col)=>{const m=V.add(C,V.mul(dA,La*.5)),m2=V.add(C,V.mul(dB,Lb*.5)),e1=V.add(C,V.mul(dA,La)),e2=V.add(C,V.mul(dB,Lb));
+  s.tube([e1,m,C,m2,e2],u=>r*(1-.38*Math.exp(-(((u-La/(La+Lb))/.1)**2))),col,{segs:7,spec:.55});s.ball(e1,r*.97,col,{flat:true});s.ball(e2,r*.97,col,{flat:true})};
+// Centrosome: a pair of centrioles at right angles (each a short cylinder of nine microtubule triplets) in a faint pericentriolar glow.
+const centrosome=(s,p,ax)=>{const pp=[-ax[1],ax[0],0];s.ball(p,.22,'#ffe066',{alpha:.2,flat:true});s.cyl(V.add(p,V.mul(pp,.07)),ax,.055,.27,'#f1f3f5',{seg:9});s.cyl(V.add(p,V.mul(ax,-.04)),pp,.055,.25,'#ced4da',{seg:9,caps:false})};
+const mix=(a,b,k)=>V.add(V.mul(a,1-k),V.mul(b,k));add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-mitosis',title:'Mitosis, stage by stage',
  description:'Watch the chromosomes of an animal cell condense, line up, separate and form two identical nuclei.',
  formula:'2n → 2n + 2n (equational division)',
  observe:'Each daughter cell receives an exact copy of the parent’s chromosomes.',
  tryText:'Pause at metaphase and rotate the view to see the plate edge-on.',
  controls:[R('n','Chromosome number 2n (shown)',2,8,2,4),R('speed','Speed of division',.2,2,.1,1,'×',1)],
  metrics:(p,t)=>{const k=Math.floor(cycle(t*p.speed,18)/3);return[N('Phase',MIT[k][0]),N('Key event',MIT[k][1]),N('Chromosomes per daughter cell',p.n+' (2n)'),N('Human somatic cells','2n = 46')]},
- draw:(c,p,t)=>{const T=cycle(t*p.speed,18),k=Math.floor(T/3),f2=(T%3)/3,s=P3.scene(c,{scale:56}),split=k===5?f2:k>5?1:0;
-  s.mesh([0,0,0],[2.4+.5*split,1.5,1.5],BC.membrane,{alpha:.18,shape:(u,v)=>1-.6*split*Math.exp(-((Math.cos(v)*Math.cos(u))**2)*12)});
-  if(k===0){s.mesh([0,0,0],.9,BC.nucleus,{alpha:.4});for(let i=0;i<8;i++)s.path(Array.from({length:12},(_,j)=>[(hash(i)-.5)*1.2+.2*Math.sin(j+i),(hash(i+3)-.5)*1.2+.2*Math.cos(j*1.3),(hash(i+6)-.5)*.8]),'#ff8787',1.5)}
-  const cols=['#ff6b6b','#4dabf7','#ffd43b','#69db7c','#9775fa','#f783ac','#ffa94d','#38d9a9'];
-  const CO={r:.1};for(let i=0;i<p.n;i++){const L=(.35+.12*(i%(p.n/2)))*1.35,col=cols[i%cols.length],home=[(hash(i)-.5)*1.1,(hash(i+20)-.5)*1.1,(hash(i+40)-.5)*.8],plate=[0,-1.1+2.2*(i+.5)/p.n,0];
-   if(k===1)chromosome(s,V.add(home,[0,0,0]),L*(.4+.6*f2),col,hash(i)*PI,true,CO);else if(k===2)chromosome(s,V.add(V.mul(home,1-f2),V.mul(plate,f2)),L,col,PI/2,true,CO);
-   else if(k>=3){const d=k===3?f2*1.6:1.6+(k>=5?.6*split:0);for(const sg of[-1,1])chromosome(s,V.add(plate,[sg*d,0,0]),L,col,PI/2,false,CO)}}
-  if(k>=1&&k<=3)for(const sg of[-1,1]){s.cyl([sg*2.15,0,0],[1,0,0],.05,.2,'#ced4da');s.cyl([sg*2.15,0,0],[0,1,0],.05,.2,'#ced4da')}
-  const LB=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);
-  if(k===0){LB([.5,.6,.5],'nucleus: chromatin (DNA already doubled)','#c9b6ff',60,-60);LB([2.3,.4,0],'cell membrane','#f2a7b5',30,50)}
-  if(k===1){const h=[(hash(0)-.5)*1.1,(hash(20)-.5)*1.1,(hash(40)-.5)*.8];LB(h,'chromosome condenses: 2 sister chromatids','#ff8787',-60,-60);LB([2.15,0,0],'centriole (spindle pole)','#ced4da',30,-60)}
-  if(k===2){LB([0,-1.1+2.2*.5/p.n,0],'metaphase plate','#e9f6ff',-80,60);LB([1.1,.5,0],'spindle fibres','#adb5bd',60,-60);LB([0,-1.1+2.2*(p.n-.5)/p.n,0],'centromere','#e9f6ff',60,-40)}
-  if(k===3)LB([1.6*f2,-1.1+2.2*.5/p.n,0],'sister chromatids pulled to poles','#ffd43b',60,60);
-  if(k===4)LB([1.6,.75,0],'nuclear envelope re-forms','#c9b6ff',60,-50);
+ draw:(c,p,t)=>{const T=cycle(t*p.speed,18),k=Math.floor(T/3),f2=(T%3)/3,s=P3.scene(c,{scale:66}),split=k===5?f2:k>5?1:0,n=p.n,X=[1,0,0],sm=smooth,thr=(k===4&&f2>.5)||k===5;
+  // cell: translucent membrane that pinches at the equator during cytokinesis, with a few mitochondria for scale and context
+  s.mesh([0,0,0],[2.4+.5*split,1.5,1.5],BC.membrane,{alpha:.17,rings:12,segs:20,shape:(u,v)=>1-.6*split*Math.exp(-((Math.cos(v)*Math.cos(u))**2)*12)});
+  if(split<.6)for(const m of[[-1.6,-.95,.5,.3],[1.55,.95,-.6,-.4],[-1.3,1.0,.4,.5],[1.7,-.9,.5,-.2]])s.mesh([m[0],m[1],m[2]],[.22,.085,.085],BC.mito,{rings:6,segs:9,rot:[0,0,m[3]],spec:.5});
+  const poleX=k<4?2.1:2.2,cenA=mix([.95,.62,.5],[-poleX,0,0],k===0?0:k===1?sm(f2):1),cenB=mix([1.12,.45,.6],[poleX,0,0],k===0?0:k===1?sm(f2):1);
+  centrosome(s,cenA,k<2&&f2<.4?[0,1,0]:X);centrosome(s,cenB,k<2&&f2<.4?[0,1,0]:X);
+  // nucleus and nuclear envelope: intact in interphase, breaks down in late prophase, re-forms around each daughter set in telophase
+  const nuc=(q,r,al)=>{s.mesh(q,r,BC.nucleus,{alpha:al,rings:9,segs:14,spec:.3});};
+  if(k===0)nuc([0,0,0],.98,.3);
+  if(k===1){const e=sm(Math.max(0,(f2-.4)/.6));if(e<.98)nuc([0,0,0],.98+.25*e,.3*(1-e));if(f2>.4)for(let j=0;j<10;j++){const a=TAU*j/10*1.7,b=hash(j+3)*PI-PI/2,R=.98+.3*e;s.mesh([R*Math.cos(b)*Math.cos(a),R*Math.sin(b),R*Math.cos(b)*Math.sin(a)],[.14,.05,.14],"#9b82e0",{alpha:.4*(1-.5*e),rings:4,segs:7})}}
+  if(k===0||(k===1&&f2<.5))s.ball([.1,.15,.25],.14*(k===1?1-f2*2:1),BC.nucleolus,{lift:.3});
+  if(k>=4)for(const sg of[-1,1])nuc([sg*(1.6+(k===4?.12*f2:.12)+.45*split),0,0],.86,k===4?.08+.24*f2:.3);
+  if(k===4&&f2>.4)for(const sg of[-1,1])s.ball([sg*(1.72+.45*split)+0,.1,.2],.1*Math.min(1,(f2-.4)*3),BC.nucleolus,{lift:.3});
+  if(k===5)for(const sg of[-1,1])s.ball([sg*(1.84+.45*split),.1,.2],.1,BC.nucleolus,{lift:.3});
+  // spindle: pole-to-pole fibres, astral rays and (below) kinetochore fibres
+  const grow=k===0?0:k===1?sm(Math.max(0,(f2-.3)/.7)):k<=3?1:0;
+  if(grow>0){for(let j=0;j<6;j++){const ph=TAU*j/6+.4,pts=[];for(let i=0;i<=6;i++){const u=i/6;pts.push([-poleX+2*poleX*u,.82*grow*Math.sin(PI*u)*Math.cos(ph),.82*grow*Math.sin(PI*u)*Math.sin(ph)])}s.path(pts,'#aab8c6',1.3)}
+   for(let j=0;j<7;j++){const ph=TAU*j/7+.2,cp=Math.cos(ph),sp=Math.sin(ph);for(const sg of[-1,1])s.seg([sg*poleX,0,0],[sg*(poleX+.5*grow),.55*grow*cp,.55*grow*sp],'#9fb0c0',1)}}
+  if(k===4&&f2<.9)for(let j=0;j<5;j++){const ph=TAU*j/5,y=.35*Math.cos(ph),z=.35*Math.sin(ph);s.seg([-poleX+.5,y,z],[poleX-.5,y,z],'#aab8c6',1.2)}
+  if(k===5)for(let j=0;j<3;j++){const ph=TAU*j/3,y=.2*Math.cos(ph),z=.2*Math.sin(ph);s.seg([-.7,y,z],[.7,y,z],'#aab8c6',1)}
+  // contractile ring in the cleavage furrow (animal cell)
+  if(k===5)s.ring([0,0,0],X,1.5*(1-.6*split)*.97,'#f06595',3,[],40);
+  // metaphase plate disc (guide)
+  if(k===2&&f2>.5){const pl=[];for(let j=0;j<18;j++){const a=TAU*j/18;pl.push([0,1.1*Math.cos(a),1.1*Math.sin(a)])}s.poly(pl,'#e9f6ff',{alpha:.07,cull:false,shade:false})}
+  // chromosomes: each is two sister chromatids joined at the centromere (kinetochore on the pole-facing side)
+  const cols=['#ff6b6b','#4dabf7','#ffd43b','#69db7c','#9775fa','#f783ac','#ffa94d','#38d9a9'],cen=[];
+  for(let i=0;i<n;i++){const col=cols[i%cols.length],Lc=(.42+.09*(i%(n/2)))*1.15,ah=hash(i+60)*TAU,home=[(hash(i)-.5)*1.1,(hash(i+20)-.5)*1.1,(hash(i+40)-.5)*.8],rho=.3+.55*Math.sqrt((i+.5)/n),ph=i*2.4+.5,plate=[0,rho*Math.cos(ph),rho*Math.sin(ph)];
+   if(k===0&&true){const pts=[];for(let j=0;j<11;j++)pts.push(V.add(home,[.2*Math.sin(j+i)+(j-5)*.04,.2*Math.cos(j*1.3+i),.15*Math.sin(j*.9+i*2)]));s.path(pts,col+'cc',1.6);continue}
+   if(thr){for(const sg of[-1,1]){const base=[sg*(1.72+.45*split),0,0],pts=[];for(let j=0;j<11;j++)pts.push(V.add(base,[.18*Math.sin(j+i)+(j-5)*.03,(hash(i+20)-.5)*.9+.18*Math.cos(j*1.3+i),(hash(i+40)-.5)*.6+.14*Math.sin(j*.9+i*2)]));s.path(pts,col+'cc',1.6)}continue}
+   let pos=home,ang=ah,a=1,b=0,tl=.05,XO=0,rs=1,y=1;
+   if(k===1){a=.35+.65*sm(f2)}
+   else if(k===2){const g=sm(Math.min(1,f2*2));pos=mix(home,plate,g);ang=ah+(ph-ah)*g;tl=.05+.23*g}
+   else{const sep=k===3?sm(f2):1;pos=plate;ang=ph;b=Math.min(1,k===3?f2*3:1);XO=k===3?1.56*sep:1.56+.12*f2*(k===4);y=1-.3*sep;if(k===4){rs=1-.5*f2;a=1-.2*f2}}
+   const u=[0,Math.cos(ang),Math.sin(ang)],C0=[0,pos[1]*y,pos[2]*y];if(k<=2)C0[0]=pos[0];
+   for(const sg of[-1,1]){const C=V.add(C0,[sg*(.035+XO),0,0]),dA=V.norm(V.add(u,[sg*(tl*(1-b)-.9*b),0,0])),dB=V.norm(V.add(V.mul(u,-1),[sg*(-tl*(1-b)-.9*b),0,0]));
+    chromatid(s,C,dA,dB,.55*Lc*a,.45*Lc*a,.08*rs,col);
+    if(k>=1&&!(k===1&&f2<.5)){const K=V.add(C,[sg*.075,0,0]);s.ball(K,.05,'#3b1f2b',{flat:true,lift:.5});if(k>=2&&!(k===4&&f2>.3))s.seg([sg*poleX,0,0],K,'#cdd6df',1.3)}}
+   if(i===0)cen.push(C0)}
+  const L0=cen[0]||[0,0,0],LB=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);
+  if(k===0){LB([.5,.5,.5],'nucleus: chromatin (DNA already doubled)','#c9b6ff',60,-60);LB([2.3,.4,0],'cell membrane','#f2a7b5',30,50);LB(cenA,'centrosome','#ffe066',-40,-50)}
+  if(k===1){LB(L0,'chromosome condenses: 2 sister chromatids','#ff8787',-60,-60);LB(cenB,'centriole (spindle pole)','#ced4da',30,-60)}
+  if(k===2){LB([0,0,0],'metaphase plate','#e9f6ff',-80,60);LB([1.2,.45,0],'spindle fibres','#adb5bd',60,-60);LB(V.add(L0,[.075,0,0]),'centromere (kinetochore)','#e9f6ff',60,-40)}
+  if(k===3)LB([1.6*sm(f2),.5,0],'sister chromatids pulled to poles','#ffd43b',60,60);
+  if(k===4)LB([1.7,.75,0],'nuclear envelope re-forms','#c9b6ff',60,-50);
   if(k===5)LB([0,1.2*(1-.5*split),.6],'cleavage furrow (cytokinesis)','#f2a7b5',60,-50);
-  if(k>=1&&k<=3)for(let i=0;i<p.n;i++){const y=-1+2*(i+.5)/p.n;s.seg([-2.1,0,0],[k===3?-1.6*f2:0,y,0],'#adb5bd55',1);s.seg([2.1,0,0],[k===3?1.6*f2:0,y,0],'#adb5bd55',1)}
-  if(k>=4)for(const sg of[-1,1])s.mesh([sg*(1.6+.6*split),0,0],.75,BC.nucleus,{alpha:.25*Math.min(1,f2*2+(k>4?1:0))});s.render();tag(c,MIT[k][0],44,98,C.gold,16)},
- assumption:'Animal cell, small chromosome number for clarity; time compressed — a human cell spends only about 1 h of a 24 h cycle in M phase.'});
+  s.render();tag(c,MIT[k][0],44,98,C.gold,16)}, assumption:'Animal cell, small chromosome number for clarity; time compressed — a human cell spends only about 1 h of a 24 h cycle in M phase.'});
 
 const MEI=[['Prophase I','Homologous chromosomes pair (synapsis) and cross over'],['Metaphase I','Bivalents line up at the equator'],['Anaphase I','Homologous chromosomes separate (chromatids stay together)'],['Telophase I','Two haploid cells, each chromosome still with two chromatids'],['Meiosis II','Sister chromatids separate, like mitosis'],['Result','Four haploid cells, genetically different']];
 add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-meiosis',title:'Meiosis and crossing over',
@@ -197,14 +232,30 @@ add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-light-reaction',titl
  tryText:'Switch to cyclic photophosphorylation. What stops being produced?',
  controls:[S('mode','Electron flow','non',[['non','Non-cyclic (PS II + PS I)'],['cyc','Cyclic (PS I only)']]),R('L','Light intensity',0,100,1,80,'%')],
  metrics:p=>p.mode==='non'?[N('Products','ATP, NADPH and O₂'),N('Photosystems','PS II (P680) and PS I (P700)'),N('O₂ source','Splitting of water'),N('Location','Grana thylakoids')]:[N('Products','ATP only'),N('Photosystem','PS I (P700) only'),N('O₂ released?','No'),N('Location','Stroma lamellae')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:.25}),on=p.L>0,sp=p.L/100;s.box([0,-.3,0],[7,.6,2.2],'#b2f2bb',{alpha:.35});s.label([-3.2,.6,1.2],'stroma',C.muted,12);s.label([-3.2,-1.2,1.2],'lumen',C.muted,12);
-  const ps2=[-2.2,-.3,0],cyt=[-.6,-.3,0],ps1=[.8,-.3,0],atp=[2.6,-.3,0];if(p.mode==='non'){s.mesh(ps2,[.55,.75,.55],'#2f9e44',{label:'PS II'});s.label(V.add(ps2,[0,1,0]),'PS II',C.white,13)}s.mesh(cyt,[.4,.6,.4],'#e8590c');s.label(V.add(cyt,[0,.9,0]),'Cyt b₆f',C.white,12);s.mesh(ps1,[.55,.75,.55],'#37b24d');s.label(V.add(ps1,[0,1,0]),'PS I',C.white,13);
-  s.cyl(V.add(atp,[0,-.1,0]),[0,1,0],.25,.9,'#adb5bd');s.mesh(V.add(atp,[0,.7,0]),[.5,.35,.5],'#ced4da',{rot:[0,t*3*sp,0]});s.label(V.add(atp,[0,1.3,0]),'ATP synthase',C.white,12);
-  if(on){const path=p.mode==='non'?[ps2,cyt,ps1,[2,.8,0]]:[ps1,cyt,ps1];for(let i=0;i<6;i++){const q=cycle(t*sp*.8+i/6,1)*(path.length-1),j=Math.floor(q),fr=q-j,pt=V.add(V.add(path[j],V.mul(V.sub(path[j+1],path[j]),fr)),[0,.2,0]);s.ball(pt,.08,'#ffd43b',{glow:true,flat:true})}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:53,pitch:.3,cy:268}),on=p.L>0,sp=p.L/100,AX=[[1,0,0],[0,1,0],[0,0,1]],Y=-.3,non=p.mode==='non';
+  // lipid bilayer cut open: two head-group leaflets around a darker hydrophobic core, with a row of phospholipids along the cut edge
+  const sl=(y,h,col,a)=>slab(s,[0,y,-.55],AX[0],AX[1],AX[2],[3.5,h,.55],col,a,-9e4);sl(Y+.21,.07,'#f3c98b',.55);sl(Y,.14,'#9c6b45',.4);sl(Y-.21,.07,'#f3c98b',.55);
+  sl(.65,.65,'#b2f2bb',.1);sl(-1.15,.55,'#a5d8ff',.1);
+  for(let i=0;i<30;i++){const x=-3.38+i*.234;for(const sg of[1,-1]){s.ball([x,Y+sg*.29,.02],.055,'#ffe3b0',{flat:true,lift:.3});s.seg([x,Y+sg*.24,.02],[x,Y+sg*.06,.02],'#6b4426',2)}}
+  s.label([-3.2,.75,1.2],'stroma',C.muted,12);s.label([-3.2,-1.25,1.2],'lumen',C.muted,12);
+  const ps2=[-2.2,Y,0],cyt=[-.6,Y,0],ps1=[.8,Y,0],atp=[2.6,Y,0],G='#2f9e44';
+  const blob=(q,r,col,o)=>s.mesh(q,r,col,{rings:8,segs:12,spec:.5,...o});
+  // PS II: core dimer-like body, LHCII antenna, oxygen-evolving complex on the lumen side
+  if(non){blob(ps2,[.5,.44,.42],G);blob(V.add(ps2,[-.72,0,.12]),[.27,.3,.26],'#1b7f3b');blob(V.add(ps2,[.1,-.46,0]),[.34,.2,.3],'#c8d94a');for(const k of[-1,0,1])s.ball(V.add(ps2,[.1+k*.12,-.5,.2]),.05,'#7d4cdb',{flat:true,lift:.3});s.ball(V.add(ps2,[.08,.0,.4]),.08,'#d8ff9a',{glow:true,flat:true,lift:.4});s.label(V.add(ps2,[0,.8,0]),'PS II',C.white,13)}
+  // Cytochrome b6f dimer with a Rieske head and plastoquinone / plastocyanin shuttles
+  for(const z of[-.2,.2])blob(V.add(cyt,[0,0,z]),[.2,.46,.24],'#e8590c');blob(V.add(cyt,[.1,.38,0]),[.2,.12,.16],'#ff922b');s.label(V.add(cyt,[0,.95,0]),'Cyt b₆f',C.white,12);
+  // PS I: core with LHCI crescents; ferredoxin docking bump on the stroma side
+  blob(ps1,[.45,.42,.38],'#37b24d');blob(V.add(ps1,[.62,0,.1]),[.2,.28,.24],'#2b8a3e');blob(V.add(ps1,[-.62,0,.1]),[.2,.28,.24],'#2b8a3e');blob(V.add(ps1,[0,.42,0]),[.2,.12,.18],'#2f9e44');s.ball(V.add(ps1,[.05,.0,.38]),.08,'#d8ff9a',{glow:true,flat:true,lift:.4});s.label(V.add(ps1,[0,.95,0]),'PS I',C.white,13);
+  // ATP synthase: F0 c-ring in the membrane, stalk, F1 head (3 alpha/beta lobes); the rotor turns as protons flow lumen -> stroma
+  s.cyl([atp[0],Y,0],[0,1,0],.27,.56,'#9aa5b1',{seg:16});const ang=t*3*sp;for(let k=0;k<10;k++){const a=ang*-1+TAU*k/10;s.ball([atp[0]+.27*Math.cos(a),Y,.27*Math.sin(a)],.05,'#cdd5dd',{flat:true,lift:.4})}
+  s.cyl([atp[0],Y+.4,0],[0,1,0],.05,.4,'#6c757d',{seg:8});for(let k=0;k<3;k++){const a=ang+TAU*k/3;s.mesh([atp[0]+.2*Math.cos(a),Y+.82,.2*Math.sin(a)],[.16,.2,.16],k===0?'#f1f3f5':'#ced4da',{rings:7,segs:10,spec:.6})}
+  s.label(V.add(atp,[0,1.35,0]),'ATP synthase',C.white,12);
+  if(on){const q0=cycle(t*sp*.5,1),pq=a=>V.add(V.add(ps2,V.mul(V.sub(cyt,ps2),a)),[0,.05,.2]);s.ball(pq(cycle(t*sp*.5,1)),.07,'#ffa94d',{flat:true});s.ball(pq(cycle(t*sp*.5+.5,1)),.07,'#ffa94d',{flat:true});
+   if(non)s.ball(V.add(V.add(cyt,V.mul(V.sub(ps1,cyt),q0)),[0,-.6,.1]),.08,'#4dabf7',{flat:true,lift:.3});
+   const path=non?[ps2,cyt,ps1,[2,.8,0]]:[ps1,cyt,ps1];for(let i=0;i<6;i++){const q=cycle(t*sp*.8+i/6,1)*(path.length-1),j=Math.floor(q),fr=q-j,pt=V.add(V.add(path[j],V.mul(V.sub(path[j+1],path[j]),fr)),[0,.2,0]);s.ball(pt,.08,'#ffd43b',{glow:true,flat:true})}
    for(let i=0;i<4;i++){const q=cycle(t*sp+i/4,1);s.ball([atp[0],-.9+q*1.6,0],.07,'#ff6b6b',{flat:true});s.ball([-1.4+(i%2)*1.4,-1.1+.2*Math.sin(t+i),.5],.07,'#ff6b6b',{flat:true})}
-   if(p.mode==='non'){const q=cycle(t*sp*.5,1);s.ball([-2.4,-1.2+q*.8,.6],.12,'#74c0fc');s.label([-2.4,-1.5,.6],'2H₂O → O₂',C.blue,12);s.label([2.1,1.1,0],'NADPH',C.gold,13)}const q=cycle(t*sp,1);s.ball([atp[0]+.5,.9+q*.6,0],.12,'#ffd43b');s.label([atp[0]+.6,1.7,0],'ATP',C.gold,13)}
-  for(let i=0;i<12;i++)s.seg([-3+i*.5,2.2,-1],[-3+i*.5+.4*sp,1.2,-.6],'#fff3bf'+Math.round(30+120*sp).toString(16).padStart(2,'0'),2);s.render();tag(c,'yellow: electrons   red: protons (H⁺)',44,98,C.muted,13)},
- assumption:'Schematic thylakoid membrane; plastoquinone, plastocyanin and ferredoxin carriers are merged into the arrows.'});
+   if(non){const q=cycle(t*sp*.5,1);s.ball([-2.4,-1.2+q*.8,.6],.12,'#74c0fc');s.label([-2.4,-1.5,.6],'2H₂O → O₂',C.blue,12);s.label([2.1,1.1,0],'NADPH',C.gold,13)}const q=cycle(t*sp,1);s.ball([atp[0]+.5,.9+q*.6,0],.12,'#ffd43b');s.label([atp[0]+.6,1.7,0],'ATP',C.gold,13)}
+  for(let i=0;i<12;i++)s.seg([-3+i*.5,2.2,-1],[-3+i*.5+.4*sp,1.2,-.6],'#fff3bf'+Math.round(30+120*sp).toString(16).padStart(2,'0'),2);s.render();tag(c,'yellow: electrons   red: protons (H⁺)',44,98,C.muted,13)}, assumption:'Schematic thylakoid membrane patch, not to scale; complexes are simplified, and ferredoxin and NADP reductase are merged into the arrows.'});
 
 add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-calvin-cycle',title:'Calvin cycle bookkeeping',
  description:'Turn the Calvin cycle once per CO₂ fixed and keep count of the ATP and NADPH used.',
