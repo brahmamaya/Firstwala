@@ -11,7 +11,23 @@ const CPK={H:['#f1f3f5',.17],C:['#495057',.27],N:['#4c6ef5',.26],O:['#fa5252',.2
 const atom=(s,p,el,k=1,opt={})=>{const [col,r]=CPK[el]||CPK.X;s.ball(p,r*k,col,{spec:.6,...opt});return s};
 const bond=(s,a,b,order=1,col='#ced4da',r=.06)=>{const d=V.sub(b,a),n=V.norm(d),side=V.norm(Math.abs(n[1])<.9?V.cross(n,[0,1,0]):V.cross(n,[1,0,0]));if(order===1)s.tube([a,b],r,col,{segs:8});else for(let i=0;i<order;i++){const o=V.mul(side,(i-(order-1)/2)*.13);s.tube([V.add(a,o),V.add(b,o)],r*.75,col,{segs:6})}return s};
 const beaker=(s,p,r,h,liq,fill=.7)=>{s.cyl(V.add(p,[0,h/2,0]),[0,1,0],r,h,'#e9f6ff',{alpha:.12,caps:false});s.cyl(V.add(p,[0,h*fill/2,0]),[0,1,0],r*.97,h*fill,liq,{alpha:.45});return s};
-window.PhysicaChem={CPK,atom,bond,beaker,hash};
+// ---- Richer shapes composed from the engine primitives (shared by chem1-4) ----
+const tint=(hex,k)=>{const n=parseInt(hex.slice(1,7),16),m=v=>Math.round(v+(255-v)*k).toString(16).padStart(2,'0');return'#'+m(n>>16)+m((n>>8)&255)+m(n&255)};
+// Ball-and-stick bond: two tapered halves coloured by the atoms they join; order 2 = parallel sticks, order 3 = three sticks in a triangle.
+const stick=(s,a,b,order=1,o={})=>{const d=V.sub(b,a),n=V.norm(d),m=V.add(a,V.mul(d,.5)),r=(o.r||.065)*(order>1?.72:1),ca=tint((CPK[o.ca]||CPK.X)[0],.3),cb=tint((CPK[o.cb]||CPK.X)[0],.3);
+  const sd=V.norm(o.side||(Math.abs(n[1])<.9?V.cross(n,[0,1,0]):V.cross(n,[1,0,0]))),w=V.cross(n,sd),g=o.gap||.13,tA=u=>r*(1-.22*u),tB=u=>r*(.78+.22*u);
+  for(let i=0;i<order;i++){let off=[0,0,0];if(order===2)off=V.mul(sd,(i-.5)*g);else if(order===3){const q=PI/2+i*TAU/3;off=V.add(V.mul(sd,Math.cos(q)*g*.8),V.mul(w,Math.sin(q)*g*.8))}
+    s.tube([V.add(a,off),V.add(m,off)],tA,ca,{segs:8});s.tube([V.add(m,off),V.add(b,off)],tB,cb,{segs:8})}return s};
+// Orbital / electron-pair lobe: a translucent teardrop whose narrow end sits at p and points along unit vector u.
+const lobe=(s,p,u,len,w,col,alpha=.4,o={})=>{const th=Math.acos(clamp(u[1],-1,1)),ps=Math.atan2(u[0],u[2]);
+  s.mesh(V.add(p,V.mul(u,len/2)),[w,len/2,w],col,{alpha,rings:o.rings||8,segs:o.segs||12,rot:[th,ps,0],spec:.5,shape:uu=>{const q=(Math.sin(uu)+1)/2;return .2+1.05*Math.pow(q,.8)}})};
+// Lab beaker: thin glass shell with rim, spout-free graduations, liquid with a concave meniscus and a lit surface. liq is #rrggbb.
+const glassBeaker=(s,p,r,h,liq,fill=.7,o={})=>{const lh=h*fill,[x,y,z]=p,rr=r*.95,la=o.alpha??.5;
+  s.lathe(p,[[.001,.0],[r*.88,0],[r,.07],[r,h],[r*1.05,h+.04]],'#dff3ff',{alpha:.14,segs:o.segs||18,spec:.7,shine:30});
+  s.lathe(p,[[.001,0],[rr*.9,0],[rr,.09],[rr,lh-.02],[rr*.99,lh+.05],[rr*.82,lh+.008],[.001,lh]],liq,{alpha:la,segs:o.segs||18,spec:.5,shine:20});
+  s.ring([x,y+h+.04,z],[0,1,0],r*1.05,'#ffffffaa',1.4,[],24);s.ring([x,y+lh+.01,z],[0,1,0],rr*.82,'#ffffff44',1,[],24);
+  if(o.ticks!==false)for(let i=1;i<=4;i++){const yy=y+h*i*.2,a=1.05,b=a+(i%2?.2:.3);s.seg([x+r*Math.cos(a),yy,z+r*Math.sin(a)],[x+r*Math.cos(b),yy,z+r*Math.sin(b)],'#ffffffcc',1.2)}return s};
+window.PhysicaChem={CPK,atom,bond,beaker,hash,tint,stick,lobe,glassBeaker};
 
 /* ---------- 1 Some Basic Concepts of Chemistry ---------- */
 const MOL={H2O:['Water',18.02,[['O',0,0,0],['H',.6,.45,0],['H',-.6,.45,0]]],CO2:['Carbon dioxide',44.01,[['C',0,0,0],['O',.75,0,0],['O',-.75,0,0]]],NH3:['Ammonia',17.03,[['N',0,0,0],['H',.55,-.3,.3],['H',-.55,-.3,.3],['H',0,-.3,-.6]]],NaCl:['Sodium chloride',58.44,[['Na',-.4,0,0],['Cl',.4,0,0]]],C6H12O6:['Glucose',180.16,null]};
@@ -108,10 +124,10 @@ add({...ch(4,'Chemical Bonding and Molecular Structure','PHYSICAL CHEMISTRY'),id
  tryText:'Keep four electron pairs and change lone pairs from 0 to 2.',
  controls:[R('bp','Bond pairs',2,6,1,4),R('lp','Lone pairs',0,3,1,0)],
  metrics:p=>{const d=VS[`${p.bp},${p.lp}`];return d?[N('Electron pairs',p.bp+p.lp,'',0),N('Shape',d[0]),N('Example',d[1]),N('Bond angle',`${d[2]}°`)]:[N('Combination','Not a common VSEPR case'),N('Try',`total pairs 2–6 (now ${p.bp+p.lp})`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:70,yaw:t*.3,pitch:.25}),key=`${p.bp},${p.lp}`,d=VS[key],tot=p.bp+p.lp;atom(s,[0,0,0],'X',1.2,{});
-  if(d){const dirs=DIRS[tot],lp=LPS[key]||[],L=1.25;let b=0;dirs.forEach((u,i)=>{if(lp.includes(i)){s.mesh(V.mul(u,.55),[.32,.32,.32],'#b197fc',{alpha:.45,rings:10,segs:14,shape:(uu,vv)=>1});s.ball(V.add(V.mul(u,.6),V.mul(V.norm(V.cross(u,[.3,.7,.2])),.1)),.05,'#e9f6ff',{flat:true});s.ball(V.sub(V.mul(u,.6),V.mul(V.norm(V.cross(u,[.3,.7,.2])),.1)),.05,'#e9f6ff',{flat:true})}
-    else{const q=V.mul(u,L);bond(s,[0,0,0],q);atom(s,q,'F',1);b++}});
-   if(lp.length)s.callout(V.mul(dirs[lp[0]],.6),'lone pair','#b197fc',60,-50);s.callout([0,0,0],'central atom','#e9ecef',-60,60);s.render();tag(c,`${d[0]} — e.g. ${d[1]}, angle ${d[2]}°`,44,98,C.gold,15)}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:70,yaw:t*.3,pitch:.25}),key=`${p.bp},${p.lp}`,d=VS[key],tot=p.bp+p.lp;atom(s,[0,0,0],'X',1.35,{});
+  if(d){const dirs=DIRS[tot],lp=LPS[key]||[],L=1.3;dirs.forEach((u,i)=>{if(lp.includes(i)){lobe(s,[0,0,0],u,1,.37,'#b197fc',.45,{rings:7,segs:12});const sd=V.norm(V.cross(u,[.3,.7,.2]));s.ball(V.add(V.mul(u,.72),V.mul(sd,.1)),.05,'#f8f0ff',{flat:true});s.ball(V.sub(V.mul(u,.72),V.mul(sd,.1)),.05,'#f8f0ff',{flat:true})}
+    else{const q=V.mul(u,L);stick(s,[0,0,0],q,1,{ca:'X',cb:'F'});atom(s,q,'F',1.05)}});
+   if(lp.length)s.callout(V.mul(dirs[lp[0]],.7),'lone pair','#b197fc',60,-50);s.callout([0,0,0],'central atom','#e9ecef',-60,60);s.render();tag(c,`${d[0]} — e.g. ${d[1]}, angle ${d[2]}°`,44,98,C.gold,15)}
   else{s.render();tag(c,'Choose 2–6 electron pairs (bond + lone)',44,98,C.red,15)}},
  assumption:'Ideal electron-pair geometries; real angles for lone-pair molecules from NCERT.'});
 
@@ -166,9 +182,11 @@ add({...ch(6,'Equilibrium','PHYSICAL CHEMISTRY'),id:'chem-ph',title:'pH of acids
  tryText:'Compare 0.1 M HCl with 0.1 M acetic acid.',
  controls:[S('k','Solute','HCl',[['HCl','Hydrochloric acid (strong)'],['AcOH','Acetic acid (weak, Kₐ 1.8×10⁻⁵)'],['NaOH','Sodium hydroxide (strong base)'],['NH3','Ammonia (weak base, K_b 1.8×10⁻⁵)']]),R('lc','Concentration (log₁₀ M)',-6,0,.1,-1,'',1)],
  metrics:p=>{const r=ph(p);return[N('Concentration',Math.pow(10,p.lc),'M',4),N('[H₃O⁺]',r.h,'M',3),N('pH',r.pH,'',2),N('Nature',r.pH<6.99?'Acidic':r.pH>7.01?'Basic':'Neutral')]},
- draw:(c,p,t)=>{const r=ph(p),s=P3.scene(c,{scale:58,cx:250,cy:290}),hue=clamp(r.pH,0,14)/14,col=['#e03131','#f76707','#fab005','#94d82d','#2f9e44','#1c7ed6','#5f3dc4'][Math.min(6,Math.floor(hue*7))];beaker(s,[0,-1.6,0],1.3,2.8,col,.75);
-  const nH=Math.round(clamp(8+Math.log10(r.h)*1.5,0,14)),nOH=Math.round(clamp(8+Math.log10(1e-14/r.h)*1.5,0,14));for(let i=0;i<nH;i++)s.ball([(hash(i)-.5)*2,-1.4+hash(i+9)*1.8,(hash(i+20)-.5)*1.4],.09,'#ff8787',{glow:true});for(let i=0;i<nOH;i++)s.ball([(hash(i+40)-.5)*2,-1.4+hash(i+49)*1.8,(hash(i+60)-.5)*1.4],.09,'#74c0fc',{glow:true});
-  for(let i=0;i<=14;i++)s.box([2.2,-1.6+i*.2,0],[.3,.18,.3],['#e03131','#f76707','#fab005','#94d82d','#2f9e44','#1c7ed6','#5f3dc4'][Math.min(6,Math.floor(i/14*7-1e-9))]);s.arrow([2.9,-1.6+r.pH*.2,0],[2.42,-1.6+r.pH*.2,0],'#e9f6ff',2.5,7,`pH ${f(r.pH,2)}`);s.callout([1.3,-.5,0],'universal indicator colour',col,30,-80);s.render();tag(c,'red: H₃O⁺ · blue: OH⁻ (number ∝ log concentration)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const r=ph(p),s=P3.scene(c,{scale:58,cx:250,cy:290}),IND=['#e03131','#f76707','#fab005','#94d82d','#2f9e44','#1c7ed6','#5f3dc4'],hue=clamp(r.pH,0,14)/14,col=IND[Math.min(6,Math.floor(hue*7))];glassBeaker(s,[0,-1.6,0],1.3,2.8,col,.75,{alpha:.42});
+  const nH=Math.round(clamp(8+Math.log10(r.h)*1.5,0,14)),nOH=Math.round(clamp(8+Math.log10(1e-14/r.h)*1.5,0,14)),w=(i,k)=>.06*Math.sin(t*1.3+i*2.1+k);for(let i=0;i<nH;i++)s.ball([(hash(i)-.5)*2+w(i,0),-1.4+hash(i+9)*1.8+w(i,1),(hash(i+20)-.5)*1.4+w(i,2)],.09,'#ff8787',{glow:true});for(let i=0;i<nOH;i++)s.ball([(hash(i+40)-.5)*2+w(i,3),-1.4+hash(i+49)*1.8+w(i,4),(hash(i+60)-.5)*1.4+w(i,5)],.09,'#74c0fc',{glow:true});
+  // pH probe (glass electrode) in the liquid, cable to a meter that shows the same pH as the measurements panel
+  s.cyl([.55,-.15,.3],[0,1,0],.07,2.3,'#e9ecef',{alpha:.55,seg:8});s.ball([.55,-1.32,.3],.1,'#adb5bd',{alpha:.7});s.tube([[.55,1,.3],[.55,1.5,.3],[-.6,1.9,.3],[-1.9,1.2,.3],[-2.45,-.6,.3]],.025,'#212529',{segs:5});s.box([-2.5,-1.1,.3],[1,.9,.45],'#343a40');s.box([-2.5,-.95,.54],[.78,.36,.02],'#0b3d2e');s.engrave([-2.5,-.95,.58],`pH ${f(r.pH,2)}`,'#69db7c',11,9e5);
+  for(let i=0;i<=14;i++)s.box([2.2,-1.6+i*.2,0],[.3,.18,.3],IND[Math.min(6,Math.floor(i/14*7-1e-9))]);s.arrow([2.9,-1.6+r.pH*.2,0],[2.42,-1.6+r.pH*.2,0],'#e9f6ff',2.5,7,`pH ${f(r.pH,2)}`);s.callout([1.2,-.5,0],'universal indicator colour',col,30,-80);s.render();tag(c,'red: H₃O⁺ · blue: OH⁻ (number ∝ log concentration)',44,98,C.muted,13)},
  assumption:'25 °C, K_w = 1.0 × 10⁻¹⁴; water’s own ions included so very dilute solutions approach pH 7.'});
 function ph(p){const c0=Math.pow(10,p.lc),Kw=1e-14,K=1.8e-5,wat=x=>(x+Math.sqrt(x*x+4*Kw))/2,weak=c=>(-K+Math.sqrt(K*K+4*K*c))/2;let h;if(p.k==='HCl')h=wat(c0);else if(p.k==='AcOH')h=wat(weak(c0));else h=Kw/wat(p.k==='NaOH'?c0:weak(c0));return{h,pH:-Math.log10(h)}}
 
