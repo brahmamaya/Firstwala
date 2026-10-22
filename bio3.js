@@ -661,9 +661,19 @@ add({...ch(19,'Chemical Coordination and Integration'),id:'bio-glucose-homeostas
  tryText:'Compare the normal and diabetic curves after the same meal.',
  controls:[R('carb','Carbohydrate in meal',0,150,5,75,'g'),R('min','Time after meal',0,240,1,45,'min'),S('cond','Condition','normal',[['normal','Normal'],['dm','Diabetes mellitus']])],
  metrics:p=>{const g=gluc(p,p.min),i=insul(p,p.min);return[N('Blood glucose',g,'mg/dL',0),N('Insulin (relative)',i*100,'%',0),N('Glucagon',g<85?'Rising':'Low'),N('Liver','Glycogenesis when glucose is high')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,cx:230}),ins=insul(p,p.min);for(let i=0;i<40;i++){const y=1-2*(i+.5)/40,r=Math.sqrt(1-y*y),a=i*2.4,rr=i<28?.65:1.05,q=[rr*r*Math.cos(a),rr*y,rr*r*Math.sin(a)];s.ball(q,.2,i<28?'#69db7c':'#ff8787')}
-  for(let i=0;i<Math.round(ins*14);i++){const q=cycle(t*.5+i/14,1);s.ball([1.3+q*1.8,(hash(i)-.5)*1.5,(hash(i+4)-.5)],.06,'#69db7c',{flat:true,glow:true})}s.callout([0,1.05,.2],'islet of Langerhans','#e9f6ff',-40,-50);s.callout([.3,.3,.55],'β-cells: insulin','#69db7c',-80,30);s.callout([.9,-.4,.4],'α-cells: glucagon','#ff8787',40,50);if(ins>.05)s.callout([2.2,0,0],'insulin → liver, muscle take up glucose','#69db7c',20,-70);s.render();
-  chart(c,420,96,236,170,{title:'Blood glucose (mg/dL)',xl:'minutes',xmin:0,xmax:240,ymin:60,ymax:420,series:[{fn:m=>gluc({...p,cond:'normal'},m),col:'#8ca6b9',dash:[4,4]},{fn:m=>gluc(p,m),col:C.gold}],marker:[p.min,gluc(p,p.min)]});tag(c,'green: β-cells (insulin)   red: α-cells (glucagon)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:240,cy:255,pitch:.03}),ins=insul(p,p.min),g=gluc(p,p.min),C0=[-.2,.25,0];
+  /* exocrine (acinar) tissue around the islet */
+  for(let i=0;i<44;i++){const a=i*2.399,rr=1.3+.85*Math.sqrt(i/44),q=[C0[0]+rr*Math.cos(a)*1.2,C0[1]+rr*Math.sin(a)*.95,-.35];s.ball(q,.22,'#f2d3b0',{alpha:.7});s.ball([q[0]+.03,q[1],-.3],.07,'#b9926a',{flat:true})}
+  /* islet: β-cells in the core, α-cells in the mantle; each cell has a nucleus */
+  for(let i=0;i<40;i++){const core=i<28,k=core?i:i-28,y=core?1-2*(k+.5)/28:1-2*(k+.5)/12,rd=Math.sqrt(1-y*y),a=i*2.4,rr=core?.55:.92,q=[C0[0]+rr*rd*Math.cos(a)*1.1,C0[1]+rr*y*.9,rr*rd*Math.sin(a)*.6];
+   s.ball(q,core?.21:.19,core?'#69db7c':'#ff8787',{spec:.4});s.ball([q[0]+.03,q[1]+.02,q[2]+.12],.07,core?'#2f9e44':'#c92a2a',{flat:true,lift:1})}
+  /* capillary around the islet carrying hormones to liver and muscle */
+  const cap=[[-2.3,-1.3,.1],[-1.4,-1.55,.1],[-.3,-1.45,.1],[.8,-1.1,.1],[1.8,-.6,.1],[2.7,-.5,.1]];s.tube(cap,.06,'#e8505b',{segs:8,alpha:.85});
+  for(let i=0;i<5;i++){const q=cycle(t*.15+i/5,1)*5,j=Math.min(4,Math.floor(q)),f2=q-j;s.mesh([cap[j][0]+(cap[j+1][0]-cap[j][0])*f2,cap[j][1]+(cap[j+1][1]-cap[j][1])*f2,.1],[.07,.03,.07],'#9c1d2a',{rings:4,segs:8,rot:[PI/2,0,0]})}
+  for(let i=0;i<Math.round(ins*14);i++){const q=cycle(t*.5+i/14,1),h=hash(i)*5,j=Math.min(4,Math.floor(h)),P=cap[j],st=[C0[0]+(hash(i+4)-.5)*.7,C0[1]-.2+(hash(i+9)-.5)*.6];s.ball([st[0]+(P[0]-st[0])*q,st[1]+(P[1]-st[1])*q,.15],.06,'#40c057',{flat:true,glow:true,lift:3})}
+  if(g<95)for(let i=0;i<4;i++){const q=cycle(t*.5+i/4,1),P=cap[1+(i%3)],st=[C0[0]+.2*i-.3,C0[1]-.9];s.ball([st[0]+(P[0]-st[0])*q,st[1]+(P[1]-st[1])*q,.15],.055,'#ff6b6b',{flat:true,glow:true,lift:3})}
+  s.callout([C0[0]-.35,C0[1]+.05,.35],'β-cells: insulin','#69db7c',-70,20);s.callout([C0[0]+.9,C0[1]-.3,.2],'α-cells: glucagon','#ff8787',75,-5);s.callout([C0[0]-.5,C0[1]+1.5,-.35],'islet of Langerhans','#e9f6ff',-40,-35);s.callout([cap[0][0]+.2,cap[0][1]-.1,.1],'blood capillary','#ff8787',-40,40);if(ins>.05)s.callout([cap[4][0],cap[4][1]-.1,.1],'insulin → liver, muscle','#69db7c',20,45);s.render();
+  chart(c,420,96,236,170,{title:'Blood glucose (mg/dL)',xl:'minutes',xmin:0,xmax:240,ymin:60,ymax:420,series:[{fn:m=>gluc({...p,cond:'normal'},m),col:'#8ca6b9',dash:[4,4]},{fn:m=>gluc(p,m),col:C.gold}],marker:[p.min,g]});tag(c,'green: β-cells (insulin)   red: α-cells (glucagon)   tan: exocrine cells',44,392,C.muted,12)},
  assumption:'Illustrative response curves (fasting 90 mg/dL normal, 140 diabetic; the normal curve dips slightly below fasting about 2 hours after a meal, when glucagon rises); not a clinical model.'});
 function gluc(p,m){const dm=p.cond==='dm',base=dm?140:90,tau=dm?95:32,A=p.carb*(dm?1.8:.6),dip=dm?0:10*Math.min(1,p.carb/75)*(m/110)*Math.exp(1-m/110);return base+A*(m/tau)*Math.exp(1-m/tau)-dip}
 function insul(p,m){if(p.cond==='dm')return .15;const tau=40;return clamp(.1+.9*(p.carb/150)*(m/tau)*Math.exp(1-m/tau),0,1)}
