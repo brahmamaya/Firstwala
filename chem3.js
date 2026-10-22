@@ -5,7 +5,7 @@ const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
 const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,stick,glassBeaker,lobe,tint}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:11,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
-const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3+i*6/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.6,h,.6],on?'#ffd43b':col);s.engrave([x,h+.25,.32],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
+const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3+i*6/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.6,h,.6],on?'#ffd43b':col);s.label([x,-.3-(i%3)*.4,.3],lab,on?'#ffd43b':'#cfe6f5',on?12:11);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
 
 /* 1 Some Basic Concepts */
 add({...ch(1,'Some Basic Concepts of Chemistry',PH),id:'chem-dilution',title:'Molarity and dilution',
@@ -140,7 +140,7 @@ add({...ch(7,'Redox Reactions',IN),id:'chem-oxidation-number',title:'Finding oxi
  tryText:'Work out the oxidation number of Cr in K₂Cr₂O₇ before checking.',
  controls:[R('i','Compound',1,9,1,1)],
  metrics:p=>{const [cmp,el,v]=OXN[p.i-1];return[N('Compound',cmp),N('Element',el),N('Oxidation number',cmp==='Na₂S₂O₃'?'+2 (average of the two S)':Number.isInteger(v)?(v>0?'+':'')+v:'+8/3 (average)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:42,cx:300,cy:300,pitch:.4,yaw:-.2});bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.35,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.4,3*.35,.5],[3.4,3*.35,.5],'#ffd43b',1.5,[4,4]);s.engrave([-3.6,3*.35+.15,.5],'0','#ffd43b',10,9e5);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:30,cx:280,cy:250,pitch:.12,yaw:-.1});bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.35,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.4,3*.35,.5],[3.4,3*.35,.5],'#ffd43b',1.5,[4,4]);s.engrave([-3.6,3*.35+.15,.5],'0','#ffd43b',10,9e5);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
  assumption:'Standard IUPAC rules for assigning oxidation numbers.'});
 
 /* 8 Organic basics */

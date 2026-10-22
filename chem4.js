@@ -5,7 +5,7 @@ const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
 const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,stick,glassBeaker,lobe,tint}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
-const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3.2+i*6.4/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.5,h,.5],on?'#ffd43b':col);s.engrave([x,h+.25,.3],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
+const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3.2+i*6.4/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.5,h,.5],on?'#ffd43b':col);s.label([x,-.3-(i%3)*.4,.3],lab,on?'#ffd43b':'#cfe6f5',on?12:11);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
 
 /* 1 Solutions */
 const GAS={CO2:['CO₂',1.67],O2:['O₂',34.86],N2:['N₂',76.48]};
@@ -134,7 +134,7 @@ add({...ch(7,'Alcohols, Phenols and Ethers',OR),id:'chem-phenol-acidity',title:'
  tryText:'Why is m-nitrophenol less acidic than p-nitrophenol?',
  controls:[R('i','Compound',1,7,1,2)],
  metrics:p=>{const [n,pk]=PHEN[p.i-1];return[N('Compound',n),N('pKₐ',pk,'',2),N('Kₐ',Math.pow(10,-pk),'',3)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:34,cx:300,cy:300,pitch:.4,yaw:-.2});bars(s,PHEN.map(([n,pk])=>[n,16.5-pk]),p.i-1,'#ff8787',.2,v=>`pKₐ ${f(16.5-v,2)}`);s.render();tag(c,'taller bar = stronger acid (height ∝ 16.5 − pKₐ)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:44,cx:280,cy:250,pitch:.12,yaw:-.1});bars(s,PHEN.map(([n,pk])=>[n,16.5-pk]),p.i-1,'#ff8787',.2,v=>`pKₐ ${f(16.5-v,2)}`);s.render();tag(c,'taller bar = stronger acid (height ∝ 16.5 − pKₐ)',44,98,C.muted,13)},
  assumption:'pKₐ values in water at 298 K (NCERT Table 7.4).'});
 
 /* 8 Aldehydes and ketones */
