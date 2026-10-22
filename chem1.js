@@ -38,10 +38,13 @@ add({...ch(1,'Some Basic Concepts of Chemistry','PHYSICAL CHEMISTRY'),id:'chem-m
  tryText:'Take 18 g of water and then 44 g of CO₂. How many molecules does each contain?',
  controls:[S('sub','Substance','H2O',Object.keys(MOL).map(k=>[k,MOL[k][0]+' ('+k.replace(/(\d+)/g,m=>m.split('').map(d=>'₀₁₂₃₄₅₆₇₈₉'[d]).join(''))+')'])),R('m','Mass taken',1,200,1,18,'g')],
  metrics:p=>{const M=MOL[p.sub][1],n=p.m/M;return[N('Molar mass',M,'g/mol',2),N('Moles',n,'mol',3),N('Molecules / formula units',n*6.022e23,'',3)]},
- draw:(c,p,t)=>{const M=MOL[p.sub][1],n=p.m/M,s=P3.scene(c,{scale:56,cy:280,cx:300});s.cyl([-1.6,-1.3,0],[0,1,0],1,.2,'#adb5bd',{cap:'#dee2e6'});s.box([-1.6,-1.6,0],[2.4,.4,1.6],'#343a40');
-  const heap=Math.min(1.1,.25+Math.cbrt(p.m)*.18);s.lathe([-1.6,-1.2,0],[[heap,0],[heap*.6,heap*.5],[0,heap*.75]],p.sub==='NaCl'?'#f8f9fa':p.sub==='C6H12O6'?'#fff3bf':p.sub==='CO2'?'#e9ecef':'#74c0fc',{alpha:p.sub==='H2O'?.6:undefined});
-  const geo=MOL[p.sub][2],q=[1.6,.4,0];if(geo){for(const [el,x,y,z] of geo){if(el!==geo[0][0]||x||y||z)bond(s,q,V.add(q,[x,y,z]),p.sub==='CO2'?2:1)}for(const [el,x,y,z] of geo)atom(s,V.add(q,[x,y,z]),el,1.3)}else{for(let i=0;i<6;i++){const a=TAU*i/6,r=[.55*Math.cos(a),.2*Math.sin(2*a),.55*Math.sin(a)],b=[.55*Math.cos(a+TAU/6),.2*Math.sin(2*a+TAU/3),.55*Math.sin(a+TAU/6)];bond(s,V.add(q,r),V.add(q,b));atom(s,V.add(q,r),i===5?'O':'C')}}
-  s.callout([-1.6,-.7,0],`${p.m} g on the balance`,'#e9f6ff',-60,-50);s.callout(V.add(q,[0,.6,0]),`1 ${p.sub==='NaCl'?'formula unit':'molecule'} (M = ${M} g/mol)`,'#e9f6ff',40,-60);s.render();
+ draw:(c,p,t)=>{const M=MOL[p.sub][1],n=p.m/M,s=P3.scene(c,{scale:62,cy:250,cx:290});
+  s.box([-1.3,-1.55,0],[2.7,.3,1.9],'#2b3036');s.lathe([-1.3,-1.4,0],[[.001,0],[1.05,0],[1.1,.06],[.95,.16],[.001,.16]],'#ced4da',{spec:.7,shine:30});
+  const heap=Math.min(1.0,.3+Math.cbrt(p.m)*.17),hc=p.sub==='NaCl'?'#f8f9fa':p.sub==='C6H12O6'?'#fff3bf':p.sub==='CO2'?'#e9ecef':'#74c0fc';
+  s.lathe([-1.3,-1.24,0],[[heap,0],[heap*.8,heap*.28],[heap*.45,heap*.55],[.001,heap*.72]],hc,{alpha:p.sub==='H2O'?.65:undefined,spec:.6,segs:24});
+  const geo=MOL[p.sub][2],q=[1.3,.3,0],K=1.7;if(geo){const c0=geo[0];for(const [el,x,y,z] of geo){if(el!==c0[0]||x||y||z)stick(s,q,V.add(q,[x*K,y*K,z*K]),p.sub==='CO2'?2:1,{ca:c0[0],cb:el,side:[0,0,1]})}for(const [el,x,y,z] of geo)atom(s,V.add(q,[x*K,y*K,z*K]),el,1.5)}
+  else{const R6=.8,pt=i=>{const a=TAU*i/6;return V.add(q,[R6*Math.cos(a),.18*Math.sin(2*a),R6*Math.sin(a)])},E=i=>i===5?'O':'C';for(let i=0;i<6;i++){stick(s,pt(i),pt(i+1),1,{ca:E(i),cb:E(i+1)});atom(s,pt(i),E(i),1.15)}}
+  s.callout([-1.3,-.55,0],`${p.m} g on the balance`,'#e9f6ff',-50,-60);s.callout(V.add(q,[0,1.1,0]),`1 ${p.sub==='NaCl'?'formula unit':'molecule'} (M = ${M} g/mol)`,'#e9f6ff',20,-50);s.render();
   tag(c,`${p.m} g ÷ ${M} g/mol = ${f(n,3)} mol  →  ${f(n*6.022e23,3)} particles`,44,98,C.gold,15)},
  assumption:'Molar masses from IUPAC atomic masses; for NaCl the count is formula units, not molecules.'});
 
