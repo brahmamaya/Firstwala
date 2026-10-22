@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
-const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
+const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,stick,glassBeaker,lobe,tint}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:11,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3+i*6/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.6,h,.6],on?'#ffd43b':col);s.engrave([x,h+.25,.32],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
@@ -118,8 +118,15 @@ add({...ch(6,'Equilibrium',PH),id:'chem-solubility-product',title:'Solubility pr
  tryText:'Compare the solubility of AgCl in pure water and in 0.01 M NaCl.',
  controls:[R('lc','NaCl concentration (log₁₀ M)',-7,-1,.1,-7,'',1)],
  metrics:p=>{const c0=Math.pow(10,p.lc),sv=(-c0+Math.sqrt(c0*c0+4*1.8e-10))/2;return[N('[Cl⁻] from NaCl',c0,'M',3),N('Solubility of AgCl',sv,'mol/L',3),N('In pure water',Math.sqrt(1.8e-10),'mol/L',3)]},
- draw:(c,p,t)=>{const c0=Math.pow(10,p.lc),sv=(-c0+Math.sqrt(c0*c0+4*1.8e-10))/2,s=P3.scene(c,{scale:56,cx:250,cy:290});beaker(s,[0,-1.9,0],1.3,2.8,'#e7f5ff',.75);s.lathe([0,-1.9,0],[[1.1,0],[.7,.25],[0,.35]],'#f8f9fa');const nAg=Math.round(clamp(sv/1.34e-5,0,1)*14);for(let i=0;i<nAg;i++)s.ball([(hash(i)-.5)*2,-1.3+hash(i+5)*1.4,(hash(i+9)-.5)*1.4],.08,'#ced4da',{glow:true});
-  const nCl=Math.round(clamp((p.lc+7)/6,0,1)*24);for(let i=0;i<nCl+nAg;i++)s.ball([(hash(i+50)-.5)*2,-1.3+hash(i+55)*1.4,(hash(i+59)-.5)*1.4],.08,'#40c057');s.callout([.7,-1.75,0],'undissolved AgCl (white)','#f8f9fa',60,40);s.callout([0,-.6,.6],'Ag⁺ (grey) · Cl⁻ (green)','#e9f6ff',-70,-50);s.render();tag(c,`solubility = ${f(sv,3)} mol/L`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const c0=Math.pow(10,p.lc),sv=(-c0+Math.sqrt(c0*c0+4*1.8e-10))/2,s=P3.scene(c,{scale:50,cx:240,cy:262,yaw:.15,pitch:.13}),y0=-1.9;glassBeaker(s,[0,y0,0],1.4,3.2,'#cfe8ff',.72,{alpha:.3});
+  for(let i=0;i<9;i++){const a2=hash(i+70)*TAU,rr=hash(i+71)*.8,h2=.28*(1-rr/.9);s.mesh([Math.cos(a2)*rr,y0+.1+h2*.4,Math.sin(a2)*rr],[.22+hash(i+72)*.1,.14+h2,.22+hash(i+73)*.1],'#f1f3f5',{rings:6,segs:8,spec:.5})}
+  const nAg=Math.round(clamp(sv/1.34e-5,0,1)*14),nCl=Math.round(clamp((p.lc+7)/6,0,1)*24);
+  const mv=(i,k)=>{const u=t*(.5+hash(i+k)*.5)+i*2.1;return[.07*Math.sin(u),.06*Math.cos(u*1.2),.07*Math.sin(u*.8)]};
+  const pos=(i,k)=>{const m=mv(i,k);return[(hash(i+k)-.5)*2.1+m[0],y0+.75+hash(i+k+5)*1.15+m[1],(hash(i+k+9)-.5)*1.7+m[2]]};
+  for(let i=0;i<nAg;i++)s.ball(pos(i,0),.075,'#ced4da',{spec:.8});
+  for(let i=0;i<nCl+nAg;i++)s.ball(pos(i,50),.11,'#51cf66',{spec:.5});
+  for(let i=0;i<nCl;i++)s.ball(pos(i,100),.07,'#9775fa',{spec:.6});
+  s.callout([.3,y0+.2,.6],'undissolved AgCl (white)','#f8f9fa',55,30);s.callout([-.9,y0+1.7,.6],'Ag⁺ (grey) · Cl⁻ (green)'+(nCl?' · Na⁺ (violet)':''),'#e9f6ff',-20,-60);s.render();tag(c,`solubility = ${f(sv,3)} mol/L`,44,98,C.gold,15)},
  assumption:'Ideal solution, activities equal to concentrations.'});
 
 /* 7 Redox */
