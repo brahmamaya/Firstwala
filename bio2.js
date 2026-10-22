@@ -12,6 +12,44 @@ const smooth=x=>x*x*(3-2*x);
 const ORG={nucleus:['Double membrane (nuclear envelope with pores)','Both','Contains chromatin (DNA); controls the cell'],mito:['Double membrane; inner folds = cristae','Both','Site of aerobic respiration — “power house”; has own DNA and 70S ribosomes'],chloro:['Double membrane; thylakoids stacked as grana','Plant only','Photosynthesis; has own DNA and 70S ribosomes'],
   er:['Single membrane network','Both','RER (with ribosomes): proteins; SER: lipids (steroids)'],golgi:['Single-membrane flat cisternae','Both','Packages materials; forms glycoproteins and glycolipids'],ribo:['No membrane (RNA + protein)','Both','Protein synthesis; 80S in eukaryotes (60S + 40S)'],
   vacuole:['Single membrane (tonoplast)','Large in plants','Stores sap; up to 90% of plant cell volume'],lyso:['Single membrane','Animal (mainly)','Hydrolytic enzymes, active at acidic pH'],centro:['No membrane; two centrioles (9 triplet microtubules)','Animal only','Forms spindle poles in cell division'],wall:['Rigid, non-living layer','Plant only','Cellulose, hemicellulose, pectins; gives shape and protection']};
+/*BEGIN cellkit*/
+/* ---- Cell explorer: textbook organelle models built from the Physica3D primitives (local helpers) ---- */
+const _pl=(p,rot)=>{const Rt=P3.rotator(rot);return q=>V.add(p,Rt(q))};
+const _sq=n=>(u,v)=>{const a=Math.abs(Math.cos(u)*Math.cos(v)),b=Math.abs(Math.sin(u)),d=Math.abs(Math.cos(u)*Math.sin(v));return 1/Math.pow(a**n+b**n+d**n,1/n)};
+/* Sectioned organelle: opaque back half-shell plus a flat cut face (z=0 of the local frame) that carries the inner structure, as in textbook cut-aways. */
+function halfBody(s,p,rad,rot,col,face,edge,R=5,S=10){const A=_pl(p,rot),g=[];
+  for(let i=0;i<=R;i++){const u=-Math.PI/2+Math.PI*i/R,row=[];for(let j=0;j<=S;j++){const v=Math.PI+Math.PI*j/S;row.push(A([rad[0]*Math.cos(u)*Math.cos(v),rad[1]*Math.sin(u),rad[2]*Math.cos(u)*Math.sin(v)]))}g.push(row)}
+  for(let i=0;i<R;i++)for(let j=0;j<S;j++)s.poly([g[i][j],g[i+1][j],g[i+1][j+1],g[i][j+1]],col,{cull:false,spec:.3});
+  const ring=[];for(let j=0;j<24;j++){const v=TAU*j/24;ring.push(A([rad[0]*Math.cos(v),rad[1]*Math.sin(v),0]))}
+  s.poly(ring,face,{cull:false,normal:P3.rotator(rot)([0,0,1]),stroke:edge,lw:2.2,shade:false});return{A,z:s.P(p)[2]}}
+function mitoModel(s,p,sc,rot,hl){const Y=hl,ax=.4*sc,ay=.19*sc,{A,z}=halfBody(s,p,[ax,ay,ay*.8],rot,Y?'#ffd43b':BC.mito,Y?'#fff0a0':'#fbd3b0',Y?'#a86f00':'#a84312');
+  const el=(k,n=22)=>Array.from({length:n+1},(_,j)=>{const v=TAU*j/n;return A([ax*k*Math.cos(v),ay*k*Math.sin(v),.003])});
+  s.path(el(.84),Y?'#8a5a00':'#c2541b',2.2,[],z+.02);
+  for(let i=0;i<7;i++){const x=(-.66+i*.22)*ax,sg=i%2?1:-1,yb=sg*ay*.84*Math.sqrt(Math.max(0,1-(x/(ax*.84))**2)),w=.03*sc,h=ay*.62,pts=[];
+    pts.push(A([x-w,yb,.004]),A([x-w,yb-sg*h*.8,.004]),A([x,yb-sg*h,.004]),A([x+w,yb-sg*h*.8,.004]),A([x+w,yb,.004]));s.path(pts,Y?'#8a5a00':'#c2541b',2.6,[],z+.03)}
+  for(const [x,y] of[[-.45,.0],[.1,.02],[.5,-.03]])s.ball(A([x*ax,y*ay,.01]),.012*sc,Y?'#6b4500':'#7a3a12',{flat:true,lift:.1})}
+function chloroModel(s,p,sc,rot,hl){const Y=hl,ax=.46*sc,ay=.2*sc,{A,z}=halfBody(s,p,[ax,ay,ay*.9],rot,Y?'#ffd43b':'#37a64a',Y?'#fff0a0':'#8fdc8f',Y?'#a86f00':'#1f7a2e'),dk=Y?'#b98a00':'#1d6a2a',hg=Y?'#ffe58a':'#4fc35f';
+  s.path(Array.from({length:23},(_,j)=>{const v=TAU*j/22;return A([ax*.9*Math.cos(v),ay*.88*Math.sin(v),.003])}),Y?'#8a5a00':'#2f8f3f',1.6,[],z+.02);
+  const cs=[[-.5,.02],[-.1,-.03],[.3,.03]];cs.forEach(([x,y],k)=>{for(let i=0;i<5;i++){const cx=x*ax,cy=(y+(i-2)*.11)*ay*1.35,w=.13*sc,h=.028*sc;s.poly([A([cx-w,cy-h*.6,.004]),A([cx-w*.9,cy+h,.004]),A([cx+w*.9,cy+h,.004]),A([cx+w,cy-h*.6,.004])],i%2?dk:hg,{cull:false,shade:false,stroke:'#0f3d17',lw:.8,z:z+.03})}});
+  s.path([A([-.5*ax+.1*sc,.0,.004]),A([-.1*ax-.1*sc,-.02*ay,.004]),A([-.1*ax+.1*sc,-.02*ay,.004]),A([.3*ax-.1*sc,.03*ay,.004])],Y?'#c79200':'#2c9a3d',1.6,[],z+.03);
+  s.ball(A([.62*ax,-.05*ay,.01]),.045*sc,'#f4f1e6',{flat:true,lift:.1});s.ball(A([-.78*ax,.3*ay,.01]),.02*sc,'#5c3d12',{flat:true,lift:.1})}
+function golgiModel(s,p,sc,rot,hl){const prof=[[0,.012],[.3,.016],[.43,.05],[.42,.016],[.28,-.012],[0,-.012]],Rt=P3.rotator(rot),A=_pl(p,rot);
+  for(let k=0;k<5;k++){const r=1-.09*Math.abs(k-2);s.lathe(V.add(p,Rt([0,(k-2)*.085*sc,0])),prof.map(([a,b])=>[a*r*sc,b*sc]),hl?(k%2?'#ffe066':'#ffd43b'):(k%2?'#f6c35e':'#e8a62d'),{segs:12,rot})}
+  for(const [x,y,z,r] of[[.5,.12,.1,.045],[.55,-.05,-.1,.04],[-.5,.1,-.15,.04],[.38,-.22,.3,.035]])s.ball(A([x*sc,y*sc,z*sc]),r*sc,hl?'#ffe066':'#f7d58a',{alpha:.85})}
+function nucleusModel(s,p,r,hl){const Y=hl?'#ffe066':null;
+  s.mesh(p,r*.8,Y?'#ffd43b':BC.nucleus,{alpha:.85,rings:8,segs:12});
+  s.mesh(p,r,Y?'#fff3a8':'#a58ce0',{alpha:.3,rings:9,segs:14});
+  for(let k=0;k<4;k++){const pts=[];for(let i=0;i<=14;i++){const a=i*.9+k*1.7,b=Math.sin(i*.55+k)*1.1;pts.push(V.add(p,[r*.58*Math.cos(b)*Math.cos(a),r*.58*Math.sin(b),r*.58*Math.cos(b)*Math.sin(a)]))}s.tube(pts,r*.035,'#2a1a6e',{segs:5})}
+  s.ball(V.add(p,[r*.12,r*.2,r*.28]),r*.24,BC.nucleolus,{lift:.2});
+  for(let i=0;i<16;i++){const a=i*2.4,b=Math.asin(((i*.618)%1)*1.7-.85);s.ball(V.add(p,[r*1.01*Math.cos(b)*Math.cos(a),r*1.01*Math.sin(b),r*1.01*Math.cos(b)*Math.sin(a)]),r*.05,'#1c1245',{flat:true,lift:.15})}}
+function rerModel(s,p,sc,hl){const Y=hl?'#ffe066':null;
+  for(let k=0;k<4;k++){const q=V.add(p,[(k%2)*.06*sc,(k-1.5)*.1*sc,0]);s.mesh(q,[(.5-.03*k)*sc,.03*sc,.27*sc],Y||(k%2?'#7fb8e6':BC.er),{rings:4,segs:12,shape:(u,v)=>1+.12*Math.sin(5*v+k*2)*Math.cos(u)});
+    for(let i=0;i<7;i++){const a=hash(i+k*9)*TAU,m=Math.sqrt(hash(i+k*9+40))*.8;s.ball(V.add(q,[Math.cos(a)*m*.5*sc,.04*sc,Math.sin(a)*m*.27*sc]),.02*sc,Y?'#fff3a8':'#3a2d6b',{flat:true})}}
+  s.tube([V.add(p,[-.5*sc,-.05*sc,.1*sc]),V.add(p,[-.7*sc,0,.25*sc]),V.add(p,[-.85*sc,.1*sc,.1*sc])],.03*sc,Y||'#8ec5ee',{segs:6})}
+/* Labels in two tidy columns (left/right of the cell), sorted by height so leader lines never cross or stack. */
+const cellLabels=(s,items,hi,xl,xr)=>{const col=[[],[]],k=window.PhysicaTextScale||1;for(const it of items)col[(it[4]||(s.P(it[1])[0]<348?'L':'R'))==='L'?0:1].push(it);
+  [xl,xr].forEach((x,j)=>{const a=col[j].sort((m,n)=>s.P(m[1])[1]-s.P(n[1])[1]),n=a.length,g=n>1?Math.min(44,250/(n-1)):0,y0=262-g*(n-1)/2;a.forEach((it,i)=>{const Q=s.P(it[1]);s.callout(it[1],it[2],hi(it[0])?'#ffe066':(it[3]||'#dbe7f0'),(x-Q[0])/k,(y0+g*i-Q[1])/k,hi(it[0])?13:11)})})};
+/*END cellkit*/
 add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-explorer',title:'Cell explorer',
  description:'Fly around an animal or plant cell and highlight each organelle to learn its structure and job.',
  formula:'Eukaryotic cell = plasma membrane + cytoplasm + membrane-bound organelles + nucleus',
@@ -19,24 +57,35 @@ add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-explorer',title:'Cell exp
  tryText:'Select chloroplast while viewing an animal cell — what happens?',
  controls:[S('type','Cell','plant',[['plant','Plant cell'],['animal','Animal cell']]),S('org','Highlight organelle','mito',Object.keys(ORG).map(k=>[k,{nucleus:'Nucleus',mito:'Mitochondrion',chloro:'Chloroplast',er:'Endoplasmic reticulum',golgi:'Golgi apparatus',ribo:'Ribosomes',vacuole:'Vacuole',lyso:'Lysosome',centro:'Centrosome',wall:'Cell wall'}[k]]))],
  metrics:p=>{const d=ORG[p.org],present=!(p.type==='animal'&&(p.org==='chloro'||p.org==='wall'))&&!(p.type==='plant'&&p.org==='centro');return[N('Present in this cell?',present?'Yes':'No'),N('Structure',d[0]),N('Found in',d[1]),N('Function',d[2])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,yaw:.2}),pl=p.type==='plant',hi=k=>p.org===k,g=(k,col)=>hi(k)?'#ffe066':col;
-  if(pl){s.box([0,0,0],[4.6,2.9,2.9],g('wall','#69db7c'),{alpha:hi('wall')?.35:.15});s.mesh([0,0,0],[2.2,1.35,1.35],BC.membrane,{alpha:.12});s.mesh([.3,0,0],[1.3,.85,.85],g('vacuole','#9ad1f0'),{alpha:hi('vacuole')?.55:.3});for(let i=0;i<6;i++){const a=TAU*i/6;s.mesh([1.5*Math.cos(a)*.9,1.05*Math.sin(a),.9*Math.sin(a+1)],[.3,.16,.16],g('chloro',BC.chloroplast),{rot:[0,a,.4],rings:8,segs:12});}}
-  else{s.mesh([0,0,0],[2.2,1.6,1.6],BC.membrane,{alpha:.18,shape:(u,v)=>1+.05*Math.sin(3*v+u*2)});s.cyl([.9,.9,.4],[1,0,0],.06,.4,g('centro','#ced4da'));s.cyl([.9,.9,.4],[0,0,1],.06,.4,g('centro','#ced4da'));for(let i=0;i<4;i++)s.ball([-1+hash(i)*.6,-.6+hash(i+2)*.4,.8*hash(i+5)],.13,g('lyso','#e599f7'))}
-  const nx=pl?-1.3:-.3;s.mesh([nx,.1,0],.62,g('nucleus',BC.nucleus),{rings:12,segs:16});s.ball([nx+.15,.25,.35],.15,BC.nucleolus,{lift:.5});
-  for(let i=0;i<4;i++){const q=[(pl?-.5:.6)+(i%2)*.7,-.6+Math.floor(i/2)*.9,(i%2?.6:-.5)];s.mesh(q,[.32,.13,.15],g('mito',BC.mito),{rot:[0,i,.3],rings:8,segs:12})}
-  for(let k=0;k<4;k++){const pts=Array.from({length:14},(_,i)=>[nx+.7+i*.06,.6-k*.14+.05*Math.sin(i*1.3+k),-.6+.08*k]);s.tube(pts,.035,g('er',BC.er),{segs:6})}
-  for(let k=0;k<4;k++)s.mesh([pl?-.3:.2,-1+k*.12+(pl?.2:0),.75],[.4-k*.04,.035,.18],g('golgi',BC.golgi),{rings:4,segs:12,shape:(u,v)=>1+.15*Math.cos(v)});
-  for(let i=0;i<40;i++)s.ball([(hash(i)-.5)*3,(hash(i+40)-.5)*2,(hash(i+80)-.5)*2].map((v,k)=>v*(pl?.85:.8)),.035,g('ribo',BC.ribosome),{flat:true});
-  for(let i=0;i<18;i++){const a=TAU*i/18,b=(i%3-1)*.6;s.ball([nx+.63*Math.cos(b)*Math.cos(a),.1+.63*Math.sin(b),.63*Math.cos(b)*Math.sin(a)],.03,'#3b2a6b',{flat:true})}
-  if(!pl)s.mesh([0,0,0],[2.05,1.47,1.47],BC.cytoplasm,{alpha:.1,shape:(u,v)=>1+.05*Math.sin(3*v+u*2)});
-  const L=(k,q,txt)=>{if((k==='chloro'||k==='wall')&&!pl||k==='centro'&&pl||k==='lyso'&&pl)return;s.part(q,txt,hi(k)?'#ffe066':'#dbe7f0',hi(k)?13:11,[nx*.4,0,0])};
-  L('nucleus',[nx-.3,.6,.2],'nucleus (nuclear envelope with pores)');s.part([nx+.15,.25,.35],'nucleolus','#c9b6ff',11,[nx,-.4,0],50);
-  L('mito',[(pl?-.5:.6),-.6,-.5],'mitochondrion');L('er',[nx+1.1,.62,-.6],'endoplasmic reticulum');L('golgi',[pl?-.3:.2,-.64+(pl?.2:0),.75],'Golgi apparatus');
-  {const rp=[(hash(3)-.5)*3,(hash(43)-.5)*2,(hash(83)-.5)*2].map(v=>v*(pl?.85:.8));L('ribo',rp,'ribosomes')}
-  if(pl){L('wall',[2.3,1.45,1.0],'cell wall (cellulose)');s.part([0,1.32,.3],'plasma membrane','#f2a7b5',11,[0,0,0]);L('vacuole',[1.3,.55,.4],'central vacuole (tonoplast)');L('chloro',[1.35,0,.76],'chloroplast')}
-  else{s.part([0,1.55,.3],'plasma membrane','#f2a7b5',11,[0,0,0]);L('centro',[.9,1.0,.4],'centrosome (2 centrioles)');L('lyso',[-1+hash(0)*.6,-.6+hash(2)*.4,.8*hash(5)],'lysosome')}
+/*BEGIN celldraw*/
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:48,cy:252,yaw:.2}),pl=p.type==='plant',hi=k=>p.org===k,Y='#ffe066',g=(k,col)=>hi(k)?Y:col,items=[];
+  const sq=_sq(6);
+  if(pl){
+    s.box([0,0,0],[4.7,3,3],g('wall','#69db7c'),{alpha:hi('wall')?.4:.1,stroke:'#8fe36a'});s.box([0,0,0],[4.45,2.75,2.75],g('wall','#a9e34b'),{alpha:hi('wall')?.4:.07,stroke:'#c4f08a'});
+    s.mesh([0,0,0],[2.12,1.3,1.3],BC.membrane,{alpha:.13,rings:10,segs:16,shape:sq});
+    s.mesh([.9,0,0],[.98,.62,.62],g('vacuole','#9ad1f0'),{alpha:hi('vacuole')?.5:.22,rings:9,segs:14,shape:(u,v)=>1+.05*Math.sin(3*v+u)});
+    s.mesh([.9,0,0],[.9,.55,.55],'#d3efff',{alpha:.2,rings:6,segs:10});
+    const CH=[[.2,.98,.5,.25],[1.6,.95,-.2,-.35],[1.6,-.95,.3,.5],[-.3,-.98,-.5,.2]];CH.forEach((q,i)=>chloroModel(s,[q[0],q[1],q[2]],2,[0,q[3],.15*(i%2?1:-1)],hi('chloro')));
+    items.push(['chloro',[1.6,.95,-.2],'chloroplast (grana)',null,'R'],['wall',[2.3,.7,1.5],'cell wall (cellulose)',null,'R'],['vacuole',[1.2,.1,.5],'vacuole (tonoplast)',null,'R'],['membrane',[0,1.3,.9],'plasma membrane','#f2a7b5','L']);
+  }else{
+    const sh=(u,v)=>1+.05*Math.sin(3*v+u*2);
+    s.mesh([0,0,0],[2.25,1.65,1.65],BC.membrane,{alpha:.2,shape:sh,rings:10,segs:16});s.mesh([0,0,0],[2.15,1.55,1.55],BC.cytoplasm,{alpha:.1,shape:sh,rings:6,segs:10});
+    const cA=[.35,-.1,.95],pa=[1,0,0];s.cyl(cA,[1,0,0],.075,.34,g('centro','#ced4da'),{seg:9,cap:g('centro','#e9ecef')});s.cyl([cA[0]+.1,cA[1]+.1,cA[2]+.18],[0,0,1],.075,.34,g('centro','#ced4da'),{seg:9,cap:g('centro','#e9ecef')});
+    for(let i=0;i<4;i++){const q=[[-1.55,.8,.35],[1.6,.25,.55],[.6,-1.2,.1],[-.2,1.1,.5]][i];s.ball(q,.14,g('lyso','#e599f7'),{});for(let j=0;j<4;j++)s.ball(V.add(q,[.07*Math.cos(j*1.6),.07*Math.sin(j*1.6),.1]),.02,'#6f2da8',{flat:true,lift:.2})}
+    [[1.2,-.55,.4,.15],[.4,1.0,-.6,.1],[.1,-1.0,.55,.12],[1.5,.2,-.6,.1]].forEach((q,i)=>mitoModel(s,[q[0],q[1],q[2]],2.1,[0,q[3],.3],hi('mito')));
+    items.push(['centro',cA,'centrosome (2 centrioles)',null,'R'],['lyso',[1.6,.25,.55],'lysosome',null,'R'],['membrane',[0,1.62,.4],'plasma membrane','#f2a7b5','L']);
+  }
+  const nx=pl?-1.3:-.5,ny=pl?.15:.2,np=[nx,ny,0],nr=pl?.75:.8;nucleusModel(s,np,nr,hi('nucleus'));
+  rerModel(s,pl?[-.3,.5,.1]:[.55,.5,-.2],pl?1.3:1.25,hi('er'));
+  const gp=pl?[.55,-.55,1.0]:[-1.25,-.65,.45];golgiModel(s,gp,pl?1.3:1.4,[0,0,pl?.2:-.5],hi('golgi'));
+  if(pl)[[-1.0,-.85,.85,.15],[-.55,.98,-.55,.1]].forEach((q,i)=>mitoModel(s,[q[0],q[1],q[2]],2.1,[0,q[3],.3],hi('mito')));
+  for(let i=0;i<46;i++)s.ball([(hash(i)-.5)*3.6,(hash(i+40)-.5)*2.2,(hash(i+80)-.5)*2.2].map((v,k)=>v*(pl?.8:.78)),.03,g('ribo',BC.ribosome),{flat:true});
+  const mp=pl?[-.95,-.9,.8]:[1.2,-.55,.4],rp=[(hash(3)-.5)*3.6*.8,(hash(43)-.5)*2.2*.8,(hash(83)-.5)*2.2*.8];
+  items.push(['nucleus',[nx-.3,ny+.55,.3],'nucleus (with pores)',null,'L'],['nucleolus',[nx+.07,ny+.15,nr*.28],'nucleolus','#c9b6ff','L'],['mito',mp,'mitochondrion (cristae)',null,pl?'L':'R'],['er',pl?[-.3,.5,.1]:[.55,.5,-.2],'rough ER (ribosomes)',null,pl?'L':'R'],['golgi',[gp[0],gp[1]+.1,gp[2]],'Golgi apparatus',null,pl?'R':'L'],['ribo',rp,'ribosomes',null,'R']);
+  const keep=items.filter(it=>it[0]!=='nucleolus'||true);cellLabels(s,keep,hi,216,484);
   s.render();
   tag(c,'yellow: highlighted organelle',44,98,'#ffe066',13)},
+/*END celldraw*/
  assumption:'Organelles enlarged and simplified for visibility; numbers and positions vary greatly between cells.'});
 
 add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-surface-volume',title:'Why cells are small: surface area to volume',
