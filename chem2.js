@@ -123,7 +123,7 @@ add({...ch(4,'The d- and f-Block Elements',IN),id:'chem-transition-ions',title:'
  tryText:'Which ion has the largest magnetic moment?',
  controls:[S('ion','Ion','Cu2+',Object.keys(ION).map(k=>[k,k.replace('2+','²⁺').replace('3+','³⁺')]))],
  metrics:p=>{const [d,,col]=ION[p.ion],n=d<=5?d:10-d;return[N('d electrons',`3d${'⁰¹²³⁴⁵⁶⁷⁸⁹'[d]||'¹⁰'}`),N('Unpaired electrons',n,'',0),N('Spin-only μ',Math.sqrt(n*(n+2)),'BM',2),N('Colour in water',col)]},
- draw:(c,p,t)=>{const [d,col]=ION[p.ion],n=d<=5?d:10-d,s=P3.scene(c,{scale:56,cx:240,cy:290});beaker(s,[-1.4,-1.9,0],1,2.6,col,.75);atom(s,[-1.4,-.8,0],'X',1.4,{glow:true});for(let k=0;k<6;k++){const u=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]][k],q=V.add([-1.4,-.8,0],V.mul(u,.55));atom(s,q,'O',.7)}
+ draw:(c,p,t)=>{const [d,col]=ION[p.ion],n=d<=5?d:10-d,s=P3.scene(c,{scale:54,cx:240,cy:268,pitch:.06});glassBeaker(s,[-1.4,-1.9,0],1.1,2.7,col,.75,{alpha:.4,ticks:false});atom(s,[-1.4,-.8,0],'X',1.4,{glow:true});for(let k=0;k<6;k++){const u=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]][k],q=V.add([-1.4,-.8,0],V.mul(u,.6));stick(s,[-1.4,-.8,0],q,1,{ca:'X',cb:'O',r:.05});atom(s,q,'O',.75)}
   for(let b=0;b<5;b++){const x=.8+b*.55;s.box([x,.6,0],[.48,.4,.1],'#29475b',{stroke:'#42d9ca66'});const e=b<Math.min(d,5)?1:0,e2=b<Math.max(0,d-5)?1:0;if(e)s.arrow([x-.1,.45,.08],[x-.1,.75,.08],'#ffd43b',2.5,6);if(e2)s.arrow([x+.1,.75,.08],[x+.1,.45,.08],'#74c0fc',2.5,6)}
   s.callout([.8,.85,0],'3d orbitals','#e9f6ff',-20,-50);s.callout([-1.4,-.8,.5],`[M(H₂O)₆]ⁿ⁺ — ${ION[p.ion][2]}`,col==='#f8f9fa'?'#e9f6ff':col,-60,60);s.render();tag(c,n?`${n} unpaired → paramagnetic`:'all paired → diamagnetic',44,98,n?C.gold:C.mint,15)},
  assumption:'High-spin aqua ions; colours as listed in NCERT for aqueous solutions.'});
@@ -136,7 +136,7 @@ add({...ch(5,'Coordination Compounds',IN),id:'chem-crystal-field',title:'Crystal
  tryText:'For d⁶, compare Δₒ < P with Δₒ > P. How many unpaired electrons in each?',
  controls:[R('d','d electrons',1,10,1,6),R('D','Δₒ',10000,35000,500,20300,'cm⁻¹'),R('P','Pairing energy P',10000,30000,500,19000,'cm⁻¹')],
  metrics:p=>{const r=cf(p);return[N('Spin state',p.d>=4&&p.d<=7?(r.low?'Low spin':'High spin'):'(only one arrangement)'),N('Configuration',`t₂g${'⁰¹²³⁴⁵⁶'[r.t]} e_g${'⁰¹²³⁴'[r.e]}`),N('Unpaired electrons',r.u,'',0),N('CFSE',(-.4*r.t+.6*r.e),'Δₒ',1),N('Light absorbed',1e7/p.D,'nm',0)]},
- draw:(c,p,t)=>{const r=cf(p),s=P3.scene(c,{scale:54,cx:260,cy:280,yaw:t*.2});atom(s,[-1.6,0,0],'X',1.3);for(const u of[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]){const q=V.add([-1.6,0,0],V.mul(u,1));bond(s,[-1.6,0,0],q);atom(s,q,'N',.9)}
+ draw:(c,p,t)=>{const r=cf(p),s=P3.scene(c,{scale:54,cx:260,cy:280,yaw:t*.2});atom(s,[-1.6,0,0],'X',1.3);for(const u of[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]){const q=V.add([-1.6,0,0],V.mul(u,1));stick(s,[-1.6,0,0],q,1,{ca:'X',cb:'N',r:.06});atom(s,q,'N',.9)}
   const gap=clamp(p.D/35000*2.4,.4,2.4),yt=-.4*gap,ye=.6*gap;const box=(x,y,k,dn)=>{s.box([x,y,0],[.45,.06,.25],'#42d9ca');if(k)s.arrow([x-.08,y-.22,.1],[x-.08,y+.22,.1],'#ffd43b',2.5,6);if(dn)s.arrow([x+.08,y+.22,.1],[x+.08,y-.22,.1],'#74c0fc',2.5,6)};
   const up=(n,cap)=>Math.min(n,cap),dn=(n,cap)=>Math.max(0,n-cap);for(let b=0;b<3;b++)box(.9+b*.6,yt,b<up(r.t,3),b<dn(r.t,3));for(let b=0;b<2;b++)box(1.2+b*.6,ye,b<up(r.e,2),b<dn(r.e,2));
   s.label([.3,yt,0],'t₂g',C.mint,13);s.label([.6,ye,0],'e_g',C.mint,13);s.arrow([2.9,yt,0],[2.9,ye,0],'#ff8787',2,7,'Δₒ');s.callout([-1.6,1,0],'ligand','#91a7ff',-40,-40);s.render();tag(c,`d${p.d}: ${r.low?'low':'high'}-spin, ${r.u} unpaired`,44,98,C.gold,15)},
@@ -175,7 +175,7 @@ add({...ch(7,'Alcohols, Phenols and Ethers',OR),id:'chem-alcohol-hbond',title:'H
  tryText:'How many carbons give an alcohol boiling above 100 °C?',
  controls:[R('n','Carbon atoms in the alcohol',1,4,1,2)],
  metrics:p=>{const [a,ba,k,bk]=BP[p.n-1];return[N(a,ba,'°C',1),N(`${k} (similar mass)`,bk,'°C',1),N('Difference',ba-bk,'°C',1)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:280,pitch:.35,yaw:t*.15}),mol=(o,ang)=>{const cs=[];for(let i=0;i<p.n;i++){const q=V.add(o,[Math.cos(ang)*(.0+i*.6),.25*(i%2),Math.sin(ang)*i*.6]);cs.push(q);atom(s,q,'C',.8);if(i)bond(s,cs[i-1],q)}const O=V.add(cs[0],[-.45*Math.cos(ang),-.35,-.45*Math.sin(ang)]);bond(s,cs[0],O);atom(s,O,'O',.85);const H=V.add(O,[-.3,-.25,0]);atom(s,H,'H',.8);return{O,H}};
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,cx:270,cy:275,pitch:.25,yaw:t*.15}),mol=(o,ang)=>{const cs=[];for(let i=0;i<p.n;i++){const q=V.add(o,[Math.cos(ang)*(.0+i*.6),.25*(i%2),Math.sin(ang)*i*.6]);cs.push(q);atom(s,q,'C',.8);if(i)stick(s,cs[i-1],q,1,{ca:'C',cb:'C',r:.06})}const O=V.add(cs[0],[-.45*Math.cos(ang),-.35,-.45*Math.sin(ang)]);stick(s,cs[0],O,1,{ca:'C',cb:'O',r:.06});atom(s,O,'O',.9);const H=V.add(O,[-.3,-.25,0]);stick(s,O,H,1,{ca:'O',cb:'H',r:.05});atom(s,H,'H',.85);return{O,H}};
   const ms=[mol([-1.6,.6,0],0),mol([.3,-1.0,.4],1.2),mol([1.6,.9,-.6],2.6),mol([-1.2,-1.4,-.8],-.8)];for(let i=0;i<ms.length;i++){const a=ms[i].H,b=ms[(i+1)%ms.length].O;s.seg(a,b,'#69db7c',2,[4,4])}s.callout(V.mul(V.add(ms[0].H,ms[1].O),.5),'hydrogen bond O–H···O','#69db7c',60,-60);s.render();tag(c,`${BP[p.n-1][0]} boils at ${BP[p.n-1][1]} °C`,44,98,C.gold,15)},
  assumption:'Boiling points at 1 atm from standard tables.'});
 
@@ -188,7 +188,7 @@ add({...ch(8,'Aldehydes, Ketones and Carboxylic Acids',OR),id:'chem-acid-strengt
  tryText:'Put the chloroacetic acids in order of strength.',
  controls:[R('i','Acid',1,7,1,2)],
  metrics:p=>{const [fm,n,pk]=ACID[p.i-1];return[N('Acid',`${n} (${fm})`),N('pKₐ',pk,'',2),N('Kₐ',Math.pow(10,-pk),'',3),N('Strength vs acetic acid',Math.pow(10,4.76-pk),'×',1)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:34,cx:300,cy:300,pitch:.4,yaw:-.2});ACID.forEach(([fm,n,pk],i)=>{const h=(5-pk)*.8,x=-3+i*1,on=i===p.i-1;s.box([x,h/2,0],[.7,h,.7],on?'#ffd43b':'#ff8787');s.engrave([x,h+.25,.36],fm,on?'#ffd43b':'#e9f6ff',9,9e5)});s.callout([-3+(p.i-1),(5-ACID[p.i-1][2])*.8,0],`pKₐ ${ACID[p.i-1][2]}`,'#ffd43b',40,-50);s.render();tag(c,'taller bar = stronger acid (bar height ∝ 5 − pKₐ)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:42,cx:270,cy:285,pitch:.22,yaw:-.12}),X0=-3.6;ACID.forEach(([fm,n,pk],i)=>{const h=(5-pk)*.8,x=X0+i*1.2,on=i===p.i-1;s.box([x,h/2,0],[.8,h,.8],on?'#ffd43b':'#ff8787',{spec:.5});s.engrave([x,h+.2+(i%2)*.32,.42],fm,on?'#ffd43b':'#e9f6ff',9,9e5)});s.callout([X0+(p.i-1)*1.2,(5-ACID[p.i-1][2])*.4,.42],`pKₐ ${ACID[p.i-1][2]}`,'#ffd43b',-40,50);s.render();tag(c,'taller bar = stronger acid (bar height ∝ 5 − pKₐ)',44,98,C.muted,13)},
  assumption:'pKₐ values in water at 298 K (NCERT table).'});
 
 /* ---------- 9 Amines ---------- */
