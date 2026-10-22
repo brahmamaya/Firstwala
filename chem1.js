@@ -147,10 +147,10 @@ add({...ch(4,'Chemical Bonding and Molecular Structure','PHYSICAL CHEMISTRY'),id
  controls:[S('m','Molecule','O2',Object.keys(MO).map(k=>[k,k.replace('2','₂')]))],
  metrics:p=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),nb=fl.filter(x=>!x[0].includes('*')).reduce((a,x)=>a+x[2],0),na=fl.filter(x=>x[0].includes('*')).reduce((a,x)=>a+x[2],0),bo=(nb-na)/2,unp=fl.reduce((u,[n,cp,k])=>u+(cp===4?(k<=2?k:4-k):k===1?1:0),0);
   return[N('Electrons',MO[p.m],'',0),N('Bond order',bo,'',1),N('Unpaired electrons',unp,'',0),N('Magnetic',unp?'Paramagnetic':'Diamagnetic'),N('Exists?',bo>0?'Yes':'No (bond order 0)')]},
- draw:(c,p,t)=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),s=P3.scene(c,{scale:40,pitch:.04,cx:300,cy:282});
-  fl.forEach(([n,cp,k],i)=>{const y=-2.6+i*.72,anti=n.includes('*'),boxes=cp/2;s.label([-2.6,y,0],n,anti?'#ff8787':'#69db7c',13);for(let b=0;b<boxes;b++){const x=-.4+(b-(boxes-1)/2)*.9;s.box([x,y,0],[.8,.1,.1],anti?'#e03131':'#2f9e44',{spec:.5});const inBox=cp===4?(k<=2?(b<k?1:0):(b<k-2?2:1)):k;
+ draw:(c,p,t)=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),s=P3.scene(c,{scale:44,pitch:.04,cx:270,cy:272});
+  fl.forEach(([n,cp,k],i)=>{const y=-2.5+i*.72,anti=n.includes('*'),boxes=cp/2;s.label([-(boxes-1)*.45-.55,y,0],n,anti?'#ff8787':'#69db7c',13,'right');for(let b=0;b<boxes;b++){const x=(b-(boxes-1)/2)*.9;s.box([x,y,0],[.8,.1,.1],anti?'#e03131':'#2f9e44',{spec:.5});const inBox=cp===4?(k<=2?(b<k?1:0):(b<k-2?2:1)):k;
    if(inBox>=1)s.arrow([x-.13,y-.25,.1],[x-.13,y+.25,.1],'#ffd43b',2.5,6);if(inBox>=2)s.arrow([x+.13,y+.25,.1],[x+.13,y-.25,.1],'#74c0fc',2.5,6)}});
-  s.callout([.6,-2.6+5*.72,0],heavy?'σ2p below π2p (O₂, F₂, Ne₂)':'π2p below σ2p (up to N₂)','#e9f6ff',60,-20);s.render();tag(c,'green: bonding · red: antibonding (*)',44,98,C.muted,13)},
+  s.callout([.9,-2.5+5*.72,0],heavy?'σ2p below π2p (O₂, F₂, Ne₂)':'π2p below σ2p (up to N₂)','#e9f6ff',60,-20);s.render();tag(c,'green: bonding · red: antibonding (*)',44,98,C.muted,13)},
  assumption:'Standard NCERT MO energy orders: s–p mixing puts π2p below σ2p up to N₂.'});
 
 /* ---------- 5 Thermodynamics ---------- */
