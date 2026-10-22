@@ -213,8 +213,8 @@ add({...ch(7,'Redox Reactions','INORGANIC CHEMISTRY'),id:'chem-redox-displacemen
  tryText:'Put a copper strip in zinc sulphate. Does anything happen?',
  controls:[S('pair','Strip in solution','Zn-Cu',[['Zn-Cu','Zinc strip in CuSO₄'],['Cu-Zn','Copper strip in ZnSO₄'],['Cu-Ag','Copper wire in AgNO₃']]),R('time','Time',0,60,1,20,'min')],
  metrics:p=>{const d={'Zn-Cu':['Yes','Zn: 0 → +2 (oxidised)','Cu²⁺: +2 → 0 (reduced)'],'Cu-Zn':['No','Zn is more reactive than Cu','—'],'Cu-Ag':['Yes','Cu: 0 → +2 (oxidised)','Ag⁺: +1 → 0 (reduced)']}[p.pair];return[N('Reaction?',d[0]),N('Oxidation',d[1]),N('Reduction',d[2]),N('Extent',d[0]==='Yes'?`${Math.round(100*(1-Math.exp(-p.time/20)))} %`:'0 %')]},
- draw:(c,p,t)=>{const go=p.pair!=='Cu-Zn',x=go?1-Math.exp(-p.time/20):0,s=P3.scene(c,{scale:60,cx:260,cy:290}),liq=p.pair==='Zn-Cu'?(x<.5?'#4dabf7':x<.85?'#a5d8ff':'#e7f5ff'):p.pair==='Cu-Ag'?(x>.3?'#a5d8ff':'#f1f3f5'):'#f1f3f5';beaker(s,[0,-1.7,0],1.2,2.8,liq,.75);
-  const strip=p.pair==='Zn-Cu'?'#adb5bd':'#d9844a';s.box([0,-.5,0],[.5,2.6,.08],strip);if(go)for(let i=0;i<Math.round(x*40);i++){const y=-1.6+hash(i)*1.8;s.ball([(hash(i+5)-.5)*.5,y,(i%2?1:-1)*.06],.06,p.pair==='Zn-Cu'?'#c2410c':'#e9ecef',{flat:true})}
+ draw:(c,p,t)=>{const go=p.pair!=='Cu-Zn',x=go?1-Math.exp(-p.time/20):0,s=P3.scene(c,{scale:58,cx:260,cy:272}),liq=p.pair==='Zn-Cu'?(x<.5?'#4dabf7':x<.85?'#a5d8ff':'#e7f5ff'):p.pair==='Cu-Ag'?(x>.3?'#a5d8ff':'#f1f3f5'):'#f1f3f5';glassBeaker(s,[0,-1.7,0],1.2,2.8,liq,.75,{alpha:.4,ticks:false});
+  const strip=p.pair==='Zn-Cu'?'#adb5bd':'#d9844a';s.box([0,-.4,0],[.5,2.6,.08],strip,{spec:.6});if(go)for(let i=0;i<Math.round(x*40);i++){const y=-1.6+hash(i)*1.8;s.ball([(hash(i+5)-.5)*.5,y,(i%2?1:-1)*.06],.06,p.pair==='Zn-Cu'?'#c2410c':'#e9ecef',{flat:true})}
   s.callout([0,.4,.04],p.pair==='Zn-Cu'?'zinc strip':'copper strip',strip,60,-50);if(go&&x>.05)s.callout([0,-1.2,.08],p.pair==='Zn-Cu'?'copper deposit':'silver crystals',p.pair==='Zn-Cu'?'#e8590c':'#ced4da',-70,30);s.callout([.9,-.6,0],p.pair==='Zn-Cu'?'Cu²⁺ (blue) fades':p.pair==='Cu-Ag'?'solution turns blue (Cu²⁺)':'no change',liq,50,30);s.render();tag(c,go?'Electrons flow from the more reactive metal to the ions':'No reaction: copper cannot reduce Zn²⁺',44,98,go?C.mint:C.red,14)},
  assumption:'Extent follows a simple exponential approach for illustration; the direction follows the reactivity (electrochemical) series.'});
 
@@ -227,7 +227,7 @@ add({...ch(8,'Organic Chemistry – Some Basic Principles and Techniques','ORGAN
  tryText:'Stop the run when the solvent has moved 6 cm and calculate R_f of chlorophyll a.',
  controls:[R('run','Solvent front distance',0,10,.1,8,'cm',1)],
  metrics:p=>PIG.map(([n,,rf])=>N(n,`${f(rf*p.run,2)} cm (R_f ≈ ${rf})`)),
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cx:260,cy:300,pitch:.1}),k=.36;s.box([0,0,0],[1.4,4.2,.03],'#f8f9fa');beaker(s,[0,-2.3,0],1,1.2,'#e9ecef',.45);s.box([0,-1.6+p.run*k/2,.02],[1.4,p.run*k,.01],'#e7f5ff',{alpha:.6});s.seg([-.7,-1.6+p.run*k,.04],[.7,-1.6+p.run*k,.04],'#4dabf7',2,[4,3]);s.seg([-.7,-1.6,.04],[.7,-1.6,.04],'#868e96',1.5);
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cx:260,cy:300,pitch:.1}),k=.36;s.box([0,0,0],[1.4,4.2,.03],'#f8f9fa');glassBeaker(s,[0,-2.3,0],1,1.2,'#dee2e6',.45,{alpha:.4,ticks:false});s.box([0,-1.6+p.run*k/2,.02],[1.4,p.run*k,.01],'#e7f5ff',{alpha:.6});s.seg([-.7,-1.6+p.run*k,.04],[.7,-1.6+p.run*k,.04],'#4dabf7',2,[4,3]);s.seg([-.7,-1.6,.04],[.7,-1.6,.04],'#868e96',1.5);
   for(const [n,col,rf] of PIG)s.mesh([0,-1.6+rf*p.run*k,.04],[.18,.07,.02],col);s.callout([.7,-1.6+p.run*k,0],'solvent front','#4dabf7',40,-30);s.callout([.7,-1.6,0],'base line (spot)','#ced4da',40,30);PIG.forEach(([n,col,rf],i)=>s.callout([.18,-1.6+rf*p.run*k,.04],n,col,-80-20*(i%2),i*8-10));s.render();tag(c,'paper = stationary phase · solvent = mobile phase',44,98,C.muted,13)},
  assumption:'R_f values are typical for a petroleum ether–acetone solvent; they vary with solvent and paper.'});
 
@@ -239,8 +239,8 @@ add({...ch(9,'Hydrocarbons','ORGANIC CHEMISTRY'),id:'chem-ethane-conformations',
  tryText:'Find all angles at which ethane is eclipsed.',
  controls:[R('phi','Dihedral angle φ',0,360,1,60,'°')],
  metrics:p=>{const E=6.25*(1+Math.cos(3*p.phi*PI/180));return[N('Torsional energy',E,'kJ/mol',2),N('Conformation',E<.5?'Staggered':E>12?'Eclipsed':'Skew')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:240,yaw:.6,pitch:.25}),a=[-.77,0,0],b=[.77,0,0];bond(s,a,b);atom(s,a,'C');atom(s,b,'C');
-  for(let i=0;i<3;i++){const q1=TAU*i/3,q2=q1+p.phi*PI/180,h1=V.add(a,[-.36,1.03*Math.cos(q1),1.03*Math.sin(q1)]),h2=V.add(b,[.36,1.03*Math.cos(q2),1.03*Math.sin(q2)]);bond(s,a,h1);atom(s,h1,'H');bond(s,b,h2);atom(s,h2,'H')}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:240,yaw:.6,pitch:.25}),a=[-.77,0,0],b=[.77,0,0];stick(s,a,b,1,{ca:'C',cb:'C',r:.07});atom(s,a,'C');atom(s,b,'C');
+  for(let i=0;i<3;i++){const q1=TAU*i/3,q2=q1+p.phi*PI/180,h1=V.add(a,[-.36,1.03*Math.cos(q1),1.03*Math.sin(q1)]),h2=V.add(b,[.36,1.03*Math.cos(q2),1.03*Math.sin(q2)]);stick(s,a,h1,1,{ca:'C',cb:'H',r:.06});atom(s,h1,'H');stick(s,b,h2,1,{ca:'C',cb:'H',r:.06});atom(s,h2,'H')}
   s.callout(a,'front carbon','#e9f6ff',-60,-60);s.callout(b,'rear carbon rotates','#e9f6ff',40,60);s.render();
   chart(c,420,96,236,170,{title:'Torsional energy (kJ/mol) vs φ',xl:'φ (°)',xmin:0,xmax:360,ymin:0,ymax:14,series:[{fn:x=>6.25*(1+Math.cos(3*x*PI/180)),col:C.gold}],marker:[p.phi,6.25*(1+Math.cos(3*p.phi*PI/180))]})},
  assumption:'Simple cosine torsional potential with the experimental barrier of about 12.5 kJ/mol.'});
