@@ -395,8 +395,16 @@ add({...ch(12,'Ecosystem',U10),id:'bio-energy-pyramid',title:'Pyramid of energy 
  tryText:'With 10% efficiency, how much of the producers’ energy reaches the fourth level?',
  controls:[R('E','Energy fixed by producers',1000,100000,1000,10000,'kJ'),R('eff','Transfer efficiency',5,20,1,10,'%'),R('levels','Trophic levels',2,5,1,4)],
  metrics:p=>Array.from({length:p.levels},(_,i)=>N(['Producers','Primary consumers','Secondary consumers','Tertiary consumers','Top carnivores'][i],p.E*(p.eff/100)**i,'kJ',1)),
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cy:300,pitch:.3}),cols=['#40c057','#fab005','#fd7e14','#e03131','#ae3ec9'];for(let i=0;i<p.levels;i++){const e=p.E*(p.eff/100)**i,w=Math.max(.15,Math.sqrt(e/p.E)*4);s.box([0,-1.6+i*.55+.25,0],[w,.5,w*.7],cols[i]);s.label([w/2+.3,-1.6+i*.55+.25,0],f(e,1)+' kJ',cols[i],12,'left')}
-  for(let i=0;i<p.levels-1;i++){const q=cycle(t*.4+i*.3,1);s.ball([0,-1.6+i*.55+.5+q*.55,.6],.06,'#ffd43b',{glow:true,flat:true});s.ball([1.6*q,-1.6+i*.55+.4,-.8],.05,'#ff6b6b',{flat:true})}s.render();tag(c,'red dots: energy lost as heat',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const L=p.levels,RH=Math.min(80,282/L),BH=RH-16,CX=300,YB=396,cols=['#40c057','#fab005','#fd7e14','#e03131','#ae3ec9'],NM=['Producers','Primary consumers','Secondary consumers','Tertiary consumers','Top carnivores'],IC=[(x,y)=>E.grass(c,x,y+14,1.3,'#8ce99a'),(x,y)=>E.hopper(c,x+1,y+14,1.35,1),(x,y)=>E.frog(c,x,y+12,1.7,1),(x,y)=>E.snake(c,x,y+14,.85,1),(x,y)=>E.hawk(c,x,y+16,.7,1)];
+  tag(c,'lost as heat at each level',600,108,'#ff8787',12,'center');
+  for(let i=0;i<L;i++){const e=p.E*(p.eff/100)**i,w=Math.max(10,Math.sqrt(e/p.E)*290),yt=YB-(i+1)*RH+8,cy=yt+BH/2;
+   c.fillStyle='rgba(255,255,255,.07)';c.beginPath();c.arc(66,cy,25,0,TAU);c.fill();IC[i](66,cy);
+   c.fillStyle=cols[i];c.beginPath();c.roundRect(CX-w/2,yt,w,BH,Math.min(6,w/2));c.fill();c.fillStyle='rgba(255,255,255,.22)';c.beginPath();c.roundRect(CX-w/2,yt,w,BH*.35,Math.min(6,w/2));c.fill();
+   const lx=Math.max(CX+w/2+10,CX+30);tag(c,NM[i],lx,cy-8,'#e9f6ff',12);tag(c,f(e,1)+' kJ',lx,cy+8,cols[i],13);
+   E.arrow(c,568,cy,650,cy,'#ff6b6b',2+4*(1-p.eff/100)*(i<L?1:0));
+   if(i<L-1)E.arrow(c,CX,yt-1,CX,yt-15,'#ffd43b',2.5)}
+  for(let i=0;i<L-1;i++){const yt=YB-(i+1)*RH+8;tag(c,'×'+p.eff+'%',CX+8,yt-8,'#ffd43b',11)}
+  tag(c,'bar width ∝ √energy · gold arrows: energy passed up',44,108,C.muted,11)},
  assumption:'Lindeman’s 10% rule as a default; real efficiencies vary (≈ 5–20%). Box area ∝ energy.'});
 
 add({...ch(12,'Ecosystem',U10),id:'bio-productivity',title:'Gross and net primary productivity',
