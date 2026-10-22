@@ -217,7 +217,59 @@ add({...ch(5,'Morphology of Flowering Plants',U2),id:'bio-root-systems',title:'R
   if(p.type==='tap'){s.callout([.03,-1.6*g,0],'primary (tap) root','#c2a26b',60,20);s.callout([.7*Math.cos(2.2),-.55*g,.7*Math.sin(2.2)],'lateral roots','#c2a26b',-60,30)}else if(p.type==='fibrous')s.callout([.5,-.8*g,0],'fibrous roots from stem base','#c2a26b',60,30);s.callout([2.3,0,0],'soil surface','#8d6e4f',20,-30);s.render()},
  assumption:'Root growth shown schematically; real depth depends on species, soil and water.'});
 
-const OVARY={hypo:['Hypogynous','Superior ovary','Mustard, China rose, brinjal'],peri:['Perigynous','Half-inferior ovary','Plum, rose, peach'],epi:['Epigynous','Inferior ovary','Guava, cucumber, ray florets of sunflower']};
+// ---- Flower model helpers: cut-away (front half removed) so the inside of the ovary is visible ----
+const mixHex=(a,b,k)=>{const f=(x,i)=>parseInt(x.slice(1+i*2,3+i*2),16),h=i=>Math.round(f(a,i)*(1-k)+f(b,i)*k).toString(16).padStart(2,'0');return'#'+h(0)+h(1)+h(2)};
+const PETC=Array.from({length:7},(_,i)=>mixHex('#e0457b','#ffc9da',i/6)),SEPC=Array.from({length:7},(_,i)=>mixHex('#3c8a37','#8fcf6b',i/6)),WINGC=Array.from({length:7},(_,i)=>mixHex('#b04fd0','#e6b8f5',i/6));
+// A curved, cupped petal or sepal rising from base B at azimuth a: length L, width W, opening angle ph0 -> ph1 (from vertical).
+function bloomPart(s,B,a,L,W,ph0,ph1,cup,cols){const rh=[Math.cos(a),0,Math.sin(a)],th=[-Math.sin(a),0,Math.cos(a)],N=9,M=6,dirs=[],ctr=[B],rows=[];
+  for(let i=0;i<=N;i++){const ph=ph0+(ph1-ph0)*i/N;dirs.push(V.add(V.mul(rh,Math.sin(ph)),[0,Math.cos(ph),0]))}
+  for(let i=1;i<=N;i++)ctr.push(V.add(ctr[i-1],V.mul(V.add(dirs[i-1],dirs[i]),.5*L/N)));
+  for(let i=0;i<=N;i++){const u=i/N,w=W*Math.pow(Math.sin(Math.PI*Math.pow(u,1.4)),.75);let nn=V.norm(V.cross(dirs[i],th));if(V.dot(nn,rh)>0)nn=V.mul(nn,-1);
+    rows.push(Array.from({length:M+1},(_,j)=>{const sv=-1+2*j/M;return V.add(V.add(ctr[i],V.mul(th,w*sv)),V.mul(nn,cup*W*sv*sv))}))}
+  for(let i=0;i<N;i++)for(let j=0;j<M;j++)s.poly([rows[i][j],rows[i+1][j],rows[i+1][j+1],rows[i][j+1]],cols[Math.min(6,Math.round(i*6/N))],{cull:false,spec:.35,shine:16});
+  s.path(ctr,'#00000022',1);return ctr[N]}
+// Surface of revolution drawn over angles a0..a1 only (a half shell), both faces shaded.
+function halfLathe(s,p,prof,a0,a1,col,opt={}){const nA=opt.segs||12,rows=prof.map(([r,y])=>Array.from({length:nA+1},(_,j)=>{const a=a0+(a1-a0)*j/nA;return[p[0]+r*Math.cos(a),p[1]+y,p[2]+r*Math.sin(a)]}));
+  for(let i=0;i<prof.length-1;i++)for(let j=0;j<nA;j++)s.poly([rows[i][j],rows[i+1][j],rows[i+1][j+1],rows[i][j+1]],col,{cull:false,spec:opt.spec??.35,shine:opt.shine??20})}
+// Ovary cut lengthwise: wall, hollow locule and ovules on an axile placenta.
+function ovaryCut(s,C,rx,ry,t,outCol,inCol,wallCol,nOv=6){const U=9,po=[],pi=[];for(let i=0;i<=U;i++){const u=-Math.PI/2+Math.PI*i/U;po.push([rx*Math.cos(u),ry*Math.sin(u)]);pi.push([(rx-t)*Math.cos(u),(ry-t)*Math.sin(u)])}
+  halfLathe(s,C,po,Math.PI,TAU,outCol,{segs:14});halfLathe(s,C,pi,Math.PI,TAU,inCol,{segs:14,spec:.1});
+  for(const sg of[-1,1])for(let i=0;i<U;i++)s.poly([[C[0]+sg*po[i][0],C[1]+po[i][1],C[2]],[C[0]+sg*po[i+1][0],C[1]+po[i+1][1],C[2]],[C[0]+sg*pi[i+1][0],C[1]+pi[i+1][1],C[2]],[C[0]+sg*pi[i][0],C[1]+pi[i][1],C[2]]],wallCol,{cull:false,bias:.04,shade:false});
+  const yb=C[1]-(ry-t)*.82,yt=C[1]+(ry-t)*.82;s.tube([[C[0],yb,C[2]-.02],[C[0],yt,C[2]-.02]],.022,'#cfe8a0',{segs:6});
+  for(let i=0;i<nOv;i++){const y=yb+(yt-yb)*(Math.floor(i/2)+.5)/(nOv/2),sg=i%2?1:-1,ox=sg*Math.min(.12,(rx-t)*.5),q=[C[0]+ox,y,C[2]-.02];s.seg([C[0],y,C[2]-.02],q,'#cfe8a0',1.6);s.ball(q,.058,'#fff0a0',{lift:.3});s.ball(V.add(q,[sg*.012,.018,.04]),.016,'#ffffff',{flat:true,lift:.6})}
+  return[C[0]-.1,yb+(yt-yb)*.25,C[2]-.02]}// ---- Leaf cut-away block: lamina seen from below (lower epidermis with stomata) and cut across (T.S. layers) ----
+function flatDisc(s,c,r,col,z,bias,n=14){const pts=[];for(let i=0;i<n;i++){const a=TAU*i/n;pts.push([c[0]+r*Math.cos(a),c[1]+r*Math.sin(a),z])}s.poly(pts,col,{cull:false,bias,spec:.3})}
+function guardPair(s,F,kk,gap,o,bean,chl,pl){const g=gap*kk,M=(dx,dz,dy=0)=>pl?[F[0]+dx,F[1]+dz,F[2]+dy]:[F[0]+dx,F[1]+dy,F[2]+dz];for(const sg of[-1,1]){let pts;
+    if(bean)pts=Array.from({length:9},(_,i)=>{const a=-PI/2+PI*i/8;return M(1.05*kk*Math.sin(a),sg*(g+.55*kk*Math.cos(a)*(.75+.25*o)))});else pts=Array.from({length:9},(_,i)=>M(-1.1*kk+2.2*kk*i/8,sg*(g+.12*kk)));
+    s.tube(pts,bean?.2*kk:(u=>(.1+.16*Math.pow(Math.abs(u-.5)*2,3))*kk),'#8ce99a',{segs:7,bias:.4,spec:.55});
+    if(chl)for(let i=0;i<4;i++)s.ball(V.add(pts[1+i*2>8?7:1+i*2],pl?[0,0,.1*kk]:[0,-.15*kk,0]),.08*kk,'#2b8a3e',{flat:true,lift:.5})}
+  if(!bean)for(const sg of[-1,1])s.mesh(M(0,sg*(g+.55*kk),.02),[1.1*kk,pl?.22*kk:.1*kk,pl?.1*kk:.22*kk],'#b2f2bb',{alpha:.8,rings:4,segs:8})}function leafModel(s,o,gap,bean,flat){const ZF=1.3,YB=-1,A={},g=gap;
+  // back wall and the lower surface (cell walls appear as dark seams between epidermal cells)
+  s.poly([[-3,-1,-1.25],[3,-1,-1.25],[3,1,-1.25],[-3,1,-1.25]],'#16301b',{cull:false,bias:-4,shade:false});
+  s.poly([[-3,YB,-1.25],[3,YB,-1.25],[3,YB,ZF],[-3,YB,ZF]],'#1f4d26',{cull:false,bias:-3,shade:false});
+  const FX=-1.1,FZ=-.05;if(!flat)for(let i=0;i<8;i++)for(let j=0;j<4;j++){const cx=-3+.375+i*.75,cz=-1.25+.32+j*.64;if(Math.hypot(cx-FX,cz-FZ)<(bean?.75:.9)||(Math.abs(cx-1.6)<.8&&cz>.9))continue;const w=.36,d=.29,n=k=>(hash(i*7+j*3+k)-.5)*.07;
+    s.poly([[cx-w+n(1),YB,cz-d+n(2)],[cx+w+n(3),YB,cz-d+n(4)],[cx+w+n(5),YB,cz+d+n(6)],[cx-w+n(7),YB,cz+d+n(8)]],['#bfe3a3','#b0d995','#c9e8ae'][(i+j*2)%3],{cull:false,bias:-2,spec:.3})}
+  if(flat){flatDisc(s,[4.15,-.1],1.05,'#1f4d26',-.9,-3,24);for(const [dx,dy] of[[-.62,.62],[.62,.62],[-.78,-.5],[.78,-.5]])flatDisc(s,[4.15+dx,-.1+dy],.3,'#b0d995',-.9,-2,8);guardPair(s,[4.15,-.1,-.88],.62,g,o,bean,true,true);s.label([4.15,-1.38,-.9],'surface view',C.muted,11)}
+  else{guardPair(s,[FX,YB-.03,FZ],.62,g,o,bean,true);guardPair(s,[1.5,YB-.03,-.8],.4,g,o,bean,false);guardPair(s,[-2.2,YB-.03,.8],.4,g,o,bean,false);}
+  // cut face: palisade (two ranks of columns, rich in chloroplasts), spongy mesophyll with air spaces
+  const VX=-.35,VY=-.02,cz1=ZF-.2,cz2=ZF-.8,R=.19;
+  for(let i=0;i<12;i++){const x=-2.75+i*.5,y0=Math.abs(x-VX)<.55?.4:.1,col=i%2?'#3aa047':'#46b252';capsule(s,[x,y0+R,cz1],[x,.72-R,cz1],R,col,{segs:6});
+    for(let k=0;k<3;k++){const dx=(k%2?.07:-.06),y=y0+.17+k*Math.max(.12,(.72-y0-.3)/2.2);s.ball([x+dx,y,cz1+Math.sqrt(R*R-dx*dx)*.98],.05,'#1b6e26',{flat:true,lift:.6})}
+    if(i<11){const xb=x+.25,yb=Math.abs(xb-VX)<.55?.4:.1;capsule(s,[xb,yb+R,cz2],[xb,.72-R,cz2],R,i%2?'#46b252':'#3aa047',{segs:6})}}
+  for(let r=0;r<2;r++)for(let i=0;i<9;i++){const x=(r?-2.4:-2.7)+(r?.7:.62)*i,y=r?-.2:-.58+.03*Math.sin(i);if(r&&Math.abs(x-VX)<.8)continue;if(!r&&Math.abs(x-1.6)<.5)continue;if(x>2.9||x<-2.9)continue;
+    const rx=.27+.09*hash(i+r*9),ry=.19+.05*hash(i+4+r*9),cz=ZF-.3-.12*hash(i+r*5);s.mesh([x,y,cz],[rx,ry,.24],(i+r)%2?'#74c776':'#63b96a',{rings:4,segs:7,rot:[0,0,(hash(i+r)-.5)*.8],spec:.4});
+    s.ball([x-.07,y+.02,cz+.22],.045,'#1b6e26',{flat:true,lift:.6});s.ball([x+.08,y-.03,cz+.21],.045,'#1b6e26',{flat:true,lift:.6})}
+  // epidermal layers and cuticle
+  for(let i=0;i<6;i++)s.mesh([-2.5+i,.83,ZF-.3],[.47,.11,.3],'#d4efb4',{rings:4,segs:8,spec:.5});
+  s.box([0,.975,ZF-.3],[6,.06,.6],'#f3e9a0',{alpha:.85});s.box([0,-.975,ZF-.3],[6,.05,.6],'#f3e9a0',{alpha:.85});
+  for(let i=0;i<8;i++){const x=-2.625+i*.75;if(Math.abs(x-1.6)<.5)continue;s.mesh([x,-.83,ZF-.3],[.36,.1,.3],'#c5e8a4',{rings:4,segs:8,spec:.5})}
+  // stoma cut through: two guard cells in section, pore between, substomatal chamber above
+  const SX=1.6,gs=.05+g*.45;for(const sg of[-1,1]){const q=[SX+sg*(gs+.17),-.82,ZF-.3];s.mesh(q,[.19,.15,.28],'#8ce99a',{rings:4,segs:8,spec:.5});s.ball([q[0]+.02*sg,q[1],q[2]+.28],.045,'#2b8a3e',{flat:true,lift:.6})}
+  // vascular bundle (vein) in cross-section: sheath, xylem towards the upper surface, phloem towards the lower
+  s.cyl([VX,VY,ZF-.5],[0,0,1],.42,1,'#a9dd8c',{seg:14,cap:'#a9dd8c'});
+  for(const [x,y] of[[-.5,.12],[-.2,.12],[-.35,.25]])flatDisc(s,[VX+(x+.35),VY+(y-.02)],.1,'#d6336c',ZF+.01,.6);
+  for(const [x,y] of[[-.5,-.15],[-.28,-.15],[-.42,-.28],[-.2,-.28]])flatDisc(s,[VX+(x+.35),VY+(y-.02)],.075,'#4dabf7',ZF+.01,.6);
+  A.ZF=ZF;A.F=[FX,YB-.05,FZ];A.VX=VX;A.VY=VY;return A}const OVARY={hypo:['Hypogynous','Superior ovary','Mustard, China rose, brinjal'],peri:['Perigynous','Half-inferior ovary','Plum, rose, peach'],epi:['Epigynous','Inferior ovary','Guava, cucumber, ray florets of sunflower']};
 add({...ch(5,'Morphology of Flowering Plants',U2),id:'bio-flower-ovary',title:'Position of the ovary on the thalamus',
  description:'Cut a flower lengthwise. See where sepals, petals and stamens attach relative to the ovary, and choose its symmetry.',
  formula:'Hypogynous (superior) · Perigynous (half-inferior) · Epigynous (inferior)',
@@ -225,13 +277,29 @@ add({...ch(5,'Morphology of Flowering Plants',U2),id:'bio-flower-ovary',title:'P
  tryText:'Switch to a zygomorphic flower: how many planes now give equal halves?',
  controls:[S('pos','Ovary position','hypo',[['hypo','Hypogynous'],['peri','Perigynous'],['epi','Epigynous']]),S('sym','Symmetry','acti',[['acti','Actinomorphic (radial)'],['zygo','Zygomorphic (one plane)']])],
  metrics:p=>{const d=OVARY[p.pos];return[N('Flower type',d[0]),N('Ovary',d[1]),N('Examples',d[2]),N('Symmetry',p.sym==='acti'?'Actinomorphic — mustard, datura, chilli':'Zygomorphic — pea, gulmohur, bean')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cy:300,pitch:.25}),oy={hypo:.55,peri:.35,epi:.05}[p.pos],ry={hypo:.2,peri:.55,epi:.75}[p.pos];s.tube([[0,-1.6,0],[0,-.3,0]],.06,BC.stem,{segs:8});
-  const prof=p.pos==='hypo'?[[.06,-.3],[.3,-.1],[.35,.2],[.0,.3]]:p.pos==='peri'?[[.06,-.3],[.35,-.1],[.6,.5],[.55,.52],[.3,.0],[.0,.05]]:[[.06,-.3],[.45,-.1],[.5,.4],[.4,.75],[.2,.8]];s.lathe([0,0,0],prof,'#94d82d',{segs:20});
-  s.mesh([0,oy,0],[.22,.3,.22],'#c0eb75',{alpha:p.pos==='epi'?.6:undefined});s.tube([[0,oy+.25,0],[0,oy+.85,0]],.03,'#d8f5a2',{segs:6});s.ball([0,oy+.88,0],.06,'#fab005');
-  for(let i=0;i<5;i++){const a=TAU*i/5,big=p.sym==='zygo'&&i===0,sz=p.sym==='zygo'?(i===0?1.5:i===2||i===3?.7:1):1;window.PhysicaBio.petal(s,[.3*Math.cos(a),ry,.3*Math.sin(a)],[Math.cos(a),big?1.6:.6,Math.sin(a)],.9*sz,.32*sz)}
-  for(let i=0;i<6;i++){const a=TAU*i/6+.3;s.tube([[.25*Math.cos(a),ry,.25*Math.sin(a)],[.32*Math.cos(a),ry+.7,.32*Math.sin(a)]],.015,'#fff3bf',{segs:5});s.ball([.32*Math.cos(a),ry+.72,.32*Math.sin(a)],.045,'#f59f00')}for(let i=0;i<5;i++){const a=TAU*i/5+PI/5;window.PhysicaBio.petal(s,[.26*Math.cos(a),ry-.06,.26*Math.sin(a)],[Math.cos(a),.15,Math.sin(a)],.45,.18,'#69db7c')}
-  s.callout([.2,oy,.15],p.pos==='hypo'?'ovary (superior)':p.pos==='peri'?'ovary (half-inferior)':'ovary (inferior)','#d8f5a2',-60,10);s.callout([.38,-.12,0],'thalamus','#e9f6ff',-80,30);s.callout([0,oy+.9,0],'stigma','#fab005',-50,-30);s.callout([.32*Math.cos(.3),ry+.72,.32*Math.sin(.3)],'stamen (anther)','#f59f00',60,-30);s.callout([.9,ry+.35,0],'petal','#ff8fab',50,-10);s.callout([.55*Math.cos(PI/5),ry-.03,.55*Math.sin(PI/5)],'sepal','#69db7c',50,30);s.render();tag(c,'green: thalamus · pale: ovary',44,98,C.muted,13)},
- assumption:'Schematic flower; real flowers vary in the number of parts.'});
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:70,cy:310,pitch:.22}),pos=p.pos,zy=p.sym==='zygo',K={hypo:{R:.4,y:.1,top:.62+.42,sy:.2},peri:{R:.71,y:.57,top:.38+.38,sy:.2},epi:{R:.34,y:.7,top:.22+.55,sy:.2}}[pos],R=K.R,AY=K.y,GRN='#9fd14a',CUT='#e8f4b8';
+  s.tube([[0,-1.7,0],[0,-.3,0]],.06,BC.stem,{segs:8});
+  // thalamus (receptacle) and ovary, cut lengthwise; the cut face is shown in a pale tone
+  let ovTop,ov,thL;
+  if(pos==='hypo'){const pr=[[.07,-.3],[.28,-.2],[.42,-.05],[.42,.1],[.3,.19],[0,.21]];halfLathe(s,[0,0,0],pr,PI,TAU,'#7fc243',{segs:14});s.poly([...pr.map(([r,y])=>[r,y,0]),...pr.slice().reverse().map(([r,y])=>[-r,y,0])],'#cfe58a',{cull:false,bias:-.12,shade:false});
+    ov=ovaryCut(s,[0,.63,0],.3,.42,.07,'#b9e36a','#eef9c4','#9ccc4a');ovTop=1.05;thL=[.42,0,0]}
+  else if(pos==='peri'){const po=[[.07,-.3],[.3,-.18],[.55,.1],[.7,.5],[.72,.58]],pi=[[0,0],[.2,.02],[.46,.2],[.63,.5],[.64,.58]];halfLathe(s,[0,0,0],po,PI,TAU,'#7fc243',{segs:14});halfLathe(s,[0,0,0],pi,PI,TAU,'#bfe27a',{segs:14,spec:.1});
+    for(const sg of[-1,1])for(let i=0;i<4;i++)s.poly([[sg*po[i][0],po[i][1],0],[sg*po[i+1][0],po[i+1][1],0],[sg*pi[i+1][0],pi[i+1][1],0],[sg*pi[i][0],pi[i][1],0]],'#cfe58a',{cull:false,bias:-.12,shade:false});
+    ov=ovaryCut(s,[0,.4,0],.27,.38,.065,'#b9e36a','#eef9c4','#9ccc4a');ovTop=.78;thL=[.7,.3,0]}
+  else{ov=ovaryCut(s,[0,.22,0],.5,.55,.17,'#8fd14f','#eef9c4','#cfe58a',6);ovTop=.77;thL=[.5,.1,0]}
+  // style and stigma (parts of the carpel)
+  const sT=ovTop+.75,wob=.03*Math.sin(t*1.2);s.tube([[0,ovTop-.02,0],[.02,ovTop+.4,0],[wob,sT,0]],u=>.034-.014*u,'#d9f2a0',{segs:8});s.mesh([wob,sT+.07,0],[.1,.085,.1],'#ffb703',{rings:7,segs:10,spec:.5});for(let i=0;i<7;i++){const a=TAU*i/7;s.ball([wob+.085*Math.cos(a),sT+.1+.03*Math.sin(i*2),.085*Math.sin(a)],.02,'#ffd166',{flat:true})}
+  // stamens (filament + two-lobed anther with pollen): the back half only, the front ones are cut away
+  const St=[];for(let i=0;i<6;i++){const a=TAU*i/6+.3,za=Math.sin(a);if(za>.25)continue;const re=R*.55+.08,ye=AY+.55+(i%2)*.12,b0=[R*Math.cos(a),AY+.03,R*Math.sin(a)],e0=[re*Math.cos(a),ye,re*Math.sin(a)],th=[-Math.sin(a),0,Math.cos(a)];
+    s.tube([b0,V.add(V.mul(V.add(b0,e0),.5),[R*.1*Math.cos(a),0,R*.1*Math.sin(a)]),e0],.017,'#fff0b3',{segs:6});for(const sg of[-1,1]){const q=V.add(e0,V.mul(th,sg*.04));s.mesh(V.add(q,[0,.07,0]),[.036,.1,.036],'#f59f00',{rings:6,segs:8,spec:.5});for(let k=0;k<2;k++)s.ball(V.add(q,[.03*Math.cos(a+k*3),.02+.06*k,.03*Math.sin(a+k*3)]),.016,'#ffe066',{flat:true,lift:.3})}St.push(V.add(e0,[0,.14,0]))}
+  // sepals (green, outer whorl) and petals (coloured, inner whorl); front ones removed in the cut
+  let sepP=null,petP=null;for(let i=0;i<5;i++){const a=-PI/2+TAU*i/5+PI/5;if(Math.sin(a)>.4)continue;const e=bloomPart(s,[(R+.02)*Math.cos(a),AY-.06,(R+.02)*Math.sin(a)],a,.55,.16,.7,1.25,.15,SEPC);if(!sepP||Math.sin(a)<Math.sin(sepP[3]))sepP=[e[0],e[1],e[2],a]}
+  for(let i=0;i<5;i++){const a=-PI/2+TAU*i/5;if(Math.sin(a)>.4)continue;let L=1,W=.32,p0=.2,p1=.95,cols=PETC;if(zy){if(i===0){L=1.35;W=.45;p0=.05;p1=.55}else{L=.85;W=.22;p0=.35;p1=1.15;cols=WINGC}}
+    const e=bloomPart(s,[R*Math.cos(a),AY,R*Math.sin(a)],a,L,W,p0,p1,.28,cols);if(i===(zy?0:1)||!petP)petP=e}
+  const LB=(q,tx,col,dx,dy)=>s.callout(q,tx,col,dx,dy);
+  LB([.12,ov[1]+.2,-.02],pos==='hypo'?'ovary (superior)':pos==='peri'?'ovary (half-inferior)':'ovary (inferior)','#d8f5a2',-70,10);LB(thL,'thalamus','#e9f6ff',-80,40);LB([wob,sT+.1,0],'stigma','#fab005',-60,-25);LB(ov,'ovule','#fff0a0',-70,60);LB([0,ovTop+.45,0],'style','#d8f5a2',50,10);
+  if(St.length)LB(St[0],'stamen (anther)','#f59f00',60,-30);if(petP)LB(petP,'petal','#ff8fab',50,-10);if(sepP)LB([sepP[0],sepP[1],sepP[2]],'sepal','#69db7c',55,30);
+  s.render();tag(c,'green: thalamus · pale: ovary',44,98,C.muted,13)}, assumption:'Schematic flower; real flowers vary in the number of parts.'});
 
 const FAM={fab:['% ⚥ K(5) C1+2+(2) A(9)+1 G1','Papilionaceous corolla; diadelphous stamens','Pea, gram, soybean, groundnut','Pulses, edible oil, fodder'],sol:['⊕ ⚥ K(5) C(5) A5 G(2)','Five united petals; epipetalous stamens; swollen placenta','Potato, brinjal, tomato, chilli','Food, spice, medicine (belladonna)'],lil:['Br ⊕ ⚥ P(3+3) A3+3 G(3)','Six tepals in two whorls; trilocular ovary','Tulip, Gloriosa, Aloe, Asparagus','Ornamentals, medicines, vegetables']};
 add({...ch(5,'Morphology of Flowering Plants',U2),id:'bio-floral-families',title:'Floral formulae of three families',
@@ -285,11 +353,13 @@ add({...ch(6,'Anatomy of Flowering Plants',U2),id:'bio-stomata',title:'Stomata: 
  tryText:'Compare the bean-shaped dicot guard cells with the dumb-bell shaped grass guard cells.',
  controls:[S('type','Guard cells','bean',[['bean','Bean-shaped (dicot)'],['dumb','Dumb-bell shaped (grasses)']]),R('turgor','Guard-cell turgor',0,100,1,70,'%')],
  metrics:p=>{const open=p.turgor/100;return[N('Pore state',open>.25?'Open':'Closed'),N('Relative aperture',open*100,'%',0),N('Water vapour loss (transpiration)',open>.25?'Possible':'Minimal'),N('Guard-cell type',p.type==='bean'?'Bean-shaped, with chloroplasts':'Dumb-bell shaped (grasses)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,pitch:.8,cy:270}),o=p.turgor/100,gap=.04+.32*o;for(let i=0;i<14;i++){const x=-2.6+(i%7)*.86,z=(i<7?-1:1)*1.6;s.box([x,-.1,z],[.82,.2,.9],'#c3fae8',{alpha:.7})}
-  for(const sg of[-1,1]){let pts;if(p.type==='bean')pts=Array.from({length:13},(_,i)=>{const a=-PI/2+PI*i/12;return[1.05*Math.sin(a),0,sg*(gap+(.55)*Math.cos(a)*(.75+.25*o))]});else pts=Array.from({length:13},(_,i)=>{const x=-1.1+2.2*i/12;return[x,0,sg*(gap+.12)]});
-   s.tube(pts,p.type==='bean'?.2:(u=>.1+.16*Math.pow(Math.abs(u-.5)*2,3)),'#8ce99a',{segs:10});for(let i=0;i<4;i++)s.ball(pts[3+i*2],.05,'#2b8a3e',{flat:true,lift:.3})}
-  if(p.type==='dumb')for(const sg of[-1,1])s.mesh([0,0,sg*(gap+.55)],[1.1,.15,.22],'#b2f2bb',{alpha:.8});s.ball([0,-.25,0],.05,'#1971c2',{flat:true});s.callout([.6,.15,-(gap+.35)],p.type==='bean'?'guard cell (bean-shaped)':'guard cell (dumb-bell shaped)','#2b8a3e',-40,-70);s.callout([0,0,0],o>.04?'stomatal pore':'pore closed','#e9f6ff',-70,-50);s.callout([-2.6,.0,-1.6],'epidermal cells','#96f2d7',-20,-40);s.callout([.55,.06,gap+.42],'chloroplasts','#8ce99a',60,50);if(p.type==='dumb')s.callout([0,.1,-(gap+.55)],'subsidiary cell','#b2f2bb',-60,40);s.render();tag(c,o>.25?'Open pore':'Closed pore',44,98,o>.25?C.mint:C.gold,15)},
- assumption:'Aperture shown proportional to turgor for teaching; in reality opening depends on K⁺ uptake, light and CO₂ levels.'});
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:-1.2,yaw:.4,cy:250,cx:320}),o=p.turgor/100,gap=.04+.32*o,bean=p.type==='bean',fl=P3.flat,A=leafModel(s,o,gap,bean,fl),Z=A.ZF,F=fl?[4.15,-.1,-.88]:A.F,k=.62,GP=fl?[F[0]+.2,F[1]+gap*k+(bean?.35:.1),F[2]]:bean?[F[0]+.2,F[1],F[2]-(gap*k+.35)]:[F[0]+.2,F[1],F[2]-(gap*k+.1)],SP=fl?[F[0],F[1]+gap*k+.55*k,F[2]]:[F[0],F[1],F[2]-(gap*k+.55*k)],EP=fl?[3.3,.7,-.88]:[-2.7,-1,-.9];
+  const LB=(q,tx,col,dx,dy)=>s.callout(q,tx,col,dx,dy);
+  LB(GP,p.type==='bean'?'guard cell (bean-shaped)':'guard cell (dumb-bell shaped)','#8ce99a',-40,60);LB(F,o>.04?'stomatal pore':'pore closed','#e9f6ff',60,70);LB(EP,'epidermal cells','#96f2d7',-20,50);LB([-2.18,.27,Z-.02],'chloroplasts','#8ce99a',-60,-50);
+  if(p.type==='dumb')LB(SP,'subsidiary cell','#b2f2bb',-80,70);
+  LB([2.4,.975,Z-.1],'cuticle','#f3e9a0',40,-50);LB([-2.5,.83,Z-.05],'upper epidermis','#d4efb4',-50,-40);LB([2.25,.4,Z-.2],'palisade mesophyll','#69db7c',50,-10);LB([2.4,-.55,Z-.1],'spongy mesophyll','#74c776',50,30);LB([1.6,-.5,Z-.3],'air space','#e9f6ff',20,40);
+  LB([-.5,.12,Z],'xylem','#ff8fab',-60,-30);LB([-.28,-.15,Z],'phloem','#74c0fc',-60,20);
+  s.render();tag(c,o>.25?'Open pore':'Closed pore',44,98,o>.25?C.mint:C.gold,15)}, assumption:'Aperture shown proportional to turgor for teaching; in reality opening depends on K⁺ uptake, light and CO₂ levels.'});
 
 /* ---------- Chapter 7: Structural Organisation in Animals ---------- */
 const EPI={squamous:['Single layer of flat cells','Walls of blood vessels, air sacs of lungs','Diffusion boundary'],cuboidal:['Single layer of cube-like cells','Ducts of glands, tubular parts of nephrons','Secretion and absorption'],columnar:['Single layer of tall, slender cells','Lining of stomach and intestine','Secretion and absorption'],
