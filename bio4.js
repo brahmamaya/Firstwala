@@ -58,10 +58,23 @@ add({...ch(1,'Sexual Reproduction in Flowering Plants',U6),id:'bio-embryo-sac',t
  tryText:'Count the nuclei and the cells at the final stage.',
  controls:[R('stage','Stage',1,7,1,7)],
  metrics:p=>{const d=ES[p.stage-1];return[N('Stage',d[0]),N('Nuclei',d[1],'',0),N('Cells',d[2],'',0),N('Ploidy','Haploid nuclei (n) after meiosis')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62}),st=p.stage;s.mesh([0,0,0],[1.6,1.1,1.0],'#d8f5a2',{alpha:.25});s.mesh([0,0,0],[1.15,.62,.55],'#ffe066',{alpha:.25});s.label([-1.8,0,0],'micropyle',C.muted,11);s.label([1.8,0,0],'chalaza',C.muted,11);
-  if(st===1)s.ball([0,0,0],.25,'#9775fa');else if(st===2)for(let i=0;i<4;i++)s.ball([-.6+i*.4,0,0],.17,'#b197fc');else if(st===3){for(let i=0;i<3;i++)s.ball([-.7+i*.35,0,0],.12,'#868e96');s.ball([.6,0,0],.22,'#9775fa')}
-  else if(st<7){const n=2**(st-3);for(let i=0;i<n;i++){const side=i<n/2?-1:1,j=i%(n/2);s.ball([side*.7,(j-(n/4-.5))*.25,0],.1,'#9775fa',{glow:true})}}
-  else{s.ball([-.85,0,0],.12,'#e64980',{label:'egg'});s.ball([-.95,.25,.1],.09,'#e599f7');s.ball([-.95,-.25,.1],.09,'#e599f7');s.ball([0,.08,0],.09,'#b197fc');s.ball([0,-.08,0],.09,'#b197fc');s.label([0,.5,0],'2 polar nuclei',C.purple,11);for(let i=0;i<3;i++)s.ball([.9,(i-1)*.25,0],.09,'#adb5bd');s.label([.9,.55,0],'antipodals',C.muted,11);s.label([-1,.55,0],'synergids','#f783ac',11)}s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:300,cy:252,pitch:.02}),st=p.stage,E=[0,-.05,0],P=(a,b,z=.12)=>[E[0]+a,E[1]+b,z],NU=(q,r,col)=>{s.ball(q,r*1.25,col,{spec:.4,lift:2});},CELL=(q,r,col)=>s.ball(q,r*1.3,col,{spec:.3});
+  /* ovule: two integuments leave the micropyle open; nucellus inside; funicle at the chalazal end */
+  s.mesh([E[0],E[1],-.1],[1.45,1.85,.3],'#c9a35a',{alpha:.38,rings:14,segs:24,spec:.3});s.mesh([E[0],E[1],-.05],[1.28,1.7,.3],'#e3c987',{alpha:.35,rings:14,segs:24});s.mesh([E[0],E[1],0],[1.05,1.5,.25],'#f3e5b0',{alpha:.3,rings:14,segs:24});
+  s.tube([[E[0],E[1]+1.6,.1],[E[0],E[1]+1.95,.1]],.1,'#6b4f20',{segs:8,alpha:.8});s.tube([[E[0]+.3,E[1]-1.7,0],[E[0]+.7,E[1]-2.1,0]],.14,'#cdeea0',{segs:8,alpha:.8});
+  const sy=[0,.35,.55,.55,.75,1.0,1.25][st-1],sx=[0,.2,.2,.3,.4,.55,.8][st-1];
+  if(st>=4)s.mesh([E[0],E[1]-.05,.08],[sx,sy,.2],'#fff7c9',{alpha:.92,rings:14,segs:22,lift:1});
+  if(st>=4&&st<7)s.mesh([E[0],E[1]-.05,.1],[sx*.55,sy*.5,.15],'#dff1ff',{alpha:.8,rings:10,segs:16,lift:2});
+  if(st===1){CELL(P(0,.85),.3,'#e3d3ff');NU(P(0,.85,.22),.14,'#7048e8')}
+  else if(st===2){for(let i=0;i<4;i++){const q=P(0,1.0-i*.38);CELL(q,.18,'#e3d3ff');NU([q[0],q[1],.2],.08,'#845ef7')}}
+  else if(st===3){for(let i=0;i<3;i++)CELL(P(0,1.0-i*.3),.1-i*.01,'#bfc4c9');const q=P(0,-.3);CELL(q,.26,'#e3d3ff');NU([q[0],q[1],.22],.12,'#845ef7')}
+  else if(st<7){const pos=st===4?[[0,sy*.72],[0,-sy*.72]]:st===5?[[-.14,sy*.7],[.14,sy*.7],[-.14,-sy*.7],[.14,-sy*.7]]:[[-.17,sy*.8],[.17,sy*.8],[-.17,sy*.6],[.17,sy*.6],[-.17,-sy*.6],[.17,-sy*.6],[-.17,-sy*.8],[.17,-sy*.8]];for(const [a,b] of pos)NU(P(a,b-.05,.2),st===6?.075:.095,'#845ef7')}
+  else{for(const z of[-1,1]){const b=P(z*.3,.8);CELL(b,.17,'#e0b7f5');NU([b[0],b[1]-.03,.2],.06,'#9c36b5')}const eg=P(0,.55);CELL(eg,.22,'#f783ac');NU([eg[0],eg[1]-.04,.2],.085,'#c2255c');s.mesh(P(0,-.1,.06),[.55,.5,.12],'#fff2a8',{alpha:.5,rings:8,segs:14});NU(P(-.1,.0,.2),.09,'#845ef7');NU(P(.1,-.1,.2),.09,'#845ef7');for(let i=0;i<3;i++){const b=P((i-1)*.3,-.95+.04*(i%2));CELL(b,.15,'#adb5bd');NU([b[0],b[1],.2],.055,'#6c757d')}}
+  const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L([E[0],E[1]+1.9,.1],'micropyle (top)','#d8b36a',70,-5);L([E[0]+.4,E[1]-1.95,0],'chalaza (base)','#cdeea0',70,5);L([E[0]+1.3,E[1]+.6,0],'integuments','#c9a35a',45,-30);L([E[0]-1.0,E[1]+.5,0],'nucellus','#f3e5b0',-60,-20);
+  if(st===1)L(P(0,.85,.3),'megaspore mother cell (2n)','#c5b3ff',-110,-10);else if(st===2)L(P(0,.4,.2),'4 megaspores (n)','#c5b3ff',-90,15);else if(st===3){L(P(0,.7,.2),'3 degenerate','#bfc4c9',-85,0);L(P(0,-.3,.3),'functional megaspore','#c5b3ff',-95,25)}
+  else if(st<7)L(P(0,-sy*.3,.2),'embryo sac: free nuclei','#ffe066',-95,60);
+  else{L(P(.3,.8),'synergids','#e0b7f5',90,-30);L(P(0,.55,.25),'egg','#f783ac',-90,-10);L(P(.1,-.1,.25),'2 polar nuclei','#b197fc',-110,30);L(P(.3,-.95,.2),'3 antipodals','#adb5bd',90,15)}
+  s.render();tag(c,ES[st-1][0],44,98,C.gold,14)},
  assumption:'Polygonum type (monosporic) embryo sac, as described in NCERT.'});
 
 const POLL={auto:['Autogamy','Pollen to stigma of the same flower','Genetically identical (selfing)'],geit:['Geitonogamy','Pollen to another flower of the same plant','Functionally cross, genetically self'],xeno:['Xenogamy','Pollen to a flower of a different plant','Brings genetically different pollen']};
