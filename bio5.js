@@ -158,9 +158,28 @@ add({...ch(9,'Biotechnology: Principles and Processes',U9),id:'bio-pcr',title:'P
  tryText:'How many copies from one DNA molecule after 30 ideal cycles?',
  controls:[R('n','Number of cycles',0,35,1,10),R('eff','Efficiency per cycle',60,100,1,100,'%'),R('n0','Starting copies',1,100,1,1)],
  metrics:(p,t)=>{const copies=p.n0*(1+p.eff/100)**p.n,st=pcrStep(t);return[N('DNA copies',copies,'',copies<1e5?0:3),N('Step (animation)',st.name),N('Temperature',st.T,'°C',0),N('Enzyme','Taq polymerase')]},
- draw:(c,p,t)=>{const st=pcrStep(t),s=P3.scene(c,{scale:56,cx:230});s.lathe([0,-1.5,0],[[.0,0],[.35,.3],[.45,.8],[.45,2.8],[.5,2.9]],'#e9f6ff',{alpha:.18});const sep=st.k===0?.3:.18;
-  for(let m=0;m<Math.min(4,2**Math.min(p.n,2));m++){const x=(m%2-.5)*.4,z=(Math.floor(m/2)-.5)*.3;s.tube([[x-sep/2,-1,z],[x-sep/2,1.2,z]],.04,'#4dabf7',{segs:5});s.tube([[x+sep/2,-1,z],[x+sep/2,1.2,z]],.04,st.k===2?'#ff8787':'#4dabf7',{segs:5});if(st.k>=1)s.tube([[x+sep/2,-1,z],[x+sep/2,-.6,z]],.05,'#ffd43b',{segs:5})}const x0=-.2,z0=-.15;s.callout([x0-sep/2,.8,z0],st.k===0?'denaturation 94 °C: strands separate':'template DNA strand','#4dabf7',-60,-50);if(st.k>=1)s.callout([x0+sep/2,-.8,z0],'primer annealed (55 °C)','#ffd43b',-70,40);if(st.k===2)s.callout([x0+sep/2,.6,z0],'Taq polymerase extends new strand (72 °C)','#ff8787',60,-40);s.callout([.45,1.3,0],'PCR tube in thermal cycler','#e9f6ff',50,-40);s.render();
-  chart(c,420,96,236,90,{title:'Temperature profile',xmin:0,xmax:3,ymin:40,ymax:100,series:[{pts:[[0,94],[1,94],[1,55],[2,55],[2,72],[3,72]],col:C.red}],marker:[cycle(t,3),st.T]});chart(c,420,196,236,90,{title:'Copies (log scale)',xl:'cycles',xmin:0,xmax:35,ymin:0,ymax:12,series:[{fn:x=>Math.log10(p.n0*(1+p.eff/100)**x),col:C.gold}],marker:[p.n,Math.log10(p.n0*(1+p.eff/100)**p.n)]});tag(c,'yellow: primers',44,98,C.gold,13)},
+ draw:(c,p,t)=>{const st=pcrStep(t),T3=cycle(t,3),q=T3-st.k,X0=50,X1=390,YT=170,YB=262,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  strand=(y,col,x0,x1,w,wob)=>{c.save();c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();for(let x=x0;x<=x1;x+=4){const yy=y+(wob?3*Math.sin(x*.13+t*3):0);x===x0?c.moveTo(x,yy):c.lineTo(x,yy)}c.stroke();c.restore()},
+  rungs=(ya,yb,x0,x1,n)=>{c.save();c.lineWidth=2;for(let i=0;i<n;i++){const x=x0+(x1-x0)*i/(n-1);c.strokeStyle=i%2?'#ff8787':'#4dabf7';c.beginPath();c.moveTo(x,ya+2);c.lineTo(x,yb-2);c.stroke()}c.restore()},
+  gap=st.k===0?56:62+8*Math.sin(t*2),ya=YT-(gap-30)/2*(st.k===0?1:1)+30-30,yb=YB+(gap-92)/2;
+  /* panel */
+  c.save();c.fillStyle='rgba(16,36,58,.65)';c.strokeStyle='rgba(120,160,190,.3)';c.beginPath();c.roundRect?c.roundRect(34,126,372,190,12):c.rect(34,126,372,190);c.fill();c.stroke();c.restore();
+  const A=st.k===0?YT-8*q:YT,B=st.k===0?YB+8*q:YB;
+  if(st.k===0){const open=Math.min(1,q*3);rungs(YT+open*0,YT+open*0,0,0,0);const mid=(YT+YB)/2;for(let i=0;i<14;i++){const x=X0+20+i*(X1-X0-40)/13,half=(YB-YT)/2*(1-open*.0);c.save();c.strokeStyle=i%2?'#ff8787':'#4dabf7';c.lineWidth=2;c.beginPath();c.moveTo(x,YT+4+open*-4);c.lineTo(x,YT+4+(1-open)*(YB-YT-8)*.5+ (1-open)*0);c.moveTo(x,YB-4+open*4);c.lineTo(x,YB-4-(1-open)*(YB-YT-8)*.5);c.stroke();c.restore()}}
+  const ty=st.k===0?YT-6*Math.min(1,q*3):YT-6,by=st.k===0?YB+6*Math.min(1,q*3):YB+6;
+  strand(ty,'#4dabf7',X0,X1,6,st.k===0);strand(by,'#4dabf7',X0,X1,6,st.k===0);
+  txt("5'",X0-10,ty,C.white,12,'right');txt("3'",X1+8,ty,C.white,12,'left');txt("3'",X0-10,by,C.white,12,'right');txt("5'",X1+8,by,C.white,12,'left');
+  /* primers anneal at the 3' ends of each template (yellow), extension adds a new strand (red) */
+  const pl=44;
+  if(st.k>=1){const aq=st.k===1?Math.min(1,q*2.5):1;c.save();c.globalAlpha=aq;strand(ty+9,'#ffd43b',X1-pl-20,X1-20,5,false);strand(by-9,'#ffd43b',X0+20,X0+20+pl,5,false);c.restore();if(st.k===1){txt('primer',X1-pl/2-20,ty+23,'#ffd43b',11);txt('primer',X0+20+pl/2,by-23,'#ffd43b',11)}}
+  if(st.k===2){const ex=Math.min(1,q*1.1),xe=X1-20-pl-(X1-20-pl-X0-18)*ex,xe2=X0+20+pl+(X1-20-pl-X0-18)*ex;strand(ty+9,'#ff6b6b',xe,X1-20,5,false);strand(by-9,'#ff6b6b',X0+20,xe2,5,false);
+   const px=xe,qx=xe2;c.save();for(const [x,y] of[[px,ty+22],[qx,by-22]]){const g=c.createRadialGradient(x-3,y-3,2,x,y,15);g.addColorStop(0,'#aef0c4');g.addColorStop(1,'#20a35a');c.fillStyle=g;c.beginPath();c.arc(x,y,13,0,TAU);c.fill()}c.restore();txt('Taq',px,ty+22,'#06361c',10);txt('Taq',qx,by-22,'#06361c',10)}
+  txt(st.k===0?'1  Denaturation 94 °C: strands separate':st.k===1?'2  Annealing 55 °C: primers bind':'3  Extension 72 °C: Taq adds nucleotides',X0,146,C.white,13,'left');
+  txt('template strands (blue) · primers (yellow) · new strands (red)',X0,300,C.muted,11,'left');
+  /* step chips */
+  ['94 °C','55 °C','72 °C'].forEach((l,i)=>{const on=i===st.k;c.save();c.fillStyle=on?'rgba(255,212,59,.2)':'rgba(16,36,58,.9)';c.strokeStyle=on?'#ffd43b':'rgba(120,160,190,.4)';c.lineWidth=on?2.5:1;c.beginPath();c.roundRect?c.roundRect(50+i*112,332,100,34,8):c.rect(50+i*112,332,100,34);c.fill();c.stroke();c.restore();txt(['denature','anneal','extend'][i]+' '+l,100+i*112,349,on?C.gold:C.muted,12)});
+  chart(c,420,96,236,90,{title:'Temperature profile',xmin:0,xmax:3,ymin:40,ymax:100,series:[{pts:[[0,94],[1,94],[1,55],[2,55],[2,72],[3,72]],col:C.red}],marker:[T3,st.T]});chart(c,420,196,236,90,{title:'Copies (log scale)',xl:'cycles',xmin:0,xmax:35,ymin:0,ymax:12,series:[{fn:x=>Math.log10(p.n0*(1+p.eff/100)**x),col:C.gold}],marker:[p.n,Math.log10(p.n0*(1+p.eff/100)**p.n)]})},
  assumption:'Typical temperatures: 94 °C denaturation, 50–60 °C annealing, 72 °C extension.'});
 function pcrStep(t){const k=Math.floor(cycle(t,3));return[{k:0,name:'Denaturation',T:94},{k:1,name:'Annealing of primers',T:55},{k:2,name:'Extension by Taq polymerase',T:72}][k]}
 
