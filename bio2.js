@@ -165,14 +165,14 @@ add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-cell-cycle',title:'The 
  formula:'Interphase (G₁ + S + G₂) ≈ 95% of the cycle ;  M phase ≈ 1 h of 24 h',
  observe:'DNA content doubles from 2C to 4C in S phase, but the chromosome number stays the same until mitosis.',
  tryText:'Drag the clock to the end of S phase. What is the DNA content now?',
- controls:[R('h','Time in cycle',0,24,.1,6,'h',1),R('G1','G₁ duration',6,14,.5,11,'h',1),R('Sd','S duration',5,10,.5,8,'h',1)],
+ controls:[R('h','Time in cycle',0,24,.1,6,'h',1),R('G1','G₁ duration',6,12,.5,11,'h',1),R('Sd','S duration',5,10,.5,8,'h',1)],
  metrics:p=>{const st=cyclePhase(p);return[N('Phase',st.name),N('DNA content',st.dna),N('Interphase share',(24-1)/24*100,'%',0),N('Event',st.ev)]},
  draw:(c,p,t)=>{const st=cyclePhase(p),s=P3.scene(c,{scale:56,pitch:.75,cx:230}),G2=24-1-p.G1-p.Sd,seg=[['G₁',p.G1,'#4dabf7'],['S',p.Sd,'#ff6b6b'],['G₂',G2,'#ffd43b'],['M',1,'#69db7c']];let a0=-PI/2;
   seg.forEach(([n,d,col])=>{const a1=a0+TAU*d/24,pts=[];for(let i=0;i<=24;i++){const a=a0+(a1-a0)*i/24;pts.push([2*Math.cos(a),0,2*Math.sin(a)])}s.tube(pts,.2,col,{segs:8});const m=(a0+a1)/2;s.label([2.6*Math.cos(m),.3,2.6*Math.sin(m)],n,col,15);a0=a1});
   const a=-PI/2+TAU*p.h/24;s.arrow([0,.1,0],[1.7*Math.cos(a),.1,1.7*Math.sin(a)],C.white,4);s.mesh([0,.6,0],.35+.15*st.g,BC.membrane,{alpha:.4});s.ball([0,.6,0],.18,BC.nucleus);s.render();
   tag(c,`DNA: ${st.dna}`,44,98,C.gold,15)},
  assumption:'Typical 24 h human cell in culture; G₁ and S durations adjustable, M fixed at 1 h, G₂ takes the remainder.'});
-function cyclePhase(p){const G2=24-1-p.G1-p.Sd,h=p.h;if(h<p.G1)return{name:'G₁ (gap 1)',dna:'2C',ev:'Cell grows; prepares for DNA replication',g:h/24};if(h<p.G1+p.Sd){const k=(h-p.G1)/p.Sd;return{name:'S (synthesis)',dna:`${f(2+2*k,1)}C (replicating)`,ev:'DNA replicates; centriole duplicates (animal cells)',g:h/24}}if(h<23)return{name:'G₂ (gap 2)',dna:'4C',ev:'Proteins made for mitosis; growth continues',g:h/24};return{name:'M phase (mitosis)',dna:'4C → 2C per daughter',ev:'Nucleus and cell divide',g:1}}
+function cyclePhase(p){const G2=24-1-p.G1-p.Sd,h=p.h;if(h<p.G1)return{name:'G₁ (gap 1)',dna:'2C',ev:'Cell grows; prepares for DNA replication',g:h/24};if(h<p.G1+p.Sd){const k=(h-p.G1)/p.Sd;return{name:'S (synthesis)',dna:`${f(2+2*k,1)}C (replicating)`,ev:'DNA replicates; centriole duplicates (animal cells)',g:h/24}}if(h<23)return{name:'G₂ (gap 2)',dna:'4C',ev:'Proteins made for mitosis; growth continues',g:h/24};return{name:'M phase (mitosis)',dna:'4C',ev:'Nucleus and cell divide; each daughter cell then has 2C',g:1}}
 
 /* ---------- Chapter 11: Photosynthesis in Higher Plants ---------- */
 add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-limiting-factors',title:'Limiting factors of photosynthesis',
@@ -184,11 +184,11 @@ add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-limiting-factors',ti
  metrics:p=>{const r=photo(p);return[N('Rate (relative)',r.rate*100,'%',0),N('Limiting factor',r.lim),N('O₂ bubbles per minute',Math.round(r.rate*60),'',0)]},
  draw:(c,p,t)=>{const r=photo(p),s=P3.scene(c,{scale:56,cx:220,cy:280});s.cyl([0,-.3,0],[0,1,0],1.1,2.6,'#ffffff',{alpha:.12,caps:false});s.cyl([0,-.55,0],[0,1,0],1.05,2,'#4dabf7',{alpha:.25});
   for(let i=0;i<5;i++){const pts=Array.from({length:10},(_,j)=>[(i-2)*.15+.1*Math.sin(j+i),-1.5+j*.17,.1*Math.cos(i)]);s.tube(pts,.03,'#2b8a3e',{segs:5});for(let j=2;j<10;j+=2)for(const sg of[-1,1])leaf(s,pts[j],[sg,.4,.2*sg],.22,.05,'#40c057')}
-  const n=Math.round(r.rate*14);for(let i=0;i<n;i++){const q=cycle(t*(.3+r.rate)+i/n,1);s.ball([(hash(i)-.5)*.6,0+q*1.3,(hash(i+4)-.5)*.4],.05+.02*hash(i),'#e7f5ff',{alpha:.7})}
+  const n=Math.round(r.rate*14);for(let i=0;i<n;i++){const q=cycle(t*(.3+r.rate)+i/n,1);s.ball([(hash(i)-.5)*.6,-.5+q*.9,(hash(i+4)-.5)*.4],.05+.02*hash(i),'#e7f5ff',{alpha:.7})}
   const lx=-2.6+(1-p.L/100)*.8;s.ball([lx,.6,0],.3,p.L>0?'#fff3bf':'#495057',{glow:p.L>0,flat:true});s.cyl([lx-.35,.6,0],[1,0,0],.32,.3,'#868e96');s.callout([lx,.9,0],`lamp: light ${p.L}%`,'#fff3bf',-20,-55);s.callout([.3,-.9,.1],'Hydrilla (water plant)','#69db7c',70,50);if(n>0)s.callout([0,.9,0],'O₂ bubbles (rate of photosynthesis)','#e7f5ff',50,-60);s.callout([1.05,-1.2,0],'water with dissolved CO₂','#74c0fc',60,40);s.render();
   chart(c,420,96,236,170,{title:'Rate vs light (gold) at current CO₂',xl:'light %',xmin:0,xmax:100,ymin:0,ymax:1.05,series:[{fn:L=>photo({...p,L}).rate,col:C.gold},{fn:L=>photo({...p,L,co2:.06}).rate,col:'#8ca6b9',dash:[4,4]}],marker:[p.L,r.rate]})},
  assumption:'Blackman-type model: rate = min(light term, CO₂ term) × temperature factor (C₃ optimum ~25–30 °C). Dashed curve: 0.06 % CO₂.'});
-function photo(p){const lt=p.L/60,ct=p.co2/.05,tf=Math.exp(-(((p.T-28)/11)**2)),rate=Math.min(1,lt,ct)*tf;const lim=lt<ct&&lt<1?'Light':ct<=lt&&ct<1?'CO₂':tf<.9?'Temperature':'None (saturated)';return{rate,lim}}
+function photo(p){const lt=p.L/60,ct=p.co2/.05,tf=Math.exp(-(((p.T-28)/11)**2)),rate=Math.min(1,lt,ct)*tf;const lim=tf<.9&&tf<Math.min(1,lt,ct)?'Temperature':lt<ct&&lt<1?'Light':ct<=lt&&ct<1?'CO₂':'None (saturated)';return{rate,lim}}
 
 add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-light-reaction',title:'Light reaction: the Z scheme',
  description:'Follow electrons from water through PS II and PS I to NADP⁺ in the thylakoid membrane, and protons through ATP synthase.',
@@ -201,7 +201,7 @@ add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-light-reaction',titl
   const ps2=[-2.2,-.3,0],cyt=[-.6,-.3,0],ps1=[.8,-.3,0],atp=[2.6,-.3,0];if(p.mode==='non'){s.mesh(ps2,[.55,.75,.55],'#2f9e44',{label:'PS II'});s.label(V.add(ps2,[0,1,0]),'PS II',C.white,13)}s.mesh(cyt,[.4,.6,.4],'#e8590c');s.label(V.add(cyt,[0,.9,0]),'Cyt b₆f',C.white,12);s.mesh(ps1,[.55,.75,.55],'#37b24d');s.label(V.add(ps1,[0,1,0]),'PS I',C.white,13);
   s.cyl(V.add(atp,[0,-.1,0]),[0,1,0],.25,.9,'#adb5bd');s.mesh(V.add(atp,[0,.7,0]),[.5,.35,.5],'#ced4da',{rot:[0,t*3*sp,0]});s.label(V.add(atp,[0,1.3,0]),'ATP synthase',C.white,12);
   if(on){const path=p.mode==='non'?[ps2,cyt,ps1,[2,.8,0]]:[ps1,cyt,ps1];for(let i=0;i<6;i++){const q=cycle(t*sp*.8+i/6,1)*(path.length-1),j=Math.floor(q),fr=q-j,pt=V.add(V.add(path[j],V.mul(V.sub(path[j+1],path[j]),fr)),[0,.2,0]);s.ball(pt,.08,'#ffd43b',{glow:true,flat:true})}
-   for(let i=0;i<4;i++){const q=cycle(t*sp+i/4,1);s.ball([atp[0],.7-q*1.6,0],.07,'#ff6b6b',{flat:true});s.ball([-1.4+(i%2)*1.4,-1.1+.2*Math.sin(t+i),.5],.07,'#ff6b6b',{flat:true})}
+   for(let i=0;i<4;i++){const q=cycle(t*sp+i/4,1);s.ball([atp[0],-.9+q*1.6,0],.07,'#ff6b6b',{flat:true});s.ball([-1.4+(i%2)*1.4,-1.1+.2*Math.sin(t+i),.5],.07,'#ff6b6b',{flat:true})}
    if(p.mode==='non'){const q=cycle(t*sp*.5,1);s.ball([-2.4,-1.2+q*.8,.6],.12,'#74c0fc');s.label([-2.4,-1.5,.6],'2H₂O → O₂',C.blue,12);s.label([2.1,1.1,0],'NADPH',C.gold,13)}const q=cycle(t*sp,1);s.ball([atp[0]+.5,.9+q*.6,0],.12,'#ffd43b');s.label([atp[0]+.6,1.7,0],'ATP',C.gold,13)}
   for(let i=0;i<12;i++)s.seg([-3+i*.5,2.2,-1],[-3+i*.5+.4*sp,1.2,-.6],'#fff3bf'+Math.round(30+120*sp).toString(16).padStart(2,'0'),2);s.render();tag(c,'yellow: electrons   red: protons (H⁺)',44,98,C.muted,13)},
  assumption:'Schematic thylakoid membrane; plastoquinone, plastocyanin and ferredoxin carriers are merged into the arrows.'});
@@ -255,21 +255,21 @@ add({...ch(12,'Respiration in Plants',U4),id:'bio-respiratory-quotient',title:'R
  controls:[S('sub','Respiratory substrate','carb',[['carb','Carbohydrate (glucose)'],['fat','Fat (tripalmitin)'],['protein','Protein'],['acid','Organic acid (malic)']])],
  metrics:p=>{const d=RQS[p.sub],rq=d[1]/d[2];return[N('RQ',rq,'',2),N('Equation',d[0]),N('Interpretation',rq>1.01?'More CO₂ than O₂':rq<.99?'More O₂ used than CO₂ given out':'Equal volumes')]},
  draw:(c,p,t)=>{const d=RQS[p.sub],rq=d[1]/d[2],s=P3.scene(c,{scale:56,cy:290,cx:250});s.lathe([-1,-1.2,0],[[.05,0],[.8,.1],[.85,.8],[.6,1.2],[.25,1.5],[.25,1.9]],'#e9f6ff',{alpha:.18});for(let i=0;i<12;i++)s.mesh([-1+(hash(i)-.5)*1,-1.0+hash(i+3)*.4,(hash(i+6)-.5)*.8],[.12,.08,.09],'#d9a441',{rot:[0,i,.5],rings:6,segs:10});
-  s.tube([[-1,.7,0],[-1,1.2,0],[1,1.2,0],[1,-.6,0],[1.6,-.6,0],[1.6,1,0]],.05,'#e9f6ff',{alpha:.3});const lvl=clamp((1-rq)*1.2,-.5,.5)*Math.min(1,cycle(t,8)/4);s.tube([[1,-.6,0],[1.6,-.6,0]],.045,'#4dabf7');s.tube([[1,-.6,0],[1,-.2+lvl,0]],.045,'#4dabf7');s.tube([[1.6,-.6,0],[1.6,-.2-lvl,0]],.045,'#4dabf7');s.callout([-1,-.9,.3],'germinating seeds','#d9a441',-50,40);s.callout([-1,1.2,0],'KOH tube absorbs CO₂','#e9f6ff',-50,-50);s.callout([1.3,-.6,0],'manometer: level shows O₂ used − CO₂ given out','#4dabf7',40,50);s.render();tag(c,`RQ = ${f(rq,2)}`,44,98,C.gold,17)},
+  s.tube([[-1,.7,0],[-1,1.2,0],[1,1.2,0],[1,-.6,0],[1.6,-.6,0],[1.6,1,0]],.05,'#e9f6ff',{alpha:.3});const lvl=clamp((1-rq)*1.2,-.5,.5)*Math.min(1,cycle(t,8)/4);s.tube([[1,-.6,0],[1.6,-.6,0]],.045,'#4dabf7');s.tube([[1,-.6,0],[1,-.2+lvl,0]],.045,'#4dabf7');s.tube([[1.6,-.6,0],[1.6,-.2-lvl,0]],.045,'#4dabf7');s.callout([-1,-.9,.3],'germinating seeds','#d9a441',-50,40);s.callout([-1,1.2,0],'closed flask (no KOH)','#e9f6ff',-50,-50);s.callout([1.3,-.6,0],'manometer: level shows O₂ used − CO₂ given out','#4dabf7',40,50);s.render();tag(c,`RQ = ${f(rq,2)}`,44,98,C.gold,17)},
  assumption:'Ganong’s respirometer idea: the manometer shift reflects the difference between CO₂ released and O₂ taken up (no KOH).'});
 
 add({...ch(12,'Respiration in Plants',U4),id:'bio-electron-transport',title:'Electron transport and ATP synthase',
  description:'Inside the mitochondrion, electrons flow along the inner membrane and pump protons; ATP synthase uses the flow back to make ATP.',
- formula:'NADH → complex I … → complex IV → O₂ + 4H⁺ + 4e⁻ → 2H₂O',
+ formula:'NADH → I ; FADH₂ → II ; both → ubiquinone → III → cyt c → IV → O₂ + 4H⁺ + 4e⁻ → 2H₂O',
  observe:'Oxygen is the final electron acceptor; without it the chain stops and so does most ATP production.',
  tryText:'Lower the oxygen supply to zero.',
  controls:[R('O2','Oxygen supply',0,100,1,100,'%'),R('nadh','NADH supply',0,100,1,70,'%')],
  metrics:p=>{const r=Math.min(p.O2,p.nadh)/100;return[N('Electron flow (relative)',r*100,'%',0),N('ATP synthesis rate (relative)',r*100,'%',0),N('Final electron acceptor','Oxygen → water'),N('ATP synthase','F₀ proton channel + F₁ head (makes ATP)')]},
  draw:(c,p,t)=>{const r=Math.min(p.O2,p.nadh)/100,s=P3.scene(c,{scale:52,pitch:.2});s.box([0,0,0],[7,.5,2.2],'#ffc078',{alpha:.45});s.label([-3.2,.9,1.2],'intermembrane space',C.muted,12);s.label([-3.2,-.9,1.2],'matrix',C.muted,12);
   const cx=[-2.6,-1.3,0,1.3];cx.forEach((x,i)=>{s.mesh([x,0,0],[.4,.6,.4],['#e8590c','#f08c00','#d6336c','#ae3ec9'][i]);s.label([x,.8,0],['I','II','III','IV'][i],C.white,13)});const atp=[2.7,0,0];s.cyl(V.add(atp,[0,.2,0]),[0,1,0],.22,.7,'#adb5bd');s.mesh(V.add(atp,[0,-.55,0]),[.5,.35,.5],'#ced4da',{rot:[0,t*4*r,0]});
-  for(let i=0;i<5;i++){const q=cycle(t*r*.8+i/5,1)*3,j=Math.floor(q),fr=q-j;s.ball([cx[j]+(cx[j+1]-cx[j])*fr,-.2,0],.07,'#ffd43b',{flat:true,glow:true})}for(let i=0;i<8;i++){const q=cycle(t*r*.5+i/8,1);s.ball([-2.6+i*.6,.4+q*.6,.4],.06,'#ff6b6b',{flat:true})}
+  for(let i=0;i<6;i++){const pa=i%2?[cx[1],cx[2],cx[3]]:[cx[0],cx[2],cx[3]],q=cycle(t*r*.8+i/6,1)*2,j=Math.min(1,Math.floor(q)),fr=q-j;s.ball([pa[j]+(pa[j+1]-pa[j])*fr,-.2,i%2?-.15:.15],.07,'#ffd43b',{flat:true,glow:true})}for(let i=0;i<6;i++){const q=cycle(t*r*.5+i/6,1),px=[cx[0],cx[2],cx[3]][i%3];s.ball([px+.1*(i>2?1:-1),-.4+q*1.4,.4],.06,'#ff6b6b',{flat:true})}s.label([-2.6,-.6,0],'NADH → I',C.muted,11);s.label([-1.3,-.6,0],'FADH₂ → II',C.muted,11);
   for(let i=0;i<4;i++){const q=cycle(t*r+i/4,1);s.ball([atp[0],.9-q*1.7,0],.06,'#ff6b6b',{flat:true})}if(r>0)s.label([1.6,-1.1,0],'O₂ → H₂O',C.blue,12);s.render();tag(c,r===0?'Chain stopped: no electron flow':'yellow: electrons   red: protons',44,98,r===0?C.red:C.muted,13)},
- assumption:'Schematic inner mitochondrial membrane; complex II and mobile carriers simplified.'});
+ assumption:'Schematic inner mitochondrial membrane; mobile carriers (ubiquinone, cytochrome c) are not drawn. Protons are pumped at complexes I, III and IV only; complex II does not pump.'});
 
 /* ---------- Chapter 13: Plant Growth and Development ---------- */
 add({...ch(13,'Plant Growth and Development',U4),id:'bio-growth-curves',title:'Arithmetic, geometric and sigmoid growth',
@@ -278,11 +278,11 @@ add({...ch(13,'Plant Growth and Development',U4),id:'bio-growth-curves',title:'A
  observe:'Geometric growth starts slowly, accelerates (log phase) and then slows as nutrients run short — giving a sigmoid curve.',
  tryText:'Compare the two growth types at the same rate r.',
  controls:[S('type','Growth','geo',[['arith','Arithmetic (root elongation)'],['geo','Geometric → sigmoid (cell number)']]),R('r','Growth rate r',.05,.5,.01,.2,'per day',2),R('day','Day',0,40,1,20,'day')],
- metrics:p=>{const v=growth(p,p.day);return[N(p.type==='arith'?'Length':'Size (relative)',v,p.type==='arith'?'cm':'',2),N('Phase',p.type==='arith'?'Constant rate':p.day<8?'Lag phase':v<.9*20?'Log (exponential) phase':'Stationary phase'),N('Equation',p.type==='arith'?'L = L₀ + rt':'Logistic (sigmoid) curve')]},
- draw:(c,p,t)=>{const v=growth(p,p.day),s=P3.scene(c,{scale:54,cx:220,cy:240});s.box([0,-1.5,0],[3,2.6,2],'#6d4c2f',{alpha:.25});const L=p.type==='arith'?v*.25:v*.12;s.tube([[0,-.2,0],[0,-.2-L,0]],u=>.07*(1-u)+.02,BC.root,{segs:8});critter(s,'plant',[0,-.2,0],.4+.8*(p.type==='arith'?p.day/40:v/20),t);s.callout([0,-.2-L*.6,0],'root','#c2a26b',50,30);s.callout([0,.1,0],`day ${p.day}`,'#e9f6ff',-60,-40);s.render();
+ metrics:p=>{const v=growth(p,p.day);return[N(p.type==='arith'?'Length':'Size (relative)',v,p.type==='arith'?'cm':'',2),N('Phase',p.type==='arith'?'Constant rate':v<.6?'Lag phase':v<.9*20?'Log (exponential) phase':'Stationary phase'),N('Equation',p.type==='arith'?'L = L₀ + rt':'Logistic (sigmoid) curve')]},
+ draw:(c,p,t)=>{const v=growth(p,p.day),s=P3.scene(c,{scale:54,cx:220,cy:240});s.box([0,-1.5,0],[3,2.6,2],'#6d4c2f',{alpha:.25});const L=Math.min(2.2,p.type==='arith'?v*.25:v*.12);s.tube([[0,-.2,0],[0,-.2-L,0]],u=>.07*(1-u)+.02,BC.root,{segs:8});critter(s,'plant',[0,-.2,0],.4+.8*(p.type==='arith'?p.day/40:v/20),t);s.callout([0,-.2-L*.6,0],'root','#c2a26b',50,30);s.callout([0,.1,0],`day ${p.day}`,'#e9f6ff',-60,-40);s.render();
   chart(c,420,96,236,170,{title:'Growth curve',xl:'days',xmin:0,xmax:40,ymin:0,series:[{fn:d=>growth(p,d),col:C.gold}],marker:[p.day,v]})},
  assumption:'Arithmetic: L₀ = 1 cm. Geometric phase modelled with a logistic curve (maximum size 20 relative units).'});
-function growth(p,d){if(p.type==='arith')return 1+p.r*d*5;const K=20,W0=.2;return K/(1+(K/W0-1)*Math.exp(-p.r*d))}
+function growth(p,d){if(p.type==='arith')return 1+p.r*d;const K=20,W0=.2;return K/(1+(K/W0-1)*Math.exp(-p.r*d))}
 
 add({...ch(13,'Plant Growth and Development',U4),id:'bio-phototropism',title:'Phototropism and auxin',
  description:'Shine light from one side on a coleoptile. Auxin moves to the shaded side, cells there elongate more, and the shoot bends.',
