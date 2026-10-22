@@ -121,8 +121,12 @@ add({...ch(6,'Haloalkanes and Haloarenes',OR),id:'chem-chirality',title:'Chirali
  tryText:'Rotate the right-hand molecule. Can you make it match the left one?',
  controls:[R('rot','Rotate the mirror image',0,360,5,0,'°')],
  metrics:p=>[N('Molecule','Bromochlorofluoromethane (CHBrClF)'),N('Stereocentre','1 carbon with H, F, Cl, Br'),N('Superimposable?','No — enantiomers')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cx:300,pitch:.2}),g=[['H',[0,1,0]],['F',[.94,-.33,0]],['Cl',[-.47,-.33,.82]],['Br',[-.47,-.33,-.82]]],mol=(o,mirror,ang)=>{atom(s,o,'C');g.forEach(([el,u])=>{let v=mirror?[-u[0],u[1],u[2]]:u;const ca=Math.cos(ang),sa=Math.sin(ang);v=[v[0]*ca+v[2]*sa,v[1],-v[0]*sa+v[2]*ca];const q=V.add(o,V.mul(v,1.05));bond(s,o,q);atom(s,q,el)})};
-  mol([-1.6,0,0],false,0);mol([1.6,0,0],true,p.rot*PI/180);s.box([0,0,0],[.04,2.6,1.8],'#a5d8ff',{alpha:.25});s.callout([0,1.1,.9],'mirror plane','#a5d8ff',40,-40);s.callout([-1.6,0,0],'stereocentre C*','#e9f6ff',-60,60);s.render();tag(c,'non-superimposable mirror images',44,98,C.gold,15)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cx:262,cy:262,pitch:.2,yaw:.1}),cz=Math.cos(.55),sz=Math.sin(.55),T=a=>[a[0]*cz+a[2]*sz,a[1],-a[0]*sz+a[2]*cz],g=[['H',[0,1,0]],['F',[.94,-.33,0]],['Cl',[-.47,-.33,.82]],['Br',[-.47,-.33,-.82]]],ang=p.rot*PI/180,ca=Math.cos(ang),sa=Math.sin(ang),X=1.9;
+  const pl=[[0,-1.9,-2],[0,-1.9,2],[0,1.9,2],[0,1.9,-2]].map(T);s.poly(pl,'#a5d8ff',{alpha:.2,normal:T([1,0,0]),z:-1e4,stroke:'#a5d8ffcc',lw:1.5});s.seg(T([0,-1.9,0]),T([0,1.9,0]),'#a5d8ff55',1,[3,4]);s.seg(T([0,0,-2]),T([0,0,2]),'#a5d8ff55',1,[3,4]);
+  const mol=(cx,mirror,rot)=>{const C0=[cx,0,0];g.forEach(([el,u])=>{let v=mirror?[-u[0],u[1],u[2]]:u;if(rot)v=[v[0]*ca+v[2]*sa,v[1],-v[0]*sa+v[2]*ca];const q=[cx+v[0]*1.1,v[1]*1.1,v[2]*1.1];stick(s,T(C0),T(q),1,{ca:'C',cb:el,r:.07});atom(s,T(q),el);if(mirror&&p.rot<1)s.seg(T(q),T([-q[0],q[1],q[2]]),'#ffffff44',1,[2,4]);s.label(T([q[0]+v[0]*.5,q[1]+v[1]*.5+.05,q[2]+v[2]*.5]),el,'#f1f3f5',11)});atom(s,T(C0),'C',1.05)};
+  mol(-X,false,false);mol(X,true,true);
+  s.label(T([-X,-1.9,0]),'molecule','#dbe7f0',12);s.label(T([X,-1.9,0]),'mirror image','#dbe7f0',12);
+  s.callout(T([0,1.9,1.4]),'mirror plane','#a5d8ff',30,-30);s.callout(T([-X,0,0]),'stereocentre C*','#e9f6ff',-50,-60);s.render();tag(c,'non-superimposable mirror images',44,98,C.gold,15)},
  assumption:'Ideal tetrahedral geometry.'});
 
 /* 7 Alcohols, phenols, ethers */
