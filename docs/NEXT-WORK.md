@@ -10,6 +10,7 @@ Owner rules: merge to main without asking, in batches of 10 sims. After each bat
 5. Phone fps check: Playwright context `{viewport:{width:390,height:800},hasTouch:true,isMobile:true,deviceScaleFactor:3}`, CDP `Emulation.setCPUThrottlingRate` rate 4, open the sim (`click text=Simulations`, `click text=Voice tutor, demos and quiz`, `location.hash='#<id>'`), measure rAF fps over 2 s. Must be >= 55.
 6. Merge flow: build, `node tools/perf-budget.js` (0 FAIL), `git add -A . ':!.claude'`, commit, `git fetch origin main && git merge origin/main`, on conflicts in index.html / *.min.js run `git checkout --ours <files>` then rebuild and commit, push, create PR to main, squash merge. The stop hook's "unpushed commits" warning is a stale ref, ignore it.
 7. Spawn at most 2 agents at a time (isolation worktree), each told first to `git fetch origin main && git merge --ff-only origin/main`, to commit after EACH sim, and to LOOK at screenshots before and after.
+8. SEO pages: after adding or renaming a sim (and after the build) run `NODE_PATH=/tmp/nm CHROMIUM=/opt/pw-browsers/chromium node tools/seo.js` and commit `sim/` and `sitemap.xml` (add `--og` only to redraw `og.png`). It reads the sims from the built site; `node tools/seo.test.js` checks the result.
 
 ## A/B. Visuals: remaining sims (all others are DONE and merged)
 - Chemistry: all 50 done.
