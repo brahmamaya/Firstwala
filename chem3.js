@@ -136,6 +136,20 @@ add({...ch(7,'Redox Reactions',IN),id:'chem-oxidation-number',title:'Finding oxi
 
 /* 8 Organic basics */
 const PENT=[['n-Pentane',36.1],['2-Methylbutane (isopentane)',27.7],['2,2-Dimethylpropane (neopentane)',9.5]];
+const PENTC={};
+// Ball-and-stick pentane isomers with tetrahedral hydrogens (built once per isomer, not per frame).
+function pentMol(i){if(PENTC[i])return PENTC[i];const {add,sub,mul,norm,cross}=V,D=.95,HL=.62,C0=[],cc=[],nb=[];
+  const link=(a,b)=>{cc.push([a,b]);(nb[a]=nb[a]||[]).push(b);(nb[b]=nb[b]||[]).push(a)};
+  const hd=u=>{const k=u.length;if(k===3)return[norm(mul(add(add(u[0],u[1]),u[2]),-1))];if(k===2){const m=norm(mul(add(u[0],u[1]),-1)),n=norm(cross(u[0],u[1]));return[add(mul(m,.577),mul(n,.816)),sub(mul(m,.577),mul(n,.816))]}
+    const a=u[0],q=norm(cross(a,Math.abs(a[1])<.9?[0,1,0]:[1,0,0])),r=cross(a,q);return[0,1,2].map(j=>{const g=j*TAU/3;return add(mul(a,-.333),add(mul(q,.943*Math.cos(g)),mul(r,.943*Math.sin(g))))})};
+  const zx=D*.83,zy=D*.55;
+  if(i===1){for(let k=0;k<5;k++)C0.push([(k-2)*zx,(k%2?zy:0)-.25,0]);for(let k=0;k<4;k++)link(k,k+1)}
+  else if(i===2){for(let k=0;k<4;k++)C0.push([(k-1.5)*zx,(k%2?zy:0)-.25,0]);for(let k=0;k<3;k++)link(k,k+1);
+    const u=[sub(C0[0],C0[1]),sub(C0[2],C0[1])].map(norm);C0.push(add(C0[1],mul(hd(u)[0],D)));link(1,4)}
+  else{C0.push([0,0,0]);const T=[[0,1,0],[.943,-.333,0],[-.471,-.333,.816],[-.471,-.333,-.816]];T.forEach((d,k)=>{C0.push(mul(d,D));link(0,k+1)})}
+  const pos=C0.slice(),el=C0.map(()=>'C'),hh=[];
+  C0.forEach((q,k)=>{const u=(nb[k]||[]).map(j=>norm(sub(C0[j],q)));if(u.length<4)hd(u).forEach(d=>{pos.push(add(q,mul(d,HL)));el.push('H');hh.push([k,pos.length-1])})});
+  return PENTC[i]={pos,el,cc,hh,lab:i===3?0:1}}
 add({...ch(8,'Organic Chemistry – Some Basic Principles and Techniques','ORGANIC CHEMISTRY'),id:'chem-chain-isomers',title:'Chain isomers of pentane (C₅H₁₂)',
  description:'Compare the three structural isomers of C₅H₁₂ and their boiling points.',
  formula:'Same molecular formula, different carbon skeleton',
@@ -143,8 +157,10 @@ add({...ch(8,'Organic Chemistry – Some Basic Principles and Techniques','ORGAN
  tryText:'Which isomer is a gas just above room temperature?',
  controls:[R('i','Isomer',1,3,1,1)],
  metrics:p=>[N('Isomer',PENT[p.i-1][0]),N('Formula','C₅H₁₂'),N('Boiling point',PENT[p.i-1][1],'°C',1)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,cx:250,yaw:t*.25,pitch:.3}),sk={1:[[-1.6,0,0],[-.8,.45,0],[0,0,0],[.8,.45,0],[1.6,0,0]],2:[[-1.2,0,0],[-.4,.45,0],[.4,0,0],[1.2,.45,0],[-.4,1.3,0]],3:[[0,0,0],[.85,.3,0],[-.85,.3,0],[0,-.5,.8],[0,-.5,-.8]]}[p.i],links={1:[[0,1],[1,2],[2,3],[3,4]],2:[[0,1],[1,2],[2,3],[1,4]],3:[[0,1],[0,2],[0,3],[0,4]]}[p.i];
-  links.forEach(([a,b])=>bond(s,sk[a],sk[b]));sk.forEach(q=>atom(s,q,'C'));s.callout(sk[p.i===3?0:1],`${PENT[p.i-1][0]} — b.p. ${PENT[p.i-1][1]} °C`,'#ffd43b',60,-70);s.render();tag(c,'grey: carbon skeleton (hydrogens omitted)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:70,cx:250,cy:245,yaw:.3+t*.25,pitch:.28}),m=pentMol(p.i);
+  m.hh.forEach(([a,b])=>PC.stick(s,m.pos[a],m.pos[b],1,{r:.045,ca:m.el[a],cb:m.el[b]}));m.cc.forEach(([a,b])=>PC.stick(s,m.pos[a],m.pos[b],1,{r:.075,ca:'C',cb:'C'}));
+  m.pos.forEach((q,i)=>atom(s,q,m.el[i],m.el[i]==='H'?.95:1.05));
+  s.callout(m.pos[m.lab],`${PENT[p.i-1][0]} — b.p. ${PENT[p.i-1][1]} °C`,'#ffd43b',60,-70);s.render();tag(c,'grey: carbon · white: hydrogen (C₅H₁₂)',44,98,C.muted,13)},
  assumption:'Boiling points at 1 atm.'});
 
 /* 9 Hydrocarbons */
