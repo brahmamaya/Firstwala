@@ -136,6 +136,7 @@ add({...ch(7,'Redox Reactions',IN),id:'chem-oxidation-number',title:'Finding oxi
 
 /* 8 Organic basics */
 const PENT=[['n-Pentane',36.1],['2-Methylbutane (isopentane)',27.7],['2,2-Dimethylpropane (neopentane)',9.5]];
+const TORUS=Array.from({length:13},(_,i)=>{const a=TAU*i/12;return[1.1+.22*Math.cos(a),.12*Math.sin(a)]});
 const PENTC={};
 // Ball-and-stick pentane isomers with tetrahedral hydrogens (built once per isomer, not per frame).
 function pentMol(i){if(PENTC[i])return PENTC[i];const {add,sub,mul,norm,cross}=V,D=.95,HL=.62,C0=[],cc=[],nb=[];
@@ -183,8 +184,10 @@ add({...ch(9,'Hydrocarbons','ORGANIC CHEMISTRY'),id:'chem-benzene-resonance',tit
  tryText:'Compare the bond lengths in a Kekulé structure with the hybrid.',
  controls:[S('v','View','hybrid',[['k1','Kekulé structure I'],['k2','Kekulé structure II'],['hybrid','Resonance hybrid']])],
  metrics:p=>[N('C–C bond length',p.v==='hybrid'?'139 pm (all six)':'154 / 134 pm alternating (hypothetical)'),N('π electrons','6, delocalised'),N('Resonance energy','≈ 150 kJ/mol')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:250,pitch:.5,yaw:t*.2}),ring=Array.from({length:6},(_,i)=>{const a=TAU*i/6;return[1.1*Math.cos(a),0,1.1*Math.sin(a)]});ring.forEach((q,i)=>{const nx=ring[(i+1)%6],dbl=p.v==='hybrid'?1:((i+(p.v==='k2'?1:0))%2===0)?2:1;bond(s,q,nx,dbl);atom(s,q,'C');const h=V.mul(q,1.85);bond(s,q,h);atom(s,h,'H')});
-  if(p.v==='hybrid'){s.ring([0,.18,0],[0,1,0],.7,'#ffd43b',3,[6,4]);s.ring([0,-.18,0],[0,1,0],.7,'#ffd43b',3,[6,4]);s.callout([.7,.18,0],'delocalised π cloud','#ffd43b',60,-60)}s.render();tag(c,p.v==='hybrid'?'Resonance hybrid: six equal bonds':'Kekulé structure (one contributor)',44,98,C.gold,15)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:68,cx:250,cy:235,pitch:.5,yaw:t*.2}),R0=1.1,ring=Array.from({length:6},(_,i)=>{const a=TAU*i/6;return[R0*Math.cos(a),0,R0*Math.sin(a)]}),hyb=p.v==='hybrid';
+  if(hyb)for(const y of[.4,-.4])s.lathe([0,y,0],TORUS,'#ffd43b',{alpha:.26,segs:28,spec:.6,shine:25});
+  ring.forEach((q,i)=>{const nx=ring[(i+1)%6],dbl=hyb?1:((i+(p.v==='k2'?1:0))%2===0)?2:1,h=V.mul(q,1.78);PC.stick(s,q,nx,dbl,{ca:'C',cb:'C',r:.07,gap:.15,side:[0,1,0].map((_,k)=>k===1?0:V.mul(q,1)[k]/R0)});PC.stick(s,q,h,1,{ca:'C',cb:'H',r:.05});atom(s,q,'C');atom(s,h,'H',.95)});
+  if(hyb)s.callout([R0*.7,.5,R0*.7],'delocalised π cloud','#ffd43b',60,-60);s.render();tag(c,hyb?'Resonance hybrid: six equal bonds':'Kekulé structure (one contributor)',44,98,C.gold,15)},
  assumption:'Bond lengths from X-ray and electron-diffraction data.'});
 
 done();
