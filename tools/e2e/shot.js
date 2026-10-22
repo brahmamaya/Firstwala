@@ -12,7 +12,7 @@ const srv = http.createServer((q, r) => { const p = decodeURIComponent(new URL(q
   const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
   await p.route(/googletagmanager|google-analytics|docs\.google/, r => r.abort());
   await p.goto(`http://localhost:${PORT}/`, { waitUntil: 'load' }); await p.waitForTimeout(5000);
-  await p.click('text=Simulations').catch(() => {}); await p.waitForTimeout(800); await p.click('text=Voice tutor, demos and quiz').catch(() => {}); await p.waitForTimeout(2500);
+  await p.click('[data-testid=mode-simulations]').catch(() => {}); await p.waitForTimeout(800); await p.click('[data-testid=sim-open]').catch(() => {}); await p.waitForTimeout(2500);
   for (const id of ids.split(',').filter(Boolean)) for (const m of modes.split(',')) {
     await p.evaluate(m => { const e = document.getElementById('mode-' + m); if (e) e.click(); }, m); await p.evaluate(i => { location.hash = '#' + i; }, id); await p.waitForTimeout(1300);
     const c = await p.$('#simulation'); await c.screenshot({ path: path.join(out, `${id}-${m}.png`) });

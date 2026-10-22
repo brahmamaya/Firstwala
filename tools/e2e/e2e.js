@@ -160,6 +160,33 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
     ok(await P.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'exam: no sideways scroll at 360 px');
     ok(await P.page.locator('.px button:has-text("Save & Next")').isVisible(), 'Save & Next reachable on a phone'); await P.ctx.close(); }
 
+  console.log('\n=== 6b. landing: Simulations -> Open simulations / Jump to simulation ===');
+  { const X = await newPage(browser, { viewport: { width: 390, height: 800 } }); const p = X.page; await p.goto(BASE, { waitUntil: 'load' });
+    await p.click('[data-testid=mode-simulations]');
+    ok(await p.locator('#sim-sub button:visible').count() === 2 && await p.locator('[data-testid=sim-open]').isVisible() && await p.locator('[data-testid=sim-jump]').isVisible(), 'Simulations shows exactly two options');
+    ok(await p.locator('[data-testid=mode-student],[data-testid=mode-teacher]').count() === 0, 'no Student / Teacher buttons');
+    await p.click('[data-testid=sim-jump]'); await p.waitForSelector('dialog.jump-dlg[open]');
+    ok(await p.evaluate(() => document.querySelector('.jump-dlg').contains(document.activeElement)), 'Jump panel: focus moves into it');
+    ok(await p.locator('[data-testid^=jump-subject-]').count() === 4, 'Jump step 1: four subjects');
+    await p.click('[data-testid=jump-subject-physics]'); await p.waitForSelector('[data-testid=jump-chap]');
+    ok(await p.locator('.jump-grade').count() >= 2, 'Jump step 2: chapters grouped by class');
+    await p.click('[data-testid=jump-back]'); ok(await p.locator('[data-testid=jump-subject-physics]').isVisible(), 'Back goes one step back');
+    await p.click('[data-testid=jump-subject-physics]'); await p.fill('[data-testid=jump-search]', 'lens');
+    ok(await p.locator('[data-testid=jump-sim-lens]').isVisible(), 'search "lens" works across the whole subject');
+    ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Jump panel: no sideways scroll at 390 px');
+    await p.click('[data-testid=jump-sim-lens]'); await until(() => p.evaluate(() => location.hash === '#lens'));
+    await until(() => p.evaluate(() => document.getElementById('landing').hidden), 5000);
+    ok(await p.evaluate(() => location.hash === '#lens' && document.getElementById('landing').hidden && document.getElementById('title').textContent.toLowerCase().includes('lens')), 'tapping a simulation opens it directly (#lens)');
+    await X.ctx.close(); }
+  { const X = await newPage(browser, { viewport: { width: 390, height: 800 } }); const p = X.page; await p.goto(BASE, { waitUntil: 'load' });
+    await p.click('[data-testid=mode-simulations]'); await p.click('[data-testid=sim-jump]'); await p.waitForSelector('dialog.jump-dlg[open]');
+    await p.keyboard.press('Escape'); await sleep(300);
+    ok(await p.locator('dialog.jump-dlg[open]').count() === 0, 'Escape closes the Jump panel');
+    ok(await p.evaluate(() => document.activeElement && document.activeElement.dataset.testid === 'sim-jump'), 'focus returns to the Jump button');
+    await p.click('[data-testid=sim-open]'); await until(() => p.evaluate(() => document.getElementById('landing').hidden || document.body.classList.contains('app-reveal')));
+    ok(await p.evaluate(() => document.body.classList.contains('app-reveal') || document.getElementById('landing').hidden), 'Open simulations enters the lab');
+    await X.ctx.close(); }
+
   console.log('\n=== 7. accessibility (axe, WCAG 2.1 AA, both themes) ===');
   { const axeSrc = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'); const X = await newPage(browser, { bypassCSP: true });
     const axe = async (label, scope = '.ps-ov:not([hidden])') => { for (const theme of ['dark', 'light']) {
@@ -168,6 +195,10 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
       ok(res.length === 0, `axe ${label} [${theme}]` + (res.length ? ' -> ' + res.map(v => `${v.id} ${v.sample}`).join(' | ') : '')); } };
     await X.page.goto(BASE, { waitUntil: 'load' }); await X.page.addScriptTag({ content: axeSrc });
     await X.page.waitForSelector('[data-testid=series-note]'); await axe('landing notice', '.sn');
+    await X.page.click('[data-testid=mode-simulations]'); await X.page.click('[data-testid=sim-jump]'); await axe('Jump panel: subjects', 'dialog.jump-dlg');
+    await X.page.click('[data-testid=jump-subject-physics]'); await axe('Jump panel: chapters', 'dialog.jump-dlg');
+    await X.page.click('[data-testid=jump-chap]'); await axe('Jump panel: topics', 'dialog.jump-dlg'); await X.page.keyboard.press('Escape');
+    await X.page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
     await openSeries(X.page, 'neet'); ok(await X.page.evaluate(() => document.querySelector('.ps-ov').contains(document.activeElement)), 'focus moves into the dialog'); await axe('test hub');
     await X.page.click(OV + ' .ps-tcard:nth-child(1) button'); await X.page.waitForSelector(OV + ' h2:has-text("General instructions")'); await axe('instructions + quote');
     await X.page.check('#ps-read'); await X.page.click(OV + ' button:has-text("I am ready to begin")'); await X.page.waitForSelector('.px-time'); await axe('exam', '.px');
