@@ -4,6 +4,11 @@ Read `docs/DEFINITION-OF-DONE.md` before and after **every** task. For any chang
 (India: DPDP Act 2023, IT Act, CERT-In; audience mostly students 15-18), accessibility, speed on slow phones, reliability/incident
 readiness, tests, docs. Do not optimise one at the expense of another; if there is a conflict, say so.
 
+## Owner's credit rule (always)
+- Work ONLY on the files the task names. Do not scan the whole repo, re-read whole conversations or unrelated files; open only what the task needs (use grep for a symbol, read only the needed lines). Scanning wastes the owner's credits.
+- Do only what is asked: no extra audits, extra refactors or extra checks. Merge finished work to main without asking; do not repeat explanations or the same check twice.
+- Pending work list: `docs/NEXT-WORK.md` (when the owner says "NEXT-WORK.md ka kaam shuru karo", start it at once, no explanation).
+
 ## Map
 - `index.html`, `*.js` sources, `tools/build.js`: static lab. Build with `ESBUILD=<esbuild 0.24.2> node tools/build.js` (that version reproduces the committed minified files byte-for-byte).
 - `series.js` (+ `series-loader.js`) -> `physica-series.min.js`: Test Series UI. Never use `innerHTML`; build DOM with `textContent`/`createElement`.
