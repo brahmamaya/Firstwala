@@ -92,11 +92,11 @@ add({...ch(2,'Structure of Atom','PHYSICAL CHEMISTRY'),id:'chem-electron-configu
  tryText:'Compare Cr (24) with Mn (25) and Cu (29) with Zn (30).',
  controls:[R('Z','Atomic number Z',1,36,1,24)],
  metrics:p=>{const cfg=config(p.Z),sup=k=>String(k).split('').map(d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).join('');return[N('Element',`${SYM[p.Z-1]} (Z = ${p.Z})`),N('Configuration',cfg.map(([n,k])=>n+sup(k)).join(' ')),N('Unpaired electrons',unpaired(cfg),'',0),N('Magnetic',unpaired(cfg)?'Paramagnetic':'Diamagnetic')]},
- draw:(c,p,t)=>{const cfg=config(p.Z),s=P3.scene(c,{scale:44,pitch:.15,cx:300,cy:300});const E={'1s':0,'2s':1,'2p':1.6,'3s':2.5,'3p':3.1,'4s':3.8,'3d':4.3,'4p':5.0};
+ draw:(c,p,t)=>{const cfg=config(p.Z),s=P3.scene(c,{scale:46,pitch:.06,yaw:.12,cx:290,cy:290});const E={'1s':0,'2s':1,'2p':1.6,'3s':2.5,'3p':3.1,'4s':3.8,'3d':4.3,'4p':5.0};
   SUBS.forEach(([n,cap])=>{const box=cap/2,y=-2.4+E[n]*.95,have=(cfg.find(x=>x[0]===n)||[0,0])[1];s.label([-3.3,y,0],n,have?C.white:C.muted,13);
    for(let b=0;b<box;b++){const x=-2.6+b*.62;s.box([x,y,0],[.55,.42,.1],have?'#29475b':'#1c3040',{stroke:'#42d9ca66'});const ups=Math.min(have,box),downs=Math.max(0,have-box);
     if(b<ups)s.arrow([x-.12,y-.16,.08],[x-.12,y+.18,.08],'#ffd43b',2.5,6);if(b<downs)s.arrow([x+.12,y+.18,.08],[x+.12,y-.16,.08],'#74c0fc',2.5,6)}});
-  s.callout([-2.6,-2.4+4.3*.95,0],'3d fills after 4s','#e9f6ff',-50,-40);s.render();tag(c,`${SYM[p.Z-1]}: yellow ↑ spin-up · blue ↓ spin-down (Hund: singles first)`,44,98,C.gold,14)},
+  s.callout([-2.6,-2.4+4.3*.95,0],'3d fills after 4s','#e9f6ff',-60,-30);s.render();tag(c,`${SYM[p.Z-1]}: yellow ↑ spin-up · blue ↓ spin-down (Hund: singles first)`,44,98,C.gold,14)},
  assumption:'Ground-state configurations of neutral atoms; boxes are energy-ordered for filling, not to scale.'});
 
 /* ---------- 3 Classification of Elements and Periodicity ---------- */
