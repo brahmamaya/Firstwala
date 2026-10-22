@@ -82,7 +82,7 @@ window.PhysicaDrawing={C,text,line,rr,dot,arrow,arc,measure,wrap,path,chart,resi
 window.PhysicaRenderExperiment=(c,s,p,t,renderer)=>{const FS=window.PhysicaFullStage?.[window.PhysicaAliasOf?.[s.id]||s.id];if(FS){FS(c,p,t);return}c.save();let bg=c.createLinearGradient(0,0,960,505);bg.addColorStop(0,'#0a1d2d');bg.addColorStop(1,'#081624');c.fillStyle=bg;c.fillRect(0,0,960,505);for(let x=40;x<960;x+=40)line(c,x,0,x,505,'#1d354755',1);for(let y=20;y<505;y+=40)line(c,0,y,960,y,'#1d354755',1);window.Physica3D?.backdrop(c);text(c,'PHYSICA / EXPERIMENT',35,27,'#62899c',12);text(c,s.title,35,58,C.white,21);const PX=735,PW=195,TX=PX+14,TW=PW-28;let ms=s.metrics(p,t);
 // Pick the largest type size whose wrapped lines fit the panel (long biology readouts shrink to fit).
 const lineCount=(str,size)=>{c.font=`700 ${size}px system-ui`;let n=1,row='';for(const w of String(str).split(' ')){if(c.measureText(row+w).width>TW&&row){n++;row=''}row+=w+' '}return n};
-const used=([lab,val,gap,head])=>ms.reduce((h,m)=>h+head+lineCount(m.value,val)*val*1.5+gap-val*1.5,0);
+const used=([lab,val,gap,head])=>{c.font=`700 ${val}px system-ui`;if(ms.some(m=>String(m.value).split(' ').some(w=>c.measureText(w).width>TW)))return 1e9;return ms.reduce((h,m)=>h+head+lineCount(m.value,val)*val*1.5+gap-val*1.5,0)}
 const [lab,val,gap,head]=[[13,21,43,28],[12,17,31,21],[11,15,27,18],[11,13,24,16],[10,12,21,14]].find(a=>used(a)<=262)||[10,12,21,14];
 // small black info panel, sized to its content, with a thin lighter edge so it stands apart from the stage
 rr(c,PX,91,PW,Math.min(319,55+used([lab,val,gap,head])+10),'#000','#3b5266',10);text(c,'LIVE MEASUREMENTS',TX,116,'#fff',11,'left',700);
