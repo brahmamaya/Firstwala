@@ -223,10 +223,23 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-blood-groups',title:'Blood 
  tryText:'Give Rh-positive blood to an Rh-negative recipient. What does NCERT warn about?',
  controls:[S('d','Donor','O-',['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(x=>[x,x])),S('r','Recipient','A+',['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(x=>[x,x]))],
  metrics:p=>{const r=compat(p);return[N('Compatible?',r.ok?(r.sens?'ABO: yes. Rh: sensitisation risk':'Yes'):'No — agglutination risk'),N('Donor RBC antigens',r.ag.join(', ')||'None (A/B)'),N('Recipient plasma antibodies',r.ab.join(', ')||'None'),N('Rh',r.rh)]},
- draw:(c,p,t)=>{const r=compat(p),s=P3.scene(c,{scale:58});for(let i=0;i<9;i++){const home=[-2.4+(i%3)*.6,-.8+Math.floor(i/3)*.8,(hash(i)-.5)*.6],clump=[(i%3)*.3-.3,(Math.floor(i/3)-1)*.3,(hash(i)-.5)*.3],k=r.ok?0:Math.min(1,cycle(t,6)/3),q=V.add(V.mul(home,1-k),V.mul(V.add(clump,[1.2,0,0]),k));
-   s.mesh(q,[.28,.1,.28],'#c92a2a',{rot:[PI/2*.8,i,0],rings:8,segs:14,shape:(u)=>1-.2*Math.exp(-(u*u)*5)});r.ag.forEach((a,j)=>{for(let m=0;m<3;m++){const an=TAU*(m/3+j/6);s.ball(V.add(q,[.3*Math.cos(an),.05,.3*Math.sin(an)]),.05,a==='A'?'#ffd43b':a==='B'?'#4dabf7':'#69db7c',{flat:true})}})}
-  r.ab.forEach((a,j)=>{for(let m=0;m<5;m++){const q=[1.4+(hash(m+j*5)-.5)*2,(hash(m+j*5+3)-.5)*2,(hash(m+j*9)-.5)];s.tube([q,V.add(q,[0,.18,0]),V.add(q,[-.1,.3,0])],.025,a==='anti-A'?'#fab005':'#1c7ed6',{segs:4});s.tube([V.add(q,[0,.18,0]),V.add(q,[.1,.3,0])],.025,a==='anti-A'?'#fab005':'#1c7ed6',{segs:4})}});s.render();
-  s.callout([-2.4,-.8,.2],`donor RBCs with ${r.ag.length?r.ag.join(' + ')+' antigen'+(r.ag.length>1?'s':''):'no A/B antigens'}`,'#ff8787',-40,50);if(r.ab.length)s.callout([1.4+(hash(0)-.5)*2,(hash(3)-.5)*2+.25,(hash(0)-.5)],`recipient plasma: ${r.ab.join(', ')}`,'#74c0fc',50,-50);if(!r.ok)s.callout([1.2,0,0],'antibodies bind antigens → clumps','#ff6b6b',60,50);
+ draw:(c,p,t)=>{const r=compat(p),s=P3.scene(c,{scale:58,cx:335,cy:240,pitch:.03}),k=r.ok?0:Math.min(1,cycle(t,8)/3.5),AC={A:'#ffd43b',B:'#4dabf7',Rh:'#69db7c'},ABC={'anti-A':'#f59f00','anti-B':'#1c7ed6'};
+  /* plasma compartment (recipient) */
+  s.poly([[.1,-1.5,0],[3.5,-1.5,0],[3.5,1.5,0],[.1,1.5,0]],'#f6d98f',{cull:false,alpha:.16,stroke:'#f6d98f66',lw:1.2,z:-1e5});
+  const Y=(q,col,a,sc=1)=>{const ca=Math.cos(a),sa=Math.sin(a),R=(x,y)=>[q[0]+x*ca-y*sa,q[1]+x*sa+y*ca,q[2]],w=.032;s.tube([R(0,0),R(0,.2*sc)],w,col,{segs:5});s.tube([R(0,.2*sc),R(-.13*sc,.38*sc)],w,col,{segs:5});s.tube([R(0,.2*sc),R(.13*sc,.38*sc)],w,col,{segs:5})};
+  /* donor red cells: biconcave discs with antigen spikes on the surface */
+  const HEX=[[0,0],[.82,0],[-.82,0],[.41,.72],[-.41,.72],[.41,-.72],[-.41,-.72]],home=[-2.35,0],cl=[1.8,0],cells=[];
+  for(let i=0;i<7;i++){const h=HEX[i],hx=home[0]+h[0]*1.02,hy=home[1]+h[1]*1.02,cx2=cl[0]+h[0]*.92,cy2=cl[1]+h[1]*.92,x=hx+(cx2-hx)*k,y=hy+(cy2-hy)*k;cells.push([x,y]);
+   s.mesh([x,y,0],[.4,.14,.4],'#d6303a',{rot:[PI/2,0,0],rings:10,segs:18,spec:.5,shape:u=>1-.55*Math.exp(-(((PI/2-Math.abs(u))*2.6)**2))});
+   const n=r.ag.length;for(let m=0;m<12&&n;m++){const a=TAU*m/12+i,j=m%n,col=AC[r.ag[j]];s.seg([x+.4*Math.cos(a),y+.4*Math.sin(a),.05],[x+.52*Math.cos(a),y+.52*Math.sin(a),.05],col,2);s.ball([x+.54*Math.cos(a),y+.54*Math.sin(a),.06],.055,col,{flat:true})}}
+  /* recipient antibodies */
+  if(r.ok){r.ab.forEach((a,j)=>{for(let m=0;m<5;m++){const q=[.6+hash(m*3+j*17)*2.5,(hash(m*5+j*11+2)-.5)*2.4,0];Y(q,ABC[a],(hash(m+j*7)-.5)*2.6+Math.sin(t*.6+m)*.15)}})}
+  else{const pr=[[1,2],[1,3],[1,5],[2,4],[3,4],[5,6],[3,0],[4,0],[0,5]];let m=0;for(const [a,b] of pr){const A=cells[a],B=cells[b],mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2,col=r.ab.length?ABC[r.ab[m%r.ab.length]]:'#adb5bd';if(k>.7)Y([mx,my,.1],col,Math.atan2(B[1]-A[1],B[0]-A[0])-PI/2,1.3);m++}
+   for(let m2=0;m2<4;m2++)Y([2.9+hash(m2)*.4,-1.2+hash(m2+4)*.5+(m2%2)*1.8,0],ABC[r.ab[m2%r.ab.length]]||'#aaa',hash(m2)*3)}
+  s.render();
+  tag(c,'donor red cells',150,118,'#ff8787',12);tag(c,'recipient plasma',345,118,'#f6d98f',12);
+  r.ab.length?tag(c,'Y = '+r.ab.join(' / ')+' antibodies',150,356,ABC[r.ab[0]],12):tag(c,'recipient has no anti-A / anti-B antibodies',150,356,C.muted,12);
+  tag(c,r.ag.length?'antigens on donor cells: '+r.ag.join(', ')+'   (spikes)':'donor cells carry no A/B/Rh antigens',150,372,C.muted,12);
   tag(c,r.ok?(r.sens?'No clumping now; recipient may form anti-Rh':'No clumping'):'Clumping (agglutination)',44,98,r.ok?(r.sens?C.gold:C.mint):C.red,15)},
  assumption:'ABO and Rh only; real cross-matching also checks other antigens. Y-shapes are antibodies.'});
 function compat(p){const [dg,dr]=[p.d.slice(0,-1),p.d.slice(-1)],[rg,rr]=[p.r.slice(0,-1),p.r.slice(-1)],ag=ABO[dg][0],ab=ABO[rg][1],aboOK=!ag.some(a=>ab.includes('anti-'+a)),rhOK=!(dr==='+'&&rr==='-');return{ok:aboOK,sens:aboOK&&!rhOK,ag:dr==='+'?[...ag,'Rh']:ag,ab,rh:rhOK?'Compatible':'Rh+ into Rh− recipient: no anti-Rh yet, so no clumping the first time, but the recipient may start making anti-Rh antibodies (a later Rh+ transfusion or pregnancy is then at risk)'}}
