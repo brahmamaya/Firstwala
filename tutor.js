@@ -40,7 +40,7 @@ const hammer=(cls)=>{const NS='http://www.w3.org/2000/svg',v=document.createElem
 const crown=hammer('rank-logo');const rb=el('b','','Rank mode');
 rankBtn.append(crown,rb,el('small','','Completely focused on NEET & JEE aspirants'),selTag());sw.append(simBtn,rankBtn);
 const rankSub=el('div','rank-sub');rankSub.id='rank-sub';rankSub.inert=true;const rankIn=el('div','rank-sub-in');rankSub.append(rankIn);
-for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>k==='neet'||k==='jee'?rankNeet(k):rankSoon(k,t));const i=el('span','rank-ic',ic);i.setAttribute('aria-hidden','true');b.append(i,el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
+for(const [k,ic,t,sm] of RANK){const b=btn('rank-pick',null,()=>k==='neet'||k==='jee'?rankNeet(k):rankSoon(k,t));b.append(el('b','',t),el('small','',sm));b.dataset.testid='rank-'+k;rankIn.append(b)}
 let rankOv=null,rankLoading=false;
 // NEET opens the practice space (its code and questions download only now); JEE pages stay "coming soon"
 let rankWait=null;const loadRank=()=>window.PhysicaRankNeet?Promise.resolve():rankWait||(rankWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__RANK_URL__';s.async=true;s.onload=ok;s.onerror=()=>{rankWait=null;s.remove();no()};document.head.append(s)}));
