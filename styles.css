@@ -1258,3 +1258,6 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .one-dlg{background:#fff;color:#0b1220;border-color:#c7d3e6}
 :root[data-theme="light"] .one-soon{background:#0b1220;color:#fff}
 :root[data-theme="light"] .one-close{background:#f1f5fb;color:#0b1220;border-color:#c7d3e6}
+
+/* landing, dark theme: heading and the Simulate / Teach / Rank words are plain pure white (no gradient, no blue) */
+:root:not([data-theme="light"]) .landing h1,:root:not([data-theme="light"]) .landing h1 .landing-grad,:root:not([data-theme="light"]) .ls-words b,:root:not([data-theme="light"]) .ls-words .w1,:root:not([data-theme="light"]) .ls-words .w2,:root:not([data-theme="light"]) .ls-words .w3{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;animation:none!important}
