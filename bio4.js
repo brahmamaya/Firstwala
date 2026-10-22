@@ -194,7 +194,12 @@ add({...ch(3,'Reproductive Health',U6),id:'bio-population-growth-rate',title:'Po
  tryText:'Compare 1.7% per year with 1% per year over 50 years.',
  controls:[R('r','Growth rate',.5,3,.1,1.7,'% per year',1),R('years','Years ahead',0,100,1,30,'years'),R('N0','Starting population',100,1400,10,1210,'million')],
  metrics:p=>{const Nn=p.N0*Math.exp(p.r/100*p.years);return[N('Population after',Nn,'million',0),N('Doubling time',Math.log(2)/(p.r/100),'years',1),N('India at independence','≈ 350 million'),N('Census 2011','> 1.2 billion')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:320,pitch:.25}),steps=6;for(let i=0;i<=steps;i++){const y=p.years*i/steps,Nn=p.N0*Math.exp(p.r/100*y),h=Nn/4000*3.5;s.box([-2.4+i*.8,-1.6+h/2,0],[.55,h,.55],i===steps?'#ffa94d':'#4dabf7');s.label([-2.4+i*.8,-1.9,0],'+'+Math.round(y),C.muted,10)}for(let i=0;i<6;i++)critter(s,'human',[-3.4,-1.6,-1+i*.4],.45,t);s.render();tag(c,'columns: population every few years (height ∝ size)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const k=p.r/100,Nn=p.N0*Math.exp(k*p.years),cnt=Math.min(40,Math.round(10*Nn/p.N0)),per=10,x0=56,y0=140,dx=34,dy=48,dbl=Math.log(2)/k,ymax=Math.max(2.2*p.N0,p.N0*Math.exp(k*100)*1.03);
+  /* crowd of people: each figure stands for N0/10 million people (blue = starting population, orange = added) */
+  for(let i=0;i<cnt;i++){const col=i<10?'#4dabf7':'#ffa94d',x=x0+(i%per)*dx+(Math.floor(i/per)%2?6:0),y=y0+Math.floor(i/per)*dy;c.save();c.fillStyle=col;c.beginPath();c.arc(x,y,6.5,0,TAU);c.fill();c.beginPath();c.moveTo(x-10,y+27);c.quadraticCurveTo(x-11,y+10,x,y+10);c.quadraticCurveTo(x+11,y+10,x+10,y+27);c.closePath();c.fill();c.restore()}
+  tag(c,'each figure ≈ '+Math.round(p.N0/10)+' million people',44,98,C.muted,12);tag(c,'blue: starting population · orange: added',44,114,C.muted,12);
+  tag(c,Nn>=2*p.N0?'population has more than doubled (doubling time '+dbl.toFixed(1)+' years)':'doubling time '+dbl.toFixed(1)+' years — not yet doubled',44,y0+Math.min(3,Math.floor((cnt-1)/per))*dy+50,C.gold,12);
+  chart(c,420,96,236,170,{title:'Population (million)',xl:'years ahead',xmin:0,xmax:100,ymin:0,ymax:ymax,series:[{fn:y=>p.N0*Math.exp(k*y),col:C.gold},{fn:()=>2*p.N0,col:'#8ca6b9',dash:[4,4]}],marker:[p.years,Nn]});tag(c,'dashed: twice the starting population',420,278,C.muted,10)},
  assumption:'Constant exponential growth for illustration; real rates change with time.'});
 
 /* ---------- Chapter 4: Principles of Inheritance and Variation ---------- */
