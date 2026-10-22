@@ -150,7 +150,7 @@ body.no-scroll{overflow:hidden}
 body.hide-about .intro,body.hide-tools .lab-tools,body.hide-observe .observe-card,body.hide-tips .controls-tip{display:none!important}
 @media(min-width:761px){body.hide-library .sidebar{display:none!important}body.hide-library .layout{grid-template-columns:minmax(0,1fr)!important}}
 .restore-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 12px}.restore-bar[hidden]{display:none}.restore-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-right:2px}.restore-chip{min-height:28px;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700}.restore-chip:hover{color:var(--text);border-style:solid}.restore-all{border-style:solid;color:var(--mint)}
-.focus-btn{min-height:30px;padding:4px 11px;border-radius:8px;font-size:12px;font-weight:800;margin-left:10px}.focus-btn:hover,.focus-btn[aria-pressed=true]{border-color:var(--mint);color:var(--mint)}
+.focus-btn{margin-left:10px}.focus-btn:hover,.focus-btn[aria-pressed=true]{border-color:var(--mint);color:var(--mint)}
 body.focus .topbar,body.focus .sidebar,body.focus .workspace-header,body.focus .intro,body.focus .tabs-nav,body.focus #simulation-tabs,body.focus .lab-tools,body.focus #wonder-card,body.focus .observe-card,body.focus #lesson-section,body.focus .footer,body.focus .restore-bar,body.focus .focus-btn:not(.info-btn){display:none!important}
 body.focus .layout{grid-template-columns:minmax(0,1fr)!important;min-height:100vh}body.focus .main{max-width:none;padding-top:12px}
 .focus-exit{position:fixed;z-index:150;padding:8px 14px;border-radius:999px;border:1px solid var(--mint);background:rgb(var(--k-07121f) / .9);color:var(--mint);font-size:12.5px;font-weight:800;box-shadow:0 6px 20px rgb(var(--sh) / calc(.4 * var(--sa)))}.focus-exit[hidden]{display:none}
@@ -1227,3 +1227,11 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .rec-menu button:hover,.rec-menu button:focus-visible{background:#18345a;border-color:#6fb4ff}
 :root[data-theme="light"] .rec-menu{background:#fff;border-color:#c7d3e6}
 :root[data-theme="light"] .rec-menu button{background:#f1f5fb;border-color:#c7d3e6;color:#0b1220}
+
+/* softer dark theme: no sheen or neon on buttons, lighter weights and borders, plain sans titles; smaller Focus mode button */
+.focus-btn{min-height:26px!important;padding:2px 9px!important;font-size:11.5px!important;font-weight:600!important;border-radius:999px!important;opacity:.9}
+:root:not([data-theme="light"]) .lab-tool-buttons button:after,:root:not([data-theme="light"]) .more-menu summary:after,:root:not([data-theme="light"]) .view3d-bar button:after,:root:not([data-theme="light"]) .transport button:after,:root:not([data-theme="light"]) .focus-btn:after,:root:not([data-theme="light"]) .simulation-tabs button:after,:root:not([data-theme="light"]) .tabs-nav button:after{display:none!important}
+:root:not([data-theme="light"]) .lab-tool-buttons button,:root:not([data-theme="light"]) .more-menu summary,:root:not([data-theme="light"]) .view3d-bar button,:root:not([data-theme="light"]) .transport button,:root:not([data-theme="light"]) .simulation-tabs button,:root:not([data-theme="light"]) .tabs-nav button,:root:not([data-theme="light"]) #prev,:root:not([data-theme="light"]) #next{font-weight:600!important;letter-spacing:0!important;box-shadow:none!important;border-color:rgb(var(--ov) / .16)}
+:root:not([data-theme="light"]) .lab-tool-buttons button:hover,:root:not([data-theme="light"]) .more-menu summary:hover,:root:not([data-theme="light"]) .view3d-bar button:hover,:root:not([data-theme="light"]) .focus-btn:hover,:root:not([data-theme="light"]) .restore-chip:hover{box-shadow:none!important;border-color:rgb(var(--ov) / .38)}
+:root:not([data-theme="light"]) #title{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif!important;font-weight:700!important;letter-spacing:0!important}
+:root:not([data-theme="light"]) .fb-card h2,:root:not([data-theme="light"]) .tutor-top h2{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:700;letter-spacing:0}
