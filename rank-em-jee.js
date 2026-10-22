@@ -1,4 +1,4 @@
-/* Rank mode · JEE Mains Physics · Electromagnetic Waves. Same page as the other chapters; no past-year questions yet.
+/* Rank mode · JEE Mains Physics · Electromagnetic Waves. Same page as the other chapters; past-year questions are in rank-pyq-em.js.
    Loaded with the JEE pack. Plain data only; the diagrams (emw, emdc, emsp) are drawn by rank-figs.js. Nothing leaves the device.
    F(section, level, name, formulas, how to apply, example, diagram): level 1 = must know, 2 = also useful.
    Constants used in the examples: c = 3 × 10⁸ m/s, ε₀ = 8.85 × 10⁻¹² C²/N m², μ₀ = 4π × 10⁻⁷ T m/A, h = 6.63 × 10⁻³⁴ J s. */

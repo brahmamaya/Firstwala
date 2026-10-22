@@ -17,7 +17,7 @@ bundle(CORE,'physica-core.min.js');bundle(PACK,'physica-3d.min.js');
 fs.writeFileSync(path.join(root,'.hlvoice.tmp.js'),require('./hinglish-voice.js')(root,TUTOR).js);
 // the exam questions ship as their own pack; the tutor pack carries just the list of chapters that have them
 bundle(EXAM,'physica-exam.min.js');
-bundle(['rank-pyq-jee.js','rank-pyq-kin.js','rank-pyq-lom.js','rank-pyq-wep.js','rank-pyq-rot.js','rank-pyq-grav.js','rank-pyq-prop.js','rank-pyq-thermo.js','rank-pyq-ktg.js','rank-pyq-osc.js','rank-pyq-es.js'],'physica-pyq.min.js');
+bundle(['rank-pyq-jee.js','rank-pyq-kin.js','rank-pyq-lom.js','rank-pyq-wep.js','rank-pyq-rot.js','rank-pyq-grav.js','rank-pyq-prop.js','rank-pyq-thermo.js','rank-pyq-ktg.js','rank-pyq-osc.js','rank-pyq-em.js','rank-pyq-es.js'],'physica-pyq.min.js');
 bundle(['rank-export.js'],'physica-export.min.js');
 bundle(['series-exam.js'],'physica-series-exam.min.js'); // the exam screen, fetched when a test starts
 bundle(['series.js'],'physica-series.min.js');           // Test Series hub, login, results; fetched when a student opens it
