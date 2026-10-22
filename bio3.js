@@ -151,6 +151,32 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-cardiac-cycle',title:'The c
 const heartEnds=T=>T>=.8?[.1,.4]:[T/8,T/2];
 function heartPhase(p,t){const T=60/p.hr,q=cycle(t,T),[e1,e2]=heartEnds(T),k=x=>Math.sin(PI*clamp(x,0,1));if(q<e1)return{name:'Atrial systole',valves:'AV valves open; semilunar closed',atria:k(q/e1),vent:0};if(q<e2)return{name:'Ventricular systole',valves:'AV valves closed (lub); semilunar open',atria:0,vent:k((q-e1)/(e2-e1)),sound:q<e1+.06?'LUB':''};return{name:'Joint diastole',valves:'Semilunar closed (dub); AV open',atria:0,vent:0,sound:q<e2+.06?'DUB':''}}
 
+// ECG monitor: calibrated grid (cached once), scrolling trace with glow, labelled P-QRS-T, R-R bracket, and a heart that lights up as each wave passes.
+const ECGX=[-1.3,3.1],ECGY=[-1,1.25],ECGW=3.2,ECGBASE=-.35;
+const ECGG=(()=>{const z=-.24,zig=(n,a0,a1,b0,b1,vert)=>{const o=[];for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n,lo=i%2?b1:b0,hi=i%2?b0:b1;o.push(vert?[a,lo,z]:[lo,a,z],vert?[a,hi,z]:[hi,a,z])}return o};
+  return{mv:zig(80,ECGX[0],ECGX[1],ECGY[0],ECGY[1],true),Mv:zig(16,ECGX[0],ECGX[1],ECGY[0],ECGY[1],true),mh:zig(25,ECGY[0],ECGY[1],ECGX[0],ECGX[1],false),Mh:zig(5,ECGY[0],ECGY[1],ECGX[0],ECGX[1],false)}})();
+const ecgWave=(x,T)=>{const q=cycle(x,T)/T*.8,g=(m,w,a)=>a*Math.exp(-(((q-m)/w)**2));return g(.08,.025,.15)-g(.17,.008,.12)+g(.19,.01,1)-g(.21,.008,.25)+g(.42,.04,.3)};
+const ecgDraw=(c,p,t)=>{const T=60/p.hr,s=P3.scene(c,{scale:62,cx:360,cy:258,pitch:.1}),X0=ECGX[0],X1=ECGX[1],pw=(X1-X0)/ECGW,N=190,pts=[],hp=[-2.85,.2,0],hk=.66,q=cycle(t,T)/T*.8;
+  // monitor body and screen
+  s.box([(X0+X1)/2,(ECGY[0]+ECGY[1])/2,-.5],[X1-X0+.5,ECGY[1]-ECGY[0]+.5,.32],'#1d2329');s.poly([[X0,ECGY[0],-.33],[X1,ECGY[0],-.33],[X1,ECGY[1],-.33],[X0,ECGY[1],-.33]],'#06241d',{shade:false,cull:false,bias:.05});
+  s.path(ECGG.mv,'#156653',.7,[],1e4);s.path(ECGG.mh,'#156653',.7,[],1e4);s.path(ECGG.Mv,'#2bb594',1.2,[],1e4+1);s.path(ECGG.Mh,'#2bb594',1.2,[],1e4+1);
+  s.seg([X0,ECGBASE,-.23],[X1,ECGBASE,-.23],'#1f8f74',.8,[2,4],1e4+2);
+  for(let i=0;i<=N;i++)pts.push([X0+(X1-X0)*i/N,ECGBASE+.9*ecgWave(t-ECGW+ECGW*i/N,T),-.2]);
+  s.path(pts,'rgba(105,219,124,.22)',7,[],1e5-1);s.path(pts,'#69db7c',2.4,[],1e5);
+  const win={p:[.03,.13],qrs:[.16,.23],t:[.32,.52]}[p.hl],run=[],flush=()=>{if(run.length>1){s.path(run.slice(),'rgba(255,212,59,.3)',9,[],1e5);s.path(run.slice(),'#ffd43b',4,[],1e5+1)}run.length=0};
+  for(let i=0;i<=N;i++){const qq=cycle(t-ECGW+ECGW*i/N,T)/T*.8;if(qq>=win[0]&&qq<=win[1])run.push(pts[i]);else flush()}flush();
+  // wave names and the R-R interval on complete beats in view
+  const px=tm=>X0+(tm-(t-ECGW))*pw,n=Math.floor((t-.2375*T)/T),rT=m=>m*T+.2375*T,lab=(m,f,txt,col,y)=>{const tm=m*T+f*T;if(tm>t-ECGW+.05&&tm<t-.05)s.label([px(tm),y,-.2],txt,col,13)};
+  {const m=n-1;lab(m,.1,'P','#8ce99a',ECGBASE+.42);lab(m,.2375,'QRS','#8ce99a',ECGBASE+1.12);lab(m,.525,'T','#8ce99a',ECGBASE+.55)}
+  if(rT(n-1)>t-ECGW+.05){const xa=px(rT(n-1)),xb=px(rT(n)),y=ECGY[1]-.3;s.seg([xa,y,-.2],[xb,y,-.2],'#e9f6ff',1.4,[],1e4+3);s.seg([xa,y-.07,-.2],[xa,y+.07,-.2],'#e9f6ff',1.4,[],1e4+3);s.seg([xb,y-.07,-.2],[xb,y+.07,-.2],'#e9f6ff',1.4,[],1e4+3);s.label([(xa+xb)/2,y+.14,-.2],`R–R = ${f(T,2)} s`,'#e9f6ff',12)}
+  s.label([X0+.45,ECGY[1]-.12,-.2],'Lead II','#9fb6c4',12);s.label([X1-.5,ECGY[0]-.22,-.2],'1 large square = 0.2 s','#9fb6c4',11);s.label([X1-.45,ECGY[1]+.05,-.2],`${p.hr} bpm`,C.mint,15);
+  // heart: lights up where the wave currently is (gold = depolarisation, blue = repolarisation)
+  const atr=q>=.03&&q<=.14,dep=q>=.16&&q<=.23,rep=q>=.32&&q<=.52;
+  heart(s,hp,hk,{aS:atr?.7:0,vS:dep?.8:0});
+  if(atr){s.mesh(V.add(hp,[-.55*hk,.5*hk,.4*hk]),[.38*hk,.34*hk,.2*hk],'#ffd43b',{alpha:.5,rings:8,segs:12,shade:false});s.mesh(V.add(hp,[.5*hk,.56*hk,.3*hk]),[.34*hk,.29*hk,.2*hk],'#ffd43b',{alpha:.5,rings:8,segs:12,shade:false})}
+  if(dep||rep)s.mesh(V.add(hp,[.08*hk,-.32*hk,.38*hk]),[.66*hk,.76*hk,.3*hk],dep?'#ffd43b':'#4dabf7',{alpha:.42,rings:10,segs:14,shade:false});
+  s.label([hp[0],hp[1]-1.35*hk-.15,0],atr?'atria depolarise':dep?'ventricles depolarise':rep?'ventricles repolarise':'resting (isoelectric)',atr||dep?'#ffd43b':rep?'#74c0fc':'#9fb6c4',12);
+  s.render();tag(c,{p:'P',qrs:'QRS',t:'T'}[p.hl]+' wave highlighted (see readouts)',44,98,C.gold,14)};
 add({...ch(15,'Body Fluids and Circulation'),id:'bio-ecg',title:'Electrocardiogram (ECG)',
  description:'Read an ECG trace: P wave, QRS complex and T wave. Count QRS complexes to find the heart rate.',
  formula:'Heart rate = 60 / (R–R interval in s)',
@@ -158,9 +184,7 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-ecg',title:'Electrocardiogr
  tryText:'Raise the heart rate and measure the shorter R–R interval.',
  controls:[R('hr','Heart rate',40,180,1,72,'beats/min'),S('hl','Highlight wave','qrs',[['p','P wave'],['qrs','QRS complex'],['t','T wave']])],
  metrics:p=>[N('R–R interval',60/p.hr,'s',2),N('Heart rate',p.hr,'beats/min',0),N('Highlighted',{p:'P: atrial depolarisation',qrs:'QRS: ventricular depolarisation',t:'T: ventricular repolarisation'}[p.hl])],
- draw:(c,p,t)=>{const T=60/p.hr,ecg=x=>{const q=cycle(x,T)/T*.8,g=(m,w,a)=>a*Math.exp(-(((q-m)/w)**2));return g(.08,.025,.15)-g(.17,.008,.12)+g(.19,.01,1)-g(.21,.008,.25)+g(.42,.04,.3)},s=P3.scene(c,{scale:58,pitch:.15});
-  s.box([0,0,-.4],[6.4,3,.3],'#212529');s.box([0,0,-.24],[6,2.6,.05],'#0b3d2e');const pts=[];for(let i=0;i<=240;i++){const x=t-3+3*i/240;pts.push([-2.9+5.8*i/240,-.6+ecg(x)*1.6,-.2])}s.path(pts,'#69db7c',2.5,[],1e5);
-  const win={p:[.03,.13],qrs:[.16,.23],t:[.32,.52]}[p.hl],run=[],flush=()=>{if(run.length>1)s.path(run.slice(),'#ffd43b',4,[],1e5);run.length=0};for(let i=0;i<=240;i++){const q=cycle(t-3+3*i/240,T)/T*.8;if(q>=win[0]&&q<=win[1])run.push(pts[i]);else flush()}flush();s.label([2.6,1.1,-.2],`${p.hr} bpm`,C.mint,15);s.render();tag(c,{p:'P',qrs:'QRS',t:'T'}[p.hl]+' wave highlighted (see readouts)',44,98,C.gold,14)},
+draw:(c,p,t)=>ecgDraw(c,p,t/*DBG*/),
  assumption:'Synthetic ECG built from Gaussian waves (lead II shape); not for clinical interpretation.'});
 
 const ABO={A:[['A'],['anti-B']],B:[['B'],['anti-A']],AB:[['A','B'],[]],O:[[],['anti-A','anti-B']]};
