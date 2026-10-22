@@ -20,7 +20,7 @@ add({...ch(1,'The Living World',U1),id:'bio-taxonomic-hierarchy',title:'Taxonomi
  tryText:'Compare mango and wheat: at which level do they first fall into the same taxon?',
  controls:[S('org','Organism','human',[['human','Man'],['housefly','Housefly'],['mango','Mango'],['wheat','Wheat']]),R('rank','Taxonomic category (1 = species)',1,7,1,1)],
  metrics:p=>{const t=TAXA[p.org],r=p.rank-1;return[N('Category',RANKS[r]),N('Taxon',t[r]),N('Scientific name',t[0]),N('Shared characters','Fewer as you go up')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:44,cy:300,pitch:.12}),tx=TAXA[p.org];for(let i=0;i<7;i++){const lvl=6-i,y=-1.6+i*.42,r=2.6-i*.32,on=lvl===p.rank-1;s.cyl([0,y,0],[0,1,0],r,.36,on?'#42d9ca':['#1c3a4f','#21445b','#264e66','#2b5872','#30627d','#356c89','#3a7694'][i],{cap:on?'#7ff0e3':undefined,segs:32});s.label([r+.2,y,0],`${RANKS[lvl]}: ${tx[lvl]}`,on?C.mint:C.muted,on?13:11,'left')}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:40,cy:262,pitch:.1}),tx=TAXA[p.org];for(let i=0;i<7;i++){const lvl=6-i,y=-1.6+i*.42,r=2.5-i*.34,on=lvl===p.rank-1;s.cyl([0,y,0],[0,1,0],r,.38,on?'#42d9ca':['#1c3a4f','#21445b','#264e66','#2b5872','#30627d','#356c89','#3a7694'][i],{cap:on?'#7ff0e3':undefined,segs:32});s.label([r+.25,y,0],`${RANKS[lvl]}: ${tx[lvl]}`,on?C.mint:C.muted,on?13:11,'left')}
   const top=[0,-1.6+7*.42-.2,0];s.cyl(top,[0,1,0],.5,.05,'#e9f6ff');critter(s,MODEL[p.org],V.add(top,[0,0,0]),p.org==='human'?.75:.9,t);s.render();tag(c,'Wide base: many organisms share a kingdom; the narrow top is one species',44,98,C.muted,12)},
  assumption:'Classification exactly as in NCERT Table 1.1; Angiospermae is a Division in plants, Phylum in animals.'});
 
@@ -31,8 +31,8 @@ add({...ch(1,'The Living World',U1),id:'bio-dichotomous-key',title:'Using a taxo
  tryText:'Find the answers that lead to the frog. How many couplets did you need?',
  controls:[S('q1','1. Vertebral column (backbone)','yes',[['yes','Present'],['no','Absent']]),S('q2','2. If absent: jointed legs','yes',[['yes','Present'],['no','Absent']]),S('q3','3. If present: paired fins or limbs','limbs',[['fins','Fins'],['limbs','Limbs']]),S('q4','4. Body covered with feathers','no',[['yes','Yes'],['no','No']]),S('q5','5. Hair and mammary glands','no',[['yes','Yes'],['no','No (moist, scaleless skin)']])],
  metrics:p=>{const r=keyResult(p);return[N('Identified',r.name),N('Couplets used',r.path.length,'',0),N('Path',r.path.join(' → '))]},
- draw:(c,p,t)=>{const r=keyResult(p),s=P3.scene(c,{scale:46,cy:310,pitch:.25}),list=[['Earthworm','earthworm'],['Cockroach','cockroach'],['Fish','fish'],['Frog','frog'],['Pigeon','bird'],['Human','human']];s.floor(4,.5,-1.3);
-  list.forEach(([n,m],i)=>{const a=-.9+i*.36,x=3.2*Math.sin(a),z=-1.4+2*(1-Math.cos(a)),win=n===r.name,base=[x,win?-.5:-1.3,z];if(win){pedestal(s,[x,-.5,z],.7,'#42d9ca');s.cyl([x,-.9,z],[0,1,0],.08,.8,'#29475b')}critter(s,m,base,m==='human'?.55:.8,t);s.label(V.add(base,[0,m==='human'?1.25:1,0]),n,win?C.mint:C.muted,win?14:11)});s.render()},
+ draw:(c,p,t)=>{const r=keyResult(p),s=P3.scene(c,{scale:50,cy:290,pitch:.14}),list=[['Earthworm','earthworm'],['Cockroach','cockroach'],['Fish','fish'],['Frog','frog'],['Pigeon','bird'],['Human','human']];s.floor(4,.5,-1.3);
+  list.forEach(([n,m],i)=>{const x=-3.1+i*1.24,z=-1.2,win=n===r.name,base=[x,win?-.5:-1.3,z];if(win){pedestal(s,[x,-.5,z],.7,'#42d9ca');s.cyl([x,-.9,z],[0,1,0],.08,.8,'#29475b')}critter(s,m,base,m==='human'?.55:.8,t);s.label(V.add(base,[0,m==='human'?1.25:1,0]),n,win?C.mint:C.muted,win?14:11)});s.render()},
  assumption:'A simplified teaching key; real keys use many more couplets and are specific to a group and region.'});
 function keyResult(p){if(p.q1==='no')return p.q2==='yes'?{name:'Cockroach',path:['1','2']}:{name:'Earthworm',path:['1','2']};if(p.q3==='fins')return{name:'Fish',path:['1','3']};if(p.q4==='yes')return{name:'Pigeon',path:['1','3','4']};return p.q5==='yes'?{name:'Human',path:['1','3','4','5']}:{name:'Frog',path:['1','3','4','5']}}
 
@@ -46,8 +46,8 @@ add({...ch(2,'Biological Classification',U1),id:'bio-five-kingdoms',title:'Whitt
  tryText:'Which kingdom is the only one whose members lack a cell wall entirely?',
  controls:[S('k','Kingdom','monera',[['monera','Monera'],['protista','Protista'],['fungi','Fungi'],['plantae','Plantae'],['animalia','Animalia']])],
  metrics:p=>{const d=KING[p.k];return[N('Cell type',d[0]),N('Cell wall',d[1]),N('Nuclear membrane',d[2]),N('Body organisation',d[3]),N('Nutrition',d[4])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:280,pitch:.22}),keys=Object.keys(KING);s.floor(4,.5,-1.2);keys.forEach((k,i)=>{const a=-.95+i*.475,x=3*Math.sin(a),z=-1.2+2.2*(1-Math.cos(a)),on=k===p.k,y=on?-.3:-1.2;pedestal(s,[x,y,z],.62,on?'#42d9ca':'#29475b');if(on)s.cyl([x,-.75,z],[0,1,0],.08,.9,'#29475b');
-  critter(s,KING[k][5],[x,y,z],on?.95:.6,t);s.label([x,y-.35,z+.7],k[0].toUpperCase()+k.slice(1),on?C.mint:C.muted,on?14:11)});s.render();tag(c,'Representative: '+KING[p.k][6],44,98,C.gold,14)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:46,cy:250,pitch:.14}),keys=Object.keys(KING);s.floor(4,.5,-1.2);keys.forEach((k,i)=>{const x=-2.4+i*1.2,z=-1.2,on=k===p.k,y=on?-.3:-1.2;pedestal(s,[x,y,z],.62,on?'#42d9ca':'#29475b');if(on)s.cyl([x,-.75,z],[0,1,0],.08,.9,'#29475b');
+  critter(s,KING[k][5],[x,y,z],on?.95:.6,t);s.label([x,y-.4,z+.8],k[0].toUpperCase()+k.slice(1),on?C.mint:C.muted,on?14:11)});s.render();tag(c,'Representative: '+KING[p.k][6],44,98,C.gold,14)},
  assumption:'Representative organisms only; kingdom features summarised from NCERT Table 2.1.'});
 
 add({...ch(2,'Biological Classification',U1),id:'bio-bacterial-growth',title:'Bacterial shapes and binary fission',
@@ -75,7 +75,7 @@ add({...ch(2,'Biological Classification',U1),id:'bio-bacteriophage',title:'Bacte
  controls:[R('burst','Burst size (phages per cell)',50,200,10,100),R('cycles','Infection cycles',1,4,1,1)],
  metrics:(p,t)=>{const st=['Attachment','Injection of DNA','Replication of phage DNA','Assembly of new phages','Lysis (cell bursts)'][Math.floor(cycle(t,10)/2)];return[N('Stage now',st),N('Genetic material','Double-stranded DNA'),N('Phages produced',p.burst**p.cycles,'',0)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:48,cy:280}),ph=cycle(t,10),stage=Math.floor(ph/2),k=(ph%2)/2;
-  if(stage<4)capsule(s,[-1.6,-.6,0],[1.6,-.6,0],.9,'#a9e34b');else{for(let i=0;i<10;i++){const a=TAU*i/10;s.poly([[1.6*Math.cos(a),-.6+.9*Math.sin(a)*.4,-.2],[1.4*Math.cos(a+.3),-.6+.9*Math.sin(a+.3)*.4,.2],[(1.6+k)*Math.cos(a+.15),-.6+(.9+k)*Math.sin(a+.15)*.4,0]],'#a9e34b',{cull:false,alpha:.7})}}
+  if(stage<4){const a=[-1.6,-.6,0],b=[1.6,-.6,0];s.tube([a,[0,-.6,0],b],.9,'#a9e34b',{segs:28,alpha:.55});s.ball(a,.9,'#a9e34b',{alpha:.55});s.ball(b,.9,'#a9e34b',{alpha:.55});if(stage<2)s.path(Array.from({length:40},(_,i)=>[-1.2+i*.06+.2*Math.sin(i*1.7),-.6+.3*Math.sin(i*.9)*Math.cos(i*.4),.25*Math.cos(i*1.3)]),'#e03131',2)}else{for(let i=0;i<10;i++){const a=TAU*i/10;s.poly([[1.6*Math.cos(a),-.6+.9*Math.sin(a)*.4,-.2],[1.4*Math.cos(a+.3),-.6+.9*Math.sin(a+.3)*.4,.2],[(1.6+k)*Math.cos(a+.15),-.6+(.9+k)*Math.sin(a+.15)*.4,0]],'#a9e34b',{cull:false,alpha:.7})}}
   const top=stage===0?[0,2.4-1.4*k,0]:[0,1,0];phage(s,top,1,stage===1?k:stage>1?1:0);if(stage<=1){s.callout(V.add(top,[.3,1.05,0]),'head: protein coat with DNA','#e9f6ff',55,-18);s.callout(V.add(top,[.1,.25,0]),stage===1?'tail sheath contracts':'tail sheath','#e9f6ff',70,-4);s.callout(V.add(top,[.55,-.4,.25]),'tail fibres','#e9f6ff',60,18)}if(stage<4)s.callout([-1.3,-.2,.6],'host: E. coli bacterium','#a9e34b',-30,-50);
   if(stage>=1&&stage<4){const L=stage===1?k:1;s.path(Array.from({length:20},(_,i)=>[.15*Math.sin(i*1.3),.3-L*i*.06,.15*Math.cos(i*1.1)]),'#ff6b6b',2.5)}
   if(stage===2)for(let i=0;i<Math.round(2+k*10);i++)s.ring([-1.2+hash(i)*2.4,-.6+(hash(i+3)-.5)*.8,(hash(i+6)-.5)*.6],[0,0,1],.12,'#ff6b6b',2);
@@ -94,12 +94,12 @@ add({...ch(3,'Plant Kingdom',U1),id:'bio-life-cycles',title:'Alternation of gene
  tryText:'Compare bryophytes with pteridophytes — which generation is the main plant body in each?',
  controls:[S('type','Life cycle','bryo',[['haplontic','Haplontic'],['diplontic','Diplontic'],['bryo','Haplo-diplontic: bryophytes'],['pterido','Haplo-diplontic: pteridophytes']])],
  metrics:p=>{const d=CYCLES[p.type];return[N('Dominant phase',d.dom),N('Meiosis occurs',d.meio),N('Examples',d.ex),N('Haploid share of cycle (schematic)',d.n*100,'%',0)]},
- draw:(c,p,t)=>{const d=CYCLES[p.type],s=P3.scene(c,{scale:52,pitch:.55}),Rr=2.2,a0=-PI/2,split=a0+TAU*(1-d.n);
+ draw:(c,p,t)=>{const d=CYCLES[p.type],s=P3.scene(c,{scale:56,pitch:.4,cy:270}),Rr=2.2,a0=-PI/2,split=a0+TAU*(1-d.n);
   const arc=(from,to,col)=>{const pts=[];for(let i=0;i<=40;i++){const a=from+(to-from)*i/40;pts.push([Rr*Math.cos(a),0,Rr*Math.sin(a)])}s.tube(pts,.12,col,{segs:8})};arc(a0,split,'#fab005');arc(split,a0+TAU,'#4dabf7');
   s.ball([Rr*Math.cos(a0),.0,Rr*Math.sin(a0)],.2,'#e64980',{label:'syngamy → zygote (2n)'});s.ball([Rr*Math.cos(split),0,Rr*Math.sin(split)],.2,'#9775fa',{label:p.type==='diplontic'?'meiosis → gametes (n)':'meiosis → spores (n)'});
   const a=a0+TAU*cycle(t/8,1);s.ball([Rr*Math.cos(a),.25,Rr*Math.sin(a)],.13,C.white,{glow:true});const mid=(x,y)=>[Rr*.45*Math.cos((x+y)/2),-.2,Rr*.45*Math.sin((x+y)/2)];
-  if(d.g)critter(s,d.g,mid(split,a0+TAU),.9,t);else s.ball(mid(split,a0+TAU),.12,'#4dabf7');if(d.sp)critter(s,d.sp,mid(a0,split),.9,t);else if(p.type==='haplontic')s.ball(mid(a0,split),.12,'#fab005');else{critter(s,'moss',mid(a0,split),.7,t)}
-  s.label([0,1.4,0],'blue: haploid (n)   gold: diploid (2n)',C.muted,12);s.render()},
+  if(d.g)critter(s,d.g,mid(split,a0+TAU),1.7,t);else s.ball(mid(split,a0+TAU),.12,'#4dabf7');if(d.sp)critter(s,d.sp,mid(a0,split),1.7,t);else if(p.type==='haplontic')s.ball(mid(a0,split),.12,'#fab005');else{critter(s,'moss',mid(a0,split),1.3,t)}
+  s.render();tag(c,'blue: haploid (n)   gold: diploid (2n)',44,98,C.muted,13)},
  assumption:'Arc lengths are schematic and show which generation dominates, not actual time spent.'});
 
 const GROUPS={algae:['Absent','No seeds','Gametophyte-dominant (most)','Chlamydomonas, Spirogyra, Ulothrix','algae'],bryophytes:['Absent (no true vascular tissue)','No seeds','Gametophyte (sporophyte dependent)','Funaria, Marchantia, Sphagnum','moss'],
@@ -112,10 +112,14 @@ add({...ch(3,'Plant Kingdom',U1),id:'bio-plant-groups',title:'From algae to flow
  controls:[S('g','Plant group','pteridophytes',[['algae','Algae'],['bryophytes','Bryophytes'],['pteridophytes','Pteridophytes'],['gymnosperms','Gymnosperms'],['angiosperms','Angiosperms']])],
  metrics:p=>{const d=GROUPS[p.g];return[N('Vascular tissue',d[0]),N('Seeds',d[1]),N('Main plant body',d[2]),N('Examples',d[3])]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:280,pitch:.22}),keys=Object.keys(GROUPS);s.floor(4,.5,-1.2);keys.forEach((k,i)=>{const a=-.95+i*.475,x=3*Math.sin(a),z=-1.2+2.2*(1-Math.cos(a)),on=k===p.g,y=on?-.3:-1.2;pedestal(s,[x,y,z],.62,on?'#42d9ca':'#29475b');if(on)s.cyl([x,-.75,z],[0,1,0],.08,.9,'#29475b');
-  critter(s,GROUPS[k][4],[x,y,z],on?1.1:.65,t);if(k==='angiosperms')for(let j=0;j<5;j++){const q=TAU*j/5;window.PhysicaBio.petal(s,[x,y+1.2*(on?1.1:.65),z],[Math.cos(q),.4,Math.sin(q)],.22,.09)}s.label([x,y-.35,z+.7],k[0].toUpperCase()+k.slice(1),on?C.mint:C.muted,on?14:11)});s.render()},
+  critter(s,GROUPS[k][4],[x,y,z],on?1.1:.65,t);if(k==='angiosperms')for(let j=0;j<5;j++){const q=TAU*j/5;window.PhysicaBio.petal(s,[x,y+1.2*(on?1.1:.65),z],[Math.cos(q),.4,Math.sin(q)],.22,.09)}s.label([x,y-.4,z+.8],k[0].toUpperCase()+k.slice(1),on?C.mint:C.muted,on?14:11)});s.render()},
  assumption:'Representative models; within each group there is much variation (e.g. some algae are diplontic).'});
 
 const ALGAE={chloro:['Chlorophyll a, b','Starch','Cellulose','2–8, equal, apical','Chlamydomonas, Volvox, Spirogyra','#40c057'],phaeo:['Chlorophyll a, c, fucoxanthin','Mannitol, laminarin','Cellulose and algin','2, unequal, lateral','Ectocarpus, Laminaria, Fucus','#a0782b'],rhodo:['Chlorophyll a, d, r-phycoerythrin','Floridean starch','Cellulose, pectin, polysulphate esters','Absent','Polysiphonia, Porphyra, Gracilaria','#c92a2a']};
+function algae(s,cls,b,col,t){const sw=a=>.12*Math.sin(t*1.2+a);s.mesh(b,[.32,.16,.26],'#6c757d',{rings:6,segs:10});
+  if(cls==='chloro'){for(let i=0;i<4;i++){const a=-.9+i*.6;leaf(s,V.add(b,[a*.12,.1,0]),[a+sw(i),1.4,.2*(i-1.5)],1.3+.15*(i%2),.34,col,.5*i)}}
+  else if(cls==='phaeo'){s.tube([V.add(b,[0,.1,0]),V.add(b,[sw(1),.7,0]),V.add(b,[sw(2),1.3,0])],.06,'#7a5a1c',{segs:8});for(let i=0;i<5;i++){const a=-.9+i*.45;leaf(s,V.add(b,[sw(2),1.25,0]),[a+sw(i),1,.2*(i-2)],1.2,.22,col,.2*i);s.ball(V.add(b,[sw(2)+a*.3,1.0+.05*i,.05*i]),.08,'#d9a441')}}
+  else{const top=V.add(b,[sw(1),1.9,0]);s.tube([V.add(b,[0,.1,0]),V.add(b,[sw(1),1,0]),top],.04,col,{segs:6});for(let i=0;i<7;i++){const y0=.35+i*.22,L=.62-.05*i,q=V.add(b,[sw(i)*.5,y0,0]);for(const sd of[-1,1])s.tube([q,V.add(q,[sd*L*.55,L*.35,.05*sd]),V.add(q,[sd*L,L*.6+sw(i),.1*sd])],.025,col,{segs:5})}}}
 add({...ch(3,'Plant Kingdom',U1),id:'bio-algae-classes',title:'Green, brown and red algae',
  description:'Compare the three classes of algae by pigments, stored food, cell wall and flagella (NCERT Table 3.1).',
  formula:'Pigments decide colour: chlorophylls (green), fucoxanthin (brown), phycoerythrin (red)',
@@ -124,7 +128,8 @@ add({...ch(3,'Plant Kingdom',U1),id:'bio-algae-classes',title:'Green, brown and 
  controls:[S('cls','Class','chloro',[['chloro','Chlorophyceae (green)'],['phaeo','Phaeophyceae (brown)'],['rhodo','Rhodophyceae (red)']]),R('depth','Water depth',0,60,1,5,'m')],
  metrics:p=>{const d=ALGAE[p.cls];return[N('Pigments',d[0]),N('Stored food',d[1]),N('Cell wall',d[2]),N('Flagella',d[3]),N('Examples',d[4])]},
  draw:(c,p,t)=>{const d=ALGAE[p.cls],s=P3.scene(c,{scale:50,cy:262,pitch:.12}),y=1.6-p.depth/60*3.2,light=Math.exp(-p.depth/20);s.box([0,0,0],[6,3.6,2.4],'#1971c2',{alpha:.18});for(let i=0;i<6;i++)s.seg([-2.4+i,1.8,-.4],[-2.4+i+.6,1.8-3.4*light,.2],'#fff3bf'+Math.round(80*light+20).toString(16).padStart(2,'0'),3);
-  for(let f=0;f<5;f++){const pts=Array.from({length:12},(_,i)=>[-.6+f*.3+.12*Math.sin(i*.6+t+f),y-.6+i*.12,.1*Math.cos(f)]);s.tube(pts,u=>.05+.04*Math.sin(PI*u),d[5],{segs:8});if(p.cls!=='chloro')s.mesh(V.add(pts[11],[0,.1,0]),[.18,.08,.04],d[5],{rot:[0,0,f]})}s.label([1.5,y,0],`${p.depth} m`,C.white,13);s.render();tag(c,`Light reaching this depth (illustrative): ${f(light*100,0)} %`,44,98,C.gold,13)},
+  algae(s,p.cls,[-.3,y-1.15,0],d[5],t);
+  s.label([1.5,y,0],`${p.depth} m`,C.white,13);s.render();tag(c,`Light reaching this depth (illustrative): ${f(light*100,0)} %`,44,98,C.gold,13)},
  assumption:'Light attenuation curve is illustrative; table entries from NCERT Table 3.1.'});
 
 /* ---------- Chapter 4: Animal Kingdom ---------- */
@@ -150,13 +155,15 @@ add({...ch(4,'Animal Kingdom',U1),id:'bio-germ-layers-coelom',title:'Germ layers
  tryText:'Compare the pseudocoelomate and coelomate sections — where is the mesoderm?',
  controls:[S('type','Body plan','coel',[['diplo','Diploblastic'],['acoel','Acoelomate'],['pseudo','Pseudocoelomate'],['coel','Coelomate']])],
  metrics:p=>{const d=LAYERS[p.type];return[N('Germ layers',d[0]),N('Body cavity',d[1]),N('Examples',d[2])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,yaw:.6,pitch:.25}),L=3.2,ax=[1,0,0],ecto='#4dabf7',meso='#fa5252',endo='#fcc419';const ring=(r0,r1,col,x=L/2)=>{const n=40;for(let i=0;i<n;i++){const a=TAU*i/n,b=TAU*(i+1)/n;s.poly([[x,r0*Math.cos(a),r0*Math.sin(a)],[x,r0*Math.cos(b),r0*Math.sin(b)],[x,r1*Math.cos(b),r1*Math.sin(b)],[x,r1*Math.cos(a),r1*Math.sin(a)]],col,{normal:[1,0,0],cull:false})}};
-  s.cyl([0,0,0],ax,1.5,L,ecto,{caps:false,alpha:.35});ring(1.3,1.5,ecto);
-  if(p.type==='diplo'){ring(.55,1.3,'#ced4da');ring(.35,.55,endo);s.label([L/2+.1,.9,0],'mesoglea',C.muted,12)}
-  if(p.type==='acoel'){ring(.55,1.3,meso);ring(.35,.55,endo)}
-  if(p.type==='pseudo'){ring(1.1,1.3,meso);ring(.35,.55,endo);s.label([L/2+.1,.85,0],'pseudocoelom',C.gold,12)}
-  if(p.type==='coel'){ring(1.1,1.3,meso);ring(.55,.75,meso);ring(.35,.55,endo);s.label([L/2+.1,.92,0],'coelom',C.gold,12)}
-  s.cyl([0,0,0],ax,.35,L,'#2b2b2b',{caps:false,alpha:.5});s.label([L/2+.2,0,0],'gut',C.white,12);s.label([L/2,1.75,0],'ectoderm',ecto,12);s.render();tag(c,'blue: ectoderm   red: mesoderm   yellow: endoderm',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:64,yaw:.5,pitch:.28,cy:240}),L=2.2,z0=-L/2,ax=[0,0,1],ecto='#4dabf7',meso='#fa5252',endo='#fcc419',Z=L/2;
+  const ring=(r0,r1,col,z=Z)=>{const n=56;for(let i=0;i<n;i++){const a=TAU*i/n,b=TAU*(i+1)/n;s.poly([[r0*Math.cos(a),r0*Math.sin(a),z],[r0*Math.cos(b),r0*Math.sin(b),z],[r1*Math.cos(b),r1*Math.sin(b),z],[r1*Math.cos(a),r1*Math.sin(a),z]],col,{normal:[0,0,1],cull:false})}};
+  s.cyl([0,0,z0+.0],ax,1.5,L,ecto,{caps:false,alpha:.28,seg:48});ring(1.3,1.5,ecto);
+  const ld=(ang,r,txt,col)=>{const q=[r*Math.cos(ang),r*Math.sin(ang),Z+.02];s.callout(q,txt,col,70,-30*Math.sin(ang)-10)};
+  if(p.type==='diplo'){ring(.55,1.3,'#ced4da');ring(.35,.55,endo);ld(.7,.9,'mesoglea (non-cellular)',C.muted)}
+  if(p.type==='acoel'){ring(.55,1.3,meso);ring(.35,.55,endo);ld(.7,.9,'solid mesoderm',meso)}
+  if(p.type==='pseudo'){ring(1.1,1.3,meso);ring(.35,.55,endo);ld(.7,.85,'pseudocoelom',C.gold)}
+  if(p.type==='coel'){ring(1.1,1.3,meso);ring(.55,.75,meso);ring(.35,.55,endo);ld(.7,.92,'coelom',C.gold)}
+  s.cyl([0,0,z0],ax,.35,L,'#2b2b2b',{caps:false,alpha:.5,seg:32});ld(-.9,.2,'gut',C.white);ld(2.3,1.45,'ectoderm',ecto);s.render();tag(c,'blue: ectoderm   red: mesoderm   yellow: endoderm',44,98,C.muted,13)},
  assumption:'Schematic transverse sections; organs inside the cavity are omitted.'});
 
 const PHYLA=[['porifera','Porifera','Cellular','Asymmetrical (mostly)','Absent','Pores and canals in body wall','sponge'],['coelenterata','Coelenterata (Cnidaria)','Tissue','Radial','Absent','Cnidoblasts (stinging cells)','hydra'],['ctenophora','Ctenophora','Tissue','Radial','Absent','Comb plates for locomotion','combjelly'],
@@ -170,7 +177,7 @@ add({...ch(4,'Animal Kingdom',U1),id:'bio-phylum-explorer',title:'Phylum explore
  tryText:'Which phyla are coelomate but not segmented?',
  controls:[S('ph','Phylum','arthropoda',PHYLA.map(r=>[r[0],r[1]]))],
  metrics:p=>{const d=PHYLA.find(r=>r[0]===p.ph);return[N('Organisation',d[2]),N('Symmetry',d[3]),N('Coelom',d[4]),N('Distinctive feature',d[5])]},
- draw:(c,p,t)=>{const d=PHYLA.find(r=>r[0]===p.ph),s=P3.scene(c,{scale:66,cy:310,pitch:.3,yaw:t*.25});pedestal(s,[0,-.4,0],1.6,'#29475b',.3);critter(s,d[6],[0,-.25,0],1.6,t);s.render();tag(c,d[1],44,98,C.gold,16)},
+ draw:(c,p,t)=>{const d=PHYLA.find(r=>r[0]===p.ph),s=P3.scene(c,{scale:58,cy:272,pitch:.25,yaw:t*.25});pedestal(s,[0,-.4,0],1.4,'#29475b',.3);critter(s,d[6],[0,-.25,0],1.5,t);s.render();tag(c,d[1],44,98,C.gold,16)},
  assumption:'One representative per phylum; features from NCERT Table 4.2.'});
 
 const CFEAT=[['notochord','Notochord','Present','Absent'],['nerve','Central nervous system','Dorsal, hollow, single','Ventral, solid, double'],['gill','Pharynx','Perforated by gill slits','Gill slits absent'],['heart','Heart','Ventral','Dorsal (if present)'],['tail','Post-anal part (tail)','Present','Absent']];
@@ -211,8 +218,8 @@ add({...ch(5,'Morphology of Flowering Plants',U2),id:'bio-root-systems',title:'R
  controls:[S('type','Root system','tap',[['tap','Tap root'],['fibrous','Fibrous root'],['adv','Adventitious (prop roots)']]),R('days','Days of growth',1,30,1,20,'days')],
  metrics:p=>{const d=ROOTS[p.type];return[N('Type',d[0]),N('Typical in',d[1]),N('Example',d[2]),N('Feature',d[3])]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cy:240,pitch:.2}),g=p.days/30;s.box([0,-1.4,0],[5,2.8,2.4],'#6d4c2f',{alpha:.28});s.box([0,-.02,0],[5,.04,2.4],'#8d6e4f',{alpha:.6});
-  if(p.type==='tap'){s.tube([[0,0,0],[0,-1*g,0],[.05,-2.6*g,0]],u=>.09*(1-u)+.015,BC.root,{segs:8});for(let i=1;i<7;i++){const y=-i*.35*g,a=i*2.2;s.tube([[0,y,0],[.5*Math.cos(a)*g,y-.15,.5*Math.sin(a)*g],[1*Math.cos(a)*g,y-.45*g,1*Math.sin(a)*g]],u=>.03*(1-u)+.008,BC.root,{segs:6})}critter(s,'plant',[0,0,0],1.1,t)}
-  else if(p.type==='fibrous'){for(let i=0;i<14;i++){const a=TAU*i/14,L=(1.3+hash(i))*g;s.tube([[0,0,0],[.4*Math.cos(a)*g,-L*.5,.4*Math.sin(a)*g],[.7*Math.cos(a)*g,-L,.7*Math.sin(a)*g]],u=>.025*(1-u)+.006,BC.root,{segs:5})}critter(s,'wheat',[0,0,0],1.1,t)}
+  if(p.type==='tap'){s.tube([[0,0,0],[0,-1*g,0],[.05,-2.6*g,0]],u=>.13*(1-u)+.02,BC.root,{segs:8});for(let i=1;i<7;i++){const y=-i*.35*g,a=i*2.2;s.tube([[0,y,0],[.5*Math.cos(a)*g,y-.15,.5*Math.sin(a)*g],[1*Math.cos(a)*g,y-.45*g,1*Math.sin(a)*g]],u=>.045*(1-u)+.01,BC.root,{segs:6})}critter(s,'plant',[0,0,0],1.1,t)}
+  else if(p.type==='fibrous'){for(let i=0;i<14;i++){const a=TAU*i/14,L=(1.3+hash(i))*g;s.tube([[0,0,0],[.4*Math.cos(a)*g,-L*.5,.4*Math.sin(a)*g],[.7*Math.cos(a)*g,-L,.7*Math.sin(a)*g]],u=>.035*(1-u)+.008,BC.root,{segs:6})}critter(s,'wheat',[0,0,0],1.1,t)}
   else{s.cyl([0,1,0],[0,1,0],.18,2,'#6d4c2f');s.mesh([0,2.3,0],[1.8,.7,1.2],'#2b8a3e');for(let i=0;i<5;i++){const x=-1.4+i*.7,top=1.9;s.tube([[x,top,(hash(i)-.5)],[x,top-(top+.6)*g,(hash(i)-.5)]],.04,'#8d6e4f',{segs:6})}s.callout([-1.4,.5,0],'prop (adventitious) roots from branches','#c2a26b',-30,-60)}
   if(p.type==='tap'){s.callout([.03,-1.6*g,0],'primary (tap) root','#c2a26b',60,20);s.callout([.7*Math.cos(2.2),-.55*g,.7*Math.sin(2.2)],'lateral roots','#c2a26b',-60,30)}else if(p.type==='fibrous')s.callout([.5,-.8*g,0],'fibrous roots from stem base','#c2a26b',60,30);s.callout([2.3,0,0],'soil surface','#8d6e4f',20,-30);s.render()},
  assumption:'Root growth shown schematically; real depth depends on species, soil and water.'});
@@ -409,7 +416,7 @@ add({...ch(7,'Structural Organisation in Animals',U2),id:'bio-epithelial-tissue'
  metrics:p=>{const d=EPI[p.type];return[N('Cells',d[0]),N('Found in',d[1]),N('Function',d[2])]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,pitch:.35,cy:290}),h={squamous:.18,cuboidal:.55,columnar:1.1,ciliated:1.1,compound:.45}[p.type],w={squamous:.9,cuboidal:.55,columnar:.42,ciliated:.42,compound:.5}[p.type],nx=Math.round(4.8/w),nz=Math.round(2.4/w);s.box([0,-.06,0],[5,.1,2.6],'#e9ecef',{ground:true});
   const layers=p.type==='compound'?4:1;for(let L=0;L<layers;L++){const hh=p.type==='compound'?[.4,.32,.22,.12][L]:h,y0=p.type==='compound'?[0,.4,.72,.94][L]:0,ww=p.type==='compound'?[.45,.55,.7,.9][L]:w;
-   for(let i=0;i<Math.round(4.8/ww);i++)for(let j=0;j<Math.round(2.4/ww);j++){const x=-2.4+ww*(i+.5),z=-1.2+ww*(j+.5);s.box([x,y0+hh/2,z],[ww*.96,hh,ww*.96],L===layers-1&&p.type==='compound'?'#ffd8a8':'#ffc9c9');if(hh>.2)s.ball([x,y0+hh*.4,z],Math.min(ww,hh)*.22,BC.nucleus,{flat:true,lift:.1});else s.mesh([x,y0+hh*.5,z],[ww*.32,hh*.2,ww*.32],BC.nucleus);/* squamous cells: flat, wide nucleus */
+   const rz=ww*.866,nzz=Math.floor(2.4/rz);for(let j=0;j<nzz;j++)for(let i=0;i<Math.round(4.8/ww)-1;i++){const x=-2.2+ww*(i+.5*(j%2)),z=-1.1+rz*j,top=L===layers-1&&p.type==='compound';s.cyl([x,y0+hh/2,z],[0,1,0],ww*.55,hh,top?'#ffd8a8':'#ffc9c9',{seg:6,cap:top?'#ffe8cc':'#ffe3e3',alpha:j===nzz-1?.35:undefined});if(hh>.2)s.ball([x,y0+hh*.4,z],Math.min(ww,hh)*.22,BC.nucleus,{flat:true,lift:.1});else s.mesh([x,y0+hh*.5,z],[ww*.32,hh*.2,ww*.32],BC.nucleus);/* squamous cells: flat, wide nucleus */
     if(p.type==='ciliated'&&i%1===0)for(let k=0;k<3;k++){const q=Math.sin(t*6-i*.8)*.18;s.seg([x-.1+k*.1,h,z],[x-.1+k*.1+q,h+.25,z],'#74c0fc',1.2)}}}const tp=p.type==='compound'?1.06:h;s.callout([-2.4+w*.5,tp*.5,1.2],'epithelial cell','#ffc9c9',-40,-50);s.callout([-2.4+w*1.5,(p.type==='compound'?.16:h*.4),1.2],'nucleus','#b197fc',-30,50);s.callout([2.4,-.06,1.3],'basement membrane','#e9f6ff',40,30);if(p.type==='ciliated')s.callout([0,h+.22,-1.2],'cilia','#74c0fc',40,-40);if(p.type==='compound')s.callout([2.2,1.0,-1.1],'flattened surface cells','#ffd8a8',40,-40);s.render();tag(c,'pink: cells   purple: nuclei   grey: basement membrane',44,98,C.muted,13)},
  assumption:'Cells drawn as regular prisms; real cells interlock irregularly.'});
 
