@@ -122,10 +122,32 @@ add({...ch(8,'Microbes in Human Welfare',U8),id:'bio-biogas-plant',title:'Biogas
  tryText:'Increase the dung fed per day and see the gas holder rise faster.',
  controls:[R('dung','Dung fed per day',10,200,5,50,'kg'),R('T','Digester temperature',15,40,1,32,'°C')],
  metrics:p=>{const y=.04*p.dung*Math.exp(-(((p.T-35)/12)**2));return[N('Biogas per day',y,'m³',2),N('Methane (≈ 60%)',y*.6,'m³',2),N('Microbes','Methanogens, e.g. Methanobacterium'),N('Spent slurry','Used as fertiliser')]},
- draw:(c,p,t)=>{const y=.04*p.dung*Math.exp(-(((p.T-35)/12)**2)),s=P3.scene(c,{scale:54,cy:280,pitch:.25});s.box([0,-1.85,0],[7,.3,3],'#6d4c2f',{ground:true});s.cyl([0,-.9,0],[0,1,0],1.2,1.8,'#868e96',{alpha:.35,caps:false});s.cyl([0,-1.1,0],[0,1,0],1.15,1.4,'#6d4c2f',{alpha:.75});
-  const rise=Math.min(.9,cycle(t*y*.1,1)*.9);s.cyl([0,.05+rise,0],[0,1,0],1.05,.9,'#ced4da');s.tube([[0,.5+rise,0],[0,1.2+rise,0],[1.5,1.2+rise,0]],.05,'#495057',{segs:6});s.ball([1.6,1.2+rise,0],.12,'#4dabf7',{glow:true,flat:true});
-  s.tube([[-2.6,.4,0],[-2.6,-1.2,0],[-1.2,-1.5,0]],.12,'#a0782b',{segs:8});s.tube([[1.2,-1.5,0],[2.6,-1.2,0],[2.6,.2,0]],.12,'#8d6e4f',{segs:8});s.label([-2.6,.8,0],'dung slurry in',C.gold,12);s.label([2.6,.6,0],'spent slurry out',C.muted,12);s.label([0,1.5+rise,0],'gas holder',C.white,12);
-  for(let i=0;i<10;i++){const q=cycle(t*.5+i/10,1);s.ball([(hash(i)-.5)*1.6,-1.5+q*1.2,(hash(i+4)-.5)*1.6],.05,'#e7f5ff',{flat:true})}s.render()},
+ draw:(c,p,t)=>{const y=.04*p.dung*Math.exp(-(((p.T-35)/12)**2)),rise=Math.min(.9,cycle(t*y*.1,1)*.9),GY=190,
+  txt=(s2,x,yy,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,yy);c.restore()},
+  /* ground with soil layers; the digester is a cut-away masonry pit */
+  gr=c.createLinearGradient(0,GY,0,GY+210);gr.addColorStop(0,'#7a5a3a');gr.addColorStop(1,'#3f2c1c');
+  c.save();c.fillStyle=gr;c.fillRect(24,GY,610,210);c.fillStyle='#6fae4f';c.fillRect(24,GY-5,610,8);c.restore();
+  const DX=262,DW=140,DT=GY+4,DB=GY+196;
+  c.save();c.fillStyle='#b5503a';c.strokeStyle='#7a2f22';c.lineWidth=1.5;c.beginPath();c.rect(DX-DW/2-9,DT,9,DB-DT);c.rect(DX+DW/2,DT,9,DB-DT);c.fill();c.stroke();c.fillStyle='#8a3d2d';for(let r=0;r<10;r++){c.fillRect(DX-DW/2-9,DT+r*19,9,1.4);c.fillRect(DX+DW/2,DT+r*19,9,1.4)}c.restore();
+  /* slurry in the digester with a dark sludge layer and bubbles */
+  const sl=c.createLinearGradient(0,DT+30,0,DB);sl.addColorStop(0,'#8a6a2a');sl.addColorStop(1,'#3b2a14');c.save();c.fillStyle=sl;c.fillRect(DX-DW/2,DT+34,DW,DB-DT-34);c.restore();
+  c.save();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;c.beginPath();c.moveTo(DX-DW/2,DT+34);c.lineTo(DX+DW/2,DT+34);c.stroke();c.restore();
+  for(let i=0;i<14;i++){const q=cycle(t*.5+i/14,1);c.save();c.fillStyle='rgba(231,245,255,.8)';c.beginPath();c.arc(DX-DW/2+16+hash(i)*(DW-32)+3*Math.sin(q*10+i),DB-8-q*(DB-DT-44),1.8+hash(i+3)*1.6,0,TAU);c.fill();c.restore()}
+  for(let i=0;i<6;i++){c.save();c.fillStyle='#d4b36a';c.beginPath();c.ellipse(DX-DW/2+20+hash(i+9)*(DW-40),DT+70+hash(i+12)*(DB-DT-100),5,2.2,hash(i)*3,0,TAU);c.fill();c.restore()}
+  /* floating gas holder (drum): rises as gas collects; guide frame */
+  const GH=60,gtop=DT+34-GH-rise*52,gx=DX-DW/2+3,gw=DW-6;
+  c.save();c.strokeStyle='#8fa3b5';c.lineWidth=3;c.beginPath();c.moveTo(DX,gtop-26);c.lineTo(DX,DT-4);c.stroke();c.restore();
+  c.save();const dg=c.createLinearGradient(gx,0,gx+gw,0);dg.addColorStop(0,'#98a6b3');dg.addColorStop(.35,'#e3e9ee');dg.addColorStop(1,'#7f8d9a');c.fillStyle=dg;c.strokeStyle='#5d6b78';c.lineWidth=1.5;c.beginPath();c.rect(gx,gtop,gw,GH+8);c.fill();c.stroke();c.fillStyle='rgba(120,200,255,.18)';c.fillRect(gx+2,gtop+GH-24,gw-4,26);c.fillStyle='#aebbc6';c.beginPath();c.ellipse(DX,gtop,gw/2,6,0,0,TAU);c.fill();c.stroke();c.restore();
+  txt('gas',DX,gtop+GH-12,'#b8e1ff',11);
+  /* gas outlet pipe to a stove burner */
+  c.save();c.strokeStyle='#4a5560';c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(DX,gtop-8);c.lineTo(DX,gtop-30);c.lineTo(DX+110,gtop-30);c.lineTo(DX+110,GY-34);c.stroke();c.restore();
+  c.save();c.fillStyle='#37424d';c.fillRect(DX+84,GY-34,52,12);c.fillStyle='#ff9f43';c.beginPath();c.moveTo(DX+110,GY-40);c.quadraticCurveTo(DX+104,GY-50,DX+110,GY-60);c.quadraticCurveTo(DX+116,GY-50,DX+110,GY-40);c.fill();c.fillStyle='#4dabf7';c.beginPath();c.arc(DX+110,GY-41,2.5,0,TAU);c.fill();c.restore();txt('gas used for cooking',DX+112,GY-76,'#ffd7a0',11);
+  /* inlet (mixing pit) and outlet (overflow tank) */
+  c.save();c.fillStyle='#9c6a2c';c.fillRect(80,GY-26,70,24);c.strokeStyle='#5e3f19';c.strokeRect(80,GY-26,70,24);c.restore();txt('mixing tank',115,GY-40,C.white,11);
+  c.save();c.strokeStyle='#a0782b';c.lineWidth=14;c.lineCap='butt';c.beginPath();c.moveTo(115,GY-2);c.lineTo(115,GY+95);c.lineTo(DX-DW/2-9,GY+150);c.stroke();c.restore();
+  c.save();c.strokeStyle='#8a6a40';c.lineWidth=14;c.beginPath();c.moveTo(DX+DW/2+9,GY+150);c.lineTo(500,GY+110);c.lineTo(500,GY+12);c.stroke();c.restore();c.save();c.fillStyle='#7d6a52';c.fillRect(470,GY-26,60,28);c.strokeStyle='#4d3f2f';c.strokeRect(470,GY-26,60,28);c.restore();
+  txt('dung + water slurry in',115,GY-58,C.gold,12);txt('spent slurry out',500,GY-40,C.muted,12);txt('(fertiliser)',500,GY-12,'#f2e8d9',10);txt('digester (anaerobic)',DX,DB-12,'#ffe0a8',11);txt('floating gas holder',DX-8,gtop-36,C.white,11,'right');
+  txt('bubbles: CH₄ + CO₂ released by methanogens',44,98,C.muted,12,'left')},
  assumption:'Illustrative yield ≈ 0.04 m³ biogas per kg fresh dung at the optimum (~35 °C).'});
 
 /* ---------- Chapter 9: Biotechnology: Principles and Processes ---------- */
