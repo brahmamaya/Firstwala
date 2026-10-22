@@ -687,7 +687,28 @@ add({...ch(19,'Chemical Coordination and Integration'),id:'bio-endocrine-glands'
  tryText:'Which gland sits on top of each kidney, and what does its medulla secrete?',
  controls:[S('g','Gland','thyroid',Object.keys(GL).map(k=>[k,GL[k][0]]))],
  metrics:p=>{const d=GL[p.g];return[N('Gland',d[0]),N('Main hormones',d[1])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cy:290,yaw:-.75+.5*Math.sin(t*.3)});body(s,[0,-1.5,0],1.15,.1);for(const [k,d] of Object.entries(GL)){const on=k===p.g,q=V.add(d[2].map(v=>v*1.15),[0,-1.5,0]);if(k==='thyroid'){for(const z of[-1,1])s.mesh(V.add(q,[0,0,z*.1]),[.06,.11,.06],on?'#ffd43b':'#e64980');}else if(k==='adrenal'||k==='gonads'){for(const z of[-1,1])s.mesh(V.add(q,[0,0,z*.3-(k==='adrenal'?.3:0)]),.07,on?'#ffd43b':'#e64980')}else s.mesh(q,k==='pancreas'?[.22,.06,.06]:.07,on?'#ffd43b':'#e64980');s.part(q,d[0],on?'#ffd43b':'#dbe7f0',on?13:10,[0,.4,0],on?80:62)}s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:46,cx:190,cy:268,pitch:.02}),on=k=>k===p.g,col=(k,a)=>on(k)?'#ffd43b':a,SK='#fbe6d6';
+  const L=(k,q,dx,dy)=>s.callout(q,GL[k][0],on(k)?'#ffd43b':'#cfdde8',dx,dy,on(k)?13:10),HL=(k,q,r)=>{if(on(k))s.ball(q,r*.55,'#ffd43b',{glow:true,flat:true,lift:6})};
+  /* body outline: head, neck, torso, arms (translucent so the glands show through) */
+  s.mesh([0,2.7,0],[.5,.62,.4],SK,{alpha:.4,rings:12,segs:18});s.tube([[0,2.2,0],[0,1.85,0]],.17,SK,{alpha:.3,segs:10});
+  s.mesh([0,.35,0],[1.2,1.75,.5],SK,{alpha:.26,rings:14,segs:22,shape:(u,v)=>{const q=Math.cos(u)*Math.cos(v),n=Math.sin(u);return(1/Math.pow(Math.abs(q)**4+Math.abs(n)**4+.0001,.25)*.88)*(1-.1*Math.exp(-(((n+.1)*2.2)**2))*Math.abs(q))}});
+  for(const z of[-1,1]){s.tube([[z*1.1,1.5,0],[z*1.45,.7,0],[z*1.55,-.3,0]],.17,SK,{alpha:.26,segs:8})}
+  /* inset: sagittal section of the brain with the three glands of the head */
+  const B=[3.05,2.3,0];s.mesh(B,[1.0,.75,.1],'#f1b6bd',{rings:14,segs:26,spec:.4,shape:(u,v)=>1+.04*Math.sin(9*v+3*u)});s.mesh([B[0]+.55,B[1]-.6,0],[.38,.25,.1],'#d98c9a',{rings:8,segs:14});s.tube([[B[0]+.02,B[1]-.3,0],[B[0]+.12,B[1]-.7,0],[B[0]+.2,B[1]-1.0,0]],.1,'#e7a6b0',{segs:8});
+  s.seg([.45,3.0,0],[2.15,2.95,0],'#8ca6b9',1,[3,3]);s.seg([.45,2.4,0],[2.2,1.65,0],'#8ca6b9',1,[3,3]);
+  const hy=[B[0]-.15,B[1]-.2,.1],pi=[B[0]-.1,B[1]-.62,.1],pn=[B[0]+.35,B[1]-.02,.1];
+  s.mesh(hy,[.17,.12,.1],col('hypo','#9775fa'),{rings:8,segs:12,lift:2});s.tube([[hy[0],hy[1]-.1,.1],[pi[0],pi[1]+.1,.1]],.03,col('pit','#b197fc'),{segs:6});s.mesh([pi[0]-.04,pi[1],.1],[.1,.1,.09],col('pit','#e599f7'),{rings:7,segs:10});s.mesh([pi[0]+.08,pi[1],.1],[.1,.1,.09],col('pit','#9c36b5'),{rings:7,segs:10});s.mesh(pn,[.09,.07,.07],col('pineal','#38d9a9'),{rings:7,segs:10,lift:2});
+  HL('hypo',hy,.3);HL('pit',pi,.3);HL('pineal',pn,.22);L('hypo',hy,-70,-35);L('pit',pi,75,45);L('pineal',pn,55,-45);
+  /* neck and chest: thyroid with parathyroids, thymus, (heart for context) */
+  const th=[0,1.95,.2];for(const z of[-1,1]){s.mesh([z*.15,1.95,.2],[.12,.22,.09],col('thyroid','#e8a548'),{rings:8,segs:12,rot:[0,0,z*.25]});s.ball([z*.24,2.05,.28],.035,col('para','#7cc97a'),{flat:true,lift:3});s.ball([z*.24,1.84,.28],.035,col('para','#7cc97a'),{flat:true,lift:3})}s.tube([[-.12,1.9,.2],[.12,1.9,.2]],.05,col('thyroid','#e8a548'),{segs:6});
+  HL('thyroid',th,.35);HL('para',[.24,1.95,.3],.28);L('thyroid',[-.2,1.95,.2],-95,-5);L('para',[.26,2.05,.3],45,30);
+  s.mesh([.0,1.35,.05],[.1,.1,.1],'#c0392b',{alpha:0,rings:3,segs:4});for(const z of[-1,1])s.mesh([z*.17,1.5,.1],[.19,.3,.1],col('thymus','#f5d9a0'),{rings:8,segs:12,rot:[0,0,z*-.15]});s.mesh([.12,.95,0],[.32,.36,.22],'#9b2c3a',{alpha:.45,rings:8,segs:12});HL('thymus',[0,1.5,.1],.4);L('thymus',[.25,1.55,.1],95,10);
+  /* kidneys with the adrenal caps, pancreas, ovaries */
+  for(const z of[-1,1]){s.mesh([z*.6,.1,-.05],[.2,.34,.14],'#a8454f',{alpha:.7,rings:8,segs:12});s.mesh([z*.58,.5,-.02],[.2,.1,.1],col('adrenal','#e8c05a'),{rings:6,segs:10,rot:[0,0,z*.4],lift:2})}
+  HL('adrenal',[-.58,.5,0],.3);L('adrenal',[-.62,.52,0],-80,-20);
+  s.tube([[.5,.15,.08],[.15,.3,.08],[-.2,.38,.08],[-.55,.5,.08]],u=>.09*(1.1-.5*u),col('pancreas','#f3c36b'),{segs:8});HL('pancreas',[0,.33,.1],.4);L('pancreas',[.4,.2,.1],80,35);
+  for(const z of[-1,1]){s.mesh([z*.5,-.85,.05],[.12,.08,.07],col('gonads','#f783ac'),{rings:6,segs:10,lift:2})}HL('gonads',[.5,-.85,.1],.25);L('gonads',[.55,-.88,.1],80,25);
+  s.render();tag(c,'highlighted gland: '+GL[p.g][0]+'   (ovaries shown; testes lie in the scrotum)',44,392,C.muted,12)},
  assumption:'Gland positions approximate; hormone lists from NCERT Chapter 19.'});
 
 add({...ch(19,'Chemical Coordination and Integration'),id:'bio-thyroid-feedback',title:'Thyroid feedback and iodine',
