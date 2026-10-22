@@ -7,6 +7,30 @@ const P3=window.Physica3D,V=P3.vec,{BC,hash,critter,leaf,petal,cell,capsule,heli
 const U8='BIOLOGY AND HUMAN WELFARE',U9='BIOTECHNOLOGY',U10='ECOLOGY';
 const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group});
 const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
+
+/* ---- flat ecology illustration kit (canvas silhouettes; static paths, no per-frame allocation) ---- */
+const E={
+ el(c,x,y,rx,ry,col,rot=0){c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,rot,0,TAU);c.fill()},
+ pose(c,x,y,s,d){c.save();c.translate(x,y);c.scale(s*(d||1),s)},
+ legs(c,L,col,w){c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();for(let i=0;i<L.length;i+=4){c.moveTo(L[i],L[i+1]);c.lineTo(L[i+2],L[i+3])}c.stroke()},
+ panel(c,x,y,w,h,top,bot,gy){const g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,top);g.addColorStop(1,bot);c.save();c.beginPath();c.roundRect(x,y,w,h,10);c.fillStyle=g;c.fill();c.clip();if(gy!=null){c.fillStyle='#2f7d3a';c.fillRect(x,gy,w,y+h-gy);c.fillStyle='#3f9d4a';c.fillRect(x,gy,w,4)}c.restore();c.strokeStyle='#294358';c.lineWidth=1;c.beginPath();c.roundRect(x,y,w,h,10);c.stroke()},
+ tree(c,x,y,s,col){col=col||'#2f9e44';c.fillStyle='#7a5230';c.fillRect(x-2.5*s,y-15*s,5*s,15*s);E.el(c,x,y-27*s,13*s,12*s,col);E.el(c,x-9*s,y-20*s,9*s,8*s,col);E.el(c,x+9*s,y-20*s,9*s,8*s,col);E.el(c,x-4*s,y-32*s,7*s,5*s,'rgba(255,255,255,.2)')},
+ grass(c,x,y,s,col){c.strokeStyle=col||'#69db7c';c.lineWidth=2.2*s;c.lineCap='round';c.beginPath();for(let i=0;i<5;i++){const dx=(i-2)*3.4*s,h=[11,17,22,16,10][i]*s,b=(i-2)*2.2*s;c.moveTo(x+dx,y);c.quadraticCurveTo(x+dx,y-h*.6,x+dx+b,y-h)}c.stroke()},
+ deer(c,x,y,s,d,col){col=col||'#c98d52';E.pose(c,x,y,s,d);E.legs(c,[-12,-17,-13,0,-8,-17,-8,0,10,-17,11,0,14,-17,15,0],'#7d4f27',2.6);E.el(c,0,-21,18,8,col);E.el(c,0,-17,14,4,'#f0d9b5');c.fillStyle=col;c.beginPath();c.moveTo(11,-24);c.lineTo(19,-40);c.lineTo(25,-37);c.lineTo(19,-19);c.fill();E.el(c,26,-38,7,3.8,col,.45);E.el(c,32,-35.5,2,1.6,'#3a2a1c');E.el(c,21,-42,2.2,4,col,-.5);E.el(c,-18,-24,3,4.5,'#fff',.5);c.strokeStyle='#8a6a3a';c.lineWidth=1.6;c.beginPath();c.moveTo(24,-42);c.lineTo(22,-54);c.moveTo(23,-48);c.lineTo(28,-52);c.moveTo(22,-54);c.lineTo(18,-57);c.moveTo(26,-42);c.lineTo(31,-53);c.stroke();E.el(c,28,-38,.9,.9,'#1b1b1b');c.restore()},
+ wolf(c,x,y,s,d,col){col=col||'#8f9aa6';E.pose(c,x,y,s,d);E.legs(c,[-12,-15,-13,0,-7,-15,-7,0,9,-15,10,0,14,-15,15,0],'#5f6a75',2.8);c.strokeStyle=col;c.lineWidth=7;c.beginPath();c.moveTo(-15,-20);c.quadraticCurveTo(-27,-19,-29,-8);c.stroke();E.el(c,0,-19,18,7.5,col);E.el(c,2,-15.5,13,3.5,'#d5dbe0');c.fillStyle=col;c.beginPath();c.moveTo(11,-23);c.lineTo(19,-31);c.lineTo(22,-20);c.fill();c.beginPath();c.moveTo(16,-33);c.lineTo(34,-27);c.lineTo(35,-23);c.lineTo(24,-19);c.lineTo(16,-23);c.fill();c.beginPath();c.moveTo(17,-33);c.lineTo(18,-41);c.lineTo(23,-32);c.moveTo(22,-33);c.lineTo(26,-40);c.lineTo(27,-30);c.fill();E.el(c,35,-25.5,1.8,1.5,'#1b1b1b');E.el(c,25,-28,1.3,1.1,'#f2d34f');c.restore()},
+ hare(c,x,y,s,d,col){col=col||'#c9b79a';E.pose(c,x,y,s,d);E.el(c,0,-8,10,6.5,col);E.el(c,-4,-6,6,5,'#b4a283');E.el(c,9,-13,4.6,4,col);E.el(c,6,-22,1.6,6.5,col,.3);E.el(c,10,-22.5,1.6,6.5,col,-.05);E.el(c,6,-22,.8,5,'#f0b8b8',.3);E.el(c,-10,-9,3,3,'#fff');E.el(c,12,-14,.9,.9,'#222');E.legs(c,[5,-4,8,0,-6,-2,-2,0],'#8f7e60',2);c.restore()},
+ bird(c,x,y,s,d,col,beak){col=col||'#4c6ef5';E.pose(c,x,y,s,d);c.strokeStyle='#5a4a3a';c.lineWidth=1.6;c.beginPath();c.moveTo(-1,-6);c.lineTo(-2,0);c.moveTo(3,-6);c.lineTo(4,0);c.stroke();c.fillStyle=col;c.beginPath();c.moveTo(-8,-12);c.lineTo(-20,-6);c.lineTo(-8,-9);c.fill();E.el(c,0,-12,10,6.5,col);E.el(c,0,-9.5,7,3.2,'#f1f3f5');E.el(c,9,-18,4.6,4.2,col);c.fillStyle=beak||'#ffa94d';c.beginPath();c.moveTo(13,-19);c.lineTo(19,-17.5);c.lineTo(13,-16.5);c.fill();E.el(c,-2,-13,5,2.8,'rgba(0,0,0,.22)',-.3);E.el(c,10,-19,1,1,'#111');c.restore()},
+ hawk(c,x,y,s,d){E.pose(c,x,y,s,d);c.fillStyle='#6d4c2f';c.beginPath();c.moveTo(-4,-14);c.quadraticCurveTo(-22,-30,-36,-18);c.quadraticCurveTo(-24,-18,-20,-12);c.quadraticCurveTo(-26,-8,-34,-4);c.quadraticCurveTo(-14,-6,-4,-8);c.fill();c.beginPath();c.moveTo(0,-14);c.quadraticCurveTo(20,-34,38,-22);c.quadraticCurveTo(26,-20,22,-13);c.quadraticCurveTo(28,-8,36,-4);c.quadraticCurveTo(14,-6,2,-8);c.fill();E.el(c,0,-11,6,4.5,'#8a6240');E.el(c,0,-8,5,2.4,'#f1e4d0');E.el(c,7,-14,3.6,3.2,'#f1e4d0');c.fillStyle='#fab005';c.beginPath();c.moveTo(9,-15);c.lineTo(13,-13);c.lineTo(9,-12);c.fill();E.el(c,8,-14.5,.8,.8,'#111');c.restore()},
+ hopper(c,x,y,s,d,col){col=col||'#82c91e';E.pose(c,x,y,s,d);c.strokeStyle='#5c940d';c.lineWidth=1.6;c.beginPath();c.moveTo(-9,-7);c.lineTo(-15,-17);c.lineTo(-6,-4);c.lineTo(-11,0);c.moveTo(-2,-5);c.lineTo(-3,0);c.moveTo(3,-5);c.lineTo(4,0);c.moveTo(11,-9);c.quadraticCurveTo(16,-14,17,-18);c.stroke();E.el(c,-2,-8,10,3.6,col);E.el(c,9,-9,3.8,3.2,col);E.el(c,10.5,-10,1,1,'#111');E.el(c,-8,-9,6,1.6,'#5c940d',-.2);c.restore()},
+ frog(c,x,y,s,d,col){col=col||'#40c057';E.pose(c,x,y,s,d);c.strokeStyle='#2b8a3e';c.lineWidth=2.4;c.lineCap='round';c.beginPath();c.moveTo(-7,-5);c.lineTo(-13,-9);c.lineTo(-14,0);c.lineTo(-6,0);c.moveTo(5,-3);c.lineTo(10,0);c.stroke();E.el(c,-1,-8,10,6.5,col);E.el(c,-1,-5,7,3,'#c0eb75');E.el(c,8,-12,5,4.2,col);E.el(c,9,-16,2.4,2.4,col);E.el(c,9,-16,1,1,'#111');c.restore()},
+ snake(c,x,y,s,d,col){col=col||'#e8590c';E.pose(c,x,y,s,d);c.strokeStyle=col;c.lineWidth=5.5;c.lineCap='round';c.beginPath();c.moveTo(-26,-3);c.bezierCurveTo(-18,-12,-12,4,-5,-3);c.bezierCurveTo(2,-10,8,2,14,-4);c.bezierCurveTo(18,-8,20,-14,16,-20);c.stroke();E.el(c,16,-21,4,2.8,col,-.6);E.el(c,17.5,-22,.8,.8,'#111');c.strokeStyle='#e03131';c.lineWidth=1;c.beginPath();c.moveTo(19,-23);c.lineTo(24,-26);c.stroke();c.restore()},
+ cope(c,x,y,s,d,col){col=col||'#ffa8a8';E.pose(c,x,y,s,d);c.strokeStyle=col;c.lineWidth=1.1;c.beginPath();c.moveTo(8,-2);c.quadraticCurveTo(18,-8,24,-2);c.moveTo(8,-4);c.quadraticCurveTo(16,-14,22,-12);c.moveTo(-8,0);c.lineTo(-14,6);c.moveTo(-8,0);c.lineTo(-14,-5);c.moveTo(-3,3);c.lineTo(-3,7);c.moveTo(2,3);c.lineTo(3,7);c.stroke();E.el(c,0,0,9,4.2,col);E.el(c,8,0,3.6,3,col);E.el(c,-3,0,3,2.2,'rgba(255,255,255,.35)');E.el(c,10,-1,.8,.8,'#222');c.restore()},
+ diatom(c,x,y,s,col){col=col||'#8ce99a';c.fillStyle=col;for(let i=0;i<3;i++){c.beginPath();c.arc(x+(i-1)*5*s,y+(i%2)*2*s,3.4*s,0,TAU);c.fill()}c.strokeStyle='rgba(0,60,20,.4)';c.lineWidth=.8;c.beginPath();c.arc(x,y,3.4*s,0,TAU);c.stroke()},
+ arrow(c,x0,y0,x1,y1,col,w){const a=Math.atan2(y1-y0,x1-x0),h=7+w*1.2;c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(x0,y0);c.lineTo(x1-Math.cos(a)*h*.6,y1-Math.sin(a)*h*.6);c.stroke();c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-Math.cos(a-.4)*h,y1-Math.sin(a-.4)*h);c.lineTo(x1-Math.cos(a+.4)*h,y1-Math.sin(a+.4)*h);c.fill()},
+ // value of a chart's data point in its pixel box (mirrors labkit chart mapping)
+ cx(x,w,xmin,xmax,v){return x+8+(v-xmin)/(xmax-xmin)*(w-16)},
+ cy(y,h,lo,hi,v){return y+h-8-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*(h-30)}
+};
 function antibody(s,p,k,col='#74c0fc',rot=0){const A=(x,y)=>V.add(p,[(x*Math.cos(rot)-y*Math.sin(rot))*k,(x*Math.sin(rot)+y*Math.cos(rot))*k,0]);s.tube([A(0,-.6),A(0,0)],.06*k,col,{segs:6});for(const sg of[-1,1]){s.tube([A(0,0),A(sg*.45,.5)],.06*k,col,{segs:6});s.tube([A(sg*.12,.05),A(sg*.55,.45)],.04*k,'#ffd43b',{segs:6})}}
 
 /* ---------- Chapter 7: Human Health and Disease ---------- */
@@ -284,8 +308,13 @@ add({...ch(11,'Organisms and Populations',U10),id:'bio-population-growth-models'
  tryText:'Use the flour beetle’s r = 0.12 and compare with the Norway rat’s r = 0.015.',
  controls:[S('model','Model','log',[['exp','Exponential (J-shaped)'],['log','Logistic (S-shaped)']]),R('r','Intrinsic rate r',.01,.5,.005,.12,'per day',3),R('K','Carrying capacity K',100,1000,10,500),R('t','Time',0,100,1,40,'days')],
  metrics:p=>{const n=popN(p,p.t);return[N('Population N',n,'',0),N('Growth rate now',p.model==='exp'?p.r*n:p.r*n*(p.K-n)/p.K,'per day',1),N('Shape',p.model==='exp'?'J-shaped':'Sigmoid (S-shaped)'),N('Example r (NCERT)','Norway rat 0.015 · flour beetle 0.12')]},
- draw:(c,p,t)=>{const n=popN(p,p.t),s=P3.scene(c,{scale:50,pitch:.45,cx:230}),k=Math.min(90,Math.round(n/p.K*60));s.box([0,-1.6,0],[5,.1,3.4],'#2b8a3e',{ground:true});for(let i=0;i<k;i++){const x=-2.2+(i%12)*.4,z=-1.4+Math.floor(i/12)*.4;s.mesh([x,-1.45,z],[.13,.08,.1],'#b5651d',{rings:5,segs:8})}s.render();
-  chart(c,420,96,236,170,{title:'N vs time',xl:'days',xmin:0,xmax:100,ymin:0,ymax:p.model==='exp'?Math.max(p.K,popN(p,100)):p.K*1.1,series:[{fn:x=>popN(p,x),col:C.gold},{fn:()=>p.K,col:'#8ca6b9',dash:[4,4]}],marker:[p.t,n]})},
+ draw:(c,p,t)=>{const n=popN(p,p.t),ex=p.model==='exp',cnt=clamp(Math.round(n/p.K*30),n>0?1:0,30),ymax=ex?Math.max(p.K,popN(p,100)):p.K*1.1,hx=i=>64+(i%10)*29+(Math.floor(i/10)%2?8:0),hy=i=>200+Math.floor(i/10)*66;
+  E.panel(c,44,96,312,310,'#1a4668','#1f5d52',144);for(let i=0;i<9;i++)E.grass(c,62+i*33+(i%2)*9,154+(i*37%11),.8,'#4fb85d');
+  c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=1;c.beginPath();for(let i=cnt;i<30;i++){c.moveTo(hx(i)+12,hy(i)-10);c.ellipse(hx(i),hy(i)-10,12,9,0,0,TAU)}c.stroke();
+  for(let i=0;i<cnt;i++)E.hare(c,hx(i),hy(i),1.2,i%3===1?-1:1);
+  tag(c,ex?'Exponential: resources unlimited':'Logistic: resources limited',58,114,'#e9f6ff',13);tag(c,'faint outlines: room left up to K',58,376,C.muted,11);tag(c,'each animal ≈ '+f(p.K/30,0)+' individuals'+(ex&&n>p.K?' (shown up to K)':''),58,392,C.muted,11);
+  chart(c,368,100,288,236,{title:'N vs time',xl:'days',yl:'N',xmin:0,xmax:100,ymin:0,ymax,series:[{fn:x=>popN(p,x),col:C.gold,w:3},{fn:()=>p.K,col:'#8ca6b9',dash:[4,4]}],marker:[p.t,n]});
+  tag(c,ex?'J-shaped curve':'S-shaped (sigmoid) curve',ex?384:646,ex?150:296,C.gold,12,ex?'left':'right');tag(c,'K',ex?384:646,E.cy(100,236,0,ymax,p.K)-8,'#8ca6b9',12,ex?'left':'right');tag(c,'gold: N · dashed: carrying capacity K',368,352,C.muted,11)},
  assumption:'Starting population N₀ = 10; dots show the population as a share of K (up to 90 drawn).'});
 function popN(p,t){const N0=10;return p.model==='exp'?N0*Math.exp(p.r*t):p.K/(1+(p.K/N0-1)*Math.exp(-p.r*t))}
 
@@ -296,10 +325,20 @@ add({...ch(11,'Organisms and Populations',U10),id:'bio-predator-prey',title:'Pre
  tryText:'Increase the predation rate. What happens to the size of the swings?',
  controls:[R('a','Prey birth rate',.2,1.2,.05,.6,'',2),R('b','Predation rate',.005,.05,.001,.02,'',3),R('d','Predator death rate',.1,1,.05,.4,'',2),R('t','Time',0,60,.5,20,'',1)],
  metrics:p=>{const r=lv(p),i=Math.min(r.length-1,Math.round(p.t/.05));return[N('Prey',r[i][0],'',0),N('Predators',r[i][1],'',0),N('Pattern','Oscillations; predators lag prey')]},
- draw:(c,p,t)=>{const r=lv(p),i=Math.min(r.length-1,Math.round(p.t/.05)),[H,P]=r[i],s=P3.scene(c,{scale:50,pitch:.45,cx:220});s.box([0,-1.6,0],[5,.1,3.4],'#2b8a3e',{ground:true});for(let k=0;k<Math.min(60,Math.round(H/3));k++){const x=-2.2+(k%12)*.4,z=-1.4+Math.floor(k/12)*.4;s.mesh([x,-1.45,z],[.14,.1,.1],'#f1e3c6',{rings:5,segs:8})}for(let k=0;k<Math.min(20,Math.round(P/3));k++){const x=-2+hash(k)*4,z=-1.3+hash(k+3)*2.6;s.mesh([x,-1.38,z],[.22,.14,.12],'#c92a2a',{rings:6,segs:10})}s.render();
-  chart(c,410,96,246,170,{title:'Populations vs time',xl:'time',xmin:0,xmax:60,ymin:0,series:[{pts:r.map((v,k)=>[k*.05,v[0]]),col:'#f1e3c6'},{pts:r.map((v,k)=>[k*.05,v[1]]),col:C.red}],marker:[p.t,H,'#f1e3c6']});tag(c,'cream: prey · red: predators',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const r=lv(p),i=Math.min(r.length-1,Math.round(p.t/.05)),[H,P]=r[i],g=lvx(p),uh=Math.max(1,Math.ceil(g.hmax/14)),up=Math.max(1,Math.ceil(g.pmax/10)),nd=Math.min(14,Math.round(H/uh)),nw=Math.min(10,Math.round(P/up)),ym=Math.max(g.hmax,g.pmax)*1.04;
+  E.panel(c,44,96,246,152,'#1b4d6e','#2b7a45',150);E.panel(c,44,254,246,152,'#1c3b52','#245f46',402);
+  for(let k=0;k<6;k++)E.tree(c,56+k*46,142,.62,k%2?'#2b8a3e':'#37a14a');for(let k=0;k<5;k++)E.tree(c,70+k*48,300,.7,k%2?'#1f6f3a':'#2b8a3e');
+  for(let k=0;k<7;k++)E.grass(c,52+k*38,168+(k%2)*45,.8,'#69db7c');
+  for(let k=0;k<nd;k++)E.deer(c,64+(k%7)*33+(k>6?14:0),178+Math.floor(k/7)*55,.72,k%4===1?-1:1);
+  for(let k=0;k<nw;k++)E.wolf(c,72+(k%5)*44+(k>4?14:0),338+Math.floor(k/5)*58,.8,k%3===1?-1:1);
+  tag(c,'Prey (deer): each ≈ '+uh,56,110,'#f1e3c6',12);tag(c,'Predators (wolves): each ≈ '+up,56,268,'#ffa8a8',12);
+  chart(c,304,98,352,150,{title:'Populations vs time',xl:'time',xmin:0,xmax:60,ymin:0,ymax:ym,series:[{pts:g.tp,col:'#f1e3c6'},{pts:g.pp,col:C.red}],marker:[p.t,H,'#f1e3c6']});
+  c.beginPath();c.arc(E.cx(304,352,0,60,p.t),E.cy(98,150,0,ym,P),4.5,0,TAU);c.fillStyle=C.red;c.fill();
+  chart(c,304,258,176,148,{title:'Predators vs prey',xl:'prey',xmin:0,xmax:g.hmax*1.05,ymin:0,ymax:g.pmax*1.05,series:[{pts:g.ph,col:C.gold,w:1.8}],marker:[H,P,C.gold]});
+  E.deer(c,512,306,.62,1);tag(c,'prey  H = '+f(H,0),530,296,'#f1e3c6',12);E.wolf(c,512,350,.7,1);tag(c,'predators  P = '+f(P,0),536,340,'#ffa8a8',12);tag(c,'gold: path of (prey, predators)',496,386,C.muted,11)},
  assumption:'Lotka–Volterra model, predator conversion efficiency c = 0.5, start H = 40, P = 9 (RK4 integration).'});
 function lv(p){return memo('lv'+p.a+p.b+p.d,()=>{const c=.5,f2=([H,P])=>[p.a*H-p.b*H*P,c*p.b*H*P-p.d*P];let y=[40,9];const out=[y],h=.05;for(let i=0;i<1200;i++){const k1=f2(y),k2=f2(y.map((v,j)=>v+h/2*k1[j])),k3=f2(y.map((v,j)=>v+h/2*k2[j])),k4=f2(y.map((v,j)=>v+h*k3[j]));y=y.map((v,j)=>Math.max(0,v+h/6*(k1[j]+2*k2[j]+2*k3[j]+k4[j])));out.push(y)}return out})}
+function lvx(p){return memo('lvx'+p.a+p.b+p.d,()=>{const r=lv(p),tp=[],pp=[],ph=[];let hm=1,pm=1;r.forEach((v,k)=>{tp.push([k*.05,v[0]]);pp.push([k*.05,v[1]]);ph.push([v[0],v[1]]);if(v[0]>hm)hm=v[0];if(v[1]>pm)pm=v[1]});return{tp,pp,ph,hmax:hm,pmax:pm}})}
 
 const PYR={expanding:['Expanding','Large pre-reproductive base; population growing',[10,9,8,7,5.5,4,2.8,1.8,1]],stable:['Stable','Similar numbers across ages; population stable',[6.5,6.5,6.4,6.3,6.2,5.8,5,3.8,2.2]],declining:['Declining','Narrow base; fewer young than adults',[4,4.5,5.2,6,6.3,6.2,5.6,4.4,2.6]]};
 add({...ch(11,'Organisms and Populations',U10),id:'bio-age-pyramids',title:'Age pyramids',
@@ -309,9 +348,30 @@ add({...ch(11,'Organisms and Populations',U10),id:'bio-age-pyramids',title:'Age 
  tryText:'Which shape matches a country with a high birth rate?',
  controls:[S('type','Population','expanding',Object.keys(PYR).map(k=>[k,PYR[k][0]]))],
  metrics:p=>{const d=PYR[p.type],pre=d[2].slice(0,3).reduce((a,b)=>a+b,0),tot=d[2].reduce((a,b)=>a+b,0);return[N('Type',d[0]),N('Meaning',d[1]),N('Pre-reproductive share',pre/tot*100,'%',0)]},
- draw:(c,p,t)=>{const d=PYR[p.type],s=P3.scene(c,{scale:54,pitch:.2});d[2].forEach((w,i)=>{const y=-1.8+i*.42,col=i<3?'#69db7c':i<6?'#4dabf7':'#ffa94d';s.box([-w*.17,y,0],[w*.34,.36,.6],col);s.box([w*.17,y,0],[w*.34,.36,.6],col,{alpha:.75})});s.label([-1.8,2.1,0],'males',C.muted,12);s.label([1.8,2.1,0],'females',C.muted,12);s.render();tag(c,'green: pre-reproductive · blue: reproductive · orange: post-reproductive',44,98,C.muted,12)},
+ draw:(c,p,t)=>{const d=PYR[p.type],GC=['#69db7c','#4dabf7','#ffa94d'],GN=['pre-reproductive','reproductive','post-reproductive'],CX=222,K=13,RH=29,Y0=386;
+  const person=(x,y,s,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y-17*s,5*s,0,TAU);c.fill();c.beginPath();c.moveTo(x-8*s,y);c.quadraticCurveTo(x-9*s,y-11*s,x,y-11*s);c.quadraticCurveTo(x+9*s,y-11*s,x+8*s,y);c.closePath();c.fill()};
+  person(CX-70,116,1.2,'#74c0fc');tag(c,'males',CX-58,108,C.muted,13);person(CX+58,116,1.2,'#f783ac');tag(c,'females',CX+70,108,C.muted,13);
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;c.beginPath();c.moveTo(CX,122);c.lineTo(CX,Y0);c.stroke();
+  d[2].forEach((w,i)=>{const y=Y0-(i+1)*RH+2,g=i<3?0:i<6?1:2;c.fillStyle=GC[g];c.globalAlpha=.95;c.beginPath();c.roundRect(CX-1-w*K,y,w*K,RH-4,3);c.fill();c.globalAlpha=.7;c.beginPath();c.roundRect(CX+1,y,w*K,RH-4,3);c.fill();c.globalAlpha=1});
+  [[0,3],[3,6],[6,9]].forEach(([a,b],g)=>{const yb=Y0-a*RH,yt=Y0-b*RH+2;c.strokeStyle=GC[g];c.lineWidth=2;c.beginPath();c.moveTo(CX+148,yb-4);c.lineTo(CX+154,yb-4);c.lineTo(CX+154,yt+2);c.lineTo(CX+148,yt+2);c.stroke();tag(c,GN[g],CX+162,(yb+yt)/2-1,GC[g],12)});
+  tag(c,'bar length = relative number of people in each age group',44,402,C.muted,11);
+  Object.keys(PYR).forEach((k,j)=>{const x=494,y=100+j*104,on=k===p.type;c.fillStyle=on?'rgba(255,212,59,.1)':'rgba(255,255,255,.03)';c.strokeStyle=on?C.gold:'#294358';c.lineWidth=on?2:1;c.beginPath();c.roundRect(x,y,162,98,8);c.fill();c.stroke();
+   PYR[k][2].forEach((w,i)=>{const yy=y+91-(i+1)*7.2,g=i<3?0:i<6?1:2;c.fillStyle=GC[g];c.globalAlpha=on?1:.6;c.fillRect(x+80-w*5.4,yy,w*5.4,6);c.fillRect(x+82,yy,w*5.4,6)});c.globalAlpha=1;tag(c,PYR[k][0],x+81,y+11,on?C.gold:C.muted,12,'center')});},
  assumption:'Schematic pyramids; bar widths are relative.'});
 
+const ORG={
+ fungus(c,x,y){c.strokeStyle='rgba(241,227,198,.55)';c.lineWidth=1.3;c.beginPath();for(let i=0;i<6;i++){c.moveTo(x-6,y);c.quadraticCurveTo(x-30-i*9,y+6-i*3,x-48-i*10,y-2+i*4);c.moveTo(x+6,y);c.quadraticCurveTo(x+30+i*9,y+6-i*3,x+48+i*10,y-2+i*4)}c.stroke();c.fillStyle='#f4e8cf';c.beginPath();c.roundRect(x-8,y-60,16,60,5);c.fill();E.el(c,x,y-62,44,30,'#b9743c');c.fillStyle='#b9743c';c.fillRect(x-44,y-62,88,6);E.el(c,x,y-60,40,5,'#7d4a22');E.el(c,x-14,y-78,7,4,'rgba(255,255,255,.7)');E.el(c,x+12,y-82,5,3,'rgba(255,255,255,.7)');E.el(c,x+24,y-70,4,2.5,'rgba(255,255,255,.7)')},
+ alga(c,x,y){const P=[[-30,-20],[-8,-34],[16,-26],[34,-10],[-22,2],[2,-8],[26,10],[-4,18]];for(let i=0;i<P.length;i++){E.el(c,x+P[i][0],y+P[i][1],15,15,'#51b848');E.el(c,x+P[i][0]-3,y+P[i][1]-3,5,5,'rgba(255,255,255,.28)');E.el(c,x+P[i][0]+3,y+P[i][1]+2,6,4,'#2f7d32',i)}},
+ hare(c,x,y){E.hare(c,x,y,4.4,1)},deer(c,x,y){E.deer(c,x,y,2.6,-1)},
+ bird(c,x,y){E.bird(c,x,y,5,1,'#4c6ef5')},hopper(c,x,y){E.hopper(c,x,y,4.8,-1)},
+ egret(c,x,y){E.bird(c,x,y,5,1,'#f8f9fa','#fcc419')},tree(c,x,y){E.tree(c,x,y,3.6,'#2f9e44')},
+ shrub(c,x,y){c.strokeStyle='#6d4c2f';c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(x,y);c.lineTo(x,y-50);c.moveTo(x,y-30);c.lineTo(x-26,y-62);c.moveTo(x,y-36);c.lineTo(x+28,y-70);c.stroke();for(let i=0;i<14;i++)E.el(c,x+Math.sin(i*2.1)*40,y-70-(i%5)*9+(i>6?10:0),13,6,i%2?'#2f9e44':'#40c057',Math.sin(i)*.9)},
+ cuscuta(c,x,y){c.lineCap='round';for(let k=0;k<3;k++){c.strokeStyle=k?'#ffc233':'#f08c00';c.lineWidth=2.4-k*.4;c.beginPath();c.moveTo(x-50+k*8,y-6-k*6);for(let i=0;i<5;i++)c.bezierCurveTo(x-36+i*22+k*5,y-60-i*4-k*8,x-20+i*22+k*5,y+14-i*4,x-6+i*22+k*5,y-38-k*5);c.stroke()}for(let i=0;i<5;i++)E.el(c,x-34+i*28,y-48+(i%2)*28,4.5,4.5,'#fff3bf')},
+ penicillium(c,x,y){c.strokeStyle='#c9d3da';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(x,y);c.lineTo(x,y-64);c.stroke();c.lineWidth=2;c.beginPath();for(const a of[-1,0,1]){c.moveTo(x,y-64);c.lineTo(x+a*20,y-82);for(const b of[-1,0,1]){c.moveTo(x+a*20,y-82);c.lineTo(x+a*20+b*8,y-94)}}c.stroke();c.fillStyle='#3fb6a8';for(const a of[-1,0,1])for(const b of[-1,0,1])for(let k=0;k<3;k++){c.beginPath();c.arc(x+a*20+b*(8+k*3),y-96-k*7,3,0,TAU);c.fill()}},
+ bacteria(c,x,y){for(let i=0;i<9;i++){const bx=x-52+(i%3)*50+(Math.floor(i/3)%2)*12,by=y-22-Math.floor(i/3)*38,a=(i*1.7)%1.6-.8;c.save();c.translate(bx,by);c.rotate(a);c.globalAlpha=.55;c.fillStyle='#ced4da';c.beginPath();c.roundRect(-18,-7,36,14,7);c.fill();c.globalAlpha=1;c.strokeStyle='#fa5252';c.lineWidth=2;c.beginPath();c.moveTo(-5,-4);c.lineTo(5,4);c.moveTo(5,-4);c.lineTo(-5,4);c.stroke();c.restore()}}
+};
+for(const [n,z] of[['cuscuta',1.2],['penicillium',1.15]]){const g=ORG[n];ORG[n]=(c,x,y)=>{c.save();c.translate(x,y);c.scale(z,z);g(c,0,0);c.restore()}}
+const IAN={mutualism:['fungus','alga','fungus','alga (together: lichen)','both benefit',''],competition:['hare','deer','species A','species B (same resource)','compete for','the same resource'],predation:['bird','hopper','predator (bird)','prey (insect)','eats',''],parasitism:['cuscuta','shrub','parasite (e.g. Cuscuta)','host plant','feeds on',''],commensalism:['egret','tree','bird / epiphyte (benefits)','tree (unaffected)','uses, no',' effect on it'],amensalism:['penicillium','bacteria','Penicillium (unaffected)','bacteria (harmed)','releases','antibiotic']};
 const INT={mutualism:['+','+','Lichens (fungus + alga), mycorrhizae, fig and wasp'],competition:['−','−','Abingdon tortoise vs goats (Galapagos); barnacles (Connell)'],predation:['+','−','Tiger and deer; Cactoblastis moth on prickly pear'],parasitism:['+','−','Cuscuta on hedge plants; cuckoo (brood parasitism)'],commensalism:['+','0','Orchid on a mango branch; cattle egret and cattle'],amensalism:['0','−','One species harmed, the other unaffected']};
 add({...ch(11,'Organisms and Populations',U10),id:'bio-population-interactions',title:'Population interactions',
  description:'Explore the six kinds of interaction between two species and what each species gains or loses.',
@@ -320,8 +380,11 @@ add({...ch(11,'Organisms and Populations',U10),id:'bio-population-interactions',
  tryText:'Which interaction is described as “+, 0”?',
  controls:[S('type','Interaction','mutualism',Object.keys(INT).map(k=>[k,k[0].toUpperCase()+k.slice(1)]))],
  metrics:p=>{const d=INT[p.type];return[N('Species A',d[0]),N('Species B',d[1]),N('Examples (NCERT)',d[2])]},
- draw:(c,p,t)=>{const d=INT[p.type],s=P3.scene(c,{scale:56,cy:290,pitch:.2}),models={mutualism:['mushroom','algae'],competition:['frog','frog'],predation:['bird','insect'],parasitism:['plant','plant'],commensalism:['plant','bird'],amensalism:['mushroom','bacterium']}[p.type];
-  [[-1.4,models[0],d[0]],[1.4,models[1],d[1]]].forEach(([x,m,sym])=>{s.cyl([x,-1.55,0],[0,1,0],.8,.12,'#29475b');critter(s,m,[x,-1.5,0],1.2,t);const col=sym==='+'?'#40c057':sym==='−'?'#fa5252':'#adb5bd';s.ball([x,1.4,0],.35,col,{glow:true});s.label([x,1.4,0],sym,C.white,22)});const NM={mutualism:['fungus','alga (together: lichen)'],competition:['species A','species B (same resource)'],predation:['predator (bird)','prey (insect)'],parasitism:['host plant','parasite (e.g. Cuscuta)'],commensalism:['tree (unaffected)','bird / epiphyte (benefits)'],amensalism:['Penicillium (unaffected)','bacteria (harmed)']}[p.type];s.callout([-1.4,-.4,.6],NM[0],'#e9f6ff',-60,30);s.callout([1.4,-.4,.6],NM[1],'#e9f6ff',60,30);s.render()},
+
+ draw:(c,p,t)=>{const d=INT[p.type],I=IAN[p.type],CL={'+':'#40c057','−':'#fa5252','0':'#adb5bd'},sym=[d[0],d[1]];
+  [44,416].forEach((x,k)=>{E.panel(c,x,98,240,278,'#17415f','#1d5a4a',326);ORG[I[k]](c,x+120,326);c.fillStyle=CL[sym[k]];c.beginPath();c.arc(x+120,128,19,0,TAU);c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();tag(c,sym[k],x+120,129,'#fff',30,'center','700');tag(c,k?'Species B':'Species A',x+120,160,C.muted,12,'center');tag(c,I[2+k],x+120,358,'#e9f6ff',13,'center')});
+  tag(c,p.type.toUpperCase(),350,196,C.gold,13,'center');const bi=p.type==='mutualism',cp=p.type==='competition';E.arrow(c,bi||cp?316:304,226,bi||cp?384:396,226,bi?'#69db7c':cp?'#ff8787':'#ffd43b',3.5);if(bi||cp)E.arrow(c,384,226,316,226,bi?'#69db7c':'#ff8787',3.5);
+  tag(c,I[4],350,254,C.muted,12,'center');tag(c,I[5],350,270,C.muted,12,'center')},
  assumption:'Organism models are generic placeholders for the two interacting species.'});
 
 /* ---------- Chapter 12: Ecosystem ---------- */
@@ -332,8 +395,16 @@ add({...ch(12,'Ecosystem',U10),id:'bio-energy-pyramid',title:'Pyramid of energy 
  tryText:'With 10% efficiency, how much of the producers’ energy reaches the fourth level?',
  controls:[R('E','Energy fixed by producers',1000,100000,1000,10000,'kJ'),R('eff','Transfer efficiency',5,20,1,10,'%'),R('levels','Trophic levels',2,5,1,4)],
  metrics:p=>Array.from({length:p.levels},(_,i)=>N(['Producers','Primary consumers','Secondary consumers','Tertiary consumers','Top carnivores'][i],p.E*(p.eff/100)**i,'kJ',1)),
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cy:300,pitch:.3}),cols=['#40c057','#fab005','#fd7e14','#e03131','#ae3ec9'];for(let i=0;i<p.levels;i++){const e=p.E*(p.eff/100)**i,w=Math.max(.15,Math.sqrt(e/p.E)*4);s.box([0,-1.6+i*.55+.25,0],[w,.5,w*.7],cols[i]);s.label([w/2+.3,-1.6+i*.55+.25,0],f(e,1)+' kJ',cols[i],12,'left')}
-  for(let i=0;i<p.levels-1;i++){const q=cycle(t*.4+i*.3,1);s.ball([0,-1.6+i*.55+.5+q*.55,.6],.06,'#ffd43b',{glow:true,flat:true});s.ball([1.6*q,-1.6+i*.55+.4,-.8],.05,'#ff6b6b',{flat:true})}s.render();tag(c,'red dots: energy lost as heat',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const L=p.levels,RH=Math.min(80,282/L),BH=RH-16,CX=300,YB=396,cols=['#40c057','#fab005','#fd7e14','#e03131','#ae3ec9'],NM=['Producers','Primary consumers','Secondary consumers','Tertiary consumers','Top carnivores'],IC=[(x,y)=>E.grass(c,x,y+14,1.3,'#8ce99a'),(x,y)=>E.hopper(c,x+1,y+14,1.35,1),(x,y)=>E.frog(c,x,y+12,1.7,1),(x,y)=>E.snake(c,x,y+14,.85,1),(x,y)=>E.hawk(c,x,y+16,.7,1)];
+  tag(c,'lost as heat at each level',600,108,'#ff8787',12,'center');
+  for(let i=0;i<L;i++){const e=p.E*(p.eff/100)**i,w=Math.max(10,Math.sqrt(e/p.E)*290),yt=YB-(i+1)*RH+8,cy=yt+BH/2;
+   c.fillStyle='rgba(255,255,255,.07)';c.beginPath();c.arc(66,cy,25,0,TAU);c.fill();IC[i](66,cy);
+   c.fillStyle=cols[i];c.beginPath();c.roundRect(CX-w/2,yt,w,BH,Math.min(6,w/2));c.fill();c.fillStyle='rgba(255,255,255,.22)';c.beginPath();c.roundRect(CX-w/2,yt,w,BH*.35,Math.min(6,w/2));c.fill();
+   const lx=Math.max(CX+w/2+10,CX+30);tag(c,NM[i],lx,cy-8,'#e9f6ff',12);tag(c,f(e,1)+' kJ',lx,cy+8,cols[i],13);
+   E.arrow(c,568,cy,650,cy,'#ff6b6b',2+4*(1-p.eff/100)*(i<L?1:0));
+   if(i<L-1)E.arrow(c,CX,yt-1,CX,yt-15,'#ffd43b',2.5)}
+  for(let i=0;i<L-1;i++){const yt=YB-(i+1)*RH+8;tag(c,'×'+p.eff+'%',CX+8,yt-8,'#ffd43b',11)}
+  tag(c,'bar width ∝ √energy · gold arrows: energy passed up',44,108,C.muted,11)},
  assumption:'Lindeman’s 10% rule as a default; real efficiencies vary (≈ 5–20%). Box area ∝ energy.'});
 
 add({...ch(12,'Ecosystem',U10),id:'bio-productivity',title:'Gross and net primary productivity',
@@ -343,8 +414,15 @@ add({...ch(12,'Ecosystem',U10),id:'bio-productivity',title:'Gross and net primar
  tryText:'Increase respiration losses. How much is left for herbivores?',
  controls:[R('gpp','Gross primary productivity',500,5000,50,2000,'g/m²/yr'),R('rr','Respiration losses',20,80,1,45,'%')],
  metrics:p=>{const npp=p.gpp*(1-p.rr/100);return[N('NPP',npp,'g/m²/yr',0),N('Respiration losses',p.gpp-npp,'g/m²/yr',0),N('Biosphere NPP','≈ 170 billion tons/yr (dry weight)'),N('Oceans','≈ 55 billion tons/yr')]},
- draw:(c,p,t)=>{const npp=p.gpp*(1-p.rr/100),s=P3.scene(c,{scale:52,cy:290});s.box([0,-1.65,0],[6,.3,3],'#6d4c2f',{ground:true});for(let i=0;i<7;i++){const x=-2.4+i*.8,z=(hash(i)-.5)*1.6,h=.8+npp/p.gpp*1.4*(.8+.4*hash(i+3));s.cyl([x,-1.5+h/2,z],[0,1,0],.07,h,'#6d4c2f');s.mesh([x,-1.5+h+.3,z],[.45,.5,.45],'#2f9e44',{shape:(u,v)=>1+.15*Math.sin(5*v+i)*Math.cos(3*u)})}
-  for(let i=0;i<8;i++)s.seg([-3+i*.8,2.4,-1],[-3+i*.8+.5,.4,-.4],'#fff3bf88',2);for(let i=0;i<Math.round(p.rr/10);i++){const q=cycle(t*.5+i/8,1);s.ball([-2+hash(i)*4,.5+q*1.5,(hash(i+3)-.5)],.05,'#ff8787',{flat:true})}s.render();tag(c,'red dots: energy respired by plants',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const npp=p.gpp*(1-p.rr/100),R=p.gpp-npp,fr=p.rr/100,BX=470,BW=60,BT=124,BH=252,hn=BH*(1-fr),GY=334;
+  E.panel(c,44,96,334,310,'#1e5278','#2a6e8f',GY);E.el(c,100,148,22,22,'#ffd43b');c.strokeStyle='#ffd43b';c.lineWidth=2.5;c.lineCap='round';c.beginPath();for(let i=0;i<12;i++){const a=i*TAU/12+t*.15;c.moveTo(100+Math.cos(a)*29,148+Math.sin(a)*29);c.lineTo(100+Math.cos(a)*38,148+Math.sin(a)*38)}c.stroke();
+  for(let i=0;i<9;i++)E.grass(c,66+i*35,GY+4+(i%2)*10,.9,'#69db7c');for(let i=0;i<3;i++)E.tree(c,150+i*66,GY+2,1.7,i===1?'#2b8a3e':'#37a14a');
+  c.setLineDash([5,5]);for(let i=0;i<3;i++)E.arrow(c,128+i*10,184+i*3,158+i*62,250,'rgba(255,212,59,.75)',2);c.setLineDash([]);
+  E.arrow(c,262,220,340,126,'#ff6b6b',2+9*fr);E.arrow(c,286,296,324,304,'#69db7c',2+8*(1-fr));E.deer(c,334,GY+2,1.0,-1);
+  tag(c,'sunlight',50,190,'#ffd43b',12);tag(c,'R: respiration',284,118,'#ff8787',12);tag(c,'NPP: food for consumers',58,392,'#8ce99a',12);tag(c,'producers (plants)',58,372,'#e9f6ff',12);tag(c,'herbivore',316,372,'#e9f6ff',11);
+  c.fillStyle='#ff6b6b';c.beginPath();c.roundRect(BX,BT,BW,BH-hn,[6,6,0,0]);c.fill();c.fillStyle='#51cf66';c.beginPath();c.roundRect(BX,BT+BH-hn,BW,hn,[0,0,6,6]);c.fill();c.strokeStyle='#0b2030';c.lineWidth=2;c.beginPath();c.moveTo(BX,BT+BH-hn);c.lineTo(BX+BW,BT+BH-hn);c.stroke();
+  c.strokeStyle='#ffd43b';c.lineWidth=2;c.beginPath();c.moveTo(BX-8,BT);c.lineTo(BX-14,BT);c.lineTo(BX-14,BT+BH);c.lineTo(BX-8,BT+BH);c.stroke();tag(c,'GPP',BX-20,BT+BH/2-8,'#ffd43b',14,'right');tag(c,f(p.gpp,0),BX-20,BT+BH/2+9,'#ffd43b',13,'right');
+  tag(c,'R  '+f(R,0),BX+BW+10,BT+(BH-hn)/2,'#ff8787',14);tag(c,'NPP  '+f(npp,0),BX+BW+10,BT+BH-hn/2,'#8ce99a',14);tag(c,'g/m²/yr',BX+BW/2,BT-12,C.muted,11,'center');tag(c,'NPP = GPP − R',BX+BW/2,BT+BH+16,'#e9f6ff',13,'center')},
  assumption:'Single plant community; values per unit area per year.'});
 
 add({...ch(12,'Ecosystem',U10),id:'bio-decomposition',title:'Decomposition of detritus',
@@ -354,9 +432,23 @@ add({...ch(12,'Ecosystem',U10),id:'bio-decomposition',title:'Decomposition of de
  tryText:'Make the litter lignin-rich and the soil cold. How much remains after a year?',
  controls:[R('T','Temperature',0,40,1,25,'°C'),R('moist','Moisture',0,100,1,60,'%'),R('lig','Lignin / chitin content',0,60,1,20,'%'),R('m','Time',0,24,1,6,'months')],
  metrics:p=>{const k=decK(p),rem=Math.exp(-k*p.m);return[N('Litter remaining',rem*100,'%',0),N('Decay rate',k,'per month',2),N('Main step now',p.m<2?'Fragmentation by detritivores':p.m<6?'Catabolism by bacteria and fungi':'Humification and mineralisation'),N('Product','Humus — dark, amorphous, slow to decay')]},
- draw:(c,p,t)=>{const rem=Math.exp(-decK(p)*p.m),s=P3.scene(c,{scale:56,cy:290,pitch:.45});s.box([0,-1.7,0],[5,.4,3.4],'#4e342e',{ground:true});const n=Math.round(30*rem);for(let i=0;i<n;i++){const a=hash(i)*TAU;leaf(s,[(hash(i+3)-.5)*4,-1.45,(hash(i+6)-.5)*2.6],[Math.cos(a),0,Math.sin(a)],.45*(.5+rem*.5),.18*(.5+rem*.5),['#a0522d','#cd853f','#8b4513'][i%3])}
-  for(let i=0;i<Math.round((1-rem)*20);i++)s.ball([(hash(i+40)-.5)*4,-1.48,(hash(i+50)-.5)*2.6],.06,'#2b1a12',{flat:true});critter(s,'earthworm',[.5*Math.sin(t*.3),-1.6,.6],.9,t);s.callout([.5*Math.sin(t*.3),-1.45,.6],'earthworm: fragmentation','#d08b74',60,-40);if(n)s.callout([(hash(3)-.5)*4,-1.45,(hash(6)-.5)*2.6],'detritus (dead leaves)','#cd853f',-60,-50);if(rem<.95)s.callout([(hash(40)-.5)*4,-1.48,(hash(50)-.5)*2.6],'humus + minerals','#a1887f',50,50);s.render()},
+ draw:(c,p,t)=>{const k=decK(p),rem=Math.exp(-k*p.m),GY=206,hh=8+44*(1-rem),n=Math.round(30*rem),cur=p.m<2?[0]:p.m<6?[2]:[3,4];
+  c.save();c.beginPath();c.roundRect(44,96,290,310,10);c.clip();const g=c.createLinearGradient(0,96,0,GY);g.addColorStop(0,'#22567a');g.addColorStop(1,'#4a8db5');c.fillStyle=g;c.fillRect(44,96,290,GY-96);
+  c.fillStyle='#6b4a2f';c.fillRect(44,GY,290,190);c.fillStyle='#3a2217';c.fillRect(44,GY,290,hh);
+  c.fillStyle='rgba(255,255,255,.1)';for(let i=0;i<26;i++)E.el(c,52+hash(i+70)*274,GY+hh+8+hash(i+90)*(180-hh),2.4,1.6,'#a68a64');
+  c.fillStyle='#d9c9a8';for(let i=0;i<Math.round((1-rem)*18);i++)E.el(c,52+hash(i+40)*274,GY+4+hash(i+55)*(hh-6),1.8,1.8,'#d9c9a8');
+  c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=1;c.beginPath();for(let i=0;i<7;i++){const x=70+i*38,y=GY+hh+30+(i%3)*28;c.moveTo(x,y);c.bezierCurveTo(x+14,y-12,x+22,y+12,x+36,y-4)}c.stroke();
+  c.fillStyle='#ffe066';for(let i=0;i<10;i++)c.fillRect(60+hash(i+5)*260,GY+hh+10+hash(i+9)*(120-hh),3,2);
+  c.restore();
+  E.tree(c,90,GY+1,2.7,'#37a14a');const wx=200+34*Math.sin(t*.3);c.strokeStyle='#e599a8';c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(wx-40,GY+hh+22);for(let i=1;i<=16;i++){const q=i/16;c.lineTo(wx-40+q*80,GY+hh+22+5*Math.sin(q*9+t*3))}c.stroke();E.el(c,wx+40,GY+hh+22+5*Math.sin(9+t*3),4,3.4,'#f1b0bd');
+  for(let i=0;i<n;i++){const a=hash(i)*3-1.5,x=124+hash(i+3)*196,s=.5+rem*.5,y=GY-3-(hash(i+6)<.5?0:5);E.el(c,x,y,13*s,4.6*s,LC[i%3],a*.35)}
+  if(rem>.4)E.el(c,150+20*Math.sin(t*.6),120+((t*14)%100),5,2.6,'#cd853f',t);
+  c.strokeStyle='rgba(233,246,255,.6)';c.lineWidth=1;const lb=(x0,y0,x1,y1,s,al)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();tag(c,s,x1+(al==='right'?-3:3),y1,'#e9f6ff',11,al||'left')};
+  lb(260,GY-4,284,150,'detritus (litter)','right');lb(wx,GY+hh+22,wx,GY+hh+54,'earthworm (detritivore)','center');if(rem<.97)lb(250,GY+hh/2,284,GY+hh+110,'humus + minerals','right');lb(100,GY+hh+34,100,GY+hh+84,'fungal hyphae, bacteria','left');
+  chart(c,346,98,310,162,{title:'Litter remaining (%)',xl:'months',xmin:0,xmax:24,ymin:0,ymax:100,series:[{fn:x=>100*Math.exp(-k*x),col:C.gold,w:3}],marker:[p.m,rem*100]});
+  SN.forEach((s,i)=>{const y=282+i*25,on=cur.includes(i);c.fillStyle=on?'rgba(255,212,59,.16)':'rgba(255,255,255,.04)';c.beginPath();c.roundRect(346,y-10,310,23,6);c.fill();if(on){c.strokeStyle=C.gold;c.lineWidth=1.2;c.stroke()}tag(c,(i+1)+'  '+s,354,y+1,on?C.gold:'#e9f6ff',12);tag(c,SD[i],470,y+1,on?'#fff3bf':C.muted,11)})},
  assumption:'Illustrative first-order decay: k = 0.35 × temperature factor × moisture factor × (1 − lignin fraction) per month.'});
+const LC=['#a0522d','#cd853f','#8b4513'],SN=['Fragmentation','Leaching','Catabolism','Humification','Mineralisation'],SD=['small pieces (detritivores)','soluble nutrients wash down','bacteria and fungi digest it','dark humus forms, slow to decay','inorganic nutrients released'];
 function decK(p){return .35*Math.exp(-(((p.T-30)/14)**2))*(p.moist/100)*(1-p.lig/100*1.4)}
 
 /* ---------- Chapter 13: Biodiversity and Conservation ---------- */
@@ -367,8 +459,15 @@ add({...ch(13,'Biodiversity and Conservation',U10),id:'bio-species-area',title:'
  tryText:'Double the area with Z = 0.2. By what factor do species increase?',
  controls:[R('lA','Area (log₁₀ km²)',0,7,.1,3,'',1),R('Z','Slope Z',.1,1.2,.05,.2,'',2),R('Cc','Constant C (species at 1 km²)',5,100,5,20)],
  metrics:p=>{const A=10**p.lA,Sn=p.Cc*A**p.Z;return[N('Area',A,'km²',2),N('Species richness S',Sn,'',0),N('Doubling area multiplies S by',2**p.Z,'×',3),N('Typical Z','0.1–0.2 (regions); 0.6–1.2 (continents)')]},
- draw:(c,p,t)=>{const A=10**p.lA,Sn=p.Cc*A**p.Z,s=P3.scene(c,{scale:52,pitch:.55,cx:220}),r=.3+p.lA*.35;s.box([0,-.6,0],[7,.1,4],'#1971c2',{alpha:.5,ground:true});s.mesh([0,-.55,0],[r,.15,r*.8],'#2f9e44',{shape:(u,v)=>1+.15*Math.sin(5*v)});for(let i=0;i<Math.min(80,Math.round(Math.sqrt(Sn)*3));i++){const a=TAU*hash(i),rr=r*.8*Math.sqrt(hash(i+3));s.ball([rr*Math.cos(a),-.35,rr*.8*Math.sin(a)],.05,['#ffd43b','#ff8787','#74c0fc','#b197fc'][i%4],{flat:true})}s.render();
-  chart(c,420,96,236,170,{title:'log S vs log A',xl:'log₁₀ A',xmin:0,xmax:7,ymin:0,series:[{fn:x=>Math.log10(p.Cc)+p.Z*x,col:C.gold}],marker:[p.lA,Math.log10(Sn)]})},
+ draw:(c,p,t)=>{const A=10**p.lA,Sn=p.Cc*A**p.Z,rp=30+p.lA*15.5,CXI=192,CYI=262,ym=Math.log10(p.Cc)+p.Z*7,ls=Math.log10(Sn),nd=Math.min(80,Math.round(Math.sqrt(Sn)*3)),DC=['#ffd43b','#ff8787','#74c0fc','#da77f2'];
+  E.panel(c,44,96,296,310,'#1a5d8c','#164a73');c.strokeStyle='rgba(255,255,255,.1)';c.lineWidth=1;for(let i=0;i<5;i++){c.beginPath();c.ellipse(CXI,CYI,rp+12+i*14,(rp+12+i*14)*.78,0,0,TAU);c.stroke()}
+  for(let pass=0;pass<2;pass++){c.fillStyle=pass?'#3b9b4a':'#e8d9a0';c.beginPath();const q=pass?.9:1;for(let i=0;i<=36;i++){const a=i*TAU/36,r=rp*q*(1+.08*Math.sin(3*a)+.06*Math.sin(5*a+1));const x=CXI+r*Math.cos(a),y=CYI+r*.78*Math.sin(a);i?c.lineTo(x,y):c.moveTo(x,y)}c.closePath();c.fill()}
+  for(let i=0;i<Math.min(22,Math.round(rp/6));i++){const a=TAU*hash(i+11),rr=rp*.8*Math.sqrt(hash(i+13));E.tree(c,CXI+rr*Math.cos(a),CYI+rr*.78*Math.sin(a)+6,.34,'#2b8a3e')}
+  for(let i=0;i<nd;i++){const a=TAU*hash(i),rr=rp*.82*Math.sqrt(hash(i+3));c.fillStyle=DC[i%4];c.beginPath();c.arc(CXI+rr*Math.cos(a),CYI+rr*.78*Math.sin(a)-4,3.1,0,TAU);c.fill();c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=.8;c.stroke()}
+  tag(c,'Island: A = '+f(A,A<10?2:0)+' km²',58,114,'#e9f6ff',13);tag(c,'S = '+f(Sn,0)+' species',58,132,C.gold,13);tag(c,'each dot = species (√ scale), not 1 : 1',58,392,C.muted,11);
+  chart(c,352,98,304,232,{title:'log S vs log A',xl:'log₁₀ A (km²)',yl:'log₁₀ S',xmin:0,xmax:7,ymin:0,ymax:ym,series:[{fn:x=>Math.log10(p.Cc)+p.Z*x,col:C.gold,w:3}],marker:[p.lA,ls]});
+  const x0=E.cx(352,304,0,7,p.lA),y0=E.cy(98,232,0,ym,ls),x1=E.cx(352,304,0,7,Math.min(7,p.lA+1)),y1=E.cy(98,232,0,ym,Math.log10(p.Cc)+p.Z*Math.min(7,p.lA+1));c.strokeStyle='#8ca6b9';c.lineWidth=1.2;c.setLineDash([4,3]);c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);tag(c,'area ×10',(x0+x1)/2,y0+12,'#8ca6b9',10,'center');tag(c,'S ×'+f(10**p.Z,2),x1+4,(y0+y1)/2+2,'#8ca6b9',10,p.lA>5.6?'right':'left');
+  tag(c,'S = C·Aᶻ  →  log S = log C + Z log A',352,350,'#e9f6ff',12);tag(c,'a straight line on log–log axes; slope = Z',352,368,C.muted,11)},
  assumption:'Alexander von Humboldt’s relationship; dots show species richness on a compressed (√) scale.'});
 
 const LAT=[[4,1400,'Colombia (near equator)'],[41,105,'New York (41° N)'],[71,56,'Greenland (71° N)']];
