@@ -688,5 +688,79 @@ function doppler(){const s=hs(260,200,'A moving source S emitting circular wavef
   mk(s,'circle',{cx:206,cy:84,r:6,fill:'#17314f',stroke:INK,'stroke-width':1.6});ht(s,206,112,'O',INK,'middle',15);ht(s,130,46,'crowded: f′ > f',BLUE,'start',12);ht(s,10,160,'spread out: f′ < f',BLUE,'start',12);
   cp(s,178,'f′ = f (v − v_o)/(v − v_s)  (S → O positive)');cp(s,0,'S approaching: fv/(v − v_s);  receding: fv/(v + v_s)',DIM);return fin(s)}
 
-window.PhysicaRankFigs={vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share};
+/* ---- Electromagnetic Waves and Optics (JEE): E/B/k triad, displacement current, spectrum, mirror, lens, TIR, prism, YDSE, single slit, polarisers ---- */
+const pth=(p,d,c=INK,w=1.6)=>mk(p,'path',{d,fill:'none',stroke:c,'stroke-width':w});
+const thick=(s,n)=>{const l=s.querySelectorAll('line');for(let i=l.length-n;i<l.length;i++)l[i].setAttribute('stroke-width',3)};
+function emw(){const s=hs(300,170,'An electromagnetic wave travelling to the right. The electric field E oscillates up and down, the magnetic field B oscillates in the perpendicular direction (into and out of the page), and the direction of travel k is along E cross B. E and B are in phase.');
+  hv(s,14,92,288,92,DIM,1.6);ht(s,274,110,'k',DIM,'middle',14);
+  let e='',b='';for(let x=0;x<=240;x+=4){const q=Math.sin(x/240*Math.PI*4),X=30+x;e+=(x?'L':'M')+X+' '+(92-44*q);b+=(x?'L':'M')+(X-24*q)+' '+(92+20*q)}
+  pth(s,e,HI,2);pth(s,b,BLUE,2);ht(s,42,50,'E',HI,'middle',16);ht(s,16,116,'B',BLUE,'middle',16);
+  cp(s,150,'E ⟂ B ⟂ k, in phase|E₀ = cB₀, travel along E × B');return fin(s)}
+function emdc(){const s=hs(300,190,'A capacitor being charged. A conduction current I flows in the wires up to the plates. Between the plates no charge crosses, but the electric field E changes, and this gives a displacement current equal to I. Both produce the same magnetic field around.');
+  hl(s,120,30,120,150,INK);hl(s,180,30,180,150,INK);thick(s,2);
+  hl(s,20,90,120,90,INK);hl(s,180,90,280,90,INK);hv(s,40,90,80,90,HI);ht(s,60,78,'I',HI,'middle',15);hv(s,230,90,262,90,HI);ht(s,246,78,'I',HI,'middle',15);
+  for(const y of [50,90,130])hv(s,128,y,172,y,BLUE,1.5);ht(s,150,42,'E grows',BLUE,'middle',13);ht(s,150,166,'Iᵈ = ε₀ dΦᴇ/dt = I',HI,'middle',14);
+  pls(s,112,64,'+');pls(s,188,64,'−');
+  cp(s,184,'Iᵈ = C dV/dt: same size as I,|no charge crosses the gap');return fin(s)}
+function emsp(){const s=hs(310,150,'The electromagnetic spectrum from long wavelength to short: radio, microwave, infrared, visible, ultraviolet, X-ray and gamma. Frequency and photon energy rise to the right.');
+  const N=['Radio','Micro','IR','Visible','UV','X-ray','γ-ray'],C=['#3b4f73','#4a6a8c','#8c4a3e','#4a8c5a','#6a4a8c','#2f6f8f','#8c3e6a'],W=[44,44,40,50,40,44,44];let x=4;
+  N.forEach((n,i)=>{mk(s,'rect',{x,y:34,width:W[i],height:44,fill:C[i],stroke:INK,'stroke-width':1});ht(s,x+W[i]/2,61,n,'#fff','middle',12);x+=W[i]});
+  hv(s,4,100,300,100,DIM,1.4);ht(s,4,92,'λ long',DIM,'start',12);ht(s,300,92,'λ short',DIM,'end',12);ht(s,152,122,'f and photon energy rise →',DIM,'middle',12);
+  ht(s,152,20,'400 nm violet … 700 nm red',INK,'middle',12);
+  cp(s,138,'Radio > 0.1 m · Micro 1 mm–0.1 m|IR 700 nm–1 mm · UV 1–400 nm|X-ray 10⁻³–1 nm · γ < 10⁻³ nm');return fin(s)}
+function omir(){const s=hs(270,200,'Concave mirror with the object beyond the centre of curvature C. A ray parallel to the axis goes through the focus F after reflection; a ray to the pole P reflects at the same angle. They meet to form a real, inverted, diminished image between C and F.');
+  hl(s,10,100,262,100,DIM);pth(s,'M215 32.4A160 160 0 0 1 215 167.6',BLUE,2.6);
+  for(const [x,t] of [[70,'C'],[150,'F'],[230,'P']]){dot(s,x,100,INK,3);ht(s,x,118,t,INK,'middle',14)}
+  hv(s,40,100,40,60,HI,2.2);ht(s,40,50,'object',HI,'middle',13);
+  hl(s,40,60,225,60,INK);hl(s,225,60,92,131,INK);hl(s,40,60,230,100,DIM);hl(s,230,100,92,129,DIM);
+  hv(s,92,100,92,129,GRN,2.2);ht(s,90,148,'image',GRN,'middle',13);
+  cp(s,176,'1/v + 1/u = 1/f, m = −v/u|object beyond C: real, inverted, smaller');return fin(s)}
+function olens(){const s=hs(310,200,'Convex lens with an object beyond the focus. A ray parallel to the axis goes through the far focus; a ray through the centre goes straight. They meet to form a real inverted image.');
+  hl(s,8,90,300,90,DIM);pth(s,'M150 28Q168 90 150 152Q132 90 150 28',BLUE,2.4);
+  for(const [x,t] of [[30,'2F'],[90,'F'],[210,'F'],[270,'2F']]){dot(s,x,90,INK,3);ht(s,x,108,t,INK,'middle',13)}
+  hv(s,40,90,40,55,HI,2.2);hl(s,40,55,150,55,INK);hl(s,150,55,282,132,INK);hl(s,40,55,150,90,DIM);hl(s,150,90,282,132,DIM);
+  hv(s,282,90,282,132,GRN,2.2);ht(s,282,150,'image',GRN,'middle',13);ht(s,38,40,'object',HI,'middle',13);
+  cp(s,186,'1/v − 1/u = 1/f, m = v/u|1/f = (n − 1)(1/R₁ − 1/R₂)');return fin(s)}
+function otir(){const s=hs(300,190,'Light from a source O in a denser medium meets the boundary with a rarer medium. A small angle of incidence refracts away from the normal. At the critical angle the refracted ray grazes the surface. Beyond it the ray is totally reflected.');
+  hl(s,10,80,290,80,INK);ht(s,20,70,'rarer n₂',DIM,'start',13);ht(s,20,100,'denser n₁',DIM,'start',13);dsh(s,150,30,150,160);
+  dot(s,150,150,HI,4);ht(s,138,166,'O',HI,'end',14);
+  hl(s,150,150,172,80,INK);hl(s,172,80,208,34,INK);
+  hl(s,150,150,204,80,HI);hv(s,204,80,284,80,HI,1.8);ht(s,244,68,'grazing at θc',HI,'middle',12);
+  hl(s,150,150,236,80,GRN);hv(s,236,80,282,146,GRN,1.8);ht(s,268,160,'TIR, i > θc',GRN,'middle',12);
+  arcp(s,150,150,42,0,37,INK);ht(s,172,114,'θc',INK,'start',13);
+  cp(s,184,'sin θc = n₂/n₁   (denser to rarer)');return fin(s)}
+function oprism(){const s=hs(300,200,'A prism of angle A at minimum deviation. The ray inside is parallel to the base. The incident and emergent rays make equal angles with the faces, and the deviation is the angle between the incident ray extended and the emergent ray.');
+  pth(s,'M150 30L81 150L219 150Z',BLUE,2);ht(s,150,56,'A',INK,'middle',14);
+  hl(s,30,119,115.5,90,INK);hl(s,115.5,90,184.5,90,INK);hv(s,184.5,90,270,119,INK,1.8);
+  hl(s,115.5,90,200,61,DIM,'4 3');hl(s,184.5,90,100,61,DIM,'4 3');ht(s,176,70,'δ',HI,'start',16);
+  ht(s,70,136,'i',INK,'middle',13);ht(s,246,136,'e',INK,'middle',13);
+  cp(s,176,'δ = i + e − A, r₁ + r₂ = A|n = sin((A + δₘ)/2) / sin(A/2)');return fin(s)}
+function oyd(){const s=hs(320,200,'Young double slit. A plane wave falls on two slits S1 and S2 a distance d apart. Rays from both slits reach a point P on a screen at distance D. The path difference is d y over D. Bright and dark fringes alternate on the screen with equal spacing beta equal to lambda D over d.');
+  for(const [a,b] of [[20,66],[74,106],[114,160]])hl(s,70,a,70,b,INK);thick(s,3);
+  for(const y of [30,150])hv(s,10,y,44,y,DIM,1.2);
+  hl(s,270,20,270,160,INK);for(const k of [-2,-1,0,1,2])mk(s,'rect',{x:270,y:90+k*20-4,width:10,height:8,fill:HI});
+  hl(s,70,70,270,50,GRN);hl(s,70,110,270,50,GRN);dot(s,270,50,INK,3);ht(s,288,54,'P',INK,'start',14);ht(s,288,94,'O',INK,'start',14);
+  ht(s,80,62,'S₁',INK,'start',13);ht(s,80,128,'S₂',INK,'start',13);dim(s,46,70,46,110,'d',34,94);
+  dim(s,70,174,270,174,'D',170,190);dim(s,300,70,300,90,'β',312,84);
+  cp(s,208,'Δ = dy/D, bright y = nλD/d|fringe width β = λD/d');return fin(s)}
+function oslit(){const s=hs(330,200,'Single slit diffraction. Light passes through a slit of width a. On the screen a wide bright central maximum has dark minima where a sin theta equals n lambda. A graph of intensity against position shows a central peak with weak secondary maxima.');
+  for(const [a,b] of [[20,75],[105,160]])hl(s,70,a,70,b,INK);thick(s,2);
+  dim(s,52,75,52,105,'a',40,94);for(const y of [40,140])hv(s,10,y,44,y,DIM,1.2);
+  hl(s,250,20,250,160,INK);dsh(s,70,90,250,55);dsh(s,70,90,250,125);hl(s,70,90,250,90,DIM,'2 4');
+  let d='';for(let y=20;y<=160;y+=2){const al=Math.PI*(y-90)/35,v=Math.abs(al)<1e-6?1:Math.sin(al)/al;d+=(y>20?'L':'M')+(254+60*v*v)+' '+y}
+  pth(s,d,HI,2);ht(s,128,70,'θ',INK,'start',13);ht(s,258,56,'−1',DIM,'start',11);ht(s,258,129,'+1',DIM,'start',11);
+  cp(s,178,'minima: a sin θ = nλ|central width 2λD/a');return fin(s)}
+function opol(){const s=hs(320,170,'Unpolarised light passes a polariser and becomes plane polarised with half the intensity. A second polariser, the analyser, whose axis makes angle theta with the first, transmits the intensity I0 cos squared theta (Malus law).');
+  hv(s,8,70,312,70,DIM,1.4);
+  for(const a of [0,45,90,135]){const r=a*Math.PI/180;hl(s,34-16*Math.sin(r),70-16*Math.cos(r),34+16*Math.sin(r),70+16*Math.cos(r),INK)}
+  ht(s,34,104,'unpolarised',DIM,'middle',11);
+  mk(s,'rect',{x:98,y:34,width:10,height:72,fill:'none',stroke:BLUE,'stroke-width':1.8});for(const y of [44,58,70,82,96])hl(s,103,y-6,103,y+6,BLUE);
+  ht(s,103,122,'polariser',BLUE,'middle',12);
+  hv(s,150,50,150,90,HI,2.2);ht(s,150,116,'I₀/2',HI,'middle',13);
+  mk(s,'rect',{x:196,y:34,width:10,height:72,fill:'none',stroke:GRN,'stroke-width':1.8});hl(s,196,60,206,80,GRN);hl(s,196,80,206,100,GRN);
+  ht(s,190,122,'analyser',GRN,'middle',12);
+  hv(s,262,50,248,90,HI,2.2);ht(s,270,116,'(I₀/2) cos²θ',HI,'middle',13);
+  cp(s,150,'Malus: I = I₀ cos²θ|Brewster: tan i = n, reflected ⟂ refracted');return fin(s)}
+
+window.PhysicaRankFigs={vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol};
 })();
