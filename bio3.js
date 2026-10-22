@@ -343,9 +343,26 @@ add({...ch(16,'Excretory Products and their Elimination'),id:'bio-adh-regulation
  tryText:'Switch on diabetes insipidus and compare the urine volume.',
  controls:[R('intake','Water intake',.5,5,.1,2,'L/day',1),S('di','Condition','normal',[['normal','Normal'],['di','Diabetes insipidus (no ADH)']])],
  metrics:p=>{const r=adh(p);return[N('ADH level (relative)',r.adh*100,'%',0),N('Urine volume',r.vol,'L/day',2),N('Urine osmolarity',r.osm,'mOsmol/L',0),N('Status',r.note)]},
- draw:(c,p,t)=>{const r=adh(p),s=P3.scene(c,{scale:56,cx:230,yaw:-.75});body(s,[0,-2.2,0],1.25,.1);s.mesh([0,.99,0],.14,'#b197fc');s.callout([0,.99,0],'hypothalamus → posterior pituitary (ADH)','#c9b6ff',60,-40);
-  for(const z of[-1,1])s.mesh([-.15,-1.2,z*.4],[.18,.3,.14],'#a61e4d',{shape:(u,v)=>1-.25*Math.max(0,Math.sin(v)*-z)});s.mesh([0,-1.6,0],[.2+.12*r.vol/5,.2+.12*r.vol/5,.2+.12*r.vol/5],'#ffe066',{alpha:.7});
-  for(let i=0;i<Math.round(r.adh*8);i++){const q=cycle(t*.4+i/8,1);s.ball([0,.9-q*2.1,(hash(i)-.5)*.3],.05,'#b197fc',{flat:true,glow:true})}s.callout([-.15,-1.2,.45],'kidneys: ADH → more water reabsorbed','#ff8787',60,-20);s.callout([0,-1.6,.25],`bladder: ${f(r.vol,2)} L urine/day`,'#ffe066',60,40);s.render();
+ draw:(c,p,t)=>{const r=adh(p),s=P3.scene(c,{scale:52,cx:250,cy:262,pitch:.03}),Bn=[-1.5,1.4,0],K=[.45,-.5,0],BL=[-.75,-1.85,0],vk=Math.min(1,r.vol/12),ur=pm=>pm,amb=vk<.3?'#ffe27a':vk<.7?'#f6d34a':'#fff0a8';
+  /* brain in sagittal section: cerebrum with gyri, cerebellum, brainstem, hypothalamus and pituitary */
+  s.mesh(Bn,[.95,.7,.18],'#f1b6bd',{rings:14,segs:26,spec:.4,shape:(u,v)=>1+.05*Math.sin(9*v+3*u)+.04*Math.sin(11*u)});
+  s.mesh([Bn[0]+.55,Bn[1]-.5,0],[.32,.2,.16],'#d98c9a',{rings:8,segs:14});s.tube([[Bn[0]+.05,Bn[1]-.2,0],[Bn[0]+.12,Bn[1]-.55,0],[Bn[0]+.2,Bn[1]-.85,0]],.08,'#e7a6b0',{segs:8});
+  s.mesh([Bn[0]-.1,Bn[1]-.18,.05],[.2,.14,.12],'#9775fa',{rings:8,segs:12,lift:2});
+  s.tube([[Bn[0]-.08,Bn[1]-.3,.05],[Bn[0]-.05,Bn[1]-.5,.05]],.025,'#b197fc',{segs:6});s.mesh([Bn[0]-.05,Bn[1]-.58,.05],[.1,.08,.09],'#e599f7',{rings:7,segs:10});s.mesh([Bn[0]-.0,Bn[1]-.6,.05],[.11,.08,.09],'#7048e8',{rings:7,segs:10});
+  /* ADH carried in the blood to the kidney */
+  const vs=[[Bn[0],Bn[1]-.7,0],[-.9,.4,0],[-.2,.15,0],[.2,0,0]];s.tube(vs,.04,'#e8505b',{segs:6});
+  for(let i=0;i<Math.max(1,Math.round(r.adh*8));i++){const q=cycle(t*.35+i/8,1),n=q*3,j=Math.min(2,Math.floor(n)),f2=n-j;s.ball([vs[j][0]+(vs[j+1][0]-vs[j][0])*f2,vs[j][1]+(vs[j+1][1]-vs[j][1])*f2,.1],.06,'#b197fc',{flat:true,glow:true,lift:3})}
+  /* kidney in coronal section: cortex, medullary pyramids, pelvis */
+  s.mesh(K,[.62,.95,.3],'#b9545c',{rings:16,segs:26,spec:.5,shape:(u,v)=>{const nx=Math.cos(u)*Math.cos(v),ny=Math.sin(u);return 1-.42*Math.exp(-((nx+1)**2)*10-ny*ny*7)}});
+  for(let i=0;i<5;i++){const a=(-.8+i*.4)*PI*.75+PI*.05,cx0=K[0]+.5*Math.cos(a+PI*1.0)*-1,cy0=K[1]+.78*Math.sin(a);const ap=[K[0]-.12,K[1]+.02*i,.3],b1=[K[0]+.42*Math.cos(a)*1.0,K[1]+.74*Math.sin(a)+.1,.3],b2=[K[0]+.42*Math.cos(a)*1.0,K[1]+.74*Math.sin(a)-.1,.3];s.poly([ap,b1,b2],'#8c2f3d',{cull:false,z:1e5})}
+  s.ball([K[0]-.2,K[1],.32],.16,'#f6d58a',{flat:true,lift:5});
+  s.tube([[K[0]-.3,K[1]-.05,.1],[-.3,-1.0,0],[BL[0]+.05,BL[1]+.3,0]],.04,'#f1d77a',{segs:6});
+  for(let i=0;i<1+Math.round(r.vol/3);i++){const q=cycle(t*.5+i*.31,1);s.ball([K[0]-.3+(BL[0]+.05-K[0]+.3)*q*.9-q*.5*.5,K[1]-.05+(BL[1]+.3-K[1]+.05)*q,.12],.045,amb,{flat:true,lift:3})}
+  /* water returned to blood: more with more ADH */
+  for(let i=0;i<Math.round(1+r.adh*4);i++)s.arrow([K[0]+.5,K[1]+.5-i*.3,.2],[K[0]+1.05,K[1]+.5-i*.3,.2],'#4dabf7',2,7,i===0?'H₂O reabsorbed':'');
+  /* bladder: wall bag, urine level follows volume */
+  const bs=.28+.3*Math.min(1,r.vol/20);s.mesh(BL,[bs,bs*.85,.2],'#e4a8a0',{alpha:.55,rings:12,segs:18,spec:.3});s.mesh([BL[0],BL[1]-bs*.1,0],[bs*.82,bs*.68,.16],amb,{alpha:.75,rings:10,segs:16});
+  s.callout([Bn[0]-.1,Bn[1]-.18,.15],'hypothalamus','#c9b6ff',50,-40);s.callout([Bn[0],Bn[1]-.6,.15],'posterior pituitary → ADH','#c9b6ff',55,10);s.callout([K[0]+.4,K[1]-.5,.3],'kidney','#ff8787',55,-5);s.callout([BL[0]+bs,BL[1],.2],`bladder: ${f(r.vol,2)} L urine/day`,'#ffe066',45,0);s.render();
   chart(c,430,96,226,150,{title:'Urine volume vs water intake',xl:'intake (L/day)',xmin:.5,xmax:5,ymin:0,ymax:20,series:[{fn:x=>adh({intake:x,di:p.di}).vol,col:C.gold}],marker:[p.intake,r.vol]})},
  assumption:'Illustrative model: ~0.9 L/day lost by other routes, ~600 mOsmol solute per day, urine osmolarity limited to 50–1200 mOsmol/L.'});
 function adh(p){const solute=600;if(p.di==='di'){const vol=Math.max(p.intake*.9,solute/60);return{adh:0,vol:Math.min(vol,20),osm:solute/Math.min(vol,20),note:'Dilute urine, excessive thirst'}}const vol=clamp(p.intake-.9,solute/1200,solute/50),osm=solute/vol,adhL=clamp((osm-50)/1150,0,1);return{adh:adhL,vol,osm,note:adhL>.6?'Water conserved (concentrated urine)':adhL<.2?'Excess water removed (dilute urine)':'Balanced'}}
