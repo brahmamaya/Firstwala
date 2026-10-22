@@ -432,10 +432,20 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-lac-operon',title:'The
  tryText:'Add lactose. Which three enzymes are now produced?',
  controls:[S('lac','Lactose in medium','yes',[['yes','Present'],['no','Absent']])],
  metrics:p=>p.lac==='yes'?[N('Repressor','Bound to inducer — inactive'),N('Operator','Free'),N('Transcription','ON'),N('Enzymes made','β-galactosidase (z), permease (y), transacetylase (a)')]:[N('Repressor','Bound to operator'),N('Operator','Blocked'),N('Transcription','OFF'),N('Enzymes made','None (only basal level)')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:.3}),on=p.lac==='yes',genes=[['i',-3,'#ced4da'],['p',-1.8,'#ffd43b'],['o',-1.1,'#ff8787'],['z',.2,'#4dabf7'],['y',1.6,'#69db7c'],['a',2.8,'#b197fc']];s.cyl([0,0,0],[1,0,0],.18,7,'#868e96');genes.forEach(([n,x,col],i)=>{const w=i>2?1.2:.6;s.cyl([x,0,0],[1,0,0],.22,w,col);s.label([x,.5,0],n,col,14)});
-  const rep=on?[-1.1+.8,1.4+.2*Math.sin(t),0]:[-1.1,.45,0];s.mesh(rep,[.35,.25,.3],'#e8590c',{label:'repressor'});s.label(V.add(rep,[0,.45,0]),'repressor',C.gold,11);s.tube([[-3,0,0],[-3,.6,.2],[-2.6,.9,.2]],.04,'#ced4da',{segs:5});
-  if(on){for(let i=0;i<5;i++)s.ball([-2+hash(i)*4,1.6+hash(i+3)*.6,(hash(i+6)-.5)],.09,'#ffe066',{flat:true});s.ball(V.add(rep,[.25,.2,0]),.09,'#ffe066');const px=-1.8+cycle(t*.3,1)*5;s.mesh([px,.3,0],[.4,.3,.35],'#20c997',{alpha:.8});s.path(Array.from({length:12},(_,i)=>[px-i*.15,.4+.05*Math.sin(i+t*4),-.4]),'#ffa94d',2);s.label([px,.85,0],'RNA polymerase',C.mint,11)}
-  else s.mesh([-1.9,.35,0],[.4,.3,.35],'#20c997',{alpha:.5});s.render();tag(c,on?'yellow: lactose (inducer)':'Repressor sits on the operator',44,98,on?C.gold:C.red,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:335,cy:262,pitch:.03}),on=p.lac==='yes',genes=[['i',-3,'#ced4da',.6],['p',-1.85,'#ffd43b',.6],['o',-1.2,'#ff8787',.6],['z',.2,'#4dabf7',1.2],['y',1.4,'#69db7c',1.2],['a',2.6,'#b197fc',1.2]];
+  /* DNA: gene blocks, double strand with rungs */
+  for(const [n,x,col,w] of genes){s.poly([[x-w/2,-.34,-.1],[x+w/2,-.34,-.1],[x+w/2,.34,-.1],[x-w/2,.34,-.1]],col,{cull:false,alpha:.85,z:-1e5});s.label([x,-.62,0],n,col,14)}
+  const xs=Array.from({length:44},(_,i)=>-3.4+i*.158);s.tube(xs.map((x,i)=>[x,.2+.03*Math.sin(i*.9),0]),.035,'#cfd8e0',{segs:5});s.tube(xs.map((x,i)=>[x,-.2-.03*Math.sin(i*.9),0]),.035,'#9aa8b5',{segs:5});for(let i=0;i<xs.length;i+=1)s.seg([xs[i],.17,0],[xs[i],-.17,0],i%2?'#ff8787':'#4dabf7',1.6);
+  /* repressor: bound to the operator without lactose, floating free with lactose attached when lactose is present */
+  const rep=on?[-.3,1.25+.12*Math.sin(t*1.5),.1]:[-1.2,.55,.1];s.mesh(rep,[.42,.3,.28],'#e8590c',{rings:10,segs:16,spec:.5,lift:2});s.mesh([rep[0]-.1,rep[1]+.05,rep[2]+.1],[.2,.14,.15],'#ff922b',{rings:6,segs:10,lift:3});
+  if(!on){for(const dx of[-.15,.15])s.tube([[rep[0]+dx,rep[1]-.2,.1],[rep[0]+dx,.28,.05]],.045,'#e8590c',{segs:6});s.label([.9,.95,0],'repressor binds operator',C.gold,11)}
+  else{for(let i=0;i<2;i++){const q=[rep[0]+.3+i*.12,rep[1]+.1-i*.2,.2];s.ball(q,.07,'#ffe066',{glow:true,lift:4});s.ball([q[0]+.1,q[1]+.05,.2],.06,'#ffd43b',{flat:true,lift:4})}s.label([rep[0],rep[1]+.5,0],'repressor + lactose (inactive)',C.gold,11);
+   for(let i=0;i<6;i++){const q=[-3.2+hash(i)*3.2+.3*Math.sin(t+i),1.5+hash(i+3)*.7,(hash(i+6)-.5)*.4];s.ball(q,.07,'#ffe066',{flat:true,glow:true});s.ball([q[0]+.1,q[1]+.04,q[2]],.055,'#ffd43b',{flat:true})}}
+  /* RNA polymerase: blocked at the promoter, or moving through z, y, a leaving one mRNA */
+  if(on){const px=-1.85+cycle(t*.3,1)*5,mr=Array.from({length:Math.max(2,Math.floor((px+1.85)/.2)+2)},(_,i)=>[-1.85+i*.2,.42+.07*Math.sin(i*1.2+t*3),.15]);s.mesh([px,.36,.05],[.42,.3,.3],'#20c997',{alpha:.85,rings:8,segs:12,spec:.4,lift:2});s.path(mr,'#ffa94d',2.5,[],1e5);s.label([px,.85,0],'RNA polymerase',C.mint,11);
+   s.label([.2,-1.05,0],'β-galactosidase',C.blue,10);s.label([1.4,-1.05,0],'permease','#69db7c',10);s.label([2.6,-1.05,0],'transacetylase','#b197fc',10);for(const [x,col] of[[.2,'#4dabf7'],[1.4,'#69db7c'],[2.6,'#b197fc']])s.mesh([x,-1.3+.04*Math.sin(t*2+x),.1],[.28,.2,.2],col,{rings:8,segs:12,spec:.4})}
+  else{s.mesh([-1.85,.4,.05],[.42,.3,.3],'#20c997',{alpha:.5,rings:8,segs:12});s.label([-2.7,1.0,0],'RNA polymerase blocked',C.red,11)}
+  s.render();tag(c,'i regulator gene · p promoter · o operator · z, y, a structural genes',44,114,C.muted,11);tag(c,on?'yellow: lactose (inducer) · genes z, y, a transcribed':'No lactose: repressor sits on the operator, genes OFF',44,98,on?C.gold:C.red,13)},
  assumption:'Negative regulation as described in NCERT; catabolite (glucose) control not included.'});
 
 add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-dna-fingerprinting',title:'DNA fingerprinting with VNTRs',
