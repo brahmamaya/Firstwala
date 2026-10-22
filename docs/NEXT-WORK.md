@@ -11,13 +11,10 @@ Owner rules: merge to main without asking, in batches of 10 sims. After each bat
 6. Merge flow: build, `node tools/perf-budget.js` (0 FAIL), `git add -A . ':!.claude'`, commit, `git fetch origin main && git merge origin/main`, on conflicts in index.html / *.min.js run `git checkout --ours <files>` then rebuild and commit, push, create PR to main, squash merge. The stop hook's "unpushed commits" warning is a stale ref, ignore it.
 7. Spawn at most 2 agents at a time (isolation worktree), each told first to `git fetch origin main && git merge --ff-only origin/main`, to commit after EACH sim, and to LOOK at screenshots before and after.
 
-## A. Visuals batch 3 (10 sims)
-- Chemistry (chem1..4.js), 5 sims from: gas laws / kinetic theory, rate / collision theory, solubility, osmosis / colligative properties, atomic models / orbitals, periodic trends, SN1/SN2 mechanism with curved arrows, coordination geometry, calorimeter. Reuse `window.PhysicaChem` helpers `stick`, `lobe`, `glassBeaker`, `tint` (chem1.js).
-- Biology (bio1..5.js), 5 sims: bio-ecg, bio-meiosis, bio-dna-replication, bio-central-dogma, plus digestive system or root/stem anatomy or calvin cycle.
-- Per sim: shaded CPK/organ shapes, glassware with meniscus, correct particle/ion motion, labels uncluttered, <= ~600 primitives, no per-frame allocation. Do not change ids, controls, measurements or audited science.
-
-## B. Visuals batches 4..N
-Repeat A for the remaining sims: biology ~85 left (ids in docs/simulation-quality-audit.md, skip the 15 done: bio-cell-explorer, bio-human-skeleton, bio-nephron, bio-double-circulation, bio-cardiac-cycle, bio-synapse, bio-stomata, bio-light-reaction, bio-dna-double-helix, bio-flower-ovary, bio-mitosis, bio-action-potential, bio-reflex-arc, bio-breathing-mechanism), chemistry ~39 left (done: chem-vsepr, chem-hybridisation, chem-ph, chem-daniell-cell, chem-faraday-electrolysis, chem-le-chatelier, chem-catalyst, chem-chain-isomers, chem-molar-conductivity, chem-benzene-resonance).
+## A/B. Visuals: remaining sims (all others are DONE and merged)
+- Chemistry: all 50 done.
+- Biology: 5 left to redo (flat ecology/biotech diagrams, same style as bio-predator-prey / bio-energy-pyramid): bio-latitudinal-gradient, bio-bt-cotton, bio-insulin-rdna, bio-cockroach (skip if it needs a full organ-coordinate rebuild), bio-genetic-drift (judged decent; only if clearly crude). Also 15 biology sims were judged fine and skipped (see git log), and bio-fluid-mosaic etc. are done.
+- Per sim: BEFORE screenshot, iterate, commit after each, lab-smoke for the ids, then merge flow above.
 
 ## C. 2D mode of bio/chem sims
 For every redesigned sim, open `2d` screenshot; if the model is small, side-on or flat, fix the default 2D camera/yaw/scale in that sim so it is front-facing and fills the stage (edit only the sim's own file).
