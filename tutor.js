@@ -13,7 +13,7 @@ let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('phys
 
 // ---- mode choice: step 3 on the landing page (the logo brings the landing page back to change it)
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
-const selTag=()=>{const t=el('span','land-sel','✓ Selected');t.setAttribute('aria-hidden','true');return t};
+const selTag=()=>{const t=el('span','land-sel');t.hidden=true;return t};
 const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
 // Landing: two buttons. "Simulations" opens Student and Teacher underneath (as before); "Rank mode" opens its exams.
 const simBtn=btn('land-grade land-mode land-sim',null,()=>{const on=!simSub.classList.contains('open');if(on)rankOpen(false);simOpen(on)});
