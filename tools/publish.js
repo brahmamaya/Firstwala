@@ -2,8 +2,8 @@
    because GitHub Pages serves everything in the published folder and cannot send headers or hide files. */
 const fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),out=path.join(root,'_site');
-const FILE=/^(CNAME|manifest\.webmanifest|styles\.min\.css|info\.css|ga\.js|sw\.js|help\.js|framebust\.js|[A-Za-z0-9._-]+\.html|[A-Za-z0-9._-]+\.min\.js)$/;
-const DIRS=['fonts','icons','.well-known','tests'];
+const FILE=/^(CNAME|manifest\.webmanifest|styles\.min\.css|info\.css|sim-page\.css|sitemap\.xml|robots\.txt|og\.png|ga\.js|sw\.js|help\.js|framebust\.js|[A-Za-z0-9._-]+\.html|[A-Za-z0-9._-]+\.min\.js)$/;
+const DIRS=['fonts','sim','icons','.well-known','tests'];
 fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out);
 const copy=(a,b)=>{const st=fs.statSync(a);if(st.isDirectory()){fs.mkdirSync(b,{recursive:true});for(const f of fs.readdirSync(a))copy(path.join(a,f),path.join(b,f))}else fs.copyFileSync(a,b)};
 let n=0;for(const f of fs.readdirSync(root)){if(FILE.test(f)){copy(path.join(root,f),path.join(out,f));n++}}
