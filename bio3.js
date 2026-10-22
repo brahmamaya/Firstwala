@@ -637,8 +637,20 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-myelinated-conduction',
  tryText:'Double the axon diameter for both types and compare the speeds.',
  controls:[R('d','Axon diameter',1,20,.5,10,'μm',1)],
  metrics:p=>{const vm=6*p.d,vu=Math.sqrt(p.d);return[N('Myelinated speed',vm,'m/s',0),N('Non-myelinated speed',vu,'m/s',1),N('Time for 1 m (myelinated)',1000/vm,'ms',1),N('Time for 1 m (non-myelinated)',1000/vu,'ms',0)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.2}),vm=6*p.d,vu=Math.sqrt(p.d),r=.08+p.d*.008;for(const [z,my] of [[-.9,true],[.9,false]]){s.tube([[-3.4,0,z],[3.4,0,z]],r,'#ffe8cc',{segs:10});if(my)for(let i=0;i<8;i++)s.cyl([-3+i*.86,0,z],[1,0,0],r+.12,.7,'#f1f3f5',{alpha:.85});
-   const x=my?-3+Math.floor(cycle(t*vm/40,1)*8)*.86-.43:-3.4+cycle(t*vu/12,1)*6.8;s.ball([x,0,z],r+.12,'#ffd43b',{glow:true,flat:true,lift:4});s.label([-3.6,.6,z],my?'myelinated':'non-myelinated',C.white,12)}s.callout([-3+.86,r+.12,-.9],'myelin sheath (Schwann cell)','#f1f3f5',-30,-60);s.callout([-3+.43,0,-.9],'node of Ranvier: impulse jumps here','#ffd43b',40,-80);s.callout([1,r,.9],'axon: impulse travels continuously','#ffe8cc',30,60);s.render();tag(c,'animation speeds are relative, not real time',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,pitch:.02,cx:345,cy:250}),vm=6*p.d,vu=Math.sqrt(p.d),r=.1+p.d*.012,ro=r*1.9+.06,Y1=.95,Y2=-.95,SK=(u,v)=>{const q=Math.cos(u)*Math.cos(v);return 1/Math.sqrt(Math.abs(q)**6+1-q*q)},
+  mix=(a,b,k)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join('')},
+  nodes=[-2,-1,0,1,2],xm=nodes[Math.min(4,Math.floor(cycle(t*vm/40,1)*5))],xu=-3.4+cycle(t*vu/12,1)*6.8;
+  /* myelinated fibre: axon core, sheath segments with nodes of Ranvier between them */
+  s.tube([[-3.4,Y1,0],[3.4,Y1,0]],r,u=>mix('#ffe0a8','#ffd43b',Math.max(0,1-Math.abs(-3.4+u*6.8-xm)*3)),{segs:10});
+  for(let i=0;i<6;i++){const x=-2.5+i;s.mesh([x,Y1,0],[.43,ro,ro],'#f4eee0',{alpha:.88,rings:8,segs:12,spec:.5,shape:SK});s.mesh([x,Y1,0],[.4,ro*.78,ro*.78],'#e2d6bd',{alpha:.5,rings:6,segs:10,shape:SK})}
+  s.mesh([-.5,Y1+ro*.85,.05],[.2,.12,.14],'#8e6bd8',{rings:6,segs:10,lift:2});
+  for(const x of nodes)for(const sg of[-1,1])s.ball([x,Y1+sg*(r+.02),.1],.04,'#4dabf7',{flat:true});
+  s.ball([xm,Y1,.1],r+.1,'#ffd43b',{glow:true,flat:true,lift:4});
+  /* non-myelinated fibre: bare axon, depolarised region travels continuously */
+  s.tube([[-3.4,Y2,0],[3.4,Y2,0]],r,u=>mix('#ffe0a8','#ffd43b',Math.max(0,1-Math.abs(-3.4+u*6.8-xu)*1.6)),{segs:10});s.tube([[-3.4,Y2,0],[3.4,Y2,0]],r*1.25,'#ffe8cc',{alpha:.25,segs:10});
+  s.ball([xu,Y2,.1],r+.1,'#ffd43b',{glow:true,flat:true,lift:4});
+  s.label([-2.6,Y1+ro+.55,0],'myelinated fibre',C.white,12);s.label([-2.4,Y2+.6,0],'non-myelinated fibre',C.white,12);
+  s.callout([-1.5,Y1+ro*.8,0],'myelin sheath (Schwann cell)','#f1f3f5',-60,-35);s.callout([nodes[2],Y1-ro*.9,.1],'node of Ranvier: impulse jumps here','#ffd43b',70,45);s.callout([1.5,Y2,0],'axon: impulse travels continuously','#ffe8cc',30,28);s.callout([-.5,Y1+ro*.95,.1],'Schwann cell nucleus','#b79cf0',45,-50);s.render();tag(c,'animation speeds are relative, not real time',44,392,C.muted,12)},
  assumption:'Rule-of-thumb speeds: myelinated ≈ 6 m/s per μm of diameter; non-myelinated ≈ √d m/s (d in μm).'});
 
 /* ---------- Chapter 19: Chemical Coordination and Integration ---------- */
