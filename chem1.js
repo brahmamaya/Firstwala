@@ -38,10 +38,13 @@ add({...ch(1,'Some Basic Concepts of Chemistry','PHYSICAL CHEMISTRY'),id:'chem-m
  tryText:'Take 18 g of water and then 44 g of CO₂. How many molecules does each contain?',
  controls:[S('sub','Substance','H2O',Object.keys(MOL).map(k=>[k,MOL[k][0]+' ('+k.replace(/(\d+)/g,m=>m.split('').map(d=>'₀₁₂₃₄₅₆₇₈₉'[d]).join(''))+')'])),R('m','Mass taken',1,200,1,18,'g')],
  metrics:p=>{const M=MOL[p.sub][1],n=p.m/M;return[N('Molar mass',M,'g/mol',2),N('Moles',n,'mol',3),N('Molecules / formula units',n*6.022e23,'',3)]},
- draw:(c,p,t)=>{const M=MOL[p.sub][1],n=p.m/M,s=P3.scene(c,{scale:56,cy:280,cx:300});s.cyl([-1.6,-1.3,0],[0,1,0],1,.2,'#adb5bd',{cap:'#dee2e6'});s.box([-1.6,-1.6,0],[2.4,.4,1.6],'#343a40');
-  const heap=Math.min(1.1,.25+Math.cbrt(p.m)*.18);s.lathe([-1.6,-1.2,0],[[heap,0],[heap*.6,heap*.5],[0,heap*.75]],p.sub==='NaCl'?'#f8f9fa':p.sub==='C6H12O6'?'#fff3bf':p.sub==='CO2'?'#e9ecef':'#74c0fc',{alpha:p.sub==='H2O'?.6:undefined});
-  const geo=MOL[p.sub][2],q=[1.6,.4,0];if(geo){for(const [el,x,y,z] of geo){if(el!==geo[0][0]||x||y||z)bond(s,q,V.add(q,[x,y,z]),p.sub==='CO2'?2:1)}for(const [el,x,y,z] of geo)atom(s,V.add(q,[x,y,z]),el,1.3)}else{for(let i=0;i<6;i++){const a=TAU*i/6,r=[.55*Math.cos(a),.2*Math.sin(2*a),.55*Math.sin(a)],b=[.55*Math.cos(a+TAU/6),.2*Math.sin(2*a+TAU/3),.55*Math.sin(a+TAU/6)];bond(s,V.add(q,r),V.add(q,b));atom(s,V.add(q,r),i===5?'O':'C')}}
-  s.callout([-1.6,-.7,0],`${p.m} g on the balance`,'#e9f6ff',-60,-50);s.callout(V.add(q,[0,.6,0]),`1 ${p.sub==='NaCl'?'formula unit':'molecule'} (M = ${M} g/mol)`,'#e9f6ff',40,-60);s.render();
+ draw:(c,p,t)=>{const M=MOL[p.sub][1],n=p.m/M,s=P3.scene(c,{scale:62,cy:250,cx:290});
+  s.box([-1.3,-1.55,0],[2.7,.3,1.9],'#2b3036');s.lathe([-1.3,-1.4,0],[[.001,0],[1.05,0],[1.1,.06],[.95,.16],[.001,.16]],'#ced4da',{spec:.7,shine:30});
+  const heap=Math.min(1.0,.3+Math.cbrt(p.m)*.17),hc=p.sub==='NaCl'?'#f8f9fa':p.sub==='C6H12O6'?'#fff3bf':p.sub==='CO2'?'#e9ecef':'#74c0fc';
+  s.lathe([-1.3,-1.24,0],[[heap,0],[heap*.8,heap*.28],[heap*.45,heap*.55],[.001,heap*.72]],hc,{alpha:p.sub==='H2O'?.65:undefined,spec:.6,segs:24});
+  const geo=MOL[p.sub][2],q=[1.3,.3,0],K=1.7;if(geo){const c0=geo[0];for(const [el,x,y,z] of geo){if(el!==c0[0]||x||y||z)stick(s,q,V.add(q,[x*K,y*K,z*K]),p.sub==='CO2'?2:1,{ca:c0[0],cb:el,side:[0,0,1]})}for(const [el,x,y,z] of geo)atom(s,V.add(q,[x*K,y*K,z*K]),el,1.5)}
+  else{const R6=.8,pt=i=>{const a=TAU*i/6;return V.add(q,[R6*Math.cos(a),.18*Math.sin(2*a),R6*Math.sin(a)])},E=i=>i===5?'O':'C';for(let i=0;i<6;i++){stick(s,pt(i),pt(i+1),1,{ca:E(i),cb:E(i+1)});atom(s,pt(i),E(i),1.15)}}
+  s.callout([-1.3,-.55,0],`${p.m} g on the balance`,'#e9f6ff',-50,-60);s.callout(V.add(q,[0,1.1,0]),`1 ${p.sub==='NaCl'?'formula unit':'molecule'} (M = ${M} g/mol)`,'#e9f6ff',20,-50);s.render();
   tag(c,`${p.m} g ÷ ${M} g/mol = ${f(n,3)} mol  →  ${f(n*6.022e23,3)} particles`,44,98,C.gold,15)},
  assumption:'Molar masses from IUPAC atomic masses; for NaCl the count is formula units, not molecules.'});
 
@@ -52,10 +55,12 @@ add({...ch(1,'Some Basic Concepts of Chemistry','PHYSICAL CHEMISTRY'),id:'chem-l
  tryText:'Use 4 g H₂ and 16 g O₂. Which one is limiting?',
  controls:[R('h','Hydrogen taken',.5,10,.5,4,'g',1),R('o','Oxygen taken',4,80,1,16,'g'),R('prog','Reaction progress',0,100,1,100,'%')],
  metrics:p=>{const nh=p.h/2.016,no=p.o/32,nw=Math.min(nh,2*no),lim=nh<2*no?'Hydrogen (H₂)':nh>2*no?'Oxygen (O₂)':'Neither (exact ratio)';return[N('Moles H₂',nh,'mol',3),N('Moles O₂',no,'mol',3),N('Limiting reagent',lim),N('Water formed',nw*18.02,'g',2),N('Left over',nh>2*no?`${f((nh-2*no)*2.016,2)} g H₂`:`${f((no-nh/2)*32,2)} g O₂`)]},
- draw:(c,p,t)=>{const nh=p.h/2.016,no=p.o/32,x=Math.min(nh,2*no)*p.prog/100,k=12/Math.max(nh+no,.1),H=Math.round((nh-x)*k),O=Math.round((no-x/2)*k),W=Math.round(x*k),s=P3.scene(c,{scale:56,cx:300});s.box([0,0,0],[4,2.6,2],'#e9f6ff',{alpha:.07});
-  let i=0;const spot=()=>{const j=i++;return[-1.7+hash(j)*3.4+.08*Math.sin(t*2+j),-1.1+hash(j+50)*2.2,-.8+hash(j+90)*1.6]};
-  for(let j=0;j<H;j++){const q=spot();atom(s,V.add(q,[-.12,0,0]),'H',.8);atom(s,V.add(q,[.12,0,0]),'H',.8)}for(let j=0;j<O;j++){const q=spot();atom(s,V.add(q,[-.17,0,0]),'O',.7);atom(s,V.add(q,[.17,0,0]),'O',.7)}
-  for(let j=0;j<W;j++){const q=spot();atom(s,q,'O',.75);atom(s,V.add(q,[.17,.13,0]),'H',.7);atom(s,V.add(q,[-.17,.13,0]),'H',.7)}s.render();
+ draw:(c,p,t)=>{const nh=p.h/2.016,no=p.o/32,x=Math.min(nh,2*no)*p.prog/100,k=12/Math.max(nh+no,.1),H=Math.round((nh-x)*k),O=Math.round((no-x/2)*k),W=Math.round(x*k),s=P3.scene(c,{scale:74,cx:290,cy:270});s.box([0,0,0],[4,2.6,2],'#e9f6ff',{alpha:.06});
+  const bx=[[-2,-1.3,-1],[2,-1.3,-1],[2,1.3,-1],[-2,1.3,-1],[-2,-1.3,1],[2,-1.3,1],[2,1.3,1],[-2,1.3,1]];for(const [i,j] of [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]])s.seg(bx[i],bx[j],'#ffffff44',1);
+  let i=0;const spot=()=>{const j=i++;return[-1.6+hash(j)*3.2+.08*Math.sin(t*2+j),-1+hash(j+50)*2,-.7+hash(j+90)*1.4]};
+  const di=(q,el,d)=>{const a=V.add(q,[-d,0,0]),b=V.add(q,[d,0,0]);stick(s,a,b,el==='O'?2:1,{ca:el,cb:el,r:.05,gap:.09,side:[0,0,1]});atom(s,a,el,el==='H'?.9:.8);atom(s,b,el,el==='H'?.9:.8)};
+  for(let j=0;j<H;j++)di(spot(),'H',.17);for(let j=0;j<O;j++)di(spot(),'O',.23);
+  for(let j=0;j<W;j++){const q=spot(),a=V.add(q,[.26,.2,0]),b=V.add(q,[-.26,.2,0]);stick(s,q,a,1,{ca:'O',cb:'H',r:.05});stick(s,q,b,1,{ca:'O',cb:'H',r:.05});atom(s,q,'O',.85);atom(s,a,'H',.8);atom(s,b,'H',.8)}s.render();
   tag(c,'white pairs: H₂   red pairs: O₂   red + 2 white: H₂O  (particles drawn ∝ moles)',44,98,C.muted,13)},
  assumption:'Molar masses H₂ = 2.016 and O₂ = 32.00 g/mol; the reaction is assumed to go to completion.'});
 
@@ -68,10 +73,10 @@ add({...ch(2,'Structure of Atom','PHYSICAL CHEMISTRY'),id:'chem-orbitals',title:
  tryText:'Compare 2p and 3p: do they have the same shape? How many radial nodes does 3p have?',
  controls:[S('o','Orbital','pz',Object.keys(ORB).map(k=>[k,ORB[k][1]])),R('n','Principal quantum number n',1,4,1,2)],
  metrics:p=>{const l=ORB[p.o][0],ok=p.n>l;return ok?[N('Orbital',`${p.n}${ORB[p.o][1]}`),N('Quantum numbers',`n = ${p.n}, l = ${l}`),N('Radial nodes',p.n-l-1,'',0),N('Angular nodes',l,'',0)]:[N('Orbital','Not allowed'),N('Reason',`l = ${l} needs n ≥ ${l+1}`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,yaw:t*.25,pitch:.3}),[l,,fn]=ORB[p.o],ok=p.n>l;s.axes(2.2,[0,0,0]);s.label([2.5,0,0],'x',C.red,12);
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,yaw:t*.25,pitch:.3,cy:290}),[l,,fn]=ORB[p.o],ok=p.n>l;s.axes(1.9,[0,0,0]);s.label([2.15,0,0],'x',C.red,12);
   if(ok){const g=(u,v)=>{const x=Math.cos(u)*Math.cos(v),y=Math.sin(u),z=Math.cos(u)*Math.sin(v);return fn(x,y,z)},R0=.7+p.n*.25;
-   s.mesh([0,0,0],R0*1.6,(a,b)=>g(-PI/2+PI*a,TAU*b)>=0?'#4dabf7':'#ff6b6b',{rings:28,segs:36,alpha:.85,shape:(u,v)=>Math.max(.02,Math.abs(g(u,v)))**(l?1:1)*(l===2&&p.o==='dz2'?.55:1)});
-   for(let k=1;k<=p.n-l-1;k++)s.ring([0,0,0],[0,1,0],R0*1.6*k/(p.n-l)*.55,'#ffd43b',1.5,[4,4]);s.ball([0,0,0],.06,'#e9f6ff',{flat:true,lift:5});s.callout([0,0,0],'nucleus','#e9f6ff',-60,60);
+   s.mesh([0,0,0],R0*1.6,(a,b)=>g(-PI/2+PI*a,TAU*b)>=0?'#4dabf7':'#ff6b6b',{rings:34,segs:44,alpha:.62,spec:.6,shine:24,shape:(u,v)=>Math.max(.02,Math.abs(g(u,v)))**(l?1:1)*(l===2&&p.o==='dz2'?.55:1)});
+   for(let k=1;k<=p.n-l-1;k++)s.ring([0,0,0],[0,1,0],R0*1.6*k/(p.n-l)*.55,'#ffd43b',1.5,[4,4]);s.ball([0,0,0],.06,'#e9f6ff',{flat:true,lift:5});s.callout([0,0,0],'nucleus','#e9f6ff',-70,0);
    if(p.n-l-1>0)s.callout([R0*1.6/(p.n-l)*.55,0,0],`${p.n-l-1} radial node${p.n-l-1>1?'s':''} (dashed)`,'#ffd43b',60,50);s.render();tag(c,`${p.n}${ORB[p.o][1]}: blue (+) and red (−) lobes`,44,98,C.gold,15)}
   else{s.render();tag(c,`${p.n}${ORB[p.o][1]} does not exist: l must be less than n`,44,98,C.red,15)}},
  assumption:'Angular shapes are drawn from the real spherical harmonics; radial nodes are shown as dashed spheres (rings) for counting only.'});
@@ -87,11 +92,11 @@ add({...ch(2,'Structure of Atom','PHYSICAL CHEMISTRY'),id:'chem-electron-configu
  tryText:'Compare Cr (24) with Mn (25) and Cu (29) with Zn (30).',
  controls:[R('Z','Atomic number Z',1,36,1,24)],
  metrics:p=>{const cfg=config(p.Z),sup=k=>String(k).split('').map(d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).join('');return[N('Element',`${SYM[p.Z-1]} (Z = ${p.Z})`),N('Configuration',cfg.map(([n,k])=>n+sup(k)).join(' ')),N('Unpaired electrons',unpaired(cfg),'',0),N('Magnetic',unpaired(cfg)?'Paramagnetic':'Diamagnetic')]},
- draw:(c,p,t)=>{const cfg=config(p.Z),s=P3.scene(c,{scale:44,pitch:.15,cx:300,cy:300});const E={'1s':0,'2s':1,'2p':1.6,'3s':2.5,'3p':3.1,'4s':3.8,'3d':4.3,'4p':5.0};
+ draw:(c,p,t)=>{const cfg=config(p.Z),s=P3.scene(c,{scale:46,pitch:.06,yaw:.12,cx:290,cy:290});const E={'1s':0,'2s':1,'2p':1.6,'3s':2.5,'3p':3.1,'4s':3.8,'3d':4.3,'4p':5.0};
   SUBS.forEach(([n,cap])=>{const box=cap/2,y=-2.4+E[n]*.95,have=(cfg.find(x=>x[0]===n)||[0,0])[1];s.label([-3.3,y,0],n,have?C.white:C.muted,13);
    for(let b=0;b<box;b++){const x=-2.6+b*.62;s.box([x,y,0],[.55,.42,.1],have?'#29475b':'#1c3040',{stroke:'#42d9ca66'});const ups=Math.min(have,box),downs=Math.max(0,have-box);
     if(b<ups)s.arrow([x-.12,y-.16,.08],[x-.12,y+.18,.08],'#ffd43b',2.5,6);if(b<downs)s.arrow([x+.12,y+.18,.08],[x+.12,y-.16,.08],'#74c0fc',2.5,6)}});
-  s.callout([-2.6,-2.4+4.3*.95,0],'3d fills after 4s','#e9f6ff',-50,-40);s.render();tag(c,`${SYM[p.Z-1]}: yellow ↑ spin-up · blue ↓ spin-down (Hund: singles first)`,44,98,C.gold,14)},
+  s.callout([-2.6,-2.4+4.3*.95,0],'3d fills after 4s','#e9f6ff',-60,-30);s.render();tag(c,`${SYM[p.Z-1]}: yellow ↑ spin-up · blue ↓ spin-down (Hund: singles first)`,44,98,C.gold,14)},
  assumption:'Ground-state configurations of neutral atoms; boxes are energy-ordered for filling, not to scale.'});
 
 /* ---------- 3 Classification of Elements and Periodicity ---------- */
@@ -106,10 +111,10 @@ add({...ch(3,'Classification of Elements and Periodicity in Properties','INORGAN
  tryText:'Why is the ionisation enthalpy of N higher than that of O?',
  controls:[S('prop','Property','IE',[['IE','First ionisation enthalpy'],['R','Covalent radius'],['EN','Electronegativity (Pauling)']]),R('Z','Highlight element Z',1,36,1,7)],
  metrics:p=>{const v=PT[p.prop][p.Z-1],u={IE:'kJ/mol',R:'pm',EN:''}[p.prop],[per,gr]=pos(p.Z);return[N('Element',`${SYM[p.Z-1]} (Z = ${p.Z})`),N('Period, group',`${per}, ${gr}`),N({IE:'Ionisation enthalpy',R:'Covalent radius',EN:'Electronegativity'}[p.prop],p.prop==='EN'&&!v?'not defined':`${v} ${u}`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:34,pitch:.55,yaw:-.35,cx:320,cy:300}),mx={IE:2400,R:210,EN:4}[p.prop],cols={IE:'#ffa94d',R:'#4dabf7',EN:'#69db7c'}[p.prop];
-  for(let Z=1;Z<=36;Z++){const [per,gr]=pos(Z),x=-4.25+(gr-1)*.5,z=-1.2+(per-1)*.8,v=PT[p.prop][Z-1],h=Math.max(.04,v/mx*3),on=Z===p.Z;s.box([x,h/2,z],[.42,h,.62],on?'#ffd43b':cols,{stroke:'#00000044'});s.engrave([x,h+.08,z+.33],SYM[Z-1],on?'#ffd43b':'#e9f6ff',9,9e5)}
-  const [per,gr]=pos(p.Z),v=PT[p.prop][p.Z-1];s.callout([-4.25+(gr-1)*.5,Math.max(.04,v/mx*3),-1.2+(per-1)*.8],`${SYM[p.Z-1]}: ${p.prop==='EN'&&!v?'—':v+' '+({IE:'kJ/mol',R:'pm',EN:''}[p.prop])}`,'#ffd43b',40,-60);
-  s.label([-4.6,0,-1.6],'group 1',C.muted,11);s.label([4.25,0,-1.6],'18',C.muted,11);s.render();tag(c,'bar height = property value · rows = periods 1–4',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:40,pitch:.38,yaw:-.22,cx:290,cy:290}),mx={IE:2400,R:210,EN:4}[p.prop],cols={IE:'#ffa94d',R:'#4dabf7',EN:'#69db7c'}[p.prop];
+  for(let Z=1;Z<=36;Z++){const [per,gr]=pos(Z),x=-4.25+(gr-1)*.5,z=-1.4+(per-1)*1.0,v=PT[p.prop][Z-1],h=Math.max(.04,v/mx*3),on=Z===p.Z;s.box([x,h/2,z],[.4,h,.5],on?'#ffd43b':cols,{stroke:'#00000033',spec:.5});s.engrave([x,h+.06,z+.27],SYM[Z-1],on?'#ffd43b':'#e9f6ff',9,9e5)}
+  const [per,gr]=pos(p.Z),v=PT[p.prop][p.Z-1];s.callout([-4.25+(gr-1)*.5,Math.max(.04,v/mx*3),-1.4+(per-1)*1.0],`${SYM[p.Z-1]}: ${p.prop==='EN'&&!v?'—':v+' '+({IE:'kJ/mol',R:'pm',EN:''}[p.prop])}`,'#ffd43b',40,-60);
+  s.box([0,-.04,.1],[9.4,.06,4.2],'#1c3040',{alpha:.5});s.label([-4.4,0,-1.9],'group 1',C.muted,11);s.label([4.25,0,-1.9],'18',C.muted,11);s.render();tag(c,'bar height = property value · rows = periods 1–4',44,98,C.muted,13)},
  assumption:'Ionisation enthalpies (kJ/mol) and Pauling electronegativities from standard tables; covalent radii from Cordero et al. (2008). Pauling electronegativities are not defined for He, Ne and Ar (shown as 0); Kr is given as 3.00.'});
 
 /* ---------- 4 Chemical Bonding and Molecular Structure ---------- */
@@ -142,8 +147,8 @@ add({...ch(4,'Chemical Bonding and Molecular Structure','PHYSICAL CHEMISTRY'),id
  controls:[S('m','Molecule','O2',Object.keys(MO).map(k=>[k,k.replace('2','₂')]))],
  metrics:p=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),nb=fl.filter(x=>!x[0].includes('*')).reduce((a,x)=>a+x[2],0),na=fl.filter(x=>x[0].includes('*')).reduce((a,x)=>a+x[2],0),bo=(nb-na)/2,unp=fl.reduce((u,[n,cp,k])=>u+(cp===4?(k<=2?k:4-k):k===1?1:0),0);
   return[N('Electrons',MO[p.m],'',0),N('Bond order',bo,'',1),N('Unpaired electrons',unp,'',0),N('Magnetic',unp?'Paramagnetic':'Diamagnetic'),N('Exists?',bo>0?'Yes':'No (bond order 0)')]},
- draw:(c,p,t)=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),s=P3.scene(c,{scale:40,pitch:.1,cx:300,cy:290});
-  fl.forEach(([n,cp,k],i)=>{const y=-2.6+i*.72,anti=n.includes('*'),boxes=cp/2;s.label([-2.6,y,0],n,anti?'#ff8787':'#69db7c',13);for(let b=0;b<boxes;b++){const x=-.4+(b-(boxes-1)/2)*.9;s.box([x,y,0],[.75,.08,.3],anti?'#c92a2a':'#2b8a3e');const inBox=cp===4?(k<=2?(b<k?1:0):(b<k-2?2:1)):k;
+ draw:(c,p,t)=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),s=P3.scene(c,{scale:40,pitch:.04,cx:300,cy:282});
+  fl.forEach(([n,cp,k],i)=>{const y=-2.6+i*.72,anti=n.includes('*'),boxes=cp/2;s.label([-2.6,y,0],n,anti?'#ff8787':'#69db7c',13);for(let b=0;b<boxes;b++){const x=-.4+(b-(boxes-1)/2)*.9;s.box([x,y,0],[.8,.1,.1],anti?'#e03131':'#2f9e44',{spec:.5});const inBox=cp===4?(k<=2?(b<k?1:0):(b<k-2?2:1)):k;
    if(inBox>=1)s.arrow([x-.13,y-.25,.1],[x-.13,y+.25,.1],'#ffd43b',2.5,6);if(inBox>=2)s.arrow([x+.13,y+.25,.1],[x+.13,y-.25,.1],'#74c0fc',2.5,6)}});
   s.callout([.6,-2.6+5*.72,0],heavy?'σ2p below π2p (O₂, F₂, Ne₂)':'π2p below σ2p (up to N₂)','#e9f6ff',60,-20);s.render();tag(c,'green: bonding · red: antibonding (*)',44,98,C.muted,13)},
  assumption:'Standard NCERT MO energy orders: s–p mixing puts π2p below σ2p up to N₂.'});
@@ -156,9 +161,9 @@ add({...ch(5,'Thermodynamics','PHYSICAL CHEMISTRY'),id:'chem-gibbs',title:'Gibbs
  tryText:'Melting of ice: ΔH = +6.0 kJ/mol, ΔS = +22 J/(K·mol). Where is the crossover temperature?',
  controls:[R('H','ΔH',-100,100,1,6,'kJ/mol'),R('S','ΔS',-200,200,1,22,'J/(K·mol)'),R('T','Temperature',100,600,1,298,'K')],
  metrics:p=>{const G=p.H-p.T*p.S/1000,Tc=p.S!==0?p.H*1000/p.S:NaN;return[N('ΔG',G,'kJ/mol',2),N('Spontaneous?',G<0?'Yes':G>0?'No':'At equilibrium'),N('Crossover temperature',Number.isFinite(Tc)&&Tc>0?`${f(Tc,1)} K`:'none (same at all T)')]},
- draw:(c,p,t)=>{const G=p.H-p.T*p.S/1000,s=P3.scene(c,{scale:54,cx:240,cy:290}),hR=clamp(G/40,-1.8,1.8);s.box([0,-1.8,0],[5,.15,1.4],'#29475b');
-  const path=Array.from({length:41},(_,i)=>{const x=-2.2+4.4*i/40,u=Math.max(0,x/2.2);return[x,-.6+.5*Math.exp(-((x)**2)*6)+hR*u*u*(3-2*u),0]});s.tube(path,.06,'#868e96',{segs:6});
-  const q=G<0?cycle(t*.25,1):0,ball=path[Math.min(40,Math.round(q*40))];s.ball(V.add(ball,[0,.25,0]),.22,G<0?'#69db7c':'#ff6b6b',{glow:G<0});s.callout(path[0],'reactants','#e9f6ff',-30,-60);s.callout(path[40],`products (ΔG = ${f(G,1)} kJ/mol)`,G<0?'#69db7c':'#ff8787',-40,G<0?50:-60);s.render();
+ draw:(c,p,t)=>{const G=p.H-p.T*p.S/1000,s=P3.scene(c,{scale:62,cx:250,cy:285,pitch:.05}),hR=clamp(G/40,-1.8,1.8);s.box([0,-1.75,0],[5,.1,1],'#29475b');
+  const path=Array.from({length:41},(_,i)=>{const x=-2.2+4.4*i/40,u=Math.max(0,x/2.2);return[x,-.6+.5*Math.exp(-((x)**2)*6)+hR*u*u*(3-2*u),0]});s.tube(path,.08,'#ced4da',{segs:10,spec:.7});
+  const q=G<0?cycle(t*.25,1):0,ball=path[Math.min(40,Math.round(q*40))];s.ball(V.add(ball,[0,.25,0]),.22,G<0?'#69db7c':'#ff6b6b',{glow:G<0});s.callout(path[0],'reactants','#e9f6ff',-30,-60);s.callout(path[40],`products (ΔG = ${f(G,1)} kJ/mol)`,G<0?'#69db7c':'#ff8787',-10,G<0?62:-60);s.render();
   chart(c,420,96,236,170,{title:'ΔG vs T',xl:'T (K)',xmin:100,xmax:600,ymin:-120,ymax:120,series:[{fn:T=>p.H-T*p.S/1000,col:C.gold},{fn:()=>0,col:'#8ca6b9',dash:[4,4]}],marker:[p.T,G]})},
  assumption:'ΔH and ΔS are taken as independent of temperature over this range.'});
 
@@ -208,8 +213,8 @@ add({...ch(7,'Redox Reactions','INORGANIC CHEMISTRY'),id:'chem-redox-displacemen
  tryText:'Put a copper strip in zinc sulphate. Does anything happen?',
  controls:[S('pair','Strip in solution','Zn-Cu',[['Zn-Cu','Zinc strip in CuSO₄'],['Cu-Zn','Copper strip in ZnSO₄'],['Cu-Ag','Copper wire in AgNO₃']]),R('time','Time',0,60,1,20,'min')],
  metrics:p=>{const d={'Zn-Cu':['Yes','Zn: 0 → +2 (oxidised)','Cu²⁺: +2 → 0 (reduced)'],'Cu-Zn':['No','Zn is more reactive than Cu','—'],'Cu-Ag':['Yes','Cu: 0 → +2 (oxidised)','Ag⁺: +1 → 0 (reduced)']}[p.pair];return[N('Reaction?',d[0]),N('Oxidation',d[1]),N('Reduction',d[2]),N('Extent',d[0]==='Yes'?`${Math.round(100*(1-Math.exp(-p.time/20)))} %`:'0 %')]},
- draw:(c,p,t)=>{const go=p.pair!=='Cu-Zn',x=go?1-Math.exp(-p.time/20):0,s=P3.scene(c,{scale:60,cx:260,cy:290}),liq=p.pair==='Zn-Cu'?(x<.5?'#4dabf7':x<.85?'#a5d8ff':'#e7f5ff'):p.pair==='Cu-Ag'?(x>.3?'#a5d8ff':'#f1f3f5'):'#f1f3f5';beaker(s,[0,-1.7,0],1.2,2.8,liq,.75);
-  const strip=p.pair==='Zn-Cu'?'#adb5bd':'#d9844a';s.box([0,-.5,0],[.5,2.6,.08],strip);if(go)for(let i=0;i<Math.round(x*40);i++){const y=-1.6+hash(i)*1.8;s.ball([(hash(i+5)-.5)*.5,y,(i%2?1:-1)*.06],.06,p.pair==='Zn-Cu'?'#c2410c':'#e9ecef',{flat:true})}
+ draw:(c,p,t)=>{const go=p.pair!=='Cu-Zn',x=go?1-Math.exp(-p.time/20):0,s=P3.scene(c,{scale:58,cx:260,cy:272}),liq=p.pair==='Zn-Cu'?(x<.5?'#4dabf7':x<.85?'#a5d8ff':'#e7f5ff'):p.pair==='Cu-Ag'?(x>.3?'#a5d8ff':'#f1f3f5'):'#f1f3f5';glassBeaker(s,[0,-1.7,0],1.2,2.8,liq,.75,{alpha:.4,ticks:false});
+  const strip=p.pair==='Zn-Cu'?'#adb5bd':'#d9844a';s.box([0,-.4,0],[.5,2.6,.08],strip,{spec:.6});if(go)for(let i=0;i<Math.round(x*40);i++){const y=-1.6+hash(i)*1.8;s.ball([(hash(i+5)-.5)*.5,y,(i%2?1:-1)*.06],.06,p.pair==='Zn-Cu'?'#c2410c':'#e9ecef',{flat:true})}
   s.callout([0,.4,.04],p.pair==='Zn-Cu'?'zinc strip':'copper strip',strip,60,-50);if(go&&x>.05)s.callout([0,-1.2,.08],p.pair==='Zn-Cu'?'copper deposit':'silver crystals',p.pair==='Zn-Cu'?'#e8590c':'#ced4da',-70,30);s.callout([.9,-.6,0],p.pair==='Zn-Cu'?'Cu²⁺ (blue) fades':p.pair==='Cu-Ag'?'solution turns blue (Cu²⁺)':'no change',liq,50,30);s.render();tag(c,go?'Electrons flow from the more reactive metal to the ions':'No reaction: copper cannot reduce Zn²⁺',44,98,go?C.mint:C.red,14)},
  assumption:'Extent follows a simple exponential approach for illustration; the direction follows the reactivity (electrochemical) series.'});
 
@@ -222,7 +227,7 @@ add({...ch(8,'Organic Chemistry – Some Basic Principles and Techniques','ORGAN
  tryText:'Stop the run when the solvent has moved 6 cm and calculate R_f of chlorophyll a.',
  controls:[R('run','Solvent front distance',0,10,.1,8,'cm',1)],
  metrics:p=>PIG.map(([n,,rf])=>N(n,`${f(rf*p.run,2)} cm (R_f ≈ ${rf})`)),
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cx:260,cy:300,pitch:.1}),k=.36;s.box([0,0,0],[1.4,4.2,.03],'#f8f9fa');beaker(s,[0,-2.3,0],1,1.2,'#e9ecef',.45);s.box([0,-1.6+p.run*k/2,.02],[1.4,p.run*k,.01],'#e7f5ff',{alpha:.6});s.seg([-.7,-1.6+p.run*k,.04],[.7,-1.6+p.run*k,.04],'#4dabf7',2,[4,3]);s.seg([-.7,-1.6,.04],[.7,-1.6,.04],'#868e96',1.5);
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cx:260,cy:300,pitch:.1}),k=.36;s.box([0,0,0],[1.4,4.2,.03],'#f8f9fa');glassBeaker(s,[0,-2.3,0],1,1.2,'#dee2e6',.45,{alpha:.4,ticks:false});s.box([0,-1.6+p.run*k/2,.02],[1.4,p.run*k,.01],'#e7f5ff',{alpha:.6});s.seg([-.7,-1.6+p.run*k,.04],[.7,-1.6+p.run*k,.04],'#4dabf7',2,[4,3]);s.seg([-.7,-1.6,.04],[.7,-1.6,.04],'#868e96',1.5);
   for(const [n,col,rf] of PIG)s.mesh([0,-1.6+rf*p.run*k,.04],[.18,.07,.02],col);s.callout([.7,-1.6+p.run*k,0],'solvent front','#4dabf7',40,-30);s.callout([.7,-1.6,0],'base line (spot)','#ced4da',40,30);PIG.forEach(([n,col,rf],i)=>s.callout([.18,-1.6+rf*p.run*k,.04],n,col,-80-20*(i%2),i*8-10));s.render();tag(c,'paper = stationary phase · solvent = mobile phase',44,98,C.muted,13)},
  assumption:'R_f values are typical for a petroleum ether–acetone solvent; they vary with solvent and paper.'});
 
@@ -234,8 +239,8 @@ add({...ch(9,'Hydrocarbons','ORGANIC CHEMISTRY'),id:'chem-ethane-conformations',
  tryText:'Find all angles at which ethane is eclipsed.',
  controls:[R('phi','Dihedral angle φ',0,360,1,60,'°')],
  metrics:p=>{const E=6.25*(1+Math.cos(3*p.phi*PI/180));return[N('Torsional energy',E,'kJ/mol',2),N('Conformation',E<.5?'Staggered':E>12?'Eclipsed':'Skew')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:240,yaw:.6,pitch:.25}),a=[-.77,0,0],b=[.77,0,0];bond(s,a,b);atom(s,a,'C');atom(s,b,'C');
-  for(let i=0;i<3;i++){const q1=TAU*i/3,q2=q1+p.phi*PI/180,h1=V.add(a,[-.36,1.03*Math.cos(q1),1.03*Math.sin(q1)]),h2=V.add(b,[.36,1.03*Math.cos(q2),1.03*Math.sin(q2)]);bond(s,a,h1);atom(s,h1,'H');bond(s,b,h2);atom(s,h2,'H')}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:240,yaw:.6,pitch:.25}),a=[-.77,0,0],b=[.77,0,0];stick(s,a,b,1,{ca:'C',cb:'C',r:.07});atom(s,a,'C');atom(s,b,'C');
+  for(let i=0;i<3;i++){const q1=TAU*i/3,q2=q1+p.phi*PI/180,h1=V.add(a,[-.36,1.03*Math.cos(q1),1.03*Math.sin(q1)]),h2=V.add(b,[.36,1.03*Math.cos(q2),1.03*Math.sin(q2)]);stick(s,a,h1,1,{ca:'C',cb:'H',r:.06});atom(s,h1,'H');stick(s,b,h2,1,{ca:'C',cb:'H',r:.06});atom(s,h2,'H')}
   s.callout(a,'front carbon','#e9f6ff',-60,-60);s.callout(b,'rear carbon rotates','#e9f6ff',40,60);s.render();
   chart(c,420,96,236,170,{title:'Torsional energy (kJ/mol) vs φ',xl:'φ (°)',xmin:0,xmax:360,ymin:0,ymax:14,series:[{fn:x=>6.25*(1+Math.cos(3*x*PI/180)),col:C.gold}],marker:[p.phi,6.25*(1+Math.cos(3*p.phi*PI/180))]})},
  assumption:'Simple cosine torsional potential with the experimental barrier of about 12.5 kJ/mol.'});
