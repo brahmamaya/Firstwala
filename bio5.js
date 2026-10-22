@@ -432,9 +432,23 @@ add({...ch(12,'Ecosystem',U10),id:'bio-decomposition',title:'Decomposition of de
  tryText:'Make the litter lignin-rich and the soil cold. How much remains after a year?',
  controls:[R('T','Temperature',0,40,1,25,'°C'),R('moist','Moisture',0,100,1,60,'%'),R('lig','Lignin / chitin content',0,60,1,20,'%'),R('m','Time',0,24,1,6,'months')],
  metrics:p=>{const k=decK(p),rem=Math.exp(-k*p.m);return[N('Litter remaining',rem*100,'%',0),N('Decay rate',k,'per month',2),N('Main step now',p.m<2?'Fragmentation by detritivores':p.m<6?'Catabolism by bacteria and fungi':'Humification and mineralisation'),N('Product','Humus — dark, amorphous, slow to decay')]},
- draw:(c,p,t)=>{const rem=Math.exp(-decK(p)*p.m),s=P3.scene(c,{scale:56,cy:290,pitch:.45});s.box([0,-1.7,0],[5,.4,3.4],'#4e342e',{ground:true});const n=Math.round(30*rem);for(let i=0;i<n;i++){const a=hash(i)*TAU;leaf(s,[(hash(i+3)-.5)*4,-1.45,(hash(i+6)-.5)*2.6],[Math.cos(a),0,Math.sin(a)],.45*(.5+rem*.5),.18*(.5+rem*.5),['#a0522d','#cd853f','#8b4513'][i%3])}
-  for(let i=0;i<Math.round((1-rem)*20);i++)s.ball([(hash(i+40)-.5)*4,-1.48,(hash(i+50)-.5)*2.6],.06,'#2b1a12',{flat:true});critter(s,'earthworm',[.5*Math.sin(t*.3),-1.6,.6],.9,t);s.callout([.5*Math.sin(t*.3),-1.45,.6],'earthworm: fragmentation','#d08b74',60,-40);if(n)s.callout([(hash(3)-.5)*4,-1.45,(hash(6)-.5)*2.6],'detritus (dead leaves)','#cd853f',-60,-50);if(rem<.95)s.callout([(hash(40)-.5)*4,-1.48,(hash(50)-.5)*2.6],'humus + minerals','#a1887f',50,50);s.render()},
+ draw:(c,p,t)=>{const k=decK(p),rem=Math.exp(-k*p.m),GY=206,hh=8+44*(1-rem),n=Math.round(30*rem),cur=p.m<2?[0]:p.m<6?[2]:[3,4];
+  c.save();c.beginPath();c.roundRect(44,96,290,310,10);c.clip();const g=c.createLinearGradient(0,96,0,GY);g.addColorStop(0,'#22567a');g.addColorStop(1,'#4a8db5');c.fillStyle=g;c.fillRect(44,96,290,GY-96);
+  c.fillStyle='#6b4a2f';c.fillRect(44,GY,290,190);c.fillStyle='#3a2217';c.fillRect(44,GY,290,hh);
+  c.fillStyle='rgba(255,255,255,.1)';for(let i=0;i<26;i++)E.el(c,52+hash(i+70)*274,GY+hh+8+hash(i+90)*(180-hh),2.4,1.6,'#a68a64');
+  c.fillStyle='#d9c9a8';for(let i=0;i<Math.round((1-rem)*18);i++)E.el(c,52+hash(i+40)*274,GY+4+hash(i+55)*(hh-6),1.8,1.8,'#d9c9a8');
+  c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=1;c.beginPath();for(let i=0;i<7;i++){const x=70+i*38,y=GY+hh+30+(i%3)*28;c.moveTo(x,y);c.bezierCurveTo(x+14,y-12,x+22,y+12,x+36,y-4)}c.stroke();
+  c.fillStyle='#ffe066';for(let i=0;i<10;i++)c.fillRect(60+hash(i+5)*260,GY+hh+10+hash(i+9)*(120-hh),3,2);
+  c.restore();
+  E.tree(c,90,GY+1,2.7,'#37a14a');const wx=200+34*Math.sin(t*.3);c.strokeStyle='#e599a8';c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(wx-40,GY+hh+22);for(let i=1;i<=16;i++){const q=i/16;c.lineTo(wx-40+q*80,GY+hh+22+5*Math.sin(q*9+t*3))}c.stroke();E.el(c,wx+40,GY+hh+22+5*Math.sin(9+t*3),4,3.4,'#f1b0bd');
+  for(let i=0;i<n;i++){const a=hash(i)*3-1.5,x=124+hash(i+3)*196,s=.5+rem*.5,y=GY-3-(hash(i+6)<.5?0:5);E.el(c,x,y,13*s,4.6*s,LC[i%3],a*.35)}
+  if(rem>.4)E.el(c,150+20*Math.sin(t*.6),120+((t*14)%100),5,2.6,'#cd853f',t);
+  c.strokeStyle='rgba(233,246,255,.6)';c.lineWidth=1;const lb=(x0,y0,x1,y1,s,al)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();tag(c,s,x1+(al==='right'?-3:3),y1,'#e9f6ff',11,al||'left')};
+  lb(260,GY-4,284,150,'detritus (litter)','right');lb(wx,GY+hh+22,wx,GY+hh+54,'earthworm (detritivore)','center');if(rem<.97)lb(250,GY+hh/2,284,GY+hh+110,'humus + minerals','right');lb(100,GY+hh+34,100,GY+hh+84,'fungal hyphae, bacteria','left');
+  chart(c,346,98,310,162,{title:'Litter remaining (%)',xl:'months',xmin:0,xmax:24,ymin:0,ymax:100,series:[{fn:x=>100*Math.exp(-k*x),col:C.gold,w:3}],marker:[p.m,rem*100]});
+  SN.forEach((s,i)=>{const y=282+i*25,on=cur.includes(i);c.fillStyle=on?'rgba(255,212,59,.16)':'rgba(255,255,255,.04)';c.beginPath();c.roundRect(346,y-10,310,23,6);c.fill();if(on){c.strokeStyle=C.gold;c.lineWidth=1.2;c.stroke()}tag(c,(i+1)+'  '+s,354,y+1,on?C.gold:'#e9f6ff',12);tag(c,SD[i],470,y+1,on?'#fff3bf':C.muted,11)})},
  assumption:'Illustrative first-order decay: k = 0.35 × temperature factor × moisture factor × (1 − lignin fraction) per month.'});
+const LC=['#a0522d','#cd853f','#8b4513'],SN=['Fragmentation','Leaching','Catabolism','Humification','Mineralisation'],SD=['small pieces (detritivores)','soluble nutrients wash down','bacteria and fungi digest it','dark humus forms, slow to decay','inorganic nutrients released'];
 function decK(p){return .35*Math.exp(-(((p.T-30)/14)**2))*(p.moist/100)*(1-p.lig/100*1.4)}
 
 /* ---------- Chapter 13: Biodiversity and Conservation ---------- */
