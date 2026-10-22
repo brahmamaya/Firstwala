@@ -191,6 +191,23 @@ const dnaModel=(s,seq,phase,turns,R0,x0,x1)=>{const N=Math.round(turns*10),PAIR=
   s.callout(at(15,D.B1(15)+D.GAP*.5),'base pair (H-bonds): A=T 2, G≡C 3','#e9f6ff',40,-90);s.callout([2,-.7,0],'one turn = 10 bp = 3.4 nm; width 2 nm','#ffd43b',30,60);s.label(at(-.5,D.B1(-.5)),'5′','#ff8787',12);s.label(at(30.5,D.B2(30.5)),'5′','#ff8787',12);s.label(at(-.5,D.B2(-.5)),'3′','#74c0fc',12);s.label(at(30.5,D.B1(30.5)),'3′','#74c0fc',12);s.render();tag(c,'red A · yellow T · teal G · blue C',44,98,C.muted,13)},
  assumption:'B-form DNA dimensions from NCERT Chapter 5; three turns shown.'});
 
+// Meselson-Stahl: a CsCl density-gradient tube (denser DNA settles lower) beside the DNA molecules of that generation, drawn as double helices with old (15N) and new (14N) strands.
+const MSH='#5c7cfa',MSL='#e599f7';
+const msDraw=(c,p,t)=>{const g=p.gen,heavy=g===0?1:0,hyb=g===0?0:1/2**(g-1),light=1-heavy-hyb,s=P3.scene(c,{scale:57,cx:335,cy:290}),TX=-2.5,n=Math.min(8,2**g);
+  // glass tube with a density gradient (light at the top, dense at the bottom)
+  s.lathe([TX,0,0],[[0,-1.66],[.22,-1.62],[.38,-1.45],[.45,-1.15],[.45,2.4],[.49,2.44]],'#cfe8ff',{alpha:.16,segs:22,spec:.5});
+  for(let i=0;i<10;i++){const k=i/9,y=-1.52+i*.39,r=i===0?.3:i===1?.4:.42;s.cyl([TX,y,0],[0,1,0],r,.4,k<.5?(k<.25?'#4a6fd0':'#5d83da'):(k<.75?'#7ea0e6':'#a9c6f2'),{alpha:.3,seg:18,caps:false})}
+  s.ring([TX,2.2,0],[0,1,0],.42,'#e9f6ff',1.2,[],30);
+  const band=(y,w,col,nm)=>{if(w>0){s.cyl([TX,y,0],[0,1,0],.4,.06+.12*w,col,{alpha:.92,seg:20});s.label([TX+.85,y,0],nm,col,12,'left')}};
+  band(-1.0,heavy,'#5c7cfa','heavy');band(-.3,hyb,'#9775fa','hybrid');band(.4,light,'#f783ac','light');
+  s.arrow([TX-.8,1.9,0],[TX-.8,-1.2,0],'#9fb6c4',2);s.label([TX-.8,2.15,0],'denser','#9fb6c4',11);s.label([TX+.7,1.7,0],'CsCl gradient','#9fb6c4',11,'left');
+  // the DNA of this generation: each molecule is a double helix; old strands (15N) blue, new strands (14N) pink
+  const rows=n>4?2:1,h=n>4?1.65:2.4,m=Math.min(n,4),cxm=1.25;
+  for(let i=0;i<n;i++){const col=i%4,row=Math.floor(i/4),x=cxm+(col-(m-1)/2)*.95,y1=rows===2?2.05-row*2.1:1.9,old=i<2,hv=g===0,c1=hv||(old&&i%2===0)?MSH:MSL,c2=hv||(old&&i%2===1)?MSH:MSL,ph=t*.6+i*.7,A=[],B=[];
+   for(let j=0;j<=18;j++){const u=j/18,a=TAU*1.6*u+ph;A.push([x+.2*Math.cos(a),y1-h*u,.2*Math.sin(a)]);B.push([x+.2*Math.cos(a+PI),y1-h*u,.2*Math.sin(a+PI)])}
+   s.tube(A,.05,c1,{segs:6,spec:.6});s.tube(B,.05,c2,{segs:6,spec:.6});for(let j=1;j<18;j+=2)s.seg(A[j],B[j],'#8fa1b3',1.6)}
+  s.label([cxm,2.55,0],g===0?'parental DNA (all ¹⁵N)':`${2**g} DNA molecules${n<2**g?' (8 shown)':''}`,'#e9f6ff',12);
+  s.render();tag(c,'blue strands: ¹⁵N (old) · pink: ¹⁴N (new)',44,98,C.muted,13)};
 add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-meselson-stahl',title:'Semiconservative replication (Meselson–Stahl)',
  description:'Grow E. coli in ¹⁵N, then switch to ¹⁴N. Spin the DNA in a CsCl gradient after each generation.',
  formula:'After generation n (n ≥ 1): hybrid fraction = 1/2ⁿ⁻¹ ;  light fraction = 1 − 1/2ⁿ⁻¹',
@@ -198,9 +215,7 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-meselson-stahl',title:
  tryText:'After two generations, what fraction of DNA is light?',
  controls:[R('gen','Generations in ¹⁴N',0,5,1,1)],
  metrics:p=>{const g=p.gen,heavy=g===0?100:0,hyb=g===0?0:100/2**(g-1),light=g===0?0:100-hyb;return[N('Heavy (¹⁵N/¹⁵N)',heavy,'%',0),N('Hybrid (¹⁵N/¹⁴N)',hyb,'%',1),N('Light (¹⁴N/¹⁴N)',light,'%',1),N('Generation time of E. coli','≈ 20 min')]},
- draw:(c,p,t)=>{const g=p.gen,heavy=g===0?1:0,hyb=g===0?0:1/2**(g-1),light=1-heavy-hyb,s=P3.scene(c,{scale:56,cx:200});s.lathe([0,-1.8,0],[[.0,0],[.35,.25],[.42,.6],[.42,3.2]],'#e9f6ff',{alpha:.2});
-  const band=(y,w,col)=>{if(w>0)s.cyl([0,y,0],[0,1,0],.4,.06+.12*w,col,{alpha:.85})};band(-1.0,heavy,'#5c7cfa');band(-.3,hyb,'#9775fa');band(.4,light,'#e599f7');s.label([.8,-1,0],'heavy',C.blue,12);s.label([.8,-.3,0],'hybrid',C.purple,12);s.label([.8,.4,0],'light','#f783ac',12);
-  const nmol=Math.min(8,2**g);for(let i=0;i<nmol;i++){const x=1.8+(i%4)*.55,y=.8-Math.floor(i/4)*1.4,old=i<2;s.tube([[x,y,0],[x,y-1,0]],.05,(g===0||old&&i%2===0)?'#5c7cfa':'#e599f7',{segs:5});s.tube([[x+.15,y,0],[x+.15,y-1,0]],.05,g===0||(old&&i%2===1)?'#5c7cfa':'#e599f7',{segs:5})}s.render();tag(c,'blue strands: ¹⁵N (old) · pink: ¹⁴N (new)',44,98,C.muted,13)},
+draw:(c,p,t)=>msDraw(c,p,t/*DBG*/),
  assumption:'Ideal synchronous divisions; band thickness ∝ fraction of DNA.'});
 
 const CODON=(()=>{const b='UCAG',aa='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',m={};let k=0;for(const x of b)for(const y of b)for(const z of b)m[x+y+z]=aa[k++];return m})();
