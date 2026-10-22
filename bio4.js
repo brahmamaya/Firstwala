@@ -289,8 +289,23 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-sex-linked',t
  tryText:'What happens with a normal mother and an affected father?',
  controls:[S('m','Mother','XXc',XL.mother),S('f','Father','XY',XL.father),S('trait','Trait','haem',[['haem','Haemophilia'],['cb','Colour blindness']])],
  metrics:p=>{const r=xcross(p);return[N('Daughters affected',r.dA,'%',0),N('Daughters carriers',r.dC,'%',0),N('Sons affected',r.sA,'%',0),N('Chance child is a son',50,'%',0)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:300,pitch:.2}),r=xcross(p),kids=xkids(p);critter(s,'human',[-1,0,-1.2],.75,t);critter(s,'human',[1,0,-1.2],.75,t);s.label([-1,1.6,-1.2],'mother '+p.m.replace('Xc','Xᶜ').replace('Xc','Xᶜ'),'#f783ac',12);s.label([1,1.6,-1.2],'father '+p.f.replace('Xc','Xᶜ'),C.blue,12);
-  kids.forEach((k,i)=>{const x=-2.1+i*1.4,col=k.state==='affected'?'#fa5252':k.state==='carrier'?'#ffd43b':'#69db7c';s.cyl([x,-1.55,.9],[0,1,0],.45,.1,col);critter(s,'human',[x,-1.5,.9],.55,t);s.label([x,-1.85,.9],`${k.sex} · ${k.state}`,col,11)});s.render();tag(c,`${p.trait==='haem'?'Haemophilia':'Colour blindness'} (X-linked recessive) · red: affected   yellow: carrier   green: normal`,44,98,C.muted,13)},
+ draw:(c,p,t)=>{const kids=xkids(p),mx=p.m==='XX'?['X','X']:p.m==='XXc'?['X','Xc']:['Xc','Xc'],fx=p.f==='XY'?'X':'Xc',GX=215,GY=170,CW=92,CH=84,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  /* chromosomes: X (with the recessive allele marked in red), Y */
+  chrom=(x,y,kind,sc)=>{c.save();c.lineCap='round';c.lineWidth=4.2*sc;c.strokeStyle='#b9c6d2';c.beginPath();if(kind==='Y'){c.moveTo(x-5*sc,y-9*sc);c.lineTo(x,y);c.lineTo(x+5*sc,y-9*sc);c.moveTo(x,y);c.lineTo(x,y+10*sc)}else{c.moveTo(x-6*sc,y-10*sc);c.lineTo(x+6*sc,y+10*sc);c.moveTo(x+6*sc,y-10*sc);c.lineTo(x-6*sc,y+10*sc)}c.stroke();if(kind==='Xc'){c.fillStyle='#ff4d4d';c.beginPath();c.arc(x+5*sc,y-8.5*sc,3.4*sc,0,TAU);c.fill()}c.restore()},
+  chromLabel=k=>k==='Xc'?'Xᶜ':k,
+  /* pedigree symbol: circle = female, square = male; solid red = affected, yellow dot = carrier */
+  sym=(x,y,female,state,r)=>{c.save();c.lineWidth=2;c.strokeStyle=state==='affected'?'#ff6b6b':state==='carrier'?'#ffd43b':'#69db7c';c.fillStyle=state==='affected'?'#fa5252':'rgba(16,36,58,.9)';c.beginPath();if(female)c.arc(x,y,r,0,TAU);else c.rect(x-r,y-r,2*r,2*r);c.fill();c.stroke();if(state==='carrier'){c.fillStyle='#ffd43b';c.beginPath();c.arc(x,y,r*.32,0,TAU);c.fill()}c.restore()};
+  /* parents */
+  txt('mother',62,GY-8,'#f783ac',11);sym(62,GY+22,true,p.m==='XX'?'normal':p.m==='XXc'?'carrier':'affected',17);mx.forEach((k,i)=>chrom(40+i*44,GY+66,k,1));txt(p.m.replace(/Xc/g,'Xᶜ'),62,GY+94,C.muted,11);
+  txt('father',62,GY+120,C.blue,11);sym(62,GY+148,false,p.f==='XY'?'normal':'affected',16);chrom(40,GY+190,p.f==='XY'?'X':'Xc',1);chrom(84,GY+190,'Y',1);
+  /* Punnett grid: mother's gametes across, father's gametes down */
+  txt("mother's gametes",GX+CW,GY-40,C.muted,11);txt("father's",GX-62,GY+CH-12,C.muted,11);txt('gametes',GX-62,GY+CH+4,C.muted,11);
+  mx.forEach((k,i)=>{chrom(GX+CW*(i+.5),GY-20,k,1)});chrom(GX-24,GY+CH*.5,fx,1);chrom(GX-24,GY+CH*1.5,'Y',1);
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const k=kids[i*2+j],x=GX+i*CW,y=GY+j*CH;c.save();c.fillStyle='rgba(33,68,91,.8)';c.strokeStyle='rgba(180,200,215,.5)';c.lineWidth=1.2;c.beginPath();c.rect(x,y,CW,CH);c.fill();c.stroke();c.restore();sym(x+CW/2,y+34,k.sex==='daughter',k.state,19);txt(k.sex+' · '+k.state,x+CW/2,y+CH-12,k.state==='affected'?'#ff8787':k.state==='carrier'?'#ffd43b':'#8ce99a',11)}
+  /* key */
+  txt('key',470,GY-14,C.muted,11,'left');sym(480,GY+16,true,'normal',11);txt('female',500,GY+16,C.white,12,'left');sym(480,GY+46,false,'normal',10);txt('male',500,GY+46,C.white,12,'left');sym(480,GY+78,true,'carrier',11);txt('carrier (female)',500,GY+78,C.white,12,'left');sym(480,GY+110,true,'affected',11);txt('affected',500,GY+110,C.white,12,'left');
+  txt((p.trait==='haem'?'Haemophilia':'Colour blindness')+' · X-linked recessive',470,GY+146,C.gold,12,'left')},
  assumption:'Single X-linked recessive allele, complete penetrance; each of the four combinations is equally likely.'});
 function xkids(p){const mx=p.m==='XX'?['X','X']:p.m==='XXc'?['X','Xc']:['Xc','Xc'],fx=p.f==='XY'?'X':'Xc',out=[];for(const m of mx){out.push({sex:'daughter',state:m==='Xc'&&fx==='Xc'?'affected':(m==='Xc'||fx==='Xc')?'carrier':'normal'});out.push({sex:'son',state:m==='Xc'?'affected':'normal'})}return out}
 function xcross(p){const k=xkids(p),d=k.filter(x=>x.sex==='daughter'),s2=k.filter(x=>x.sex==='son');return{dA:100*d.filter(x=>x.state==='affected').length/d.length,dC:100*d.filter(x=>x.state==='carrier').length/d.length,sA:100*s2.filter(x=>x.state==='affected').length/s2.length}}
