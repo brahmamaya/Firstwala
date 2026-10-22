@@ -216,10 +216,39 @@ add({...ch(9,'Biotechnology: Principles and Processes',U9),id:'bio-recombinant-d
  tryText:'Choose blue–white screening. What colour are recombinant colonies?',
  controls:[R('step','Step',1,4,1,1),S('screen','Screening method','bw',[['bw','Blue–white (lacZ, β-galactosidase)'],['tet','Insertional inactivation of tetᴿ (pBR322)']])],
  metrics:p=>{const d=CLONE[p.step-1];return[N('Step',d[0]),N('What happens',d[1]),N('Recombinant colonies',p.screen==='bw'?'White (lacZ inactivated)':'Ampicillin-resistant but tetracycline-sensitive'),N('Vector features','ori, selectable marker, cloning sites')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.4}),st=p.step;if(st<=2){const gap=st===1?.6:.0,segs=36;for(let i=0;i<segs;i++){const a0=TAU*i/segs,a1=TAU*(i+1)/segs;if(st===1&&(a0>TAU-.25||a1<.25))continue;const col=a0<1.2?'#ff8787':a0<2.6?'#69db7c':a0<4?'#4dabf7':'#ced4da';s.tube([[1.2*Math.cos(a0),0,1.2*Math.sin(a0)],[1.2*Math.cos(a1),0,1.2*Math.sin(a1)]],.12,col,{segs:8})}
-   const ins=st===1?[[2.6,0,-.5],[2.6,0,.5]]:[[1.2,0,-.25],[1.45,0,0],[1.2,0,.25]];s.tube(ins,.12,'#ffd43b',{segs:8});s.label([1.2,.5,-1.6],'ampᴿ',C.red,12);s.label([-1.4,.5,0],'ori',C.muted,12);s.label([st===1?2.6:1.6,.5,0],'foreign DNA',C.gold,12)}
-  else if(st===3){capsule(s,[-1.6,0,0],[1.6,0,0],.8,'#a9e34b');s.ring([0,0,0],[0,1,0],.4,'#ffd43b',4);s.ring([.7,0,.2],[0,1,0],.25,'#ff8787',3)}
-  else{s.lathe([0,-.4,0],[[0,0],[2.2,0],[2.2,.25]],'#ffe8cc',{alpha:.7});for(let i=0;i<22;i++){const a=TAU*hash(i),r=1.9*Math.sqrt(hash(i+3)),rec=hash(i+7)<.35;s.mesh([r*Math.cos(a),-.1,r*Math.sin(a)],[.15,.06,.15],p.screen==='bw'?(rec?'#f8f9fa':'#1c7ed6'):(rec?'#ffd43b':'#adb5bd'))}}s.render();tag(c,CLONE[st-1][0]+(st===4?(p.screen==='bw'?' — white = recombinant':' — yellow = recombinant'):''),44,98,C.gold,14)},
+ draw:(c,p,t)=>{const st=p.step,bw=p.screen==='bw',
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  SEG=[[.15,1.3,'#ff6b6b','ampᴿ'],[1.45,2.6,'#69db7c',bw?'lacZ':'tetᴿ'],[2.75,4.0,'#4dabf7','ori'],[4.15,5.4,'#ced4da','other']],
+  arc=(x,y,r,a0,a1,col,w)=>{c.save();c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.arc(x,y,r,a0,a1);c.stroke();c.restore()},
+  /* plasmid: circular DNA with labelled regions; gap (open) at angle -π/2 when cut */
+  plasmid=(x,y,r,open,ins)=>{const AM=.455;for(const [a0,a1,col,lab] of SEG){arc(x,y,r,a0-Math.PI/2,a1-Math.PI/2,col,12)}
+   if(open){c.save();c.fillStyle='#0f2030';c.beginPath();c.arc(x+Math.cos(AM)*r,y+Math.sin(AM)*r,11,0,TAU);c.fill();c.restore()}
+   if(ins){arc(x,y,r,AM-.3,AM+.3,'#ffd43b',12)}
+   for(const [a0,a1,col,lab] of SEG){const am=(a0+a1)/2-Math.PI/2;txt(lab,x+Math.cos(am)*(r+34),y+Math.sin(am)*(r+34),col,12)}};
+  const gc=(x,y)=>{c.save();c.strokeStyle='#f1f3f5';c.lineWidth=1.2;c.setLineDash([2,3]);c.beginPath();c.moveTo(x,y-34);c.lineTo(x,y+34);c.stroke();c.restore()};
+  if(st===1){plasmid(180,260,70,true,false);
+   /* EcoRI cut: GAATTC site with staggered sticky ends */
+   txt('vector (plasmid)',180,376,C.white,12);txt('EcoRI site G^AATTC',298,332,'#ffe08a',11,'left');
+   c.save();c.strokeStyle='#ffe08a';c.lineWidth=1.4;c.beginPath();c.moveTo(250,298);c.lineTo(296,328);c.stroke();c.restore();
+   c.save();c.lineCap='round';c.lineWidth=6;c.strokeStyle='#ffd43b';c.beginPath();c.moveTo(344,236);c.lineTo(400,236);c.moveTo(452,236);c.lineTo(580,236);c.stroke();c.strokeStyle='#ffd43b';c.beginPath();c.moveTo(344,252);c.lineTo(414,252);c.moveTo(438,252);c.lineTo(580,252);c.stroke();
+   c.strokeStyle='#ff8787';c.lineWidth=3;c.beginPath();c.moveTo(400,236);c.lineTo(400,246);c.moveTo(452,236);c.lineTo(452,246);c.stroke();c.restore();
+   txt('foreign DNA (with gene of interest)',470,176,C.gold,12);txt("sticky ends: single-strand overhangs 5'-AATT-3'",460,280,'#ff9d9d',11);
+   c.save();c.strokeStyle='#e9ecef';c.lineWidth=2.4;c.lineCap='round';for(const [x,y] of[[420,222],[426,222]]){c.beginPath();c.moveTo(x-8,y-9);c.lineTo(x+8,y+9);c.stroke();c.beginPath();c.moveTo(x+8,y-9);c.lineTo(x-8,y+9);c.stroke()}c.restore();txt('EcoRI cuts both DNAs',470,198,C.white,11)}
+  else if(st===2){plasmid(230,258,76,false,true);txt('recombinant plasmid',230,384,C.white,12);txt('foreign DNA inserted inside the marker gene',330,318,'#ffd43b',11,'left');
+   c.save();c.strokeStyle='#ffd43b';c.lineWidth=1.4;c.beginPath();c.moveTo(296,288);c.lineTo(328,312);c.stroke();c.restore();
+   txt('1  sticky ends pair by H-bonds',420,216,C.white,13,'left');txt('2  DNA ligase seals the sugar–phosphate backbone',420,246,C.white,13,'left');txt('→ recombinant DNA',420,278,C.gold,14,'left')}
+  else if(st===3){
+   /* bacterium: rod-shaped cell with nucleoid and the incoming plasmid */
+   c.save();const g=c.createLinearGradient(0,200,0,330);g.addColorStop(0,'#c5e87a');g.addColorStop(1,'#6a9a1d');c.fillStyle=g;c.strokeStyle='#4d7513';c.lineWidth=3;c.beginPath();c.roundRect?c.roundRect(250,190,330,150,75):c.rect(250,190,330,150);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.roundRect?c.roundRect(290,200,250,30,15):c.rect(290,200,250,30);c.fill();c.restore();
+   c.save();c.strokeStyle='#f8e9a0';c.lineWidth=2;c.lineJoin='round';c.beginPath();for(let i=0;i<=70;i++){const a=i*.45,r=14+i*.5,x=395+Math.cos(a)*r*1.9*(i/70*.6+.4),y=268+Math.sin(a)*r*.7*.8;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();c.restore();txt('chromosome (nucleoid)',395,320,'#2f4a0a',11);
+   const q=cycle(t*.3,1),px=130+q*190,py=262;arc(px,py,24,0,TAU,'#4dabf7',6);c.save();c.strokeStyle='#ffd43b';c.lineWidth=6;c.beginPath();c.arc(px,py,24,-1.3,-.6);c.stroke();c.restore();arc(470,262,18,0,TAU,'#4dabf7',5);c.save();c.strokeStyle='#ffd43b';c.lineWidth=5;c.beginPath();c.arc(470,262,18,-1.3,-.6);c.stroke();c.restore();
+   txt('recombinant plasmid',130,222,C.white,12);txt('competent E. coli (host)',415,164,C.white,13);txt('plasmid inside',470,298,C.white,11);txt('enters after heat shock / CaCl₂',130,310,C.muted,11)}
+  else{/* petri dish with colonies */
+   c.save();const g=c.createRadialGradient(300,270,10,300,270,120);g.addColorStop(0,'rgba(255,236,200,.9)');g.addColorStop(1,'rgba(240,200,140,.85)');c.fillStyle=g;c.strokeStyle='rgba(220,235,245,.8)';c.lineWidth=4;c.beginPath();c.arc(300,270,118,0,TAU);c.fill();c.stroke();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=2;c.beginPath();c.arc(300,270,108,.2,1.2);c.stroke();c.restore();
+   for(let i=0;i<22;i++){const a=TAU*hash(i),r=92*Math.sqrt(hash(i+3)),rec=hash(i+7)<.35,x=300+r*Math.cos(a),y=270+r*Math.sin(a),col=bw?(rec?'#f8f9fa':'#1c7ed6'):(rec?'#ffd43b':'#adb5bd');c.save();const gg=c.createRadialGradient(x-2,y-2,1,x,y,8);gg.addColorStop(0,'#fff7');gg.addColorStop(.35,col);gg.addColorStop(1,col);c.fillStyle=col;c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=1;c.beginPath();c.arc(x,y,7.5,0,TAU);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.arc(x-2.2,y-2.4,2.4,0,TAU);c.fill();c.restore()}
+   txt('plate with ampicillin',300,396,C.muted,11);
+   const L=bw?[['#f8f9fa','white = recombinant'],['#1c7ed6','blue = non-recombinant']]:[['#ffd43b','yellow = recombinant'],['#adb5bd','grey = non-recombinant']];L.forEach((e,i)=>{c.save();c.fillStyle=e[0];c.strokeStyle='rgba(0,0,0,.4)';c.beginPath();c.arc(448,224+i*34,9,0,TAU);c.fill();c.stroke();c.restore();txt(e[1],464,224+i*34,C.white,12,'left')})}
+  tag(c,CLONE[st-1][0]+(st===4?(bw?' — white = recombinant':' — yellow = recombinant'):''),44,98,C.gold,14)},
  assumption:'Generic cloning workflow from NCERT Chapter 9; plasmid map simplified.'});
 
 /* ---------- Chapter 10: Biotechnology and its Applications ---------- */
