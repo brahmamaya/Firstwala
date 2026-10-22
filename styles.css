@@ -1200,3 +1200,11 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .rk-seltop .rk-seltoggle{font-size:13px;line-height:1.25;white-space:normal;text-align:center;max-width:min(100%,250px)}
 
 .rk-series{background:var(--mint)!important;color:var(--on-mint)!important;border:1px solid var(--mint)!important}.rk-series:hover{background:var(--mint-hover)!important}
+
+.landing-icons{display:flex;justify-content:center;gap:12px;margin:18px auto 12px}
+.landing-ic{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgb(var(--ovt) / .28);background:rgb(var(--ovt) / .08);color:var(--t-fff);text-decoration:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.landing-ic.wa{border-color:#25d36688;background:#25d3661f;color:#25d366}
+.landing-ic:hover,.landing-ic:focus-visible{background:rgb(var(--ovt) / .18)}
+.landing-ic.wa:hover,.landing-ic.wa:focus-visible{background:#25d36638;border-color:#25d366}
+:root[data-theme="light"] .landing-ic{background:#fff;border-color:#dbe3ee;color:#33465c}
+:root[data-theme="light"] .landing-ic.wa{background:#e6faee;border-color:#25d366;color:#0b6b36}
