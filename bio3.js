@@ -377,10 +377,29 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-action-potential',title
  tryText:'Increase the stimulus slowly. At what value does the impulse fire?',
  controls:[R('stim','Stimulus strength',0,40,1,25,'mV'),R('thr','Threshold depolarisation',10,25,1,15,'mV')],
  metrics:(p,t)=>{const fire=p.stim>=p.thr,v=apV(p,cycle(t,4));return[N('Fires?',fire?'Yes — all-or-none spike':'No (sub-threshold)'),N('Membrane potential now',v,'mV',0),N('Resting potential',-70,'mV',0),N('Na⁺/K⁺ pump','3 Na⁺ out for 2 K⁺ in')]},
- draw:(c,p,t)=>{const fire=p.stim>=p.thr,s=P3.scene(c,{scale:56,pitch:.2}),T=cycle(t,4),front=-3+T*2.2;s.tube([[-3.4,0,0],[3.4,0,0]],.42,(u)=>{const x=-3.4+6.8*u,d=x-front;return fire&&d<0&&d>-.8?'#ffd43b':'#ffe8cc'},{alpha:.55,segs:16});
-  for(let i=0;i<20;i++){const x=-3.2+i*.34,d=x-front,active=fire&&d<0&&d>-.8;s.ball([x,active?.15:.65,(hash(i)-.5)*.6],.05,'#fab005',{flat:true});s.ball([x+.15,active?.7:.2,(hash(i+5)-.5)*.6],.05,'#7950f2',{flat:true})}s.callout([2.6,.42,0],'axon membrane: resting (−70 mV, outside +)','#ffe8cc',-20,-60);if(fire){s.callout([clamp(front-.4,-3,3),.42,0],'depolarised: Na⁺ rushes in','#ffd43b',-40,-80);s.callout([clamp(front-1.2,-3.2,3),.7,0],'repolarising: K⁺ moves out','#b197fc',-40,70)}else s.callout([0,.42,0],'stimulus below threshold: no impulse','#ff8787',-30,-80);s.render();
+ draw:(c,p,t)=>{const fire=p.stim>=p.thr,s=P3.scene(c,{scale:48,cx:290,cy:318,pitch:-.1,yaw:.5}),T=cycle(t,4),front=-3+T*2.2,R0=.6,X0=-3.4,X1=3.4,A=(x,r,a)=>[x,r*Math.cos(a),r*Math.sin(a)];
+  const AX=AXL||(AXL=Array.from({length:35},(_,i)=>[-3.4+6.8*i/34,0,0])),zone=x=>{const d=x-front;return !fire?0:d<0&&d>-.8?1:d<=-.8&&d>-1.7?2:0};
+  /* membrane: outer and inner leaflet shells coloured by state (cream = resting, gold = depolarised, lilac = repolarising) */
+  s.tube(AX,R0,u=>{const z=zone(X0+6.8*u);return z===1?'#ffc919':z===2?'#b197fc':'#f5deb8'},{alpha:.5,segs:20});
+  s.tube(AX,R0-.07,u=>{const z=zone(X0+6.8*u);return z===1?'#f08c00':z===2?'#7950f2':'#e7b988'},{alpha:.38,segs:16});
+  /* axoplasm: neurofilaments / microtubules and mitochondria */
+  for(let k=0;k<4;k++){const a=k*1.57+.5,r=.18+.06*(k%2);s.tube([A(X0,r,a),A(X1,r,a)],.012,'#8fa6b8',{segs:4})}
+  for(const [x,a] of[[-2.2,3.9],[.4,2.5],[2.5,4.4]])s.mesh(A(x,.2,a),[.24,.08,.08],'#f08c3a',{alpha:.85,rings:5,segs:8});
+  /* voltage-gated channels in the membrane: Na⁺ (orange) and K⁺ (purple); bright when open */
+  for(let i=0;i<13;i++){const x=X0+.3+i*.5,na=i%2===0,z=zone(x),open=na?z===1:z===2,a=.5+.7*hash(i+3),n=A(0,1,a);
+    s.cyl(A(x,R0-.03,a),n,.08,.2,open?(na?'#ffa94d':'#b197fc'):(na?'#a8642a':'#5f4a9c'),{seg:7});if(open)s.ball(A(x,R0+.14,a),.06,na?'#fff3bf':'#e5dbff',{flat:true,lift:.5,glow:true})}
+  /* ions: outside the membrane (r > R0) or inside it */
+  for(let i=0;i<22;i++){const x=X0+.2+i*.3,z=zone(x),a=.2+1.7*hash(i+11),a2=.3+1.6*hash(i+31),bob=.03*Math.sin(t*2+i);
+    s.ball(A(x,z===1?.3:R0+.2+bob,a),.05,'#fab005',{flat:true});s.ball(A(x+.14,z===2?R0+.22+bob:.34,a2),.05,'#7950f2',{flat:true})}
+  /* stimulating electrode at the left end */
+  s.cyl([X0-.45,.62,.32],V.norm([1,-.5,-.3]),.05,.7,'#adb5bd',{seg:8});if(T<.7)s.ball([X0+.05,.4,.1],.12+.05*Math.sin(T*30),'#ffd43b',{flat:true,glow:true});
+  const wl=[['a',A(X0-.7,.9,.35),'stimulus electrode','#ced4da','B'],['a',A(-.5,R0,1.1),'Na⁺ channel (voltage-gated)','#ffa94d','B'],['a',A(.5,R0,1.1),'K⁺ channel (voltage-gated)','#b197fc','B']];
+  if(fire)wl.push(['a',[clamp(front-.4,-3,3),.3,.4],'depolarised: Na⁺ rushes in','#ffd43b','C'],['a',[clamp(front-1.3,-3.2,3),.3,.4],'repolarising: K⁺ moves out','#b197fc','C']);else wl.push(['a',[0,.3,.4],'stimulus below threshold: no impulse','#ff8787','C']);
+  wl.push(['a',[-1.6,-.1,.4],'axoplasm (cytoplasm)','#a9bccb','C'],['a',[-2.7,R0,.3],'axon membrane: resting (−70 mV, outside +)','#ffe3bf','T']);
+  lblRows(c,s,wl,{T:236,B:374,C:396},40,640);s.render();
   chart(c,420,96,236,170,{title:'Membrane potential vs time',xl:'ms',xmin:0,xmax:4,ymin:-90,ymax:45,series:[{fn:x=>apV(p,x),col:C.gold},{fn:()=>-70+p.thr,col:'#ff8787',dash:[4,4]}],marker:[T,apV(p,T)]});tag(c,'yellow dots: Na⁺   purple: K⁺',44,98,C.muted,13)},
  assumption:'Stylised waveform (peak ≈ +35 mV, undershoot ≈ −80 mV); the time axis is shown in ms but the animation is slowed.'});
+let AXL=null;
 function apV(p,x){const t0=.5;if(x<t0)return-70;if(p.stim<p.thr)return-70+p.stim*(1-Math.exp(-(x-t0)/.08))*Math.exp(-(x-t0)/.3);const u=x-t0;if(u<.3)return-70+105*Math.sin(PI/2*u/.3);if(u<1.1)return 35-115*(u-.3)/.8;return-80+10*(1-Math.exp(-(u-1.1)/.5))}
 
 /*BEGIN synkit*/
