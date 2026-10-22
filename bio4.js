@@ -85,10 +85,23 @@ add({...ch(1,'Sexual Reproduction in Flowering Plants',U6),id:'bio-pollination',
  tryText:'Switch to wind and see how much pollen misses.',
  controls:[S('type','Type','xeno',Object.keys(POLL).map(k=>[k,POLL[k][0]])),S('agent','Agent','insect',[['insect','Insect (bee)'],['wind','Wind']])],
  metrics:p=>{const d=POLL[p.type];return[N('Type',d[0]),N('Pollen goes to',d[1]),N('Genetics',d[2]),N('Agent features',p.agent==='wind'?'Light pollen, feathery stigma, often no nectar':'Colour, scent, nectar; sticky pollen')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cy:300,pitch:.2}),plant=(x,flowers)=>{s.tube([[x,-1.6,0],[x,.6,0]],.05,BC.stem,{segs:8});flowers.forEach(([dx,dy],i)=>{const q=[x+dx,dy,0];s.tube([[x,dy-.3,0],q],.03,BC.stem,{segs:5});for(let k=0;k<5;k++){const a=TAU*k/5;petal(s,q,[Math.cos(a),.5,Math.sin(a)],.32,.12,p.agent==='wind'?'#d8f5a2':'#ff8fab')}s.ball(q,.07,'#fab005')})};
-  plant(-1.8,[[-.4,.6],[.4,1.0]]);plant(1.8,[[.3,.8]]);const src=[-2.2,.6,0],dst={auto:[-2.2,.6,0],geit:[-1.4,1.0,0],xeno:[2.1,.8,0]}[p.type],q=cycle(t*.25,1);
-  if(p.agent==='insect'){const pos=p.type==='auto'?V.add(src,[.3*Math.cos(t*3),.3+.1*Math.sin(t*5),.3*Math.sin(t*3)]):V.add(V.add(src,V.mul(V.sub(dst,src),q)),[0,.7*Math.sin(PI*q),.2*Math.sin(t*9)]);critter(s,'insect',V.add(pos,[0,.05,0]),.3,t);s.ball(V.add(pos,[0,.1,.05]),.03,'#ffd43b',{flat:true})}
-  else for(let i=0;i<24;i++){const qq=cycle(t*.25+i/24,1),pos=V.add(V.add(src,[qq*5,(hash(i)-.5)*1.5*qq,(hash(i+3)-.5)*2*qq]),[0,.3*Math.sin(qq*6+i),0]);s.ball(pos,.03,'#ffd43b',{flat:true})}s.callout([-2.2,.6,0],'anther → pollen source','#fab005',-40,-60);s.callout(dst,p.type==='auto'?'stigma of the same flower':p.type==='geit'?'another flower, same plant':'flower of a different plant','#ff8fab',40,-60);s.callout([1.8,-1,0],p.agent==='wind'?'wind: light, dry pollen; dull flowers':'insect: colourful, scented flowers with nectar','#e9f6ff',40,40);s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:330,cy:262,pitch:.02}),wind=p.agent==='wind',F1=[-2.4,.9,0],F2=[-1.35,1.45,0],F3=[2.2,1.15,0];
+  /* ground and two plants with leaves */
+  s.poly([[-3.6,-1.75,-.2],[3.6,-1.75,-.2],[3.6,-2.1,-.2],[-3.6,-2.1,-.2]],'#6d4c2f',{cull:false});
+  const stem=(pts)=>s.tube(pts,.055,'#5b8f3a',{segs:8}),lf=(q,dir,len)=>leafShape(s,q,dir,len),leafShape=(S,q,d,len)=>{S.mesh(V.add(q,V.mul(d,len*.5)),[len*.5,len*.17,.05],'#4ea24a',{rings:6,segs:10,rot:[0,0,Math.atan2(d[1],d[0])],spec:.3})};
+  stem([[-2.0,-1.75,0],[-2.05,-.5,0],[-2.3,.4,0],F1.map((v,i)=>i===1?v-.28:v)]);stem([[-2.05,-.3,0],[-1.8,.5,0],[F2[0]-.05,F2[1]-.3,0]]);stem([[2.0,-1.75,0],[2.05,-.4,0],[F3[0]-.05,F3[1]-.3,0]]);
+  lf([-2.05,-1.1,0],[-1,.5,0],.9);lf([-2.05,-.7,0],[1,.45,0],.9);lf([2.05,-1.2,0],[-1,.5,0],.9);lf([2.05,-.8,0],[1,.45,0],.9);
+  /* flowers: petals + stamens (filament and anther) around a central pistil with stigma */
+  const flower=(q,anthers)=>{const pc=wind?'#c5d99a':'#ff8fab',pl=wind?.26:.46;for(let k=0;k<6;k++){const a=TAU*k/6+.3;petal(s,q,[Math.cos(a),Math.sin(a),.12],pl,wind?.09:.24,pc)}
+   for(let k=0;k<5;k++){const a=TAU*k/5+.1,r=wind?.5:.2,e=V.add(q,[Math.cos(a)*r,Math.sin(a)*r-(wind?.12:0),.18]);s.tube([V.add(q,[0,0,.1]),e],.012,'#d9e2a0',{segs:4});s.ball(e,wind?.06:.045,anthers?'#f59f00':'#ffd43b',{spec:.4,lift:2})}
+   s.tube([V.add(q,[0,-.1,0]),V.add(q,[0,.1,.2])],.025,'#a8d86a',{segs:5});if(wind){for(let k=0;k<5;k++){const a=-.9+k*.45;s.seg(V.add(q,[0,.1,.2]),V.add(q,[Math.sin(a)*.18,.1+Math.cos(a)*.18,.22]),'#e9f5c0',1.6)}}else s.ball(V.add(q,[0,.12,.2]),.065,'#ff6b9a',{flat:true,lift:3,spec:.5})};
+  flower(F1,true);flower(F2,false);flower(F3,false);
+  const dst={auto:F1,geit:F2,xeno:F3}[p.type],q=cycle(t*.25,1);
+  if(!wind){const base=p.type==='auto'?V.add(F1,[.35*Math.cos(t*3),.4+.1*Math.sin(t*5),0]):V.add(V.add(F1,V.mul(V.sub(dst,F1),q)),[0,.7*Math.sin(PI*q)+.35,0]),fl=Math.sin(t*50),dirx=p.type==='auto'?Math.sign(Math.cos(t*3))||1:Math.sign(dst[0]-F1[0])||1,bx=(a,b,z=0)=>V.add(base,[a*dirx*.9,b*.9,z]);
+   s.mesh(bx(0,0),[.19,.15,.15],'#3d3027',{rings:6,segs:10});s.mesh(bx(-.22,0),[.22,.17,.17],'#f2b01e',{rings:6,segs:10,spec:.4});s.mesh(bx(-.5,-.01),[.18,.15,.15],'#2b2b2b',{rings:6,segs:10});s.mesh(bx(-.7,-.03),[.15,.12,.12],'#f2b01e',{rings:6,segs:10});s.mesh(bx(.2,.03),[.1,.09,.1],'#3d3027',{rings:5,segs:8});
+   for(const z of[-1,1])s.mesh(bx(-.2,.25+.04*fl,z*.05),[.3,.1+.06*fl*fl,.04],'#dfeaff',{alpha:.55,rings:5,segs:10,rot:[0,0,.5*dirx]});s.ball(bx(-.3,-.16),.04,'#ffd43b',{flat:true,lift:2})}
+  else for(let i=0;i<26;i++){const qq=cycle(t*.25+i/26,1),pos=V.add(V.add(F1,[0,.1,.3]),V.add(V.mul(V.sub(dst===F1?V.add(F1,[1.2,0,0]):dst,F1),qq),[0,(hash(i)-.5)*.5*qq+.25*Math.sin(qq*6+i)+.2*qq,0]));s.ball(pos,.035,'#ffd43b',{flat:true,lift:2})}
+  s.callout(V.add(F1,[0,.2,.2]),'anther → pollen source','#fab005',-85,-20);s.callout(V.add(dst,[0,.1,.2]),p.type==='auto'?'stigma of the same flower':p.type==='geit'?'another flower, same plant':'flower of a different plant','#ff8fab',60,-70);s.render();tag(c,wind?'wind: light, dry pollen; dull flowers, feathery stigma':'insect: colourful, scented flowers with nectar',44,98,'#e9f6ff',13)},
  assumption:'Two plants of the same species; pollen paths are illustrative.'});
 
 /* ---------- Chapter 2: Human Reproduction ---------- */
