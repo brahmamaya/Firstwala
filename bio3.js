@@ -399,16 +399,40 @@ add({...ch(17,'Locomotion and Movement'),id:'bio-synovial-joints',title:'Synovia
  tryText:'Try both sliders on a hinge joint. Which one does nothing?',
  controls:[S('j','Joint','ball',Object.keys(JOINT).map(k=>[k,JOINT[k][0]])),R('a','Movement 1',-60,60,1,30,'°'),R('b','Movement 2',-60,60,1,0,'°')],
  metrics:p=>{const d=JOINT[p.j];return[N('Joint',d[0]),N('Example',d[1]),N('Range',d[2])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.25}),a=rad(p.a),b=rad(p.b),bone='#ede3c8';s.tube([[0,-2.2,0],[0,-.35,0]],.22,bone,{segs:12});
-  if(p.j==='ball'){s.mesh([0,-.2,0],[.55,.35,.55],'#dee2e6',{alpha:.4,shape:(u)=>u>0?.6:1});s.ball([0,0,0],.38,bone);const d=[Math.sin(a)*Math.cos(b),Math.cos(a)*Math.cos(b),Math.sin(b)];s.tube([[0,0,0],V.mul(d,2.2)],.2,bone,{segs:12})}
-  else if(p.j==='hinge'){s.cyl([0,0,0],[0,0,1],.35,.8,bone);const d=[Math.sin(a),Math.cos(a),0];s.tube([V.mul(d,.2),V.mul(d,2.2)],.2,bone,{segs:12});s.label([0,0,.6],'axis',C.muted,12)}
-  else if(p.j==='pivot'){s.ring([0,.2,0],[0,1,0],.35,'#adb5bd',5);s.tube([[0,-.3,0],[0,2,0]],.16,bone,{segs:12});for(let i=0;i<4;i++){const q=a+i*PI/2;s.box([.35*Math.cos(q),1.5,.35*Math.sin(q)],[.3,.25,.12],'#ced4da',{rotY:-q})}}
-  else if(p.j==='gliding'){for(let i=0;i<4;i++)s.box([-.6+(i%2)*.75+(i===1?p.a/120:0),-.1+Math.floor(i/2)*.65,(i===2?p.b/120:0)],[.7,.6,.7],bone)}
-  else{s.mesh([0,0,0],[.45,.25,.45],bone,{shape:(u,v)=>1+.4*Math.cos(2*v)*Math.sin(u)});const d=[Math.sin(a),Math.cos(a)*Math.cos(b),Math.sin(b)];s.tube([V.mul(d,.3),V.mul(d,2)],.16,bone,{segs:12})}
-  if(p.j!=='gliding'){s.mesh([0,0,0],[.78,.62,.78],'#ffc9c9',{alpha:.16,rings:10,segs:16});s.callout([.7,.25,.2],'synovial capsule + fluid','#ffc9c9',60,-30)}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:p.j==='gliding'?96:64,pitch:.04,cx:300,cy:p.j==='gliding'?215:250}),a=rad(p.a),b=rad(p.b),bone='#ede3c8',bone2='#dccfae',cart='#a8d8ee',
+  /* long bone: flared ends, shaft narrower */
+  LB=(pts,r,col)=>s.tube(pts,u=>r*(1+.75*Math.exp(-((u/.13)**2))+.5*Math.exp(-(((1-u)/.13)**2))),col,{segs:12,spec:.4}),
+  SQ=(u,v)=>1/Math.pow(Math.abs(Math.cos(u)*Math.cos(v))**4+Math.abs(Math.sin(u))**4+Math.abs(Math.cos(u)*Math.sin(v))**4,.25);
+  if(p.j==='ball'){
+   /* scapula blade with glenoid cup holding the humeral head */
+   s.mesh([-.75,-1.5,-.1],[.55,1.15,.1],bone2,{rings:12,segs:20,rot:[0,0,.35]});
+   s.mesh([0,-.12,0],[.62,.42,.5],bone,{rings:10,segs:18,shape:u=>u>.15?.0:1});s.mesh([0,-.1,.02],[.55,.36,.44],cart,{rings:10,segs:18,alpha:.85,shape:u=>u>.15?.0:1});
+   const d=[Math.sin(a)*Math.cos(b),Math.cos(a)*Math.cos(b),Math.sin(b)];s.tube([V.mul(d,.3),V.mul(d,2.5)],.17,bone,{segs:12,spec:.4});LB([V.mul(d,.5),V.mul(d,2.6)],.14,bone);
+   s.ball([0,0,0],.4,bone,{spec:.5});s.ball([0,0,0],.43,cart,{alpha:.5});s.tube([V.mul(d,.25),V.mul(d,.7)],.22,bone,{segs:10})}
+  else if(p.j==='hinge'){
+   /* humerus ends in a spool (trochlea); ulna with olecranon hooks around it */
+   LB([[0,-2.4,0],[0,-.35,0]],.17,bone);s.cyl([0,0,0],[0,0,1],.34,.75,bone,{seg:22});s.cyl([0,0,0],[0,0,1],.37,.55,cart,{seg:22});
+   const d=[Math.sin(a),Math.cos(a),0],n=[-Math.cos(a),Math.sin(a),0];LB([V.mul(d,.25),V.mul(d,2.5)],.14,bone2);s.mesh(V.add(V.mul(d,-.05),V.mul(n,-.0)),[.3,.35,.28],bone2,{rings:8,segs:14});
+   s.label([.62,-.5,.3],'axis',C.muted,12)}
+  else if(p.j==='pivot'){
+   /* axis vertebra with odontoid peg; atlas ring rotates around it */
+   s.mesh([0,-.95,0],[.95,.45,.8],bone2,{rings:10,segs:20,spec:.4,shape:SQ});s.lathe([0,-.55,0],[[.3,0],[.26,.5],[.2,.95],[.14,1.2],[0,1.3]],bone,{segs:16,spec:.4});
+   const an=[];for(let i=0;i<=24;i++){const q=a+TAU*i/24;an.push([.62*Math.cos(q),.3,.62*Math.sin(q)])}s.tube(an,u=>.15+.04*Math.sin(u*TAU),cart,{segs:8,alpha:.9});s.tube(an,.1,bone,{segs:8});
+   s.tube([[.1*Math.cos(a+PI*.5)+.0,.3,.0],[0,.3,0]],.01,bone,{segs:3});s.ball([.62*Math.cos(a+PI*.5),.3,.62*Math.sin(a+PI*.5)],.14,'#ffd43b',{flat:true,lift:3})}
+  else if(p.j==='gliding'){
+   /* carpals: rounded blocks separated by a thin cartilage and fluid layer */
+   for(let i=0;i<4;i++){const x=-.45+(i%2)*.95+(i===1?p.a/120:0),y=-.45+Math.floor(i/2)*.9+(i===2?p.b/120:0);s.mesh([x,y,0],[.42,.4,.4],i%2?bone2:bone,{rings:10,segs:16,spec:.4,shape:SQ});s.mesh([x,y,.0],[.45,.43,.43],cart,{rings:8,segs:14,alpha:.25,shape:SQ})}}
+  else{
+   /* saddle joint: trapezium and metacarpal base are each concave in one plane and convex in the other */
+   LB([[-.2,-2.3,0],[0,-.5,0]],.2,bone2);s.mesh([0,-.2,0],[.6,.38,.5],bone2,{rings:12,segs:22,spec:.4,shape:(u,v)=>1+.4*Math.cos(2*v)*Math.sin(u)*(u>0?1:.3)});
+   const d=[Math.sin(a),Math.cos(a)*Math.cos(b),Math.sin(b)];s.mesh([0,.12,0],[.5,.3,.45],bone,{rings:10,segs:20,spec:.4,shape:(u,v)=>1-.35*Math.cos(2*v)*Math.sin(u)*(u<0?1:.3)});LB([V.mul(d,.3),V.mul(d,2.3)],.15,bone)}
+  if(p.j!=='gliding'){s.mesh([0,0,0],[.85,.7,.82],'#ffc9c9',{alpha:.14,rings:10,segs:18});s.callout([.8,.35,.2],'synovial capsule + fluid','#ffc9c9',55,-35)}
   const J={ball:['head of humerus','socket (glenoid cavity)','movement in all planes (shoulder, hip)'],hinge:['trochlea of humerus','ulna moves in one plane','elbow, knee'],pivot:['odontoid process of axis','atlas rotates round it','neck: atlas–axis'],gliding:['carpals slide on each other','flat surfaces glide','wrist (carpals)'],saddle:['saddle-shaped surfaces','two planes of movement','thumb: carpal–metacarpal']}[p.j];
-  if(p.j==='ball'){s.ball([0,0,0],.4,'#cfe8ff',{alpha:.35});s.callout([.1,.3,.2],J[0],'#ede3c8',-70,-50);s.callout([.4,-.3,.2],J[1],'#dee2e6',60,40);s.callout([-.3,.1,.3],'articular cartilage','#cfe8ff',-70,20)}
-  else s.callout([0,0,.3],J[0],'#ede3c8',-70,-40);s.callout([0,-1.6,0],J[2],'#ffd43b',-60,30);s.render()},
+  if(p.j==='ball'){s.callout([-.15,.3,.3],J[0],'#ede3c8',-85,-30);s.callout([-.35,-.3,.3],J[1],'#dee2e6',-85,40);s.callout([.3,-.1,.4],'articular cartilage','#a8d8ee',70,55)}
+  else if(p.j==='pivot')s.callout([.1,.9,0],J[0],'#ede3c8',70,-30);
+  else if(p.j==='gliding')s.callout([-.45,.45,.3],J[0],'#ede3c8',-80,-40);
+  else s.callout([0,0,.3],J[0],'#ede3c8',-85,-40);
+  s.label([0,-2.6,0],J[2],'#ffd43b',13);s.render()},
  assumption:'Bones simplified to cylinders and spheres; ligaments and synovial membrane omitted.'});
 
 /*BEGIN skelkit*/
