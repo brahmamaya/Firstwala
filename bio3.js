@@ -399,7 +399,7 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-action-potential',title
   lblRows(c,s,wl,{T:236,B:374,C:396},40,640);s.render();
   chart(c,420,96,236,170,{title:'Membrane potential vs time',xl:'ms',xmin:0,xmax:4,ymin:-90,ymax:45,series:[{fn:x=>apV(p,x),col:C.gold},{fn:()=>-70+p.thr,col:'#ff8787',dash:[4,4]}],marker:[T,apV(p,T)]});tag(c,'yellow dots: Na⁺   purple: K⁺',44,98,C.muted,13)},
  assumption:'Stylised waveform (peak ≈ +35 mV, undershoot ≈ −80 mV); the time axis is shown in ms but the animation is slowed.'});
-let AXL=null;
+let AXL=null,RFX=null;
 function apV(p,x){const t0=.5;if(x<t0)return-70;if(p.stim<p.thr)return-70+p.stim*(1-Math.exp(-(x-t0)/.08))*Math.exp(-(x-t0)/.3);const u=x-t0;if(u<.3)return-70+105*Math.sin(PI/2*u/.3);if(u<1.1)return 35-115*(u-.3)/.8;return-80+10*(1-Math.exp(-(u-1.1)/.5))}
 
 /*BEGIN synkit*/
@@ -461,15 +461,35 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-reflex-arc',title:'Refl
  tryText:'Tap harder. Does the kick get larger?',
  controls:[R('tap','Tap strength',0,100,1,60,'%')],
  metrics:(p,t)=>{const T=cycle(t,4),st=T<.5?'Tap on tendon':T<1.3?'Afferent (sensory) neuron to spinal cord':T<1.6?'Synapse in grey matter':T<2.4?'Efferent (motor) neuron to thigh muscle':'Muscle contracts — leg kicks';return[N('Stage',st),N('Afferent entry','Dorsal root of spinal nerve'),N('Efferent exit','Ventral root'),N('Effector','Quadriceps (thigh) muscle')]},
- draw:(c,p,t)=>{const T=cycle(t,4),s=P3.scene(c,{scale:54,cx:300}),kick=T>2.4?Math.sin(PI*Math.min(1,(T-2.4)/1.2))*.7*p.tap/100:0,sc=[-2.6,1.2,0];
-  // Spinal cord in cross-section: white matter outside, butterfly-shaped grey matter inside.
-  s.mesh(sc,[.9,.72,.5],'#f1f3f5',{alpha:.55});const G=(d,r,rot)=>s.mesh(V.add(sc,d),r,'#868e96',{rot,rings:8,segs:12});for(const sg of[-1,1]){G([sg*.22,.3,0],[.1,.26,.14],[0,0,-sg*.35]);G([sg*.25,-.22,0],[.2,.22,.18])}G([0,.04,0],[.3,.07,.12]);s.ball(V.add(sc,[0,.04,.13]),.04,'#343a40',{flat:true,lift:1});
-  s.tube([[-.3,.6,0],[1.8,.6,0]],.3,'#f1c7a8',{segs:12});s.mesh([.75,.86,0],[.95,.2,.28],'#c2414b',{rings:8,segs:14});const knee=[1.8,.6,0],shin=[1.8+1.6*Math.sin(kick),.6-1.6*Math.cos(kick),0];s.tube([knee,shin],.22,'#f1c7a8',{segs:12});s.ball(knee,.29,'#f1c7a8');s.mesh(V.add(knee,[.25,.12,0]),[.1,.14,.16],'#ede3c8');s.mesh(V.add(shin,[.25,0,0]),[.3,.08,.14],'#f1c7a8');
-  const hx=T<.5?2.6-.6*T*2:2.05;s.cyl([hx,.75,0],[1,0,0],.09,.5,'#495057');s.tube([[hx+.2,.75,0],[hx+.7,1.4,0]],.03,'#868e96',{segs:4});
-  const drg=V.add(sc,[.9,.45,.3]),aff=[[1.0,.82,.25],[0,1.0,.3],[-1.2,1.5,.3],drg,V.add(sc,[.22,.32,.1]),V.add(sc,[.25,-.2,.05])],eff=[V.add(sc,[.25,-.25,-.05]),V.add(sc,[1.0,-.4,-.25]),[-1.2,.85,-.3],[0,.8,-.3],[.9,.82,-.22]];
-  s.path(aff,'#4dabf7',3);s.path(eff,'#ff6b6b',3);s.ball(drg,.14,'#ffd43b');const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
-  if(T>.5&&T<1.3)s.ball(along(aff,(T-.5)/.8),.1,'#4dabf7',{glow:true,flat:true});if(T>1.6&&T<2.4)s.ball(along(eff,(T-1.6)/.8),.1,'#ff6b6b',{glow:true,flat:true});
-  const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L(V.add(sc,[-.6,.4,.3]),'spinal cord: white matter','#f1f3f5',-40,-60);L(V.add(sc,[-.25,-.22,.15]),'grey matter','#adb5bd',-70,40);L(drg,'dorsal root ganglion','#ffd43b',-10,-60);L([0,1.0,.3],'sensory (afferent) neuron','#74c0fc',30,-70);L([0,.8,-.3],'motor (efferent) neuron','#ff8787',20,60);L([1.0,.82,.25],'receptor: muscle spindle','#74c0fc',50,-50);L([.4,.95,-.1],'effector: quadriceps muscle','#ff8787',-10,-90);L([hx,.85,0],'tap on patellar tendon','#ced4da',50,-30);s.render();tag(c,'blue: sensory (afferent)   red: motor (efferent)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const T=cycle(t,4),s=P3.scene(c,{scale:46,cx:330,cy:262,yaw:.42,pitch:-.08}),kick=T>2.4?Math.sin(PI*Math.min(1,(T-2.4)/1.2))*.7*p.tap/100:0,sc=[-2.6,1.2,0],K=[1.8,.6,0],K0=K,SKIN='#e9b896',BONE='#efe6cf',TEND='#f3ead0',Av=(a,b)=>V.add(a,b),sn=Math.sin(kick),cs=Math.cos(kick),dd=[sn,-cs,0],nn=[cs,sn,0];
+  if(!RFX){const drg=Av(sc,[.9,.45,.3]);RFX={THIGH:smooth3([[-.4,.6,0],[.2,.62,0],[.8,.62,0],K0],4),drg,aff:smooth3([[1.0,.82,.25],[.2,1.0,.3],[-1.0,1.5,.3],drg,Av(sc,[.5,.55,.2]),Av(sc,[.22,.32,.1]),Av(sc,[.25,-.2,.05])],4),eff:smooth3([Av(sc,[.25,-.25,-.05]),Av(sc,[.6,-.45,-.2]),Av(sc,[1.0,-.4,-.25]),[-1.2,.85,-.3],[0,.8,-.3],[.9,.82,-.22]],4)}}
+  const {drg,aff,eff,THIGH}=RFX;
+  /* spinal cord in cross-section (white matter shell, butterfly grey matter, central canal) with dorsal and ventral roots */
+  s.mesh(sc,[.98,.78,.12],'#aab4bd',{rings:10,segs:28});s.mesh(Av(sc,[0,0,.03]),[.94,.74,.12],'#f1f3f5',{rings:10,segs:28});
+  if(!RFX.bf){const H=[[0,.12],[.1,.16],[.15,.4],[.28,.64],[.35,.65],[.33,.42],[.38,.2],[.5,.08],[.57,-.08],[.53,-.3],[.4,-.47],[.24,-.5],[.14,-.36],[.1,-.16],[0,-.1]];RFX.bf=H.concat(H.slice(1,-1).reverse().map(q=>[-q[0],q[1]])).map(q=>[sc[0]+q[0],sc[1]+q[1],.13]);RFX.bf.push(RFX.bf[0])}
+  s.poly(RFX.bf.slice(0,-1),'#8c959f',{cull:false,z:undefined,bias:2});s.path(RFX.bf,'#5c6670',1.5,[],-1e5+1);
+  s.tube([Av(sc,[0,.06,.13]),Av(sc,[0,.06,.2])],.03,'#343a40',{segs:6});
+  for(const [x,y] of[[.3,-.2],[.42,-.1],[.26,-.34]])s.ball(Av(sc,[x,y,.17]),.055,'#ff8787',{lift:2});
+  /* neurons */
+  s.tube(aff,.03,'#4dabf7',{segs:5});s.tube(eff,.03,'#ff6b6b',{segs:5});s.mesh(drg,[.17,.12,.12],'#ffd43b',{rings:7,segs:10});
+  const syn=Av(sc,[.24,-.22,.05]);s.ball(syn,.06,'#e9ecef',{lift:3,glow:T>1.25&&T<1.75});
+  /* thigh: skin shell, femur, quadriceps with fibre lines, tendon, patella, patellar ligament */
+  const P=Av(K,[.27,.1,0]),Tub=Av(K,[dd[0]*.45+nn[0]*.24,dd[1]*.45+nn[1]*.24,0]),A=Av(K,V.mul(dd,1.6));
+  s.tube(THIGH,u=>.4-.14*u+.03*Math.sin(Math.PI*u),SKIN,{alpha:.28,segs:14});s.tube([[-.3,.6,0],[K[0]-.08,K[1],0]],.07,BONE,{segs:8});s.ball(K,.14,BONE,{lift:-1});
+  s.mesh([.75,.8,.02],[.98,.26,.3],'#c2414b',{rings:8,segs:14,spec:.4,shape:(u)=>.85+.15*Math.cos(u)});
+  for(const [y,z] of[[.96,.06],[.88,.2],[.8,.24],[.94,-.12]])s.tube([[-.1,y,z],[.75,y+.03,z],[1.65,y-.02,z*.8]],.012,'#9b2c36',{segs:4});
+  s.tube([[1.65,.86,0],P],.05,TEND,{segs:6});s.mesh(P,[.1,.15,.16],BONE,{rings:6,segs:10});s.tube([P,Tub],.05,T>.45&&T<.7?'#ffe066':TEND,{segs:6});
+  /* lower leg: skin, tibia, foot (swings with the kick) */
+  s.tube([0,.2,.4,.6,.8,1].map(u=>Av(K,V.mul(dd,1.6*u))),u=>.25-.13*u+.04*Math.sin(Math.PI*Math.min(1,u*1.6)),SKIN,{alpha:.45,segs:12});s.tube([K,A],.055,BONE,{segs:8});s.mesh(Av(A,[nn[0]*.28,nn[1]*.28-.04,0]),[.3,.07,.13],SKIN,{rot:[0,0,kick],rings:6,segs:10});
+  /* reflex hammer (rubber head), withdrawn after the tap */
+  const tp=V.mul(Av(P,Tub),.5),off=T<.5?.9*(1-T*2):T<1?(T-.5)*1.6:.8,hd=Av(tp,[.24+off,.05*off,0]);s.cyl(hd,[1,0,0],.1,.22,'#868e96',{seg:10});s.tube([Av(hd,[.12,0,0]),Av(hd,[.75,.7,0])],.03,'#495057',{segs:5});
+  /* muscle spindle (receptor) and the two neurons' travelling impulses */
+  capsule(s,[.8,.84,.25],[1.2,.82,.25],.035,'#74c0fc');
+  const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
+  if(T>.5&&T<1.3)s.ball(along(aff,(T-.5)/.8),.09,'#74c0fc',{glow:true,flat:true,lift:5});if(T>1.6&&T<2.4)s.ball(along(eff,(T-1.6)/.8),.09,'#ff8787',{glow:true,flat:true,lift:5});
+  lblRows(c,s,[['a',drg,'dorsal root ganglion','#ffd43b','T'],['a',[-.6,1.28,.3],'sensory (afferent) neuron','#74c0fc','T'],['a',[1.0,.83,.25],'receptor: muscle spindle','#74c0fc','T'],
+    ['a',Av(sc,[-.7,.45,.15]),'spinal cord: white matter','#f1f3f5','B'],['a',Av(sc,[-.3,-.3,.17]),'grey matter','#adb5bd','B'],['a',[-.3,.8,-.3],'motor (efferent) neuron','#ff8787','B'],['a',[.5,.7,.1],'effector: quadriceps muscle','#ff8787','B'],['a',tp,'tap on patellar tendon','#ced4da','C']],{T:150,B:372,C:394},40,640);
+  s.render();tag(c,'blue: sensory (afferent)   red: motor (efferent)',44,98,C.muted,13)},
  assumption:'Monosynaptic stretch reflex, slowed down for viewing; real response takes a fraction of a second.'});
 
 add({...ch(18,'Neural Control and Coordination'),id:'bio-myelinated-conduction',title:'Myelinated vs non-myelinated fibres',
