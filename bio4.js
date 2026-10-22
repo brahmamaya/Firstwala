@@ -211,8 +211,20 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-monohybrid-cr
  tryText:'Increase the number of offspring and watch the observed ratio approach 3 : 1.',
  controls:[S('p1','Parent 1','Tt',MONO),S('p2','Parent 2','Tt',MONO),R('n','Offspring grown',4,200,4,40),R('seed','Sample number',1,20,1,1)],
  metrics:p=>{const g=cross1(p.p1,p.p2),tall=g.TT+g.Tt,obs=sample1(p);return[N('Expected genotypes',`TT ${g.TT*4}/4 · Tt ${g.Tt*4}/4 · tt ${g.tt*4}/4`),N('Expected phenotypes',`${tall*100}% tall, ${g.tt*100}% dwarf`),N('Observed in sample',`${obs.tall} tall : ${obs.dwarf} dwarf`),N('Observed ratio',obs.dwarf?f(obs.tall/obs.dwarf,2)+' : 1':'All tall')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cy:290,pitch:.45}),g1=p.p1.split(''),g2=p.p2.split('');for(let i=0;i<2;i++)for(let j=0;j<2;j++){const geno=[g1[i],g2[j]].sort().join(''),tall=geno.includes('T');s.box([-3+i*1.1,-1.6,-1+j*1.1],[1,.1,1],'#20c997');pea(s,[-3+i*1.1,-1.55,-1+j*1.1],tall,.7,t);s.label([-3+i*1.1,-1.3,-.6+j*1.1],geno,C.white,12)}
-  const obs=sample1(p),cols=Math.ceil(Math.sqrt(p.n*1.6));for(let k=0;k<Math.min(p.n,120);k++){const x=-1+(k%cols)*.32,z=-1.4+Math.floor(k/cols)*.32;pea(s,[x,-1.6,z],obs.list[k],.4,t)}s.render();tag(c,'left: Punnett square · right: random offspring sample',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const g1=p.p1.split(''),g2=p.p2.split(''),obs=sample1(p),GX=122,GY=168,CW=88,CH=86,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  /* a pea plant icon: tall (long stem, 4 leaf pairs) or dwarf (short stem, 2 leaf pairs) */
+  plant=(x,y,tall,sc)=>{const h=(tall?44:19)*sc,nl=tall?4:2,col=tall?'#37b24d':'#94d82d';c.save();c.lineCap='round';c.strokeStyle='#2b8a3e';c.lineWidth=Math.max(1.4,2.2*sc);c.beginPath();c.moveTo(x,y);c.lineTo(x,y-h);c.stroke();c.fillStyle=col;for(let i=0;i<nl;i++){const yy=y-h*(.25+.7*i/nl),w=(7-(i>1&&tall?1:0))*sc;for(const sg of[-1,1]){c.beginPath();c.ellipse(x+sg*w*.9,yy-w*.25*(sg>0?1:.2),w,w*.42,sg*-.5,0,TAU);c.fill()}}c.fillStyle=tall?'#ffe066':'#fcc2d7';c.beginPath();c.arc(x,y-h-2*sc,3.2*sc,0,TAU);c.fill();c.restore()},
+  gam=(a,x,y)=>{c.save();c.beginPath();c.arc(x,y,13,0,TAU);c.fillStyle=a==='T'?'#ffd43b':'#4dabf7';c.fill();c.restore();txt(a,x,y+1,'#10243a',15)};
+  /* Punnett square: gametes of parent 1 across the top, of parent 2 down the side */
+  txt('gametes of parent 1 ('+p.p1+')',GX+CW,GY-48,C.muted,11);txt('parent 2',GX-70,GY+CH-10,C.muted,11);txt('('+p.p2+')',GX-72,GY+CH+6,C.muted,11);
+  for(let i=0;i<2;i++){gam(g1[i],GX+CW*(i+.5),GY-26);gam(g2[i],GX-28,GY+CH*(i+.5))}
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const geno=[g1[i],g2[j]].sort().join(''),tall=geno.includes('T'),x=GX+i*CW,y=GY+j*CH;c.save();c.fillStyle=tall?'rgba(55,178,77,.18)':'rgba(148,216,45,.16)';c.strokeStyle='rgba(180,200,215,.5)';c.lineWidth=1.2;c.beginPath();c.rect(x,y,CW,CH);c.fill();c.stroke();c.restore();plant(x+CW/2,y+CH-24,tall,.95);txt(geno,x+CW/2,y+CH-10,C.white,13)}
+  txt('green: tall (TT, Tt)   lime: dwarf (tt)',GX+CW,GY+2*CH+14,C.muted,10);
+  /* random offspring sample */
+  const n=Math.min(p.n,120),FX=350,FY=140,FW=290,FH=190,cols=Math.ceil(Math.sqrt(n*FW/FH)),rows=Math.ceil(n/cols),dx=FW/cols,dy=FH/rows,sc=Math.min(dx/22,dy/50,1.05);
+  txt('offspring sample ('+n+' plants)',FX,FY-12,C.muted,11,'left');for(let k=0;k<n;k++)plant(FX+dx*(k%cols+.5),FY+dy*(Math.floor(k/cols)+.95),obs.list[k],sc);
+  txt(obs.tall+' tall : '+obs.dwarf+' dwarf',FX,FY+FH+22,C.gold,13,'left')},
  assumption:'Complete dominance; offspring drawn at random with Mendelian probabilities (reproducible for each sample number).'});
 function pea(s,p,tall,k,t){const h=(tall?1.6:.55)*k;s.tube([p,V.add(p,[0,h,0])],.03*k+.01,'#5c940d',{segs:5});leaf(s,V.add(p,[0,h*.5,0]),[1,.4,0],.35*k,.1*k);leaf(s,V.add(p,[0,h*.8,0]),[-1,.4,.2],.3*k,.1*k)}
 function cross1(a,b){const r={TT:0,Tt:0,tt:0};for(const x of a)for(const y of b){const g=[x,y].sort().join('');r[g==='Tt'||g==='tT'?'Tt':g]+=.25}return r}
