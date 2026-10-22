@@ -80,9 +80,24 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-breathing-mechanism',ti
  tryText:'Pull the diaphragm further. How does the pressure change?',
  controls:[R('pull','Diaphragm pull (depth when automatic)',0,100,1,0,'%'),S('auto','Breathe automatically','yes',[['yes','Yes'],['no','No — use the slider']])],
  metrics:(p,t)=>{const d=p.auto==='yes'?(p.pull>0?p.pull:100)*(.5+.5*Math.sin(t*1.2)):p.pull,dP=p.auto==='yes'?-3*(p.pull>0?p.pull:100)/100*Math.cos(t*1.2):-d/100*3;/* automatic: pressure follows airflow, below atmospheric while the jar volume grows, above it while it shrinks */return[N('Phase',p.auto==='yes'?(Math.cos(t*1.2)>0?'Inspiration':'Expiration'):d>0?'Inspiration (held)':'Rest'),N('Pressure inside vs atmosphere',dP,'mm Hg',1),N('Diaphragm','Contracts and flattens during inspiration'),N('External intercostals','Lift ribs and sternum')]},
- draw:(c,p,t)=>{const d=(p.auto==='yes'?(p.pull>0?p.pull:100)*(.5+.5*Math.sin(t*1.2)):p.pull)/100,s=P3.scene(c,{scale:58,cy:280,cx:250});s.lathe([0,-1.4,0],[[1.3,0],[1.35,1.6],[1.0,2.4],[.3,2.8],[.2,3.1]],'#e9f6ff',{alpha:.12});s.tube([[0,1.75,0],[0,1.1,0]],.07,'#ced4da',{segs:8});for(const z of[-1,1])s.tube([[0,1.1,0],[0,.8,z*.35]],.05,'#ced4da',{segs:6});
-  lungPair(s,[0,.3,0],.7+.45*d);const sag=-.2-.7*d;s.lathe([0,-1.4,0],[[0,sag],[.6,sag*.75],[1.0,sag*.35],[1.3,0]],'#ff8787',{alpha:.85});s.tube([[0,-1.4+sag,0],[0,-2.2,0]],.05,'#495057',{segs:6});s.ball([0,-2.25,0],.12,'#495057');
-  for(let i=0;i<3;i++){const q=cycle(t*1.2/TAU*2+i/3,1),dir=p.auto==='yes'?Math.cos(t*1.2):d>0?1:0;if(dir>0)s.ball([0,2.6-q*1.2,0],.06,'#74c0fc',{flat:true})}s.callout([0,1.6,0],'Y-tube = trachea + bronchi','#ced4da',50,-40);s.callout([0,.3,.6*(.7+.45*d)],'balloons = lungs','#ff8fab',60,10);s.callout([1.3,.6,0],'bell jar = thoracic cavity','#e9f6ff',40,-40);s.callout([.6,-1.4+sag*.75,0],'rubber sheet = diaphragm','#ff8787',60,40);s.render()},
+ draw:(c,p,t)=>{const d=(p.auto==='yes'?(p.pull>0?p.pull:100)*(.5+.5*Math.sin(t*1.2)):p.pull)/100,s=P3.scene(c,{scale:56,cy:262,cx:330,pitch:.12}),B=-1.4,GL='#dcefff',sag=-.2-.7*d,k=.7+.45*d;
+  /* glass jar: thick shoulder profile, inner wall, rim and a highlight streak */
+  const JP=BJ||(BJ={prof:[[1.3,0],[1.34,.25],[1.36,1.4],[1.31,1.9],[1.16,2.25],[.92,2.5],[.62,2.68],[.38,2.78],[.31,2.9],[.3,3.2]].map(([r,y])=>[r,y]),hl:Array.from({length:12},(_,i)=>{const y=.2+i*.2,r=y<1.5?1.36:y<1.9?1.33:1.2-(y-1.9)*.5;return[r*Math.cos(1.62),y,r*Math.sin(1.62)]})});
+  s.lathe([0,B,0],JP.prof,GL,{alpha:.13,segs:30});s.lathe([0,B,0],JP.prof.map(([r,y])=>[r-.06,y]),'#bcd9ee',{alpha:.07,segs:24});
+  s.path(JP.hl.map(q=>[q[0],q[1]+B,q[2]]),'#ffffff66',4,[],1e5);
+  s.lathe([0,B-.05,0],[[1.42,0],[1.42,.1],[1.3,.1]],'#8fa6b8',{alpha:.5,segs:30});
+  /* rubber stopper, Y-tube and balloon lungs */
+  s.lathe([0,B+2.95,0],[[.27,0],[.36,.22],[.36,.3],[.26,.3]],'#5c3d2e',{segs:14});
+  s.tube([[0,B+3.55,0],[0,B+2.05,0]],.07,'#cfd8dc',{alpha:.8,segs:10});
+  const ly=B+1.05,tops=[B+2.05,ly+k*.6];for(const z of[-1,1]){const g=z*.36*k;s.tube([[0,B+2.05,0],[0,B+1.85,z*.1],[0,tops[1]+.08,g]],.05,'#cfd8dc',{alpha:.8,segs:8});
+    s.mesh([0,ly,g],[.36*k,.58*k,.32*k],'#ff8fa6',{alpha:.78,rings:15,segs:24,spec:.7,shape:u=>1-.3*Math.max(0,Math.sin(u))**2});s.ball([0,tops[1]+.02,g],.06,'#d6336c',{flat:true})}
+  /* rubber sheet (diaphragm) clamped at the base, pull string and knob */
+  s.lathe([0,B,0],[[0,sag],[.6,sag*.75],[1.0,sag*.35],[1.3,0],[1.34,.02]],'#ff8787',{alpha:.86,segs:30});
+  s.tube([[0,B+sag,0],[0,B+sag-.45,0]],.04,'#495057',{segs:6});s.ball([0,B+sag-.55,0],.14,'#495057');
+  if(d>.02){const y0=B+sag-.85;s.poly([[-.14,y0+.3,0],[.14,y0+.3,0],[0,y0,0]],'#4dd0e1',{cull:false});s.seg([0,B+sag-.7,0],[0,y0+.3,0],'#4dd0e1',3)}
+  /* air through the Y-tube: in during inspiration, out during expiration */
+  const dir=p.auto==='yes'?Math.cos(t*1.2):d>0?1:0;for(let i=0;i<4;i++){const q=cycle(t*.7+i/4,1);if(dir>.1)s.ball([0,B+3.7-q*1.4,0],.06,'#74c0fc',{flat:true,glow:true});else if(dir<-.1)s.ball([0,B+2.3+q*1.4,0],.06,'#ffa94d',{flat:true,glow:true})}
+  lblCols(c,s,[['a',[0,B+3.3,0],'Y-tube = trachea + bronchi','#e9f6ff','R'],['a',[1.1,B+1.9,.4],'bell jar = thoracic cavity','#e9f6ff','R'],['a',[0,ly+.1,.36*k+.3],'balloons = lungs','#ff8fa6','L'],['a',[-.3,B+sag*.7,1.0],'rubber sheet = diaphragm','#ff8787','L']],()=>false,170,520,120,330);s.render()},
  assumption:'Classroom bell-jar analogy; pressure difference values are illustrative (a few mm Hg).'});
 
 let CCF=null;const PP={alveoli:[104,40],deoxy:[40,45],oxy:[95,40],tissue:[40,45],air:[159,.3]};
@@ -399,7 +414,7 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-action-potential',title
   lblRows(c,s,wl,{T:236,B:374,C:396},40,640);s.render();
   chart(c,420,96,236,170,{title:'Membrane potential vs time',xl:'ms',xmin:0,xmax:4,ymin:-90,ymax:45,series:[{fn:x=>apV(p,x),col:C.gold},{fn:()=>-70+p.thr,col:'#ff8787',dash:[4,4]}],marker:[T,apV(p,T)]});tag(c,'yellow dots: Na⁺   purple: K⁺',44,98,C.muted,13)},
  assumption:'Stylised waveform (peak ≈ +35 mV, undershoot ≈ −80 mV); the time axis is shown in ms but the animation is slowed.'});
-let AXL=null,RFX=null;
+let AXL=null,RFX=null,BJ=null;
 function apV(p,x){const t0=.5;if(x<t0)return-70;if(p.stim<p.thr)return-70+p.stim*(1-Math.exp(-(x-t0)/.08))*Math.exp(-(x-t0)/.3);const u=x-t0;if(u<.3)return-70+105*Math.sin(PI/2*u/.3);if(u<1.1)return 35-115*(u-.3)/.8;return-80+10*(1-Math.exp(-(u-1.1)/.5))}
 
 /*BEGIN synkit*/
