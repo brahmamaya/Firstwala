@@ -88,10 +88,31 @@ add({...ch(8,'Microbes in Human Welfare',U8),id:'bio-sewage-treatment',title:'Se
  tryText:'How long must the sewage be aerated to remove 90% of its BOD?',
  controls:[R('bod0','BOD of incoming sewage',100,500,10,300,'mg/L'),R('h','Aeration time',0,12,.1,4,'h',1)],
  metrics:p=>{const k=.3,b=p.bod0*Math.exp(-k*p.h);return[N('BOD after aeration',b,'mg/L',0),N('BOD removed',(1-b/p.bod0)*100,'%',0),N('Stage now',p.h<.5?'Primary treatment (settling)':'Secondary treatment (aeration)'),N('Microbes','Aerobic bacteria and fungi forming flocs')]},
- draw:(c,p,t)=>{const k=.3,b=p.bod0*Math.exp(-k*p.h),s=P3.scene(c,{scale:50,pitch:.4});const tank=(x,w,col,lab)=>{s.box([x,-.5,0],[w,1.4,2],'#adb5bd',{alpha:.25});s.box([x,-.65,0],[w*.96,1.05,1.92],col,{alpha:.55});s.label([x,.6,1.1],lab,C.white,12)};
-  tank(-2.5,1.6,'#8d6e4f','primary');tank(0,2,`#${Math.round(90+80*(1-b/p.bod0)).toString(16)}${Math.round(110+60*(1-b/p.bod0)).toString(16)}60`,'aeration');tank(2.5,1.6,'#4dabf7','settling');for(let i=0;i<14;i++){const q=cycle(t*.6+i/14,1);s.ball([-.8+hash(i)*1.6,-1.1+q*1.1,(hash(i+3)-.5)*1.6],.05,'#e7f5ff',{flat:true})}
-  for(let i=0;i<10;i++)s.mesh([-.7+hash(i+20)*1.4,-.8+hash(i+25)*.6,(hash(i+30)-.5)*1.4],[.12,.08,.1],'#a0782b',{shape:(u,v)=>1+.3*Math.sin(5*v+i)});s.render();
-  chart(c,420,300,236,100,{title:'BOD (mg/L)',xmin:0,xmax:12,ymin:0,ymax:p.bod0,series:[{fn:x=>p.bod0*Math.exp(-k*x),col:C.gold}],marker:[p.h,b]})},
+ draw:(c,p,t)=>{const k=.3,b=p.bod0*Math.exp(-k*p.h),rem=1-b/p.bod0,TY=170,TH=170,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  rr=(x,y,w,h,r)=>{c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)},
+  mixc=(a,b2,k2)=>{const A=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)),B=[1,3,5].map(i=>parseInt(b2.slice(i,i+2),16));return'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*k2)).join(',')+')'},
+  /* tank: concrete wall, water of a given colour, with a water line */
+  tank=(x,w,col,lab,wl)=>{c.save();c.fillStyle='rgba(120,135,150,.35)';rr(x-6,TY-6,w+12,TH+12,8);c.fill();const g=c.createLinearGradient(0,TY,0,TY+TH);g.addColorStop(0,col);g.addColorStop(1,'#0b1622');c.fillStyle=g;rr(x,TY+wl,w,TH-wl,4);c.fill();c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;c.beginPath();c.moveTo(x,TY+wl);c.lineTo(x+w,TY+wl);c.stroke();c.restore();txt(lab,x+w/2,TY-22,C.white,13)},
+  pipe=(x1,y1,x2,y2)=>{c.save();c.strokeStyle='#7f93a5';c.lineWidth=8;c.lineCap='butt';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.strokeStyle='#a9bccd';c.lineWidth=3;c.beginPath();c.moveTo(x1,y1-1);c.lineTo(x2,y2-1);c.stroke();c.restore()},
+  X1=46,W1=106,X2=182,W2=132,X3=346,W3=96;
+  pipe(10,TY+34,X1,TY+34);pipe(X1+W1,TY+40,X2,TY+40);pipe(X2+W2,TY+40,X3,TY+40);pipe(X3+W3,TY+34,X3+W3+22,TY+34);
+  /* 1 primary: bar screen, grit/sludge settling at the bottom, scum on top */
+  tank(X1,W1,'#8d7254','primary',14);c.save();c.fillStyle='#5b4632';c.beginPath();c.moveTo(X1,TY+TH);c.lineTo(X1,TY+TH-22);c.quadraticCurveTo(X1+W1/2,TY+TH-48,X1+W1,TY+TH-22);c.lineTo(X1+W1,TY+TH);c.fill();c.fillStyle='rgba(210,190,150,.8)';rr(X1+10,TY+10,W1-20,5,2);c.fill();c.strokeStyle='#cfd8e0';c.lineWidth=2;for(let i=0;i<6;i++){c.beginPath();c.moveTo(X1+8+i*5,TY+18);c.lineTo(X1+8+i*5,TY+TH-70)}c.stroke();c.restore();
+  for(let i=0;i<9;i++){const q=cycle(t*.25+i/9,1);c.save();c.fillStyle='#6b563d';c.beginPath();c.arc(X1+30+hash(i)*(W1-50),TY+30+q*(TH-80),2.6,0,TAU);c.fill();c.restore()}
+  txt('debris, grit and',X1+W1/2,TY+TH+20,C.muted,10);txt('sludge settle out',X1+W1/2,TY+TH+34,C.muted,10);
+  /* 2 aeration: clear-to-brown colour by BOD, flocs, diffusers and bubbles */
+  tank(X2,W2,mixc('#8a7a3e','#4f8f6c',rem),'secondary: aeration',14);c.save();c.fillStyle='#cfd8e0';for(let i=0;i<6;i++){c.fillRect(X2+18+i*26,TY+TH-10,14,6)}c.restore();
+  for(let i=0;i<14;i++){const f=cycle(t*.5+i/14,1);c.save();c.fillStyle='rgba(230,245,255,.75)';c.beginPath();c.arc(X2+25+(i%6)*26+3*Math.sin(f*9+i),TY+TH-12-f*(TH-30),2+hash(i)*1.8,0,TAU);c.fill();c.restore()}
+  for(let i=0;i<10;i++){const x=X2+20+hash(i+20)*(W2-40),y=TY+50+hash(i+25)*(TH-90);c.save();c.fillStyle='#a0782b';c.strokeStyle='#6b4f1d';c.lineWidth=1;c.beginPath();for(let a=0;a<=16;a++){const th=TAU*a/16,rr2=(9+hash(i+7)*5)*(1+.3*Math.sin(5*th+i));const px=x+Math.cos(th)*rr2,py=y+Math.sin(th)*rr2*.7;a?c.lineTo(px,py):c.moveTo(px,py)}c.closePath();c.fill();c.stroke();c.fillStyle='#e7cf9a';for(let m=0;m<3;m++){c.beginPath();c.arc(x-4+m*4,y+(m%2)*2-1,1.4,0,TAU);c.fill()}c.restore()}
+  txt('flocs: bacteria + fungi',X2+W2/2,TY+TH+24,C.muted,10);txt('air in',X2+W2/2,TY+TH+8,'#cfe9ff',10);
+  /* 3 settling tank: clear effluent above, activated sludge below and recycled */
+  tank(X3,W3,'#4d96d6','settling tank',14);c.save();c.fillStyle='#8a6a2a';c.beginPath();c.moveTo(X3,TY+TH);c.lineTo(X3,TY+TH-30);c.quadraticCurveTo(X3+W3/2,TY+TH-50,X3+W3,TY+TH-30);c.lineTo(X3+W3,TY+TH);c.fill();c.restore();txt('effluent',X3+W3/2,TY+60,'#e7f5ff',12);txt('activated sludge',X3+W3/2,TY+TH-16,'#f3e5b0',11);
+  c.save();c.strokeStyle='#d9a441';c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();c.moveTo(X3+W3/2,TY+TH+4);c.lineTo(X3+W3/2,TY+TH+50);c.lineTo(X2+W2/2,TY+TH+50);c.lineTo(X2+W2/2,TY+TH+28);c.stroke();c.setLineDash([]);c.restore();txt('part returned as inoculum',(X2+X3+W2)/2+34,TY+TH+41,'#d9a441',10);
+  txt('sludge → anaerobic digester → biogas',470,296,'#a8e063',10,'left');
+  /* flow particles through the pipes */
+  for(let i=0;i<8;i++){const q=cycle(t*.35+i/8,1),x=10+q*(X3+W3+22-10);c.save();c.fillStyle=q<.35?'#9c7f5a':q<.7?'#7aa07c':'#9fd3ff';c.beginPath();c.arc(x,(q<.35?TY+34:TY+40),3.2,0,TAU);c.fill();c.restore()}
+  chart(c,470,112,190,150,{title:'BOD (mg/L)',xmin:0,xmax:12,ymin:0,ymax:p.bod0,series:[{fn:x=>p.bod0*Math.exp(-k*x),col:C.gold}],marker:[p.h,b]})},
  assumption:'First-order BOD decay with k = 0.3 per hour (illustrative); real plants vary widely.'});
 
 add({...ch(8,'Microbes in Human Welfare',U8),id:'bio-biogas-plant',title:'Biogas plant',
