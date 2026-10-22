@@ -53,9 +53,9 @@ add({...ch(3,'Chemical Kinetics',PH),id:'chem-catalyst',title:'How a catalyst sp
  observe:'A catalyst provides a path with lower Eₐ; it does not change ΔH or the position of equilibrium.',
  tryText:'Lower Eₐ by 20 kJ/mol at 298 K. How many times faster is the reaction?',
  controls:[R('Ea','Uncatalysed Eₐ',40,150,1,100,'kJ/mol'),R('dE','Lowering by catalyst',0,60,1,20,'kJ/mol'),R('T','Temperature',250,500,1,298,'K')],
- metrics:p=>{const r=Math.exp(p.dE*1000/(8.314*p.T));return[N('Catalysed Eₐ',Math.max(1,p.Ea-p.dE),'kJ/mol',0),N('Rate increase',r,'×',3),N('ΔH and K','unchanged')]},
+ metrics:p=>{const r=Math.exp(Math.min(p.dE,p.Ea-1)*1000/(8.314*p.T));return[N('Catalysed Eₐ',Math.max(1,p.Ea-p.dE),'kJ/mol',0),N('Rate increase',r,'×',3),N('ΔH and K','unchanged')]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:260,cy:300}),k=2.6/150,prof=(E)=>Array.from({length:41},(_,i)=>{const x=-2.6+5.2*i/40;return[x,-1.4+E*k*Math.exp(-x*x*1.2)-.5*(x>0?Math.min(1,x/1.5):0),0]});s.tube(prof(p.Ea),.05,'#ff8787',{segs:6});s.tube(prof(Math.max(1,p.Ea-p.dE)).map(q=>[q[0],q[1],.3]),.05,'#69db7c',{segs:6});
-  s.arrow([0,-1.4,.6],[0,-1.4+p.Ea*k,.6],'#ff8787',2,7,`Eₐ ${p.Ea}`);s.arrow([.25,-1.4,.6],[.25,-1.4+Math.max(1,p.Ea-p.dE)*k,.6],'#69db7c',2,7,`with catalyst ${Math.max(1,p.Ea-p.dE)}`);s.callout([-2.4,-1.4,0],'reactants','#e9f6ff',-20,-50);s.callout([2.5,-1.9,0],'products (ΔH same)','#e9f6ff',20,50);s.render();tag(c,`rate × ${f(Math.exp(p.dE*1000/(8.314*p.T)),3)} at ${p.T} K`,44,98,C.gold,15)},
+  s.arrow([0,-1.4,.6],[0,-1.4+p.Ea*k,.6],'#ff8787',2,7,`Eₐ ${p.Ea}`);s.arrow([.25,-1.4,.6],[.25,-1.4+Math.max(1,p.Ea-p.dE)*k,.6],'#69db7c',2,7,`with catalyst ${Math.max(1,p.Ea-p.dE)}`);s.callout([-2.4,-1.4,0],'reactants','#e9f6ff',-20,-50);s.callout([2.5,-1.9,0],'products (ΔH same)','#e9f6ff',20,50);s.render();tag(c,`rate × ${f(Math.exp(Math.min(p.dE,p.Ea-1)*1000/(8.314*p.T)),3)} at ${p.T} K`,44,98,C.gold,15)},
  assumption:'Same pre-exponential factor with and without the catalyst.'});
 
 /* 4 d- and f-block */
@@ -78,8 +78,8 @@ add({...ch(5,'Coordination Compounds',IN),id:'chem-geometric-isomers',title:'Geo
  tryText:'In fac-[Co(NH₃)₃Cl₃], what is the angle between any two Cl ligands?',
  controls:[S('iso','Isomer','trans',[['cis','cis-[Co(NH₃)₄Cl₂]⁺'],['trans','trans-[Co(NH₃)₄Cl₂]⁺'],['fac','fac-[Co(NH₃)₃Cl₃]'],['mer','mer-[Co(NH₃)₃Cl₃]']])],
  metrics:p=>[N('Isomer',{cis:'cis (Cl at 90°)',trans:'trans (Cl at 180°)',fac:'facial',mer:'meridional'}[p.iso]),N('Colour',{cis:'violet',trans:'green',fac:'—',mer:'—'}[p.iso]),N('Coordination number',6,'',0)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:250,yaw:t*.3,pitch:.3}),D=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],cl={cis:[0,2],trans:[2,3],fac:[0,2,4],mer:[0,1,2]}[p.iso];atom(s,[0,0,0],'Cu',1.2);
-  D.forEach((u,i)=>{const q=V.mul(u,1.3),isCl=cl.includes(i);bond(s,[0,0,0],q);atom(s,q,isCl?'Cl':'N',isCl?1:.9);if(!isCl)for(let k=0;k<3;k++){const a=TAU*k/3;atom(s,V.add(q,V.add(V.mul(u,.28),[.18*Math.cos(a)*(u[0]?0:1),.18*Math.sin(a)*(u[1]?0:1),.18*Math.cos(a)*(u[2]?0:1)])),'H',.55)}});
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:250,yaw:t*.3,pitch:.3}),D=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],cl={cis:[0,2],trans:[2,3],fac:[0,2,4],mer:[0,1,2]}[p.iso];atom(s,[0,0,0],'Co',1.2);
+  D.forEach((u,i)=>{const q=V.mul(u,1.3),isCl=cl.includes(i);bond(s,[0,0,0],q);atom(s,q,isCl?'Cl':'N',isCl?1:.9);if(!isCl)for(let k=0;k<3;k++){const a=TAU*k/3;atom(s,V.add(q,V.add(V.mul(u,.28),[.18*Math.cos(a)*(u[0]?0:1),.18*Math.sin(a)*(u[1]?0:1),.18*(u[2]?0:(u[1]?Math.sin(a):Math.cos(a)))])),'H',.55)}});
   s.callout(V.mul(D[cl[0]],1.3),'Cl⁻','#40c057',50,-50);s.callout([0,0,0],'Co³⁺','#d9844a',-60,60);s.render();tag(c,{cis:'cis: Cl–Co–Cl 90°',trans:'trans: Cl–Co–Cl 180°',fac:'fac: three Cl on one face',mer:'mer: three Cl in one plane'}[p.iso],44,98,C.gold,15)},
  assumption:'Ideal octahedral geometry; NH₃ hydrogens drawn schematically.'});
 

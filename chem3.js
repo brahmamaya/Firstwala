@@ -14,7 +14,7 @@ add({...ch(1,'Some Basic Concepts of Chemistry',PH),id:'chem-dilution',title:'Mo
  observe:'Dilution changes the volume, not the amount of solute, so concentration falls in proportion.',
  tryText:'Make 100 mL of 1 M solution and dilute it to 250 mL. What is the new molarity?',
  controls:[R('n','Moles of NaCl',.01,.5,.01,.1,'mol',2),R('V1','Starting volume',50,250,5,100,'mL'),R('add','Water added',0,500,10,150,'mL')],
- metrics:p=>{const M1=p.n/(p.V1/1000),V2=p.V1+p.add;return[N('Initial molarity',M1,'M',3),N('Final volume',V2,'mL',0),N('Final molarity',p.n/(V2/1000),'M',3),N('Mass of NaCl',p.n*58.44,'g',2)]},
+ metrics:p=>{const M1=p.n/(p.V1/1000),V2=p.V1+p.add;return[N('Initial molarity',M1,'M',3),N('Final volume',V2,'mL',0),N('Final molarity',p.n/(V2/1000),'M',3),N('Mass of NaCl',p.n*58.44,'g',2),N('Initial solution',M1>6.1?'Above NaCl solubility (~6.1 M): would not all dissolve':'Fully dissolved')]},
  draw:(c,p,t)=>{const V2=p.V1+p.add,s=P3.scene(c,{scale:54,cx:280,cy:300}),M=p.n/(V2/1000),fill=clamp(V2/750,.08,.95),tint=clamp(M/2,0,1);beaker(s,[0,-1.9,0],1.3,3.2,tint>.5?'#4dabf7':tint>.2?'#74c0fc':'#d0ebff',fill);
   for(let i=0;i<Math.round(p.n*60);i++)s.ball([(hash(i)-.5)*2,-1.8+hash(i+7)*3.1*fill,(hash(i+13)-.5)*1.6],.06,i%2?'#9775fa':'#40c057',{flat:true});for(let i=0;i<=5;i++)s.seg([1.28,-1.9+i*.64*.75*(4/3)*.75,0],[1.12,-1.9+i*.64*.75*(4/3)*.75,0],'#e9f6ff',1.2);
   s.callout([1.3,-1.9+3.2*fill,0],`${V2} mL, ${f(M,3)} M`,'#74c0fc',50,-40);s.callout([0,-1.2,.6],'Na⁺ (purple) and Cl⁻ (green) ions','#e9f6ff',-80,40);s.render();tag(c,`M₁V₁ = ${f(p.n/(p.V1/1000),3)} × ${p.V1} = M₂ × ${V2}`,44,98,C.gold,14)},
@@ -68,10 +68,10 @@ add({...ch(4,'Chemical Bonding and Molecular Structure',PH),id:'chem-hybridisati
  controls:[S('h','Hybridisation','sp3',[['sp','sp'],['sp2','sp²'],['sp3','sp³']])],
  metrics:p=>{const d=HYB[p.h];return[N('Hybridisation',d[0]),N('Example',d[1]),N('Bond angle',`${d[2]}°`),N('s-character',d[3],'%',1),N('Unhybridised p orbitals',p.h==='sp'?2:p.h==='sp2'?1:0,'',0)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:260,yaw:t*.3,pitch:.3}),dirs={sp:[[1,0,0],[-1,0,0]],sp2:[[1,0,0],[-.5,0,.866],[-.5,0,-.866]],sp3:[[0,1,0],[.943,-.333,0],[-.471,-.333,.816],[-.471,-.333,-.816]]}[p.h];atom(s,[0,0,0],'C',1.1);
-  dirs.forEach(u=>{s.mesh(V.mul(u,.6),[.5,.5,.5],'#4dabf7',{alpha:.35,rings:10,segs:14,shape:()=>1,rot:[0,0,0]});const q=V.mul(u,1.35);bond(s,[0,0,0],q);atom(s,q,'H')});
+  dirs.forEach((u,i)=>{s.mesh(V.mul(u,.6),[.5,.5,.5],'#4dabf7',{alpha:.35,rings:10,segs:14,shape:()=>1,rot:[0,0,0]});const q=V.mul(u,1.35),cc=p.h!=='sp3'&&i===0;bond(s,[0,0,0],q,cc?(p.h==='sp'?3:2):1);atom(s,q,cc?'C':'H')});
   if(p.h!=='sp3')for(const sg of[1,-1])s.mesh([0,sg*.65,0],[.22,.55,.22],'#ff8787',{alpha:.35,rings:10,segs:12});if(p.h==='sp')for(const sg of[1,-1])s.mesh([0,0,sg*.65],[.22,.22,.55],'#ff8787',{alpha:.35,rings:10,segs:12});
   s.callout(V.mul(dirs[0],.6),`${HYB[p.h][0]} hybrid orbital`,'#74c0fc',50,-60);if(p.h!=='sp3')s.callout([0,.9,0],'unhybridised p (forms π bond)','#ff8787',-60,-50);s.render();tag(c,`${HYB[p.h][0]}: bond angle ${HYB[p.h][2]}°`,44,98,C.gold,15)},
- assumption:'Hybrid lobes drawn schematically; ethene and ethyne show one carbon of the molecule.'});
+ assumption:'Hybrid lobes drawn schematically; one carbon of ethyne (C≡C) or ethene (C=C) is shown with the other carbon at the first position; sp³ is methane.'});
 
 const DIP=[['CO₂','linear',[['O',1],['O',-1]],0],['H₂O','bent',[['H',104.5]],1.85],['NH₃','pyramidal',[['H',107]],1.47],['NF₃','pyramidal',[['F',102]],.23],['BF₃','trigonal planar',[['F',120]],0],['CH₄','tetrahedral',[['H',109.5]],0],['CHCl₃','tetrahedral',[['Cl',109.5]],1.04]];
 add({...ch(4,'Chemical Bonding and Molecular Structure',PH),id:'chem-dipole-moment',title:'Dipole moments of molecules',
@@ -130,7 +130,7 @@ add({...ch(7,'Redox Reactions',IN),id:'chem-oxidation-number',title:'Finding oxi
  observe:'Oxidation numbers can be fractional as averages (Fe₃O₄ gives +8/3); in H₂O₂ oxygen is −1 and in OF₂ it is +2.',
  tryText:'Work out the oxidation number of Cr in K₂Cr₂O₇ before checking.',
  controls:[R('i','Compound',1,9,1,1)],
- metrics:p=>{const [cmp,el,v]=OXN[p.i-1];return[N('Compound',cmp),N('Element',el),N('Oxidation number',Number.isInteger(v)?(v>0?'+':'')+v:'+8/3 (average)')]},
+ metrics:p=>{const [cmp,el,v]=OXN[p.i-1];return[N('Compound',cmp),N('Element',el),N('Oxidation number',cmp==='Na₂S₂O₃'?'+2 (average of the two S)':Number.isInteger(v)?(v>0?'+':'')+v:'+8/3 (average)')]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:42,cx:300,cy:300,pitch:.4,yaw:-.2});bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.35,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.4,3*.35,.5],[3.4,3*.35,.5],'#ffd43b',1.5,[4,4]);s.engrave([-3.6,3*.35+.15,.5],'0','#ffd43b',10,9e5);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
  assumption:'Standard IUPAC rules for assigning oxidation numbers.'});
 
