@@ -17,8 +17,17 @@ add({...ch(7,'Human Health and Disease',U8),id:'bio-immune-response',title:'Prim
  tryText:'Move the second exposure earlier or later. Does the secondary response still appear?',
  controls:[R('second','Second exposure on day',20,80,1,40,'day'),R('day','Day now',0,120,1,55,'day')],
  metrics:p=>{const a=abLevel(p,p.day);return[N('Antibody level (relative)',a,'',1),N('Primary peak (≈ day 12)',abLevel(p,12),'',1),N('Secondary peak',abLevel(p,p.second+6),'',1),N('Memory','B and T memory cells formed in primary response')]},
- draw:(c,p,t)=>{const a=abLevel(p,p.day),s=P3.scene(c,{scale:56,cx:220});for(let i=0;i<8;i++){const q=[(hash(i)-.5)*3,(hash(i+3)-.5)*2.4,(hash(i+6)-.5)*1.5];s.ball(q,.22,'#e64980');for(let k=0;k<8;k++){const u=hash(i*8+k)*2-1,ph=TAU*hash(i*8+k+1),r=Math.sqrt(1-u*u);s.ball(V.add(q,[.26*r*Math.cos(ph),.26*u,.26*r*Math.sin(ph)]),.05,'#ffa8a8',{flat:true})}}
-  for(let i=0;i<Math.min(24,Math.round(a*2));i++){const q=[(hash(i+40)-.5)*3.4,(hash(i+50)-.5)*2.6+.1*Math.sin(t*2+i),(hash(i+60)-.5)*1.6];antibody(s,q,.5,'#74c0fc',hash(i)*TAU)}s.callout([(hash(0)-.5)*3,(hash(3)-.5)*2.4+.22,(hash(6)-.5)*1.5],'antigen (pathogen surface)','#ff8fab',-50,-50);if(a>.5)s.callout([(hash(40)-.5)*3.4,(hash(50)-.5)*2.6+.1*Math.sin(t*2),(hash(60)-.5)*1.6],'antibodies (IgG) from plasma B cells','#74c0fc',50,50);s.render();
+ draw:(c,p,t)=>{const a=abLevel(p,p.day),s=P3.scene(c,{scale:56,cx:235,cy:262,pitch:.02}),PL=[-1.9,.55,0],
+  /* pathogens (bacteria-like cells) coated with surface antigens; antibodies bind them */
+  PA=[[.4,.9],[1.7,.4],[.9,-.7],[2.1,-1.0],[-.3,-.9]],nAb=Math.min(24,Math.round(a*2));
+  PA.forEach(([x,y],i)=>{const q=[x+.04*Math.sin(t+i),y+.05*Math.cos(t*.8+i),0];s.mesh(q,[.34,.24,.24],'#e0457b',{rings:10,segs:16,spec:.5,rot:[0,0,hash(i)*3]});s.mesh(q,[.26,.17,.17],'#b3245b',{rings:6,segs:10,rot:[0,0,hash(i)*3]});
+    for(let k=0;k<9;k++){const an=TAU*k/9+i,rr=[.34*Math.cos(an),.24*Math.sin(an)],ca=Math.cos(hash(i)*3),sa=Math.sin(hash(i)*3),e=[q[0]+rr[0]*ca-rr[1]*sa,q[1]+rr[0]*sa+rr[1]*ca,.05],d=V.norm([e[0]-q[0],e[1]-q[1],0]),tip=V.add(e,V.mul(d,.1));s.seg(e,tip,'#ffa8a8',1.6);s.ball(tip,.04,'#ffd8d8',{flat:true})}});
+  /* plasma B cell: eccentric nucleus, rough ER, secreting antibodies */
+  s.mesh(PL,[.62,.55,.5],'#e7a9c4',{alpha:.6,rings:12,segs:18,spec:.5});s.mesh([PL[0]-.15,PL[1]+.05,.1],[.26,.26,.24],'#5f3dc4',{rings:8,segs:12,lift:6});for(let i=0;i<4;i++){s.ring([PL[0]+.12,PL[1]-.1,.15],[0,0,1],.12+i*.07,'#2f7fc4',2,[],24)}
+  for(let i=0;i<Math.min(6,Math.ceil(nAb/4));i++){const q=cycle(t*.35+i/6,1);antibody(s,[PL[0]+.7+q*1.2,PL[1]-.1+(hash(i)-.5)*.7*q,.1],.34,'#74c0fc',-.8+hash(i)*1.6)}
+  /* free antibodies in the plasma */
+  for(let i=0;i<nAb;i++){const q=[-1.1+hash(i+40)*3.5,-1.5+hash(i+50)*2.9+.08*Math.sin(t*2+i),(hash(i+60)-.5)*.5];if(Math.hypot(q[0]-PL[0],q[1]-PL[1])<.9)continue;antibody(s,q,.36,'#74c0fc',hash(i)*TAU)}
+  s.callout([PL[0]-.4,PL[1]-.35,.3],'plasma B cell','#f3c4d6',-35,40);s.callout([PA[0][0],PA[0][1]+.28,.1],'antigen (pathogen surface)','#ff8fab',-10,-50);if(a>.5)s.callout([1.2,-1.4,.2],'antibodies (IgG)','#74c0fc',40,35);s.render();
   chart(c,420,96,236,170,{title:'Antibody level vs time',xl:'days',xmin:0,xmax:120,ymin:0,ymax:abLevel(p,p.second+6)*1.1,series:[{fn:d=>abLevel(p,d),col:C.gold}],marker:[p.day,a]})},
  assumption:'Schematic antibody curves: primary peak ≈ 1 unit at day 12; secondary ≈ 10× higher, peaking about 6 days after re-exposure.'});
 function abLevel(p,d){const e0=Math.exp(-.7),g=(t0,lag,peak,w)=>{const x=d-t0-lag;if(x<0)return 0;if(x<=w)return peak*(Math.exp(-(((x-w)/w)**2)*.7)-e0)/(1-e0);return peak*Math.exp(-(((x-w)/w)**2)*.7)*Math.exp(-(x-w)/40)};return g(0,4,1,8)+(d>=p.second?g(p.second,1.5,10,5):0)}
