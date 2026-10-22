@@ -114,6 +114,7 @@ add({...ch(3,'Classification of Elements and Periodicity in Properties','INORGAN
 
 /* ---------- 4 Chemical Bonding and Molecular Structure ---------- */
 const VS={'2,0':['Linear','BeCl₂',180],'3,0':['Trigonal planar','BF₃',120],'2,1':['Bent (V-shape)','SO₂',119.5],'4,0':['Tetrahedral','CH₄',109.5],'3,1':['Trigonal pyramidal','NH₃',107],'2,2':['Bent (V-shape)','H₂O',104.5],'5,0':['Trigonal bipyramidal','PCl₅','90, 120'],'4,1':['See-saw','SF₄','~102, ~173'],'3,2':['T-shape','ClF₃','~87.5'],'2,3':['Linear','XeF₂',180],'6,0':['Octahedral','SF₆',90],'5,1':['Square pyramidal','BrF₅','~84.8'],'4,2':['Square planar','XeF₄',90]};
+const VSEL={'2,0':['Be','Cl'],'3,0':['B','F'],'2,1':['S','O'],'4,0':['C','H'],'3,1':['N','H'],'2,2':['O','H'],'5,0':['P','Cl'],'4,1':['S','F'],'3,2':['Cl','F'],'2,3':['Xe','F'],'6,0':['S','F'],'5,1':['Br','F'],'4,2':['Xe','F']};
 const DIRS={2:[[1,0,0],[-1,0,0]],3:[[1,0,0],[-.5,0,.866],[-.5,0,-.866]],4:[[0,1,0],[.943,-.333,0],[-.471,-.333,.816],[-.471,-.333,-.816]],5:[[0,1,0],[0,-1,0],[1,0,0],[-.5,0,.866],[-.5,0,-.866]],6:[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]};
 // Which electron-pair directions hold lone pairs (equatorial first in trigonal bipyramid; trans in octahedron).
 const LPS={'2,1':[2],'3,1':[0],'2,2':[0,1],'4,1':[2],'3,2':[3,4],'2,3':[2,3,4],'5,1':[3],'4,2':[2,3]};
@@ -124,10 +125,10 @@ add({...ch(4,'Chemical Bonding and Molecular Structure','PHYSICAL CHEMISTRY'),id
  tryText:'Keep four electron pairs and change lone pairs from 0 to 2.',
  controls:[R('bp','Bond pairs',2,6,1,4),R('lp','Lone pairs',0,3,1,0)],
  metrics:p=>{const d=VS[`${p.bp},${p.lp}`];return d?[N('Electron pairs',p.bp+p.lp,'',0),N('Shape',d[0]),N('Example',d[1]),N('Bond angle',`${d[2]}°`)]:[N('Combination','Not a common VSEPR case'),N('Try',`total pairs 2–6 (now ${p.bp+p.lp})`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:70,yaw:t*.3,pitch:.25}),key=`${p.bp},${p.lp}`,d=VS[key],tot=p.bp+p.lp;atom(s,[0,0,0],'X',1.35,{});
-  if(d){const dirs=DIRS[tot],lp=LPS[key]||[],L=1.3;dirs.forEach((u,i)=>{if(lp.includes(i)){lobe(s,[0,0,0],u,1,.37,'#b197fc',.45,{rings:7,segs:12});const sd=V.norm(V.cross(u,[.3,.7,.2]));s.ball(V.add(V.mul(u,.72),V.mul(sd,.1)),.05,'#f8f0ff',{flat:true});s.ball(V.sub(V.mul(u,.72),V.mul(sd,.1)),.05,'#f8f0ff',{flat:true})}
-    else{const q=V.mul(u,L);stick(s,[0,0,0],q,1,{ca:'X',cb:'F'});atom(s,q,'F',1.05)}});
-   if(lp.length)s.callout(V.mul(dirs[lp[0]],.7),'lone pair','#b197fc',60,-50);s.callout([0,0,0],'central atom','#e9ecef',-60,60);s.render();tag(c,`${d[0]} — e.g. ${d[1]}, angle ${d[2]}°`,44,98,C.gold,15)}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:70,yaw:t*.3,pitch:.25}),key=`${p.bp},${p.lp}`,d=VS[key],tot=p.bp+p.lp,el=VSEL[key]||['X','F'],L=el[1]==='H'?1.05:1.3;atom(s,[0,0,0],el[0],el[0]==='C'||el[0]==='N'||el[0]==='O'||el[0]==='B'||el[0]==='Be'?1.5:1.2,{});
+  if(d){const dirs=DIRS[tot],lp=LPS[key]||[];dirs.forEach((u,i)=>{if(lp.includes(i)){lobe(s,[0,0,0],u,1,.37,'#b197fc',.45,{rings:7,segs:12});const sd=V.norm(V.cross(u,[.3,.7,.2]));s.ball(V.add(V.mul(u,.72),V.mul(sd,.1)),.05,'#f8f0ff',{flat:true});s.ball(V.sub(V.mul(u,.72),V.mul(sd,.1)),.05,'#f8f0ff',{flat:true})}
+    else{const q=V.mul(u,L);stick(s,[0,0,0],q,1,{ca:el[0],cb:el[1]});atom(s,q,el[1],el[1]==='H'?1.15:1.05)}});
+   if(lp.length)s.callout(V.mul(dirs[lp[0]],.7),'lone pair','#b197fc',60,-50);s.callout([0,0,0],`central ${el[0]}`,'#e9ecef',70,-55);s.render();tag(c,`${d[0]} — e.g. ${d[1]}, angle ${d[2]}°`,44,98,C.gold,15)}
   else{s.render();tag(c,'Choose 2–6 electron pairs (bond + lone)',44,98,C.red,15)}},
  assumption:'Ideal electron-pair geometries; real angles for lone-pair molecules from NCERT.'});
 
@@ -169,9 +170,18 @@ add({...ch(6,'Equilibrium','PHYSICAL CHEMISTRY'),id:'chem-le-chatelier',title:'L
  tryText:'Raise the temperature from 500 K to 800 K. Does the yield of NH₃ rise or fall?',
  controls:[R('P','Pressure',50,300,10,200,'atm'),R('T','Temperature',500,900,10,700,'K'),R('n2','Extra N₂ added',0,2,.1,0,'×')],
  metrics:p=>{const r=haber(p);return[N('NH₃ in mixture',r.y*100,'%',1),N('NH₃ formed per 1 N₂ + 3 H₂ fed',2*r.x,'mol',3),N('Shift (vs 200 atm, 700 K, no extra N₂)',r.dir),N('Effect of temperature','Exothermic: heat lowers K')]},
- draw:(c,p,t)=>{const r=haber(p),s=P3.scene(c,{scale:54,cx:260}),vol=2.6*Math.cbrt(200/p.P);s.box([0,0,0],[vol*1.4,vol,vol*.7],p.T>750?'#ff8787':'#e9f6ff',{alpha:.08});const tot=36,nA=Math.round(r.y*tot),nN=Math.round((1-r.y)*tot*(.25+.1*p.n2)/(1+.1*p.n2)),nH=tot-nA-nN;let i=0;
-  const spot=()=>{const j=i++;return[(hash(j)-.5)*vol*1.25+.06*Math.sin(t*3+j),(hash(j+70)-.5)*vol*.85,(hash(j+140)-.5)*vol*.55]};for(let j=0;j<nN;j++){const q=spot();atom(s,V.add(q,[-.13,0,0]),'N',.7);atom(s,V.add(q,[.13,0,0]),'N',.7)}for(let j=0;j<nH;j++){const q=spot();atom(s,V.add(q,[-.1,0,0]),'H',.7);atom(s,V.add(q,[.1,0,0]),'H',.7)}
-  for(let j=0;j<nA;j++){const q=spot();atom(s,q,'N',.75);for(let k=0;k<3;k++){const a=TAU*k/3;atom(s,V.add(q,[.17*Math.cos(a),-.1,.17*Math.sin(a)]),'H',.6)}}s.callout([vol*.7,vol*.5,0],`${p.P} atm, ${p.T} K`,'#e9f6ff',40,-50);s.render();tag(c,'blue pairs: N₂ · white pairs: H₂ · blue + 3 white: NH₃',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const r=haber(p),s=P3.scene(c,{scale:52,cx:250,cy:250,yaw:.5+.12*Math.sin(t*.2),pitch:.07}),H=2.4*Math.cbrt(200/p.P),R0=1.4,hot=clamp((p.T-500)/400,0,1),y0=-1.9;
+  s.cyl([0,y0-.1,0],[0,1,0],R0*1.12,.2,'#495057',{spec:.5});s.cyl([0,y0+.02,0],[0,1,0],R0*1.02,.04,`#ff${Math.round(150-110*hot).toString(16).padStart(2,'0')}${Math.round(80-60*hot).toString(16).padStart(2,'0')}`,{alpha:.25+.6*hot,flat:true});
+  s.lathe([0,y0,0],[[R0,.0],[R0,H+.12]],'#dff3ff',{alpha:.12+.08*hot,segs:20,spec:.8,shine:30});
+  s.cyl([0,y0+H+.05,0],[0,1,0],R0*.98,.14,'#868e96',{spec:.8});s.cyl([0,y0+H+.7,0],[0,1,0],.1,1.2,'#adb5bd',{spec:.7});s.cyl([0,y0+H+1.35,0],[0,1,0],.42,.16,'#868e96',{spec:.6});
+  s.ring([0,y0+H+.12,0],[0,1,0],R0,'#ffffffaa',1.2,[],24);
+  const tot=34,nA=Math.round(r.y*tot),nN=Math.round((1-r.y)*tot*(.25+.1*p.n2)/(1+.1*p.n2)),nH=tot-nA-nN,sp=.5+.7*hot;let i=0;
+  const spot=()=>{const j=i++,a=hash(j*5+2)*TAU+t*sp*(hash(j+9)-.5)*1.2,rr=Math.sqrt(hash(j*3+71))*(R0-.35);return[rr*Math.cos(a)+.1*Math.sin(t*2.6*sp+j),y0+.3+(H-.5)*hash(j+140)+.12*Math.sin(t*2.2*sp+j*1.7),rr*Math.sin(a)]},
+   rot=(j,u,v)=>{const a=t*.8*sp*(hash(j+3)>.5?1:-1)+j;return[u*Math.cos(a),v,u*Math.sin(a)]};
+  for(let j=0;j<nN;j++){const q=spot(),a=V.add(q,rot(j,-.13,0)),b=V.add(q,rot(j,.13,0));s.ball(a,.17,'#4c6ef5',{spec:.6});s.ball(b,.17,'#4c6ef5',{spec:.6});stick(s,a,b,3,{r:.045,gap:.07,ca:'N',cb:'N'})}
+  for(let j=0;j<nH;j++){const q=spot(),a=V.add(q,rot(j,-.1,0)),b=V.add(q,rot(j,.1,0));s.ball(a,.11,'#f1f3f5',{spec:.6});s.ball(b,.11,'#f1f3f5',{spec:.6});s.tube([a,b],.04,'#dee2e6',{segs:6})}
+  for(let j=0;j<nA;j++){const q=spot();atom(s,q,'N',.72);for(let k=0;k<3;k++){const a=TAU*k/3+t*.7+j,h=V.add(q,[.2*Math.cos(a),-.12,.2*Math.sin(a)]);s.tube([q,h],.035,'#ced4da',{segs:5});s.ball(h,.1,'#f1f3f5',{spec:.6})}}
+  s.callout([R0,y0+H*.6,0],`${p.P} atm, ${p.T} K`,'#e9f6ff',40,-50);s.render();tag(c,'blue pairs: N₂ · white pairs: H₂ · blue + 3 white: NH₃',44,98,C.muted,13)},
  assumption:'Equilibrium yield from Kp(T) = exp(−ΔG°/RT) with ΔH° = −92.4 kJ/mol and ΔS° = −198 J/(K·mol); ideal gases, stoichiometric feed.'});
 function haber(p){const Kp=Math.exp(-(-92400-p.T*(-198.3))/(8.314*p.T)),solve=P=>{let lo=0,hi=.999;for(let k=0;k<60;k++){const x=(lo+hi)/2,n=4-2*x,yN=(1+p.n2-x)/(n+p.n2),yH=(3-3*x)/(n+p.n2),yA=2*x/(n+p.n2),Q=yA*yA/(yN*yH**3*P*P);if(Q<Kp)lo=x;else hi=x}const x=(lo+hi)/2;X=x;return 2*x/(4-2*x+p.n2)};let X=0;const y=solve(p.P),y0=(()=>{const q={...p,P:200,T:700,n2:0};const K0=Math.exp(-(-92400-700*(-198.3))/(8.314*700));let lo=0,hi=.999;for(let k=0;k<60;k++){const x=(lo+hi)/2,n=4-2*x,Q=(2*x/n)**2/((1-x)/n*((3-3*x)/n)**3*40000);if(Q<K0)lo=x;else hi=x}return(lo+hi)/2})();return{y,x:X,dir:X>y0+.003?'Towards NH₃ (right)':X<y0-.003?'Towards N₂ + H₂ (left)':'No change'}}
 
