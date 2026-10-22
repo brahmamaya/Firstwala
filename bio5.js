@@ -414,8 +414,15 @@ add({...ch(12,'Ecosystem',U10),id:'bio-productivity',title:'Gross and net primar
  tryText:'Increase respiration losses. How much is left for herbivores?',
  controls:[R('gpp','Gross primary productivity',500,5000,50,2000,'g/m²/yr'),R('rr','Respiration losses',20,80,1,45,'%')],
  metrics:p=>{const npp=p.gpp*(1-p.rr/100);return[N('NPP',npp,'g/m²/yr',0),N('Respiration losses',p.gpp-npp,'g/m²/yr',0),N('Biosphere NPP','≈ 170 billion tons/yr (dry weight)'),N('Oceans','≈ 55 billion tons/yr')]},
- draw:(c,p,t)=>{const npp=p.gpp*(1-p.rr/100),s=P3.scene(c,{scale:52,cy:290});s.box([0,-1.65,0],[6,.3,3],'#6d4c2f',{ground:true});for(let i=0;i<7;i++){const x=-2.4+i*.8,z=(hash(i)-.5)*1.6,h=.8+npp/p.gpp*1.4*(.8+.4*hash(i+3));s.cyl([x,-1.5+h/2,z],[0,1,0],.07,h,'#6d4c2f');s.mesh([x,-1.5+h+.3,z],[.45,.5,.45],'#2f9e44',{shape:(u,v)=>1+.15*Math.sin(5*v+i)*Math.cos(3*u)})}
-  for(let i=0;i<8;i++)s.seg([-3+i*.8,2.4,-1],[-3+i*.8+.5,.4,-.4],'#fff3bf88',2);for(let i=0;i<Math.round(p.rr/10);i++){const q=cycle(t*.5+i/8,1);s.ball([-2+hash(i)*4,.5+q*1.5,(hash(i+3)-.5)],.05,'#ff8787',{flat:true})}s.render();tag(c,'red dots: energy respired by plants',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const npp=p.gpp*(1-p.rr/100),R=p.gpp-npp,fr=p.rr/100,BX=470,BW=60,BT=124,BH=252,hn=BH*(1-fr),GY=334;
+  E.panel(c,44,96,334,310,'#1e5278','#2a6e8f',GY);E.el(c,100,148,22,22,'#ffd43b');c.strokeStyle='#ffd43b';c.lineWidth=2.5;c.lineCap='round';c.beginPath();for(let i=0;i<12;i++){const a=i*TAU/12+t*.15;c.moveTo(100+Math.cos(a)*29,148+Math.sin(a)*29);c.lineTo(100+Math.cos(a)*38,148+Math.sin(a)*38)}c.stroke();
+  for(let i=0;i<9;i++)E.grass(c,66+i*35,GY+4+(i%2)*10,.9,'#69db7c');for(let i=0;i<3;i++)E.tree(c,150+i*66,GY+2,1.7,i===1?'#2b8a3e':'#37a14a');
+  c.setLineDash([5,5]);for(let i=0;i<3;i++)E.arrow(c,128+i*10,184+i*3,158+i*62,250,'rgba(255,212,59,.75)',2);c.setLineDash([]);
+  E.arrow(c,262,220,340,126,'#ff6b6b',2+9*fr);E.arrow(c,286,296,324,304,'#69db7c',2+8*(1-fr));E.deer(c,334,GY+2,1.0,-1);
+  tag(c,'sunlight',50,190,'#ffd43b',12);tag(c,'R: respiration',284,118,'#ff8787',12);tag(c,'NPP: food for consumers',58,392,'#8ce99a',12);tag(c,'producers (plants)',58,372,'#e9f6ff',12);tag(c,'herbivore',316,372,'#e9f6ff',11);
+  c.fillStyle='#ff6b6b';c.beginPath();c.roundRect(BX,BT,BW,BH-hn,[6,6,0,0]);c.fill();c.fillStyle='#51cf66';c.beginPath();c.roundRect(BX,BT+BH-hn,BW,hn,[0,0,6,6]);c.fill();c.strokeStyle='#0b2030';c.lineWidth=2;c.beginPath();c.moveTo(BX,BT+BH-hn);c.lineTo(BX+BW,BT+BH-hn);c.stroke();
+  c.strokeStyle='#ffd43b';c.lineWidth=2;c.beginPath();c.moveTo(BX-8,BT);c.lineTo(BX-14,BT);c.lineTo(BX-14,BT+BH);c.lineTo(BX-8,BT+BH);c.stroke();tag(c,'GPP',BX-20,BT+BH/2-8,'#ffd43b',14,'right');tag(c,f(p.gpp,0),BX-20,BT+BH/2+9,'#ffd43b',13,'right');
+  tag(c,'R  '+f(R,0),BX+BW+10,BT+(BH-hn)/2,'#ff8787',14);tag(c,'NPP  '+f(npp,0),BX+BW+10,BT+BH-hn/2,'#8ce99a',14);tag(c,'g/m²/yr',BX+BW/2,BT-12,C.muted,11,'center');tag(c,'NPP = GPP − R',BX+BW/2,BT+BH+16,'#e9f6ff',13,'center')},
  assumption:'Single plant community; values per unit area per year.'});
 
 add({...ch(12,'Ecosystem',U10),id:'bio-decomposition',title:'Decomposition of detritus',
