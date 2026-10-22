@@ -55,10 +55,12 @@ add({...ch(1,'Some Basic Concepts of Chemistry','PHYSICAL CHEMISTRY'),id:'chem-l
  tryText:'Use 4 g H₂ and 16 g O₂. Which one is limiting?',
  controls:[R('h','Hydrogen taken',.5,10,.5,4,'g',1),R('o','Oxygen taken',4,80,1,16,'g'),R('prog','Reaction progress',0,100,1,100,'%')],
  metrics:p=>{const nh=p.h/2.016,no=p.o/32,nw=Math.min(nh,2*no),lim=nh<2*no?'Hydrogen (H₂)':nh>2*no?'Oxygen (O₂)':'Neither (exact ratio)';return[N('Moles H₂',nh,'mol',3),N('Moles O₂',no,'mol',3),N('Limiting reagent',lim),N('Water formed',nw*18.02,'g',2),N('Left over',nh>2*no?`${f((nh-2*no)*2.016,2)} g H₂`:`${f((no-nh/2)*32,2)} g O₂`)]},
- draw:(c,p,t)=>{const nh=p.h/2.016,no=p.o/32,x=Math.min(nh,2*no)*p.prog/100,k=12/Math.max(nh+no,.1),H=Math.round((nh-x)*k),O=Math.round((no-x/2)*k),W=Math.round(x*k),s=P3.scene(c,{scale:56,cx:300});s.box([0,0,0],[4,2.6,2],'#e9f6ff',{alpha:.07});
-  let i=0;const spot=()=>{const j=i++;return[-1.7+hash(j)*3.4+.08*Math.sin(t*2+j),-1.1+hash(j+50)*2.2,-.8+hash(j+90)*1.6]};
-  for(let j=0;j<H;j++){const q=spot();atom(s,V.add(q,[-.12,0,0]),'H',.8);atom(s,V.add(q,[.12,0,0]),'H',.8)}for(let j=0;j<O;j++){const q=spot();atom(s,V.add(q,[-.17,0,0]),'O',.7);atom(s,V.add(q,[.17,0,0]),'O',.7)}
-  for(let j=0;j<W;j++){const q=spot();atom(s,q,'O',.75);atom(s,V.add(q,[.17,.13,0]),'H',.7);atom(s,V.add(q,[-.17,.13,0]),'H',.7)}s.render();
+ draw:(c,p,t)=>{const nh=p.h/2.016,no=p.o/32,x=Math.min(nh,2*no)*p.prog/100,k=12/Math.max(nh+no,.1),H=Math.round((nh-x)*k),O=Math.round((no-x/2)*k),W=Math.round(x*k),s=P3.scene(c,{scale:74,cx:290,cy:270});s.box([0,0,0],[4,2.6,2],'#e9f6ff',{alpha:.06});
+  const bx=[[-2,-1.3,-1],[2,-1.3,-1],[2,1.3,-1],[-2,1.3,-1],[-2,-1.3,1],[2,-1.3,1],[2,1.3,1],[-2,1.3,1]];for(const [i,j] of [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]])s.seg(bx[i],bx[j],'#ffffff44',1);
+  let i=0;const spot=()=>{const j=i++;return[-1.6+hash(j)*3.2+.08*Math.sin(t*2+j),-1+hash(j+50)*2,-.7+hash(j+90)*1.4]};
+  const di=(q,el,d)=>{const a=V.add(q,[-d,0,0]),b=V.add(q,[d,0,0]);stick(s,a,b,el==='O'?2:1,{ca:el,cb:el,r:.05,gap:.09,side:[0,0,1]});atom(s,a,el,el==='H'?.9:.8);atom(s,b,el,el==='H'?.9:.8)};
+  for(let j=0;j<H;j++)di(spot(),'H',.17);for(let j=0;j<O;j++)di(spot(),'O',.23);
+  for(let j=0;j<W;j++){const q=spot(),a=V.add(q,[.26,.2,0]),b=V.add(q,[-.26,.2,0]);stick(s,q,a,1,{ca:'O',cb:'H',r:.05});stick(s,q,b,1,{ca:'O',cb:'H',r:.05});atom(s,q,'O',.85);atom(s,a,'H',.8);atom(s,b,'H',.8)}s.render();
   tag(c,'white pairs: H₂   red pairs: O₂   red + 2 white: H₂O  (particles drawn ∝ moles)',44,98,C.muted,13)},
  assumption:'Molar masses H₂ = 2.016 and O₂ = 32.00 g/mol; the reaction is assumed to go to completion.'});
 
