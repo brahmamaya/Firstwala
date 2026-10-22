@@ -107,10 +107,15 @@ function size(){W=cv.clientWidth||innerWidth;H=cv.clientHeight||innerHeight;cons
   free(A);free(B1);free(B2);free(H0);free(H1);A=target(sceneW,sceneH);H0=target(sceneW,sceneH);H1=target(sceneW,sceneH);fresh=true;const bw=Math.max(2,sceneW>>2),bh=Math.max(2,sceneH>>2);B1=target(bw,bh);B2=target(bw,bh);gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
 const pass=(P,o)=>{gl.bindFramebuffer(gl.FRAMEBUFFER,o?o.fb:null);gl.viewport(0,0,o?o.w:cv.width,o?o.h:cv.height);gl.useProgram(P.p)};
 const ease=x=>x*x*x*(x*(x*6-15)+10);
+let lastInput=performance.now(),frozen=false;const saver=weak||matchMedia('(pointer:coarse)').matches;
+const wakeUp=()=>{lastInput=performance.now();if(frozen){frozen=false;running=true;last=0;raf=requestAnimationFrame(draw)}};
+for(const ev of ['pointerdown','touchstart','keydown','wheel','scroll'])addEventListener(ev,wakeUp,{passive:true,capture:true});
 const FRAME=matchMedia('(pointer:coarse)').matches?41:31;let lastPaint=0;
 function draw(now){
   // stop completely while the background is not on screen (page hidden, landing closed or scrolled away)
   if(running&&!dv&&(document.hidden||!cv.getClientRects().length)){running=false;return}
+  // on touch / weak devices the slow animation pauses after 8 s without any touch, scroll or key (saves the GPU and battery), and resumes on the next input
+  if(running&&!dv&&saver&&now-lastInput>8000){running=false;frozen=true;return}
   // 30 frames a second: the background moves slowly, so this halves the work on every device without losing the look
   if(running&&!dv&&now-lastPaint<FRAME){raf=requestAnimationFrame(draw);return}lastPaint=now;
   const dt=Math.min(.1,last?(now-last)/1000:.016);last=now;
