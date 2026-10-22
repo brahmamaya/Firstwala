@@ -139,10 +139,20 @@ add({...ch(2,'Human Reproduction',U6),id:'bio-gametogenesis',title:'Spermatogene
  tryText:'Switch to oogenesis. Where does the second meiotic division finish?',
  controls:[S('type','Process','sperm',[['sperm','Spermatogenesis'],['oo','Oogenesis']]),R('cells','Primary cells',1,4,1,1)],
  metrics:p=>p.type==='sperm'?[N('Gametes per primary cell',4,'',0),N('Total gametes',4*p.cells,'',0),N('Chromosomes','46 → 23'),N('Where','Seminiferous tubules (testis)')]:[N('Ova per primary cell',1,'',0),N('Polar bodies','2 (first may divide → 3)'),N('Meiosis II','Completed only after sperm entry'),N('Chromosomes','46 → 23')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.1}),sp=p.type==='sperm',n=p.cells;for(let k=0;k<n;k++){const ox=(k-(n-1)/2)*(sp?2:1.8);s.ball([ox,1.8,0],.3,'#9775fa',{label:k===0?'2n':''});
-   const lv1=sp?[[-.5,.7],[.5,.7]]:[[-.4,.7],[.5,.7]];lv1.forEach(([dx,y],i)=>{const r=sp?.22:(i?.08:.3);s.ball([ox+dx,y,0],r,sp?'#b197fc':(i?'#ced4da':'#f783ac'));s.seg([ox,1.5,0],[ox+dx,y+r,0],'#adb5bd',1.5)});
-   if(sp)for(let i=0;i<4;i++){const x=ox-.75+i*.5,y=-.6;s.ball([x,y,0],.12,'#74c0fc');s.tube([[x,y-.12,0],[x+.05*Math.sin(t*6+i),y-.6,0]],.02,'#74c0fc',{segs:4});s.seg([ox+(i<2?-.5:.5),.5,0],[x,y+.12,0],'#adb5bd',1.5)}
-   else{s.ball([ox-.4,-.6,0],.32,'#e64980',{label:k===0?'ovum (n)':''});s.ball([ox+.2,-.6,0],.08,'#ced4da');s.seg([ox-.4,.4,0],[ox-.4,-.28,0],'#adb5bd',1.5)}}s.label([-3,1.8,0],'primary',C.muted,11);s.label([-3,.7,0],'meiosis I',C.muted,11);s.label([-3,-.6,0],'meiosis II',C.muted,11);s.render()},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:300,cy:240,pitch:.02}),sp=p.type==='sperm',n=p.cells,Y=[1.7,.4,-.95];
+  /* a cell: membrane ring, cytoplasm, nucleus with chromosome rods */
+  const cell=(x,y,r,col,nu,nr)=>{s.ball([x,y,0],r,col,{spec:.4});s.ball([x,y,.1],r*nr,nu,{flat:false,lift:1});for(let i=0;i<3;i++){const a=i*2.1+x;s.seg([x+Math.cos(a)*r*nr*.4,y+Math.sin(a)*r*nr*.4-r*nr*.2,.2],[x+Math.cos(a)*r*nr*.4,y+Math.sin(a)*r*nr*.4+r*nr*.2,.2],'#1f1147',2,[],1e5)}},
+  sperm=(x,y,i)=>{s.mesh([x,y,0],[.11,.075,.075],'#4aa3ff',{rings:6,segs:10,spec:.5});s.mesh([x,y+.07,0],[.07,.035,.07],'#e8f4ff',{rings:4,segs:8,lift:1});s.tube([[x,y-.08,0],[x,y-.3,0]],.04,'#ffa94d',{segs:6});s.tube([[x,y-.3,0],[x+.04*Math.sin(t*6+i),y-.55,0],[x-.04*Math.sin(t*6+i),y-.8,0],[x+.03*Math.sin(t*6+i),y-1.0,0]],.014,'#8fc7ff',{segs:4})};
+  for(let k=0;k<n;k++){const ox=(k-(n-1)/2)*(sp?2.4:2.0);
+   if(sp){cell(ox,Y[0],.36,'#c9b8ff','#6741d9',.55);for(const dx of[-.55,.55]){cell(ox+dx,Y[1],.27,'#b7a3ff','#5f3dc4',.5);s.seg([ox,Y[0]-.34,0],[ox+dx,Y[1]+.27,0],'#adb5bd',1.5)}
+    for(let i=0;i<4;i++){const x=ox+(i-1.5)*.38;sperm(x,Y[2]+.1,i);s.seg([ox+(i<2?-.55:.55),Y[1]-.26,0],[x,Y[2]+.19,0],'#adb5bd',1)}}
+   else{cell(ox,Y[0],.44,'#f6a8c6','#c2255c',.5);cell(ox-.25,Y[1],.34,'#f783ac','#a61e4d',.5);cell(ox+.45,Y[1]+.05,.1,'#ced4da','#868e96',.5);s.seg([ox-.1,Y[0]-.42,0],[ox-.2,Y[1]+.34,0],'#adb5bd',1.5);s.seg([ox+.2,Y[0]-.3,0],[ox+.42,Y[1]+.12,0],'#adb5bd',1.2);
+    cell(ox-.35,Y[2],.34,'#f783ac','#a61e4d',.5);cell(ox+.12,Y[2]-.05,.1,'#ced4da','#868e96',.5);cell(ox+.45,Y[2]+.1,.1,'#ced4da','#868e96',.5);s.seg([ox-.25,Y[1]-.34,0],[ox-.33,Y[2]+.34,0],'#adb5bd',1.5);s.seg([ox-.2,Y[1]-.3,0],[ox+.1,Y[2]+.05,0],'#adb5bd',1)}}
+  const lx=-3.4;s.label([lx,Y[0],0],'primary',C.muted,11);s.label([lx,Y[1],0],'meiosis I',C.muted,11);s.label([lx,Y[2],0],'meiosis II',C.muted,11);
+  const x0=(0-(n-1)/2)*(sp?2.4:2.0);
+  if(sp){s.callout([x0+.36,Y[0],0],'primary spermatocyte (2n)','#c9b8ff',65,-5);s.callout([x0+.55+.27,Y[1],0],'secondary spermatocyte (n)','#b7a3ff',65,10);s.callout([x0+.57,Y[2]+.1,0],'spermatids → sperms (n)','#8fc7ff',70,30)}
+  else{s.callout([x0+.44,Y[0],0],'primary oocyte (2n)','#f6a8c6',70,-5);s.callout([x0-.25,Y[1]+.34,0],'secondary oocyte (n)','#f783ac',-80,-25);s.callout([x0+.45,Y[1]+.05,0],'1st polar body','#ced4da',70,-5);s.callout([x0-.35,Y[2]-.2,0],'ovum (n)','#ff8fb7',-70,35);s.callout([x0+.12,Y[2]-.05,0],'2nd polar body','#ced4da',55,40)}
+  s.render()},
  assumption:'One primary cell per column; spermiogenesis (spermatid → sperm) merged into the last row.'});
 
 const EMB=[[0,'Zygote','Ampullary region of fallopian tube',1],[1,'2-cell stage (cleavage)','Fallopian tube',2],[2,'4-cell stage','Fallopian tube',4],[3,'8–16 cells: morula','Moving towards uterus',16],[5,'Blastocyst','Uterus',64],[7,'Implantation','Embedded in endometrium',100]];
