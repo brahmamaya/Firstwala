@@ -16,9 +16,12 @@ add({...ch(1,'Solutions',PH),id:'chem-henry-law',title:'Henry’s law: gas disso
  tryText:'Compare CO₂ and N₂ at 2 bar.',
  controls:[S('g','Gas','CO2',Object.keys(GAS).map(k=>[k,GAS[k][0]])),R('p','Partial pressure',.2,5,.1,2,'bar',1)],
  metrics:p=>{const KH=GAS[p.g][1]*1000,x=p.p/KH,mol=x*55.5/(1-x);return[N('K_H (298 K)',GAS[p.g][1],'kbar',2),N('Mole fraction x',x,'',3),N('Moles dissolved per litre',mol,'mol',4)]},
- draw:(c,p,t)=>{const x=p.p/(GAS[p.g][1]*1000),s=P3.scene(c,{scale:56,cx:250,cy:300});s.cyl([0,-.6,0],[0,1,0],1.2,3.4,'#e9f6ff',{alpha:.1});s.cyl([0,-1.3,0],[0,1,0],1.17,2,'#4dabf7',{alpha:.35});s.cyl([0,1.15-p.p*.08,0],[0,1,0],1.15,.15,'#868e96');
-  for(let i=0;i<Math.round(p.p*5);i++)s.ball([(hash(i)-.5)*2,.1+hash(i+3)*.8,(hash(i+6)-.5)*1.6],.08,'#e9ecef',{flat:true});for(let i=0;i<Math.round(clamp(x*5e4,0,40));i++)s.ball([(hash(i+40)-.5)*2,-2.2+hash(i+43)*1.8,(hash(i+46)-.5)*1.6],.08,'#ffd43b',{flat:true});
-  s.callout([1.15,1.15-p.p*.08,0],`piston: ${p.p} bar`,'#ced4da',50,-40);s.callout([.5,-.6,.6],`dissolved ${GAS[p.g][0]}`,'#ffd43b',60,40);s.render();tag(c,`x = p/K_H = ${f(x,3)}`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const x=p.p/(GAS[p.g][1]*1000),s=P3.scene(c,{scale:46,cx:240,cy:275,yaw:.15,pitch:.12}),y0=-2,H=4.3,lt=y0+H*.4,py=y0+H-.3-p.p*.12;
+  glassBeaker(s,[0,y0,0],1.15,H,'#4dabf7',.4,{ticks:false,alpha:.42});
+  s.cyl([0,py,0],[0,1,0],1.08,.2,'#adb5bd',{spec:.7});s.cyl([0,py+.6,0],[0,1,0],.07,1.0,'#868e96',{segs:8});s.box([0,py+1.15,0],[.8,.14,.3],'#868e96',{spec:.5});
+  const ng=Math.round(p.p*5),sp=.7;for(let i=0;i<ng;i++){const u=t*(.8+hash(i)*.6)+i*2.3,cx=(hash(i)-.5)*1.5+.18*Math.sin(u),cz=(hash(i+3)-.5)*1.3+.18*Math.cos(u*.9),cy=lt+.15+hash(i+6)*Math.max(.05,py-lt-.4)+.1*Math.sin(u*1.2),an=u*.7,dx=.09*Math.cos(an),dy=.09*Math.sin(an);s.ball([cx-dx,cy-dy,cz],.07,'#f1f3f5',{spec:.5});s.ball([cx+dx,cy+dy,cz],.07,'#f1f3f5',{spec:.5})}
+  const nd=Math.round(clamp(x*5e4,0,40));for(let i=0;i<nd;i++){const u=t*(.5+hash(i+1)*.5)+i*1.7;s.ball([(hash(i+40)-.5)*1.7+.07*Math.sin(u),y0+.15+hash(i+43)*(H*.4-.4)+.07*Math.cos(u),(hash(i+46)-.5)*1.5],.075,'#ffd43b',{spec:.6})}
+  s.callout([1.1,py,0],`piston: ${p.p} bar`,'#ced4da',45,-30);s.callout([.9,y0+.6,.5],`dissolved ${GAS[p.g][0]}`,'#ffd43b',55,25);s.render();tag(c,`x = p/K_H = ${f(x,3)}`,44,98,C.gold,15)},
  assumption:'Henry’s law constants for water at 298 K (NCERT table); dilute solution.'});
 
 add({...ch(1,'Solutions',PH),id:'chem-osmosis',title:'Osmosis and osmotic pressure',
