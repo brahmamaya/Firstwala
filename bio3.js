@@ -13,13 +13,14 @@ const smooth3=(P,n=3)=>{const o=[];for(let i=0;i<P.length-1;i++){const p0=P[Math
 let HV=null;
 function heart(s,p,k=1,o={}){HV=HV||{aorta:smooth3([[.04,.42,0],[.1,1.05,.02],[.2,1.5,-.1],[.45,1.5,-.35],[.4,1.05,-.58],[.3,.2,-.62]]),trunk:smooth3([[-.14,.3,.4],[-.15,.7,.4],[-.05,1.0,.34],[.05,1.1,.25]]),svc:smooth3([[-.68,1.55,-.05],[-.66,1.15,-.0],[-.62,.75,.02]]),ivc:smooth3([[-.6,-.05,-.15],[-.62,-.5,-.15],[-.6,-.9,-.15]])};const ry=o.rotY||0,cy=Math.cos(ry),sy=Math.sin(ry),A=(x,y,z)=>V.add(p,[(x*cy+z*sy)*k,y*k,(-x*sy+z*cy)*k]),aS=o.aS||0,vS=o.vS||0,ra=1-.14*aS,rv=1-.13*vS,rot2=ry?[0,ry,0]:null,
     RED='#d6336c',BLU='#5c7cfa',DRED='#b02a5b',DBLU='#3b5bdb',ART='#e03131',taper=u=>1-.42*Math.max(0,-Math.sin(u))**1.6,sq=(a,b)=>V.mul(a,b);
-  const M=(c,r,col,opt)=>s.mesh(A(c[0],c[1],c[2]),[r[0]*k,r[1]*k,r[2]*k],col,{rot2,...opt}),T=(pts,r,col,seg=10)=>s.tube(pts.map(q=>A(q[0],q[1],q[2])),typeof r==='function'?u=>r(u)*k:r*k,col,{segs:seg});
+  const hq=o.hi?1.9:1,M=(c,r,col,opt)=>s.mesh(A(c[0],c[1],c[2]),[r[0]*k,r[1]*k,r[2]*k],col,{rot2,...opt,rings:Math.round((opt.rings||14)*hq),segs:Math.round((opt.segs||22)*hq)}),T=(pts,r,col,seg=10)=>s.tube(pts.map(q=>A(q[0],q[1],q[2])),typeof r==='function'?u=>r(u)*k:r*k,col,{segs:o.hi?seg+4:seg}),
+    lit=(h,q)=>{q=Math.round(q*8)/8;const n=parseInt(h.slice(1),16),m=v=>Math.round(v+(255-v)*.38*q).toString(16).padStart(2,'0');return'#'+m(n>>16)+m((n>>8)&255)+m(n&255)};
   /* ventricles: left (thick, red, forms the apex) and right (blue, wraps the front) */
-  M([.2,-.3,-.08],[.55*rv,.88*(1-.06*vS),.46*rv],RED,{rot:[0,0,.45],rings:13,segs:20,shape:taper,spec:.5});
-  M([-.3,-.18,.2],[.46*rv,.7*(1-.05*vS),.34*rv],BLU,{rot:[0,0,.3],rings:11,segs:18,shape:taper,spec:.5});
+  M([.2,-.3,-.08],[.55*rv,.88*(1-.06*vS),.46*rv],lit(RED,vS),{rot:[0,0,.45],rings:13,segs:20,shape:taper,spec:.5});
+  M([-.3,-.18,.2],[.46*rv,.7*(1-.05*vS),.34*rv],lit(BLU,vS),{rot:[0,0,.3],rings:11,segs:18,shape:taper,spec:.5});
   /* atria and auricles */
-  M([-.64,.4,.1],[.34*ra,.55*ra,.31*ra],BLU,{rings:10,segs:14,spec:.4});M([-.36,.92,.3],[.22*ra,.15*ra,.1*ra],'#4c6ef5',{rot:[0,0,.5],rings:5,segs:9});
-  M([.5,.62,-.3],[.34*ra,.3*ra,.3*ra],'#e5527a',{rings:9,segs:14,spec:.4});M([.64,.86,.08],[.19*ra,.14*ra,.1*ra],'#e5527a',{rot:[0,0,-.6],rings:5,segs:9});
+  M([-.64,.4,.1],[.34*ra,.55*ra,.31*ra],lit(BLU,aS),{rings:10,segs:14,spec:.4});M([-.36,.92,.3],[.22*ra,.15*ra,.1*ra],'#4c6ef5',{rot:[0,0,.5],rings:5,segs:9});
+  M([.5,.62,-.3],[.34*ra,.3*ra,.3*ra],lit('#e5527a',aS),{rings:9,segs:14,spec:.4});M([.64,.86,.08],[.19*ra,.14*ra,.1*ra],'#e5527a',{rot:[0,0,-.6],rings:5,segs:9});
   /* great vessels */
   T(HV.aorta,u=>.2-.07*u,ART,12);
   T([[.14,1.45,-.12],[.1,1.9,-.08]],.06,ART,7);T([[.26,1.5,-.2],[.3,1.92,-.18]],.045,ART,7);T([[.4,1.46,-.33],[.52,1.85,-.3]],.05,ART,7);
@@ -31,6 +32,7 @@ function heart(s,p,k=1,o={}){HV=HV||{aorta:smooth3([[.04,.42,0],[.1,1.05,.02],[.
   T([[.12,.5,.2],[.1,.25,.45],[.2,-.3,.5],[.34,-.8,.4],[.42,-1.02,.2]],.026,ART,5);T([[.1,.5,.1],[.46,.4,.2],[.7,.2,-.05]],.024,ART,5);T([[.0,.5,.2],[-.5,.22,.45],[-.84,-.1,.3],[-.78,-.62,.1]],.026,ART,5);
   T([[.16,.45,.22],[.18,.2,.5],[.28,-.3,.55],[.4,-.78,.45]],.03,DBLU,5);
   return s}
+const heartPaths=()=>HV;
 /* Lungs with lobes (right: upper, middle, lower; left: upper with lingula, lower), bronchial tree and alveoli.
    World frame of the circulation scene: body faces +x, patient's right = +z. */
 function lungs(s,c0,k,col='#ffc9c9',alpha=.5){const A=(x,y,z)=>V.add(c0,[x*k,y*k,z*k]);
@@ -83,7 +85,7 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-breathing-mechanism',ti
   for(let i=0;i<3;i++){const q=cycle(t*1.2/TAU*2+i/3,1),dir=p.auto==='yes'?Math.cos(t*1.2):d>0?1:0;if(dir>0)s.ball([0,2.6-q*1.2,0],.06,'#74c0fc',{flat:true})}s.callout([0,1.6,0],'Y-tube = trachea + bronchi','#ced4da',50,-40);s.callout([0,.3,.6*(.7+.45*d)],'balloons = lungs','#ff8fab',60,10);s.callout([1.3,.6,0],'bell jar = thoracic cavity','#e9f6ff',40,-40);s.callout([.6,-1.4+sag*.75,0],'rubber sheet = diaphragm','#ff8787',60,40);s.render()},
  assumption:'Classroom bell-jar analogy; pressure difference values are illustrative (a few mm Hg).'});
 
-const PP={alveoli:[104,40],deoxy:[40,45],oxy:[95,40],tissue:[40,45],air:[159,.3]};
+let CCF=null;const PP={alveoli:[104,40],deoxy:[40,45],oxy:[95,40],tissue:[40,45],air:[159,.3]};
 add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-gas-exchange',title:'Exchange of gases: partial pressures',
  description:'Follow blood along a pulmonary or tissue capillary and watch O₂ and CO₂ diffuse down their partial-pressure gradients.',
  formula:'Diffusion rate ∝ partial-pressure gradient',
@@ -119,10 +121,16 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-cardiac-cycle',title:'The c
  tryText:'Raise the heart rate. Which phase gets shorter?',
  controls:[R('hr','Heart rate',50,180,1,72,'beats/min'),R('sv','Stroke volume',50,120,1,70,'mL')],
  metrics:(p,t)=>{const r=heartPhase(p,t);return[N('Cycle duration',60/p.hr,'s',2),N('Phase now',r.name),N('Valves',r.valves),N('Cardiac output',p.sv*p.hr/1000,'L/min',2)]},
- draw:(c,p,t)=>{const r=heartPhase(p,t),s=P3.scene(c,{scale:62,cy:265,cx:250,yaw:.55,pitch:-.1}),aS=r.atria,vS=r.vent;heart(s,[0,0,0],1,{aS,vS});
-  const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L([-.75,.55,.3],'right atrium','#91a7ff',-60,-30);L([-.35,-.4,.45],'right ventricle','#91a7ff',-70,30);L([.75,.65,-.1],'left atrium','#ff8fab',60,-40);L([.55,-.55,.35],'left ventricle (thickest wall)','#ff8fab',-30,70);L([.05,1.45,-.1],'aorta','#ff6b6b',50,-40);L([.3,1.1,.3],'pulmonary artery','#91a7ff',60,-10);L([-.68,1.4,0],'superior vena cava','#91a7ff',-50,-30);
+ draw:(c,p,t)=>{const r=heartPhase(p,t),s=P3.scene(c,{scale:62,cy:250,cx:320,yaw:.22,pitch:-.04}),aS=r.atria,vS=r.vent;heart(s,[0,0,0],1,{aS,vS,hi:true});
+  /* schematic blood flow: venous return, atria to ventricles, ventricles to arteries (dots only where the phase allows it) */
+  const FL=CCF||(CCF=[[[-.66,1.55,0],[-.64,1.15,.0],[-.62,.75,.02]],[[-.03,.9,.34],[.05,1.1,.25],[.3,1.14,.1]],HV.aorta,[[.1,1.55,-.12],[.1,1.95,-.08]]]);
+  const sys=r.name==='Ventricular systole',act=[true,sys,sys,sys];
+  FL.forEach((L,i)=>{if(!act[i])return;const n=L.length-1,col=i===0?'#9bb1ff':i===1?'#9bb1ff':'#ff9aa8';for(let j=0;j<3;j++){const q=cycle(t*.9+j/3+i*.13,1),m=Math.min(n-1,Math.floor(q*n)),fr=q*n-m;s.ball(V.add(L[m],V.mul(V.sub(L[m+1],L[m]),fr)),.05,col,{flat:true,lift:30})}});
+  /* valve state chips */
+  s.hud(()=>{const k=window.PhysicaTextScale||1,av=!sys,sl=sys;c.save();c.font=`700 ${Math.round(12*k)}px system-ui, sans-serif`;[['AV valves',av,350],['Semilunar valves',sl,376]].forEach(([n,o,y])=>{const w=c.measureText('Semilunar valves: closed').width+26,x=250;c.fillStyle='#0b1a26cc';c.fillRect(x-w/2,y,w,22*k);c.fillStyle=o?'#69db7c':'#ff6b6b';c.beginPath();c.arc(x-w/2+11,y+11*k,4,0,6.2832);c.fill();c.fillStyle='#dbe7f0';c.textAlign='left';c.textBaseline='middle';c.fillText(n+': '+(o?'open':'closed'),x-w/2+20,y+11*k)});c.restore()});
+  lblCols(c,s,[['a',[-.68,1.4,0],'superior vena cava','#91a7ff','L'],['a',[-.7,.35,.2],'right atrium','#91a7ff','L'],['a',[-.55,-.3,.3],'right ventricle','#91a7ff','L'],['a',[.1,1.5,-.12],'aorta','#ff8787','R'],['a',[-.02,.95,.3],'pulmonary artery','#91a7ff','R'],['a',[.55,.7,-.3],'left atrium','#ff8fab','R'],['a',[.4,-.5,.1],'left ventricle (thickest wall)','#ff8fab','R']],()=>false,168,478,100,300);
   if(r.sound)s.label([0,-1.45,0],r.sound,C.gold,20);s.render();
-  const T=60/p.hr,[e1,e2]=heartEnds(T);chart(c,430,300,226,100,{title:'Phase timeline (one cycle)',xmin:0,xmax:T,ymin:0,ymax:1,series:[{pts:[[0,.8],[e1,.8],[e1,0],[T,0]],col:'#e64980'},{pts:[[0,0],[e1,0],[e1,.5],[e2,.5],[e2,0],[T,0]],col:'#a61e4d'}],marker:[cycle(t,T),.95,'#ffd43b']})},
+  const T=60/p.hr,[e1,e2]=heartEnds(T);chart(c,440,322,216,92,{title:'Phase timeline (one cycle)',xmin:0,xmax:T,ymin:0,ymax:1,series:[{pts:[[0,.8],[e1,.8],[e1,0],[T,0]],col:'#e64980'},{pts:[[0,0],[e1,0],[e1,.5],[e2,.5],[e2,0],[T,0]],col:'#a61e4d'}],marker:[cycle(t,T),.95,'#ffd43b']})},
  assumption:'Up to about 75 beats/min atrial systole is 0.1 s and ventricular systole 0.3 s (diastole 0.4 s at 72, cycle ≈ 0.83 s); above that, all phases are shortened in proportion so that joint diastole is always shown. Teaching simplification.'});
 /* Phase ends (s): 0.1 and 0.4 at <=75 bpm; scaled with the cycle length (1/8 and 1/2 of T) when T<0.8 s so joint diastole never vanishes. */
 const heartEnds=T=>T>=.8?[.1,.4]:[T/8,T/2];
