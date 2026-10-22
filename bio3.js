@@ -352,7 +352,7 @@ add({...ch(17,'Locomotion and Movement'),id:'bio-human-skeleton',title:'The huma
  controls:[S('part','Highlight','axial',Object.keys(SKEL).map(k=>[k,SKEL[k][0]]))],
  metrics:p=>{const d=SKEL[p.part];return[N('Part',d[0]),N('Number of bones',d[1],'',0),N('Made up of',d[2]),N('Whole skeleton',206,'bones',0)]},
 /*BEGIN skeldraw*/
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:47,cy:300,yaw:.4*Math.sin(t*.3)}),g={axial:['skull','vertebral','ribs','sternum'],appendicular:['limbs','girdles']},hi=k=>p.part===k||(g[p.part]||[]).includes(k);
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:47,cy:300,yaw:-.9+.35*Math.sin(t*.3)}),g={axial:['skull','vertebral','ribs','sternum'],appendicular:['limbs','girdles']},hi=k=>p.part===k||(g[p.part]||[]).includes(k);
   drawSkeleton(s,hi);
   lblCols(c,s,[['skull',[.0,3.0,.1],'skull (22 bones)'],['vertebral',[-.1,1.6,0],'vertebral column (26)',null,'L'],['ribs',[.1,1.7,.36],'ribs (12 pairs)'],['ribs',[.3,1.62,.1],'costal cartilage','#bfe0e6','R'],['sternum',[.27,1.8,0],'sternum',null,'R'],['girdles',[-.05,2.17,.5],'pectoral girdle'],['girdles',[.0,1.1,.4],'pelvic girdle',null,'L'],['limbs',[0,1.6,.58],'humerus'],['limbs',[0,.1,.17],'femur',null,'L']],hi,238,458);
   s.render()},
@@ -375,7 +375,7 @@ function apV(p,x){const t0=.5;if(x<t0)return-70;if(p.stim<p.thr)return-70+p.stim
 
 /*BEGIN synkit*/
 /* Labels in up to three rows: items [key,3D point,text,colour,'T'|'B'|'C',visible]. Laid out at draw time, left to right, so they never overlap (hidden items keep their slot). */
-const lblRows=(c,s,items,Y={T:134,B:370,C:391},x0=40,x1=652)=>{const rows={T:[],B:[],C:[]};for(const it of items)rows[it[4]||'T'].push({it,Q:s.P(it[1])});
+const lblRows=(c,s,items,Y={T:134,B:370,C:391},x0=40,x1=636)=>{const rows={T:[],B:[],C:[]};for(const it of items)rows[it[4]||'T'].push({it,Q:s.P(it[1])});
   s.hud(()=>{const k=window.PhysicaTextScale||1;c.save();c.font=`700 ${Math.round(11*k)}px system-ui, sans-serif`;
     for(const r of['T','B','C']){const a=rows[r].sort((m,n)=>m.Q[0]-n.Q[0]);for(const q of a)q.w=c.measureText(q.it[2]).width+4;
       let x=x0;for(const q of a){q.x=Math.max(x,q.Q[0]-q.w/2);x=q.x+q.w+8}for(let i=a.length-1;i>=0;i--){const lim=(a[i+1]?a[i+1].x-8:x1)-a[i].w;if(a[i].x>lim)a[i].x=lim}x=x0;for(const q of a){q.x=Math.max(x,q.x);x=q.x+q.w+8}
@@ -418,7 +418,7 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-synapse',title:'Transmi
     if(T>.78)for(let i=0;i<4;i++)s.ball([gap/2+.15+((T-.78)*2.2+i*.12)%.5,-.5+i*.33,(hash(i+20)-.5)*.6],.035,'#ffd43b',{flat:true})}
   else for(let i=0;i<6;i++)s.cyl([0,-.6+i*.24,(hash(i)-.5)*.5],[1,0,0],.07,gap+.2,'#20c997',{seg:7});
   const imp=-3.9+T*3.7;if(imp<bx-.35)s.ball([imp,0,0],.14,'#ffd43b',{glow:true,flat:true});
-  const rel=T>.55;lblRows(c,s,[['a',[-4.9,1.3,0],'dendrites','#ffd8a8','T'],['a',[-2.78,.2,.15],'myelin sheath','#fff0b8','T'],['a',[bx,.55,.1],'axon terminal (pre-synaptic knob)','#ffd8a8','T'],['a',[px,1.2,.3],'post-synaptic membrane','#9fd8e8','T'],
+  const rel=T>.55;lblRows(c,s,[['a',[-4.9,1.3,0],'dendrites','#ffd8a8','T'],['a',[-2.78,.2,.15],'myelin sheath','#fff0b8','T'],['a',[bx,.55,.1],'axon terminal (pre-synaptic knob)','#ffd8a8','T'],['a',[px,-1.3,.3],'post-synaptic membrane','#9fd8e8','B'],
     ['a',[-4.7,.5,.2],'soma (cell body)','#ffd8a8','T'],['a',[-4.78,.02,.0],'nucleus','#c9b6ff','B'],['a',[-3.14,-.2,0],'node of Ranvier','#f4b183','B'],
     ...(chem?[['a',[bx-.05,-.3,.3],'synaptic vesicles','#b197fc','B'],['a',[X/1+.25,-.9,.2],'synaptic cleft','#e9f6ff','C'],['a',[gap/2,.3,.5],'receptors','#20c997','C'],['a',[gap*.5,0,0],'neurotransmitter (e.g. acetylcholine)','#9775fa','C',rel]]:[['a',[0,-.7,.1],'gap junctions: ions flow directly','#20c997','C']])]);
   s.render();tag(c,chem?'purple: vesicles / neurotransmitter · teal: receptors':'teal: gap-junction channels',44,98,C.muted,13)},
