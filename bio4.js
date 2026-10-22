@@ -455,8 +455,19 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-dna-fingerprinting',ti
  tryText:'Which alleged father shares all the non-maternal bands with the child?',
  controls:[S('case','Case','pat',[['pat','Paternity test'],['for','Forensic match']])],
  metrics:p=>p.case==='pat'?[N('Mother','Explains half the child’s bands'),N('Alleged father 1','Does not explain the rest'),N('Alleged father 2','Matches all remaining bands'),N('Conclusion','Father 2 is the biological father')]:[N('Crime scene sample','Reference'),N('Suspect 1','Different pattern'),N('Suspect 2','Identical pattern — match'),N('Technique','Restriction digest → electrophoresis → blotting → probe')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,pitch:.55}),lanes=p.case==='pat'?[['Mother',[1,4,7]],['Child',[1,5,7,9]],['Father 1',[2,6,8]],['Father 2',[5,9,3]]]:[['Scene',[2,5,6,9]],['Suspect 1',[1,4,6,8]],['Suspect 2',[2,5,6,9]],['Suspect 3',[3,4,7,9]]];
-  s.box([0,-.1,0],[5.6,.16,4.2],'#d0ebff',{alpha:.8});lanes.forEach(([n,b],i)=>{const x=-2.1+i*1.4;s.box([x,0,-1.9],[.8,.12,.15],'#343a40');s.label([x,.4,-2.3],n,C.white,12);const k=Math.min(1,cycle(t,8)/4);b.forEach(y=>s.box([x,.03,-1.7+y*.37*k],[.8,.06,.1],'#7048e8',{alpha:.9}))});s.label([-2.8,.3,2],'+ (anode)',C.red,12);s.label([-2.8,.3,-2.1],'− wells',C.muted,12);s.render()},
+ draw:(c,p,t)=>{const pat=p.case==='pat',lanes=pat?[['Mother',[1,4,7]],['Child',[1,5,7,9]],['Father 1',[2,6,8]],['Father 2',[5,9,3]]]:[['Crime scene',[2,5,6,9]],['Suspect 1',[1,4,6,8]],['Suspect 2',[2,5,6,9]],['Suspect 3',[3,4,7,9]]],GX=88,GY=140,GW=336,GH=212,LW=80,k=Math.min(1,cycle(t,8)/4),k2=1-(1-k)*(1-k),
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  col=(li,b)=>{if(pat){const m=lanes[0][1],f=lanes[3][1];if(li===1)return m.includes(b)?'#4dabf7':f.includes(b)?'#ffd43b':'#9775fa';if(li===0)return m.some(x=>lanes[1][1].includes(x)&&x===b)?'#4dabf7':'#9775fa';if(li===3)return lanes[1][1].includes(b)?'#ffd43b':'#9775fa';return '#7a6cc0'}const s0=lanes[0][1];return s0.includes(b)?'#51cf66':'#9775fa'},
+  by=b=>GY+26+b*(GH-48)/10*k2;
+  /* gel slab with wells */
+  c.save();const g=c.createLinearGradient(0,GY,0,GY+GH);g.addColorStop(0,'rgba(120,190,210,.35)');g.addColorStop(1,'rgba(70,140,170,.25)');c.fillStyle=g;c.strokeStyle='rgba(180,220,235,.55)';c.lineWidth=1.5;c.beginPath();c.roundRect?c.roundRect(GX,GY,GW,GH,10):c.rect(GX,GY,GW,GH);c.fill();c.stroke();c.restore();
+  lanes.forEach(([n,bands],li)=>{const x=GX+14+li*LW;c.save();c.fillStyle='#0b1622';c.fillRect(x,GY+10,60,9);c.restore();txt(n,x+30,GY-10,C.white,12);
+   bands.forEach(b=>{const y=by(b),cc=col(li,b);c.save();c.shadowColor=cc;c.shadowBlur=9;c.fillStyle=cc;c.beginPath();c.roundRect?c.roundRect(x+3,y-3.5,54,7,3):c.rect(x+3,y-3.5,54,7);c.fill();c.restore()})});
+  if(k>.95)lanes[1][1].forEach(b=>{c.save();c.strokeStyle='rgba(255,255,255,.18)';c.setLineDash([3,4]);c.beginPath();c.moveTo(GX+8,by(b));c.lineTo(GX+GW-8,by(b));c.stroke();c.restore()});
+  txt('− wells',GX-4,GY+14,C.muted,11,'right');txt('+ anode',GX-4,GY+GH-12,C.red,11,'right');c.save();c.strokeStyle='#ff8787';c.lineWidth=2;c.beginPath();c.moveTo(GX-20,GY+34);c.lineTo(GX-20,GY+GH-34);c.stroke();c.beginPath();c.moveTo(GX-26,GY+GH-42);c.lineTo(GX-20,GY+GH-32);c.lineTo(GX-14,GY+GH-42);c.stroke();c.restore();
+  /* key */
+  txt(pat?'each child band comes':'a match needs every band',446,GY+4,C.muted,11,'left');txt(pat?'from one parent':'to line up',446,GY+19,C.muted,11,'left');
+  [pat?['#4dabf7','from the mother']:['#51cf66','matches the scene'],pat?['#ffd43b','from Father 2']:['#9775fa','no match'],pat?['#9775fa','other bands']:null].filter(Boolean).forEach((e,i)=>{c.save();c.fillStyle=e[0];c.shadowColor=e[0];c.shadowBlur=6;c.fillRect(446,GY+54+i*30-3,26,7);c.restore();txt(e[1],480,GY+54+i*30,C.white,12,'left')})},
  assumption:'Band positions are illustrative; real profiles use several VNTR probes.'});
 
 /* ---------- Chapter 6: Evolution ---------- */
