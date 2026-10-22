@@ -52,10 +52,32 @@ add({...ch(7,'Human Health and Disease',U8),id:'bio-malaria-cycle',title:'Life c
  tryText:'Step to the RBC stage. Why does fever come in cycles?',
  controls:[R('stage','Stage',1,6,1,1)],
  metrics:p=>{const d=MAL[p.stage-1];return[N('Stage',d[0]),N('What happens',d[1]),N('Host',d[2]),N('Pathogen','Plasmodium (e.g. P. vivax, P. falciparum)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,pitch:.3}),st=p.stage,pts=[[-2.6,1.4,0],[-2.6,-.4,0],[-1,-1.4,0],[1,-1.4,0],[2.6,-.4,0],[2.6,1.4,0]];s.path([...pts,pts[0]],'#29475b',3,[5,5]);
-  critter(s,'human',[-3.4,-1.7,-1.3],.8,t);critter(s,'insect',[3,0,-1.3],1.2,t);s.mesh(pts[1],[.5,.3,.35],'#a61e4d',{label:'liver'});for(let i=0;i<5;i++)s.mesh(V.add(pts[2],[(i-2)*.25,.1*Math.sin(i),0]),[.18,.07,.18],'#c92a2a',{rot:[PI/2,0,0],rings:6,segs:10});s.mesh(pts[4],[.45,.25,.3],'#ffc078',{alpha:.6});s.mesh(pts[5],[.25,.3,.25],'#ffd8a8',{alpha:.6});
-  const q=cycle(t*.5,1),pos=V.add(pts[st-1],V.mul(V.sub(pts[st%6],pts[st-1]),q));for(let i=0;i<5;i++)s.ball(V.add(pos,[(hash(i)-.5)*.3,(hash(i+2)-.5)*.3,0]),.05,'#be4bdb',{glow:true,flat:true});
-  s.label([-2.6,1.8,0],'bite',C.muted,11);s.label([-1.3,-1.8,0],'RBCs',C.red,11);s.label([2.6,1.8,0],'salivary glands',C.muted,11);s.label([2.9,-.85,0],'mosquito gut',C.muted,11);s.render();tag(c,MAL[st-1][0],44,98,C.gold,15)},
+ draw:(c,p,t)=>{const st=p.stage,CX=340,CY=252,RX=248,RY=92,ANG=[212,152,104,52,-22,-92],R=36,
+  P=ANG.map(a=>[CX+RX*Math.cos(a*Math.PI/180),CY+RY*Math.sin(a*Math.PI/180)]),
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  disc=(x,y,r,col,hi)=>{const g=c.createRadialGradient(x-r*.3,y-r*.35,r*.1,x,y,r);g.addColorStop(0,hi||'#fff4');g.addColorStop(.3,col);g.addColorStop(1,col);c.save();c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();c.fillStyle='rgba(255,255,255,.22)';c.beginPath();c.arc(x-r*.28,y-r*.32,r*.35,0,TAU);c.fill();c.restore()},
+  rbc=(x,y,r,col)=>{c.save();c.fillStyle=col||'#d6303a';c.beginPath();c.arc(x,y,r,0,TAU);c.fill();c.fillStyle='rgba(120,10,25,.55)';c.beginPath();c.arc(x,y,r*.45,0,TAU);c.fill();c.restore()},
+  para=(x,y,r)=>{c.save();c.fillStyle='#c77dff';c.strokeStyle='#7048e8';c.lineWidth=1;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();c.stroke();c.restore()},
+  icons=[
+   /* 1 mosquito bite: body, wing, proboscis and drop of saliva with sporozoites */
+   (x,y)=>{c.save();c.fillStyle='#3b3f45';c.beginPath();c.ellipse(x+3,y-2,10,4.2,-.35,0,TAU);c.fill();c.beginPath();c.arc(x-8,y+1,3.4,0,TAU);c.fill();c.strokeStyle='#3b3f45';c.lineWidth=1.4;c.beginPath();c.moveTo(x-10,y+3);c.lineTo(x-18,y+11);c.stroke();c.fillStyle='rgba(200,225,255,.75)';c.beginPath();c.ellipse(x+1,y-10,9,3.4,.6,0,TAU);c.fill();c.strokeStyle='#3b3f45';c.lineWidth=1;for(let i=0;i<3;i++){c.beginPath();c.moveTo(x+6-i*3,y+1);c.lineTo(x+9-i*5,y+11);c.stroke()}c.restore();for(let i=0;i<3;i++)para(x-20+i*1.5,y+14+i*1.5,1.8)},
+   /* 2 liver: lobed organ with parasites in the cells */
+   (x,y)=>{c.save();const g=c.createLinearGradient(x-18,y-12,x+18,y+12);g.addColorStop(0,'#c0504d');g.addColorStop(1,'#7a1f2a');c.fillStyle=g;c.beginPath();c.moveTo(x-19,y-3);c.bezierCurveTo(x-16,y-17,x+8,y-17,x+19,y-8);c.bezierCurveTo(x+22,y+2,x+10,y+13,x-4,y+11);c.bezierCurveTo(x-14,y+10,x-21,y+4,x-19,y-3);c.fill();c.strokeStyle='rgba(60,0,10,.5)';c.beginPath();c.moveTo(x+2,y-12);c.quadraticCurveTo(x+4,y,x-3,y+10);c.stroke();c.restore();for(let i=0;i<5;i++)para(x-10+i*5,y-4+3*Math.sin(i*2),1.9)},
+   /* 3 RBC stage: infected red cells (ring forms) and one bursting */
+   (x,y)=>{rbc(x-12,y-6,8);rbc(x+9,y-8,8);rbc(x-2,y+8,8);c.save();c.strokeStyle='#c77dff';c.lineWidth=1.6;c.beginPath();c.arc(x-12,y-6,3.2,0,TAU);c.stroke();c.beginPath();c.arc(x+9,y-8,3.2,0,TAU);c.stroke();c.strokeStyle='#ffd43b';c.lineWidth=1.3;for(let i=0;i<8;i++){const a=TAU*i/8;c.beginPath();c.moveTo(x-2+Math.cos(a)*9.5,y+8+Math.sin(a)*9.5);c.lineTo(x-2+Math.cos(a)*14,y+8+Math.sin(a)*14);c.stroke()}c.restore()},
+   /* 4 gametocytes: red cell containing a crescent gametocyte */
+   (x,y)=>{rbc(x-6,y,12);c.save();c.strokeStyle='#be4bdb';c.lineWidth=4.2;c.lineCap='round';c.beginPath();c.arc(x-6,y,6.5,.5,TAU-.9);c.stroke();c.restore();rbc(x+14,y-9,6);c.save();c.strokeStyle='#be4bdb';c.lineWidth=2.4;c.beginPath();c.arc(x+14,y-9,3,.3,TAU-1);c.stroke();c.restore()},
+   /* 5 mosquito gut: wall with oocysts */
+   (x,y)=>{c.save();c.fillStyle='#e8c78a';c.strokeStyle='#a1783a';c.lineWidth=1.4;c.beginPath();c.ellipse(x,y,20,12,0,0,TAU);c.fill();c.stroke();c.restore();for(let i=0;i<4;i++){c.save();c.fillStyle='#fff3c9';c.strokeStyle='#a1783a';c.beginPath();c.arc(x-11+i*7,y+9-Math.abs(i-1.5)*2,3.6,0,TAU);c.fill();c.stroke();c.restore()}para(x-3,y-3,3.4);para(x+5,y-2,3.4)},
+   /* 6 salivary glands: acini with sporozoites in the duct */
+   (x,y)=>{c.save();c.fillStyle='#ffd8a8';c.strokeStyle='#d9843a';c.lineWidth=1.2;for(let i=0;i<5;i++){c.beginPath();c.arc(x-12+i*6.5,y-4+(i%2)*7,6.2,0,TAU);c.fill();c.stroke()}c.strokeStyle='#9c6b3c';c.lineWidth=2.2;c.beginPath();c.moveTo(x-14,y+10);c.lineTo(x+16,y+10);c.stroke();c.restore();for(let i=0;i<4;i++)para(x-6+i*5,y+10,1.6)}];
+  /* flow arrows between consecutive stages (curved along the loop) */
+  c.save();c.lineWidth=2;for(let i=0;i<6;i++){const a=P[i],b=P[(i+1)%6],on=i===st-1,mid=[(a[0]+b[0])/2+(CX-(a[0]+b[0])/2)*.0,(a[1]+b[1])/2],ang=Math.atan2(b[1]-a[1],b[0]-a[0]),d=Math.hypot(b[0]-a[0],b[1]-a[1]),sx=a[0]+Math.cos(ang)*(R+5),sy=a[1]+Math.sin(ang)*(R+5),ex=b[0]-Math.cos(ang)*(R+9),ey=b[1]-Math.sin(ang)*(R+9);c.strokeStyle=on?'#ffd43b':'#3c5a70';c.fillStyle=on?'#ffd43b':'#3c5a70';c.setLineDash(on?[]:[5,4]);c.beginPath();c.moveTo(sx,sy);c.lineTo(ex,ey);c.stroke();c.setLineDash([]);c.beginPath();c.moveTo(ex,ey);c.lineTo(ex-Math.cos(ang-.45)*9,ey-Math.sin(ang-.45)*9);c.lineTo(ex-Math.cos(ang+.45)*9,ey-Math.sin(ang+.45)*9);c.closePath();c.fill()}c.restore();
+  const names=['mosquito bite','liver stage','RBC stage','gametocytes','mosquito gut','salivary glands'],lab=[[0,-1],[0,1],[0,1],[0,1],[0,-1],[0,-1]];
+  P.forEach(([x,y],i)=>{const on=i===st-1,mos=i>=4;c.save();c.fillStyle=on?'rgba(255,212,59,.18)':'rgba(16,36,58,.9)';c.strokeStyle=on?'#ffd43b':mos?'#ffa94d':'#4dabf7';c.lineWidth=on?3.5:2;c.beginPath();c.arc(x,y,R,0,TAU);c.fill();c.stroke();c.restore();c.save();c.beginPath();c.arc(x,y,R-2,0,TAU);c.clip();c.translate(x,y);c.scale(1.45,1.45);icons[i](0,0);c.restore();const L=lab[i];txt((i+1)+'  '+names[i],x+L[0]*(R+10),y+L[1]*(R+16),on?C.gold:C.white,on?15:14,L[0]<0?'right':L[0]>0?'left':'center')});
+  /* moving parasite along the arrow of the current stage */
+  {const a=P[st-1],b=P[st%6],q=cycle(t*.5,1);for(let i=0;i<4;i++)para(a[0]+(b[0]-a[0])*Math.min(1,q+i*.03)*.85+(hash(i)-.5)*7,a[1]+(b[1]-a[1])*Math.min(1,q+i*.03)*.85+(hash(i+2)-.5)*7,3.4)}
+  tag(c,MAL[st-1][0],44,98,C.gold,16);txt('blue ring: in human   orange ring: in female Anopheles   purple: parasite',44,120,C.muted,12,'left')},
  assumption:'Simplified cycle from NCERT Chapter 7; purple dots are parasites.'});
 
 /* ---------- Chapter 8: Microbes in Human Welfare ---------- */
