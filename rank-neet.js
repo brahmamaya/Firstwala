@@ -71,7 +71,7 @@ function chooser(p){if(subj!=='physics'){const c=el('div','rk-card rk-center wid
   for(const [cls,list] of JEE_CH){const c=el('div','rk-card'),l=el('div','rk-chlist');c.append(el('h3','',cls+' Physics'));
     list.forEach((n,i)=>{const b=btn('rk-ch'+(READY.includes(n)?'':' soon'),null,()=>{chap=n;tab='guide';load();selSet.clear();selOn=false;setHead();home()});b.append(el('i','',String(i+1)),el('span','',n),...(READY.includes(n)?[]:[el('b','','Soon')]));b.dataset.testid='rk-ch-'+(i+1)+(cls==='Class 12'?'b':'a');l.append(b)});c.append(l);p.append(c)}}
 function soonPane(p){const c=el('div','rk-card rk-center wide');c.append(el('h3','',(TABS.find(x=>x[0]===tab)||[0,'This'])[1]+' · coming soon'),el('p','rk-how',chap+' is being prepared. Ready now: '+READY.join(', ')+'.'),btn('rk-btn','Back to chapters',goBack));p.append(c)}
-const fig=key=>{const g=window.PhysicaRankFigs?.[key]?.();if(g)g.classList.add('rk-bigfig');return g};
+const fig=key=>{const gs=key.split(',').map(k=>window.PhysicaRankFigs?.[k]?.()).filter(Boolean);for(const g of gs)g.classList.add('rk-bigfig');if(gs.length<2)return gs[0]||null;const w=el('div','rk-figgrid');w.append(...gs);return w};
 /* small typesetter. parse() turns the markup into nodes (text, power, fraction, radical) that the page draws with DOM
    elements and the slide export draws on a canvas / writes into PowerPoint.
    Markup: {n;d} fraction, ^(x) power, √x / √(x) / √{n;d} radical, ΔA/A and X/Y fractions (units and plain words stay text). */
