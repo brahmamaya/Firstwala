@@ -7,6 +7,8 @@ const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group,subject:'chem
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const particles=(s,n,box,col,r=.07,seed=0,t=0)=>{for(let i=0;i<n;i++)s.ball([box[0]+(hash(i+seed)-.5)*box[3]+.05*Math.sin(t*2+i),box[1]+(hash(i+seed+31)-.5)*box[4],box[2]+(hash(i+seed+67)-.5)*box[5]],r,col,{flat:true})};
 
+// shaded, softly drifting particles (lit spheres, no per-frame allocation beyond scene calls)
+const orbs=(s,n,box,col,r=.09,seed=0,t=0)=>{for(let i=0;i<n;i++)s.ball([box[0]+(hash(i+seed)-.5)*box[3]+.07*Math.sin(t*1.6+i*1.7),box[1]+(hash(i+seed+31)-.5)*box[4]+.05*Math.cos(t*1.3+i),box[2]+(hash(i+seed+67)-.5)*box[5]],r,col,{spec:.7})};
 // point at fraction u (0..1) along a polyline
 const along=(pts,u)=>{let L=0;const ls=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1],pts[i][2]-pts[i-1][2]);ls.push(l);L+=l}let d=u*L;for(let i=0;i<ls.length;i++){if(d<=ls[i]||i===ls.length-1){const k=Math.min(1,d/ls[i]),a=pts[i],b=pts[i+1];return[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,a[2]+(b[2]-a[2])*k]}d-=ls[i]}};
 /* ---------- 1 Solutions ---------- */
@@ -17,8 +19,11 @@ add({...ch(1,'Solutions',PH),id:'chem-raoult',title:'Raoult’s law: vapour pres
  tryText:'What is the total vapour pressure of an equimolar mixture?',
  controls:[R('x','Mole fraction of benzene',0,1,.01,.5,'',2)],
  metrics:p=>{const pb=p.x*95.1,pt=(1-p.x)*28.4;return[N('p (benzene)',pb,'mm Hg',1),N('p (toluene)',pt,'mm Hg',1),N('Total vapour pressure',pb+pt,'mm Hg',1),N('Benzene in vapour',pb/(pb+pt)*100,'%',1)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:230,cy:290}),pb=p.x*95.1,pt=(1-p.x)*28.4;s.lathe([0,-1.8,0],[[.05,0],[1.2,.2],[1.3,1.2],[.6,2.4],[.25,2.7],[.25,3.2]],'#e9f6ff',{alpha:.14});s.cyl([0,-1.3,0],[0,1,0],1.15,.9,'#fff3bf',{alpha:.45});
-  particles(s,Math.round(pb/6),[0,.4,0,1.6,1.4,1.4],'#ffd43b',.08,0,t);particles(s,Math.round(pt/6),[0,.4,0,1.6,1.4,1.4],'#ff8787',.08,90,t);s.callout([.9,-1.3,0],'liquid mixture','#fff3bf',50,40);s.callout([.5,.9,0],'vapour above liquid','#e9f6ff',60,-50);s.render();
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:230,cy:290}),pb=p.x*95.1,pt=(1-p.x)*28.4,Y=-1.8;
+  s.lathe([0,Y,0],[[.001,0],[1.1,0],[1.2,.2],[1.3,1.2],[.6,2.4],[.28,2.7],[.28,3.2],[.34,3.26]],'#dff3ff',{alpha:.13,segs:20,spec:.7,shine:30});
+  s.lathe([0,Y,0],[[.001,.02],[1.08,.02],[1.18,.2],[1.26,.9],[1.22,.95],[.001,.9]],'#ffe8a3',{alpha:.5,segs:20,spec:.5});s.ring([0,Y+.92,0],[0,1,0],1.2,'#ffffff55',1,[],24);
+  const nb=Math.round(pb/6),nt=Math.round(pt/6),vap=(n,col,seed)=>{for(let i=0;i<n;i++){const y=-.55+hash(i+seed+31)*1.15+.05*Math.sin(t*1.3+i),r=1.3-.583*(y+.6)-.22,a=hash(i+seed)*TAU+t*.3*(i%2?1:-1),d=Math.sqrt(hash(i+seed+67))*r;s.ball([d*Math.cos(a),y,d*Math.sin(a)*.6],.085,col,{spec:.7})}};
+  vap(nb,'#ffd43b',0);vap(nt,'#ff8787',90);s.callout([.9,-1.3,0],'liquid mixture','#fff3bf',50,40);s.callout([.5,.4,0],'vapour above liquid','#e9f6ff',60,-50);s.render();
   chart(c,420,96,236,170,{title:'Vapour pressure (mm Hg) vs x(benzene)',xl:'x',xmin:0,xmax:1,ymin:0,ymax:100,series:[{fn:x=>x*95.1+(1-x)*28.4,col:C.gold},{fn:x=>x*95.1,col:'#ffd43b',dash:[4,4]},{fn:x=>(1-x)*28.4,col:'#ff8787',dash:[4,4]}],marker:[p.x,pb+pt]});tag(c,'yellow: benzene · red: toluene molecules in the vapour',44,98,C.muted,13)},
  assumption:'Ideal solution; pure-liquid vapour pressures at 298 K: benzene 95.1, toluene 28.4 mm Hg.'});
 
@@ -30,9 +35,11 @@ add({...ch(1,'Solutions',PH),id:'chem-colligative',title:'Colligative properties
  tryText:'Dissolve 0.5 mol of NaCl and of glucose. Compare the freezing points.',
  controls:[S('sol','Solute','NaCl',Object.keys(SOL).map(k=>[k,SOL[k][0]])),R('m','Molality',0,2,.05,.5,'mol/kg',2)],
  metrics:p=>{const i=SOL[p.sol][1],tb=.52*i*p.m,tf=1.86*i*p.m;return[N('van ’t Hoff factor i',i,'',0),N('Boiling point',100+tb,'°C',2),N('Freezing point',-tf,'°C',2),N('Mass of solute (1 kg water)',p.m*SOL[p.sol][2],'g',1)]},
- draw:(c,p,t)=>{const i=SOL[p.sol][1],s=P3.scene(c,{scale:56,cx:230,cy:290});beaker(s,[0,-1.8,0],1.3,3,'#74c0fc',.7);const n=Math.round(p.m*10);for(let k=0;k<n;k++){const q=[(hash(k)-.5)*2,-1.6+hash(k+11)*1.8,(hash(k+23)-.5)*1.5];if(i===1)s.ball(q,.1,'#ffd43b');else{s.ball(q,.09,'#9775fa');for(let j=1;j<i;j++)s.ball(V.add(q,[.25*j,.1,0]),.1,'#40c057')}}
-  s.cyl([1.7,-.3,0],[0,1,0],.07,3.4,'#e9f6ff',{alpha:.4});s.cyl([1.7,-1.9,0],[0,1,0],.13,.25,'#fa5252');s.cyl([1.7,-1.75+clamp(.52*i*p.m,0,4)*.35+.6,0],[0,1,0],.04,clamp(.52*i*p.m,0,4)*.7+1.2,'#fa5252');s.callout([1.7,1.2,0],`b.p. ${f(100+.52*i*p.m,2)} °C`,'#ff8787',30,-40);
-  s.callout([0,-1,.6],i===1?`${SOL[p.sol][0]} molecules (i = 1)`:`ions: i = ${i}`,'#e9f6ff',-80,-50);s.render();tag(c,`f.p. ${f(-1.86*i*p.m,2)} °C   ·   b.p. ${f(100+.52*i*p.m,2)} °C`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const i=SOL[p.sol][1],s=P3.scene(c,{scale:48,cx:225,cy:262}),dT=clamp(.52*i*p.m,0,4);glassBeaker(s,[0,-1.8,0],1.4,3,'#74c0fc',.7,{alpha:.38,ticks:false});
+  const n=Math.round(p.m*10),mv=(k,sd)=>[(hash(k+sd)-.5)*2.1+.06*Math.sin(t*1.5+k),-1.65+hash(k+sd+11)*1.7+.05*Math.cos(t*1.2+k),(hash(k+sd+23)-.5)*1.2];
+  for(let k=0;k<n;k++){if(i===1)s.ball(mv(k,0),.11,'#ffd43b',{spec:.7});else{s.ball(mv(k,0),i===3?.1:.09,'#9775fa',{spec:.7});for(let j=1;j<i;j++)s.ball(mv(k,j*40),.13,'#40c057',{spec:.7})}}
+  s.cyl([.9,.1,.55],[0,1,0],.07,3.4,'#e9f6ff',{alpha:.4});s.ball([.9,-1.55,.55],.14,'#fa5252',{spec:.7});s.cyl([.9,-.6+dT*.18,.55],[0,1,0],.035,dT*.36+1.9,'#fa5252');s.callout([.9,1.6,.55],`b.p. ${f(100+dT,2)} °C`,'#ff8787',30,-40);
+  s.callout([-.8,-1,.6],i===1?`${SOL[p.sol][0]} molecules (i = 1)`:`ions: i = ${i}`,'#e9f6ff',-60,-40);s.render();tag(c,`f.p. ${f(-1.86*i*p.m,2)} °C   ·   b.p. ${f(100+.52*i*p.m,2)} °C`,44,98,C.gold,15)},
  assumption:'Dilute ideal solutions with complete dissociation of electrolytes (ideal i).'});
 
 /* ---------- 2 Electrochemistry ---------- */
@@ -90,7 +97,7 @@ add({...ch(3,'Chemical Kinetics',PH),id:'chem-reaction-order',title:'Order of re
  tryText:'Double [A]₀ for each order and see what happens to t½.',
  controls:[R('o','Order',0,2,1,1),R('k','Rate constant k',.01,.5,.01,.1,'',2),R('A0','[A]₀',.2,2,.1,1,'M',1),R('tt','Time',0,60,1,10,'s')],
  metrics:p=>{const A=conc(p.o,p.k,p.A0,p.tt),half=p.o===0?p.A0/(2*p.k):p.o===1?.693/p.k:1/(p.k*p.A0);return[N('[A] now',A,'M',3),N('Half-life t½',half,'s',2),N('Units of k',['mol L⁻¹ s⁻¹','s⁻¹','L mol⁻¹ s⁻¹'][p.o])]},
- draw:(c,p,t)=>{const A=conc(p.o,p.k,p.A0,p.tt),s=P3.scene(c,{scale:56,cx:220});s.box([0,0,0],[3,2.4,1.8],'#e9f6ff',{alpha:.07});const nA=Math.round(A/2*40),nP=Math.round((p.A0-A)/2*40);particles(s,nA,[0,0,0,2.8,2.2,1.6],'#4dabf7',.09,0,t);particles(s,nP,[0,0,0,2.8,2.2,1.6],'#ffa94d',.09,200,t);s.callout([1.5,1.2,0],`[A] = ${f(A,3)} M`,'#4dabf7',30,-40);s.render();
+ draw:(c,p,t)=>{const A=conc(p.o,p.k,p.A0,p.tt),s=P3.scene(c,{scale:60,cx:220,cy:285});s.box([0,0,0],[3,2.4,1.8],'#e9f6ff',{alpha:.07});const nA=Math.round(A/2*40),nP=Math.round((p.A0-A)/2*40);orbs(s,nA,[0,0,0,2.7,2.1,1.5],'#4dabf7',.11,0,t);orbs(s,nP,[0,0,0,2.7,2.1,1.5],'#ffa94d',.11,200,t);s.callout([1.5,1.2,0],`[A] = ${f(A,3)} M`,'#4dabf7',30,-40);s.render();
   chart(c,420,96,236,170,{title:'[A] vs time',xl:'t (s)',xmin:0,xmax:60,ymin:0,ymax:2.05,series:[{fn:x=>conc(p.o,p.k,p.A0,x),col:C.gold}],marker:[p.tt,A]});tag(c,'blue: reactant A · orange: product',44,98,C.muted,13)},
  assumption:'Single reactant A → products at constant temperature.'});
 
@@ -101,8 +108,8 @@ add({...ch(3,'Chemical Kinetics',PH),id:'chem-arrhenius',title:'Arrhenius equati
  tryText:'Set Eₐ = 50 kJ/mol and compare 298 K with 308 K.',
  controls:[R('Ea','Activation energy Eₐ',10,150,1,50,'kJ/mol'),R('T','Temperature',250,500,1,298,'K')],
  metrics:p=>{const fr=Math.exp(-p.Ea*1000/(8.314*p.T)),r10=Math.exp(p.Ea*1000/8.314*(1/p.T-1/(p.T+10)));return[N('Fraction with E ≥ Eₐ',fr,'',3),N('Rate rise for +10 K',r10,'×',2)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:230,cy:300}),h=clamp(p.Ea/150*2.6,.3,2.6),path=Array.from({length:41},(_,i)=>{const x=-2.4+4.8*i/40;return[x,-1.4+h*Math.exp(-x*x*1.4)-.4*(x>0?Math.min(1,x):0),0]});s.tube(path,.06,'#868e96',{segs:6});
-  const fr=Math.exp(-p.Ea*1000/(8.314*p.T)),n=12;for(let i=0;i<n;i++){const hot=hash(i)<Math.min(1,fr*1e3**(p.Ea>60?0:0))||i<Math.round(clamp(Math.log10(fr*1e12)/12,0,1)*n*.6),u=hot?cycle(t*.3+i/n,1):.08+.1*Math.sin(t*3+i),q=path[clamp(Math.round(u*40),0,40)];s.ball(V.add(q,[0,.15,(hash(i+5)-.5)*.6]),.1,hot?'#ff6b6b':'#4dabf7',{flat:true})}
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:240,cy:262,pitch:.05}),h=clamp(p.Ea/150*2.6,.3,2.6),path=Array.from({length:41},(_,i)=>{const x=-2.4+4.8*i/40;return[x,-1.4+h*Math.exp(-x*x*1.4)-.4*(x>0?Math.min(1,x):0),0]});s.tube(path,.08,'#ced4da',{segs:10,spec:.7});
+  const fr=Math.exp(-p.Ea*1000/(8.314*p.T)),n=12;for(let i=0;i<n;i++){const hot=hash(i)<Math.min(1,fr*1e3**(p.Ea>60?0:0))||i<Math.round(clamp(Math.log10(fr*1e12)/12,0,1)*n*.6),u=hot?cycle(t*.3+i/n,1):.08+.1*Math.sin(t*3+i),q=path[clamp(Math.round(u*40),0,40)];s.ball(V.add(q,[0,.17,(hash(i+5)-.5)*.6]),.12,hot?'#ff6b6b':'#4dabf7',{spec:.7})}
   s.arrow([0,-1.4,0],[0,-1.4+h,0],'#ffd43b',2.5,8,`Eₐ = ${p.Ea} kJ/mol`);s.callout(path[4],'reactants','#e9f6ff',-20,-60);s.callout(path[38],'products','#e9f6ff',20,50);s.render();
   chart(c,420,96,236,170,{title:'ln k vs 1/T (×1000)',xl:'1000/T',xmin:2,xmax:4,ymin:-60,ymax:0,series:[{fn:x=>-p.Ea*x/8.314,col:C.gold}],marker:[1000/p.T,-p.Ea*1000/(8.314*p.T)]})},
  assumption:'Arrhenius behaviour with temperature-independent A and Eₐ; red molecules are those shown crossing the barrier (illustrative count).'});
