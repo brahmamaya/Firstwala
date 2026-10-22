@@ -153,7 +153,7 @@ const is3D=s=>mode==='ultra'&&!INT(s.id)?.allViews&&!(INT(s.id)||window.PhysicaU
   function select(s,scroll=true){if(!s)return;wake();window.PhysicaExperience?.onSelect();current=s;elapsed=0;history.replaceState(null,'',`#${s.id}`);render();if(scroll)window.scrollTo({top:0,behavior:'smooth'});window.dispatchEvent(new Event('physica-sim'))}
   window.PhysicaState={get sim(){return current},get params(){return saved.get(current.id)},get time(){return elapsed}};
   function syncPlay(){$('play-icon').textContent=playing?'Ⅱ':'▶';$('play-label').textContent=playing?'Pause':'Play';$('play').setAttribute('aria-label',playing?'Pause simulation':'Play simulation');$('live-status').textContent=playing?'LIVE SIMULATION':'SIMULATION PAUSED';document.querySelector('.stage').classList.toggle('paused',!playing);window.PhysicaExperience?.update()}
-  // Big classroom boards (4K panels with phone-class chips) and Teacher mode run "lite": no live blur, and frames are
+  // Big classroom boards (4K panels with phone-class chips) run "lite": no live blur, and frames are
   // paced at 30 per second so motion stays even. Resolution adapts to how long drawing really takes (not to the
   // screen's refresh rate), between the screen's own pixels and full sharpness (devicePixelRatio, max 2).
   const BIG=document.documentElement.classList.contains('board');
@@ -162,7 +162,7 @@ const is3D=s=>mode==='ultra'&&!INT(s.id)?.allViews&&!(INT(s.id)||window.PhysicaU
   const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);document.documentElement.classList.toggle('noblur',IOS);
   // auto-lite only for a device that is truly struggling: judged after the first 8 s, only while a simulation plays,
   // needs ~7 s of slow frames AND slow drawing, and switches back once drawing is easy again (never sticky)
-  const T0=performance.now();let autoLite=false,slowN=0,fastN=0,lastLite=0,gapAvg=16.7,prevT=0,rafAvg=16.7,lastRaf=0;const lite=()=>BIG||autoLite||document.body.classList.contains('mode-teacher');let lastDraw=0;
+  const T0=performance.now();let autoLite=false,slowN=0,fastN=0,lastLite=0,gapAvg=16.7,prevT=0,rafAvg=16.7,lastRaf=0;const lite=()=>BIG||autoLite;let lastDraw=0;
   let renderScale=1,cost=6,lastAdapt=0,lastUp=-1e5,upWait=2000,lateN=0,easyN=0,lastTick=0;window.PhysicaPerf={get cost(){return+cost.toFixed(1)},get scale(){return+renderScale.toFixed(2)}};function adapt(ms,now){if(window.PhysicaRecordWidth)return;cost+=(ms-cost)*.08;if(prevT&&now-prevT<250)gapAvg+=(now-prevT-gapAvg)*.05;prevT=now;window.PhysicaLite=lite();document.documentElement.classList.toggle('lite',window.PhysicaLite);if(now-lastLite>900){lastLite=now;if(now-T0>8000&&!document.hidden&&playing){if(!autoLite){if(gapAvg>30&&(renderScale<=.51||BIG))slowN++;else slowN=Math.max(0,slowN-1);if(slowN>=8){autoLite=true;fastN=0}}else{if(cost<5&&rafAvg<18.5)fastN++;else fastN=0;if(fastN>=8){autoLite=false;slowN=0}}}}
     if(now-lastAdapt<900||now-lastTick<900)return;lastTick=now;
     const budget=lite()?22:14,late=BIG?autoLite&&gapAvg>60:gapAvg>(autoLite?40:21),floorS=BIG?.9:.75,easy=gapAvg<(autoLite?36:18.5);lateN=cost>budget||late?lateN+1:0;easyN=cost<budget*.45&&easy?easyN+1:0;
