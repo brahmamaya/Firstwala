@@ -478,8 +478,19 @@ add({...ch(6,'Evolution',U7),id:'bio-hardy-weinberg',title:'Hardy–Weinberg equ
  tryText:'Set s = 0. Do the frequencies change over generations?',
  controls:[R('p0','Initial frequency p (allele A)',.05,.95,.01,.5,'',2),R('s','Selection against aa (s)',0,1,.05,.3,'',2),R('gen','Generations',0,100,1,20)],
  metrics:p=>{const q=hwq(p,p.gen),pp=1-q;return[N('p (A)',pp,'',3),N('q (a)',q,'',3),N('AA : Aa : aa',`${f(pp*pp,2)} : ${f(2*pp*q,2)} : ${f(q*q,2)}`),N('In equilibrium?',p.s===0?'Yes — no change':'No — selection acting')]},
- draw:(c,p,t)=>{const q=hwq(p,p.gen),pp=1-q,s=P3.scene(c,{scale:50,cy:300,pitch:.4,cx:230}),n=100,fa=pp*pp,fh=2*pp*q;for(let i=0;i<n;i++){const x=-2.2+(i%10)*.48,z=-1.6+Math.floor(i/10)*.36,f2=(i+.5)/n,col=f2<fa?'#4dabf7':f2<fa+fh?'#9775fa':'#ff6b6b';s.mesh([x,-1.5,z],[.17,.1,.13],col,{rings:6,segs:10})}s.render();
-  chart(c,420,96,236,170,{title:'Allele frequency q over time',xl:'generations',xmin:0,xmax:100,ymin:0,ymax:1,series:[{pts:Array.from({length:101},(_,g)=>[g,hwq(p,g)]),col:C.red},{pts:Array.from({length:101},(_,g)=>[g,1-hwq(p,g)]),col:C.blue}],marker:[p.gen,q]});tag(c,'blue AA · purple Aa · red aa',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const q=hwq(p,p.gen),pp=1-q,fa=pp*pp,fh=2*pp*q,fr=q*q,n=100,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  gc=['#4dabf7','#9775fa','#ff6b6b'],
+  /* 100 individuals: each circle is one organism coloured by genotype */
+  org=(x,y,col)=>{const gr=c.createRadialGradient(x-3,y-3,1,x,y,9);gr.addColorStop(0,'#fff8');gr.addColorStop(.25,col);gr.addColorStop(1,col);c.save();c.fillStyle=col;c.beginPath();c.arc(x,y,8.2,0,TAU);c.fill();c.fillStyle='rgba(255,255,255,.28)';c.beginPath();c.arc(x-2.5,y-2.8,3,0,TAU);c.fill();c.restore()};
+  for(let i=0;i<n;i++){const f2=(i+.5)/n;org(50+(i%10)*19,138+Math.floor(i/10)*19.5,f2<fa?gc[0]:f2<fa+fh?gc[1]:gc[2])}
+  txt('population of 100 individuals',58,118,C.muted,11,'left');
+  const bar=(x,y,w,parts,label)=>{txt(label,x,y-12,C.muted,11,'left');let cx=x;for(const [v,col,tx] of parts){const ww=w*v;c.save();c.fillStyle=col;c.fillRect(cx,y,ww,18);c.restore();if(ww>34)txt(tx,cx+ww/2,y+9,'#10243a',11);cx+=ww}c.save();c.strokeStyle='rgba(180,200,215,.5)';c.strokeRect(x,y,w,18);c.restore()};
+  bar(258,156,150,[[pp,gc[0],'A '+f(pp,2)],[q,gc[2],'a '+f(q,2)]],'allele frequencies  p + q = 1');
+  bar(258,214,150,[[fa,gc[0],'AA'],[fh,gc[1],'Aa'],[fr,gc[2],'aa']],'genotypes  p² + 2pq + q² = 1');
+  txt('AA '+f(fa,2)+'   Aa '+f(fh,2)+'   aa '+f(fr,2),258,246,C.white,12,'left');
+  txt(p.s===0?'no selection: frequencies stay constant':'selection against aa: q falls',258,276,p.s===0?C.mint:C.red,12,'left');
+  chart(c,420,96,236,170,{title:'Allele frequency q over time',xl:'generations',xmin:0,xmax:100,ymin:0,ymax:1,series:[{pts:Array.from({length:101},(_,g)=>[g,hwq(p,g)]),col:C.red},{pts:Array.from({length:101},(_,g)=>[g,1-hwq(p,g)]),col:C.blue}],marker:[p.gen,q]});tag(c,'blue AA · purple Aa · red aa',44,98,C.muted,12)},
  assumption:'Large random-mating population; selection acts only on the recessive homozygote (fitness 1 − s).'});
 function hwq(p,g){let q=1-p.p0;for(let i=0;i<g;i++)q=q*(1-p.s*q)/(1-p.s*q*q);return q}
 
