@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
-const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
+const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,stick,glassBeaker,lobe,tint}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3.2+i*6.4/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.5,h,.5],on?'#ffd43b':col);s.engrave([x,h+.25,.3],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
@@ -92,9 +92,14 @@ add({...ch(5,'Coordination Compounds',IN),id:'chem-geometric-isomers',title:'Geo
  tryText:'In fac-[Co(NH₃)₃Cl₃], what is the angle between any two Cl ligands?',
  controls:[S('iso','Isomer','trans',[['cis','cis-[Co(NH₃)₄Cl₂]⁺'],['trans','trans-[Co(NH₃)₄Cl₂]⁺'],['fac','fac-[Co(NH₃)₃Cl₃]'],['mer','mer-[Co(NH₃)₃Cl₃]']])],
  metrics:p=>[N('Isomer',{cis:'cis (Cl at 90°)',trans:'trans (Cl at 180°)',fac:'facial',mer:'meridional'}[p.iso]),N('Colour',{cis:'violet',trans:'green',fac:'—',mer:'—'}[p.iso]),N('Coordination number',6,'',0)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:250,yaw:t*.3,pitch:.3}),D=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],cl={cis:[0,2],trans:[2,3],fac:[0,2,4],mer:[0,1,2]}[p.iso];atom(s,[0,0,0],'Co',1.2);
-  D.forEach((u,i)=>{const q=V.mul(u,1.3),isCl=cl.includes(i);bond(s,[0,0,0],q);atom(s,q,isCl?'Cl':'N',isCl?1:.9);if(!isCl)for(let k=0;k<3;k++){const a=TAU*k/3;atom(s,V.add(q,V.add(V.mul(u,.28),[.18*Math.cos(a)*(u[0]?0:1),.18*Math.sin(a)*(u[1]?0:1),.18*(u[2]?0:(u[1]?Math.sin(a):Math.cos(a)))])),'H',.55)}});
-  s.callout(V.mul(D[cl[0]],1.3),'Cl⁻','#40c057',50,-50);s.callout([0,0,0],'Co³⁺','#d9844a',-60,60);s.render();tag(c,{cis:'cis: Cl–Co–Cl 90°',trans:'trans: Cl–Co–Cl 180°',fac:'fac: three Cl on one face',mer:'mer: three Cl in one plane'}[p.iso],44,98,C.gold,15)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:250,cy:285,yaw:t*.3,pitch:.3}),D=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],cl={cis:[0,2],trans:[2,3],fac:[0,2,4],mer:[0,1,2]}[p.iso],L=1.75;
+  for(let i=0;i<6;i++)for(let j=i+1;j<6;j++)if(j!==(i^1))s.seg(V.mul(D[i],L),V.mul(D[j],L),'#74c0fc55',1);
+  s.ball([0,0,0],.36,'#e8909f',{spec:.7});
+  D.forEach((u,i)=>{const q=V.mul(u,L),isCl=cl.includes(i);stick(s,[0,0,0],q,1,{ca:'Co',cb:isCl?'Cl':'N',r:.075});
+   if(isCl){atom(s,q,'Cl',1.15);return}
+   atom(s,q,'N',.95);const e=Math.abs(u[1])<.9?[0,1,0]:[1,0,0],e1=V.norm(V.cross(u,e)),e2=V.cross(u,e1);
+   for(let k=0;k<3;k++){const a=TAU*k/3+.5,d=V.add(V.mul(u,.34),V.add(V.mul(e1,.9*Math.cos(a)),V.mul(e2,.9*Math.sin(a)))),h=V.add(q,V.mul(V.norm(d),.5));stick(s,q,h,1,{ca:'N',cb:'H',r:.045});atom(s,h,'H',.7)}});
+  s.callout(V.mul(D[cl[0]],L),'Cl⁻','#40c057',45,-45);s.callout([0,0,0],'Co³⁺','#e8909f',-60,55);s.render();tag(c,{cis:'cis: Cl–Co–Cl 90°',trans:'trans: Cl–Co–Cl 180°',fac:'fac: three Cl on one face',mer:'mer: three Cl in one plane'}[p.iso],44,98,C.gold,15)},
  assumption:'Ideal octahedral geometry; NH₃ hydrogens drawn schematically.'});
 
 /* 6 Haloalkanes */
