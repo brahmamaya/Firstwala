@@ -96,7 +96,7 @@ add({...ch(5,'Thermodynamics',PH),id:'chem-hess-law',title:'Hess’s law: two ro
  tryText:'Use the two-step path. Add up the steps.',
  controls:[S('route','Route','two',[['one','Direct'],['two','Through CO']]),R('mol','Moles of carbon',.5,3,.5,1,'mol',1)],
  metrics:p=>[N('Step 1',p.route==='two'?`${f(-110.5*p.mol,1)} kJ (C → CO)`:`${f(-393.5*p.mol,1)} kJ (C → CO₂)`),N('Step 2',p.route==='two'?`${f(-283*p.mol,1)} kJ (CO → CO₂)`:'—'),N('Total ΔH',-393.5*p.mol,'kJ',1)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:48,cx:260,cy:300,pitch:.15}),k=4/393.5,y0=1.8,lev=(y,lab,x0=-2.4,x1=-.6)=>{s.box([(x0+x1)/2,y,0],[x1-x0,.08,.6],'#42d9ca');s.label([x1+.15,y,0],lab,C.white,12,'left')};
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:40,cx:230,cy:235,pitch:.03}),k=4/393.5,y0=1.8,lev=(y,lab,x0=-2.4,x1=-.6)=>{s.box([(x0+x1)/2,y,0],[x1-x0,.08,.6],'#42d9ca');s.label([x1+.15,y,0],lab,C.white,12,'left')};
   lev(y0,'C + O₂');lev(y0-393.5*k,'CO₂');if(p.route==='two'){lev(y0-110.5*k,'CO + ½O₂',.6,2.4);s.arrow([.9,y0,0],[.9,y0-110.5*k,0],'#ffd43b',3,9,'−110.5 kJ');s.arrow([1.6,y0-110.5*k,0],[1.6,y0-393.5*k,0],'#ff8787',3,9,'−283.0 kJ')}s.arrow([-1.5,y0,0],[-1.5,y0-393.5*k,0],'#69db7c',4,10,'−393.5 kJ');s.render();tag(c,`ΔH (total) = ${f(-393.5*p.mol,1)} kJ for ${p.mol} mol C`,44,98,C.gold,15)},
  assumption:'Standard enthalpies at 298 K; per mole of carbon (graphite).'});
 
