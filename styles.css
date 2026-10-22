@@ -1240,3 +1240,21 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .rk-skel{display:grid;gap:10px;padding:10px 0;width:100%}.rk-skel i{display:block;height:58px;border-radius:12px;background:linear-gradient(90deg,rgba(128,140,170,.16),rgba(128,140,170,.32),rgba(128,140,170,.16));background-size:200% 100%;animation:rkshim 1.2s linear infinite}
 @keyframes rkshim{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.rk-skel i{animation:none}}
+
+/* ONE-TOOL button (landing, between the email and WhatsApp icons) and its launch panel */
+.landing-icons{align-items:center}
+.landing-one{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:92px;min-height:76px;padding:8px 14px;border-radius:18px;border:1px solid rgb(var(--ovt) / .32);background:rgb(var(--ovt) / .08);color:var(--t-fff);cursor:pointer;font-family:'Orbitron',sans-serif;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.landing-one span{font-size:12px;font-weight:800;letter-spacing:.14em;line-height:1}
+.landing-one:hover,.landing-one:focus-visible{background:rgb(var(--ovt) / .18);border-color:rgb(var(--ovt) / .6)}
+:root[data-theme="light"] .landing-one{background:#fff;border-color:#c7d3e6;color:#0b1220}
+.one-dlg{width:min(92vw,380px);padding:22px 22px 18px;border-radius:18px;border:1px solid #2c4468;background:#05080d;color:#fff}
+.one-dlg::backdrop{background:rgba(0,0,0,.65)}
+.one-dlg h2{margin:0 0 4px;font-family:'Orbitron',sans-serif;font-size:22px;letter-spacing:.14em;font-weight:800}
+.one-sub{margin:0 0 12px;font-size:15px;font-weight:700}
+.one-dlg ul{margin:0 0 14px;padding-left:18px;font-size:14.5px;line-height:1.55}
+.one-soon{margin:0 0 14px;padding:8px 12px;border-radius:10px;background:#fff;color:#000;font-family:'Orbitron',sans-serif;font-weight:800;font-size:13px;letter-spacing:.08em;text-align:center}
+.one-close{width:100%;min-height:44px;border-radius:12px;border:1px solid #2c4468;background:#10223a;color:#fff;font:700 14px system-ui;cursor:pointer}
+.one-close:hover,.one-close:focus-visible{background:#18345a}
+:root[data-theme="light"] .one-dlg{background:#fff;color:#0b1220;border-color:#c7d3e6}
+:root[data-theme="light"] .one-soon{background:#0b1220;color:#fff}
+:root[data-theme="light"] .one-close{background:#f1f5fb;color:#0b1220;border-color:#c7d3e6}
