@@ -19,12 +19,35 @@ add({...ch(1,'Sexual Reproduction in Flowering Plants',U6),id:'bio-double-fertil
  tryText:'Pause at triple fusion. Which three nuclei fuse?',
  controls:[R('speed','Speed',.3,2,.1,1,'×',1)],
  metrics:(p,t)=>{const k=Math.min(4,Math.floor(cycle(t*p.speed,15)/3));return[N('Stage',DF[k][0]),N('What happens',DF[k][1]),N('Zygote','Diploid (2n)'),N('Primary endosperm nucleus','Triploid (3n)')]},
- draw:(c,p,t)=>{const T=cycle(t*p.speed,15),k=Math.min(4,Math.floor(T/3)),q=(T%3)/3,s=P3.scene(c,{scale:58,cy:262});s.mesh([0,-1.2,0],[1.1,1.0,1.0],'#c0eb75',{alpha:.25});s.tube([[0,-.25,0],[0,1.6,0]],.18,'#d8f5a2',{alpha:.3});s.mesh([0,1.75,0],[.42,.18,.42],'#ffd43b',{alpha:.6});
-  s.mesh([.2,-1.3,0],[.5,.62,.42],'#ffe066',{alpha:.3});const es=[.2,-1.3,0];const tubePath=[[0,1.8,.1],[0,1.0,.05],[0,0,0],[.05,-.6,.05],[.18,-.85,.0]];
-  if(k===0)s.ball([.15,1.95-.2*(1-q),.1],.13,'#f59f00',{label:'pollen'});else{s.ball([.15,1.95,.1],.13,'#f59f00');const reach=k===1?q:1;s.tube(tubePath.filter((_,i)=>i<=Math.ceil(reach*4)),.04,'#fab005',{segs:6})}
-  s.ball(V.add(es,[0,.35,0]),.09,BC.female,{label:k<3?'egg':''});for(const z of[-.15,.15])s.ball(V.add(es,[.1,.4,z]),.06,'#e599f7');for(const y of[.05,-.05])s.ball(V.add(es,[0,y,0]),.07,'#b197fc');for(let i=0;i<3;i++)s.ball(V.add(es,[(i-1)*.12,-.45,0]),.05,'#adb5bd');
-  if(k===3){const g1=V.add(V.mul([.18,-.85,0],1-q),V.mul(V.add(es,[0,.35,0]),q)),g2=V.add(V.mul([.18,-.85,0],1-q),V.mul(es,q));s.ball(g1,.06,BC.male,{glow:true});s.ball(g2,.06,BC.male,{glow:true})}
-  if(k===4){s.ball(V.add(es,[0,.35,0]),.13,'#e64980',{label:'zygote (2n)'});s.ball(es,.12,'#9775fa',{label:'PEN (3n)'})}const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L([.35,1.78,0],'stigma','#ffd43b',60,-30);L([.12,.9,0],'style','#d8f5a2',70,0);L([-1.0,-1.0,.2],'ovary','#c0eb75',-50,20);L([.65,-1.2,0],'ovule: embryo sac','#ffe066',60,20);if(k>=1&&k<4)L([0,.4,.04],'pollen tube','#fab005',-70,-30);if(k<3){L(V.add(es,[.1,.4,.15]),'synergids','#e599f7',60,50);L(V.add(es,[0,.05,0]),'2 polar nuclei','#b197fc',70,-10);L(V.add(es,[.12,-.45,0]),'antipodals','#adb5bd',60,-40)}s.render();tag(c,DF[k][0],44,98,C.gold,15)},
+ draw:(c,p,t)=>{const T=cycle(t*p.speed,15),k=Math.min(4,Math.floor(T/3)),q=(T%3)/3,s=P3.scene(c,{scale:56,cx:305,cy:248,pitch:.02}),AX=-2.5,E=[2.1,-.15,0],E3=(a,b)=>[E[0]+a,E[1]+b,0.12];
+  /* A: whole pistil, ovary cut open to show an ovule */
+  s.mesh([AX,-1.05,0],[.78,.8,.3],'#bfe38a',{alpha:.5,rings:12,segs:18,spec:.3});s.mesh([AX,-1.1,0],[.62,.62,.28],'#e8f6c8',{alpha:.5,rings:10,segs:14});s.mesh([AX,-.95,.05],[.2,.28,.12],'#f3e2a6',{rings:8,segs:12});
+  s.tube([[AX,-.35,0],[AX,.95,0]],.12,'#cdeea0',{alpha:.7,segs:10});s.mesh([AX,1.12,0],[.34,.14,.2],'#ffd43b',{rings:8,segs:12,spec:.4});
+  const tp=[[AX,1.2,.1],[AX,.5,.08],[AX,-.3,.08],[AX,-.7,.1]],reach=k===0?0:k===1?q:1;
+  for(let i=0;i<3;i++)s.ball([AX-.2+i*.2,1.26+.02*(i%2),.1],.07,'#f59f00',{flat:true,lift:2});
+  if(reach>0){const n=Math.max(2,Math.ceil(reach*3)),pts=[];for(let i=0;i<=n;i++){const f2=Math.min(1,i/3*1+0);pts.push(tp[Math.min(3,i)])}s.tube(pts.slice(0,Math.max(2,Math.floor(reach*3)+1)),.035,'#e8a317',{segs:6})}
+  s.callout([AX+.3,1.15,.1],'stigma','#ffd43b',45,-20);s.callout([AX+.1,.4,0],'style','#cdeea0',50,0);s.callout([AX-.5,-1.35,.2],'ovary','#bfe38a',-35,25);if(k===0)s.callout([AX-.2,1.28,.1],'pollen grains','#f59f00',-55,-25);else if(k===1)s.callout([AX,.2,.1],'pollen tube','#fab005',-60,10);
+  /* magnification lines */
+  s.seg([AX+.2,-.85,0],[E[0]-1.4,E[1]+1.2,0],'#8ca6b966',1,[3,3]);s.seg([AX+.2,-1.15,0],[E[0]-1.4,E[1]-1.2,0],'#8ca6b966',1,[3,3]);
+  /* B: ovule — integuments with the micropyle, nucellus, embryo sac */
+  s.mesh([E[0],E[1],-.1],[1.35,1.75,.3],'#c9a35a',{alpha:.38,rings:14,segs:24,spec:.3});s.mesh([E[0],E[1],-.05],[1.18,1.6,.3],'#e3c987',{alpha:.35,rings:14,segs:24});s.mesh([E[0],E[1],0],[.95,1.4,.25],'#f3e5b0',{alpha:.4,rings:14,segs:24});
+  s.tube([[E[0],E[1]+1.5,.1],[E[0],E[1]+1.8,.1]],.1,'#6b4f20',{segs:8,alpha:.8});
+  s.mesh([E[0],E[1]+.0,.08],[.68,1.15,.2],'#fff7c9',{alpha:.9,rings:14,segs:22,lift:1});
+  /* egg apparatus (micropylar end), central cell with polar nuclei, antipodals (chalazal end) */
+  for(const z of[-1,1]){const b=E3(z*.3,.78);s.ball(b,.17,'#e0b7f5',{spec:.4});s.ball([b[0],b[1]-.03,.2],.06,'#9c36b5',{flat:true,lift:2});for(let i=-1;i<=1;i++)s.seg([b[0]+i*.05,b[1]+.17,.12],[b[0]+i*.05,b[1]+.3,.12],'#b27fd1',1.2)}
+  const eg=E3(0,.55);s.ball(eg,.22,k===4?'#e64980':'#f783ac',{spec:.4});s.ball([eg[0],eg[1]-.04,.2],.085,k===4?'#a61e4d':'#c2255c',{flat:true,lift:2});
+  s.mesh([E[0],E[1]-.12,.06],[.55,.5,.12],'#fff2a8',{alpha:.5,rings:8,segs:14});
+  const pn=[E3(-.1,.0),E3(.1,-.1)];if(k<4){for(const q2 of pn)s.ball(q2,.09,'#845ef7',{spec:.4,lift:2})}else s.ball(E3(0,-.05),.17,'#9775fa',{spec:.4,lift:2});
+  for(let i=0;i<3;i++){const b=E3((i-1)*.3,-.95+.04*(i%2));s.ball(b,.15,'#adb5bd',{spec:.3});s.ball([b[0],b[1],.2],.055,'#6c757d',{flat:true,lift:2})}
+  /* pollen tube enters the micropyle and a synergid; two male gametes are released */
+  const syn=E3(-.3,.78);if(k===2){const tipY=E[1]+2.2-q*1.3,pts=[[E[0],E[1]+2.3,.1],[E[0],E[1]+1.8,.1],[E[0]-.02,Math.max(tipY,E[1]+.95),.1]];if(tipY<E[1]+.95)pts.push([syn[0]+.1,Math.max(tipY,syn[1]),.1]);s.tube(pts,.05,'#e8a317',{segs:6})}
+  if(k>=3){s.tube([[E[0],E[1]+2.3,.1],[E[0],E[1]+1.8,.1],[E[0]-.02,E[1]+.95,.1],[syn[0]+.1,syn[1],.1]],.05,'#e8a317',{segs:6,alpha:k===3?1:.5});
+   if(k===3){const o=[syn[0]+.1,syn[1],.2];const g1=V.add(V.mul(o,1-q),V.mul(eg,q)),g2=V.add(V.mul(o,1-q),V.mul([E[0],E[1]-.05,.2],q));s.ball(g1,.07,BC.male,{glow:true,lift:4});s.ball(g2,.07,BC.male,{glow:true,lift:4})}}
+  const L=(pt,txt,col,dx,dy)=>s.callout(pt,txt,col,dx,dy);L([E[0],E[1]+1.7,.1],'micropyle','#d8b36a',65,-10);L([E[0]+1.2,E[1]+.6,0],'integuments','#c9a35a',50,-20);
+  if(k<3){L([E[0]+.3,E[1]+.8,.2],'synergids','#e0b7f5',90,-40);L([E[0]+.2,E[1]+.5,.25],'egg','#f783ac',95,-10);L([E[0]+.1,E[1]-.1,.2],'2 polar nuclei','#b197fc',100,15);L([E[0]+.3,E[1]-.95,.2],'3 antipodals','#adb5bd',90,35)}
+  else if(k===4){L(eg,'zygote (2n)','#ff8fb7',100,-5);L(E3(0,-.05),'PEN (3n)','#c5b3ff',100,25)}
+  else L([E[0]+.3,E[1]+.0,.2],'embryo sac (7 cells, 8 nuclei)','#ffe066',85,45);
+  s.render();tag(c,DF[k][0],44,98,C.gold,15)},
  assumption:'Schematic pistil and one ovule; polar nuclei shown at the centre of the embryo sac.'});
 
 const ES=[['Megaspore mother cell (2n)',1,1],['Meiosis → 4 megaspores (n)',4,4],['3 degenerate; 1 functional megaspore',1,1],['Mitosis 1 → 2 nuclei',2,1],['Mitosis 2 → 4 nuclei',4,1],['Mitosis 3 → 8 nuclei',8,1],['Mature embryo sac: 7 cells, 8 nuclei',8,7]];
