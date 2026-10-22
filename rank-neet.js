@@ -129,12 +129,32 @@ function guide(p){const G=U().guide;p.append(el('p','rk-lead wide',G.intro));
   for(const m of G.myths){const d=el('div','rk-myth');d.append(el('p','rk-wrong',m[0]),el('p','rk-right',m[1]));g.append(d)}c.append(g);p.append(c)}
 function notes(p){const D=U(),l=el('div','rk-card wide rk-look');l.append(el('h3','','Remember in one look'));const ch=el('div','rk-chips');for(const x of D.look)ch.append(el('span','rk-tag',x));l.append(ch);p.append(l);
   D.notes.forEach(n=>{const c=el('div','rk-card rk-note-card');c.append(el('h3','',n.h));const ul=el('ul','rk-list');for(const i of n.items)ul.append(el('li','',i));c.append(ul);const fg=n.fig&&fig(n.fig);if(fg)c.append(fg);p.append(c)});}
-let pyqWait=null;const PQ=()=>window[CHAPS[CH()]?.q||'PhysicaRankPyq'],loadPyq=()=>PQ()?Promise.resolve():pyqWait||(pyqWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__PYQ_URL__';s.async=true;s.onload=ok;s.onerror=()=>{pyqWait=null;s.remove();no()};document.head.append(s)}));
+/* PYQ data is one small bundle per chapter. The topic list and counts come from PQ_IDX (built into this file), so the tab paints at once;
+   a chapter's questions load when the tab opens, and the other chapters trickle in when the phone is idle (one request at a time). */
+const PQ_IDX=__PYQ_IDX__,PQ_URL=__PYQ_MAP__,PQG=()=>CHAPS[CH()]?.q||'PhysicaRankPyq',PQ=()=>window[PQG()],pqWait=new Map(),pqFail=new Set();let pqBusy=0,lastAct=0,pfT=0;
+const loadPqG=g=>window[g]?Promise.resolve():pqWait.get(g)||(pqBusy++,pqWait.set(g,new Promise((ok,no)=>{const s=document.createElement('script');s.src=PQ_URL[g];s.async=true;s.onload=()=>{pqBusy--;ok()};s.onerror=()=>{pqBusy--;pqWait.delete(g);s.remove();no()};document.head.append(s)})),pqWait.get(g)),loadPyq=()=>loadPqG(PQG());
+for(const ev of ['pointerdown','keydown','touchmove','wheel','scroll'])addEventListener(ev,()=>{lastAct=Date.now()},{capture:true,passive:true});
+function prefetchPyq(){clearTimeout(pfT);if(!ov||!X.pyq||navigator.connection?.saveData===true)return;
+  const go=()=>{if(!ov)return;if(pqBusy||document.hidden||Date.now()-lastAct<1500){pfT=setTimeout(prefetchPyq,1200);return}
+    const cur=PYQ_CH.indexOf(CH()),nx=PYQ_CH.map((c,i)=>[Math.abs(i-cur),CHAPS[c].q]).filter(([,g])=>!window[g]&&!pqFail.has(g)).sort((a,b)=>a[0]-b[0])[0];
+    if(nx)loadPqG(nx[1]).then(prefetchPyq,()=>{pqFail.add(nx[1]);prefetchPyq()})};
+  window.requestIdleCallback?requestIdleCallback(go,{timeout:5000}):(pfT=setTimeout(go,1500))}
 let exWait=null;const loadExport=()=>window.PhysicaRankExport?Promise.resolve():exWait||(exWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__EXPORT_URL__';s.async=true;s.onload=ok;s.onerror=()=>{exWait=null;s.remove();no()};document.head.append(s)}));
 let selOn=false;const selSet=new Set();
 const ABC='abcd',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
-function pyq(p){const L=PQ(),idx=L&&new Map(L.map((q,i)=>[q,i]));
-  if(!L){p.append(loadCard('past-year questions'));loadPyq().then(()=>{if(ov&&tab==='pyq'&&view.className==='rk-view')home()},()=>{if(ov&&tab==='pyq')view.replaceChildren(failCard(home))});return}
+/* topic list from the index (no chapter data yet): same headings and sub-topic buttons as the full view; a tap loads the chapter and opens that sub-topic */
+function pyqIdx(p,g){const T=PQ_IDX[g]||[],ch=CH(),skel=()=>{const s=el('div','rk-skel');s.setAttribute('role','status');s.append(el('span','rk-sr','Loading questions…'),el('i'),el('i'),el('i'));return s};
+  const live=()=>p.isConnected&&ov&&tab==='pyq'&&CH()===ch&&view.className==='rk-view',up=key=>{if(!live())return;p.replaceChildren();p._items=null;pyq(p,key);masonry(p)};
+  let latest;const want=(key,body)=>(latest=key,loadPqG(g)).then(()=>{if(latest===key)up(key)},()=>{if(!live()||latest!==key)return;const e=el('div','rk-fail');e.setAttribute('role','alert');e.append(el('p','rk-how','Could not load the questions. Check your internet.'),btn('rk-mini','Try again',()=>{body.replaceChildren(skel());want(key,body)}));body.replaceChildren(e)});
+  const trow=el('div','rk-seltop wide'),tgl=btn('rk-pill rk-seltoggle','Select questions to make slides',()=>{selOn=true;tgl.disabled=true;const hd=el('div');trow.append(hd);hd.append(skel());want(null,hd)});tgl.dataset.testid='rk-select';trow.append(tgl);p.append(trow);
+  p.append((()=>{const bar=el('div','rk-filter wide');bar.append(el('span','',T.reduce((a,t)=>a+t[1].reduce((b,s)=>b+s[1],0),0)+' questions. Tap a sub-topic to open it.'));return bar})());
+  for(const [tp,sts] of T){p.append(el('h2','rk-sec wide',tname(tp)+' ('+sts.reduce((a,s)=>a+s[1],0)+')'));
+    for(const [st,n] of sts){const w=el('div','rk-subwrap wide'),body=el('div','rk-pane rk-subbody'),h=btn('rk-subbtn','',()=>{h.setAttribute('aria-expanded','true');body.hidden=false;body.style.display='';body.replaceChildren(skel());want(tp+'\u0001'+st,body)});
+      h.append(el('span','',st),el('b','',String(n)));h.setAttribute('aria-expanded','false');body.hidden=true;w.append(h,body);p.append(w)}}}
+/* openKey: undefined = open the first sub-topic (as before), null = open none, 'topic\u0001sub-topic' = open that one */
+function pyq(p,openKey){const L=PQ();prefetchPyq();
+  if(!L){const g0=PQG();pyqIdx(p,g0);loadPqG(g0).then(()=>{if(p.isConnected&&ov&&tab==='pyq'&&view.className==='rk-view'&&!p.querySelector('.rk-skel')&&window[g0])(p.replaceChildren(),p._items=null,pyq(p,null),masonry(p))},()=>{});return}
+  const idx=new Map(L.map((q,i)=>[q,i]));
   const card=(q,n)=>{const c=el('div','rk-card'),hd=el('div','rk-qhead');hd.append(el('span','rk-qn','Q'+(n+1)),el('span','rk-year',q.y));c.append(hd,el('p','rk-q',q.q));{const g=q.fig&&window.PhysicaFig?.(q.fig);if(g){g.classList.add('rk-fig');c.append(g)}}
     const i=idx.get(q),lab=el('label','rk-pick'),cb=el('input');cb.type='checkbox';cb.checked=selSet.has(i);cb.setAttribute('aria-label','Select question');c._i=i;c.classList.toggle('picked',cb.checked);
     cb.addEventListener('change',()=>{cb.checked?selSet.add(i):selSet.delete(i);c.classList.toggle('picked',cb.checked);refresh()});lab.append(cb,el('span','','Select'));hd.prepend(lab);
@@ -151,9 +171,9 @@ function pyq(p){const L=PQ(),idx=L&&new Map(L.map((q,i)=>[q,i]));
   tgl.dataset.testid='rk-select';dl.dataset.testid='rk-download';
   sbar.append(cnt,sa,sc,dl);const trow=el('div','rk-seltop wide');trow.append(tgl);p.prepend(trow);
   const syncChecks=()=>{for(const c of p.querySelectorAll('.rk-card')){if(c._i==null)continue;const on=selSet.has(c._i);c.querySelector('.rk-pick input').checked=on;c.classList.toggle('picked',on)}},
-    refresh=()=>{p.classList.toggle('selon',selOn);tgl.setAttribute('aria-pressed',String(selOn));tgl.textContent=selOn?'⬇ Tap download':'Select questions to make slides';sbar.hidden=!selOn;cnt.textContent=selSet.size+' selected';sa.hidden=sc.hidden=dl.hidden=!selOn;dl.disabled=!selSet.size;dl.setAttribute('aria-disabled',String(!selSet.size))};
-  let first=1;for(const tp of [...new Set(L.map(q=>q.tp))]){const T=L.filter(q=>q.tp===tp);p.append(el('h2','rk-sec wide',tname(tp)+' ('+T.length+')'));
-    for(const st of [...new Set(T.map(q=>q.st))]){p.append(sub(st,T.filter(q=>q.st===st),first));first=0}}
+    refresh=()=>{p.classList.toggle('selon',selOn);tgl.setAttribute('aria-pressed',String(selOn));tgl.textContent=selOn?'⬇ Tap download':'Select questions to make slides';sbar.hidden=!selOn;if(selOn)loadExport().catch(()=>{});cnt.textContent=selSet.size+' selected';sa.hidden=sc.hidden=dl.hidden=!selOn;dl.disabled=!selSet.size;dl.setAttribute('aria-disabled',String(!selSet.size))};
+  let first=openKey===undefined;for(const tp of [...new Set(L.map(q=>q.tp))]){const T=L.filter(q=>q.tp===tp);p.append(el('h2','rk-sec wide',tname(tp)+' ('+T.length+')'));
+    for(const st of [...new Set(T.map(q=>q.st))]){p.append(sub(st,T.filter(q=>q.st===st),first||openKey===tp+'\u0001'+st));first=false}}
   p.append(sbar);refresh()}
 /* Download dialog: what to include and which file, both required */
 const PAPERS=['JEE Main','JEE Advanced','IIT-JEE','AIEEE'];
