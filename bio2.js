@@ -108,12 +108,26 @@ add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-fluid-mosaic',title:'Fluid mos
  tryText:'Raise the temperature and watch lateral movement increase.',
  controls:[R('temp','Temperature',5,45,1,37,'°C'),S('show','Show proteins','yes',[['yes','Yes'],['no','No']])],
  metrics:p=>[N('Model','Fluid mosaic'),N('Lipid arrangement','Polar heads outside, hydrophobic tails inside'),N('Human RBC membrane','≈ 52% protein, 40% lipid'),N('Lateral movement',p.temp>30?'High':p.temp>15?'Moderate':'Low')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.35}),jig=.02+p.temp*.0025;for(let i=0;i<12;i++)for(let j=0;j<6;j++){const x=-3+i*.52+Math.sin(t*2+i*3+j)*jig*4,z=-1.4+j*.52+Math.cos(t*1.7+i+j*2)*jig*4;if(p.show==='yes'&&((i===3&&j===2)||(i===8&&j===3)))continue;
-   for(const sg of[1,-1]){s.ball([x,sg*.62,z],.13,'#ff8787');s.seg([x-.04,sg*.5,z],[x-.06,sg*.12,z],'#ffd43b',2);s.seg([x+.04,sg*.5,z],[x+.06+Math.sin(t*5+i)*jig*2,sg*.12,z],'#ffd43b',2)}}
-  if(p.show==='yes'){s.mesh([-3+3*.52,0,-1.4+2*.52],[.4,1.05,.4],'#5c7cfa',{shape:(u,v)=>1+.1*Math.sin(4*v)});s.mesh([-3+8*.52,.75,-1.4+3*.52],[.45,.25,.4],'#b197fc');for(let k=0;k<4;k++)s.ball([-3+3*.52+.15*Math.cos(k*1.6),1.15+.12*k,-1.4+2*.52+.1*Math.sin(k)],.08,'#69db7c',{flat:true});s.label([-1.5,1.6,-.4],'integral protein (glycoprotein)',C.blue,12);s.label([1.2,1.25,.2],'peripheral protein',C.purple,12)}
-  s.render();tag(c,'red: polar heads   yellow: fatty-acid tails',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.16,cy:262}),jig=.02+p.temp*.0025,NX=19,X0=-3.2,DX=.35,IX=-1.5,PX=1.5,show=p.show==='yes';
+  for(let i=0;i<NX;i++)for(let j=0;j<2;j++){const bx=X0+i*DX,z=-.2+j*.4;if(show&&Math.abs(bx-IX)<.42)continue;const x=bx+Math.sin(t*2+i*3+j)*jig*1,w=Math.sin(t*5+i+j*2)*jig*2;
+   for(const sg of[1,-1]){s.ball([x,sg*.62,z],.14,'#ff8787');s.seg([x-.05,sg*.5,z],[x-.07+w,sg*.12,z],'#ffd43b',2.4);s.seg([x+.05,sg*.5,z],[x+.09,sg*.32,z],'#ffd43b',2.4);s.seg([x+.09,sg*.32,z],[x+.05-w,sg*.12,z],'#ffd43b',2.4)}}
+  if(show){/* integral glycoprotein spanning the bilayer, sugar chain outside */
+   s.mesh([IX,0,0],[.38,.98,.34],'#5c7cfa',{shape:(u,v)=>1+.08*Math.sin(4*v)});s.mesh([IX,0,0],[.2,.9,.2],'#748ffc',{});
+   for(let k=0;k<5;k++){const q=[IX+.08*Math.sin(k*1.4)+.12*k*.5,1.05+.1*k,.05*k];s.ball(q,.07,'#69db7c',{flat:true});if(k)s.seg([IX+.08*Math.sin((k-1)*1.4)+.12*(k-1)*.5,1.05+.1*(k-1),.05*(k-1)],q,'#69db7c',1.6)}
+   /* peripheral protein on the inner surface */
+   s.mesh([PX,.95,0],[.5,.28,.4],'#b197fc',{});
+   s.callout([IX+.3,1.25,0],'integral protein (glycoprotein)','#91a7ff',-40,-40);s.callout([PX+.3,1.0,0],'peripheral protein','#d0bfff',50,-30)}
+  s.callout([2.9,-.66,.2],'polar head (hydrophilic)','#ff8787',-20,50);s.callout([1.9,-.3,.2],'fatty-acid tails (hydrophobic)','#ffd43b',-60,60);
+  s.label([-3.3,1.6,0],'outside the cell',C.muted,12,'left');s.label([-3.3,-1.5,0],'cytoplasm',C.muted,12,'left');s.render();tag(c,'red: polar heads   yellow: fatty-acid tails',44,98,C.muted,13)},
  assumption:'Molecules not to scale; cholesterol and carbohydrate chains simplified.'});
 
+const RQ=[0,.28,.52,.72,.86,.95,1],RA=32,RT=[],RC=['#f58a8a','#ee6a6a','#e44a4a','#d93636','#cc2a2a','#bf2424'];
+for(let i=0;i<RA;i++)RT.push([Math.cos(TAU*i/RA),Math.sin(TAU*i/RA)]);
+/* Human RBC: biconcave disc, Evans–Fung profile, R = 3.5 µm; axis tilted so the dimple shows. */
+function rbcDisc(s,p,su,a){const R=3.5*su,ca=Math.cos(a),sa=Math.sin(a),Y=q=>.5*R*Math.sqrt(Math.max(0,1-q*q))*(.207+2.003*q*q-1.123*q**4),
+ pt=(q,k,sg)=>{const r=R*q,x=r*RT[k][0],y=sg*Y(q),z=r*RT[k][1];return[p[0]+x,p[1]+y*ca-z*sa,p[2]+y*sa+z*ca]},
+ nm=(q,k,sg)=>{const h=.002,d=(Y(Math.min(1,q+h))-Y(Math.max(0,q-h)))/(R*2*h),nx=-sg*d*RT[k][0],ny=sg,nz=-sg*d*RT[k][1];return[nx,ny*ca-nz*sa,ny*sa+nz*ca]};
+ for(const sg of[1,-1])for(let i=0;i<RQ.length-1;i++)for(let k=0;k<RA;k++){const k2=(k+1)%RA,qm=(RQ[i]+RQ[i+1])/2;s.poly(sg>0?[pt(RQ[i],k,sg),pt(RQ[i],k2,sg),pt(RQ[i+1],k2,sg),pt(RQ[i+1],k,sg)]:[pt(RQ[i],k,sg),pt(RQ[i+1],k,sg),pt(RQ[i+1],k2,sg),pt(RQ[i],k2,sg)],RC[i],{normal:nm(qm,k,sg),cull:false,spec:.35})}}
 const SIZES=[['Mycoplasma (smallest cell)',.3,'#82c91e'],['Bacterium',4,'#94d82d'],['Human RBC',7,'#e03131']];
 add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-sizes',title:'How big are cells?',
  description:'Compare the smallest cells (Mycoplasma), bacteria and a human red blood cell, drawn to the same scale.',
@@ -122,8 +136,8 @@ add({...ch(8,'Cell: The Unit of Life',U3),id:'bio-cell-sizes',title:'How big are
  tryText:'Zoom out: how many Mycoplasma cells would fit across one RBC?',
  controls:[R('zoom','Zoom (μm across view)',1,20,.5,10,'μm',1)],
  metrics:p=>[N('Mycoplasma',.3,'μm',1),N('Bacteria','3–5 μm'),N('Human RBC',7,'μm',1),N('RBC ÷ Mycoplasma',7/.3,'×',0),N('Largest isolated cell','Ostrich egg')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.25}),su=6/p.zoom,gap=.35,W=.3*su+4*su+7*su+2*gap,x0=-W/2;s.ball([x0+.15*su,0,0],Math.max(.02,.15*su),'#82c91e');const bx=x0+.3*su+gap;capsule(s,[bx+.5*su,0,0],[bx+3.5*su,0,0],.5*su,'#94d82d');
-  s.mesh([bx+4*su+gap+3.5*su,0,0],[3.5*su,.9*su,3.5*su],'#e03131',{rot:[PI/2,0,0],shape:(u,v)=>1-.25*Math.exp(-(u*u)*4),rings:14,segs:24});s.render();
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.25}),su=6/p.zoom,gap=.35,W=.3*su+4*su+7*su+2*gap,x0=-W/2;s.ball([x0+.15*su,0,0],Math.max(.02,.15*su),'#82c91e');const bx=x0+.3*su+gap;capsule(s,[bx+.5*su,0,0],[bx+3.5*su,0,0],.5*su,'#94d82d',{segs:24});
+  rbcDisc(s,[bx+4*su+gap+3.5*su,0,0],su,PI/2-.5);s.render();
   const pxPerUm=Math.hypot(s.P([su,0,0])[0]-s.P([0,0,0])[0],s.P([su,0,0])[1]-s.P([0,0,0])[1]);c.save();c.strokeStyle='#e9f6ff';c.lineWidth=2;c.beginPath();c.moveTo(80,400);c.lineTo(80+pxPerUm,400);c.stroke();c.restore();tag(c,'1 μm',80+pxPerUm/2,388,C.white,12,'center');tag(c,'left: Mycoplasma · centre: bacterium · right: RBC',44,98,C.muted,13)},
  assumption:'Sizes from NCERT Chapter 8; the RBC is drawn as a flattened disc and the bacterium as a 4 μm rod.'});
 
@@ -135,9 +149,9 @@ add({...ch(9,'Biomolecules',U3),id:'bio-enzyme-kinetics',title:'Enzyme action an
  tryText:'Add inhibitor, then raise [S] a lot. Does V_max change?',
  controls:[R('S','Substrate concentration [S]',0,50,.5,10,'mM',1),R('Km','Michaelis constant K_m',1,20,.5,5,'mM',1),R('Vmax','Maximum rate V_max',10,100,5,60,'μmol/min'),R('I','Competitive inhibitor [I]',0,20,.5,0,'mM',1)],
  metrics:p=>{const Ka=p.Km*(1+p.I/2),v=p.Vmax*p.S/(Ka+p.S);return[N('Reaction rate v',v,'μmol/min',1),N('Fraction of V_max',v/p.Vmax*100,'%',0),N('Apparent K_m',Ka,'mM',1),N('Example','Malonate inhibits succinic dehydrogenase')]},
- draw:(c,p,t)=>{const Ka=p.Km*(1+p.I/2),v=p.Vmax*p.S/(Ka+p.S),s=P3.scene(c,{scale:58,cx:230}),ph=cycle(t*v/p.Vmax*1.2+.1,1);s.mesh([0,0,0],[1.1,.9,.9],'#748ffc',{shape:(u,v2)=>1-.45*Math.exp(-((u-1.1)**2*3+(v2-PI/2)**2*2))});
-  const occ=p.I>0&&hash(Math.floor(t))<p.I/(p.I+p.S+1e-9);s.ball([0,.65-(occ?0:.25*Math.min(1,ph*3)),.2],.22,occ?'#fa5252':'#ffd43b');if(!occ&&ph>.5){s.ball([.6+ph,.9+ph*.6,.2],.15,'#69db7c');s.ball([-.6-ph,.9+ph*.6,.2],.15,'#69db7c')}
-  for(let i=0;i<Math.min(24,Math.round(p.S/2));i++)s.ball([-2.2+hash(i)*4.4,-1.2+hash(i+5)*2.6,-1+hash(i+9)*.6],.12,'#ffd43b');for(let i=0;i<Math.round(p.I/2);i++)s.ball([-2.2+hash(i+50)*4.4,-1.2+hash(i+55)*2.6,-1+hash(i+59)*.6],.12,'#fa5252');s.part([-.8,-.5,.6],'enzyme','#91a7ff',12,[0,.6,0]);s.callout([0,.62,.5],'active site','#ffe066',-70,-55);s.callout([0,.65-(occ?0:.25*Math.min(1,ph*3)),.42],occ?'inhibitor blocks the site':'substrate binds (E–S complex)',occ?'#ff8787':'#ffd43b',70,-60);s.render();
+ draw:(c,p,t)=>{const Ka=p.Km*(1+p.I/2),v=p.Vmax*p.S/(Ka+p.S),s=P3.scene(c,{scale:52,cx:225,cy:262}),ph=cycle(t*v/p.Vmax*1.2+.1,1);s.mesh([0,-.25,0],[1.5,.85,.85],'#5c7cfa',{rings:12,segs:20,spec:.5});s.mesh([-.88,.35,0],[.62,.75,.72],'#748ffc',{rings:10,segs:16,spec:.5});s.mesh([.88,.35,0],[.62,.75,.72],'#748ffc',{rings:10,segs:16,spec:.5});
+  const occ=p.I>0&&hash(Math.floor(t))<p.I/(p.I+p.S+1e-9);s.ball([0,.95-(occ?0:.3*Math.min(1,ph*3)),.2],.22,occ?'#fa5252':'#ffd43b');if(!occ&&ph>.5){s.ball([.6+ph,1.3+ph*.6,.2],.15,'#69db7c');s.ball([-.6-ph,1.3+ph*.6,.2],.15,'#69db7c')}
+  for(let i=0;i<Math.min(24,Math.round(p.S/2));i++)s.ball([-2.2+hash(i)*4.4,-1.2+hash(i+5)*2.6,-1+hash(i+9)*.6],.12,'#ffd43b');for(let i=0;i<Math.round(p.I/2);i++)s.ball([-2.2+hash(i+50)*4.4,-1.2+hash(i+55)*2.6,-1+hash(i+59)*.6],.12,'#fa5252');s.part([-.8,-.5,.6],'enzyme','#91a7ff',12,[0,.6,0]);s.callout([0,.6,.3],'active site','#ffe066',-70,-55);s.callout([0,.95-(occ?0:.3*Math.min(1,ph*3)),.42],occ?'inhibitor blocks the site':'substrate binds (E–S complex)',occ?'#ff8787':'#ffd43b',70,-60);s.render();
   chart(c,420,96,236,170,{title:'v vs [S]',xl:'[S] (mM)',xmin:0,xmax:50,ymin:0,ymax:p.Vmax*1.05,series:[{fn:S=>p.Vmax*S/(p.Km+S),col:'#8ca6b9',dash:[4,4]},{fn:S=>p.Vmax*S/(Ka+S),col:C.gold}],marker:[p.S,v]});tag(c,'yellow: substrate · red: inhibitor · green: products',44,98,C.muted,13)},
  assumption:'Michaelis–Menten kinetics with K_i = 2 mM; dashed curve = without inhibitor.'});
 
@@ -149,7 +163,9 @@ add({...ch(9,'Biomolecules',U3),id:'bio-enzyme-conditions',title:'Temperature an
  tryText:'Find the pH where pepsin works best and compare it with trypsin.',
  controls:[S('enz','Enzyme','amylase',Object.entries(ENZ).map(([k,v])=>[k,v[1]])),R('T','Temperature',0,70,1,37,'°C'),R('pH','pH',1,12,.1,6.8,'',1)],
  metrics:p=>{const a=enzAct(p);return[N('Relative activity',a*100,'%',0),N('Optimum pH',ENZ[p.enz][0],'',1),N('Optimum temperature',37,'°C',0),N('State',p.T>50?'Denatured (irreversible)':p.T<10?'Inactive (reversible)':'Active')]},
- draw:(c,p,t)=>{const a=enzAct(p),s=P3.scene(c,{scale:60,cx:220}),wob=p.T>50?.35:0;s.mesh([0,0,0],[1.1,.9,.9],'#748ffc',{shape:(u,v)=>1+wob*Math.sin(5*v+t*3)*Math.cos(3*u)-(p.T<=50?.45*Math.exp(-((u-1.1)**2*3+(v-PI/2)**2*2)):0)});for(let i=0;i<Math.round(a*8);i++){const q=cycle(t*.6+i/8,1);s.ball([1.2+q*1.4,.4+.3*Math.sin(i),.2],.12,'#69db7c')}s.part([-.7,-.6,.5],p.T>50?'enzyme denatured (shape lost)':p.T<10?'enzyme inactive (cold)':'enzyme (protein)','#91a7ff',12,[0,0,0]);if(p.T<=50)s.callout([0,.62,.5],'active site','#ffe066',-60,-55);if(a>.05)s.callout([1.9,.45,.2],'products formed','#69db7c',40,-50);s.render();
+ draw:(c,p,t)=>{const a=enzAct(p),s=P3.scene(c,{scale:52,cx:215,cy:262});if(p.T>50)s.tube(Array.from({length:60},(_,i)=>[1.2*Math.sin(i*.21+t*.5)+.35*Math.sin(i*.63+t*.7),(i-30)*.045+.3*Math.sin(i*.37+t),.5*Math.cos(i*.29+t*.4)]),.07,'#748ffc',{segs:8});
+  else{s.mesh([0,-.25,0],[1.5,.85,.85],'#5c7cfa',{rings:12,segs:20,spec:.5});s.mesh([-.88,.35,0],[.62,.75,.72],'#748ffc',{rings:10,segs:16,spec:.5});s.mesh([.88,.35,0],[.62,.75,.72],'#748ffc',{rings:10,segs:16,spec:.5})}
+  for(let i=0;i<Math.round(a*8);i++){const q=cycle(t*.6+i/8,1);s.ball([1.2+q*1.4,.4+.3*Math.sin(i),.2],.12,'#69db7c')}s.part([-.7,-.6,.5],p.T>50?'enzyme denatured (shape lost)':p.T<10?'enzyme inactive (cold)':'enzyme (protein)','#91a7ff',12,[0,0,0]);if(p.T<=50)s.callout([0,.7,.3],'active site','#ffe066',-60,-55);if(a>.05)s.callout([1.9,.45,.2],'products formed','#69db7c',40,-50);s.render();
   chart(c,420,96,236,80,{title:'Activity vs temperature',xmin:0,xmax:70,ymin:0,ymax:1.05,series:[{fn:T=>enzAct({...p,T}),col:C.gold}],marker:[p.T,a]});chart(c,420,186,236,80,{title:'Activity vs pH',xmin:1,xmax:12,ymin:0,ymax:1.05,series:[{fn:x=>enzAct({...p,pH:x}),col:C.mint}],marker:[p.pH,a]})},
  assumption:'Bell-shaped teaching curves: temperature optimum 37 °C with denaturation above ~50 °C; pH optima are typical textbook values.'});
 function enzAct(p){const T=p.T,tf=T<=37?Math.exp(-(((T-37)/18)**2)):Math.exp(-(((T-37)/9)**2)),pf=Math.exp(-(((p.pH-ENZ[p.enz][0])/1.4)**2));return tf*pf}
@@ -298,9 +314,9 @@ add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-cell-cycle',title:'The 
  tryText:'Drag the clock to the end of S phase. What is the DNA content now?',
  controls:[R('h','Time in cycle',0,24,.1,6,'h',1),R('G1','G₁ duration',6,12,.5,11,'h',1),R('Sd','S duration',5,10,.5,8,'h',1)],
  metrics:p=>{const st=cyclePhase(p);return[N('Phase',st.name),N('DNA content',st.dna),N('Interphase share',(24-1)/24*100,'%',0),N('Event',st.ev)]},
- draw:(c,p,t)=>{const st=cyclePhase(p),s=P3.scene(c,{scale:56,pitch:.75,cx:230}),G2=24-1-p.G1-p.Sd,seg=[['G₁',p.G1,'#4dabf7'],['S',p.Sd,'#ff6b6b'],['G₂',G2,'#ffd43b'],['M',1,'#69db7c']];let a0=-PI/2;
-  seg.forEach(([n,d,col])=>{const a1=a0+TAU*d/24,pts=[];for(let i=0;i<=24;i++){const a=a0+(a1-a0)*i/24;pts.push([2*Math.cos(a),0,2*Math.sin(a)])}s.tube(pts,.2,col,{segs:8});const m=(a0+a1)/2;s.label([2.6*Math.cos(m),.3,2.6*Math.sin(m)],n,col,15);a0=a1});
-  const a=-PI/2+TAU*p.h/24;s.arrow([0,.1,0],[1.7*Math.cos(a),.1,1.7*Math.sin(a)],C.white,4);s.mesh([0,.6,0],.35+.15*st.g,BC.membrane,{alpha:.4});s.ball([0,.6,0],.18,BC.nucleus);s.render();
+ draw:(c,p,t)=>{const st=cyclePhase(p),s=P3.scene(c,{scale:44,pitch:.12,cx:230,cy:262}),G2=24-1-p.G1-p.Sd,seg=[['G₁',p.G1,'#4dabf7'],['S',p.Sd,'#ff6b6b'],['G₂',G2,'#ffd43b'],['M',1,'#69db7c']];let a0=-PI/2;
+  seg.forEach(([n,d,col])=>{const a1=a0+TAU*d/24,pts=[],K=Math.max(3,Math.round(32*d/24));for(let i=0;i<=K;i++){const a=a0+(a1-a0)*i/K;pts.push([2*Math.cos(a),-2*Math.sin(a),0])}s.tube(pts,.22,col,{segs:12});const m=(a0+a1)/2;s.label([2.75*Math.cos(m),-2.75*Math.sin(m),0],n,col,15);a0=a1});
+  const a=-PI/2+TAU*p.h/24;s.arrow([0,0,.1],[1.65*Math.cos(a),-1.65*Math.sin(a),.1],C.white,4);s.mesh([0,0,0],.5+.2*st.g,BC.membrane,{alpha:.35,rings:12,segs:20});s.mesh([0,0,0],.24+.06*st.g,BC.nucleus,{rings:10,segs:14});s.render();
   tag(c,`DNA: ${st.dna}`,44,98,C.gold,15)},
  assumption:'Typical 24 h human cell in culture; G₁ and S durations adjustable, M fixed at 1 h, G₂ takes the remainder.'});
 function cyclePhase(p){const G2=24-1-p.G1-p.Sd,h=p.h;if(h<p.G1)return{name:'G₁ (gap 1)',dna:'2C',ev:'Cell grows; prepares for DNA replication',g:h/24};if(h<p.G1+p.Sd){const k=(h-p.G1)/p.Sd;return{name:'S (synthesis)',dna:`${f(2+2*k,1)}C (replicating)`,ev:'DNA replicates; centriole duplicates (animal cells)',g:h/24}}if(h<23)return{name:'G₂ (gap 2)',dna:'4C',ev:'Proteins made for mitosis; growth continues',g:h/24};return{name:'M phase (mitosis)',dna:'4C',ev:'Nucleus and cell divide; each daughter cell then has 2C',g:1}}
@@ -360,8 +376,8 @@ add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-calvin-cycle',title:
  tryText:'How many turns are needed to make three glucose molecules?',
  controls:[R('co2','CO₂ molecules fixed',1,36,1,6)],
  metrics:p=>[N('Turns of the cycle',p.co2,'',0),N('ATP used',3*p.co2,'',0),N('NADPH used',2*p.co2,'',0),N('Glucose formed',p.co2/6,'',2)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.65,cx:240}),stages=[['Carboxylation (RuBisCO)','#ff6b6b'],['Reduction (ATP, NADPH)','#ffd43b'],['Regeneration of RuBP (ATP)','#4dabf7']];stages.forEach(([n,col],i)=>{const a0=-PI/2+TAU*i/3,pts=[];for(let j=0;j<=20;j++){const a=a0+TAU/3*j/20;pts.push([2*Math.cos(a),0,2*Math.sin(a)])}s.tube(pts,.16,col,{segs:8});const m=a0+PI/3;s.label([2.7*Math.cos(m),.3,2.7*Math.sin(m)],n,col,12)});
-  const a=-PI/2+TAU*cycle(t*.35,1);s.ball([2*Math.cos(a),.3,2*Math.sin(a)],.18,'#e9f6ff',{glow:true});s.ball([0,0,0],.25,'#40c057',{label:`${Math.floor(p.co2/6)} glucose`});const done=Math.min(p.co2,36);for(let i=0;i<done;i++)s.ball([-.9+(i%6)*.36,-.1,-.9+Math.floor(i/6)*.36],.09,'#868e96',{flat:true});s.render();tag(c,'grey dots: CO₂ fixed',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:38,pitch:.1,cx:270,cy:255}),stages=[['Carboxylation|(RuBisCO)','#ff6b6b'],['Reduction|(ATP, NADPH)','#ffd43b'],['Regeneration|of RuBP (ATP)','#4dabf7']],X=a=>[2*Math.cos(a),-2*Math.sin(a),0];stages.forEach(([n,col],i)=>{const a0=-PI/2+TAU*i/3,pts=[];for(let j=0;j<=20;j++)pts.push(X(a0+TAU/3*j/20));s.tube(pts,.17,col,{segs:12});const m=a0+PI/3;{const [n1,n2]=n.split('|'),q=[2.5*Math.cos(m),-2.5*Math.sin(m),0],al=Math.cos(m)>.2?'left':Math.cos(m)<-.2?'right':'center';s.label(q,n1,col,12,al);s.label([q[0],q[1]-.3,0],n2,col,12,al)}});
+  const a=-PI/2+TAU*cycle(t*.35,1);s.ball(V.add(X(a),[0,0,.1]),.2,'#e9f6ff',{glow:true});s.ball([0,.6,0],.28,'#40c057',{label:`${Math.floor(p.co2/6)} glucose`});const done=Math.min(p.co2,36);for(let i=0;i<done;i++)s.ball([-.75+(i%6)*.3,-.1-Math.floor(i/6)*.3,0],.09,'#868e96',{flat:true});s.render();tag(c,'grey dots: CO₂ fixed',44,98,C.muted,13)},
  assumption:'Stoichiometry from NCERT Chapter 11; intermediates such as 3-PGA and G3P not shown individually.'});
 
 add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-c3-c4',title:'C₃ vs C₄ plants and photorespiration',
@@ -371,10 +387,13 @@ add({...ch(11,'Photosynthesis in Higher Plants',U4),id:'bio-c3-c4',title:'C₃ v
  tryText:'Raise the temperature to 40 °C. Which plant keeps its rate?',
  controls:[S('type','Plant','c4',[['c3','C₃ (e.g. wheat, rice)'],['c4','C₄ (e.g. maize, sorghum)']]),R('T','Temperature',10,45,1,30,'°C')],
  metrics:p=>{const r=c34(p);return[N('Relative rate',r*100,'%',0),N('Primary CO₂ acceptor',p.type==='c4'?'PEP (3C), by PEP carboxylase':'RuBP (5C), by RuBisCO'),N('Photorespiration',p.type==='c4'?'Absent / negligible':'Present; rises with temperature'),N('Kranz anatomy',p.type==='c4'?'Present':'Absent')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.45,cx:230}),c4=p.type==='c4';s.box([0,0,0],[5,.9,2.6],'#d3f9d8',{alpha:.25});
-  for(let b=0;b<2;b++){const x=-1.2+b*2.4;s.cyl([x,0,0],[0,0,1],.3,2.4,'#e9ecef');if(c4)for(let i=0;i<10;i++){const a=TAU*i/10;s.cyl([x+.55*Math.cos(a),.55*Math.sin(a),0],[0,0,1],.2,2.3,'#2b8a3e',{alpha:.85})}
-   for(let i=0;i<14;i++){const a=TAU*i/14,r=c4?1.0:.6+.3*hash(i);s.ball([x+r*Math.cos(a),r*Math.sin(a)*.6,(hash(i+b)-.5)*1.8],.16,'#8ce99a',{alpha:.8})}}
-  s.label([-1.2,1.1,1.3],c4?'bundle sheath (Kranz)':'mesophyll',C.mint,12);s.render();
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:42,pitch:.1,cx:190,cy:262}),c4=p.type==='c4',cell=(x,y,r,col,n)=>{s.ball([x,y,0],r,col,{alpha:.55});for(let k=0;k<n;k++){const a=TAU*k/n+x;s.ball([x+r*.5*Math.cos(a),y+r*.5*Math.sin(a),.12],r*.3,'#2b8a3e',{flat:true})}};
+  s.box([0,1.3,0],[5.2,.14,.5],'#b2f2bb');s.box([0,-1.3,0],[5.2,.14,.5],'#b2f2bb');
+  if(c4){for(let i=0;i<12;i++){const a=TAU*i/12;cell(1.5*Math.cos(a),1.0*Math.sin(a),.24,'#8ce99a',2)}for(let i=0;i<9;i++){const a=TAU*i/9;cell(.78*Math.cos(a),.72*Math.sin(a),.26,'#51cf66',3)}
+   for(let i=0;i<5;i++){const x=-2.4+i*1.2;if(Math.abs(x)>1.9)cell(x,.0,.22,'#8ce99a',2)}}
+  else for(let r=0;r<4;r++)for(let i=0;i<12;i++){const x=-2.35+i*.43+(r%2)*.2,y=[.82,.44,-.42,-.82][r];if(Math.abs(x)<.4&&Math.abs(y)<.5)continue;cell(x,y,r<2?.2:.19,'#8ce99a',2)}
+  s.ball([-.1,.0,.05],.14,'#ff8fab',{flat:true});s.ball([.1,.0,.05],.14,'#ff8fab',{flat:true});s.ball([0,-.2,.05],.12,'#74c0fc',{flat:true});
+  s.callout([0,.05,.2],'xylem and phloem','#ffd6e0',-90,-95);s.callout([.55,.55,.2],c4?'bundle sheath (Kranz)':'mesophyll cell',C.mint,45,-85);s.callout([-1.7,1.3,.2],'epidermis','#b2f2bb',-30,-25);s.render();
   chart(c,420,96,236,170,{title:'Rate vs temperature',xl:'°C',xmin:10,xmax:45,ymin:0,ymax:1.05,series:[{fn:T=>c34({type:'c3',T}),col:'#74c0fc'},{fn:T=>c34({type:'c4',T}),col:C.gold}],marker:[p.T,c34(p)]});tag(c,'blue: C₃   gold: C₄',432,262,C.muted,12)},
  assumption:'Illustrative curves: C₃ optimum ~25 °C with photorespiration losses above it; C₄ optimum ~35 °C.'});
 function c34(p){return p.type==='c4'?Math.exp(-(((p.T-35)/10)**2)):Math.exp(-(((p.T-25)/9)**2))*.85}
@@ -389,7 +408,7 @@ add({...ch(12,'Respiration in Plants',U4),id:'bio-respiration-atp',title:'ATP ba
  metrics:p=>{const g=p.glc;if(p.mode!=='aerobic')return[N('Net ATP',2*g,'',0),N('End products',p.mode==='alcohol'?'Ethanol + CO₂':'Lactic acid'),N('NADH','Re-oxidised to keep glycolysis going'),N('O₂ needed','No')];return[N('Glycolysis (net)',`${2*g} ATP + ${2*g} NADH`),N('Link + Krebs cycle',`${2*g} ATP, ${8*g} NADH, ${2*g} FADH₂`),N('ETS (NADH×3, FADH₂×2)',`${34*g} ATP`),N('Total',38*g,'ATP',0)]},
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:250}),aer=p.mode==='aerobic';s.mesh([-1.8,0,0],[1.2,1.1,1],'#f6d6c2',{alpha:.2});s.label([-1.8,1.4,0],'cytoplasm: glycolysis',C.muted,12);
   const q=cycle(t*.4,1);s.ball([-2.4+q*.6,.2,0],.22,'#ffd43b',{label:q<.5?'glucose (6C)':''});if(q>.5){s.ball([-1.6,.5,0],.16,'#ffa94d');s.ball([-1.6,-.2,0],.16,'#ffa94d')}
-  if(aer){s.mesh([1.4,0,0],[1.5,.85,.85],BC.mito,{alpha:.55});for(let i=0;i<6;i++)s.mesh([.5+i*.35,0,0],[.06,.65,.6],'#d9480f',{alpha:.6});s.label([1.4,1.2,0],'mitochondrion: Krebs + ETS',C.muted,12);const n=Math.min(38,Math.round(cycle(t*.4,1)*38));for(let i=0;i<n;i++)s.ball([.3+(i%8)*.3,-1.4-Math.floor(i/8)*.25,.5],.07,'#ffd43b',{flat:true})}
+  if(aer){s.mesh([1.4,0,0],[1.55,.88,.88],'#f4a261',{alpha:.3,rings:14,segs:24});s.mesh([1.4,0,0],[1.4,.72,.72],'#e8743b',{alpha:.4,rings:12,segs:20});for(let i=0;i<7;i++){const sg=i%2?-1:1,x=.45+i*.33,h=.5*Math.sqrt(Math.max(.05,1-((x-1.4)/1.4)**2));s.mesh([x,sg*(.72*Math.sqrt(Math.max(.05,1-((x-1.4)/1.4)**2))-h*.45),0],[.05,h*.55,.5*h/.5],'#b9460f',{rings:8,segs:12})}s.label([1.4,1.2,0],'mitochondrion: Krebs + ETS',C.muted,12);const n=Math.min(38,Math.round(cycle(t*.4,1)*38));for(let i=0;i<n;i++)s.ball([.3+(i%8)*.3,-1.4-Math.floor(i/8)*.25,.5],.07,'#ffd43b',{flat:true})}
   else{for(let i=0;i<2;i++)s.ball([-.8+i*.3,-1.4,.5],.07,'#ffd43b',{flat:true});s.label([0,-.6,0],p.mode==='alcohol'?'→ ethanol + CO₂':'→ lactic acid',C.gold,14)}s.render();tag(c,'yellow dots: ATP per glucose',44,98,C.gold,13)},
  assumption:'NCERT theoretical yield (NADH = 3 ATP, FADH₂ = 2 ATP); actual yields are lower.'});
 
@@ -412,8 +431,8 @@ add({...ch(12,'Respiration in Plants',U4),id:'bio-electron-transport',title:'Ele
  tryText:'Lower the oxygen supply to zero.',
  controls:[R('O2','Oxygen supply',0,100,1,100,'%'),R('nadh','NADH supply',0,100,1,70,'%')],
  metrics:p=>{const r=Math.min(p.O2,p.nadh)/100;return[N('Electron flow (relative)',r*100,'%',0),N('ATP synthesis rate (relative)',r*100,'%',0),N('Final electron acceptor','Oxygen → water'),N('ATP synthase','F₀ proton channel + F₁ head (makes ATP)')]},
- draw:(c,p,t)=>{const r=Math.min(p.O2,p.nadh)/100,s=P3.scene(c,{scale:52,pitch:.2});s.box([0,0,0],[7,.5,2.2],'#ffc078',{alpha:.45});s.label([-3.2,.9,1.2],'intermembrane space',C.muted,12);s.label([-3.2,-.9,1.2],'matrix',C.muted,12);
-  const cx=[-2.6,-1.3,0,1.3];cx.forEach((x,i)=>{s.mesh([x,0,0],[.4,.6,.4],['#e8590c','#f08c00','#d6336c','#ae3ec9'][i]);s.label([x,.8,0],['I','II','III','IV'][i],C.white,13)});const atp=[2.7,0,0];s.cyl(V.add(atp,[0,.2,0]),[0,1,0],.22,.7,'#adb5bd');s.mesh(V.add(atp,[0,-.55,0]),[.5,.35,.5],'#ced4da',{rot:[0,t*4*r,0]});
+ draw:(c,p,t)=>{const r=Math.min(p.O2,p.nadh)/100,s=P3.scene(c,{scale:54,pitch:.12,cy:262});s.box([0,0,0],[7.2,.5,.7],'#ffc078',{alpha:.4});for(let i=0;i<32;i++)for(const sg of[1,-1])for(let z=-1;z<=1;z+=2)s.ball([-3.4+i*.22,sg*.3,z*.25],.075,'#ffa94d',{flat:true});s.label([-3.2,1.15,0],'intermembrane space',C.muted,12,'left');s.label([-3.2,-1.15,0],'matrix',C.muted,12,'left');
+  const cx=[-2.6,-1.3,0,1.3];cx.forEach((x,i)=>{s.mesh([x,0,0],[.4,.62,.45],['#e8590c','#f08c00','#d6336c','#ae3ec9'][i],{rings:12,segs:18,spec:.6});s.label([x,.8,0],['I','II','III','IV'][i],C.white,13)});const atp=[2.7,0,0];s.cyl(V.add(atp,[0,.2,0]),[0,1,0],.22,.7,'#adb5bd');s.mesh(V.add(atp,[0,-.55,0]),[.5,.35,.5],'#ced4da',{rot:[0,t*4*r,0]});
   for(let i=0;i<6;i++){const pa=i%2?[cx[1],cx[2],cx[3]]:[cx[0],cx[2],cx[3]],q=cycle(t*r*.8+i/6,1)*2,j=Math.min(1,Math.floor(q)),fr=q-j;s.ball([pa[j]+(pa[j+1]-pa[j])*fr,-.2,i%2?-.15:.15],.07,'#ffd43b',{flat:true,glow:true})}for(let i=0;i<6;i++){const q=cycle(t*r*.5+i/6,1),px=[cx[0],cx[2],cx[3]][i%3];s.ball([px+.1*(i>2?1:-1),-.4+q*1.4,.4],.06,'#ff6b6b',{flat:true})}s.label([-2.6,-.6,0],'NADH → I',C.muted,11);s.label([-1.3,-.6,0],'FADH₂ → II',C.muted,11);
   for(let i=0;i<4;i++){const q=cycle(t*r+i/4,1);s.ball([atp[0],.9-q*1.7,0],.06,'#ff6b6b',{flat:true})}if(r>0)s.label([1.6,-1.1,0],'O₂ → H₂O',C.blue,12);s.render();tag(c,r===0?'Chain stopped: no electron flow':'yellow: electrons   red: protons',44,98,r===0?C.red:C.muted,13)},
  assumption:'Schematic inner mitochondrial membrane; mobile carriers (ubiquinone, cytochrome c) are not drawn. Protons are pumped at complexes I, III and IV only; complex II does not pump.'});
