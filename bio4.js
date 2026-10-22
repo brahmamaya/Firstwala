@@ -163,8 +163,27 @@ add({...ch(2,'Human Reproduction',U6),id:'bio-early-development',title:'From zyg
  tryText:'Move to day 5. Which two parts does the blastocyst have?',
  controls:[R('day','Days after fertilisation',0,7,.5,3,'days',1)],
  metrics:p=>{const e=[...EMB].reverse().find(x=>p.day>=x[0]);return[N('Stage',e[1]),N('Location',e[2]),N('Approximate cells',e[3]<100?e[3]:'Many','',0),N('Next',p.day<5?'Cleavage continues':'Trophoblast attaches to uterine wall')]},
- draw:(c,p,t)=>{const e=[...EMB].reverse().find(x=>p.day>=x[0]),s=P3.scene(c,{scale:54,pitch:.2}),path=[[-3,1.2,0],[-2,1.4,0],[-1,1.0,0],[0,.4,0],[1.2,-.4,0],[2.2,-.9,0]];s.tube(path,.35,'#ffc9c9',{alpha:.3});s.lathe([2.6,-2.4,0],[[.1,0],[.9,.5],[1.1,1.4],[.6,1.8]],'#ffa8a8',{alpha:.35});
-  const pos=along(path,Math.min(1,p.day/6)),n=e[3];if(p.day>=5){s.mesh(pos,.32,'#ffc078',{alpha:.5});s.mesh(V.add(pos,[.12,.08,0]),.14,'#e8590c');s.callout(V.add(pos,[0,.3,0]),'blastocyst: trophoblast','#ffc078',-40,-50);s.callout(V.add(pos,[.12,.08,.1]),'inner cell mass → embryo','#e8590c',60,-40)}else if(n===1)s.ball(pos,.25,'#ffc078');else{const k=Math.min(16,n);for(let i=0;i<k;i++){const y=1-2*(i+.5)/k,r=Math.sqrt(1-y*y),a=i*2.4;s.ball(V.add(pos,[.17*r*Math.cos(a),.17*y,.17*r*Math.sin(a)]),.25/Math.cbrt(k)*1.2,'#ffc078')}}s.callout([-2.5,1.35,.3],'fallopian tube (fertilisation in ampulla)','#ffc9c9',-20,-60);s.callout([2.6,-1.3,.9],'uterus: implantation in endometrium','#ffa8a8',30,40);if(p.day<5)s.callout(pos,`${e[1]||'embryo'}`,'#ffc078',50,50);s.render()},
+ draw:(c,p,t)=>{const e=[...EMB].reverse().find(x=>p.day>=x[0]),s=P3.scene(c,{scale:50,cx:285,cy:245,pitch:.02}),d=p.day,n=e[3],UC=[-1.5,-2.1,0],
+  W=[[.05,0],[.2,.05],[.22,.5],[.28,.8],[.5,1.2],[.72,1.6],[.8,1.9],[.65,2.1],[.38,2.2],[.05,2.22]].map(([r,y])=>[r*.85,y*.85]);
+  /* tract: uterus (coronal section) with cavity, fallopian tubes and ovary */
+  s.lathe(UC,W,'#ef9a9a',{alpha:.45,segs:24});const ring=(k,m)=>W.map(([r,y],i)=>[UC[0]+k*(i<2?r*.2:r*m),UC[1]+y,.3]);s.poly([...ring(-1,.8),...ring(1,.8).reverse()],'#cf3b3b',{cull:false,alpha:.95,z:1e5});s.poly([...ring(-1,.45),...ring(1,.45).reverse()],'#4a0f1a',{cull:false,alpha:.9,z:1e5});
+  const L=[[-2.05,-.4,0],[-2.5,.1,0],[-3.0,.35,0],[-3.3,.15,0]],R=[[-.95,-.4,0],[-.5,.1,0],[0,.35,0],[.3,.15,0]];s.tube(L,u=>.07+.05*u,'#e59a8f',{segs:8});s.tube(R,u=>.07+.05*u,'#e59a8f',{segs:8});for(let i=0;i<5;i++){const a=-1.0+i*.5;s.seg(L[3],[L[3][0]-.14*Math.cos(a),L[3][1]+.14*Math.sin(a)-.08,0],'#d7776b',2)}
+  s.mesh([-3.35,-.35,0],[.42,.3,.25],'#f3b9a6',{rings:10,segs:14,spec:.4});s.mesh([.5,-.35,0],[.42,.3,.25],'#f3b9a6',{rings:10,segs:14});
+  const path=[[-3.3,.1,0],[-3.0,.35,0],[-2.5,.1,0],[-2.05,-.4,0],[-1.9,-.9,0],[-1.6,-1.2,0]],pos=d>=7?[-1.45,-.75,0]:along(path,Math.min(1,d/6));s.ball([pos[0],pos[1],.35],.1,'#ffc078',{glow:true,lift:5});s.seg([pos[0]+.1,pos[1],.3],[.55,.4,0],'#8ca6b9',1,[3,3]);
+  s.callout([-3.35,-.35,.2],'ovary','#ffc9c9',-5,50);s.callout([-2.6,.12,0],'fallopian tube','#ffc9c9',-25,-45);s.callout([-1.9,-1.6,.4],'uterus','#ffa8a8',-65,25);
+  /* magnified embryo */
+  const M=[2.1,.45,0],R0=1.25;s.ball([M[0],M[1],-.4],R0*1.18,'#0f1b2d',{alpha:.45});s.ball([M[0],M[1],-.4],R0*1.18,'#3b556d',{alpha:.2});
+  const cellc='#ffc078',tro='#ffb066',cell=(q,r,col,nu)=>{s.ball(q,r,col,{spec:.4});if(nu!==false)s.ball([q[0],q[1],q[2]+r*.3],r*.38,'#e8590c',{flat:true,lift:1})};
+  if(d>=5){const bc=d>=7?[M[0],M[1]+.25,0]:M,N=40,Rb=1.0;s.mesh(bc,[Rb*.9,Rb*.9,Rb*.9],'#bfe3ff',{alpha:.28,rings:10,segs:16});
+   for(let i=0;i<N;i++){const y=1-2*(i+.5)/N,rr=Math.sqrt(1-y*y),a=i*2.4;if(d>=7&&y<-.5)continue;cell([bc[0]+Rb*rr*Math.cos(a),bc[1]+Rb*y,Rb*rr*Math.sin(a)*.8],.16,tro,false)}
+   for(let i=0;i<6;i++){const a=i*1.1,r2=.14+.06*(i%2);cell([bc[0]-.45+.28*Math.cos(a)*.9,bc[1]+.35+.24*Math.sin(a)*.9,.1+.08*Math.sin(a*2)],.17,'#e8590c',false)}
+   if(d>=7){s.poly([[M[0]-1.4,M[1]-.55,-.3],[M[0]+1.4,M[1]-.55,-.3],[M[0]+1.4,M[1]-1.4,-.3],[M[0]-1.4,M[1]-1.4,-.3]],'#c0392b',{cull:false,z:-1e5});s.callout([M[0]+.9,M[1]-1.0,0],'endometrium','#ff8a80',30,25)}
+   s.callout([M[0]+.8,M[1]+.7,.4],'trophoblast','#ffc078',45,-25);s.callout([M[0]-.5,M[1]+.4,.4],'inner cell mass → embryo','#ff922b',-75,-45);s.callout([M[0]+.2,M[1]-.3,.3],'blastocoel (cavity)','#bfe3ff',60,35)}
+  else if(n===1){cell(M,.65,cellc)}
+  else if(n===2){cell([M[0]-.5,M[1],0],.55,cellc);cell([M[0]+.5,M[1],0],.55,cellc)}
+  else if(n===4){for(let i=0;i<4;i++)cell([M[0]+(i%2?.5:-.5),M[1]+(i<2?.5:-.5),0],.5,cellc)}
+  else{for(let i=0;i<16;i++){const y=1-2*(i+.5)/16,rr=Math.sqrt(1-y*y),a=i*2.4;cell([M[0]+.62*rr*Math.cos(a),M[1]+.62*y,.62*rr*Math.sin(a)],.3,cellc)}}
+  if(d<5)s.callout([M[0]+.2,M[1]+.7,.3],e[1],'#ffc078',55,-35);s.render()},
  assumption:'Typical human timeline; implantation begins about a week after fertilisation.'});
 
 /* ---------- Chapter 3: Reproductive Health ---------- */
