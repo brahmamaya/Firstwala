@@ -73,10 +73,10 @@ add({...ch(2,'Structure of Atom','PHYSICAL CHEMISTRY'),id:'chem-orbitals',title:
  tryText:'Compare 2p and 3p: do they have the same shape? How many radial nodes does 3p have?',
  controls:[S('o','Orbital','pz',Object.keys(ORB).map(k=>[k,ORB[k][1]])),R('n','Principal quantum number n',1,4,1,2)],
  metrics:p=>{const l=ORB[p.o][0],ok=p.n>l;return ok?[N('Orbital',`${p.n}${ORB[p.o][1]}`),N('Quantum numbers',`n = ${p.n}, l = ${l}`),N('Radial nodes',p.n-l-1,'',0),N('Angular nodes',l,'',0)]:[N('Orbital','Not allowed'),N('Reason',`l = ${l} needs n ≥ ${l+1}`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,yaw:t*.25,pitch:.3}),[l,,fn]=ORB[p.o],ok=p.n>l;s.axes(2.2,[0,0,0]);s.label([2.5,0,0],'x',C.red,12);
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:58,yaw:t*.25,pitch:.3,cy:290}),[l,,fn]=ORB[p.o],ok=p.n>l;s.axes(1.9,[0,0,0]);s.label([2.15,0,0],'x',C.red,12);
   if(ok){const g=(u,v)=>{const x=Math.cos(u)*Math.cos(v),y=Math.sin(u),z=Math.cos(u)*Math.sin(v);return fn(x,y,z)},R0=.7+p.n*.25;
-   s.mesh([0,0,0],R0*1.6,(a,b)=>g(-PI/2+PI*a,TAU*b)>=0?'#4dabf7':'#ff6b6b',{rings:28,segs:36,alpha:.85,shape:(u,v)=>Math.max(.02,Math.abs(g(u,v)))**(l?1:1)*(l===2&&p.o==='dz2'?.55:1)});
-   for(let k=1;k<=p.n-l-1;k++)s.ring([0,0,0],[0,1,0],R0*1.6*k/(p.n-l)*.55,'#ffd43b',1.5,[4,4]);s.ball([0,0,0],.06,'#e9f6ff',{flat:true,lift:5});s.callout([0,0,0],'nucleus','#e9f6ff',-60,60);
+   s.mesh([0,0,0],R0*1.6,(a,b)=>g(-PI/2+PI*a,TAU*b)>=0?'#4dabf7':'#ff6b6b',{rings:34,segs:44,alpha:.62,spec:.6,shine:24,shape:(u,v)=>Math.max(.02,Math.abs(g(u,v)))**(l?1:1)*(l===2&&p.o==='dz2'?.55:1)});
+   for(let k=1;k<=p.n-l-1;k++)s.ring([0,0,0],[0,1,0],R0*1.6*k/(p.n-l)*.55,'#ffd43b',1.5,[4,4]);s.ball([0,0,0],.06,'#e9f6ff',{flat:true,lift:5});s.callout([0,0,0],'nucleus','#e9f6ff',-70,0);
    if(p.n-l-1>0)s.callout([R0*1.6/(p.n-l)*.55,0,0],`${p.n-l-1} radial node${p.n-l-1>1?'s':''} (dashed)`,'#ffd43b',60,50);s.render();tag(c,`${p.n}${ORB[p.o][1]}: blue (+) and red (−) lobes`,44,98,C.gold,15)}
   else{s.render();tag(c,`${p.n}${ORB[p.o][1]} does not exist: l must be less than n`,44,98,C.red,15)}},
  assumption:'Angular shapes are drawn from the real spherical harmonics; radial nodes are shown as dashed spheres (rings) for counting only.'});
