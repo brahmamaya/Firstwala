@@ -200,7 +200,7 @@ add({...ch(9,'Amines',OR),id:'chem-amine-basicity',title:'Basic strength of amin
  tryText:'Why is (CH₃)₃N weaker than (CH₃)₂NH in water?',
  controls:[R('i','Amine',1,8,1,3)],
  metrics:p=>{const [fm,n,pk]=AM[p.i-1];return[N('Amine',`${n} (${fm})`),N('pK_b',pk,'',2),N('K_b',Math.pow(10,-pk),'',3)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:32,cx:300,cy:300,pitch:.4,yaw:-.2});AM.forEach(([fm,n,pk],i)=>{const h=(10-pk)*.45,x=-3.5+i*1,on=i===p.i-1;s.box([x,h/2,0],[.7,h,.7],on?'#ffd43b':'#4dabf7');s.engrave([x,h+.25,.36],fm,on?'#ffd43b':'#e9f6ff',9,9e5)});s.callout([-3.5+(p.i-1),(10-AM[p.i-1][2])*.45,0],`pK_b ${AM[p.i-1][2]}`,'#ffd43b',40,-50);s.render();tag(c,'taller bar = stronger base (bar height ∝ 10 − pK_b)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:34,cx:270,cy:292,pitch:.22,yaw:-.12}),X0=-3.6;AM.forEach(([fm,n,pk],i)=>{const h=(10-pk)*.45,x=X0+i*1.2,on=i===p.i-1;s.box([x,h/2,0],[.8,h,.8],on?'#ffd43b':'#4dabf7',{spec:.5});s.engrave([x,h+.2+(i%2)*.32,.42],fm,on?'#ffd43b':'#e9f6ff',9,9e5)});s.callout([X0+(p.i-1)*1.2,(10-AM[p.i-1][2])*.22,.42],`pK_b ${AM[p.i-1][2]}`,'#ffd43b',-40,50);s.render();tag(c,'taller bar = stronger base (bar height ∝ 10 − pK_b)',44,98,C.muted,13)},
  assumption:'pK_b values in aqueous solution (NCERT Table 9.3).'});
 
 /* ---------- 10 Biomolecules ---------- */
@@ -211,9 +211,9 @@ add({...ch(10,'Biomolecules','BIOMOLECULES'),id:'chem-glucose-mutarotation',titl
  tryText:'Start from β-glucose. Does the rotation rise or fall?',
  controls:[S('start','Dissolve','alpha',[['alpha','α-D-glucose'],['beta','β-D-glucose']]),R('min','Time after dissolving',0,240,1,30,'min')],
  metrics:p=>{const r=mut(p);return[N('α-anomer',r.a*100,'%',1),N('β-anomer',(1-r.a)*100,'%',1),N('Specific rotation',r.rot,'°',1)]},
- draw:(c,p,t)=>{const r=mut(p),s=P3.scene(c,{scale:56,cx:230,yaw:t*.2,pitch:.35}),ring=[];for(let i=0;i<6;i++){const a=TAU*i/6,q=[.9*Math.cos(a),.18*(i%2?1:-1),.9*Math.sin(a)];ring.push(q)}
-  ring.forEach((q,i)=>{bond(s,q,ring[(i+1)%6]);atom(s,q,i===0?'O':'C',i===0?.9:.8)});const anomeric=ring[1],isA=r.a>=.5;const oh=V.add(anomeric,[.35,isA?-.6:.6,.2]);bond(s,anomeric,oh);atom(s,oh,'O',.8);atom(s,V.add(oh,[.25,isA?-.2:.2,0]),'H',.7);
-  for(let i=2;i<5;i++){const q=V.add(ring[i],[V.norm(ring[i])[0]*.45,i%2?.5:-.5,V.norm(ring[i])[2]*.45]);bond(s,ring[i],q);atom(s,q,'O',.7)}const c6=V.add(ring[5],[.3,.8,-.2]);bond(s,ring[5],c6);atom(s,c6,'C',.8);
+ draw:(c,p,t)=>{const r=mut(p),s=P3.scene(c,{scale:62,cx:230,cy:280,yaw:t*.2,pitch:.35}),ring=[];for(let i=0;i<6;i++){const a=TAU*i/6,q=[.9*Math.cos(a),.18*(i%2?1:-1),.9*Math.sin(a)];ring.push(q)}
+  const E=i=>i===0?'O':'C';ring.forEach((q,i)=>{stick(s,q,ring[(i+1)%6],1,{ca:E(i),cb:E((i+1)%6),r:.07});atom(s,q,E(i),.85)});const anomeric=ring[1],isA=r.a>=.5;const oh=V.add(anomeric,[.35,isA?-.6:.6,.2]);stick(s,anomeric,oh,1,{ca:'C',cb:'O',r:.06});atom(s,oh,'O',.8);const hh=V.add(oh,[.25,isA?-.2:.2,0]);stick(s,oh,hh,1,{ca:'O',cb:'H',r:.05});atom(s,hh,'H',.7);
+  for(let i=2;i<5;i++){const q=V.add(ring[i],[V.norm(ring[i])[0]*.45,i%2?.5:-.5,V.norm(ring[i])[2]*.45]);stick(s,ring[i],q,1,{ca:'C',cb:'O',r:.06});atom(s,q,'O',.7)}const c6=V.add(ring[5],[.3,.8,-.2]);stick(s,ring[5],c6,1,{ca:'C',cb:'C',r:.06});atom(s,c6,'C',.8);
   s.callout(anomeric,`C1 (anomeric): OH ${isA?'down = α':'up = β'}`,'#ffd43b',60,-60);s.callout(ring[0],'ring O','#ff8787',-60,-40);s.render();
   chart(c,420,96,236,170,{title:'Specific rotation vs time',xl:'min',xmin:0,xmax:240,ymin:0,ymax:120,series:[{fn:m=>mut({...p,min:m}).rot,col:C.gold},{fn:()=>52.7,col:'#8ca6b9',dash:[4,4]}],marker:[p.min,r.rot]})},
  assumption:'First-order approach to equilibrium (36 % α, 64 % β) with a half-time of about 40 min at room temperature (illustrative).'});
