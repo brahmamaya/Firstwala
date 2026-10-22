@@ -16,7 +16,7 @@ let deferred=null;const btns=[];
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;return e};
 function make(where,cls,label){if(!where)return;const b=el('button',cls,label);b.type='button';b.hidden=true;b.dataset.testid='install-app';b.addEventListener('click',install);where.append(b);btns.push(b)}
 make(document.querySelector('.more-pop'),'','📲 Install app');
-const lf=document.querySelector('.landing-foot');if(lf){const w=el('div','install-wrap');lf.before(w);make(w,'install-chip','📲 Install Physica app')}
+const lf=document.querySelector('.landing-links');if(lf){const w=el('div','install-wrap');lf.after(w);make(w,'install-chip','📲 Install app')}
 const show=()=>{for(const b of btns)b.hidden=false};
 const tip=el('div','install-tip');tip.setAttribute('role','dialog');tip.setAttribute('aria-label','Add Physica to your Home Screen');tip.hidden=true;
 const tx=el('p','',null);tx.append(el('b','','Add Physica to your Home Screen'));if(steps)steps.forEach((t,i)=>{tx.append(document.createElement('br'),document.createTextNode(`${i+1}. ${t}`))});

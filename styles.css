@@ -464,8 +464,7 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 .fb-close{position:absolute!important;top:12px;right:12px}
 /* Install as an app */
 .install-wrap{display:flex;justify-content:center;margin-top:14px}
-.install-chip{height:38px;padding:0 18px;border-radius:999px;border:1px solid rgb(var(--ov) / .22);color:var(--t-fff);font-weight:800;font-size:13px;letter-spacing:.03em;cursor:pointer;
-  background:linear-gradient(180deg,rgb(var(--ov) / .16),rgb(var(--ov) / .04) 50%,rgb(var(--ov) / .09));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px rgb(var(--sh) / calc(.5 * var(--sa)));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.install-chip{border-radius:999px;border:1px solid rgb(var(--ov) / .22);color:var(--t-fff);letter-spacing:.03em;cursor:pointer;background:linear-gradient(180deg,rgb(var(--ov) / .16),rgb(var(--ov) / .04) 50%,rgb(var(--ov) / .09));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px rgb(var(--sh) / calc(.5 * var(--sa)));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .install-chip:hover{border-color:rgb(var(--ov) / .45)}
 .install-chip[hidden],.more-pop [data-testid=install-app][hidden]{display:none!important}
 .install-tip{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:320;width:min(360px,calc(100% - 32px));padding:16px 18px;border-radius:20px;color:var(--t-fff);
@@ -1041,9 +1040,8 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 /* landing: clear "Selected" badge on the active mode, and the new Simulate · Teach · Rank headline */
 .land-mode{position:relative}
-.land-sel{display:none;align-items:center;gap:4px;margin-top:4px;padding:3px 12px;border-radius:999px;background:var(--s-0b3d2a);border:1px solid #2fbf84;color:var(--t-b8f5d6);font:700 12px/1.3 system-ui,sans-serif;letter-spacing:.04em;white-space:nowrap;}
+.land-sel{align-items:center;gap:4px;margin-top:4px;padding:3px 12px;border-radius:999px;background:var(--s-0b3d2a);border:1px solid #2fbf84;color:var(--t-b8f5d6);font:700 12px/1.3 system-ui,sans-serif;letter-spacing:.04em;white-space:nowrap}
 .land-mode[aria-pressed=true] .land-sel,.land-rank[aria-expanded=true] .land-sel{display:inline-flex}
-.land-mode[aria-pressed=true],.land-rank[aria-expanded=true]{border-color:#2fbf84!important;box-shadow:0 0 0 2px #2fbf84,0 8px 34px #2fbf8444!important}
 .landing-sub{display:flex;flex-direction:column;align-items:center;gap:12px}
 .landing-sub{max-width:760px!important}
 .ls-words{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,18px);flex-wrap:nowrap;white-space:nowrap}
@@ -1214,3 +1212,10 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .rk-bigfig.rk-hand{background:var(--s-0a0a0a);border-color:var(--t-2a2a2a);max-width:380px}
 .rk-figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px;margin:8px 0}
 .rk-figgrid .rk-bigfig{margin:0;max-width:none}
+
+/* landing: no brand row or footer line; smaller install chip; chosen mode = solid black with white text (no "Selected" tag) */
+.land-sel{display:none!important}
+.install-chip{height:28px!important;padding:0 12px!important;font-size:11.5px!important;font-weight:700!important;opacity:.85}
+.land-mode[aria-pressed=true],.land-mode[aria-expanded=true],.land-mode.open,:root[data-theme="light"] .land-mode[aria-pressed=true],:root[data-theme="light"] .land-mode[aria-expanded=true],:root[data-theme="light"] .land-mode.open{background:#000!important;color:#fff!important;border-color:#fff!important;box-shadow:0 0 0 2px #000!important}
+.land-mode[aria-pressed=true] *,.land-mode[aria-expanded=true] *,.land-mode.open *{color:#fff!important}
+:root[data-theme="light"] .landing h1,:root[data-theme="light"] .landing h1 .landing-grad{color:#000!important;-webkit-text-fill-color:#000!important;background:none!important}
