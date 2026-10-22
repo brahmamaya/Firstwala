@@ -111,10 +111,10 @@ add({...ch(3,'Classification of Elements and Periodicity in Properties','INORGAN
  tryText:'Why is the ionisation enthalpy of N higher than that of O?',
  controls:[S('prop','Property','IE',[['IE','First ionisation enthalpy'],['R','Covalent radius'],['EN','Electronegativity (Pauling)']]),R('Z','Highlight element Z',1,36,1,7)],
  metrics:p=>{const v=PT[p.prop][p.Z-1],u={IE:'kJ/mol',R:'pm',EN:''}[p.prop],[per,gr]=pos(p.Z);return[N('Element',`${SYM[p.Z-1]} (Z = ${p.Z})`),N('Period, group',`${per}, ${gr}`),N({IE:'Ionisation enthalpy',R:'Covalent radius',EN:'Electronegativity'}[p.prop],p.prop==='EN'&&!v?'not defined':`${v} ${u}`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:34,pitch:.55,yaw:-.35,cx:320,cy:300}),mx={IE:2400,R:210,EN:4}[p.prop],cols={IE:'#ffa94d',R:'#4dabf7',EN:'#69db7c'}[p.prop];
-  for(let Z=1;Z<=36;Z++){const [per,gr]=pos(Z),x=-4.25+(gr-1)*.5,z=-1.2+(per-1)*.8,v=PT[p.prop][Z-1],h=Math.max(.04,v/mx*3),on=Z===p.Z;s.box([x,h/2,z],[.42,h,.62],on?'#ffd43b':cols,{stroke:'#00000044'});s.engrave([x,h+.08,z+.33],SYM[Z-1],on?'#ffd43b':'#e9f6ff',9,9e5)}
-  const [per,gr]=pos(p.Z),v=PT[p.prop][p.Z-1];s.callout([-4.25+(gr-1)*.5,Math.max(.04,v/mx*3),-1.2+(per-1)*.8],`${SYM[p.Z-1]}: ${p.prop==='EN'&&!v?'—':v+' '+({IE:'kJ/mol',R:'pm',EN:''}[p.prop])}`,'#ffd43b',40,-60);
-  s.label([-4.6,0,-1.6],'group 1',C.muted,11);s.label([4.25,0,-1.6],'18',C.muted,11);s.render();tag(c,'bar height = property value · rows = periods 1–4',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:40,pitch:.38,yaw:-.22,cx:290,cy:290}),mx={IE:2400,R:210,EN:4}[p.prop],cols={IE:'#ffa94d',R:'#4dabf7',EN:'#69db7c'}[p.prop];
+  for(let Z=1;Z<=36;Z++){const [per,gr]=pos(Z),x=-4.25+(gr-1)*.5,z=-1.4+(per-1)*1.0,v=PT[p.prop][Z-1],h=Math.max(.04,v/mx*3),on=Z===p.Z;s.box([x,h/2,z],[.4,h,.5],on?'#ffd43b':cols,{stroke:'#00000033',spec:.5});s.engrave([x,h+.06,z+.27],SYM[Z-1],on?'#ffd43b':'#e9f6ff',9,9e5)}
+  const [per,gr]=pos(p.Z),v=PT[p.prop][p.Z-1];s.callout([-4.25+(gr-1)*.5,Math.max(.04,v/mx*3),-1.4+(per-1)*1.0],`${SYM[p.Z-1]}: ${p.prop==='EN'&&!v?'—':v+' '+({IE:'kJ/mol',R:'pm',EN:''}[p.prop])}`,'#ffd43b',40,-60);
+  s.box([0,-.04,.1],[9.4,.06,4.2],'#1c3040',{alpha:.5});s.label([-4.4,0,-1.9],'group 1',C.muted,11);s.label([4.25,0,-1.9],'18',C.muted,11);s.render();tag(c,'bar height = property value · rows = periods 1–4',44,98,C.muted,13)},
  assumption:'Ionisation enthalpies (kJ/mol) and Pauling electronegativities from standard tables; covalent radii from Cordero et al. (2008). Pauling electronegativities are not defined for He, Ne and Ar (shown as 0); Kr is given as 3.00.'});
 
 /* ---------- 4 Chemical Bonding and Molecular Structure ---------- */
@@ -147,8 +147,8 @@ add({...ch(4,'Chemical Bonding and Molecular Structure','PHYSICAL CHEMISTRY'),id
  controls:[S('m','Molecule','O2',Object.keys(MO).map(k=>[k,k.replace('2','₂')]))],
  metrics:p=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),nb=fl.filter(x=>!x[0].includes('*')).reduce((a,x)=>a+x[2],0),na=fl.filter(x=>x[0].includes('*')).reduce((a,x)=>a+x[2],0),bo=(nb-na)/2,unp=fl.reduce((u,[n,cp,k])=>u+(cp===4?(k<=2?k:4-k):k===1?1:0),0);
   return[N('Electrons',MO[p.m],'',0),N('Bond order',bo,'',1),N('Unpaired electrons',unp,'',0),N('Magnetic',unp?'Paramagnetic':'Diamagnetic'),N('Exists?',bo>0?'Yes':'No (bond order 0)')]},
- draw:(c,p,t)=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),s=P3.scene(c,{scale:40,pitch:.1,cx:300,cy:290});
-  fl.forEach(([n,cp,k],i)=>{const y=-2.6+i*.72,anti=n.includes('*'),boxes=cp/2;s.label([-2.6,y,0],n,anti?'#ff8787':'#69db7c',13);for(let b=0;b<boxes;b++){const x=-.4+(b-(boxes-1)/2)*.9;s.box([x,y,0],[.75,.08,.3],anti?'#c92a2a':'#2b8a3e');const inBox=cp===4?(k<=2?(b<k?1:0):(b<k-2?2:1)):k;
+ draw:(c,p,t)=>{const heavy=['O2','F2','Ne2'].includes(p.m),fl=moFill(MO[p.m],heavy),s=P3.scene(c,{scale:40,pitch:.04,cx:300,cy:282});
+  fl.forEach(([n,cp,k],i)=>{const y=-2.6+i*.72,anti=n.includes('*'),boxes=cp/2;s.label([-2.6,y,0],n,anti?'#ff8787':'#69db7c',13);for(let b=0;b<boxes;b++){const x=-.4+(b-(boxes-1)/2)*.9;s.box([x,y,0],[.8,.1,.1],anti?'#e03131':'#2f9e44',{spec:.5});const inBox=cp===4?(k<=2?(b<k?1:0):(b<k-2?2:1)):k;
    if(inBox>=1)s.arrow([x-.13,y-.25,.1],[x-.13,y+.25,.1],'#ffd43b',2.5,6);if(inBox>=2)s.arrow([x+.13,y+.25,.1],[x+.13,y-.25,.1],'#74c0fc',2.5,6)}});
   s.callout([.6,-2.6+5*.72,0],heavy?'σ2p below π2p (O₂, F₂, Ne₂)':'π2p below σ2p (up to N₂)','#e9f6ff',60,-20);s.render();tag(c,'green: bonding · red: antibonding (*)',44,98,C.muted,13)},
  assumption:'Standard NCERT MO energy orders: s–p mixing puts π2p below σ2p up to N₂.'});
@@ -161,9 +161,9 @@ add({...ch(5,'Thermodynamics','PHYSICAL CHEMISTRY'),id:'chem-gibbs',title:'Gibbs
  tryText:'Melting of ice: ΔH = +6.0 kJ/mol, ΔS = +22 J/(K·mol). Where is the crossover temperature?',
  controls:[R('H','ΔH',-100,100,1,6,'kJ/mol'),R('S','ΔS',-200,200,1,22,'J/(K·mol)'),R('T','Temperature',100,600,1,298,'K')],
  metrics:p=>{const G=p.H-p.T*p.S/1000,Tc=p.S!==0?p.H*1000/p.S:NaN;return[N('ΔG',G,'kJ/mol',2),N('Spontaneous?',G<0?'Yes':G>0?'No':'At equilibrium'),N('Crossover temperature',Number.isFinite(Tc)&&Tc>0?`${f(Tc,1)} K`:'none (same at all T)')]},
- draw:(c,p,t)=>{const G=p.H-p.T*p.S/1000,s=P3.scene(c,{scale:54,cx:240,cy:290}),hR=clamp(G/40,-1.8,1.8);s.box([0,-1.8,0],[5,.15,1.4],'#29475b');
-  const path=Array.from({length:41},(_,i)=>{const x=-2.2+4.4*i/40,u=Math.max(0,x/2.2);return[x,-.6+.5*Math.exp(-((x)**2)*6)+hR*u*u*(3-2*u),0]});s.tube(path,.06,'#868e96',{segs:6});
-  const q=G<0?cycle(t*.25,1):0,ball=path[Math.min(40,Math.round(q*40))];s.ball(V.add(ball,[0,.25,0]),.22,G<0?'#69db7c':'#ff6b6b',{glow:G<0});s.callout(path[0],'reactants','#e9f6ff',-30,-60);s.callout(path[40],`products (ΔG = ${f(G,1)} kJ/mol)`,G<0?'#69db7c':'#ff8787',-40,G<0?50:-60);s.render();
+ draw:(c,p,t)=>{const G=p.H-p.T*p.S/1000,s=P3.scene(c,{scale:62,cx:250,cy:285,pitch:.05}),hR=clamp(G/40,-1.8,1.8);s.box([0,-1.75,0],[5,.1,1],'#29475b');
+  const path=Array.from({length:41},(_,i)=>{const x=-2.2+4.4*i/40,u=Math.max(0,x/2.2);return[x,-.6+.5*Math.exp(-((x)**2)*6)+hR*u*u*(3-2*u),0]});s.tube(path,.08,'#ced4da',{segs:10,spec:.7});
+  const q=G<0?cycle(t*.25,1):0,ball=path[Math.min(40,Math.round(q*40))];s.ball(V.add(ball,[0,.25,0]),.22,G<0?'#69db7c':'#ff6b6b',{glow:G<0});s.callout(path[0],'reactants','#e9f6ff',-30,-60);s.callout(path[40],`products (ΔG = ${f(G,1)} kJ/mol)`,G<0?'#69db7c':'#ff8787',-10,G<0?62:-60);s.render();
   chart(c,420,96,236,170,{title:'ΔG vs T',xl:'T (K)',xmin:100,xmax:600,ymin:-120,ymax:120,series:[{fn:T=>p.H-T*p.S/1000,col:C.gold},{fn:()=>0,col:'#8ca6b9',dash:[4,4]}],marker:[p.T,G]})},
  assumption:'ΔH and ΔS are taken as independent of temperature over this range.'});
 
