@@ -459,8 +459,15 @@ add({...ch(13,'Biodiversity and Conservation',U10),id:'bio-species-area',title:'
  tryText:'Double the area with Z = 0.2. By what factor do species increase?',
  controls:[R('lA','Area (log₁₀ km²)',0,7,.1,3,'',1),R('Z','Slope Z',.1,1.2,.05,.2,'',2),R('Cc','Constant C (species at 1 km²)',5,100,5,20)],
  metrics:p=>{const A=10**p.lA,Sn=p.Cc*A**p.Z;return[N('Area',A,'km²',2),N('Species richness S',Sn,'',0),N('Doubling area multiplies S by',2**p.Z,'×',3),N('Typical Z','0.1–0.2 (regions); 0.6–1.2 (continents)')]},
- draw:(c,p,t)=>{const A=10**p.lA,Sn=p.Cc*A**p.Z,s=P3.scene(c,{scale:52,pitch:.55,cx:220}),r=.3+p.lA*.35;s.box([0,-.6,0],[7,.1,4],'#1971c2',{alpha:.5,ground:true});s.mesh([0,-.55,0],[r,.15,r*.8],'#2f9e44',{shape:(u,v)=>1+.15*Math.sin(5*v)});for(let i=0;i<Math.min(80,Math.round(Math.sqrt(Sn)*3));i++){const a=TAU*hash(i),rr=r*.8*Math.sqrt(hash(i+3));s.ball([rr*Math.cos(a),-.35,rr*.8*Math.sin(a)],.05,['#ffd43b','#ff8787','#74c0fc','#b197fc'][i%4],{flat:true})}s.render();
-  chart(c,420,96,236,170,{title:'log S vs log A',xl:'log₁₀ A',xmin:0,xmax:7,ymin:0,series:[{fn:x=>Math.log10(p.Cc)+p.Z*x,col:C.gold}],marker:[p.lA,Math.log10(Sn)]})},
+ draw:(c,p,t)=>{const A=10**p.lA,Sn=p.Cc*A**p.Z,rp=30+p.lA*15.5,CXI=192,CYI=262,ym=Math.log10(p.Cc)+p.Z*7,ls=Math.log10(Sn),nd=Math.min(80,Math.round(Math.sqrt(Sn)*3)),DC=['#ffd43b','#ff8787','#74c0fc','#da77f2'];
+  E.panel(c,44,96,296,310,'#1a5d8c','#164a73');c.strokeStyle='rgba(255,255,255,.1)';c.lineWidth=1;for(let i=0;i<5;i++){c.beginPath();c.ellipse(CXI,CYI,rp+12+i*14,(rp+12+i*14)*.78,0,0,TAU);c.stroke()}
+  for(let pass=0;pass<2;pass++){c.fillStyle=pass?'#3b9b4a':'#e8d9a0';c.beginPath();const q=pass?.9:1;for(let i=0;i<=36;i++){const a=i*TAU/36,r=rp*q*(1+.08*Math.sin(3*a)+.06*Math.sin(5*a+1));const x=CXI+r*Math.cos(a),y=CYI+r*.78*Math.sin(a);i?c.lineTo(x,y):c.moveTo(x,y)}c.closePath();c.fill()}
+  for(let i=0;i<Math.min(22,Math.round(rp/6));i++){const a=TAU*hash(i+11),rr=rp*.8*Math.sqrt(hash(i+13));E.tree(c,CXI+rr*Math.cos(a),CYI+rr*.78*Math.sin(a)+6,.34,'#2b8a3e')}
+  for(let i=0;i<nd;i++){const a=TAU*hash(i),rr=rp*.82*Math.sqrt(hash(i+3));c.fillStyle=DC[i%4];c.beginPath();c.arc(CXI+rr*Math.cos(a),CYI+rr*.78*Math.sin(a)-4,3.1,0,TAU);c.fill();c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=.8;c.stroke()}
+  tag(c,'Island: A = '+f(A,A<10?2:0)+' km²',58,114,'#e9f6ff',13);tag(c,'S = '+f(Sn,0)+' species',58,132,C.gold,13);tag(c,'each dot = species (√ scale), not 1 : 1',58,392,C.muted,11);
+  chart(c,352,98,304,232,{title:'log S vs log A',xl:'log₁₀ A (km²)',yl:'log₁₀ S',xmin:0,xmax:7,ymin:0,ymax:ym,series:[{fn:x=>Math.log10(p.Cc)+p.Z*x,col:C.gold,w:3}],marker:[p.lA,ls]});
+  const x0=E.cx(352,304,0,7,p.lA),y0=E.cy(98,232,0,ym,ls),x1=E.cx(352,304,0,7,Math.min(7,p.lA+1)),y1=E.cy(98,232,0,ym,Math.log10(p.Cc)+p.Z*Math.min(7,p.lA+1));c.strokeStyle='#8ca6b9';c.lineWidth=1.2;c.setLineDash([4,3]);c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);tag(c,'area ×10',(x0+x1)/2,y0+12,'#8ca6b9',10,'center');tag(c,'S ×'+f(10**p.Z,2),x1+4,(y0+y1)/2+2,'#8ca6b9',10,p.lA>5.6?'right':'left');
+  tag(c,'S = C·Aᶻ  →  log S = log C + Z log A',352,350,'#e9f6ff',12);tag(c,'a straight line on log–log axes; slope = Z',352,368,C.muted,11)},
  assumption:'Alexander von Humboldt’s relationship; dots show species richness on a compressed (√) scale.'});
 
 const LAT=[[4,1400,'Colombia (near equator)'],[41,105,'New York (41° N)'],[71,56,'Greenland (71° N)']];
