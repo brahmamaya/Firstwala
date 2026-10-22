@@ -140,7 +140,7 @@ add({...ch(7,'Redox Reactions',IN),id:'chem-oxidation-number',title:'Finding oxi
  tryText:'Work out the oxidation number of Cr in K₂Cr₂O₇ before checking.',
  controls:[R('i','Compound',1,9,1,1)],
  metrics:p=>{const [cmp,el,v]=OXN[p.i-1];return[N('Compound',cmp),N('Element',el),N('Oxidation number',cmp==='Na₂S₂O₃'?'+2 (average of the two S)':Number.isInteger(v)?(v>0?'+':'')+v:'+8/3 (average)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:30,cx:280,cy:250,pitch:.12,yaw:-.1});bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.35,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.4,3*.35,.5],[3.4,3*.35,.5],'#ffd43b',1.5,[4,4]);s.engrave([-3.6,3*.35+.15,.5],'0','#ffd43b',10,9e5);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const cm=P3.cam,fl=P3.flat,s=P3.scene(c,{scale:48,cx:262,cy:292,pitch:fl?0:.1-cm.pitch,yaw:fl?0:-cm.yaw,boost:1});s.plate([0,0,0],[8,2],'#1a2a3a',0);bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.3,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.6,3*.3,.5],[3.6,3*.3,.5],'#ffd43b',1.5,[4,4]);s.label([-3.75,3*.3,.5],'0','#ffd43b',12);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
  assumption:'Standard IUPAC rules for assigning oxidation numbers.'});
 
 /* 8 Organic basics */

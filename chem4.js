@@ -121,8 +121,12 @@ add({...ch(6,'Haloalkanes and Haloarenes',OR),id:'chem-chirality',title:'Chirali
  tryText:'Rotate the right-hand molecule. Can you make it match the left one?',
  controls:[R('rot','Rotate the mirror image',0,360,5,0,'°')],
  metrics:p=>[N('Molecule','Bromochlorofluoromethane (CHBrClF)'),N('Stereocentre','1 carbon with H, F, Cl, Br'),N('Superimposable?','No — enantiomers')],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:60,cx:300,pitch:.2}),g=[['H',[0,1,0]],['F',[.94,-.33,0]],['Cl',[-.47,-.33,.82]],['Br',[-.47,-.33,-.82]]],mol=(o,mirror,ang)=>{atom(s,o,'C');g.forEach(([el,u])=>{let v=mirror?[-u[0],u[1],u[2]]:u;const ca=Math.cos(ang),sa=Math.sin(ang);v=[v[0]*ca+v[2]*sa,v[1],-v[0]*sa+v[2]*ca];const q=V.add(o,V.mul(v,1.05));bond(s,o,q);atom(s,q,el)})};
-  mol([-1.6,0,0],false,0);mol([1.6,0,0],true,p.rot*PI/180);s.box([0,0,0],[.04,2.6,1.8],'#a5d8ff',{alpha:.25});s.callout([0,1.1,.9],'mirror plane','#a5d8ff',40,-40);s.callout([-1.6,0,0],'stereocentre C*','#e9f6ff',-60,60);s.render();tag(c,'non-superimposable mirror images',44,98,C.gold,15)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:52,cx:262,cy:262,pitch:.2,yaw:.1}),cz=Math.cos(.55),sz=Math.sin(.55),T=a=>[a[0]*cz+a[2]*sz,a[1],-a[0]*sz+a[2]*cz],g=[['H',[0,1,0]],['F',[.94,-.33,0]],['Cl',[-.47,-.33,.82]],['Br',[-.47,-.33,-.82]]],ang=p.rot*PI/180,ca=Math.cos(ang),sa=Math.sin(ang),X=1.9;
+  const pl=[[0,-1.9,-2],[0,-1.9,2],[0,1.9,2],[0,1.9,-2]].map(T);s.poly(pl,'#a5d8ff',{alpha:.2,normal:T([1,0,0]),z:-1e4,stroke:'#a5d8ffcc',lw:1.5});s.seg(T([0,-1.9,0]),T([0,1.9,0]),'#a5d8ff55',1,[3,4]);s.seg(T([0,0,-2]),T([0,0,2]),'#a5d8ff55',1,[3,4]);
+  const mol=(cx,mirror,rot)=>{const C0=[cx,0,0];g.forEach(([el,u])=>{let v=mirror?[-u[0],u[1],u[2]]:u;if(rot)v=[v[0]*ca+v[2]*sa,v[1],-v[0]*sa+v[2]*ca];const q=[cx+v[0]*1.1,v[1]*1.1,v[2]*1.1];stick(s,T(C0),T(q),1,{ca:'C',cb:el,r:.07});atom(s,T(q),el);if(mirror&&p.rot<1)s.seg(T(q),T([-q[0],q[1],q[2]]),'#ffffff44',1,[2,4]);s.label(T([q[0]+v[0]*.5,q[1]+v[1]*.5+.05,q[2]+v[2]*.5]),el,'#f1f3f5',11)});atom(s,T(C0),'C',1.05)};
+  mol(-X,false,false);mol(X,true,true);
+  s.label(T([-X,-1.9,0]),'molecule','#dbe7f0',12);s.label(T([X,-1.9,0]),'mirror image','#dbe7f0',12);
+  s.callout(T([0,1.9,1.4]),'mirror plane','#a5d8ff',30,-30);s.callout(T([-X,0,0]),'stereocentre C*','#e9f6ff',-50,-60);s.render();tag(c,'non-superimposable mirror images',44,98,C.gold,15)},
  assumption:'Ideal tetrahedral geometry.'});
 
 /* 7 Alcohols, phenols, ethers */
@@ -146,9 +150,16 @@ add({...ch(8,'Aldehydes, Ketones and Carboxylic Acids',OR),id:'chem-nucleophilic
  tryText:'Which compound reacts fastest with HCN?',
  controls:[R('i','Carbonyl compound',1,3,1,2),R('prog','Progress',0,100,1,40,'%')],
  metrics:p=>[N('Compound',CARB[p.i-1][0]),N('Relative reactivity',['','low','medium','high'][CARB[p.i-1][1]]),N('Reason',CARB[p.i-1][2])],
- draw:(c,p,t)=>{const q=p.prog/100,s=P3.scene(c,{scale:62,cx:250,pitch:.3,yaw:.3}),Cc=[0,0,0],O=[0,1.15,0];bond(s,Cc,O,q<.5?2:1);atom(s,Cc,'C');atom(s,O,'O');const g=p.i===1?['H','H']:p.i===2?['C','H']:['C','C'];
-  [[-1,-.6,0],[1,-.6,0]].forEach((u,k)=>{const r=V.mul(u,1);bond(s,Cc,r);atom(s,r,g[k]==='C'?'C':'H',g[k]==='C'?1:1)});const nu=[0,-.3,2.4-q*1.4];atom(s,nu,'C',.9);atom(s,V.add(nu,[0,0,.45]),'N',.9);bond(s,nu,V.add(nu,[0,0,.45]),3);if(q>.6){bond(s,Cc,nu);atom(s,V.add(O,[.3,.35,0]),'H',.8)}
-  s.callout(Cc,'δ+ carbonyl carbon','#e9f6ff',-70,40);s.callout(nu,'CN⁻ nucleophile','#4c6ef5',50,50);s.callout(O,q>.6?'O becomes –OH':'δ− oxygen','#ff8787',40,-50);s.render();tag(c,`${CARB[p.i-1][0]}: ${CARB[p.i-1][2]}`,44,98,C.gold,14)},
+ draw:(c,p,t)=>{const q=p.prog/100,s=P3.scene(c,{scale:50,cx:262,cy:268,pitch:.25,yaw:.2}),cz=Math.cos(.8),sz=Math.sin(.8),T=a=>[a[0]*cz+a[2]*sz,a[1],-a[0]*sz+a[2]*cz],pyr=clamp((q-.45)/.45,0,1),b=pyr*.34,pre=q<.6;
+  const Cc=[0,0,0],O=[0,1.15,-b*.9],g=p.i===1?['H','H']:p.i===2?['C','H']:['C','C'],R1=[-1,-.6,-b],R2=[1,-.6,-b],nz=pre?2.3-q*1.3:1.5,nuC=[0,0,nz],nuN=[0,0,nz+1],W=a=>T(a),sd=T([1,0,0]);
+  if(pre){s.ball(W(Cc),.45,'#4dabf7',{alpha:.16});s.seg(W([0,0,1.9]),W([0,0,.5]),'#4c6ef5aa',1.3,[4,4]);const gz=-1.9;atom(s,W([0,0,gz]),'C',.9,{alpha:.22});atom(s,W([0,0,gz-1]),'N',.9,{alpha:.22});s.seg(W([0,0,gz+.4]),W([0,0,-.5]),'#4c6ef566',1.3,[4,4]);s.label(W([0,-.8,gz-.6]),'or attack from this face','#adb5bd',11)}
+  stick(s,W(Cc),W(O),q<.5?2:1,{ca:'C',cb:'O',side:sd});[[R1,0],[R2,1]].forEach(([r,k])=>{stick(s,W(Cc),W(r),1,{ca:'C',cb:g[k]});atom(s,W(r),g[k]==='C'?'C':'H')});
+  atom(s,W(Cc),'C');atom(s,W(O),'O');atom(s,W(nuC),'C',.9);atom(s,W(nuN),'N',.9);stick(s,W(nuC),W(nuN),3,{ca:'C',cb:'N',r:.06});
+  if(!pre){stick(s,W(Cc),W(nuC),1,{ca:'C',cb:'C'});atom(s,V.add(W(O),[.32,.35,0]),'H',.8)}
+  if(pre){const arc=(a,m,e)=>Array.from({length:11},(_,k)=>{const u=k/10,w=1-u;return W([w*w*a[0]+2*w*u*m[0]+u*u*e[0],w*w*a[1]+2*w*u*m[1]+u*u*e[1],w*w*a[2]+2*w*u*m[2]+u*u*e[2]])});
+   const a1=arc([0,.25,nz-.1],[0,1.25,(nz+.4)/2],[0,.12,.38]);s.curve(a1,'#ffd43b',2.6,12);s.arrow(a1[9],a1[10],'#ffd43b',2.6,9);
+   const a2=arc([.08,.6,0],[.85,1.15,.1],[.12,1.2,.3]);s.curve(a2,'#ff8787',2.2,12);s.arrow(a2[9],a2[10],'#ff8787',2.2,8)}
+  s.callout(W(Cc),pre?'δ+ carbonyl carbon':'tetrahedral carbon (sp³)','#e9f6ff',-80,60);s.callout(W(nuN),'CN⁻ nucleophile','#74a0ff',45,40);s.callout(W(O),q>.6?'O becomes –OH':'δ− oxygen','#ff8787',60,-30);s.render();tag(c,`${CARB[p.i-1][0]}: ${CARB[p.i-1][2]}`,44,98,C.gold,14)},
  assumption:'Schematic mechanism (attack, then protonation); hydrogens on methyl groups omitted.'});
 
 /* 9 Amines */
@@ -172,10 +183,16 @@ add({...ch(10,'Biomolecules','BIOMOLECULES'),id:'chem-zwitterion',title:'Amino a
  tryText:'Set pH = 2 and pH = 11. What is the net charge in each case?',
  controls:[R('pH','pH',0,14,.1,6,'',1)],
  metrics:p=>{const z=charge(p.pH);return[N('Net charge',z,'',2),N('Main form',p.pH<2.34?'cation (H₃N⁺–CH₂–COOH)':p.pH>9.6?'anion (H₂N–CH₂–COO⁻)':'zwitterion (H₃N⁺–CH₂–COO⁻)'),N('Isoelectric point',5.97,'',2)]},
- draw:(c,p,t)=>{const z=charge(p.pH),s=P3.scene(c,{scale:62,cx:240,pitch:.3,yaw:.3}),N0=[-1.3,0,0],Ca=[0,.4,0],Cc=[1.3,0,0],O1=[1.9,.9,0],O2=[1.9,-.8,0];bond(s,N0,Ca);bond(s,Ca,Cc);bond(s,Cc,O1,2);bond(s,Cc,O2);[[N0,'N'],[Ca,'C'],[Cc,'C'],[O1,'O'],[O2,'O']].forEach(([q,e])=>atom(s,q,e));
-  const nH=p.pH<9.6?3:2;for(let k=0;k<nH;k++){const a=TAU*k/3;atom(s,V.add(N0,[-.5,.4*Math.cos(a),.4*Math.sin(a)]),'H',.8)}if(p.pH<2.34)atom(s,V.add(O2,[.4,-.3,0]),'H',.8);
-  if(p.pH<9.6)s.callout(N0,'–NH₃⁺','#4c6ef5',-60,-50);else s.callout(N0,'–NH₂','#4c6ef5',-60,-50);s.callout(O2,p.pH<2.34?'–COOH':'–COO⁻','#ff8787',50,50);s.render();
-  chart(c,420,96,236,170,{title:'Net charge vs pH',xl:'pH',xmin:0,xmax:14,ymin:-1.1,ymax:1.1,series:[{fn:charge,col:C.gold},{fn:()=>0,col:'#8ca6b9',dash:[4,4]}],marker:[p.pH,z]})},
+ draw:(c,p,t)=>{const z=charge(p.pH),s=P3.scene(c,{scale:50,cx:176,cy:262,pitch:.3,yaw:.3}),N0=[-1.3,0,0],Ca=[0,.4,0],Cc=[1.3,0,0],O1=[1.9,.9,0],O2=[1.9,-.8,0],ion=p.pH<9.6,cooMinus=p.pH>=2.34;
+  stick(s,N0,Ca,1,{ca:'N',cb:'C'});stick(s,Ca,Cc,1,{ca:'C',cb:'C'});stick(s,Cc,O1,2,{ca:'C',cb:'O',side:[0,0,1]});stick(s,Cc,O2,1,{ca:'C',cb:'O'});
+  const hC=V.add(Ca,[0,.3,.9]);stick(s,Ca,hC,1,{ca:'C',cb:'H'});atom(s,hC,'H',.8);
+  [[N0,'N'],[Ca,'C'],[Cc,'C'],[O1,'O'],[O2,'O']].forEach(([q,e])=>atom(s,q,e));
+  if(ion)s.ball(N0,.48,'#4c6ef5',{alpha:.18,glow:true});if(cooMinus){s.ball(O1,.5,'#ff6b6b',{alpha:.15});s.ball(O2,.5,'#ff6b6b',{alpha:.15})}
+  const nH=ion?3:2;for(let k=0;k<nH;k++){const a=TAU*k/3,h=V.add(N0,[-.5,.4*Math.cos(a),.4*Math.sin(a)]);stick(s,N0,h,1,{ca:'N',cb:'H',r:.05});atom(s,h,'H',.8)}if(!cooMinus){const h=V.add(O2,[.4,-.3,0]);stick(s,O2,h,1,{ca:'O',cb:'H',r:.05});atom(s,h,'H',.8)}
+  s.callout(N0,ion?'–NH₃⁺':'–NH₂','#74a0ff',-40,-70);s.callout(O2,cooMinus?'–COO⁻':'–COOH','#ff8787',20,70);s.render();
+  chart(c,410,104,230,150,{title:'Net charge vs pH',xl:'pH',xmin:0,xmax:14,ymin:-1.1,ymax:1.1,series:[{fn:charge,col:C.gold},{fn:()=>0,col:'#8ca6b9',dash:[4,4]}],marker:[p.pH,z]});
+  const k=window.PhysicaTextScale||1,fm=p.pH<2.34?0:p.pH>9.6?2:1;c.save();c.font=`700 ${Math.round(11.5*k)}px system-ui, sans-serif`;c.textBaseline='middle';
+  [['H₃N⁺–CH₂–COOH  cation'],['H₃N⁺–CH₂–COO⁻  zwitterion'],['H₂N–CH₂–COO⁻  anion']].forEach(([m],i)=>{const y=282+i*22;c.fillStyle=i===fm?C.gold:'#8ca6b9';c.fillText((i===fm?'● ':'○ ')+m,410,y)});c.restore()},
  assumption:'Glycine pKₐ₁ = 2.34 (–COOH), pKₐ₂ = 9.60 (–NH₃⁺) at 298 K.'});
 function charge(pH){return 1/(1+Math.pow(10,pH-2.34))-1/(1+Math.pow(10,9.6-pH))}
 
