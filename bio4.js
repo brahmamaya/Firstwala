@@ -191,6 +191,23 @@ const dnaModel=(s,seq,phase,turns,R0,x0,x1)=>{const N=Math.round(turns*10),PAIR=
   s.callout(at(15,D.B1(15)+D.GAP*.5),'base pair (H-bonds): A=T 2, G≡C 3','#e9f6ff',40,-90);s.callout([2,-.7,0],'one turn = 10 bp = 3.4 nm; width 2 nm','#ffd43b',30,60);s.label(at(-.5,D.B1(-.5)),'5′','#ff8787',12);s.label(at(30.5,D.B2(30.5)),'5′','#ff8787',12);s.label(at(-.5,D.B2(-.5)),'3′','#74c0fc',12);s.label(at(30.5,D.B1(30.5)),'3′','#74c0fc',12);s.render();tag(c,'red A · yellow T · teal G · blue C',44,98,C.muted,13)},
  assumption:'B-form DNA dimensions from NCERT Chapter 5; three turns shown.'});
 
+// Meselson-Stahl: a CsCl density-gradient tube (denser DNA settles lower) beside the DNA molecules of that generation, drawn as double helices with old (15N) and new (14N) strands.
+const MSH='#5c7cfa',MSL='#e599f7';
+const msDraw=(c,p,t)=>{const g=p.gen,heavy=g===0?1:0,hyb=g===0?0:1/2**(g-1),light=1-heavy-hyb,s=P3.scene(c,{scale:57,cx:335,cy:290}),TX=-2.5,n=Math.min(8,2**g);
+  // glass tube with a density gradient (light at the top, dense at the bottom)
+  s.lathe([TX,0,0],[[0,-1.66],[.22,-1.62],[.38,-1.45],[.45,-1.15],[.45,2.4],[.49,2.44]],'#cfe8ff',{alpha:.16,segs:22,spec:.5});
+  for(let i=0;i<10;i++){const k=i/9,y=-1.52+i*.39,r=i===0?.3:i===1?.4:.42;s.cyl([TX,y,0],[0,1,0],r,.4,k<.5?(k<.25?'#4a6fd0':'#5d83da'):(k<.75?'#7ea0e6':'#a9c6f2'),{alpha:.3,seg:18,caps:false})}
+  s.ring([TX,2.2,0],[0,1,0],.42,'#e9f6ff',1.2,[],30);
+  const band=(y,w,col,nm)=>{if(w>0){s.cyl([TX,y,0],[0,1,0],.4,.06+.12*w,col,{alpha:.92,seg:20});s.label([TX+.85,y,0],nm,col,12,'left')}};
+  band(-1.0,heavy,'#5c7cfa','heavy');band(-.3,hyb,'#9775fa','hybrid');band(.4,light,'#f783ac','light');
+  s.arrow([TX-.8,1.9,0],[TX-.8,-1.2,0],'#9fb6c4',2);s.label([TX-.8,2.15,0],'denser','#9fb6c4',11);s.label([TX+.7,1.7,0],'CsCl gradient','#9fb6c4',11,'left');
+  // the DNA of this generation: each molecule is a double helix; old strands (15N) blue, new strands (14N) pink
+  const rows=n>4?2:1,h=n>4?1.65:2.4,m=Math.min(n,4),cxm=1.25;
+  for(let i=0;i<n;i++){const col=i%4,row=Math.floor(i/4),x=cxm+(col-(m-1)/2)*.95,y1=rows===2?2.05-row*2.1:1.9,old=i<2,hv=g===0,c1=hv||(old&&i%2===0)?MSH:MSL,c2=hv||(old&&i%2===1)?MSH:MSL,ph=t*.6+i*.7,A=[],B=[];
+   for(let j=0;j<=18;j++){const u=j/18,a=TAU*1.6*u+ph;A.push([x+.2*Math.cos(a),y1-h*u,.2*Math.sin(a)]);B.push([x+.2*Math.cos(a+PI),y1-h*u,.2*Math.sin(a+PI)])}
+   s.tube(A,.05,c1,{segs:6,spec:.6});s.tube(B,.05,c2,{segs:6,spec:.6});for(let j=1;j<18;j+=2)s.seg(A[j],B[j],'#8fa1b3',1.6)}
+  s.label([cxm,2.55,0],g===0?'parental DNA (all ¹⁵N)':`${2**g} DNA molecules${n<2**g?' (8 shown)':''}`,'#e9f6ff',12);
+  s.render();tag(c,'blue strands: ¹⁵N (old) · pink: ¹⁴N (new)',44,98,C.muted,13)};
 add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-meselson-stahl',title:'Semiconservative replication (Meselson–Stahl)',
  description:'Grow E. coli in ¹⁵N, then switch to ¹⁴N. Spin the DNA in a CsCl gradient after each generation.',
  formula:'After generation n (n ≥ 1): hybrid fraction = 1/2ⁿ⁻¹ ;  light fraction = 1 − 1/2ⁿ⁻¹',
@@ -198,13 +215,55 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-meselson-stahl',title:
  tryText:'After two generations, what fraction of DNA is light?',
  controls:[R('gen','Generations in ¹⁴N',0,5,1,1)],
  metrics:p=>{const g=p.gen,heavy=g===0?100:0,hyb=g===0?0:100/2**(g-1),light=g===0?0:100-hyb;return[N('Heavy (¹⁵N/¹⁵N)',heavy,'%',0),N('Hybrid (¹⁵N/¹⁴N)',hyb,'%',1),N('Light (¹⁴N/¹⁴N)',light,'%',1),N('Generation time of E. coli','≈ 20 min')]},
- draw:(c,p,t)=>{const g=p.gen,heavy=g===0?1:0,hyb=g===0?0:1/2**(g-1),light=1-heavy-hyb,s=P3.scene(c,{scale:56,cx:200});s.lathe([0,-1.8,0],[[.0,0],[.35,.25],[.42,.6],[.42,3.2]],'#e9f6ff',{alpha:.2});
-  const band=(y,w,col)=>{if(w>0)s.cyl([0,y,0],[0,1,0],.4,.06+.12*w,col,{alpha:.85})};band(-1.0,heavy,'#5c7cfa');band(-.3,hyb,'#9775fa');band(.4,light,'#e599f7');s.label([.8,-1,0],'heavy',C.blue,12);s.label([.8,-.3,0],'hybrid',C.purple,12);s.label([.8,.4,0],'light','#f783ac',12);
-  const nmol=Math.min(8,2**g);for(let i=0;i<nmol;i++){const x=1.8+(i%4)*.55,y=.8-Math.floor(i/4)*1.4,old=i<2;s.tube([[x,y,0],[x,y-1,0]],.05,(g===0||old&&i%2===0)?'#5c7cfa':'#e599f7',{segs:5});s.tube([[x+.15,y,0],[x+.15,y-1,0]],.05,g===0||(old&&i%2===1)?'#5c7cfa':'#e599f7',{segs:5})}s.render();tag(c,'blue strands: ¹⁵N (old) · pink: ¹⁴N (new)',44,98,C.muted,13)},
+draw:(c,p,t)=>msDraw(c,p,t/*DBG*/),
  assumption:'Ideal synchronous divisions; band thickness ∝ fraction of DNA.'});
 
 const CODON=(()=>{const b='UCAG',aa='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',m={};let k=0;for(const x of b)for(const y of b)for(const z of b)m[x+y+z]=aa[k++];return m})();
 const AAN={F:'Phe',L:'Leu',S:'Ser',Y:'Tyr',C:'Cys',W:'Trp',P:'Pro',H:'His',Q:'Gln',R:'Arg',I:'Ile',M:'Met',T:'Thr',N:'Asn',K:'Lys',V:'Val',A:'Ala',D:'Asp',E:'Glu',G:'Gly','*':'Stop'};
+// Transcription then translation. Phase 1: RNA polymerase opens the DNA and the mRNA grows. Phase 2: a ribosome reads the mRNA codon by codon;
+// tRNAs pair anticodon-to-codon and each amino acid joins the growing polypeptide until a stop codon is reached.
+const DGX0=-3,DGDX=.3,DGYD=2.15,DGYM=-.55,DGAA=['#ff6b6b','#ffd43b','#69db7c','#4dabf7','#9775fa','#f783ac'],DGPD={A:'T',T:'A',G:'C',C:'G'},DGPR={A:'U',U:'A',G:'C',C:'G'};
+const dgTrna=(s,x,y0,aaCol,anti,name)=>{s.tube([[x-.32,y0+.02,.1],[x-.28,y0+.2,.1],[x,y0+.3,.1],[x+.28,y0+.2,.1],[x+.32,y0+.02,.1]],.045,'#74c0fc',{segs:6});s.tube([[x,y0+.3,.1],[x,y0+.82,.1]],.05,'#74c0fc',{segs:6});s.tube([[x-.22,y0+.92,.1],[x,y0+.86,.1],[x+.22,y0+.92,.1]],.045,'#74c0fc',{segs:6});
+  anti.forEach((b,i)=>s.ball([x+(i-1)*DGDX,y0,.1],.1,BC[b],{lift:.2}));if(aaCol)s.ball([x,y0+1.07,.1],.13,aaCol,{lift:.3});if(name)s.label([x,y0+1.36,.1],name,aaCol,11)};
+const dgBez=(a,b,c,n)=>Array.from({length:n+1},(_,i)=>{const u=i/n;return[0,1,2].map(d=>(1-u)*(1-u)*a[d]+2*u*(1-u)*b[d]+u*u*c[d])});
+const dogDraw=(c,p,t)=>{const r=dogma(p),s=P3.scene(c,{scale:54,cx:355,cy:300}),m=r.mrna.replace(/ /g,''),d=r.dna.replace(/ /g,''),cod=r.mrna.split(' '),aaN=cod.map(x=>AAN[CODON[x]]),stopIdx=aaN.indexOf('Stop')<0?6:aaN.indexOf('Stop'),
+  q=cycle(t*.15,1),cl=(a,b,v)=>Math.max(a,Math.min(b,v)),sm=x=>x*x*(3-2*x),X=j=>DGX0+DGDX*j,yD=DGYD,yM=DGYM,qa=cl(0,1,q/.35),nTx=q<.35?qa*18:18,k=Math.floor(nTx),tx=q<.35,xp=X(nTx-.5),th=t*.45;
+  const bub=x=>tx?sm(cl(0,1,(.75-Math.abs(x-xp))/.4)):0,pos2=(x,sd)=>{const e=bub(x),a=TAU*(x-X(0))/3+th+(sd?2.62:0),R0=.28,hy=yD+R0*Math.cos(a),hz=R0*Math.sin(a);return[x,hy+(yD+(sd?-.5:.5)-hy)*e,hz*(1-e)]};
+  // DNA: two backbones (the helix opens inside the polymerase), base pairs as coloured half-rungs
+  const S1=[],S2=[];for(let x=X(0)-.2;x<=X(17)+.2;x+=.1){S1.push(pos2(x,0));S2.push(pos2(x,1))}
+  s.tube(S1,.05,'#9fb3c8',{segs:6,spec:.6});s.tube(S2,.05,'#8aa1bb',{segs:6,spec:.6});
+  for(let j=0;j<18;j++){const x=X(j),e=bub(x),a=pos2(x,0),b=pos2(x,1),mid=V.mul(V.add(a,b),.5);
+    if(e<.6){s.seg(a,mid,BC[d[j]],4);s.seg(mid,b,BC[DGPD[d[j]]],4)}else{s.ball(V.add(b,[0,.16,0]),.085,BC[DGPD[d[j]]],{lift:.2});s.ball(V.sub(a,[0,.16,0]),.085,BC[d[j]],{lift:.2})}}
+  if(p.pos>0)s.ring([X(p.pos-1),yD,0],[0,0,1],.34,'#ff6b6b',2.5,[],24);
+  // RNA polymerase and the nascent mRNA leaving it
+  if(tx){s.mesh([xp,yD,-.05],[.85,.78,.62],'#ffa94d',{alpha:.38,rings:10,segs:16});s.mesh([xp+.25,yD+.5,0],[.42,.3,.4],'#ff922b',{alpha:.4,rings:6,segs:10});
+   if(k>=1){const e1=[X(k-1)+.08,yM+.2,.05];s.tube([[xp-.45,yD-.2,.12],[xp,yD-.22,.12],...dgBez([xp,yD-.22,.12],[xp-.05,yD-1.3,.1],e1,10)],.045,'#d0b4ff',{segs:6})}
+   s.callout([xp+.3,yD+.75,0],'RNA polymerase (transcription)','#ffa94d',50,-35)}
+  s.callout([X(15),yD+.3,0],'DNA double helix','#dfe7ee',30,-42);
+  // mRNA: backbone below, bases pointing up (the face the ribosome and tRNAs read)
+  if(k>=2)s.tube([[X(0)-.15,yM,0],[X(k-1)+.15,yM,0]],.05,'#d0b4ff',{segs:6});
+  for(let j=0;j<k;j++){const x=X(j);s.ball([x,yM,0],.07,'#b79df0',{lift:.1});s.seg([x,yM,0],[x,yM+.2,0],'#b79df0',2);s.ball([x,yM+.28,0],.125,BC[m[j]],{flat:true,lift:.2});s.label([x,yM+.28,.2],m[j],'#ffffff',11)}
+  if(k>=1){s.label([X(0)-.35,yM,0],'5′','#ff8787',12);if(!tx)s.label([X(17)+.35,yM,0],'3′','#74c0fc',12)}
+  if(p.pos>0&&p.pos-1<k)s.ring([X(p.pos-1),yM+.28,.12],[0,0,1],.2,'#ff6b6b',2.5,[],24);
+  // codon brackets and amino-acid names
+  let nb=0,rel=0;
+  // ribosome: it moves along the mRNA while the tRNAs stay paired with their codons
+  if(!tx){const tr=cl(0,1,(q-.35)/.65),stp=Math.max(stopIdx,1),sv=tr*stp,idx=Math.min(Math.floor(sv),stp-1),fr=Math.min(1,sv-idx),last=idx===stp-1,mv=last?0:sm(cl(0,1,(fr-.55)/.45)),bnd=sm(cl(0,1,(fr-.3)/.2)),ent=sm(cl(0,1,fr/.4)),ex=sm(cl(0,1,(fr-.5)/.3)),xr0=X(3*idx+1)+.45,xr=xr0+.9*mv,y0=yM+.54;
+   rel=last&&stopIdx>0?sm(cl(0,1,(fr-.6)/.4)):0;nb=stopIdx===0?0:Math.min(stopIdx,idx+1+(!last&&fr>.4?1:0));
+   s.lathe([xr+.3*rel,-.15+.35*rel,-.05],[[0,0],[1.4,0],[1.38,.2],[1.22,.8],[.85,1.25],[.4,1.46],[0,1.5]],'#6c8cff',{alpha:.42-.22*rel,segs:20});s.lathe([xr-.3*rel,-.62-.3*rel,-.05],[[0,0],[1.1,0],[1.05,-.12],[.8,-.28],[.4,-.35],[0,-.37]],'#a98bff',{alpha:.5-.26*rel,segs:18});
+   if(stopIdx>0){if(ex<1)dgTrna(s,xr0-.45-.5*ex,y0+.6*ex,fr<.4?DGAA[idx%6]:null,[...cod[idx]].map(z=>DGPR[z]),null);
+    if(!last){const aI=idx+1;dgTrna(s,xr0+.45+(1-ent)*.9,y0+(1-ent)*.7,DGAA[aI%6],[...cod[aI]].map(z=>DGPR[z]),AAN[CODON[cod[aI]]])}
+    else if(fr>.1)dgBox(s,xr0+.45,y0,'stop codon: release factor')}
+   else dgBox(s,xr0-.45,y0,'stop codon: release factor');
+   // growing polypeptide: the newest amino acid sits on the tRNA that carries it
+   const ax=xr0-.45+.9*bnd*(last?0:1);
+   for(let j=0;j<nb;j++){const i=nb-1-j;s.ball([ax+.26*j+.4*rel*(j+1)/(nb+1),1.06+.07*j+.04*Math.sin(j*1.4)+.4*rel,.1],.115,DGAA[i%6],{lift:.3})}
+   if(nb>0)s.callout([ax+.2*(nb-1),1.1+.07*(nb-1)+.4*rel,.1],rel>.5?'polypeptide released':'polypeptide chain','#ff8787',-95,-25);
+   s.callout([xr-1.0,.5,-.05],'ribosome (translation)','#8fa8ff',-70,-40);if(stopIdx>0&&!last)s.callout([xr0+.45,y0+.7,.1],'tRNA: anticodon pairs with codon','#74c0fc',110,25)}
+  for(let i=0;i<6;i++){const x0=X(3*i)-.12,x1=X(3*i+2)+.12;if(i*3+2<k||(!tx)){s.seg([x0,yM-.42,0],[x1,yM-.42,0],'#868e96',1.5);if(i<nb||(!tx&&i===stopIdx&&(aaN[i]==='Stop')&&rel>.5))s.label([X(3*i+1),yM-.68,0],aaN[i],i<stopIdx?DGAA[i%6]:'#ff8787',12)}}
+  if(!tx&&p.pos>0&&p.pos-1<18)s.label([X(p.pos-1),yM-1.2,0],'mutated base','#ff6b6b',11);
+  s.render();tag(c,'bases: A red · T yellow · G teal · C blue · U purple (RNA)',44,98,C.muted,13)};
+const dgBox=(s,x,y,txt)=>{s.mesh([x,y+.35,.1],[.55,.3,.3],'#3bc9db',{alpha:.7,rings:6,segs:10});s.label([x,y+.8,.1],txt,'#66d9e8',11)};
 add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-central-dogma',title:'Transcription and translation',
  description:'Transcribe a short gene into mRNA and translate it codon by codon. Then make a point mutation and see its effect.',
  formula:'DNA → mRNA (transcription) → protein (translation) ;  AUG = start (Met)',
@@ -212,9 +271,7 @@ add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-central-dogma',title:'
  tryText:'Change codon 3 (AAA) to a stop codon by mutating one base.',
  controls:[R('pos','Mutation position (0 = none)',0,18,1,0),S('base','New base','A',['A','T','G','C'].map(x=>[x,x]))],
  metrics:p=>{const r=dogma(p);return[N('Coding DNA',r.dna),N('mRNA',r.mrna),N('Protein',r.prot),N('Mutation effect',r.effect)]},
- draw:(c,p,t)=>{const r=dogma(p),s=P3.scene(c,{scale:50,pitch:.25}),n=r.mrna.replace(/ /g,'').length,q=cycle(t*.15,1);helix(s,[-3.6,1.2,0],[-.6,1.2,0],1.6,.35,r.dna.replace(/ /g,'').slice(0,16),t*.5);s.mesh([-1.6,1.2,.3],[.5,.4,.4],'#ffa94d',{alpha:.7});s.callout([-1.6,1.5,.3],'RNA polymerase (transcription)','#ffa94d',-30,-50);s.callout([-3.3,1.2,0],'DNA (coding strand)','#dfe7ee',-20,40);
-  const m=r.mrna.replace(/ /g,'');for(let i=0;i<n;i++){const x=-2.8+i*.32;s.cyl([x,-.4,0],[0,1,0],.06,.3,BC[m[i]]||'#ccc');s.seg([x-.16,-.25,0],[x+.16,-.25,0],'#dee2e6',3)}const rx=-2.8+q*(n-1)*.32;s.mesh([rx,-.15,0],[.6,.35,.45],'#748ffc',{alpha:.6});s.mesh([rx,-.75,0],[.45,.25,.35],'#4c6ef5',{alpha:.6});
-  const aas=r.prot.split('-').filter(x=>x),made=Math.min(aas.length,Math.floor(q*n/3)+1);for(let i=0;i<made;i++)s.ball([rx-.2-i*.2,.4+i*.12,0],.1,['#ff6b6b','#ffd43b','#69db7c','#4dabf7','#9775fa','#f783ac'][i%6]);s.callout([-2.8+(n-1)*.32,-.4,0],'mRNA (codons, 5′→3′)','#c77dff',30,60);s.callout([rx,-.75,.3],'ribosome (translation)','#748ffc',40,60);s.callout([rx-.2-(made-1)*.2,.4+(made-1)*.12,0],'polypeptide chain','#ff8787',-30,-50);s.render()},
+draw:(c,p,t)=>dogDraw(c,p,t/*DBG*/),
  assumption:'Standard genetic code; gene shown as its coding (sense) strand, so mRNA = coding strand with U for T.'});
 function dogma(p){let g='ATGGCCAAATTTGGGTAA'.split('');const orig=g.join('');if(p.pos>0)g[p.pos-1]=p.base;const dna=g.join(''),mrna=dna.replace(/T/g,'U'),cod=[];for(let i=0;i<18;i+=3)cod.push(mrna.slice(i,i+3));const prot=[];for(const c2 of cod){const a=CODON[c2];prot.push(AAN[a]);if(a==='*')break}
   const op=[];const om=orig.replace(/T/g,'U');for(let i=0;i<18;i+=3){const a=CODON[om.slice(i,i+3)];op.push(AAN[a]);if(a==='*')break}let effect='No mutation';if(p.pos>0){if(dna===orig)effect='Same base — no change';else if(prot.join()===op.join())effect='Silent (same amino acid)';else if(prot.length<op.length)effect='Nonsense (early stop codon)';else effect='Missense (different amino acid)'}
