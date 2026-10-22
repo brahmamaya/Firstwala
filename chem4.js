@@ -159,7 +159,8 @@ add({...ch(9,'Amines',OR),id:'chem-hinsberg-test',title:'Hinsberg test for amine
  tryText:'Which amine gives a precipitate that stays undissolved in KOH?',
  controls:[S('a','Amine','p',[['p','Primary (ethanamine)'],['s','Secondary (N-ethylethanamine)'],['t','Tertiary (N,N-diethylethanamine)']])],
  metrics:p=>[N('Reaction with C₆H₅SO₂Cl',p.a==='t'?'No reaction':'Forms a sulphonamide'),N('In KOH',{p:'Dissolves (clear solution)',s:'Insoluble precipitate',t:'— (amine unchanged)'}[p.a]),N('Reason',{p:'N–H on sulphonamide is acidic',s:'no H left on N',t:'no H on N to replace'}[p.a])],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:250,cy:300});beaker(s,[0,-1.9,0],1.1,2.6,p.a==='p'?'#d0ebff':p.a==='s'?'#e9ecef':'#e7f5ff',.7);if(p.a==='s')for(let i=0;i<40;i++)s.ball([(hash(i)-.5)*1.8,-1.85+hash(i+3)*.3,(hash(i+6)-.5)*1.6],.06,'#f8f9fa',{flat:true});
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:50,cx:250,cy:268});glassBeaker(s,[0,-1.7,0],1.2,2.7,p.a==='p'?'#bfe4ff':p.a==='s'?'#f1f3f5':'#d0ebff',.7,{alpha:p.a==='s'?.55:.3});if(p.a==='s')for(let i=0;i<46;i++)s.ball([(hash(i)-.5)*1.7+.04*Math.sin(t*.8+i),-1.62+hash(i+3)*.35,(hash(i+6)-.5)*1.5],.07,'#ffffff',{spec:.5});
+  if(p.a==='t')for(let i=0;i<6;i++)s.ball([(hash(i+20)-.5)*1.4,-.35+hash(i+3)*.5+.03*Math.sin(t*.9+i),(hash(i+26)-.5)*1.2],.1,'#ffe8a3',{alpha:.6});
   s.callout([0,-.5,.6],{p:'clear: sulphonamide dissolved in KOH',s:'white precipitate stays',t:'no reaction'}[p.a],'#e9f6ff',60,-50);s.render();tag(c,{p:'Primary amine',s:'Secondary amine',t:'Tertiary amine'}[p.a],44,98,C.gold,15)},
  assumption:'Hinsberg’s reagent: benzenesulphonyl chloride; observations as in NCERT.'});
 

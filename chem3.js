@@ -108,8 +108,9 @@ add({...ch(6,'Equilibrium',PH),id:'chem-buffer',title:'Buffer solutions (Henders
  tryText:'Add 0.01 mol of HCl to the buffer and to pure water. Compare the pH changes.',
  controls:[R('ha','Acetic acid',.01,.2,.01,.1,'mol',2),R('a','Sodium acetate',.01,.2,.01,.1,'mol',2),R('add','Strong acid (+) / base (−) added',-.05,.05,.005,0,'mol',3)],
  metrics:p=>{const HA=p.ha+p.add,A=p.a-p.add,ok=HA>0&&A>0,pH=ok?4.76+Math.log10(A/HA):NaN,water=p.add>0?-Math.log10(p.add):p.add<0?14+Math.log10(-p.add):7;return[N('pH of buffer',ok?pH:'capacity exceeded','',2),N('pH if added to 1 L water',water,'',2),N('[A⁻]/[HA]',ok?A/HA:'—','',2)]},
- draw:(c,p,t)=>{const HA=Math.max(0,p.ha+p.add),A=Math.max(0,p.a-p.add),pH=4.76+Math.log10(Math.max(1e-6,A)/Math.max(1e-6,HA)),s=P3.scene(c,{scale:56,cx:250,cy:290});beaker(s,[0,-1.9,0],1.3,2.8,pH<4.5?'#ffa94d':pH<5?'#fab005':'#94d82d',.75);
-  for(let i=0;i<Math.round(HA*80);i++)s.ball([(hash(i)-.5)*2,-1.7+hash(i+5)*1.8,(hash(i+9)-.5)*1.4],.08,'#ff8787');for(let i=0;i<Math.round(A*80);i++)s.ball([(hash(i+70)-.5)*2,-1.7+hash(i+75)*1.8,(hash(i+79)-.5)*1.4],.08,'#74c0fc');s.callout([.6,-.4,.5],'HA (acetic acid)','#ff8787',60,-50);s.callout([-.6,-1,.5],'A⁻ (acetate)','#74c0fc',-60,40);s.render();tag(c,`pH = 4.76 + log(${f(A,3)}/${f(HA,3)}) = ${f(pH,2)}`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const HA=Math.max(0,p.ha+p.add),A=Math.max(0,p.a-p.add),pH=4.76+Math.log10(Math.max(1e-6,A)/Math.max(1e-6,HA)),s=P3.scene(c,{scale:50,cx:250,cy:268});glassBeaker(s,[0,-1.7,0],1.3,2.8,pH<4.5?'#ffa94d':pH<5?'#fab005':'#94d82d',.75,{alpha:.3});
+  const w=(i,k)=>.05*Math.sin(t*1.4+i*2.1+k);
+  for(let i=0;i<Math.round(HA*80);i++)s.ball([(hash(i)-.5)*2+w(i,0),-1.5+hash(i+5)*1.7+w(i,1),(hash(i+9)-.5)*1.4+w(i,2)],.09,'#ff8787',{spec:.6});for(let i=0;i<Math.round(A*80);i++)s.ball([(hash(i+70)-.5)*2+w(i,3),-1.5+hash(i+75)*1.7+w(i,4),(hash(i+79)-.5)*1.4+w(i,5)],.09,'#74c0fc',{spec:.6});s.callout([.8,-.5,.5],'HA (acetic acid)','#ff8787',70,-30);s.callout([-.8,-1,.5],'A⁻ (acetate)','#74c0fc',-70,10);s.render();tag(c,`pH = 4.76 + log(${f(A,3)}/${f(HA,3)}) = ${f(pH,2)}`,44,98,C.gold,15)},
  assumption:'1 L of solution; added acid or base reacts completely with the conjugate base or acid.'});
 
 add({...ch(6,'Equilibrium',PH),id:'chem-solubility-product',title:'Solubility product and common ion effect',
