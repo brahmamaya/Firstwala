@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
-const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,{add,done}=pack();
+const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3.2+i*6.4/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.5,h,.5],on?'#ffd43b':col);s.engrave([x,h+.25,.3],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
@@ -41,9 +41,12 @@ add({...ch(2,'Electrochemistry',PH),id:'chem-molar-conductivity',title:'Molar co
  tryText:'Dilute acetic acid from 0.1 M to 0.001 M. By what factor does Λₘ rise?',
  controls:[R('lc','Concentration (log₁₀ M)',-4,-.5,.05,-2,'',2)],
  metrics:p=>{const c0=Math.pow(10,p.lc),kcl=149.9-87.5*Math.sqrt(c0),K=1.8e-5,a=(-K+Math.sqrt(K*K+4*K*c0))/(2*c0);return[N('Concentration',c0,'M',4),N('Λₘ (KCl)',kcl,'S cm² mol⁻¹',1),N('α (acetic acid)',a,'',3),N('Λₘ (acetic acid)',a*390.5,'S cm² mol⁻¹',1)]},
- draw:(c,p,t)=>{const c0=Math.pow(10,p.lc),K=1.8e-5,a=(-K+Math.sqrt(K*K+4*K*c0))/(2*c0),s=P3.scene(c,{scale:50,cx:230,cy:300});for(const [x,col,ions] of[[-1.4,'#d0ebff',1],[1.4,'#e9f6ff',a]]){beaker(s,[x,-1.9,0],.9,2.4,col,.7);s.box([x-.35,-.8,0],[.08,1.6,.6],'#868e96');s.box([x+.35,-.8,0],[.08,1.6,.6],'#868e96');for(let i=0;i<Math.round(ions*16);i++){const u=cycle(t*.5+i/16,1);s.ball([x-.3+u*.6,-1.7+hash(i)*1.4,(hash(i+4)-.5)*.6],.06,i%2?'#ff8787':'#74c0fc',{flat:true})}for(let i=0;i<Math.round((1-ions)*10);i++)s.ball([x+(hash(i+30)-.5)*1.2,-1.7+hash(i+33)*1.4,(hash(i+36)-.5)*.8],.08,'#adb5bd',{flat:true})}
-  s.callout([-1.4,-.2,.5],'KCl: fully ionised','#74c0fc',-50,-50);s.callout([1.4,-.2,.5],`CH₃COOH: ${f(a*100,1)} % ionised`,'#ced4da',40,-50);s.render();
-  chart(c,420,96,236,170,{title:'Λₘ vs √c',xl:'√c',xmin:0,xmax:.6,ymin:0,ymax:400,series:[{fn:x=>149.9-87.5*x,col:C.mint},{fn:x=>{const cc=Math.max(1e-6,x*x),aa=(-K+Math.sqrt(K*K+4*K*cc))/(2*cc);return aa*390.5},col:C.gold}],marker:[Math.sqrt(c0),a*390.5]})},
+ draw:(c,p,t)=>{const c0=Math.pow(10,p.lc),K=1.8e-5,a=(-K+Math.sqrt(K*K+4*K*c0))/(2*c0),s=P3.scene(c,{scale:46,cx:215,cy:240});for(const [x,col,ions,A,B,ra,rb] of[[-1.4,'#d0ebff',1,'#9775fa','#40c057',.09,.12],[1.4,'#e9f6ff',a,'#74c0fc','#ff8787',.07,.11]]){PC.glassBeaker(s,[x,-2,0],.95,2.4,col,.7,{alpha:.4});
+   for(const [dx,lab] of[[-.42,'+'],[.42,'−']]){s.box([x+dx,-.95,0],[.07,1.7,.7],'#495057',{spec:.5});s.engrave([x+dx,.05,0],lab,lab==='+'?'#ff8787':'#74c0fc',13,9e5)}
+   const n=Math.round(ions*8);for(let i=0;i<n;i++){const z=(hash(i+4)-.5)*.5,y=-1.75+hash(i)*1.3,j=.03*Math.sin(t*5+i*2.3);s.ball([x-.3+.6*cycle(t*.35+i/n,1),y+j,z],ra,A,{spec:.6});s.ball([x+.3-.6*cycle(t*.35+(i+.5)/n,1),y+.2*(hash(i+8)-.5)-j,-z],rb,B,{spec:.6})}
+   if(ions<1)for(let i=0;i<Math.round((1-ions)*8);i++){const q=[x+(hash(i+30)-.5)*1.1,-1.75+hash(i+33)*1.3+.03*Math.sin(t*2+i),(hash(i+36)-.5)*.6],g=t*.6+i;s.ball(q,.1,'#868e96',{spec:.5});s.ball([q[0]+.12*Math.cos(g),q[1]+.07,q[2]+.12*Math.sin(g)],.075,'#fa5252',{spec:.5});s.ball([q[0]-.1*Math.cos(g),q[1]+.08,q[2]-.1*Math.sin(g)],.075,'#fa5252',{spec:.5})}}
+  s.callout([-1.4,-.4,.5],'KCl: fully ionised','#b197fc',-50,-50);s.callout([1.4,-.2,.5],`CH₃COOH: ${f(a*100,1)} % ionised`,'#ced4da',40,-50);s.render();
+  chart(c,420,96,236,170,{title:'Λₘ vs √c',xl:'√c',xmin:0,xmax:.6,ymin:0,ymax:400,series:[{fn:x=>149.9-87.5*x,col:C.mint},{fn:x=>{const cc=Math.max(1e-6,x*x),aa=(-K+Math.sqrt(K*K+4*K*cc))/(2*cc);return aa*390.5},col:C.gold}],marker:[Math.sqrt(c0),a*390.5]});tag(c,'K⁺ violet · Cl⁻ green · H⁺ blue · CH₃COO⁻ red · grey+red: CH₃COOH',44,98,C.muted,11)},
  assumption:'Λ°ₘ: KCl 149.9, CH₃COOH 390.5 S cm² mol⁻¹ (298 K); Kohlrausch constant A ≈ 87.5 for KCl; Kₐ = 1.8 × 10⁻⁵.'});
 
 /* 3 Kinetics */
@@ -54,8 +57,19 @@ add({...ch(3,'Chemical Kinetics',PH),id:'chem-catalyst',title:'How a catalyst sp
  tryText:'Lower Eₐ by 20 kJ/mol at 298 K. How many times faster is the reaction?',
  controls:[R('Ea','Uncatalysed Eₐ',40,150,1,100,'kJ/mol'),R('dE','Lowering by catalyst',0,60,1,20,'kJ/mol'),R('T','Temperature',250,500,1,298,'K')],
  metrics:p=>{const r=Math.exp(Math.min(p.dE,p.Ea-1)*1000/(8.314*p.T));return[N('Catalysed Eₐ',Math.max(1,p.Ea-p.dE),'kJ/mol',0),N('Rate increase',r,'×',3),N('ΔH and K','unchanged')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:260,cy:300}),k=2.6/150,prof=(E)=>Array.from({length:41},(_,i)=>{const x=-2.6+5.2*i/40;return[x,-1.4+E*k*Math.exp(-x*x*1.2)-.5*(x>0?Math.min(1,x/1.5):0),0]});s.tube(prof(p.Ea),.05,'#ff8787',{segs:6});s.tube(prof(Math.max(1,p.Ea-p.dE)).map(q=>[q[0],q[1],.3]),.05,'#69db7c',{segs:6});
-  s.arrow([0,-1.4,.6],[0,-1.4+p.Ea*k,.6],'#ff8787',2,7,`Eₐ ${p.Ea}`);s.arrow([.25,-1.4,.6],[.25,-1.4+Math.max(1,p.Ea-p.dE)*k,.6],'#69db7c',2,7,`with catalyst ${Math.max(1,p.Ea-p.dE)}`);s.callout([-2.4,-1.4,0],'reactants','#e9f6ff',-20,-50);s.callout([2.5,-1.9,0],'products (ΔH same)','#e9f6ff',20,50);s.render();tag(c,`rate × ${f(Math.exp(Math.min(p.dE,p.Ea-1)*1000/(8.314*p.T)),3)} at ${p.T} K`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:42,cx:262,cy:200,yaw:1e-4,pitch:1e-4}),k=2.6/150,Ec=Math.max(1,p.Ea-p.dE),Y0=-1.2,
+   y=(E,x)=>Y0+E*k*Math.exp(-x*x*1.2)-.5*(x>0?Math.min(1,x/1.5):0),prof=(E,z)=>Array.from({length:49},(_,i)=>{const x=-3+6*i/48;return[x,y(E,x),z]});
+  s.arrow([-3.3,-1.95,0],[-3.3,1.1,0],'#adb5bd',1.6,7,'E');s.arrow([-3.3,-1.95,0],[3.2,-1.95,0],'#adb5bd',1.6,7,'Reaction progress');
+  s.seg([-3,Y0,0],[-1.2,Y0,0],'#ffffff44',1,[4,4]);s.seg([1.2,Y0-.5,0],[3,Y0-.5,0],'#ffffff44',1,[4,4]);
+  s.tube(prof(p.Ea,0),.06,'#ff8787',{segs:8,spec:.5});s.tube(prof(Ec,.25),.06,'#69db7c',{segs:8,spec:.5});
+  s.seg([-.35,Y0,0],[-.35,Y0+p.Ea*k,0],'#ff8787',1.2,[3,3]);
+  s.arrow([.35,Y0,.25],[.35,Y0+Ec*k,.25],'#69db7c',2,7);
+  s.callout([-.35,Y0+p.Ea*k*.55,0],`Eₐ ${p.Ea} kJ/mol`,'#ff8787',-75,-45);s.callout([.35,Y0+Ec*k*.5,.25],`with catalyst ${Ec} kJ/mol`,'#69db7c',60,30);
+  const mol=(q,el,sc,ph)=>{const a=[q[0]-.11*sc*Math.cos(ph),q[1],q[2]-.11*sc*Math.sin(ph)],b=[q[0]+.11*sc*Math.cos(ph),q[1],q[2]+.11*sc*Math.sin(ph)];atom(s,a,el,.62*sc);atom(s,b,el,.62*sc);PC.stick(s,a,b,el==='N'?3:1,{r:.035,gap:.06,ca:el,cb:el})};
+  const w=t*.9;mol([-2.6,Y0+.4,0],'N',1.15,w);for(let i=0;i<3;i++)mol([-2.1+.45*i,Y0+.3+.1*Math.sin(t*2+i),.2*(i-1)],'H',1.1,w+i);
+  for(let i=0;i<2;i++){const q=[2.3+.7*i,Y0-.5+.38+.06*Math.sin(t*2+i),0];atom(s,q,'N',.62);for(let j=0;j<3;j++){const g=TAU*j/3+w,h=[q[0]+.2*Math.cos(g),q[1]-.12,q[2]+.2*Math.sin(g)];s.tube([q,h],.03,'#ced4da',{segs:5});s.ball(h,.075,'#f1f3f5',{spec:.6})}}
+  s.engrave([-2.35,Y0-.28,.3],'N₂ + 3H₂','#e9f6ff',11,9e5);s.engrave([2.65,Y0+.4,.3],'2NH₃','#e9f6ff',11,9e5);
+  s.render();tag(c,`rate × ${f(Math.exp(Math.min(p.dE,p.Ea-1)*1000/(8.314*p.T)),3)} at ${p.T} K`,44,98,C.gold,15)},
  assumption:'Same pre-exponential factor with and without the catalyst.'});
 
 /* 4 d- and f-block */
