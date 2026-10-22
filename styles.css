@@ -1201,11 +1201,8 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 
 .landing-icons{display:flex;justify-content:center;gap:12px;margin:18px auto 12px}
 .landing-ic{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgb(var(--ovt) / .28);background:rgb(var(--ovt) / .08);color:var(--t-fff);text-decoration:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.landing-ic.wa{border-color:#25d36688;background:#25d3661f;color:#25d366}
 .landing-ic:hover,.landing-ic:focus-visible{background:rgb(var(--ovt) / .18)}
-.landing-ic.wa:hover,.landing-ic.wa:focus-visible{background:#25d36638;border-color:#25d366}
 :root[data-theme="light"] .landing-ic{background:#fff;border-color:#dbe3ee;color:#33465c}
-:root[data-theme="light"] .landing-ic.wa{background:#e6faee;border-color:#25d366;color:#0b6b36}
 
 /* Rank mode: hand-drawn note figures (handwriting labels, paper-like card) and side-by-side figure sets */
 .rk-ov svg.rk-hand text,.rk-ov svg text{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif!important;font-style:normal!important}
@@ -1261,3 +1258,8 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 
 /* landing, dark theme: heading and the Simulate / Teach / Rank words are plain pure white (no gradient, no blue) */
 :root:not([data-theme="light"]) .landing h1,:root:not([data-theme="light"]) .landing h1 .landing-grad,:root:not([data-theme="light"]) .ls-words b,:root:not([data-theme="light"]) .ls-words .w1,:root:not([data-theme="light"]) .ls-words .w2,:root:not([data-theme="light"]) .ls-words .w3{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;animation:none!important}
+
+/* WhatsApp icon: same colour and background as the email icon */
+.landing-ic.wa{border-color:rgb(var(--ovt) / .28);background:rgb(var(--ovt) / .08);color:var(--t-fff)}
+.landing-ic.wa:hover,.landing-ic.wa:focus-visible{background:rgb(var(--ovt) / .18);border-color:rgb(var(--ovt) / .28)}
+:root[data-theme="light"] .landing-ic.wa{background:#fff;border-color:#dbe3ee;color:#33465c}
