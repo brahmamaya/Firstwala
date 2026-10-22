@@ -13,13 +13,14 @@ const smooth3=(P,n=3)=>{const o=[];for(let i=0;i<P.length-1;i++){const p0=P[Math
 let HV=null;
 function heart(s,p,k=1,o={}){HV=HV||{aorta:smooth3([[.04,.42,0],[.1,1.05,.02],[.2,1.5,-.1],[.45,1.5,-.35],[.4,1.05,-.58],[.3,.2,-.62]]),trunk:smooth3([[-.14,.3,.4],[-.15,.7,.4],[-.05,1.0,.34],[.05,1.1,.25]]),svc:smooth3([[-.68,1.55,-.05],[-.66,1.15,-.0],[-.62,.75,.02]]),ivc:smooth3([[-.6,-.05,-.15],[-.62,-.5,-.15],[-.6,-.9,-.15]])};const ry=o.rotY||0,cy=Math.cos(ry),sy=Math.sin(ry),A=(x,y,z)=>V.add(p,[(x*cy+z*sy)*k,y*k,(-x*sy+z*cy)*k]),aS=o.aS||0,vS=o.vS||0,ra=1-.14*aS,rv=1-.13*vS,rot2=ry?[0,ry,0]:null,
     RED='#d6336c',BLU='#5c7cfa',DRED='#b02a5b',DBLU='#3b5bdb',ART='#e03131',taper=u=>1-.42*Math.max(0,-Math.sin(u))**1.6,sq=(a,b)=>V.mul(a,b);
-  const M=(c,r,col,opt)=>s.mesh(A(c[0],c[1],c[2]),[r[0]*k,r[1]*k,r[2]*k],col,{rot2,...opt}),T=(pts,r,col,seg=10)=>s.tube(pts.map(q=>A(q[0],q[1],q[2])),typeof r==='function'?u=>r(u)*k:r*k,col,{segs:seg});
+  const hq=o.hi?1.9:1,M=(c,r,col,opt)=>s.mesh(A(c[0],c[1],c[2]),[r[0]*k,r[1]*k,r[2]*k],col,{rot2,...opt,rings:Math.round((opt.rings||14)*hq),segs:Math.round((opt.segs||22)*hq)}),T=(pts,r,col,seg=10)=>s.tube(pts.map(q=>A(q[0],q[1],q[2])),typeof r==='function'?u=>r(u)*k:r*k,col,{segs:o.hi?seg+4:seg}),
+    lit=(h,q)=>{q=Math.round(q*8)/8;const n=parseInt(h.slice(1),16),m=v=>Math.round(v+(255-v)*.38*q).toString(16).padStart(2,'0');return'#'+m(n>>16)+m((n>>8)&255)+m(n&255)};
   /* ventricles: left (thick, red, forms the apex) and right (blue, wraps the front) */
-  M([.2,-.3,-.08],[.55*rv,.88*(1-.06*vS),.46*rv],RED,{rot:[0,0,.45],rings:13,segs:20,shape:taper,spec:.5});
-  M([-.3,-.18,.2],[.46*rv,.7*(1-.05*vS),.34*rv],BLU,{rot:[0,0,.3],rings:11,segs:18,shape:taper,spec:.5});
+  M([.2,-.3,-.08],[.55*rv,.88*(1-.06*vS),.46*rv],lit(RED,vS),{rot:[0,0,.45],rings:13,segs:20,shape:taper,spec:.5});
+  M([-.3,-.18,.2],[.46*rv,.7*(1-.05*vS),.34*rv],lit(BLU,vS),{rot:[0,0,.3],rings:11,segs:18,shape:taper,spec:.5});
   /* atria and auricles */
-  M([-.64,.4,.1],[.34*ra,.55*ra,.31*ra],BLU,{rings:10,segs:14,spec:.4});M([-.36,.92,.3],[.22*ra,.15*ra,.1*ra],'#4c6ef5',{rot:[0,0,.5],rings:5,segs:9});
-  M([.5,.62,-.3],[.34*ra,.3*ra,.3*ra],'#e5527a',{rings:9,segs:14,spec:.4});M([.64,.86,.08],[.19*ra,.14*ra,.1*ra],'#e5527a',{rot:[0,0,-.6],rings:5,segs:9});
+  M([-.64,.4,.1],[.34*ra,.55*ra,.31*ra],lit(BLU,aS),{rings:10,segs:14,spec:.4});M([-.36,.92,.3],[.22*ra,.15*ra,.1*ra],'#4c6ef5',{rot:[0,0,.5],rings:5,segs:9});
+  M([.5,.62,-.3],[.34*ra,.3*ra,.3*ra],lit('#e5527a',aS),{rings:9,segs:14,spec:.4});M([.64,.86,.08],[.19*ra,.14*ra,.1*ra],'#e5527a',{rot:[0,0,-.6],rings:5,segs:9});
   /* great vessels */
   T(HV.aorta,u=>.2-.07*u,ART,12);
   T([[.14,1.45,-.12],[.1,1.9,-.08]],.06,ART,7);T([[.26,1.5,-.2],[.3,1.92,-.18]],.045,ART,7);T([[.4,1.46,-.33],[.52,1.85,-.3]],.05,ART,7);
@@ -31,20 +32,23 @@ function heart(s,p,k=1,o={}){HV=HV||{aorta:smooth3([[.04,.42,0],[.1,1.05,.02],[.
   T([[.12,.5,.2],[.1,.25,.45],[.2,-.3,.5],[.34,-.8,.4],[.42,-1.02,.2]],.026,ART,5);T([[.1,.5,.1],[.46,.4,.2],[.7,.2,-.05]],.024,ART,5);T([[.0,.5,.2],[-.5,.22,.45],[-.84,-.1,.3],[-.78,-.62,.1]],.026,ART,5);
   T([[.16,.45,.22],[.18,.2,.5],[.28,-.3,.55],[.4,-.78,.45]],.03,DBLU,5);
   return s}
+const heartPaths=()=>HV;
 /* Lungs with lobes (right: upper, middle, lower; left: upper with lingula, lower), bronchial tree and alveoli.
    World frame of the circulation scene: body faces +x, patient's right = +z. */
 function lungs(s,c0,k,col='#ffc9c9',alpha=.5){const A=(x,y,z)=>V.add(c0,[x*k,y*k,z*k]);
-  const lobe=(g,x,y,r,cc,ex)=>{const pos=A(x,y,g*.4),shape=(u,v)=>(1-.24*Math.max(0,-g*Math.sin(v))**1.5)*(ex?ex(u,v):1);s.mesh(pos,[r[0]*k,r[1]*k,r[2]*k],cc,{alpha,rings:7,segs:12,shape,spec:.3})};
+  const lobe=(g,x,y,r,cc,ex)=>{const pos=A(x,y,g*.72),shape=(u,v)=>(1-.24*Math.max(0,-g*Math.sin(v))**1.5)*(ex?ex(u,v):1);s.mesh(pos,[r[0]*k,r[1]*k,r[2]*k],cc,{alpha,rings:7,segs:12,shape,spec:.3})};
   const ap=u=>1-.22*Math.max(0,Math.sin(u))**2-.12*Math.max(0,-Math.sin(u))**2;
-  lobe(1,.0,.32,[.36,.28,.27],'#ff9eab',ap);lobe(1,.1,-.02,[.28,.14,.25],'#ff7f95');lobe(1,-.02,-.3,[.36,.3,.27],'#ffb0ba',ap);
-  lobe(-1,.0,.32,[.36,.3,.26],'#ff9eab',(u,v)=>ap(u)*(1-.14*Math.max(0,Math.cos(v))*Math.max(0,-Math.sin(u))));lobe(-1,-.02,-.28,[.36,.32,.26],'#ffb0ba',ap);
+  /* one smooth lung outline with the lobes drawn slightly inset, so the fissures read as grooves */
+  for(const g of[-1,1])s.mesh(A(0,0,g*.72),[.36*k,.78*k,.31*k],col,{alpha:.22,rings:9,segs:14,shape:(u,v)=>(1-.2*Math.max(0,-g*Math.sin(v))**1.5)*(1-.1*Math.max(0,Math.sin(u))**2)});
+  lobe(1,.0,.4,[.29,.3,.25],'#f0809b',ap);lobe(1,.1,.02,[.26,.12,.22],'#f6a77a');lobe(1,-.02,-.36,[.31,.3,.25],'#d96a8c',ap);
+  lobe(-1,.0,.38,[.29,.34,.25],'#f0809b',(u,v)=>ap(u)*(1-.14*Math.max(0,Math.cos(v))*Math.max(0,-Math.sin(u))));lobe(-1,-.02,-.3,[.31,.34,.25],'#d96a8c',ap);
   s.tube([A(0,1.0,0),A(0,.62,0),A(0,.5,0)],.055*k,'#f1f3f5',{segs:8});
-  for(const g of[-1,1]){const br=[A(0,.5,0),A(.0,.4,g*.15),A(.0,.32,g*.34)];s.tube(br,.04*k,'#f1f3f5',{segs:6});
-    for(const [dy,dx,dz,r] of[[.32,.06,.2,.026],[.1,-.04,.18,.024],[-.2,.0,.2,.024],[.12,.15,.1,.02]]){const m=A(.0,.32-.05,g*.3),e=A(dx*1.4,.32+dy,g*(.34+dz*.4));s.tube([m,V.add(m,V.mul(V.sub(e,m),.55)),e],r*k,'#f4f6f8',{segs:4});for(let i=0;i<3;i++)s.ball(V.add(e,[(hash(i+g*3)-.5)*.1*k,(hash(i+7)-.5)*.1*k,(hash(i+11)-.5)*.08*k]),.03*k,'#ff8fa3',{alpha:.85,flat:true})}}}
+  for(const g of[-1,1]){const br=[A(0,.5,0),A(.0,.4,g*.22),A(.0,.32,g*.6)];s.tube(br,.04*k,'#f1f3f5',{segs:6});
+    for(const [dy,dx,dz,r] of[[.32,.06,.2,.026],[.1,-.04,.18,.024],[-.2,.0,.2,.024],[.12,.15,.1,.02]]){const m=A(.0,.27,g*.56),e=A(dx*1.4,.32+dy,g*(.6+dz*.4));s.tube([m,V.add(m,V.mul(V.sub(e,m),.55)),e],r*k,'#f4f6f8',{segs:4});for(let i=0;i<3;i++)s.ball(V.add(e,[(hash(i+g*3)-.5)*.1*k,(hash(i+7)-.5)*.1*k,(hash(i+11)-.5)*.08*k]),.03*k,'#ff8fa3',{alpha:.85,flat:true})}}}
 /* Cut-away torso shell for the circulation scene (organs show through) and a small capillary plexus. */
-function torsoShell(s){const col='#f1c7a8',o={alpha:.13,rings:12,segs:18};
-  s.mesh([0,-.6,0],[.46,1.7,1.0],col,{...o,shape:u=>.88+.12*Math.sin(u)-.17*Math.exp(-(((u+.35)/.45)**2))});s.tube([[0,.95,0],[0,1.12,0]],.17,col,{alpha:.18,segs:10});
-  for(const g of[-1,1]){s.ball([0,.72,g*.96],.2,col,{alpha:.16,flat:true});s.tube([[0,.72,g*.96],[.03,-.1,g*1.12],[.08,-.9,g*1.1]],.15,col,{alpha:.16,segs:8});s.tube([[0,-1.9,g*.35],[.02,-2.35,g*.36]],.34,col,{alpha:.16,segs:8})}}
+function torsoShell(s){const col='#f1c7a8',o={alpha:.1,rings:12,segs:18};
+  s.mesh([0,-.6,0],[.46,1.7,1.15],col,{...o,shape:u=>.88+.12*Math.sin(u)-.17*Math.exp(-(((u+.35)/.45)**2))});s.tube([[0,.95,0],[0,1.12,0]],.17,col,{alpha:.18,segs:10});
+}
 function plexus(s,c0,rx,ry,rz,c1,c2){for(let k=0;k<5;k++){const pts=[];for(let i=0;i<=12;i++){const a=i*.75+k*1.3;pts.push([c0[0]+rx*.5*Math.sin(2.1*a+k),c0[1]+ry*Math.sin(1.3*a+k*2.1),c0[2]+rz*.5*Math.sin(a+k*1.7)])}s.tube(pts,.014,u=>u<.5?c1:c2,{segs:4})}}
 /*END heartkit*/
 // Translucent human body for locating organs.
@@ -76,12 +80,27 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-breathing-mechanism',ti
  tryText:'Pull the diaphragm further. How does the pressure change?',
  controls:[R('pull','Diaphragm pull (depth when automatic)',0,100,1,0,'%'),S('auto','Breathe automatically','yes',[['yes','Yes'],['no','No — use the slider']])],
  metrics:(p,t)=>{const d=p.auto==='yes'?(p.pull>0?p.pull:100)*(.5+.5*Math.sin(t*1.2)):p.pull,dP=p.auto==='yes'?-3*(p.pull>0?p.pull:100)/100*Math.cos(t*1.2):-d/100*3;/* automatic: pressure follows airflow, below atmospheric while the jar volume grows, above it while it shrinks */return[N('Phase',p.auto==='yes'?(Math.cos(t*1.2)>0?'Inspiration':'Expiration'):d>0?'Inspiration (held)':'Rest'),N('Pressure inside vs atmosphere',dP,'mm Hg',1),N('Diaphragm','Contracts and flattens during inspiration'),N('External intercostals','Lift ribs and sternum')]},
- draw:(c,p,t)=>{const d=(p.auto==='yes'?(p.pull>0?p.pull:100)*(.5+.5*Math.sin(t*1.2)):p.pull)/100,s=P3.scene(c,{scale:58,cy:280,cx:250});s.lathe([0,-1.4,0],[[1.3,0],[1.35,1.6],[1.0,2.4],[.3,2.8],[.2,3.1]],'#e9f6ff',{alpha:.12});s.tube([[0,1.75,0],[0,1.1,0]],.07,'#ced4da',{segs:8});for(const z of[-1,1])s.tube([[0,1.1,0],[0,.8,z*.35]],.05,'#ced4da',{segs:6});
-  lungPair(s,[0,.3,0],.7+.45*d);const sag=-.2-.7*d;s.lathe([0,-1.4,0],[[0,sag],[.6,sag*.75],[1.0,sag*.35],[1.3,0]],'#ff8787',{alpha:.85});s.tube([[0,-1.4+sag,0],[0,-2.2,0]],.05,'#495057',{segs:6});s.ball([0,-2.25,0],.12,'#495057');
-  for(let i=0;i<3;i++){const q=cycle(t*1.2/TAU*2+i/3,1),dir=p.auto==='yes'?Math.cos(t*1.2):d>0?1:0;if(dir>0)s.ball([0,2.6-q*1.2,0],.06,'#74c0fc',{flat:true})}s.callout([0,1.6,0],'Y-tube = trachea + bronchi','#ced4da',50,-40);s.callout([0,.3,.6*(.7+.45*d)],'balloons = lungs','#ff8fab',60,10);s.callout([1.3,.6,0],'bell jar = thoracic cavity','#e9f6ff',40,-40);s.callout([.6,-1.4+sag*.75,0],'rubber sheet = diaphragm','#ff8787',60,40);s.render()},
+ draw:(c,p,t)=>{const d=(p.auto==='yes'?(p.pull>0?p.pull:100)*(.5+.5*Math.sin(t*1.2)):p.pull)/100,s=P3.scene(c,{scale:56,cy:262,cx:330,pitch:.12}),B=-1.4,GL='#dcefff',sag=-.2-.7*d,k=.7+.45*d;
+  /* glass jar: thick shoulder profile, inner wall, rim and a highlight streak */
+  const JP=BJ||(BJ={prof:[[1.3,0],[1.34,.25],[1.36,1.4],[1.31,1.9],[1.16,2.25],[.92,2.5],[.62,2.68],[.38,2.78],[.31,2.9],[.3,3.2]].map(([r,y])=>[r,y]),hl:Array.from({length:12},(_,i)=>{const y=.2+i*.2,r=y<1.5?1.36:y<1.9?1.33:1.2-(y-1.9)*.5;return[r*Math.cos(1.62),y,r*Math.sin(1.62)]})});
+  s.lathe([0,B,0],JP.prof,GL,{alpha:.13,segs:30});s.lathe([0,B,0],JP.prof.map(([r,y])=>[r-.06,y]),'#bcd9ee',{alpha:.07,segs:24});
+  s.path(JP.hl.map(q=>[q[0],q[1]+B,q[2]]),'#ffffff66',4,[],1e5);
+  s.lathe([0,B-.05,0],[[1.42,0],[1.42,.1],[1.3,.1]],'#8fa6b8',{alpha:.5,segs:30});
+  /* rubber stopper, Y-tube and balloon lungs */
+  s.lathe([0,B+2.95,0],[[.27,0],[.36,.22],[.36,.3],[.26,.3]],'#5c3d2e',{segs:14});
+  s.tube([[0,B+3.55,0],[0,B+2.05,0]],.07,'#cfd8dc',{alpha:.8,segs:10});
+  const ly=B+1.05,tops=[B+2.05,ly+k*.6];for(const z of[-1,1]){const g=z*.36*k;s.tube([[0,B+2.05,0],[0,B+1.85,z*.1],[0,tops[1]+.08,g]],.05,'#cfd8dc',{alpha:.8,segs:8});
+    s.mesh([0,ly,g],[.36*k,.58*k,.32*k],'#ff8fa6',{alpha:.78,rings:15,segs:24,spec:.7,shape:u=>1-.3*Math.max(0,Math.sin(u))**2});s.ball([0,tops[1]+.02,g],.06,'#d6336c',{flat:true})}
+  /* rubber sheet (diaphragm) clamped at the base, pull string and knob */
+  s.lathe([0,B,0],[[0,sag],[.6,sag*.75],[1.0,sag*.35],[1.3,0],[1.34,.02]],'#ff8787',{alpha:.86,segs:30});
+  s.tube([[0,B+sag,0],[0,B+sag-.45,0]],.04,'#495057',{segs:6});s.ball([0,B+sag-.55,0],.14,'#495057');
+  if(d>.02){const y0=B+sag-.85;s.poly([[-.14,y0+.3,0],[.14,y0+.3,0],[0,y0,0]],'#4dd0e1',{cull:false});s.seg([0,B+sag-.7,0],[0,y0+.3,0],'#4dd0e1',3)}
+  /* air through the Y-tube: in during inspiration, out during expiration */
+  const dir=p.auto==='yes'?Math.cos(t*1.2):d>0?1:0;for(let i=0;i<4;i++){const q=cycle(t*.7+i/4,1);if(dir>.1)s.ball([0,B+3.7-q*1.4,0],.06,'#74c0fc',{flat:true,glow:true});else if(dir<-.1)s.ball([0,B+2.3+q*1.4,0],.06,'#ffa94d',{flat:true,glow:true})}
+  lblCols(c,s,[['a',[0,B+3.3,0],'Y-tube = trachea + bronchi','#e9f6ff','R'],['a',[1.1,B+1.9,.4],'bell jar = thoracic cavity','#e9f6ff','R'],['a',[0,ly+.1,.36*k+.3],'balloons = lungs','#ff8fa6','L'],['a',[-.3,B+sag*.7,1.0],'rubber sheet = diaphragm','#ff8787','L']],()=>false,170,520,120,330);s.render()},
  assumption:'Classroom bell-jar analogy; pressure difference values are illustrative (a few mm Hg).'});
 
-const PP={alveoli:[104,40],deoxy:[40,45],oxy:[95,40],tissue:[40,45],air:[159,.3]};
+let CCF=null;const PP={alveoli:[104,40],deoxy:[40,45],oxy:[95,40],tissue:[40,45],air:[159,.3]};
 add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-gas-exchange',title:'Exchange of gases: partial pressures',
  description:'Follow blood along a pulmonary or tissue capillary and watch O₂ and CO₂ diffuse down their partial-pressure gradients.',
  formula:'Diffusion rate ∝ partial-pressure gradient',
@@ -117,10 +136,16 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-cardiac-cycle',title:'The c
  tryText:'Raise the heart rate. Which phase gets shorter?',
  controls:[R('hr','Heart rate',50,180,1,72,'beats/min'),R('sv','Stroke volume',50,120,1,70,'mL')],
  metrics:(p,t)=>{const r=heartPhase(p,t);return[N('Cycle duration',60/p.hr,'s',2),N('Phase now',r.name),N('Valves',r.valves),N('Cardiac output',p.sv*p.hr/1000,'L/min',2)]},
- draw:(c,p,t)=>{const r=heartPhase(p,t),s=P3.scene(c,{scale:62,cy:265,cx:250,yaw:.55,pitch:-.1}),aS=r.atria,vS=r.vent;heart(s,[0,0,0],1,{aS,vS});
-  const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L([-.75,.55,.3],'right atrium','#91a7ff',-60,-30);L([-.35,-.4,.45],'right ventricle','#91a7ff',-70,30);L([.75,.65,-.1],'left atrium','#ff8fab',60,-40);L([.55,-.55,.35],'left ventricle (thickest wall)','#ff8fab',-30,70);L([.05,1.45,-.1],'aorta','#ff6b6b',50,-40);L([.3,1.1,.3],'pulmonary artery','#91a7ff',60,-10);L([-.68,1.4,0],'superior vena cava','#91a7ff',-50,-30);
+ draw:(c,p,t)=>{const r=heartPhase(p,t),s=P3.scene(c,{scale:62,cy:250,cx:320,yaw:.22,pitch:-.04}),aS=r.atria,vS=r.vent;heart(s,[0,0,0],1,{aS,vS,hi:true});
+  /* schematic blood flow: venous return, atria to ventricles, ventricles to arteries (dots only where the phase allows it) */
+  const FL=CCF||(CCF=[[[-.66,1.55,0],[-.64,1.15,.0],[-.62,.75,.02]],[[-.03,.9,.34],[.05,1.1,.25],[.3,1.14,.1]],HV.aorta,[[.1,1.55,-.12],[.1,1.95,-.08]]]);
+  const sys=r.name==='Ventricular systole',act=[true,sys,sys,sys];
+  FL.forEach((L,i)=>{if(!act[i])return;const n=L.length-1,col=i===0?'#9bb1ff':i===1?'#9bb1ff':'#ff9aa8';for(let j=0;j<3;j++){const q=cycle(t*.9+j/3+i*.13,1),m=Math.min(n-1,Math.floor(q*n)),fr=q*n-m;s.ball(V.add(L[m],V.mul(V.sub(L[m+1],L[m]),fr)),.05,col,{flat:true,lift:30})}});
+  /* valve state chips */
+  s.hud(()=>{const k=window.PhysicaTextScale||1,av=!sys,sl=sys;c.save();c.font=`700 ${Math.round(12*k)}px system-ui, sans-serif`;[['AV valves',av,350],['Semilunar valves',sl,376]].forEach(([n,o,y])=>{const w=c.measureText('Semilunar valves: closed').width+26,x=250;c.fillStyle='#0b1a26cc';c.fillRect(x-w/2,y,w,22*k);c.fillStyle=o?'#69db7c':'#ff6b6b';c.beginPath();c.arc(x-w/2+11,y+11*k,4,0,6.2832);c.fill();c.fillStyle='#dbe7f0';c.textAlign='left';c.textBaseline='middle';c.fillText(n+': '+(o?'open':'closed'),x-w/2+20,y+11*k)});c.restore()});
+  lblCols(c,s,[['a',[-.68,1.4,0],'superior vena cava','#91a7ff','L'],['a',[-.7,.35,.2],'right atrium','#91a7ff','L'],['a',[-.55,-.3,.3],'right ventricle','#91a7ff','L'],['a',[.1,1.5,-.12],'aorta','#ff8787','R'],['a',[-.02,.95,.3],'pulmonary artery','#91a7ff','R'],['a',[.55,.7,-.3],'left atrium','#ff8fab','R'],['a',[.4,-.5,.1],'left ventricle (thickest wall)','#ff8fab','R']],()=>false,168,478,100,300);
   if(r.sound)s.label([0,-1.45,0],r.sound,C.gold,20);s.render();
-  const T=60/p.hr,[e1,e2]=heartEnds(T);chart(c,430,300,226,100,{title:'Phase timeline (one cycle)',xmin:0,xmax:T,ymin:0,ymax:1,series:[{pts:[[0,.8],[e1,.8],[e1,0],[T,0]],col:'#e64980'},{pts:[[0,0],[e1,0],[e1,.5],[e2,.5],[e2,0],[T,0]],col:'#a61e4d'}],marker:[cycle(t,T),.95,'#ffd43b']})},
+  const T=60/p.hr,[e1,e2]=heartEnds(T);chart(c,440,322,216,92,{title:'Phase timeline (one cycle)',xmin:0,xmax:T,ymin:0,ymax:1,series:[{pts:[[0,.8],[e1,.8],[e1,0],[T,0]],col:'#e64980'},{pts:[[0,0],[e1,0],[e1,.5],[e2,.5],[e2,0],[T,0]],col:'#a61e4d'}],marker:[cycle(t,T),.95,'#ffd43b']})},
  assumption:'Up to about 75 beats/min atrial systole is 0.1 s and ventricular systole 0.3 s (diastole 0.4 s at 72, cycle ≈ 0.83 s); above that, all phases are shortened in proportion so that joint diastole is always shown. Teaching simplification.'});
 /* Phase ends (s): 0.1 and 0.4 at <=75 bpm; scaled with the cycle length (1/8 and 1/2 of T) when T<0.8 s so joint diastole never vanishes. */
 const heartEnds=T=>T>=.8?[.1,.4]:[T/8,T/2];
@@ -162,10 +187,10 @@ add({...ch(15,'Body Fluids and Circulation'),id:'bio-double-circulation',title:'
  controls:[S('loop','Highlight','both',[['both','Both circuits'],['pul','Pulmonary circuit'],['sys','Systemic circuit']]),R('hr','Heart rate',50,150,1,72,'beats/min')],
  metrics:p=>[N('Pulmonary circuit','RV → pulmonary artery → lungs → pulmonary veins → LA'),N('Systemic circuit','LV → aorta → body → venae cavae → RA'),N('Unusual vessels','Pulmonary artery: deoxygenated; pulmonary vein: oxygenated')],
 /*BEGIN dcdraw*/
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:80,cy:206,pitch:.04,yaw:-.9}),beat=1+.07*Math.max(0,Math.sin(t*p.hr/60*TAU)),hl=k=>p.loop==='both'||p.loop===k;
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:80,cy:206,pitch:.04,yaw:-1.38,pitch:.1}),beat=1+.07*Math.max(0,Math.sin(t*p.hr/60*TAU)),hl=k=>p.loop==='both'||p.loop===k;
   torsoShell(s);heart(s,[.07,-.07,0],.588*beat,{rotY:PI/2});lungs(s,[0,.2,0],1.1);
   /* Paths start/end at the heart model's own vessel stumps (heart rotY=PI/2: patient's right = +z, left = -z). circ(): path, index of the capillary bed (colour switch). */
-  const T=[.217,.577,-.029],pulL=[T,[.14,.62,-.3],[.1,.52,-.5],[.06,.3,-.62],[.04,.1,-.62],[0,.05,-.6],[-.06,.2,-.5],[-.1,.25,-.33]],pulR=[T,[.14,.62,.2],[.1,.5,.5],[.06,.3,.64],[.04,.1,.64],[0,.1,.55],[-.12,.3,.3],[-.12,.3,-.1],[-.1,.25,-.33]],
+  const T=[.217,.577,-.029],pulL=[T,[.14,.62,-.3],[.1,.52,-.5],[.06,.3,-.62],[.04,.1,-.62],[0,.05,-.6],[-.06,.2,-.5],[-.1,.25,-.33]],pulR=[T,[.14,.62,.2],[.1,.5,.5],[.06,.3,.64],[.04,.1,.64],[0,.1,.55],[-.14,.3,.4],[-.3,.3,.15],[-.28,.28,-.15],[-.1,.25,-.33]],
   sys=[[.08,.4,-.04],[.082,.547,-.059],[.011,.8,-.118],[-.136,.8,-.25],[-.27,.55,-.235],[-.294,.05,-.176],[-.28,-.6,-.15],[-.22,-1.3,-.1],[-.1,-1.9,-.05],[.02,-1.9,.2],[0,-1.2,.3],[-.018,-.6,.353],[-.018,-.1,.353],[.07,.15,.34]];
   const circ=(path,m,r,c1,c2)=>{s.tube(path.slice(0,m+1),r,c1,{segs:8});s.tube(path.slice(m),r,c2,{segs:8})};
   if(hl('pul')){circ(pulL,4,.036,'#4263eb','#e03131');circ(pulR,4,.036,'#4263eb','#e03131');plexus(s,[.04,.1,-.62],.1,.16,.1,'#4263eb','#e03131');plexus(s,[.04,.1,.64],.1,.16,.1,'#4263eb','#e03131')}
@@ -367,10 +392,29 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-action-potential',title
  tryText:'Increase the stimulus slowly. At what value does the impulse fire?',
  controls:[R('stim','Stimulus strength',0,40,1,25,'mV'),R('thr','Threshold depolarisation',10,25,1,15,'mV')],
  metrics:(p,t)=>{const fire=p.stim>=p.thr,v=apV(p,cycle(t,4));return[N('Fires?',fire?'Yes — all-or-none spike':'No (sub-threshold)'),N('Membrane potential now',v,'mV',0),N('Resting potential',-70,'mV',0),N('Na⁺/K⁺ pump','3 Na⁺ out for 2 K⁺ in')]},
- draw:(c,p,t)=>{const fire=p.stim>=p.thr,s=P3.scene(c,{scale:56,pitch:.2}),T=cycle(t,4),front=-3+T*2.2;s.tube([[-3.4,0,0],[3.4,0,0]],.42,(u)=>{const x=-3.4+6.8*u,d=x-front;return fire&&d<0&&d>-.8?'#ffd43b':'#ffe8cc'},{alpha:.55,segs:16});
-  for(let i=0;i<20;i++){const x=-3.2+i*.34,d=x-front,active=fire&&d<0&&d>-.8;s.ball([x,active?.15:.65,(hash(i)-.5)*.6],.05,'#fab005',{flat:true});s.ball([x+.15,active?.7:.2,(hash(i+5)-.5)*.6],.05,'#7950f2',{flat:true})}s.callout([2.6,.42,0],'axon membrane: resting (−70 mV, outside +)','#ffe8cc',-20,-60);if(fire){s.callout([clamp(front-.4,-3,3),.42,0],'depolarised: Na⁺ rushes in','#ffd43b',-40,-80);s.callout([clamp(front-1.2,-3.2,3),.7,0],'repolarising: K⁺ moves out','#b197fc',-40,70)}else s.callout([0,.42,0],'stimulus below threshold: no impulse','#ff8787',-30,-80);s.render();
+ draw:(c,p,t)=>{const fire=p.stim>=p.thr,s=P3.scene(c,{scale:48,cx:290,cy:318,pitch:-.1,yaw:.5}),T=cycle(t,4),front=-3+T*2.2,R0=.6,X0=-3.4,X1=3.4,A=(x,r,a)=>[x,r*Math.cos(a),r*Math.sin(a)];
+  const AX=AXL||(AXL=Array.from({length:35},(_,i)=>[-3.4+6.8*i/34,0,0])),zone=x=>{const d=x-front;return !fire?0:d<0&&d>-.8?1:d<=-.8&&d>-1.7?2:0};
+  /* membrane: outer and inner leaflet shells coloured by state (cream = resting, gold = depolarised, lilac = repolarising) */
+  s.tube(AX,R0,u=>{const z=zone(X0+6.8*u);return z===1?'#ffc919':z===2?'#b197fc':'#f5deb8'},{alpha:.5,segs:20});
+  s.tube(AX,R0-.07,u=>{const z=zone(X0+6.8*u);return z===1?'#f08c00':z===2?'#7950f2':'#e7b988'},{alpha:.38,segs:16});
+  /* axoplasm: neurofilaments / microtubules and mitochondria */
+  for(let k=0;k<4;k++){const a=k*1.57+.5,r=.18+.06*(k%2);s.tube([A(X0,r,a),A(X1,r,a)],.012,'#8fa6b8',{segs:4})}
+  for(const [x,a] of[[-2.2,3.9],[.4,2.5],[2.5,4.4]])s.mesh(A(x,.2,a),[.24,.08,.08],'#f08c3a',{alpha:.85,rings:5,segs:8});
+  /* voltage-gated channels in the membrane: Na⁺ (orange) and K⁺ (purple); bright when open */
+  for(let i=0;i<13;i++){const x=X0+.3+i*.5,na=i%2===0,z=zone(x),open=na?z===1:z===2,a=.5+.7*hash(i+3),n=A(0,1,a);
+    s.cyl(A(x,R0-.03,a),n,.08,.2,open?(na?'#ffa94d':'#b197fc'):(na?'#a8642a':'#5f4a9c'),{seg:7});if(open)s.ball(A(x,R0+.14,a),.06,na?'#fff3bf':'#e5dbff',{flat:true,lift:.5,glow:true})}
+  /* ions: outside the membrane (r > R0) or inside it */
+  for(let i=0;i<22;i++){const x=X0+.2+i*.3,z=zone(x),a=.2+1.7*hash(i+11),a2=.3+1.6*hash(i+31),bob=.03*Math.sin(t*2+i);
+    s.ball(A(x,z===1?.3:R0+.2+bob,a),.05,'#fab005',{flat:true});s.ball(A(x+.14,z===2?R0+.22+bob:.34,a2),.05,'#7950f2',{flat:true})}
+  /* stimulating electrode at the left end */
+  s.cyl([X0-.45,.62,.32],V.norm([1,-.5,-.3]),.05,.7,'#adb5bd',{seg:8});if(T<.7)s.ball([X0+.05,.4,.1],.12+.05*Math.sin(T*30),'#ffd43b',{flat:true,glow:true});
+  const wl=[['a',A(X0-.7,.9,.35),'stimulus electrode','#ced4da','B'],['a',A(-.5,R0,1.1),'Na⁺ channel (voltage-gated)','#ffa94d','B'],['a',A(.5,R0,1.1),'K⁺ channel (voltage-gated)','#b197fc','B']];
+  if(fire)wl.push(['a',[clamp(front-.4,-3,3),.3,.4],'depolarised: Na⁺ rushes in','#ffd43b','C'],['a',[clamp(front-1.3,-3.2,3),.3,.4],'repolarising: K⁺ moves out','#b197fc','C']);else wl.push(['a',[0,.3,.4],'stimulus below threshold: no impulse','#ff8787','C']);
+  wl.push(['a',[-1.6,-.1,.4],'axoplasm (cytoplasm)','#a9bccb','C'],['a',[-2.7,R0,.3],'axon membrane: resting (−70 mV, outside +)','#ffe3bf','T']);
+  lblRows(c,s,wl,{T:236,B:374,C:396},40,640);s.render();
   chart(c,420,96,236,170,{title:'Membrane potential vs time',xl:'ms',xmin:0,xmax:4,ymin:-90,ymax:45,series:[{fn:x=>apV(p,x),col:C.gold},{fn:()=>-70+p.thr,col:'#ff8787',dash:[4,4]}],marker:[T,apV(p,T)]});tag(c,'yellow dots: Na⁺   purple: K⁺',44,98,C.muted,13)},
  assumption:'Stylised waveform (peak ≈ +35 mV, undershoot ≈ −80 mV); the time axis is shown in ms but the animation is slowed.'});
+let AXL=null,RFX=null,BJ=null;
 function apV(p,x){const t0=.5;if(x<t0)return-70;if(p.stim<p.thr)return-70+p.stim*(1-Math.exp(-(x-t0)/.08))*Math.exp(-(x-t0)/.3);const u=x-t0;if(u<.3)return-70+105*Math.sin(PI/2*u/.3);if(u<1.1)return 35-115*(u-.3)/.8;return-80+10*(1-Math.exp(-(u-1.1)/.5))}
 
 /*BEGIN synkit*/
@@ -432,15 +476,35 @@ add({...ch(18,'Neural Control and Coordination'),id:'bio-reflex-arc',title:'Refl
  tryText:'Tap harder. Does the kick get larger?',
  controls:[R('tap','Tap strength',0,100,1,60,'%')],
  metrics:(p,t)=>{const T=cycle(t,4),st=T<.5?'Tap on tendon':T<1.3?'Afferent (sensory) neuron to spinal cord':T<1.6?'Synapse in grey matter':T<2.4?'Efferent (motor) neuron to thigh muscle':'Muscle contracts — leg kicks';return[N('Stage',st),N('Afferent entry','Dorsal root of spinal nerve'),N('Efferent exit','Ventral root'),N('Effector','Quadriceps (thigh) muscle')]},
- draw:(c,p,t)=>{const T=cycle(t,4),s=P3.scene(c,{scale:54,cx:300}),kick=T>2.4?Math.sin(PI*Math.min(1,(T-2.4)/1.2))*.7*p.tap/100:0,sc=[-2.6,1.2,0];
-  // Spinal cord in cross-section: white matter outside, butterfly-shaped grey matter inside.
-  s.mesh(sc,[.9,.72,.5],'#f1f3f5',{alpha:.55});const G=(d,r,rot)=>s.mesh(V.add(sc,d),r,'#868e96',{rot,rings:8,segs:12});for(const sg of[-1,1]){G([sg*.22,.3,0],[.1,.26,.14],[0,0,-sg*.35]);G([sg*.25,-.22,0],[.2,.22,.18])}G([0,.04,0],[.3,.07,.12]);s.ball(V.add(sc,[0,.04,.13]),.04,'#343a40',{flat:true,lift:1});
-  s.tube([[-.3,.6,0],[1.8,.6,0]],.3,'#f1c7a8',{segs:12});s.mesh([.75,.86,0],[.95,.2,.28],'#c2414b',{rings:8,segs:14});const knee=[1.8,.6,0],shin=[1.8+1.6*Math.sin(kick),.6-1.6*Math.cos(kick),0];s.tube([knee,shin],.22,'#f1c7a8',{segs:12});s.ball(knee,.29,'#f1c7a8');s.mesh(V.add(knee,[.25,.12,0]),[.1,.14,.16],'#ede3c8');s.mesh(V.add(shin,[.25,0,0]),[.3,.08,.14],'#f1c7a8');
-  const hx=T<.5?2.6-.6*T*2:2.05;s.cyl([hx,.75,0],[1,0,0],.09,.5,'#495057');s.tube([[hx+.2,.75,0],[hx+.7,1.4,0]],.03,'#868e96',{segs:4});
-  const drg=V.add(sc,[.9,.45,.3]),aff=[[1.0,.82,.25],[0,1.0,.3],[-1.2,1.5,.3],drg,V.add(sc,[.22,.32,.1]),V.add(sc,[.25,-.2,.05])],eff=[V.add(sc,[.25,-.25,-.05]),V.add(sc,[1.0,-.4,-.25]),[-1.2,.85,-.3],[0,.8,-.3],[.9,.82,-.22]];
-  s.path(aff,'#4dabf7',3);s.path(eff,'#ff6b6b',3);s.ball(drg,.14,'#ffd43b');const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
-  if(T>.5&&T<1.3)s.ball(along(aff,(T-.5)/.8),.1,'#4dabf7',{glow:true,flat:true});if(T>1.6&&T<2.4)s.ball(along(eff,(T-1.6)/.8),.1,'#ff6b6b',{glow:true,flat:true});
-  const L=(q,txt,col,dx,dy)=>s.callout(q,txt,col,dx,dy);L(V.add(sc,[-.6,.4,.3]),'spinal cord: white matter','#f1f3f5',-40,-60);L(V.add(sc,[-.25,-.22,.15]),'grey matter','#adb5bd',-70,40);L(drg,'dorsal root ganglion','#ffd43b',-10,-60);L([0,1.0,.3],'sensory (afferent) neuron','#74c0fc',30,-70);L([0,.8,-.3],'motor (efferent) neuron','#ff8787',20,60);L([1.0,.82,.25],'receptor: muscle spindle','#74c0fc',50,-50);L([.4,.95,-.1],'effector: quadriceps muscle','#ff8787',-10,-90);L([hx,.85,0],'tap on patellar tendon','#ced4da',50,-30);s.render();tag(c,'blue: sensory (afferent)   red: motor (efferent)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const T=cycle(t,4),s=P3.scene(c,{scale:46,cx:330,cy:262,yaw:.42,pitch:-.08}),kick=T>2.4?Math.sin(PI*Math.min(1,(T-2.4)/1.2))*.7*p.tap/100:0,sc=[-2.6,1.2,0],K=[1.8,.6,0],K0=K,SKIN='#e9b896',BONE='#efe6cf',TEND='#f3ead0',Av=(a,b)=>V.add(a,b),sn=Math.sin(kick),cs=Math.cos(kick),dd=[sn,-cs,0],nn=[cs,sn,0];
+  if(!RFX){const drg=Av(sc,[.9,.45,.3]);RFX={THIGH:smooth3([[-.4,.6,0],[.2,.62,0],[.8,.62,0],K0],4),drg,aff:smooth3([[1.0,.82,.25],[.2,1.0,.3],[-1.0,1.5,.3],drg,Av(sc,[.5,.55,.2]),Av(sc,[.22,.32,.1]),Av(sc,[.25,-.2,.05])],4),eff:smooth3([Av(sc,[.25,-.25,-.05]),Av(sc,[.6,-.45,-.2]),Av(sc,[1.0,-.4,-.25]),[-1.2,.85,-.3],[0,.8,-.3],[.9,.82,-.22]],4)}}
+  const {drg,aff,eff,THIGH}=RFX;
+  /* spinal cord in cross-section (white matter shell, butterfly grey matter, central canal) with dorsal and ventral roots */
+  s.mesh(sc,[.98,.78,.12],'#aab4bd',{rings:10,segs:28});s.mesh(Av(sc,[0,0,.03]),[.94,.74,.12],'#f1f3f5',{rings:10,segs:28});
+  if(!RFX.bf){const H=[[0,.12],[.1,.16],[.15,.4],[.28,.64],[.35,.65],[.33,.42],[.38,.2],[.5,.08],[.57,-.08],[.53,-.3],[.4,-.47],[.24,-.5],[.14,-.36],[.1,-.16],[0,-.1]];RFX.bf=H.concat(H.slice(1,-1).reverse().map(q=>[-q[0],q[1]])).map(q=>[sc[0]+q[0],sc[1]+q[1],.13]);RFX.bf.push(RFX.bf[0])}
+  s.poly(RFX.bf.slice(0,-1),'#8c959f',{cull:false,z:undefined,bias:2});s.path(RFX.bf,'#5c6670',1.5,[],-1e5+1);
+  s.tube([Av(sc,[0,.06,.13]),Av(sc,[0,.06,.2])],.03,'#343a40',{segs:6});
+  for(const [x,y] of[[.3,-.2],[.42,-.1],[.26,-.34]])s.ball(Av(sc,[x,y,.17]),.055,'#ff8787',{lift:2});
+  /* neurons */
+  s.tube(aff,.03,'#4dabf7',{segs:5});s.tube(eff,.03,'#ff6b6b',{segs:5});s.mesh(drg,[.17,.12,.12],'#ffd43b',{rings:7,segs:10});
+  const syn=Av(sc,[.24,-.22,.05]);s.ball(syn,.06,'#e9ecef',{lift:3,glow:T>1.25&&T<1.75});
+  /* thigh: skin shell, femur, quadriceps with fibre lines, tendon, patella, patellar ligament */
+  const P=Av(K,[.27,.1,0]),Tub=Av(K,[dd[0]*.45+nn[0]*.24,dd[1]*.45+nn[1]*.24,0]),A=Av(K,V.mul(dd,1.6));
+  s.tube(THIGH,u=>.4-.14*u+.03*Math.sin(Math.PI*u),SKIN,{alpha:.28,segs:14});s.tube([[-.3,.6,0],[K[0]-.08,K[1],0]],.07,BONE,{segs:8});s.ball(K,.14,BONE,{lift:-1});
+  s.mesh([.75,.8,.02],[.98,.26,.3],'#c2414b',{rings:8,segs:14,spec:.4,shape:(u)=>.85+.15*Math.cos(u)});
+  for(const [y,z] of[[.96,.06],[.88,.2],[.8,.24],[.94,-.12]])s.tube([[-.1,y,z],[.75,y+.03,z],[1.65,y-.02,z*.8]],.012,'#9b2c36',{segs:4});
+  s.tube([[1.65,.86,0],P],.05,TEND,{segs:6});s.mesh(P,[.1,.15,.16],BONE,{rings:6,segs:10});s.tube([P,Tub],.05,T>.45&&T<.7?'#ffe066':TEND,{segs:6});
+  /* lower leg: skin, tibia, foot (swings with the kick) */
+  s.tube([0,.2,.4,.6,.8,1].map(u=>Av(K,V.mul(dd,1.6*u))),u=>.25-.13*u+.04*Math.sin(Math.PI*Math.min(1,u*1.6)),SKIN,{alpha:.45,segs:12});s.tube([K,A],.055,BONE,{segs:8});s.mesh(Av(A,[nn[0]*.28,nn[1]*.28-.04,0]),[.3,.07,.13],SKIN,{rot:[0,0,kick],rings:6,segs:10});
+  /* reflex hammer (rubber head), withdrawn after the tap */
+  const tp=V.mul(Av(P,Tub),.5),off=T<.5?.9*(1-T*2):T<1?(T-.5)*1.6:.8,hd=Av(tp,[.24+off,.05*off,0]);s.cyl(hd,[1,0,0],.1,.22,'#868e96',{seg:10});s.tube([Av(hd,[.12,0,0]),Av(hd,[.75,.7,0])],.03,'#495057',{segs:5});
+  /* muscle spindle (receptor) and the two neurons' travelling impulses */
+  capsule(s,[.8,.84,.25],[1.2,.82,.25],.035,'#74c0fc');
+  const along=(path,q)=>{const i=Math.min(path.length-2,Math.floor(q*(path.length-1))),fr=q*(path.length-1)-i;return V.add(path[i],V.mul(V.sub(path[i+1],path[i]),fr))};
+  if(T>.5&&T<1.3)s.ball(along(aff,(T-.5)/.8),.09,'#74c0fc',{glow:true,flat:true,lift:5});if(T>1.6&&T<2.4)s.ball(along(eff,(T-1.6)/.8),.09,'#ff8787',{glow:true,flat:true,lift:5});
+  lblRows(c,s,[['a',drg,'dorsal root ganglion','#ffd43b','T'],['a',[-.6,1.28,.3],'sensory (afferent) neuron','#74c0fc','T'],['a',[1.0,.83,.25],'receptor: muscle spindle','#74c0fc','T'],
+    ['a',Av(sc,[-.7,.45,.15]),'spinal cord: white matter','#f1f3f5','B'],['a',Av(sc,[-.3,-.3,.17]),'grey matter','#adb5bd','B'],['a',[-.3,.8,-.3],'motor (efferent) neuron','#ff8787','B'],['a',[.5,.7,.1],'effector: quadriceps muscle','#ff8787','B'],['a',tp,'tap on patellar tendon','#ced4da','C']],{T:150,B:372,C:394},40,640);
+  s.render();tag(c,'blue: sensory (afferent)   red: motor (efferent)',44,98,C.muted,13)},
  assumption:'Monosynaptic stretch reflex, slowed down for viewing; real response takes a fraction of a second.'});
 
 add({...ch(18,'Neural Control and Coordination'),id:'bio-myelinated-conduction',title:'Myelinated vs non-myelinated fibres',
