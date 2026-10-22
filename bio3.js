@@ -58,7 +58,21 @@ function body(s,p,k=1,alpha=.14){const A=(x,y,z)=>V.add(p,[x*k,y*k,z*k]),col='#f
   s.mesh(A(0,1.3,0),[.3*k,.78*k,.5*k],col,{...o,shape:(u)=>.86+.16*Math.sin(u)+.06*Math.sin(3*u)});s.mesh(A(0,.5,0),[.28*k,.26*k,.44*k],col,o);
   for(const z of[-1,1]){s.tube([A(0,1.92,z*.52),A(0,1.32,z*.68),A(.06,.74,z*.72)],u=>(.11-.03*u)*k,col,so);s.ball(A(.07,.62,z*.72),.085*k,col,{alpha:o.alpha,flat:true});
     s.tube([A(0,.42,z*.24),A(.02,-.42,z*.25),A(0,-1.16,z*.25)],u=>(.16-.06*u)*k,col,so);s.mesh(A(.1,-1.23,z*.25),[.17*k,.06*k,.08*k],col,o)}}
-const lungPair=(s,c0,k,col='#ff8fab',alpha)=>{for(const z of[-1,1])s.mesh(V.add(c0,[0,0,z*.42*k]),[.38*k,.62*k,.3*k],col,{alpha,shape:(u,v)=>1-.12*Math.max(0,Math.sin(v)*z)-.2*Math.max(0,Math.sin(u))*Math.max(0,-Math.sin(v)*z)})};
+/* anatomical lungs (front view): flat medial face, narrow apex, concave base, cardiac notch on the left lung, fissures, ringed trachea and bronchial tree */
+const LUNG=sg=>{const f=(u,v)=>{const nx=Math.cos(u)*Math.cos(v),ny=Math.sin(u),mx=-sg*nx;let k=1-.3*Math.max(0,mx)**2-.2*Math.max(0,ny)**2-.14*Math.max(0,-ny)**3;if(sg>0&&mx>.25&&ny<.1&&ny>-.9)k*=1-.34*Math.min(1,(mx-.25)/.4)*Math.exp(-(((ny+.35)/.45)**2));return k};
+ return{f,pt:(c0,A,u,v,o)=>{const k=f(u,v)*o;return[c0[0]+A[0]*k*Math.cos(u)*Math.cos(v),c0[1]+A[1]*k*Math.sin(u),c0[2]+A[2]*k*Math.cos(u)*Math.sin(v)]}}};
+const LU=[LUNG(-1),LUNG(1)];
+const lungPair=(s,c0,k,col='#f0a3b4',alpha=.86,o={})=>{
+ const bc='#e4d9cf',P=(a,b)=>[c0[0]+a*k,c0[1]+b*k,c0[2]];
+ if(!o.noTrachea){s.tube([P(0,1.75),P(0,.85)],.105*k,'#d9cfc3',{segs:10});for(let i=0;i<7;i++){const y=1.68-i*.12;s.seg(P(-.1,y),P(.1,y),'#a89c8f',2)}}
+ for(const z of[-1,1]){s.tube([P(0,.85),P(z*.22,.7),P(z*.45,.5)],.07*k,bc,{segs:8});s.tube([P(z*.45,.5),P(z*.62,.25),P(z*.7,-.1),P(z*.72,-.5)],.05*k,bc,{segs:8});
+  s.tube([P(z*.55,.4),P(z*.7,.62),P(z*.78,.95)],.035*k,bc,{segs:6});s.tube([P(z*.66,.15),P(z*.9,.1),P(z*1.0,-.05)],.035*k,bc,{segs:6});s.tube([P(z*.72,-.35),P(z*.9,-.55),P(z*.95,-.8)],.03*k,bc,{segs:6})}
+ for(let i=0;i<2;i++){const sg=i?1:-1,A=[.62*k,.98*k,.42*k],cc=P(sg*.66,-.05);
+  s.mesh(cc,A,col,{alpha,rings:16,segs:26,spec:.55,shape:LU[i].f});
+  const F=(pts,w)=>s.path(pts.map(([u,v])=>LU[i].pt(cc,A,u,v,1.02)),'#c4627c',w||1.6,[],1e5),ob=[];
+  for(let j=0;j<=6;j++){const t=j/6;ob.push([.5-t,Math.PI/2-sg*(.7-t)])}F(ob);
+  if(sg<0){const h=[];for(let j=0;j<=5;j++)h.push([.12,Math.PI/2+.8-j*.22]);F(h)}}
+ return s};
 
 /* ---------- Chapter 14: Breathing and Exchange of Gases ---------- */
 add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-lung-volumes',title:'Spirometer: lung volumes and capacities',
@@ -69,7 +83,7 @@ add({...ch(14,'Breathing and Exchange of Gases'),id:'bio-lung-volumes',title:'Sp
  controls:[R('TV','Tidal volume TV',300,800,10,500,'mL'),R('IRV','Inspiratory reserve IRV',2000,3500,50,2750,'mL'),R('ERV','Expiratory reserve ERV',800,1300,10,1050,'mL'),R('RV','Residual volume RV',900,1400,10,1150,'mL'),R('rate','Breaths per minute',8,24,1,12)],
  metrics:p=>[N('Vital capacity',p.ERV+p.TV+p.IRV,'mL',0),N('Total lung capacity',p.ERV+p.TV+p.IRV+p.RV,'mL',0),N('Inspiratory capacity',p.TV+p.IRV,'mL',0),N('Functional residual capacity',p.ERV+p.RV,'mL',0),N('Minute volume',p.TV*p.rate,'mL/min',0)],
  draw:(c,p,t)=>{const vol=x=>{const per=60/p.rate,k=cycle(x,per*6),n=Math.floor(k/per),q=(k%per)/per;if(n===3)return p.RV+p.ERV+p.TV*.5+(p.IRV+p.TV*.5)*Math.sin(PI*q);if(n===4)return p.RV+p.ERV+p.TV*.5-(p.ERV+p.TV*.5)*Math.sin(PI*q);return p.RV+p.ERV+p.TV*(.5-.5*Math.cos(TAU*q))},v=vol(t),tlc=p.ERV+p.TV+p.IRV+p.RV;
-  const s=P3.scene(c,{scale:56,cx:220,cy:270}),k=.75+.45*(v-p.RV)/(tlc-p.RV);s.tube([[0,1.6,0],[0,.8,0]],.1,'#e9ecef',{segs:10});for(const z of[-1,1])s.tube([[0,.8,0],[0,.55,z*.3]],.07,'#e9ecef',{segs:8});lungPair(s,[0,0,0],k);s.callout([0,1.4,0],'trachea','#e9ecef',50,-30);s.callout([0,.62,.25],'bronchi','#e9ecef',60,-10);s.callout([0,-.2,.42*k+.3],'lungs','#ff8fab',60,30);s.render();
+  const s=P3.scene(c,{scale:64,cx:200,cy:236,pitch:.04}),k=.82+.34*(v-p.RV)/(tlc-p.RV);lungPair(s,[0,0,0],k);const dy=-1.02*k;s.mesh([0,dy-.1,0],[1.55*k,.36,.5],'#b5524a',{alpha:.9,rings:8,segs:24,shape:u=>u<0?0:1});s.callout([0,1.6*k,0],'trachea','#e9ecef',50,-30);s.callout([-.2,.7*k,.1],'bronchi','#e9ecef',-70,-30);s.callout([.9*k,.1,.42*k],'lungs','#ff8fab',70,30);s.callout([.9*k,dy,.3],'diaphragm','#e08a80',50,30);s.render();
   const per=60/p.rate;chart(c,400,96,256,190,{title:'Spirogram',xl:'time',xmin:0,xmax:per*6,ymin:0,ymax:tlc*1.05,series:[{fn:vol,col:C.mint},{fn:()=>p.RV,col:'#ff8787',dash:[4,4]},{fn:()=>tlc,col:'#8ca6b9',dash:[4,4]}],marker:[cycle(t,per*6),v]});tag(c,'red dashed: RV   grey dashed: TLC',412,276,C.muted,11)},
  assumption:'Typical adult values from NCERT; one maximal inspiration and expiration are inserted after three quiet breaths.'});
 
