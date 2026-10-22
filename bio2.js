@@ -230,6 +230,57 @@ const mix=(a,b,k)=>V.add(V.mul(a,1-k),V.mul(b,k));add({...ch(10,'Cell Cycle and 
   s.render();tag(c,MIT[k][0],44,98,C.gold,16)}, assumption:'Animal cell, small chromosome number for clarity; time compressed — a human cell spends only about 1 h of a 24 h cycle in M phase.'});
 
 const MEI=[['Prophase I','Homologous chromosomes pair (synapsis) and cross over'],['Metaphase I','Bivalents line up at the equator'],['Anaphase I','Homologous chromosomes separate (chromatids stay together)'],['Telophase I','Two haploid cells, each chromosome still with two chromatids'],['Meiosis II','Sister chromatids separate, like mitosis'],['Result','Four haploid cells, genetically different']];
+// Meiosis: one chromatid is a tube tip -> centromere -> tip. After crossing over the distal part of the lower arm carries the other homologue's colour (c2).
+const mChr=(s,C,dT,dB,Lt,Lb,r,c1,c2,tb,warp)=>{const pts=[];for(let j=0;j<=8;j++)pts.push(V.add(C,V.mul(dT,Lt*(1-j/8))));for(let j=1;j<=8;j++)pts.push(V.add(C,V.mul(dB,Lb*j/8)));
+  const P=warp?pts.map(warp):pts,ub=.5+.5*tb;s.tube(P,u=>r*(1-.36*Math.exp(-(((u-.5)/.055)**2))),c2?(u=>u>ub?c2:c1):c1,{segs:7,spec:.55});s.ball(P[0],r*.97,c1,{flat:true});s.ball(P[16],r*.97,c2||c1,{flat:true});return P};
+const MPR=[{yC:.6,Lt:.42,Lb:.66,c1:'#ff6b6b',c2:'#4dabf7'},{yC:-.62,Lt:.3,Lb:.5,c1:'#ffd43b',c2:'#69db7c'}],MTB=.62,MTOP={'-1':[true,false],'1':[false,true]};
+// Meiosis I: one homologue (two sister chromatids). side -1 = left homologue (red / yellow), +1 = right homologue (blue / green).
+// xo: how far the two inner (non-sister) chromatids cross over; mix: show the recombinant colours.
+const mHom=(s,pr,side,hx,yC,dT,dB,r,xo,mix,otherHx)=>{const q=MPR[pr],c1=side<0?q.c1:q.c2,c2=side<0?q.c2:q.c1,xi=hx-side*.055,xx=hx+side*.055,xt=otherHx+side*.055,ycX=yC-MTB*q.Lb;
+  mChr(s,[xx,yC,0],dT,dB,q.Lt,q.Lb,r,c1,null,0);
+  const warp=xo>.01?p=>{const w=smooth(Math.max(0,Math.min(1,(ycX+.16-p[1])/.32)))*xo;return[p[0]+(xt-xi)*w,p[1],p[2]+side*.09*Math.exp(-(((p[1]-ycX)/.13)**2))*xo]}:null;
+  mChr(s,[xi,yC,0],dT,dB,q.Lt,q.Lb,r,c1,mix?c2:null,MTB,warp);
+  const kx=hx+side*.2;s.ball([kx,yC,.02],.055,'#3b1f2b',{flat:true,lift:.5});return kx};
+// Meiosis II: horizontal chromosomes on the plate, sisters one above the other, kinetochores facing the poles.
+const mSis=(s,pr,side,inner,C,dT,dB,r)=>{const q=MPR[pr];return mChr(s,C,dT,dB,q.Lt,q.Lb,r,side<0?q.c1:q.c2,inner?(side<0?q.c2:q.c1):null,MTB)};
+const mSpV=(s,x,g,ph0)=>{if(g<.02)return;for(let j=0;j<5;j++){const ph=TAU*j/5+ph0,pts=[];for(let i=0;i<=6;i++){const u=i/6;pts.push([x+.62*g*Math.sin(PI*u)*Math.cos(ph),-1.25+2.5*u,.62*g*Math.sin(PI*u)*Math.sin(ph)])}s.path(pts,'#aab8c6',1.2)}};
+const meiDraw=(c,p,t)=>{const T=cycle(t*p.speed,18),k=Math.floor(T/3),f2=(T%3)/3,s=P3.scene(c,{scale:80}),sm=smooth,X=[1,0,0],pX=2.1,cl=(a,b,v)=>Math.max(a,Math.min(b,v)),mx=(a,b,u)=>V.add(V.mul(a,1-u),V.mul(b,u));
+  const split=k===3?sm(f2):k>3?1:0,mem=(q,r)=>s.mesh(q,r,BC.membrane,{alpha:.17,rings:12,segs:20});
+  // cell(s): one cell in meiosis I, two after telophase I, four at the end
+  if(k<3)mem([0,0,0],[2.4,1.5,1.5]);
+  else if(k<5){const cx=k===3?1.05+.7*split:1.75;for(const sg of[-1,1])mem([sg*cx,0,0],[1.3,1.45,1.3])}
+  else{const u=sm(f2);for(const sx of[-1,1])for(const sy of[-1,1])mem([sx*1.75,sy*.72*u,0],[1.3-.34*u,1.45-.73*u,1.3-.34*u])}
+  // centrosomes + spindle (meiosis I): poles at the ends of the cell
+  const sg1=k===0?sm(cl(0,1,(f2-.55)/.45)):k<3?1:k===3?Math.max(0,1-f2*3):0;
+  if(k<4){for(const sg of[-1,1])centrosome(s,[sg*pX,0,0],X);
+   if(sg1>.02){for(let j=0;j<6;j++){const ph=TAU*j/6+.4,pts=[];for(let i=0;i<=6;i++){const u=i/6;pts.push([-pX+2*pX*u,.8*sg1*Math.sin(PI*u)*Math.cos(ph),.8*sg1*Math.sin(PI*u)*Math.sin(ph)])}s.path(pts,'#aab8c6',1.2)}}}
+  if(k===0){const e=sm(cl(0,1,(f2-.7)/.3));if(e<.98)s.mesh([0,0,0],1.4,BC.nucleus,{alpha:.24*(1-e),rings:9,segs:14,spec:.3});if(f2<.4)s.ball([.12,.2,.3],.13*(1-f2/.4),BC.nucleolus,{lift:.3})}
+  if(k<4){let r=.062,xo=0,bend=0,mixc=true,sep=0;const ang=[],pos=[];
+   if(k===0){const g=sm(cl(0,1,f2/.55)),cond=sm(cl(0,1,f2/.4));r=.032+.03*cond;xo=sm(cl(0,1,(f2-.62)/.3));mixc=xo>.5;
+    const S0=[[[-.8,.5],[.8,.35]],[[.6,-.78],[-.72,-.4]]];
+    for(let pr=0;pr<2;pr++)for(let h=0;h<2;h++){const sx=S0[pr][h][0],sy=S0[pr][h][1],fx=h?.27:-.27,fy=MPR[pr].yC;pos[pr*2+h]=[fx+(sx-fx)*(1-g),fy+(sy-fy)*(1-g)];ang[pr*2+h]=(hash(pr*2+h+5)-.5)*2.4*(1-g)}}
+   else{sep=k===2?sm(f2):k===3?1:0;xo=k===1?1:k===2?1-sm(cl(0,1,f2*3)):0;bend=k===2?.85*sm(cl(0,1,f2*2.5)):k===3?.85*(1-sm(f2)):0;const sh=k===3?.1*split:0;
+    for(let pr=0;pr<2;pr++)for(let h=0;h<2;h++){pos[pr*2+h]=[(h?1:-1)*(.27+1.5*sep+sh),MPR[pr].yC];ang[pr*2+h]=0}}
+   for(let pr=0;pr<2;pr++){const pa=pos[pr*2],pb=pos[pr*2+1];
+    for(let h=0;h<2;h++){const side=h?1:-1,pp=pos[pr*2+h],a=ang[pr*2+h],bx=-side*bend,dT=V.norm([Math.sin(a)+bx,Math.cos(a),0]),dB=V.norm([-Math.sin(a)+bx,-Math.cos(a),0]);
+     const kx=mHom(s,pr,side,pp[0],pp[1],dT,dB,r,xo,mixc,h?pa[0]:pb[0]);if(k>=1&&k<=3&&sg1>.05&&!(k===3&&f2>.55))s.seg([side*pX,0,0],[kx,pp[1],.02],'#cdd6df',1.2)}}
+   const q0=MPR[0];
+   if(k===0&&f2>.35)s.callout([-.27,q0.yC+q0.Lt,0],f2<.6?'homologous pair: 4 chromatids (bivalent)':'bivalent (tetrad)','#e9f6ff',-70,-50);
+   if(k===0&&xo>.5)s.callout([0,q0.yC-MTB*q0.Lb,.05],'chiasma: crossing over swaps segments','#ffd43b',90,50);
+   if(k===1){s.callout([0,q0.yC-MTB*q0.Lb,.05],'chiasma holds each pair together','#ffd43b',80,60);s.callout([-.27,q0.yC+q0.Lt+.05,0],'bivalents line up on the equator','#e9f6ff',-80,-45)}
+   if(k===2)s.callout([-.27-1.5*sep,q0.yC+.35,0],'homologues separate (2n → n)','#e9f6ff',-70,-55);
+   if(k===3)s.callout([1.8,q0.yC+.4,0],'two cells; chromosomes still double','#e9f6ff',20,-55);
+   if(k===3&&f2>.15)s.ring([0,0,0],X,1.45*(1-.5*split),'#f06595',3,[],40)}
+  else{ // meiosis II (k=4) and the four haploid cells (k=5)
+   const g=k===4?sm(cl(0,1,f2/.3)):1,sp=k===4?sm(cl(0,1,(f2-.55)/.45)):1,bd=.75*cl(0,1,sp*3)*(1-u5),u5=k===5?sm(f2):0,off=[-.6,.55];
+   if(k===4)for(const sg of[-1,1]){const cx=sg*1.75;for(const e of[-1,1])centrosome(s,[cx,e*1.22,0],[0,1,0]);mSpV(s,cx,sm(cl(0,1,(f2-.1)/.3)),sg)}
+   for(const side of[-1,1])for(let pr=0;pr<2;pr++)for(const e of[-1,1]){const cx=side*1.75,q=MPR[pr],inner=(MTOP[side][pr]===(e>0)),r=.058-.008*u5,sx=cx+e*.055,sEx=cx+off[pr],sEy=e*(.07+.9*sp);
+    const C=[sx+(sEx-sx)*g,q.yC+(sEy-q.yC)*g+(k===5?(e*.72-sEy)*u5:0),0],dT=V.norm(mx([0,1,0],[-1,-e*bd,0],g)),dB=V.norm(mx([0,-1,0],[1,-e*bd,0],g));
+    mSis(s,pr,side,inner,C,dT,dB,r);
+    if(k===4&&g>.5){const K=[C[0],C[1]+e*.09,.03];s.ball(K,.052,'#3b1f2b',{flat:true,lift:.5});if(f2>.15)s.seg([cx,e*1.22,0],K,'#cdd6df',1.1)}}
+   if(k===4)s.callout([-1.75+off[0],.1+.9*sp,0],f2<.55?'sister chromatids line up (metaphase II)':'sister chromatids separate','#e9f6ff',-60,-60);
+   if(k===5)s.callout([2.4,.72*u5,0],'4 haploid (n) cells, each different','#f2a7b5',20,-50)}
+  s.render();tag(c,MEI[k][0],44,98,C.gold,16)};
 add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-meiosis',title:'Meiosis and crossing over',
  description:'Follow one diploid cell through meiosis I and II to four haploid cells. Watch crossing over swap segments.',
  formula:'2n → 4 cells of n (reductional division) ;  combinations = 2ⁿ',
@@ -237,11 +288,7 @@ add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-meiosis',title:'Meiosis
  tryText:'Increase the haploid number and see how fast the number of possible combinations grows.',
  controls:[R('nh','Haploid number n (for combinations)',1,23,1,23),R('speed','Speed',.2,2,.1,1,'×',1)],
  metrics:(p,t)=>{const k=Math.floor(cycle(t*p.speed,18)/3);return[N('Stage',MEI[k][0]),N('Key event',MEI[k][1]),N('Possible combinations (2ⁿ)',2**p.nh,'',0),N('Chromosome number','2n → n')]},
- draw:(c,p,t)=>{const T=cycle(t*p.speed,18),k=Math.floor(T/3),f2=(T%3)/3,s=P3.scene(c,{scale:52});const pairs=[[.45,'#ff6b6b','#4dabf7'],[.3,'#ffd43b','#69db7c']];
-  if(k<=3){const sp=k===3?f2:0;s.mesh([0,0,0],[2.6+sp,1.5,1.5],BC.membrane,{alpha:.16,shape:(u,v)=>1-.6*sp*Math.exp(-((Math.cos(v)*Math.cos(u))**2)*12)});
-   pairs.forEach(([L,c1,c2],i)=>{const y=i?-.5:.5;let x1,x2;if(k===0){x1=-.18*(1-f2)-.1;x2=.18*(1-f2)+.1}else if(k===1){x1=-.12;x2=.12}else{const d=k===2?f2*1.6:1.6+sp*.5;x1=-.12-d;x2=.12+d}
-    L*=1.4;const cross=k>=1||f2>.6;chromosome(s,[x1,y,0],L,c1,0,true,{r:.1});chromosome(s,[x2,y,0],L,c2,0,true,{r:.1});if(i===0){if(k<=1)s.callout([x2+.1,y+L*.4,0],'homologous pair (bivalent, 4 chromatids)','#e9f6ff',60,-55);if(cross&&k<=1)s.callout([x1+.07,y-L*.3,0],'chiasma: crossing over swaps segments','#ffd43b',-70,60);if(k===2)s.callout([x2,y,0],'homologues separate (2n → n)','#e9f6ff',60,-55)}if(cross){s.tube([[x1+.07,y-L*.45,0],[x1+.07,y-L*.15,0]],.075,c2,{segs:8});s.tube([[x2-.07,y-L*.45,0],[x2-.07,y-L*.15,0]],.075,c1,{segs:8})}})}
-  else{const cells=[[-1.6,.9],[-1.6,-.9],[1.6,.9],[1.6,-.9]];cells.forEach(([x,y],i)=>{const g=k===4?f2:1;s.mesh([x,y*g,0],.75,BC.membrane,{alpha:.18});pairs.forEach(([L,c1,c2],j)=>{chromosome(s,[x+(j?.3:-.3),y*g,0],L*1.1,(i+j)%2?c1:c2,0,false,{r:.1})})});s.callout([1.6+.75,.9,0],'4 haploid (n) cells, each different','#f2a7b5',20,-50)}s.render();tag(c,MEI[k][0],44,98,C.gold,16)},
+ draw:(c,p,t)=>meiDraw(c,p,t/*DBG*/),
  assumption:'Two homologous pairs shown (2n = 4); a single crossover drawn on each pair.'});
 
 add({...ch(10,'Cell Cycle and Cell Division',U3),id:'bio-cell-cycle',title:'The cell cycle clock',
