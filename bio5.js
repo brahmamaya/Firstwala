@@ -191,8 +191,20 @@ add({...ch(9,'Biotechnology: Principles and Processes',U9),id:'bio-gel-electroph
  tryText:'Increase the run time. Do small fragments run off the gel first?',
  controls:[R('time','Run time',0,60,1,35,'min'),R('V','Voltage',50,150,5,100,'V'),R('cut','Your sample: fragment size',200,9000,50,1500,'bp')],
  metrics:p=>{const d=gelDist(p,p.cut);return[N('Your fragment moved',d*10,'mm',1),N('Direction','Towards the anode (+)'),N('Stain','Ethidium bromide (orange under UV)'),N('Matrix','Agarose (from seaweed)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,pitch:.6}),L=4.4;s.box([0,-.15,0],[3.2,.2,L+.6],'#d0ebff',{alpha:.85});s.box([0,-.05,-L/2-.25],[3.4,.3,.15],'#1c1c1c');s.box([0,-.05,L/2+.25],[3.4,.3,.15],'#e03131');s.label([1.9,.3,L/2+.25],'+',C.red,18);s.label([1.9,.3,-L/2-.25],'−',C.white,18);
-  const lane=(x,sizes,col)=>{s.box([x,.0,-L/2+.1],[.6,.08,.12],'#343a40');sizes.forEach(bp=>{const d=Math.min(L-.2,gelDist(p,bp));s.box([x,.0,-L/2+.15+d],[.6,.06,.08],col,{alpha:.9})})};lane(-.8,LADDER,'#ffa94d');lane(.8,[p.cut],'#ff922b');s.label([-.8,.3,-L/2-.6],'ladder',C.muted,12);s.label([.8,.3,-L/2-.6],'sample',C.muted,12);s.render()},
+ draw:(c,p,t)=>{const GX=215,GY=140,GW=220,GH=208,L=4.4,pxu=(GH-30)/L,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  rr=(x,y,w,h,r)=>{c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)};
+  /* buffer tank with electrodes: cathode (−, black) at the wells end, anode (+, red) at the far end */
+  c.save();c.fillStyle='rgba(120,160,190,.18)';c.strokeStyle='rgba(170,200,225,.55)';c.lineWidth=2;rr(GX-30,GY-30,GW+60,GH+60,12);c.fill();c.stroke();c.restore();
+  c.save();c.fillStyle='#202428';rr(GX-30,GY-22,GW+60,8,3);c.fill();c.fillStyle='#d83b3b';rr(GX-30,GY+GH+14,GW+60,8,3);c.fill();c.restore();
+  txt('− cathode',GX+GW+34,GY-18,C.white,12,'left');txt('+ anode',GX+GW+34,GY+GH+18,C.red,12,'left');
+  /* agarose gel slab with wells */
+  c.save();const g=c.createLinearGradient(GX,GY,GX+GW,GY+GH);g.addColorStop(0,'rgba(170,215,235,.9)');g.addColorStop(1,'rgba(120,180,210,.85)');c.fillStyle=g;c.strokeStyle='rgba(220,240,250,.7)';c.lineWidth=1.5;rr(GX,GY,GW,GH,8);c.fill();c.stroke();c.restore();
+  const lanes=[[GX+GW*.28,LADDER,'ladder'],[GX+GW*.72,[p.cut],'your sample']];
+  lanes.forEach(([x,sizes,name])=>{c.save();c.fillStyle='#0f2030';rr(x-26,GY+8,52,10,3);c.fill();c.restore();txt(name,x,GY-42,C.muted,12);
+   sizes.forEach(bp=>{const d=Math.min(L-.2,gelDist(p,bp)),y=GY+24+d*pxu,off=d>=L-.2-1e-6,col=name==='ladder'?'#ffa94d':'#ffd08a';c.save();c.shadowColor='#ff8f1f';c.shadowBlur=off?0:10;c.globalAlpha=off?.35:1;c.fillStyle=col;rr(x-24,y-3,48,6,3);c.fill();c.restore();if(name==='ladder')txt(bp>=1000?(bp/1000)+' kb':bp+' bp',x-32,y,C.muted,10,'right');else txt(bp+' bp',x+30,y,C.gold,11,'left')})});
+  txt('smaller fragments run farther',GX-22,GY+GH+34,C.muted,11,'left');
+  c.save();c.strokeStyle='#8fd3ff';c.fillStyle='#8fd3ff';c.lineWidth=2;c.beginPath();c.moveTo(GX-52,GY+40);c.lineTo(GX-52,GY+GH-30);c.stroke();c.beginPath();c.moveTo(GX-58,GY+GH-36);c.lineTo(GX-52,GY+GH-26);c.lineTo(GX-46,GY+GH-36);c.stroke();c.restore();txt('DNA (negative)',GX-62,GY+GH*.42,'#8fd3ff',11,'right');txt('moves to the anode',GX-62,GY+GH*.42+14,'#8fd3ff',11,'right')},
  assumption:'Mobility model d ∝ V·t·(log₁₀ 20000 − log₁₀ bp), illustrative; bands that pass the end leave the gel.'});
 function gelDist(p,bp){return Math.max(0,p.V*p.time/3500*(Math.log10(20000)-Math.log10(bp))*1.2)}
 
