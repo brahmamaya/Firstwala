@@ -20,7 +20,7 @@ const stick=(s,a,b,order=1,o={})=>{const d=V.sub(b,a),n=V.norm(d),m=V.add(a,V.mu
     s.tube([V.add(a,off),V.add(m,off)],tA,ca,{segs:8});s.tube([V.add(m,off),V.add(b,off)],tB,cb,{segs:8})}return s};
 // Orbital / electron-pair lobe: a translucent teardrop whose narrow end sits at p and points along unit vector u.
 const lobe=(s,p,u,len,w,col,alpha=.4,o={})=>{const th=Math.acos(clamp(u[1],-1,1)),ps=Math.atan2(u[0],u[2]);
-  s.mesh(V.add(p,V.mul(u,len/2)),[w,len/2,w],col,{alpha,rings:o.rings||6,segs:o.segs||10,rot:[th,ps,0],spec:.5,shape:(uu)=>.5+.5*(Math.sin(uu)+1)/2+.12*Math.cos(uu)})};
+  s.mesh(V.add(p,V.mul(u,len/2)),[w,len/2,w],col,{alpha,rings:o.rings||8,segs:o.segs||12,rot:[th,ps,0],spec:.5,shape:uu=>{const q=(Math.sin(uu)+1)/2;return .2+1.05*Math.pow(q,.8)}})};
 // Lab beaker: thin glass shell with rim, spout-free graduations, liquid with a concave meniscus and a lit surface. liq is #rrggbb.
 const glassBeaker=(s,p,r,h,liq,fill=.7,o={})=>{const lh=h*fill,[x,y,z]=p,rr=r*.95,la=o.alpha??.5;
   s.lathe(p,[[.001,.0],[r*.88,0],[r,.07],[r,h],[r*1.05,h+.04]],'#dff3ff',{alpha:.14,segs:o.segs||18,spec:.7,shine:30});
