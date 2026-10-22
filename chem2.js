@@ -145,10 +145,18 @@ add({...ch(6,'Haloalkanes and Haloarenes',OR),id:'chem-sn1-sn2',title:'SN2 and S
  tryText:'Choose the tertiary bromide. Which mechanism wins?',
  controls:[S('sub','Substrate','methyl',Object.keys(SUBST).map(k=>[k,SUBST[k][0]])),R('prog','Reaction progress',0,100,1,50,'%')],
  metrics:p=>{const [n,s2,s1]=SUBST[p.sub];return[N('Relative SN2 rate',s2,'',4),N('Relative SN1 rate',s1,'',4),N('Main mechanism',s2>s1?'SN2 (inversion)':'SN1 (racemisation)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,cx:260,yaw:.3,pitch:.2}),q=p.prog/100,umb=1-2*q,C0=[0,0,0],sub=p.sub;atom(s,C0,'C',1);const R=['methyl','primary','secondary','tertiary'].indexOf(sub);
-  for(let i=0;i<3;i++){const a=TAU*i/3,pos=[-.38*umb,.95*Math.cos(a),.95*Math.sin(a)];bond(s,C0,pos);atom(s,pos,i<R?'C':'H',i<R?.9:1)}
-  const br=[.95+q*1.5,0,0],nu=[-2.6+q*1.65,0,0];bond(s,C0,br,1,q>.5?'#495057':'#ced4da',q>.5?.03:.06);atom(s,br,'Br');bond(s,C0,nu,1,q<.5?'#495057':'#ced4da',q<.5?.03:.06);atom(s,nu,'O');atom(s,V.add(nu,[-.45,.25,0]),'H',.9);
-  s.callout(nu,'OH⁻ attacks from the back','#ff8787',-40,-60);s.callout(br,q>.6?'Br⁻ leaves':'C–Br bond breaking','#c2410c',40,-60);s.callout([-.38*umb,.95,0],q>.5?'configuration inverted (umbrella flips)':'groups flatten at the transition state','#e9f6ff',-30,70);s.render();tag(c,`${SUBST[sub][0]}: SN2 rel. ${SUBST[sub][1]} · SN1 rel. ${SUBST[sub][2]}${SUBST[sub][2]>SUBST[sub][1]?' · SN1 dominates; animation shows SN2':''}`,44,98,C.gold,14)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:56,cx:250,yaw:.12,pitch:.14}),q=p.prog/100,umb=1-2*q,C0=[0,0,0],sub=p.sub,Rn=['methyl','primary','secondary','tertiary'].indexOf(sub);
+  const dash=(a,b,col)=>{for(let k=0;k<5;k++){const u0=k/5+.03,u1=k/5+.13;s.tube([V.add(a,V.mul(V.sub(b,a),u0)),V.add(a,V.mul(V.sub(b,a),u1))],.04,col,{segs:6})}};
+  const br=[.95+q*1.5,0,0],nu=[-2.6+q*1.65,0,0],oc=q<.5?'O':'O';
+  atom(s,C0,'C',1.05);
+  for(let i=0;i<3;i++){const a=TAU*i/3+.5,pos=[-.38*umb,.95*Math.cos(a),.95*Math.sin(a)];stick(s,C0,pos,1,{ca:'C',cb:i<Rn?'C':'H'});atom(s,pos,i<Rn?'C':'H',i<Rn?.9:1);
+   if(i<Rn){const o=V.norm(V.sub(pos,[0,0,0]));for(let k=0;k<3;k++){const b2=a+k*TAU/3;stick(s,pos,V.add(pos,[.32*(o[0]+.3*umb),.38*Math.cos(b2)+.3*o[1],.38*Math.sin(b2)+.3*o[2]]),1,{ca:'C',cb:'H',r:.045})}}}
+  const bro=q<.5;if(bro)stick(s,C0,br,1,{ca:'C',cb:'Br'});else dash(C0,br,'#f4a261');
+  if(q<.5)dash(nu,C0,'#ffa8a8');else stick(s,nu,C0,1,{ca:'O',cb:'C'});
+  atom(s,br,'Br',q>.6?1.1:1,{glow:q>.7});atom(s,nu,'O',1);stick(s,nu,V.add(nu,[-.5,.34,0]),1,{ca:'O',cb:'H'});atom(s,V.add(nu,[-.5,.34,0]),'H',.9);
+  const arc=(a,b,h,col)=>{let pr=a;for(let k=1;k<=8;k++){const u=k/8,pt=[a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u+h*Math.sin(Math.PI*u),a[2]];if(k<8)s.seg(pr,pt,col,2.2);else s.arrow(pr,pt,col,2.2,9);pr=pt}};
+  if(q<.5){arc(V.add(nu,[.2,.3,0]),[-.2,.35,0],.55,'#ffa8a8')}else{arc([1.3,.15,0],V.add(br,[-.15,.45,0]),.6,'#f4a261')}
+  s.callout(nu,q<.5?'OH⁻ attacks from the back':q<.95?'O–C bond forming':'C–O bond formed','#ff8787',-30,-55);s.callout(br,q>.6?'Br⁻ leaves':'C–Br bond breaking','#f4a261',30,-55);s.callout([-.38*umb,-.95,0],q>.5?'umbrella flipped (inversion)':'groups flatten at the transition state','#e9f6ff',-20,60);s.render();tag(c,`${SUBST[sub][0]}: SN2 rel. ${SUBST[sub][1]} · SN1 rel. ${SUBST[sub][2]}${SUBST[sub][2]>SUBST[sub][1]?' · SN1 dominates; animation shows SN2':''}`,44,98,C.gold,14)},
  assumption:'Relative rates are approximate orders of magnitude for teaching; the animation shows the SN2 pathway.'});
 
 /* ---------- 7 Alcohols, Phenols and Ethers ---------- */
