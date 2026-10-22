@@ -347,7 +347,15 @@ add({...ch(11,'Organisms and Populations',U10),id:'bio-age-pyramids',title:'Age 
  tryText:'Which shape matches a country with a high birth rate?',
  controls:[S('type','Population','expanding',Object.keys(PYR).map(k=>[k,PYR[k][0]]))],
  metrics:p=>{const d=PYR[p.type],pre=d[2].slice(0,3).reduce((a,b)=>a+b,0),tot=d[2].reduce((a,b)=>a+b,0);return[N('Type',d[0]),N('Meaning',d[1]),N('Pre-reproductive share',pre/tot*100,'%',0)]},
- draw:(c,p,t)=>{const d=PYR[p.type],s=P3.scene(c,{scale:54,pitch:.2});d[2].forEach((w,i)=>{const y=-1.8+i*.42,col=i<3?'#69db7c':i<6?'#4dabf7':'#ffa94d';s.box([-w*.17,y,0],[w*.34,.36,.6],col);s.box([w*.17,y,0],[w*.34,.36,.6],col,{alpha:.75})});s.label([-1.8,2.1,0],'males',C.muted,12);s.label([1.8,2.1,0],'females',C.muted,12);s.render();tag(c,'green: pre-reproductive · blue: reproductive · orange: post-reproductive',44,98,C.muted,12)},
+ draw:(c,p,t)=>{const d=PYR[p.type],GC=['#69db7c','#4dabf7','#ffa94d'],GN=['pre-reproductive','reproductive','post-reproductive'],CX=222,K=13,RH=29,Y0=386;
+  const person=(x,y,s,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y-17*s,5*s,0,TAU);c.fill();c.beginPath();c.moveTo(x-8*s,y);c.quadraticCurveTo(x-9*s,y-11*s,x,y-11*s);c.quadraticCurveTo(x+9*s,y-11*s,x+8*s,y);c.closePath();c.fill()};
+  person(CX-70,116,1.2,'#74c0fc');tag(c,'males',CX-58,108,C.muted,13);person(CX+58,116,1.2,'#f783ac');tag(c,'females',CX+70,108,C.muted,13);
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;c.beginPath();c.moveTo(CX,122);c.lineTo(CX,Y0);c.stroke();
+  d[2].forEach((w,i)=>{const y=Y0-(i+1)*RH+2,g=i<3?0:i<6?1:2;c.fillStyle=GC[g];c.globalAlpha=.95;c.beginPath();c.roundRect(CX-1-w*K,y,w*K,RH-4,3);c.fill();c.globalAlpha=.7;c.beginPath();c.roundRect(CX+1,y,w*K,RH-4,3);c.fill();c.globalAlpha=1});
+  [[0,3],[3,6],[6,9]].forEach(([a,b],g)=>{const yb=Y0-a*RH,yt=Y0-b*RH+2;c.strokeStyle=GC[g];c.lineWidth=2;c.beginPath();c.moveTo(CX+148,yb-4);c.lineTo(CX+154,yb-4);c.lineTo(CX+154,yt+2);c.lineTo(CX+148,yt+2);c.stroke();tag(c,GN[g],CX+162,(yb+yt)/2-1,GC[g],12)});
+  tag(c,'bar length = relative number of people in each age group',44,402,C.muted,11);
+  Object.keys(PYR).forEach((k,j)=>{const x=494,y=100+j*104,on=k===p.type;c.fillStyle=on?'rgba(255,212,59,.1)':'rgba(255,255,255,.03)';c.strokeStyle=on?C.gold:'#294358';c.lineWidth=on?2:1;c.beginPath();c.roundRect(x,y,162,98,8);c.fill();c.stroke();
+   PYR[k][2].forEach((w,i)=>{const yy=y+91-(i+1)*7.2,g=i<3?0:i<6?1:2;c.fillStyle=GC[g];c.globalAlpha=on?1:.6;c.fillRect(x+80-w*5.4,yy,w*5.4,6);c.fillRect(x+82,yy,w*5.4,6)});c.globalAlpha=1;tag(c,PYR[k][0],x+81,y+11,on?C.gold:C.muted,12,'center')});},
  assumption:'Schematic pyramids; bar widths are relative.'});
 
 const INT={mutualism:['+','+','Lichens (fungus + alga), mycorrhizae, fig and wasp'],competition:['−','−','Abingdon tortoise vs goats (Galapagos); barnacles (Connell)'],predation:['+','−','Tiger and deer; Cactoblastis moth on prickly pear'],parasitism:['+','−','Cuscuta on hedge plants; cuckoo (brood parasitism)'],commensalism:['+','0','Orchid on a mango branch; cattle egret and cattle'],amensalism:['0','−','One species harmed, the other unaffected']};
