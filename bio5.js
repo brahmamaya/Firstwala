@@ -324,10 +324,20 @@ add({...ch(11,'Organisms and Populations',U10),id:'bio-predator-prey',title:'Pre
  tryText:'Increase the predation rate. What happens to the size of the swings?',
  controls:[R('a','Prey birth rate',.2,1.2,.05,.6,'',2),R('b','Predation rate',.005,.05,.001,.02,'',3),R('d','Predator death rate',.1,1,.05,.4,'',2),R('t','Time',0,60,.5,20,'',1)],
  metrics:p=>{const r=lv(p),i=Math.min(r.length-1,Math.round(p.t/.05));return[N('Prey',r[i][0],'',0),N('Predators',r[i][1],'',0),N('Pattern','Oscillations; predators lag prey')]},
- draw:(c,p,t)=>{const r=lv(p),i=Math.min(r.length-1,Math.round(p.t/.05)),[H,P]=r[i],s=P3.scene(c,{scale:50,pitch:.45,cx:220});s.box([0,-1.6,0],[5,.1,3.4],'#2b8a3e',{ground:true});for(let k=0;k<Math.min(60,Math.round(H/3));k++){const x=-2.2+(k%12)*.4,z=-1.4+Math.floor(k/12)*.4;s.mesh([x,-1.45,z],[.14,.1,.1],'#f1e3c6',{rings:5,segs:8})}for(let k=0;k<Math.min(20,Math.round(P/3));k++){const x=-2+hash(k)*4,z=-1.3+hash(k+3)*2.6;s.mesh([x,-1.38,z],[.22,.14,.12],'#c92a2a',{rings:6,segs:10})}s.render();
-  chart(c,410,96,246,170,{title:'Populations vs time',xl:'time',xmin:0,xmax:60,ymin:0,series:[{pts:r.map((v,k)=>[k*.05,v[0]]),col:'#f1e3c6'},{pts:r.map((v,k)=>[k*.05,v[1]]),col:C.red}],marker:[p.t,H,'#f1e3c6']});tag(c,'cream: prey · red: predators',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const r=lv(p),i=Math.min(r.length-1,Math.round(p.t/.05)),[H,P]=r[i],g=lvx(p),uh=Math.max(1,Math.ceil(g.hmax/14)),up=Math.max(1,Math.ceil(g.pmax/10)),nd=Math.min(14,Math.round(H/uh)),nw=Math.min(10,Math.round(P/up)),ym=Math.max(g.hmax,g.pmax)*1.04;
+  E.panel(c,44,96,246,152,'#1b4d6e','#2b7a45',150);E.panel(c,44,254,246,152,'#1c3b52','#245f46',402);
+  for(let k=0;k<6;k++)E.tree(c,56+k*46,142,.62,k%2?'#2b8a3e':'#37a14a');for(let k=0;k<5;k++)E.tree(c,70+k*48,300,.7,k%2?'#1f6f3a':'#2b8a3e');
+  for(let k=0;k<7;k++)E.grass(c,52+k*38,168+(k%2)*45,.8,'#69db7c');
+  for(let k=0;k<nd;k++)E.deer(c,64+(k%7)*33+(k>6?14:0),178+Math.floor(k/7)*55,.72,k%4===1?-1:1);
+  for(let k=0;k<nw;k++)E.wolf(c,72+(k%5)*44+(k>4?14:0),338+Math.floor(k/5)*58,.8,k%3===1?-1:1);
+  tag(c,'Prey (deer): each ≈ '+uh,56,110,'#f1e3c6',12);tag(c,'Predators (wolves): each ≈ '+up,56,268,'#ffa8a8',12);
+  chart(c,304,98,352,150,{title:'Populations vs time',xl:'time',xmin:0,xmax:60,ymin:0,ymax:ym,series:[{pts:g.tp,col:'#f1e3c6'},{pts:g.pp,col:C.red}],marker:[p.t,H,'#f1e3c6']});
+  c.beginPath();c.arc(E.cx(304,352,0,60,p.t),E.cy(98,150,0,ym,P),4.5,0,TAU);c.fillStyle=C.red;c.fill();
+  chart(c,304,258,176,148,{title:'Predators vs prey',xl:'prey',xmin:0,xmax:g.hmax*1.05,ymin:0,ymax:g.pmax*1.05,series:[{pts:g.ph,col:C.gold,w:1.8}],marker:[H,P,C.gold]});
+  E.deer(c,512,306,.62,1);tag(c,'prey  H = '+f(H,0),530,296,'#f1e3c6',12);E.wolf(c,512,350,.7,1);tag(c,'predators  P = '+f(P,0),536,340,'#ffa8a8',12);tag(c,'gold: path of (prey, predators)',496,386,C.muted,11)},
  assumption:'Lotka–Volterra model, predator conversion efficiency c = 0.5, start H = 40, P = 9 (RK4 integration).'});
 function lv(p){return memo('lv'+p.a+p.b+p.d,()=>{const c=.5,f2=([H,P])=>[p.a*H-p.b*H*P,c*p.b*H*P-p.d*P];let y=[40,9];const out=[y],h=.05;for(let i=0;i<1200;i++){const k1=f2(y),k2=f2(y.map((v,j)=>v+h/2*k1[j])),k3=f2(y.map((v,j)=>v+h/2*k2[j])),k4=f2(y.map((v,j)=>v+h*k3[j]));y=y.map((v,j)=>Math.max(0,v+h/6*(k1[j]+2*k2[j]+2*k3[j]+k4[j])));out.push(y)}return out})}
+function lvx(p){return memo('lvx'+p.a+p.b+p.d,()=>{const r=lv(p),tp=[],pp=[],ph=[];let hm=1,pm=1;r.forEach((v,k)=>{tp.push([k*.05,v[0]]);pp.push([k*.05,v[1]]);ph.push([v[0],v[1]]);if(v[0]>hm)hm=v[0];if(v[1]>pm)pm=v[1]});return{tp,pp,ph,hmax:hm,pmax:pm}})}
 
 const PYR={expanding:['Expanding','Large pre-reproductive base; population growing',[10,9,8,7,5.5,4,2.8,1.8,1]],stable:['Stable','Similar numbers across ages; population stable',[6.5,6.5,6.4,6.3,6.2,5.8,5,3.8,2.2]],declining:['Declining','Narrow base; fewer young than adults',[4,4.5,5.2,6,6.3,6.2,5.6,4.4,2.6]]};
 add({...ch(11,'Organisms and Populations',U10),id:'bio-age-pyramids',title:'Age pyramids',
