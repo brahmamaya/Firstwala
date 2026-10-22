@@ -1,4 +1,4 @@
-/* Rank mode · JEE Mains Physics · Optics (ray optics and wave optics). Same page as the other chapters; no past-year questions yet.
+/* Rank mode · JEE Mains Physics · Optics (ray optics and wave optics). Same page as the other chapters; past-year questions are in rank-pyq-optics.js.
    Loaded with the JEE pack. Plain data only; the diagrams (omir, olens, otir, oprism, oyd, oslit, opol) are drawn by rank-figs.js. Nothing leaves the device.
    F(section, level, name, formulas, how to apply, example, diagram): level 1 = must know, 2 = also useful.
    Sign convention: Cartesian, distances from the pole or optical centre, positive along the direction of the incident light. D = 25 cm. */
