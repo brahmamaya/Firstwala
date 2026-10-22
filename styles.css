@@ -285,7 +285,7 @@ body.focus .below-stage{display:none!important}
   .toast{background:var(--s-232833)!important}
   .main>*{animation:none!important}
   .stage:before{display:none}}
-/* big classroom boards (4K panels) and Teacher mode: same lighter look, no live blur over the moving stage */
+/* big classroom boards (4K panels): same lighter look, no live blur over the moving stage */
 html.lite .topbar,html.lite .stage,html.lite .controls-card,html.lite .observe-card,html.lite .formula-card,html.lite .physics-panel,html.lite .more-pop,html.lite .sidebar,html.lite .lab-tool-buttons button,html.lite .more-menu summary,html.lite .view3d-bar button,html.lite .transport .restart-button,html.lite .focus-btn,html.lite .restore-chip,html.lite .simulation-tabs button,html.lite .tabs-nav button,html.lite #prev,html.lite #next,html.lite .rec-quality,html.lite .step-btn,html.lite .toast{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* panels keep their own premium look (blur over the dark page shows nothing anyway); only what floats over the
    moving stage or other content gets a solid graphite backing so it stays crisp without blur */
@@ -523,17 +523,6 @@ button.panel-close.panel-close,button.wonder-close.wonder-close{height:26px!impo
 .tutor-score{font-weight:900;margin:8px 0 0}
 .tutor-ans{white-space:pre-line;margin-top:6px}.tutor-exam-prog{margin:0 0 8px;font-weight:800;font-size:13px;color:var(--t-59e08f)}.tutor-chip[aria-pressed=true]{border-color:var(--t-fff);background:rgb(var(--ov) / .2)}.tutor-q.got>b:first-child::before{content:"✓ ";color:var(--t-59e08f)}
 .tutor-note{color:rgb(var(--ovt) / .7);margin:0 0 10px}
-/* Teacher (projector) view: everything bigger and easier to read from the back of the class */
-body.mode-teacher .controls-card .control-label span:first-child{font-size:17px!important}
-body.mode-teacher .controls-card .control-value{font-size:21px!important}
-body.mode-teacher .controls-card .control-row input[type=range]{height:12px}
-body.mode-teacher .controls-card .control-row input[type=range]::-webkit-slider-thumb{width:32px;height:32px}
-body.mode-teacher #title{font-size:clamp(30px,3.4vw,46px)}
-body.mode-teacher .tutor-card{font-size:16px}
-body.mode-teacher .tutor-top h2{font-size:20px}
-body.mode-teacher .tutor-predict p,body.mode-teacher .tutor-q b{font-size:19px}
-body.mode-teacher .tutor-opt{font-size:17px;padding:14px 18px}
-body.mode-teacher .tutor-say{font-size:17px}
 .tutor-voice,.tutor-mic,.tutor-read{display:inline-grid;place-items:center;border:1px solid rgb(var(--ov) / .2);border-radius:50%;color:var(--t-fff);cursor:pointer;background:linear-gradient(180deg,rgb(var(--ov) / .16),rgb(var(--ov) / .04));box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
 .tutor-voice{width:36px;height:36px;font-size:16px}
 .tutor-mic{width:42px;height:42px;flex:none;font-size:18px}
@@ -1076,7 +1065,7 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 *,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 :root{--g-blur:none}
 
-/* landing: Simulations expands to Student / Teacher */
+/* landing: Simulations expands to Open simulations / Jump to simulation */
 .sim-sub{display:grid;grid-template-rows:0fr;max-width:620px;margin:0 auto;transition:grid-template-rows .45s cubic-bezier(.2,.9,.3,1)}
 .sim-sub.open{grid-template-rows:1fr;margin-bottom:22px}
 .sim-sub-in{overflow:hidden;min-height:0;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 2px}
@@ -1263,3 +1252,34 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .landing-ic.wa{border-color:rgb(var(--ovt) / .28);background:rgb(var(--ovt) / .08);color:var(--t-fff)}
 .landing-ic.wa:hover,.landing-ic.wa:focus-visible{background:rgb(var(--ovt) / .18);border-color:rgb(var(--ovt) / .28)}
 :root[data-theme="light"] .landing-ic.wa{background:#fff;border-color:#dbe3ee;color:#33465c}
+
+/* Jump to simulation panel (landing): pure white on black in dark, black on white in light; no gradients */
+.jump-dlg{width:min(94vw,520px);max-height:88vh;padding:0;border-radius:18px;border:1px solid #fff;background:#000;color:#fff;overflow:hidden}
+.jump-dlg[open]{display:flex;flex-direction:column}
+.jump-dlg::backdrop{background:rgba(0,0,0,.7)}
+.jump-top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #fff4}
+.jump-step{margin:0 auto;font:700 13px system-ui,sans-serif}
+.jump-back,.jump-x{min-height:44px;min-width:64px;padding:0 14px;border-radius:12px;border:1px solid #fff;background:#000;color:#fff;font:700 14px system-ui,sans-serif;cursor:pointer}
+.jump-back[hidden]{display:inline-block;visibility:hidden}
+.jump-body{overflow:auto;padding:14px 14px 18px;min-height:0}
+.jump-h{margin:0 0 8px;font:800 20px/1.2 system-ui,sans-serif;color:#fff}
+.jump-h:focus{outline:none}
+.jump-sub,.jump-count{margin:0 0 10px;font:14px/1.4 system-ui,sans-serif;color:#fff}
+.jump-grade{margin:14px 0 6px;font:800 14px system-ui,sans-serif;letter-spacing:.04em;color:#fff}
+.jump-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.jump-res>.jump-btn{margin-bottom:8px}
+.jump-btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:48px;padding:10px 14px;border-radius:14px;border:1px solid #fff;background:#000;color:#fff;font-family:system-ui,sans-serif;text-align:left;cursor:pointer}
+.jump-btn b{font-size:15px;color:#fff}.jump-btn small{font-size:12.5px;color:#fff}
+.jump-btn:disabled{opacity:.5;cursor:default}
+.jump-empty{padding:12px 0;font:14px system-ui,sans-serif}
+.jump-search{display:grid;gap:4px;margin:0 0 12px}.jump-search label{font:700 13px system-ui,sans-serif}
+.jump-search input{min-height:44px;padding:0 12px;border-radius:12px;border:1px solid #fff;background:#000;color:#fff;font:16px system-ui,sans-serif}
+.jump-btn:hover,.jump-back:hover,.jump-x:hover{background:#222}
+.jump-dlg :focus-visible{outline:3px solid #fff;outline-offset:2px}
+:root[data-theme="light"] .jump-dlg{background:#fff;color:#000;border-color:#000}
+:root[data-theme="light"] .jump-top{border-color:#0004}
+:root[data-theme="light"] .jump-h,:root[data-theme="light"] .jump-sub,:root[data-theme="light"] .jump-count,:root[data-theme="light"] .jump-grade,:root[data-theme="light"] .jump-btn b,:root[data-theme="light"] .jump-btn small,:root[data-theme="light"] .jump-search label{color:#000}
+:root[data-theme="light"] .jump-btn,:root[data-theme="light"] .jump-back,:root[data-theme="light"] .jump-x,:root[data-theme="light"] .jump-search input{background:#fff;color:#000;border-color:#000}
+:root[data-theme="light"] .jump-btn:hover,:root[data-theme="light"] .jump-back:hover,:root[data-theme="light"] .jump-x:hover{background:#e8e8e8}
+:root[data-theme="light"] .jump-dlg :focus-visible{outline-color:#000}
+.sim-sub .land-mode{justify-content:center!important;text-align:center}

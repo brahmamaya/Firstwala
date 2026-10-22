@@ -1,5 +1,5 @@
-/* Modes (Normal / Student / Teacher, chosen on the landing page).
-   Normal: the site as it is. Teacher: a projector view (bigger text and controls). Student: the Physica Tutor -
+/* Modes (Normal / Student, chosen on the landing page via Simulations > Open simulations).
+   Normal: the site as it is. Student: the Physica Tutor -
    ask by typing or voice (pre-written answers built from the live values, read aloud), "Predict → Show me" demos that
    move the sliders by themselves, and a spoken quiz. Voice uses the browser's own speech features; no AI service. */
 (() => {
@@ -8,21 +8,21 @@ const C=()=>window.PhysicaTutor||{},stage=document.querySelector('.stage'),title
 if(!stage||!titleEl)return;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 const btn=(cls,text,fn)=>{const b=el('button',cls,text);b.type='button';if(fn)b.addEventListener('click',fn);return b};
-const KEY='physica-learn-mode',MODES=[['normal','Normal'],['student','🎓 Student'],['teacher','👩‍🏫 Teacher']];
+const KEY='physica-learn-mode',MODES=[['normal','Normal'],['student','Student']];
 let mode='normal';try{mode=localStorage.getItem(KEY)||localStorage.getItem('physica-mode')||'normal'}catch{}if(!MODES.some(m=>m[0]===mode))mode='normal';
 
 // ---- mode choice: step 3 on the landing page (the logo brings the landing page back to change it)
 const sw=el('div','landing-grades landing-modes');sw.setAttribute('role','group');sw.setAttribute('aria-label','Mode');
 const selTag=()=>{const t=el('span','land-sel');t.hidden=true;return t};
-const SUB={normal:'Explore freely',student:'Voice tutor, demos and quiz',teacher:'Projector view for class'};
-// Landing: two buttons. "Simulations" opens Student and Teacher underneath (as before); "Rank mode" opens its exams.
+// Landing: two buttons. "Simulations" opens two options underneath: Open simulations / Jump to simulation; "Rank mode" opens its exams.
 const simBtn=btn('land-grade land-mode land-sim',null,()=>{const on=!simSub.classList.contains('open');if(on)rankOpen(false);simOpen(on)});
 simBtn.setAttribute('aria-expanded','false');simBtn.setAttribute('aria-controls','sim-sub');simBtn.dataset.testid='mode-simulations';
-const simBtnIc=el('span','sim-ic','▶');simBtnIc.setAttribute('aria-hidden','true');simBtn.append(simBtnIc,el('b','','Simulations'),el('small','','Student or Teacher · 2D and ultra-realistic'));
+const simBtnIc=el('span','sim-ic','▶');simBtnIc.setAttribute('aria-hidden','true');simBtn.append(simBtnIc,el('b','','Simulations'),el('small','','2D and ultra-realistic'));
 const simSub=el('div','sim-sub');simSub.id='sim-sub';simSub.inert=true;const simIn=el('div','sim-sub-in');simSub.append(simIn);
 const simOpen=open=>{simSub.classList.toggle('open',open);simBtn.setAttribute('aria-expanded',String(open));simSub.inert=!open;simBtn.classList.toggle('open',open)};
-// Normal mode stays the default behind the scenes but has no card; tapping the selected Student / Teacher card again returns to it
-for(const [id,label] of MODES){if(id==='normal')continue;const b=btn('land-grade land-mode',null,()=>{rankOpen(false);const on=id!==mode;setMode(on?id:'normal');if(on)document.getElementById('landing-go')?.click()});b.append(el('b','',label),el('small','',SUB[id]),selTag());b.dataset.mode=id;b.dataset.testid='mode-'+id;simIn.append(b)}
+// Normal mode stays the default behind the scenes. "Open simulations" = the old Student button (voice tutor, demos, quiz); "Jump to simulation" opens the picker built lazily by landing.js
+{const o=btn('land-grade land-mode',null,()=>{rankOpen(false);setMode('student');document.getElementById('landing-go')?.click()});o.append(el('b','','Open simulations'));o.dataset.testid='sim-open';
+const j=btn('land-grade land-mode',null,()=>{rankOpen(false);window.dispatchEvent(new CustomEvent('physica-jump',{detail:{back:j}}))});j.append(el('b','','Jump to simulation'));j.dataset.testid='sim-jump';j.setAttribute('aria-haspopup','dialog');simIn.append(o,j)}
 // ---- Rank mode: NEET / JEE preparation space. Tapping the card slides two exam buttons in underneath; each leads to a "coming soon" page.
 const RANK=[['neet','🧬','NEET','Medical entrance'],['jee','⚛️','JEE Mains','Engineering entrance'],['jeeadv','🚀','JEE Advanced','IIT entrance']];
 // Rank mode open: the three exam buttons slide in and "Open simulations" is hidden (Rank mode has no simulations)
@@ -128,8 +128,7 @@ let tab='ask',tutorOn=false;try{tutorOn=localStorage.getItem('physica-tutor')===
 const tbtn=btn('tutor-switch','',()=>{tutorOn=!tutorOn;try{localStorage.setItem('physica-tutor',tutorOn?'1':'0')}catch{}render();if(tutorOn&&!card.hidden)card.scrollIntoView({behavior:'smooth',block:'nearest'})});
 tbtn.dataset.testid='ai-tutor';const tdot=el('span','tutor-switch-knob');tbtn.append(el('span','tutor-switch-ic','✦'),el('b','','AI Tutor'),tdot);
 document.querySelector('.topbar-right')?.prepend(tbtn);
-function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tbtn.hidden=mode!=='student';tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-teacher',mode==='teacher');document.body.classList.toggle('mode-student',on);
-  for(const b of [...sw.querySelectorAll('button[data-mode]'),...simIn.querySelectorAll('button[data-mode]')])b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
+function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tbtn.hidden=mode!=='student';tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-student',on);
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
   if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
   if(!c){if(examSet()){tab='exam';const b=btn('','🎯 Exam',()=>render());b.setAttribute('aria-pressed','true');tabs.append(b);window.PhysicaGlass?.(tabs);exam();return}
