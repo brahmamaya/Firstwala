@@ -718,8 +718,20 @@ add({...ch(19,'Chemical Coordination and Integration'),id:'bio-thyroid-feedback'
  tryText:'Lower iodine intake below 50 μg/day. What happens to TSH and gland size?',
  controls:[R('iod','Iodine intake',10,300,5,150,'μg/day')],
  metrics:p=>{const r=thy(p);return[N('Thyroid hormone (T₄) level',r.t4*100,'% of normal',0),N('TSH level',r.tsh*100,'% of normal',0),N('Thyroid size',r.size,'× normal',2),N('Condition',r.t4<.75?'Hypothyroidism, goitre risk':'Normal')]},
- draw:(c,p,t)=>{const r=thy(p),s=P3.scene(c,{scale:62,cx:240});s.tube([[0,-1.6,0],[0,.6,0]],.6,'#ffd8c2',{alpha:.3});for(const z of[-1,1])s.mesh([.45,-.4,z*.32*r.size],[.18*r.size,.42*r.size,.2*r.size],'#e64980');s.tube([[.5,-.5,-.3],[.55,-.55,0],[.5,-.5,.3]],.08*r.size,'#e64980');
-  for(let i=0;i<9;i++)s.cyl([.15,-1.4+i*.22,0],[0,1,0],.2,.08,'#dee2e6');s.cyl([.15,-.4,0],[0,1,0],.18,2.1,'#adb5bd',{alpha:.5});s.mesh([0,1.6,0],.18,'#b197fc');s.mesh([.1,1.3,0],.12,'#748ffc');s.callout([0,1.65,0],'hypothalamus (TRH)','#c9b6ff',60,-30);s.callout([.1,1.3,0],'anterior pituitary (TSH)','#91a7ff',70,10);s.callout([.5,-.4,.32*r.size],r.size>1.2?'enlarged thyroid (goitre)':'thyroid gland (T₃, T₄)','#e64980',70,40);s.callout([.15,-1.2,.2],'trachea','#dee2e6',-60,30);for(let i=0;i<Math.round(r.tsh*5);i++){const q=cycle(t*.6+i/5,1);s.ball([.2,1.2-q*1.5,.1],.05,'#748ffc',{flat:true,glow:true})}for(let i=0;i<Math.round(r.t4*5);i++){const q=cycle(t*.5+i/5,1);s.ball([-.2,-.3+q*1.5,-.1],.05,'#ffd43b',{flat:true})}s.render();tag(c,'blue: TSH down · yellow: T₄ up (feedback)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const r=thy(p),s=P3.scene(c,{scale:46,cx:250,cy:268,pitch:.03}),X=-.4,
+  along=(P,q)=>{const n=P.length-1,k=q*n,j=Math.min(n-1,Math.floor(k)),f2=k-j;return[P[j][0]+(P[j+1][0]-P[j][0])*f2,P[j][1]+(P[j+1][1]-P[j][1])*f2,.15]},
+  pTSH=[[X-.2,1.2],[-1.8,1.2],[-1.8,-.9],[X-.5,-.9]],pT4=[[X+.5,-.9],[1.2,-.9],[1.2,1.7],[X+.35,1.7]];
+  /* brain (sagittal): hypothalamus, pituitary on its stalk */
+  s.mesh([X,2.0,0],[.95,.7,.14],'#f1b6bd',{rings:14,segs:26,spec:.4,shape:(u,v)=>1+.04*Math.sin(9*v+3*u)});s.mesh([X+.5,1.45,0],[.3,.2,.12],'#d98c9a',{rings:8,segs:12});s.tube([[X+.1,1.85,0],[X+.15,1.5,0],[X+.25,1.2,0]],.09,'#e7a6b0',{segs:8});
+  s.mesh([X-.2,1.7,.1],[.17,.12,.1],'#9775fa',{rings:8,segs:12,lift:2});s.tube([[X-.2,1.62,.1],[X-.2,1.38,.1]],.03,'#b197fc',{segs:6});s.mesh([X-.2,1.25,.1],[.12,.1,.09],'#5c7cfa',{rings:7,segs:10,lift:2});
+  /* trachea with cartilage rings and the thyroid lobes + isthmus that wrap it */
+  s.tube([[X,.1,0],[X,-1.9,0]],.22,'#dcd3c8',{segs:10});for(let i=0;i<10;i++){const y=.0-i*.2;s.seg([X-.2,y,.2],[X+.2,y,.2],'#a89c8f',2)}
+  const sz=r.size,gc=sz>1.25?'#d6336c':'#f06595';for(const z of[-1,1])s.mesh([X+z*.3*(.85+.15*sz),-.9,.08],[.17*sz,.36*sz,.14*sz],gc,{rings:10,segs:14,spec:.5,rot:[0,0,z*.2]});s.tube([[X-.2,-.8,.15],[X+.2,-.8,.15]],.06*sz,gc,{segs:8});
+  /* hormone paths: TSH down the left, T₄ up the right with negative feedback onto the brain */
+  s.path(pTSH.map(q=>[q[0],q[1],.1]),'#748ffc',2,[5,4],1e5);s.arrow([X-.9,-.9,.1],[X-.5,-.9,.1],'#748ffc',2,8);
+  s.path(pT4.map(q=>[q[0],q[1],.1]),'#ffd43b',2,[5,4],1e5);s.seg([X+.35,1.6,.1],[X+.35,1.8,.1],'#ff6b6b',4,[],1e5);s.path([[1.2,1.2,.1],[X+.35,1.2,.1]],'#ff6b6b',1.5,[3,3],1e5);s.seg([X+.35,1.1,.1],[X+.35,1.3,.1],'#ff6b6b',4,[],1e5);
+  for(let i=0;i<Math.round(r.tsh*5);i++)s.ball(along(pTSH,cycle(t*.25+i/5,1)),.07,'#748ffc',{flat:true,glow:true,lift:3});for(let i=0;i<Math.round(r.t4*5);i++)s.ball(along(pT4,cycle(t*.25+i/5,1)),.07,'#ffd43b',{flat:true,glow:true,lift:3});
+  s.callout([X-.2,1.75,.1],'hypothalamus (TRH)','#c9b6ff',-90,-25);s.callout([X-.2,1.25,.1],'anterior pituitary (TSH)','#91a7ff',-90,30);s.callout([X+.4,-.7,.1],sz>1.2?'enlarged thyroid (goitre)':'thyroid gland (T₃, T₄)','#f783ac',55,40);s.callout([X+.2,-1.3,.2],'trachea','#dee2e6',70,0);s.callout([1.2,.4,.1],'negative feedback ⊣','#ff6b6b',20,0);s.render();tag(c,'blue: TSH (more when T₄ is low)  ·  yellow: T₄  ·  red ⊣: feedback inhibits',44,392,C.muted,12)},
  assumption:'Toy steady-state model (T₄ ∝ √(iodine supply), TSH ∝ 1/T₄); adult requirement taken as ~150 μg/day.'});
 function thy(p){const i=Math.min(1,p.iod/150),t4=Math.sqrt(i),tsh=1/t4;return{t4,tsh,size:1+Math.max(0,tsh-1)*.6}}
 
