@@ -183,10 +183,16 @@ add({...ch(10,'Biomolecules','BIOMOLECULES'),id:'chem-zwitterion',title:'Amino a
  tryText:'Set pH = 2 and pH = 11. What is the net charge in each case?',
  controls:[R('pH','pH',0,14,.1,6,'',1)],
  metrics:p=>{const z=charge(p.pH);return[N('Net charge',z,'',2),N('Main form',p.pH<2.34?'cation (H₃N⁺–CH₂–COOH)':p.pH>9.6?'anion (H₂N–CH₂–COO⁻)':'zwitterion (H₃N⁺–CH₂–COO⁻)'),N('Isoelectric point',5.97,'',2)]},
- draw:(c,p,t)=>{const z=charge(p.pH),s=P3.scene(c,{scale:62,cx:240,pitch:.3,yaw:.3}),N0=[-1.3,0,0],Ca=[0,.4,0],Cc=[1.3,0,0],O1=[1.9,.9,0],O2=[1.9,-.8,0];bond(s,N0,Ca);bond(s,Ca,Cc);bond(s,Cc,O1,2);bond(s,Cc,O2);[[N0,'N'],[Ca,'C'],[Cc,'C'],[O1,'O'],[O2,'O']].forEach(([q,e])=>atom(s,q,e));
-  const nH=p.pH<9.6?3:2;for(let k=0;k<nH;k++){const a=TAU*k/3;atom(s,V.add(N0,[-.5,.4*Math.cos(a),.4*Math.sin(a)]),'H',.8)}if(p.pH<2.34)atom(s,V.add(O2,[.4,-.3,0]),'H',.8);
-  if(p.pH<9.6)s.callout(N0,'–NH₃⁺','#4c6ef5',-60,-50);else s.callout(N0,'–NH₂','#4c6ef5',-60,-50);s.callout(O2,p.pH<2.34?'–COOH':'–COO⁻','#ff8787',50,50);s.render();
-  chart(c,420,96,236,170,{title:'Net charge vs pH',xl:'pH',xmin:0,xmax:14,ymin:-1.1,ymax:1.1,series:[{fn:charge,col:C.gold},{fn:()=>0,col:'#8ca6b9',dash:[4,4]}],marker:[p.pH,z]})},
+ draw:(c,p,t)=>{const z=charge(p.pH),s=P3.scene(c,{scale:50,cx:176,cy:262,pitch:.3,yaw:.3}),N0=[-1.3,0,0],Ca=[0,.4,0],Cc=[1.3,0,0],O1=[1.9,.9,0],O2=[1.9,-.8,0],ion=p.pH<9.6,cooMinus=p.pH>=2.34;
+  stick(s,N0,Ca,1,{ca:'N',cb:'C'});stick(s,Ca,Cc,1,{ca:'C',cb:'C'});stick(s,Cc,O1,2,{ca:'C',cb:'O',side:[0,0,1]});stick(s,Cc,O2,1,{ca:'C',cb:'O'});
+  const hC=V.add(Ca,[0,.3,.9]);stick(s,Ca,hC,1,{ca:'C',cb:'H'});atom(s,hC,'H',.8);
+  [[N0,'N'],[Ca,'C'],[Cc,'C'],[O1,'O'],[O2,'O']].forEach(([q,e])=>atom(s,q,e));
+  if(ion)s.ball(N0,.48,'#4c6ef5',{alpha:.18,glow:true});if(cooMinus){s.ball(O1,.5,'#ff6b6b',{alpha:.15});s.ball(O2,.5,'#ff6b6b',{alpha:.15})}
+  const nH=ion?3:2;for(let k=0;k<nH;k++){const a=TAU*k/3,h=V.add(N0,[-.5,.4*Math.cos(a),.4*Math.sin(a)]);stick(s,N0,h,1,{ca:'N',cb:'H',r:.05});atom(s,h,'H',.8)}if(!cooMinus){const h=V.add(O2,[.4,-.3,0]);stick(s,O2,h,1,{ca:'O',cb:'H',r:.05});atom(s,h,'H',.8)}
+  s.callout(N0,ion?'–NH₃⁺':'–NH₂','#74a0ff',-40,-70);s.callout(O2,cooMinus?'–COO⁻':'–COOH','#ff8787',20,70);s.render();
+  chart(c,410,104,230,150,{title:'Net charge vs pH',xl:'pH',xmin:0,xmax:14,ymin:-1.1,ymax:1.1,series:[{fn:charge,col:C.gold},{fn:()=>0,col:'#8ca6b9',dash:[4,4]}],marker:[p.pH,z]});
+  const k=window.PhysicaTextScale||1,fm=p.pH<2.34?0:p.pH>9.6?2:1;c.save();c.font=`700 ${Math.round(11.5*k)}px system-ui, sans-serif`;c.textBaseline='middle';
+  [['H₃N⁺–CH₂–COOH  cation'],['H₃N⁺–CH₂–COO⁻  zwitterion'],['H₂N–CH₂–COO⁻  anion']].forEach(([m],i)=>{const y=282+i*22;c.fillStyle=i===fm?C.gold:'#8ca6b9';c.fillText((i===fm?'● ':'○ ')+m,410,y)});c.restore()},
  assumption:'Glycine pKₐ₁ = 2.34 (–COOH), pKₐ₂ = 9.60 (–NH₃⁺) at 298 K.'});
 function charge(pH){return 1/(1+Math.pow(10,pH-2.34))-1/(1+Math.pow(10,9.6-pH))}
 
