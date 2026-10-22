@@ -764,7 +764,6 @@ function opol(){const s=hs(320,170,'Unpolarised light passes a polariser and bec
 
 /* ---- Current Electricity (JEE): drift, series/parallel, Wheatstone, meter bridge, potentiometer, cells, Kirchhoff, meters, RC ---- */
 const zg=(s,x1,y1,x2,y2,c=INK,amp=7,n=6)=>{const L=Math.hypot(x2-x1,y2-y1),ux=(x2-x1)/L,uy=(y2-y1)/L,nx=-uy,ny=ux,ld=L*.2,bd=L-2*ld;let d=`M${x1} ${y1}L${x1+ux*ld} ${y1+uy*ld}`;for(let i=0;i<n;i++){const t=ld+bd*(i+.5)/n,a=(i%2?-1:1)*amp;d+=`L${x1+ux*t+nx*a} ${y1+uy*t+ny*a}`}return pth(s,d+`L${x1+ux*(L-ld)} ${y1+uy*(L-ld)}L${x2} ${y2}`,c,1.6)};
-const dot=(s,x,y)=>mk(s,'circle',{cx:x,cy:y,r:3,fill:INK});
 const cellH=(s,x,y,lab)=>{hl(s,x,y-13,x,y+13);line(s,x+7,y-7,x+7,y+7,INK,3.2);if(lab)ht(s,x+3,y-18,lab,HI,'middle',13)};
 const cellV=(s,x,y,lab)=>{hl(s,x-13,y,x+13,y);line(s,x-7,y+7,x+7,y+7,INK,3.2);if(lab)ht(s,x+22,y+5,lab,HI,'start',13)};
 const gal=(s,x,y,t='G')=>{mk(s,'circle',{cx:x,cy:y,r:13,fill:'none',stroke:INK,'stroke-width':1.5});ht(s,x,y+5,t,INK,'middle',14)};
@@ -774,8 +773,8 @@ function cedrift(){const s=hs(300,190,'A metal wire with an electric field E alo
   const P=[[210,76,'M210 76L196 86L180 72L164 90L150 76'],[130,110,'M130 110L116 100L100 116L84 102L70 112'],[230,104,'M230 104L214 96L198 110L184 100L170 108']];
   for(const [x,y,d] of P){pth(s,d,DIM,1.2);mk(s,'circle',{cx:x,cy:y,r:6,fill:'none',stroke:RED,'stroke-width':1.6});ht(s,x,y+4,'−',RED,'middle',12)}
   hv(s,244,150,60,150,HI,2);ht(s,152,170,'drift of electrons, vd',HI,'middle',13);
-  hv(s,40,92,18,92,GRN,1.6);hv(s,260,92,286,92,GRN,2);ht(s,279,84,'I',GRN,'middle',15);
-  cp(s,186,'I = nAvd e, vd ≈ 10⁻⁴ m/s|electrons drift against E; I flows along E');return fin(s)}
+  hv(s,12,92,38,92,GRN,2);hv(s,262,92,288,92,GRN,2);ht(s,276,82,'I',GRN,'middle',15);
+  cp(s,186,'I = nAvd e, vd ≈ 10⁻⁴ m/s|electrons move against E');return fin(s)}
 function cesp(){const s=hs(300,260,'Resistors in series carry the same current and their resistances add. Resistors in parallel have the same potential difference and their conductances add.');
   ht(s,12,22,'Series',HI,'start',14);
   hl(s,14,50,40,50);zg(s,40,50,98,50);ht(s,69,32,'R₁',INK,'middle',13);zg(s,98,50,156,50);ht(s,127,32,'R₂',INK,'middle',13);zg(s,156,50,214,50);ht(s,185,32,'R₃',INK,'middle',13);hl(s,214,50,262,50);
@@ -789,7 +788,7 @@ function cewb(){const s=hs(300,230,'A Wheatstone bridge. Four resistors P, Q, R 
   const A=[40,95],B=[150,35],C=[260,95],D=[150,155];
   zg(s,A[0],A[1],B[0],B[1]);zg(s,B[0],B[1],C[0],C[1]);zg(s,A[0],A[1],D[0],D[1]);zg(s,D[0],D[1],C[0],C[1]);
   hl(s,B[0],B[1],B[0],82);gal(s,150,95);hl(s,150,108,150,D[1]);
-  for(const [p,t,dx,dy] of [[A,'A',-14,5],[B,'B',0,-8],[C,'C',14,5],[D,'D',0,20]]){dot(s,p[0],p[1]);ht(s,p[0]+dx,p[1]+dy,t,BLUE,'middle',14)}
+  for(const [p,t,dx,dy] of [[A,'A',-14,5],[B,'B',0,-8],[C,'C',14,5],[D,'D',14,20]]){dot(s,p[0],p[1]);ht(s,p[0]+dx,p[1]+dy,t,BLUE,'middle',14)}
   ht(s,84,52,'P',INK,'middle',14);ht(s,216,52,'Q',INK,'middle',14);ht(s,84,148,'R',INK,'middle',14);ht(s,216,148,'S',INK,'middle',14);
   hl(s,40,95,40,190);hl(s,260,95,260,190);hl(s,40,190,138,190);hl(s,162,190,260,190);cellH(s,138,190,'E');
   cp(s,222,'balanced: P/Q = R/S, no current in G|then V(B) = V(D) and G can be removed');return fin(s)}
@@ -807,9 +806,9 @@ function cepot(){const s=hs(300,260,'A potentiometer. A long uniform wire AB car
   line(s,30,100,270,100,INK,3);ht(s,22,96,'A',BLUE,'end',14);ht(s,278,96,'B',BLUE,'start',14);
   hl(s,30,100,30,190);hl(s,270,100,270,190);hl(s,30,190,66,190);cellH(s,66,190,'E₀');hl(s,73,190,130,190);zg(s,130,190,230,190);ht(s,180,176,'rheostat',DIM,'middle',12);hl(s,230,190,270,190);
   hl(s,30,100,30,50);hl(s,30,50,70,50);cellH(s,70,50,'E');hl(s,77,50,130,50);gal(s,143,50);hl(s,156,50,200,50);hl(s,200,50,200,88);
-  mk(s,'polygon',{points:'200,100 193,88 207,88',fill:HI});ht(s,222,76,'jockey J',HI,'middle',12);
+  mk(s,'polygon',{points:'200,100 193,88 207,88',fill:HI});ht(s,212,74,'jockey J',HI,'start',12);
   hv(s,32,132,198,132,DIM,1.2);hv(s,198,132,32,132,DIM,1.2);ht(s,115,150,'l',INK,'middle',14);
-  cp(s,222,'k = V/L (potential gradient), E = kl at balance|E₁/E₂ = l₁/l₂,  r = R(l₁ − l₂)/l₂');return fin(s)}
+  cp(s,222,'k = V/L, E = kl at balance|E₁/E₂ = l₁/l₂, r = R(l₁ − l₂)/l₂');return fin(s)}
 function cecell(){const s=hs(300,320,'Cells in series: n cells give EMF nE and internal resistance nr. Cells in parallel: m cells give EMF E and internal resistance r over m. Both groups are connected to an external resistance R.');
   ht(s,12,20,'Series',HI,'start',14);
   hl(s,30,36,70,36);cellH(s,70,36,'+');hl(s,77,36,110,36);cellH(s,110,36,'+');hl(s,117,36,150,36);cellH(s,150,36,'+');hl(s,157,36,270,36);
@@ -818,7 +817,7 @@ function cecell(){const s=hs(300,320,'Cells in series: n cells give EMF nE and i
   ht(s,12,156,'Parallel',HI,'start',14);
   hl(s,50,172,250,172);hl(s,50,262,250,262);
   for(const x of [80,130,180]){hl(s,x,172,x,200);cellV(s,x,200,'');hl(s,x,214,x,262);dot(s,x,172);dot(s,x,262)}
-  ht(s,80,190,'+',RED,'middle',13);ht(s,130,190,'+',RED,'middle',13);ht(s,180,190,'+',RED,'middle',13);
+  for(const x of [80,130,180])ht(s,x+9,196,'+',RED,'start',13);
   hl(s,250,172,250,200);zg(s,250,200,250,236,INK,6,4);hl(s,250,236,250,262);ht(s,232,222,'R',INK,'end',14);
   ht(s,150,288,'E and r/m in parallel',BLUE,'middle',13);
   cp(s,306,'mixed: I = nmE/(mR + nr)|greatest when R = nr/m');return fin(s)}
@@ -832,24 +831,24 @@ function cekir(){const s=hs(300,260,'Kirchhoff laws. Left: at a junction the cur
   hl(s,286,56,286,80);zg(s,286,80,286,116,INK,6,4);ht(s,274,102,'R₂',INK,'end',13);hl(s,286,116,286,140);
   hl(s,176,56,176,86);cellV(s,176,86,'');hl(s,176,100,176,140);hl(s,176,140,286,140);ht(s,198,98,'E',HI,'start',14);
   pth(s,'M200 74A32 32 0 1 1 200 122',BLUE,1.6);mk(s,'polygon',{points:'204,126 194,124 198,116',fill:BLUE});ht(s,240,104,'I',BLUE,'middle',14);
-  ht(s,170,174,'Σ ΔV = 0 round a loop',BLUE,'start',13);ht(s,170,192,'E − IR₁ − IR₂ = 0',BLUE,'start',13);
+  ht(s,170,174,'Σ ΔV = 0 in a loop',BLUE,'start',13);ht(s,170,192,'E − IR₁ − IR₂ = 0',BLUE,'start',13);
   cp(s,222,'through a resistor along I: −IR; cell − to +: +E|negative answer: current opposite to assumed');return fin(s)}
 function cemet(){const s=hs(300,290,'Top: an ammeter. A small shunt resistance S is connected in parallel with the galvanometer G. Bottom: a voltmeter. A large resistance Rs is connected in series with the galvanometer.');
   ht(s,12,20,'Ammeter: shunt in parallel',HI,'start',14);
   hl(s,14,64,50,64);dot(s,50,64);hl(s,50,64,50,44);hl(s,50,44,100,44);gal(s,113,44);hl(s,126,44,176,44);hl(s,176,44,176,64);dot(s,176,64);hl(s,176,64,230,64);
   hl(s,50,64,50,94);hl(s,50,94,66,94);zg(s,66,94,160,94);hl(s,160,94,176,94);hl(s,176,94,176,64);
-  hv(s,18,52,40,52,GRN,1.6);ht(s,14,46,'I',GRN,'middle',13);ht(s,113,22,'I_g',INK,'middle',13);ht(s,113,120,'S: I − I_g',INK,'middle',13);
+  hv(s,18,52,40,52,GRN,1.6);ht(s,14,46,'I',GRN,'middle',13);ht(s,150,36,'Ig',INK,'middle',13);ht(s,113,120,'S: I − Ig',INK,'middle',13);
   ht(s,12,150,'Voltmeter: resistance in series',HI,'start',14);
-  hl(s,14,196,46,196);zg(s,46,196,140,196);ht(s,93,178,'R_s',INK,'middle',13);hl(s,140,196,158,196);gal(s,171,196);hl(s,184,196,230,196);
+  hl(s,14,196,46,196);zg(s,46,196,140,196);ht(s,93,178,'Rₛ',INK,'middle',13);hl(s,140,196,158,196);gal(s,171,196);hl(s,184,196,230,196);
   dot(s,46,196);dot(s,184,196);hl(s,46,196,46,224);hl(s,184,196,184,224);hv(s,184,224,46,224,DIM,1.2);hv(s,46,224,184,224,DIM,1.2);ht(s,115,244,'V across both',DIM,'middle',13);
-  cp(s,262,'S = I_g G/(I − I_g)|R_s = V/I_g − G');return fin(s)}
+  cp(s,262,'S = Ig G/(I − Ig)|Rₛ = V/Ig − G');return fin(s)}
 function cerc(){const s=hs(300,230,'Charging and discharging of a capacitor through a resistor. The charge on a charging capacitor rises as one minus e to the power minus t over tau and reaches 63 percent at t equal to tau. A discharging capacitor loses charge as e to the power minus t over tau and keeps 37 percent at t equal to tau.');
-  hv(s,40,140,284,140,DIM,1.4);hv(s,40,140,40,16,DIM,1.4);ht(s,282,158,'t',INK,'end',14);ht(s,34,24,'q',INK,'end',14);
-  const X=t=>40+t*46,Y=v=>140-v*100;let a='',b='';for(let t=0;t<=5.01;t+=.1){a+=(t?'L':'M')+X(t)+' '+Y(1-Math.exp(-t));b+=(t?'L':'M')+X(t)+' '+Y(Math.exp(-t))}
-  hl(s,40,Y(1),270,Y(1),DIM,'2 4');ht(s,36,Y(1)+5,'Q₀',INK,'end',13);pth(s,a,HI,2);pth(s,b,BLUE,2);
-  hl(s,X(1),Y(.632),X(1),140,DIM,'4 3');hl(s,40,Y(.632),X(1),Y(.632),DIM,'4 3');hl(s,40,Y(.368),X(1),Y(.368),DIM,'4 3');
-  ht(s,X(1),156,'τ',INK,'middle',14);ht(s,X(1)+8,Y(.632)+18,'63 %',HI,'start',13);ht(s,X(1)+8,Y(.368)-8,'37 %',BLUE,'start',13);
-  ht(s,200,Y(.88)-4,'charging',HI,'middle',13);ht(s,170,Y(.12)-10,'discharging',BLUE,'middle',13);
+  hv(s,70,140,288,140,DIM,1.4);hv(s,70,140,70,16,DIM,1.4);ht(s,288,158,'t',INK,'end',14);ht(s,64,22,'q',INK,'end',14);
+  const X=t=>70+t*42,Y=v=>140-v*100;let a='',b='';for(let t=0;t<=5.01;t+=.1){a+=(t?'L':'M')+X(t)+' '+Y(1-Math.exp(-t));b+=(t?'L':'M')+X(t)+' '+Y(Math.exp(-t))}
+  hl(s,70,Y(1),280,Y(1),DIM,'2 4');ht(s,64,Y(1)+5,'Q₀',INK,'end',13);pth(s,a,HI,2);pth(s,b,BLUE,2);
+  hl(s,X(1),Y(.632),X(1),140,DIM,'4 3');hl(s,70,Y(.632),X(1),Y(.632),DIM,'4 3');hl(s,70,Y(.368),X(1),Y(.368),DIM,'4 3');
+  ht(s,X(1),156,'τ',INK,'middle',14);ht(s,64,Y(.632)+5,'63 %',HI,'end',12);ht(s,64,Y(.368)+5,'37 %',BLUE,'end',12);
+  ht(s,226,Y(.78),'charging',HI,'middle',13);ht(s,190,Y(.12)-12,'discharging',BLUE,'middle',13);
   cp(s,196,'τ = RC; q = Q₀(1 − e^(−t/τ)) or Q₀e^(−t/τ)|half left after 0.693τ');return fin(s)}
 
 window.PhysicaRankFigs={vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
