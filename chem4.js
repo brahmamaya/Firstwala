@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
-const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
+const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,stick,glassBeaker,lobe,tint}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:12,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
 const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3.2+i*6.4/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.5,h,.5],on?'#ffd43b':col);s.engrave([x,h+.25,.3],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
@@ -16,9 +16,12 @@ add({...ch(1,'Solutions',PH),id:'chem-henry-law',title:'Henry’s law: gas disso
  tryText:'Compare CO₂ and N₂ at 2 bar.',
  controls:[S('g','Gas','CO2',Object.keys(GAS).map(k=>[k,GAS[k][0]])),R('p','Partial pressure',.2,5,.1,2,'bar',1)],
  metrics:p=>{const KH=GAS[p.g][1]*1000,x=p.p/KH,mol=x*55.5/(1-x);return[N('K_H (298 K)',GAS[p.g][1],'kbar',2),N('Mole fraction x',x,'',3),N('Moles dissolved per litre',mol,'mol',4)]},
- draw:(c,p,t)=>{const x=p.p/(GAS[p.g][1]*1000),s=P3.scene(c,{scale:56,cx:250,cy:300});s.cyl([0,-.6,0],[0,1,0],1.2,3.4,'#e9f6ff',{alpha:.1});s.cyl([0,-1.3,0],[0,1,0],1.17,2,'#4dabf7',{alpha:.35});s.cyl([0,1.15-p.p*.08,0],[0,1,0],1.15,.15,'#868e96');
-  for(let i=0;i<Math.round(p.p*5);i++)s.ball([(hash(i)-.5)*2,.1+hash(i+3)*.8,(hash(i+6)-.5)*1.6],.08,'#e9ecef',{flat:true});for(let i=0;i<Math.round(clamp(x*5e4,0,40));i++)s.ball([(hash(i+40)-.5)*2,-2.2+hash(i+43)*1.8,(hash(i+46)-.5)*1.6],.08,'#ffd43b',{flat:true});
-  s.callout([1.15,1.15-p.p*.08,0],`piston: ${p.p} bar`,'#ced4da',50,-40);s.callout([.5,-.6,.6],`dissolved ${GAS[p.g][0]}`,'#ffd43b',60,40);s.render();tag(c,`x = p/K_H = ${f(x,3)}`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const x=p.p/(GAS[p.g][1]*1000),s=P3.scene(c,{scale:46,cx:240,cy:275,yaw:.15,pitch:.12}),y0=-2,H=4.3,lt=y0+H*.4,py=y0+H-.3-p.p*.12;
+  glassBeaker(s,[0,y0,0],1.15,H,'#4dabf7',.4,{ticks:false,alpha:.42});
+  s.cyl([0,py,0],[0,1,0],1.08,.2,'#adb5bd',{spec:.7});s.cyl([0,py+.6,0],[0,1,0],.07,1.0,'#868e96',{segs:8});s.box([0,py+1.15,0],[.8,.14,.3],'#868e96',{spec:.5});
+  const ng=Math.round(p.p*5),sp=.7;for(let i=0;i<ng;i++){const u=t*(.8+hash(i)*.6)+i*2.3,cx=(hash(i)-.5)*1.5+.18*Math.sin(u),cz=(hash(i+3)-.5)*1.3+.18*Math.cos(u*.9),cy=lt+.15+hash(i+6)*Math.max(.05,py-lt-.4)+.1*Math.sin(u*1.2),an=u*.7,dx=.09*Math.cos(an),dy=.09*Math.sin(an);s.ball([cx-dx,cy-dy,cz],.07,'#f1f3f5',{spec:.5});s.ball([cx+dx,cy+dy,cz],.07,'#f1f3f5',{spec:.5})}
+  const nd=Math.round(clamp(x*5e4,0,40));for(let i=0;i<nd;i++){const u=t*(.5+hash(i+1)*.5)+i*1.7;s.ball([(hash(i+40)-.5)*1.7+.07*Math.sin(u),y0+.15+hash(i+43)*(H*.4-.4)+.07*Math.cos(u),(hash(i+46)-.5)*1.5],.075,'#ffd43b',{spec:.6})}
+  s.callout([1.1,py,0],`piston: ${p.p} bar`,'#ced4da',45,-30);s.callout([.9,y0+.6,.5],`dissolved ${GAS[p.g][0]}`,'#ffd43b',55,25);s.render();tag(c,`x = p/K_H = ${f(x,3)}`,44,98,C.gold,15)},
  assumption:'Henry’s law constants for water at 298 K (NCERT table); dilute solution.'});
 
 add({...ch(1,'Solutions',PH),id:'chem-osmosis',title:'Osmosis and osmotic pressure',
@@ -28,9 +31,17 @@ add({...ch(1,'Solutions',PH),id:'chem-osmosis',title:'Osmosis and osmotic pressu
  tryText:'Find π for 0.1 M glucose at 300 K. Then apply a larger pressure.',
  controls:[R('c','Concentration',.01,.5,.01,.1,'mol/L',2),R('i','van ’t Hoff factor i',1,3,1,1),R('T','Temperature',273,350,1,300,'K'),R('Pa','Applied pressure',0,30,.5,0,'atm',1)],
  metrics:p=>{const pi=p.i*p.c*.0821*p.T;return[N('Osmotic pressure π',pi,'atm',2),N('Water flow',p.Pa>pi+.01?'Out of the solution (reverse osmosis)':p.Pa<pi-.01?'Into the solution (osmosis)':'None (balanced)')]},
- draw:(c,p,t)=>{const pi=p.i*p.c*.0821*p.T,dir=Math.sign(pi-p.Pa),h=clamp(dir*.5*Math.min(1,cycle(t,6)/3),-.5,.5),s=P3.scene(c,{scale:54,cx:260,cy:300});s.tube([[-1.6,1.4,0],[-1.6,-1.2,0],[1.6,-1.2,0],[1.6,1.4,0]],.55,'#e9f6ff',{alpha:.12,segs:14});s.cyl([-1.6,-.4-h/2,0],[0,1,0],.5,2.4-h,'#d0ebff',{alpha:.45});s.cyl([1.6,-.4+h/2,0],[0,1,0],.5,2.4+h,'#74c0fc',{alpha:.5});
-  s.box([0,-1.2,0],[.06,1.1,1.1],'#ffd43b',{alpha:.6});for(let i=0;i<Math.round(p.c*40*p.i);i++)s.ball([1.6+(hash(i)-.5)*.7,-1+hash(i+5)*2,(hash(i+9)-.5)*.7],.06,'#9775fa',{flat:true});for(let i=0;i<5;i++){const u=cycle(t*.4+i/5,1),x=dir>=0?-.6+u*1.2:.6-u*1.2;s.ball([x,-1.2,(i-2)*.15],.05,'#4dabf7',{flat:true,glow:true})}
-  if(p.Pa>0)s.arrow([1.6,2.3,0],[1.6,1.6+h/2,0],'#ff8787',3,9,`${p.Pa} atm`);s.callout([0,-1.2,.55],'semipermeable membrane','#ffd43b',-40,60);s.callout([1.6,.4,.5],'solution','#9775fa',60,-40);s.callout([-1.6,.4,.5],'pure water','#d0ebff',-60,-40);s.render();tag(c,`π = ${p.i} × ${p.c} × 0.0821 × ${p.T} = ${f(pi,2)} atm`,44,98,C.gold,14)},
+ draw:(c,p,t)=>{const pi=p.i*p.c*.0821*p.T,dir=Math.sign(pi-p.Pa),h=clamp(dir*.5*Math.min(1,cycle(t,6)/3),-.5,.5),s=P3.scene(c,{scale:60,cx:240,cy:262,yaw:.1,pitch:.1}),W=2.5,D=.7,y0=-1.3,top=0,yl=top-h*.9,yr=top+h*.9;
+  s.box([0,y0-.06,0],[2*W+.2,.12,D*2+.2],'#868e96',{alpha:.5});
+  s.box([-W/2,(y0+yl)/2,0],[W,yl-y0,D*2],'#a5d8ff',{alpha:.34,spec:.4});s.box([W/2,(y0+yr)/2,0],[W,yr-y0,D*2],'#74c0fc',{alpha:.46,spec:.4});
+  s.box([0,y0+1.25,0],[2*W,2.5,D*2],'#e9f6ff',{alpha:.07,spec:.7});
+  s.seg([-W,yl,D],[0,yl,D],'#ffffffaa',1.4);s.seg([0,yr,D],[W,yr,D],'#ffffffaa',1.4);s.seg([-W,y0+2.5,D],[W,y0+2.5,D],'#ffffff88',1.2);
+  s.box([0,y0+1.25,0],[.07,2.5,D*2],'#ffd43b',{alpha:.38});for(let k=0;k<7;k++)for(let m=0;m<3;m++)s.ball([0,y0+.3+k*.4,(m-1)*.5],.04,'#fff3bf',{flat:true});
+  const ns=Math.min(60,Math.round(p.c*40*p.i)),yTop=yr-.15;for(let i=0;i<ns;i++){const u=t*(.6+hash(i)*.5)+i*3.1;s.ball([.25+hash(i+2)*(W-.5)+.12*Math.sin(u),y0+.2+hash(i+5)*(yTop-y0-.3)+.1*Math.cos(u*1.3),(hash(i+9)-.5)*(D*1.7)+.1*Math.sin(u*.8)],.075,'#9775fa',{spec:.6})}
+  for(let i=0;i<14;i++){const side=i<7?-1:1,u=t*.5+hash(i+20)*3;s.ball([side*(.3+hash(i+30)*(W-.4))+.1*Math.sin(u),y0+.25+hash(i+33)*((side<0?yl:yr)-y0-.5),(hash(i+36)-.5)*D*1.6],.045,'#e7f5ff',{flat:true,alpha:.85})}
+  for(let i=0;i<6;i++){const u=cycle(t*.4+i/6,1),x=dir>=0?-.7+u*1.4:.7-u*1.4;s.ball([x,y0+.5+((i*.37)%1.5),((i%3)-1)*.45],.055,'#4dabf7',{glow:true})}
+  if(p.Pa>0){s.box([W/2,yr+.1,0],[W-.1,.14,D*2-.1],'#adb5bd',{spec:.6});s.arrow([W/2,yr+1.1,0],[W/2,yr+.3,0],'#ff8787',3,9,`${p.Pa} atm`)}
+  s.callout([0,y0+2.5,0],'semipermeable membrane','#ffd43b',0,-34);s.callout([W-.3,yr,D],'solution','#b197fc',20,-50);s.callout([-W+.3,yl,D],'pure water','#a5d8ff',-20,-50);s.render();tag(c,`π = ${p.i} × ${p.c} × 0.0821 × ${p.T} = ${f(pi,2)} atm`,44,98,C.gold,14)},
  assumption:'Dilute ideal solution; the height change is illustrative.'});
 
 /* 2 Electrochemistry */
@@ -92,9 +103,14 @@ add({...ch(5,'Coordination Compounds',IN),id:'chem-geometric-isomers',title:'Geo
  tryText:'In fac-[Co(NH₃)₃Cl₃], what is the angle between any two Cl ligands?',
  controls:[S('iso','Isomer','trans',[['cis','cis-[Co(NH₃)₄Cl₂]⁺'],['trans','trans-[Co(NH₃)₄Cl₂]⁺'],['fac','fac-[Co(NH₃)₃Cl₃]'],['mer','mer-[Co(NH₃)₃Cl₃]']])],
  metrics:p=>[N('Isomer',{cis:'cis (Cl at 90°)',trans:'trans (Cl at 180°)',fac:'facial',mer:'meridional'}[p.iso]),N('Colour',{cis:'violet',trans:'green',fac:'—',mer:'—'}[p.iso]),N('Coordination number',6,'',0)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:66,cx:250,yaw:t*.3,pitch:.3}),D=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],cl={cis:[0,2],trans:[2,3],fac:[0,2,4],mer:[0,1,2]}[p.iso];atom(s,[0,0,0],'Co',1.2);
-  D.forEach((u,i)=>{const q=V.mul(u,1.3),isCl=cl.includes(i);bond(s,[0,0,0],q);atom(s,q,isCl?'Cl':'N',isCl?1:.9);if(!isCl)for(let k=0;k<3;k++){const a=TAU*k/3;atom(s,V.add(q,V.add(V.mul(u,.28),[.18*Math.cos(a)*(u[0]?0:1),.18*Math.sin(a)*(u[1]?0:1),.18*(u[2]?0:(u[1]?Math.sin(a):Math.cos(a)))])),'H',.55)}});
-  s.callout(V.mul(D[cl[0]],1.3),'Cl⁻','#40c057',50,-50);s.callout([0,0,0],'Co³⁺','#d9844a',-60,60);s.render();tag(c,{cis:'cis: Cl–Co–Cl 90°',trans:'trans: Cl–Co–Cl 180°',fac:'fac: three Cl on one face',mer:'mer: three Cl in one plane'}[p.iso],44,98,C.gold,15)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:54,cx:250,cy:285,yaw:t*.3,pitch:.3}),D=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],cl={cis:[0,2],trans:[2,3],fac:[0,2,4],mer:[0,1,2]}[p.iso],L=1.75;
+  for(let i=0;i<6;i++)for(let j=i+1;j<6;j++)if(j!==(i^1))s.seg(V.mul(D[i],L),V.mul(D[j],L),'#74c0fc55',1);
+  s.ball([0,0,0],.36,'#e8909f',{spec:.7});
+  D.forEach((u,i)=>{const q=V.mul(u,L),isCl=cl.includes(i);stick(s,[0,0,0],q,1,{ca:'Co',cb:isCl?'Cl':'N',r:.075});
+   if(isCl){atom(s,q,'Cl',1.15);return}
+   atom(s,q,'N',.95);const e=Math.abs(u[1])<.9?[0,1,0]:[1,0,0],e1=V.norm(V.cross(u,e)),e2=V.cross(u,e1);
+   for(let k=0;k<3;k++){const a=TAU*k/3+.5,d=V.add(V.mul(u,.34),V.add(V.mul(e1,.9*Math.cos(a)),V.mul(e2,.9*Math.sin(a)))),h=V.add(q,V.mul(V.norm(d),.5));stick(s,q,h,1,{ca:'N',cb:'H',r:.045});atom(s,h,'H',.7)}});
+  s.callout(V.mul(D[cl[0]],L),'Cl⁻','#40c057',45,-45);s.callout([0,0,0],'Co³⁺','#e8909f',-60,55);s.render();tag(c,{cis:'cis: Cl–Co–Cl 90°',trans:'trans: Cl–Co–Cl 180°',fac:'fac: three Cl on one face',mer:'mer: three Cl in one plane'}[p.iso],44,98,C.gold,15)},
  assumption:'Ideal octahedral geometry; NH₃ hydrogens drawn schematically.'});
 
 /* 6 Haloalkanes */
