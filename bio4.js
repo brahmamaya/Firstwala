@@ -163,14 +163,32 @@ function xkids(p){const mx=p.m==='XX'?['X','X']:p.m==='XXc'?['X','Xc']:['Xc','Xc
 function xcross(p){const k=xkids(p),d=k.filter(x=>x.sex==='daughter'),s2=k.filter(x=>x.sex==='son');return{dA:100*d.filter(x=>x.state==='affected').length/d.length,dC:100*d.filter(x=>x.state==='carrier').length/d.length,sA:100*s2.filter(x=>x.state==='affected').length/s2.length}}
 
 /* ---------- Chapter 5: Molecular Basis of Inheritance ---------- */
-add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-dna-double-helix',title:'DNA double helix',
+// Oriented rectangular slab (6 lit faces) centred at c with unit axes ax/ay/az and half-sizes h. Used for flat base plates.
+const slab=(s,c,ax,ay,az,h,col)=>{const A=[V.mul(ax,h[0]),V.mul(ay,h[1]),V.mul(az,h[2])],F=[[0,1],[0,-1],[1,1],[1,-1],[2,1],[2,-1]],O=[[1,2],[2,1],[2,0],[0,2],[0,1],[1,0]];
+  F.forEach(([k,sg],i)=>{const [p,q]=O[i],m=V.add(c,V.mul(A[k],sg)),e=A[p],g=A[q],n=V.mul(V.norm(A[k]),sg);s.poly([V.add(V.add(m,e),g),V.add(V.sub(m,e),g),V.sub(V.sub(m,e),g),V.sub(V.add(m,e),g)],col,{normal:n,cull:true,spec:.5,shine:30})})};
+// Textbook B-DNA: right-handed, 10 bp per turn, antiparallel sugar-phosphate backbones with phosphate and deoxyribose beads,
+// flat base plates stacked like coins (purines longer than pyrimidines), 2 or 3 hydrogen bonds, a narrow minor and a wide major groove.
+const dnaModel=(s,seq,phase,turns,R0,x0,x1)=>{const N=Math.round(turns*10),PAIR={A:'T',T:'A',G:'C',C:'G'},GAP=2.62,PUR={A:1,G:1},dx=(x1-x0)/N,
+  pt=(i,q,r)=>[x0+i*dx,r*Math.cos(q),r*Math.sin(q)],B1=i=>phase+TAU*i/10,B2=i=>B1(i)+GAP,P1=[],P2=[];
+  for(let i=-.5;i<=N+.5;i+=.5){P1.push(pt(i,B1(i),R0));P2.push(pt(i,B2(i),R0))}
+  s.tube(P1,.06,'#9fb3c8',{segs:6,spec:.6});s.tube(P2,.06,'#8aa1bb',{segs:6,spec:.6});
+  for(let i=0;i<=N;i++){const a=pt(i,B1(i),R0),b=pt(i,B2(i),R0),ax=[1,0,0],d=V.sub(b,a),L=Math.hypot(...d),u=V.mul(d,1/L),w=V.cross(ax,u),b1=seq[i%seq.length],b2=PAIR[b1],f1=PUR[b1]?.56:.44;
+    s.ball(a,.1,'#e9eef4',{lift:.1});s.ball(b,.1,'#dfe6ee',{lift:.1});
+    const cut=V.add(a,V.mul(u,L*f1)),inA=V.add(a,V.mul(u,.1)),inB=V.sub(b,V.mul(u,.1));
+    slab(s,V.mul(V.add(inA,cut),.5),ax,u,w,[.04,(L*f1-.1)/2-.01,PUR[b1]?.085:.065],BC[b1]);
+    slab(s,V.mul(V.add(cut,inB),.5),ax,u,w,[.04,(L*(1-f1)-.1)/2-.01,PUR[b2]?.085:.065],BC[b2]);
+    const nb=(b1==='G'||b1==='C')?3:2;for(let k=0;k<nb;k++)s.ball(V.add(cut,V.mul(w,(k-(nb-1)/2)*.065)),.022,'#ffffff',{flat:true,lift:.4});
+    if(i<N){s.ball(pt(i+.5,B1(i+.5),R0),.075,'#f2b134',{lift:.1});s.ball(pt(i+.5,B2(i+.5),R0),.075,'#f2b134',{lift:.1})}}
+  return{pt,B1,B2,GAP}};add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-dna-double-helix',title:'DNA double helix',
  description:'Spin a B-DNA double helix, change its length and GC content, and calculate how long the molecule would be.',
  formula:'Rise 0.34 nm per bp ;  10 bp per turn ;  pitch 3.4 nm ;  A = T and G = C (Chargaff)',
  observe:'A human diploid cell has about 6.6 × 10⁹ bp — about 2.2 m of DNA if stretched out.',
  tryText:'Set the length to the human value (log₁₀ bp ≈ 9.8). How long is the DNA?',
  controls:[R('lbp','Length (log₁₀ base pairs)',1,10,.01,9.82,'',2),R('gc','GC content',20,80,1,40,'%')],
  metrics:p=>{const bp=10**p.lbp,L=bp*.34e-9;return[N('Base pairs',bp,'',2),N('Length',L>=1?L:L*1e9,L>=1?'m':'nm',2),N('Turns of helix',bp/10,'',2),N('A = T, G = C',`A ${f((100-p.gc)/2,0)}%, T ${f((100-p.gc)/2,0)}%, G ${f(p.gc/2,0)}%, C ${f(p.gc/2,0)}%`)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62}),r=rng(Math.round(p.gc));let seq='';for(let i=0;i<40;i++){const x=r()*100;seq+=x<p.gc/2?'G':x<p.gc?'C':x<p.gc+(100-p.gc)/2?'A':'T'}helix(s,[-3,0,0],[3,0,0],3,.6,seq,t*.8);s.callout([-2,.6*Math.cos(TAU*3*(1/6)+t*.8),.6*Math.sin(TAU*3*(1/6)+t*.8)],'sugar–phosphate backbone','#dfe7ee',-30,-60);s.callout([0,0,0],'base pair (H-bonds): A=T 2, G≡C 3','#e9f6ff',40,-90);s.callout([2,-.7,0],'one turn = 10 bp = 3.4 nm; width 2 nm','#ffd43b',30,60);s.render();tag(c,'red A · yellow T · teal G · blue C',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:62}),r=rng(Math.round(p.gc));let seq='';for(let i=0;i<40;i++){const x=r()*100;seq+=x<p.gc/2?'G':x<p.gc?'C':x<p.gc+(100-p.gc)/2?'A':'T'}const D=dnaModel(s,seq,t*.8,3,.6,-3,3),at=(i,q)=>D.pt(i,q,.6);
+  s.callout(at(11.5,D.B1(11.5)),'sugar–phosphate backbone','#dfe7ee',-30,-70);s.callout(at(7,D.B1(7)+D.GAP/2),'minor groove (narrow)','#a5d8ff',-20,-70);s.callout(at(18,D.B1(18)+D.GAP/2+PI),'major groove (wide)','#ffd8a8',40,70);
+  s.callout(at(15,D.B1(15)+D.GAP*.5),'base pair (H-bonds): A=T 2, G≡C 3','#e9f6ff',40,-90);s.callout([2,-.7,0],'one turn = 10 bp = 3.4 nm; width 2 nm','#ffd43b',30,60);s.label(at(-.5,D.B1(-.5)),'5′','#ff8787',12);s.label(at(30.5,D.B2(30.5)),'5′','#ff8787',12);s.label(at(-.5,D.B2(-.5)),'3′','#74c0fc',12);s.label(at(30.5,D.B1(30.5)),'3′','#74c0fc',12);s.render();tag(c,'red A · yellow T · teal G · blue C',44,98,C.muted,13)},
  assumption:'B-form DNA dimensions from NCERT Chapter 5; three turns shown.'});
 
 add({...ch(5,'Molecular Basis of Inheritance',U7),id:'bio-meselson-stahl',title:'Semiconservative replication (Meselson–Stahl)',
