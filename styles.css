@@ -1066,7 +1066,7 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 .rk-ropt input{margin-top:4px;width:20px;height:20px;accent-color:var(--t-2b6cff);flex:none}.rk-ropt b{display:block;font-size:16px;color:var(--t-fff)}.rk-ropt small{display:block;color:var(--t-9aa6bb);font-size:13px;line-height:1.4}
 .rk-dlgrow{display:flex;justify-content:flex-end;align-items:center;gap:12px}.rk-btn:disabled{opacity:.4;cursor:not-allowed}
 
-.rk-seltop{display:flex;justify-content:flex-end}
+.rk-seltop{display:flex;flex-direction:column;align-items:flex-end;gap:6px}.rk-selhint{margin:0;font-size:13px;line-height:1.35;text-align:right;max-width:34em;color:var(--t-9e9e9e)}
 .rk-seltop .rk-pill{background:var(--s-fff)!important;color:var(--t-000)!important;border-color:var(--t-fff)!important;font-weight:700;min-height:40px;padding:6px 22px}
 .rk-seltop .rk-pill[aria-pressed=true]{background:var(--s-fff)!important;color:var(--t-000)!important;box-shadow:0 0 0 3px #4d9bff}
 .rk-selbar[hidden]{display:none!important}
