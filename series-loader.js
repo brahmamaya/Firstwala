@@ -50,8 +50,8 @@ function landingNotice() {
   const x = el('button', 'sn-x', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'Close this notice');
   const go = el('button', '', 'Show me'); go.type = 'button';
   const ol = el('ol'); for (const t of ['Tap Rank mode', 'Choose your exam: NEET, JEE Mains or JEE Advanced', 'Tap the 📝 Test Series button at the top']) ol.append(el('li', '', t));
-  const t1 = el('b', '', '📝 Full-length Test Series is live');
-  box.append(x, t1, el('p', '', 'NEET 2027, JEE Main 2027 and JEE Advanced 2027: real exam pattern, 30 tests each. The first 3 tests of every exam are free.'), el('p', '', 'Where to find it:'), ol, go, el('div', 'sn-bar'));
+  const t1 = el('b', '', '📝 Full-length Test Series is coming');
+  box.append(x, t1, el('p', '', 'NEET 2027, JEE Main 2027 and JEE Advanced 2027: real exam pattern, 30 tests each. The first 3 tests of every exam will be free.'), el('p', '', 'Where to find it:'), ol, go, el('div', 'sn-bar'));
   let left = 10000, started = Date.now(), timer = null;
   const done = remember => { clearTimeout(timer); mo.disconnect(); box.remove(); css.remove(); if (remember) try { sessionStorage.setItem('physica-series-note', '1'); } catch {} };
   const run = () => { started = Date.now(); timer = setTimeout(() => done(false), left); box.classList.remove('paused'); };
