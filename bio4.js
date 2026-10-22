@@ -238,8 +238,16 @@ add({...ch(4,'Principles of Inheritance and Variation',U7),id:'bio-dihybrid-cros
  tryText:'Make a test cross (RrYy × rryy). What ratio appears?',
  controls:[S('p1','Parent 1','RrYy',DIH),S('p2','Parent 2','RrYy',DIH)],
  metrics:p=>{const r=cross2(p.p1,p.p2);return[N('Round yellow',r.RY,'/16',0),N('Round green',r.Ry,'/16',0),N('Wrinkled yellow',r.rY,'/16',0),N('Wrinkled green',r.ry,'/16',0)]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:48,pitch:.6}),g1=gam(p.p1),g2=gam(p.p2);for(let i=0;i<4;i++)for(let j=0;j<4;j++){const a=g1[i],b=g2[j],round=a[0]==='R'||b[0]==='R',yel=a[1]==='Y'||b[1]==='Y',q=[-1.65+i*1.1,0,-1.65+j*1.1];s.box(V.add(q,[0,-.1,0]),[1,.08,1],(i+j)%2?'#1c3a4f':'#21445b');
-   s.mesh(V.add(q,[0,.25,0]),.3,yel?'#ffd43b':'#69db7c',{shape:round?undefined:(u,v)=>1+.12*Math.sin(5*v)*Math.cos(3*u),rings:10,segs:16})}for(let i=0;i<4;i++){s.label([-1.65+i*1.1,.2,-2.5],g1[i],C.gold,13);s.label([-2.5,.2,-1.65+i*1.1],g2[i],C.blue,13)}s.render()},
+ draw:(c,p,t)=>{const g1=gam(p.p1),g2=gam(p.p2),r=cross2(p.p1,p.p2),GX=150,GY=150,CS=54,
+  txt=(s2,x,y,col,sz,al)=>{c.save();c.font='600 '+sz+'px system-ui,sans-serif';c.fillStyle=col;c.textAlign=al||'center';c.textBaseline='middle';c.fillText(s2,x,y);c.restore()},
+  /* seed icon: round = smooth disc, wrinkled = dented outline; yellow or green cotyledons */
+  seed=(x,y,round,yel,rad)=>{c.save();c.beginPath();for(let i=0;i<=36;i++){const a=TAU*i/36,k=round?1:1-.14*Math.abs(Math.sin(a*3+.6))-.05*Math.sin(a*5);const px=x+Math.cos(a)*rad*k,py=y+Math.sin(a)*rad*k;i?c.lineTo(px,py):c.moveTo(px,py)}c.closePath();const gr=c.createRadialGradient(x-rad*.35,y-rad*.4,rad*.1,x,y,rad*1.1);gr.addColorStop(0,yel?'#fff0a0':'#c3f0b0');gr.addColorStop(.6,yel?'#ffd43b':'#69db7c');gr.addColorStop(1,yel?'#d6a50f':'#2f9e44');c.fillStyle=gr;c.fill();c.lineWidth=1;c.strokeStyle='rgba(0,0,0,.25)';c.stroke();c.restore()};
+  txt('gametes of parent 1 ('+p.p1+')',GX+2*CS,GY-48,C.gold,11);txt('parent 2',GX-70,GY+2*CS-8,C.blue,11);txt('('+p.p2+')',GX-70,GY+2*CS+8,C.blue,11);
+  for(let i=0;i<4;i++){txt(g1[i],GX+CS*(i+.5),GY-22,C.gold,13);txt(g2[i],GX-26,GY+CS*(i+.5),C.blue,13)}
+  for(let i=0;i<4;i++)for(let j=0;j<4;j++){const a=g1[i],b=g2[j],round=a[0]==='R'||b[0]==='R',yel=a[1]==='Y'||b[1]==='Y',x=GX+i*CS,y=GY+j*CS;c.save();c.fillStyle=(i+j)%2?'rgba(28,58,79,.9)':'rgba(33,68,91,.9)';c.fillRect(x,y,CS,CS);c.strokeStyle='rgba(180,200,215,.25)';c.strokeRect(x,y,CS,CS);c.restore();seed(x+CS/2,y+CS/2-4,round,yel,15);txt(a[0]+b[0]!==''?[a[0],b[0]].sort().join('')+[a[1],b[1]].sort().join(''):'',x+CS/2,y+CS-6,C.muted,9)}
+  /* phenotype key with expected counts */
+  const key=[['round yellow',true,true,r.RY],['round green',true,false,r.Ry],['wrinkled yellow',false,true,r.rY],['wrinkled green',false,false,r.ry]];txt('phenotypes (out of 16)',420,GY-12,C.muted,11,'left');
+  key.forEach((k,i)=>{const y=GY+26+i*46;seed(432,y,k[1],k[2],14);txt(k[0],458,y,C.white,13,'left');txt(k[3]+' / 16',600,y,C.gold,14,'right')})},
  assumption:'Genes on different chromosomes (independent assortment) with complete dominance of R and Y.'});
 function gam(g){return[g[0]+g[2],g[0]+g[3],g[1]+g[2],g[1]+g[3]]}
 function cross2(a,b){const r={RY:0,Ry:0,rY:0,ry:0};for(const x of gam(a))for(const y of gam(b)){const R=(x[0]==='R'||y[0]==='R')?'R':'r',Y=(x[1]==='Y'||y[1]==='Y')?'Y':'y';r[R+Y]++}return r}
