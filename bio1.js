@@ -319,6 +319,46 @@ add({...ch(5,'Morphology of Flowering Plants',U2),id:'bio-floral-families',title
 
 /* ---------- Chapter 6: Anatomy of Flowering Plants ---------- */
 const STEM={dicot:['Ring (in a circle)','Conjoint, collateral, open (cambium present)','Large pith present','Hypodermis of collenchyma'],monocot:['Scattered through ground tissue','Conjoint, collateral, closed (no cambium)','No distinct pith','Hypodermis of sclerenchyma']};
+// Stem transverse section (cut face toward the viewer) with one vascular bundle enlarged. Cells are drawn as dotted rings / flat circles so the scene stays light.
+const STM={mono:null};
+const stemMono=()=>{if(STM.mono)return STM.mono;const B=[],add=(r,n,k,ph)=>{for(let i=0;i<n;i++){const a=TAU*i/n+ph+(hash(i+r*10)-.5)*.25,rr=r+(hash(i*3+r*7)-.5)*.14;B.push([rr*Math.cos(a),rr*Math.sin(a),a,k])}};add(1.36,12,.24,.1);add(.96,8,.31,.3);add(.55,4,.39,.7);B.push([0,0,1.2,.42]);
+  const cells=[];for(let gx=-1.6;gx<=1.6;gx+=.27)for(let gy=-1.6;gy<=1.6;gy+=.27){const x=gx+(hash(gx*40+gy*13)-.5)*.1,y=gy+(hash(gy*40+gx*17+3)-.5)*.1;if(Math.hypot(x,y)>1.5)continue;if(B.some(b=>Math.hypot(x-b[0],y-b[1])<.17+.62*b[3]))continue;cells.push([x,y,.105+.03*hash(gx*7+gy*11)])}
+  return STM.mono={B,cells}};
+const stemDraw=(c,p,t)=>{const s=P3.scene(c,{scale:46,cx:345,cy:268}),dic=p.type==='dicot',SX=-1.15,SY=0,R=1.72,SC=s.sc,L=n=>1000+n*10,pt=(r,a)=>[SX+r*Math.cos(a),SY+r*Math.sin(a),.02],D=Math.PI/180,
+   ring=(r,n,wU,fill,edge,lay,eW)=>{const pts=Array.from({length:73},(_,i)=>[SX+r*Math.cos(TAU*i/72),SY+r*Math.sin(TAU*i/72),.02]),w=wU*SC,d=[.01,TAU*r*SC/n];s.path(pts,edge,w+(eW||3),d,L(lay));s.path(pts,fill,w,d,L(lay)+.1)};
+  // cut face on a short slab: colour of ground (parenchyma) tissue
+  s.cyl([SX,SY,-.2],[0,0,1],R+.1,.4,'#a9d49b',{seg:56,cap:'#e4f4d8'});
+  s.path(Array.from({length:73},(_,i)=>[SX+(R+.08)*Math.cos(TAU*i/72),SY+(R+.08)*Math.sin(TAU*i/72),.02]),'#d9b84a',2.4,[],L(1)-1);
+  ring(R-.04,104,.085,'#3fa55a','#1f6f3a',2,2);
+  const bun=(cx,cy,ang,k,lay,det)=>{const ca=Math.cos(ang),sa=Math.sin(ang),kv=.75*k,W=(v,u)=>[cx+u*k*ca-v*kv*sa,cy+u*k*sa+v*kv*ca,.02],pl=(pts,col,z,st)=>s.poly(pts.map(q=>W(q[0],q[1])),col,{z:L(lay)+z,cull:false,shade:false,stroke:st,lw:1}),bl=(v,u,r,col,st,z)=>s.ball(W(v,u),Math.max(.012,r*k),col,{flat:true,stroke:st,lift:L(lay)+z});
+    if(dic){pl([[-.24,0],[.24,0],[.36,.55],[-.36,.55]],'#f6e8b6',0,'#b99b4e');pl([[-.36,.55],[.36,.55],[.36,.66],[-.36,.66]],'#ffa94d',.1,'#d9822b');pl([[-.36,.66],[.36,.66],[.31,.92],[-.31,.92]],'#7fcf8a',.1,'#3f9a54');pl([[-.44,.93],[.44,.93],[.36,1.01],[.14,1.06],[-.14,1.06],[-.36,1.01]],'#a47b55',.2,'#6f4e37');
+     for(const [v,u,r] of[[-.2,.42,.075],[0,.43,.085],[.2,.42,.075],[-.12,.27,.06],[.12,.27,.06],[0,.12,.045],[-.07,.17,.04],[.07,.17,.04]])bl(v,u,r,'#e03131','#8f1b1b',.5);
+     if(det)for(const [v,u,r,cc] of[[-.17,.77,.055,'#e8f9ea'],[0,.75,.055,'#e8f9ea'],[.17,.77,.055,'#e8f9ea'],[-.09,.85,.05,'#e8f9ea'],[.09,.85,.05,'#e8f9ea'],[-.09,.76,.028,'#2f8a46'],[.09,.76,.028,'#2f8a46'],[0,.85,.028,'#2f8a46']])bl(v,u,r,cc,'#3f9a54',.6)}
+    else{const el=(rv,ru,cv,cu,n=16)=>Array.from({length:n},(_,i)=>[cv+rv*Math.cos(TAU*i/n),cu+ru*Math.sin(TAU*i/n)]);pl(el(.5,.6,0,0),'#a98a55',0,'#6f5a33');pl(el(.4,.5,0,0),'#f1e6c6',.1,null);pl(el(.21,.17,0,.28,12),'#7fcf8a',.2,'#3f9a54');
+     bl(-.2,-.06,.12,'#e03131','#8f1b1b',.5);bl(.2,-.06,.12,'#e03131','#8f1b1b',.5);bl(0,-.27,.06,'#e03131','#8f1b1b',.5);bl(0,-.4,.1,'#ffffff','#9aa7b0',.5);
+     if(det){bl(-.08,.3,.06,'#e8f9ea','#3f9a54',.6);bl(.1,.3,.06,'#e8f9ea','#3f9a54',.6);bl(.01,.22,.03,'#2f8a46','#3f9a54',.6)}}};
+  if(dic){
+   ring(R-.2,52,.17,'#9ed89d','#2f8a46',3,5);ring(R-.37,46,.17,'#a9dca4','#2f8a46',4,5);ring(R-.57,40,.2,'#ecf8e3','#8cc79a',5,2);ring(1.2,64,.09,'#c4e6c0','#4c9a62',6,2);
+   for(let i=0;i<10;i++){const a=TAU*i/10+.1;bun(SX+.42*Math.cos(a),SY+.42*Math.sin(a),a,.74,7,false)}
+   ring(.3,7,.24,'#f4fbee','#8cc79a',8,2);s.ball([SX,SY,.02],.12,'#f4fbee',{flat:true,stroke:'#8cc79a',lift:L(8)});
+   bun(1.75,-1.4,Math.PI/2,2.8,12,true);
+   s.seg([SX+.42+.74*.99,SY+.27,.02],[1.0,-1.4,.02],'#9fb6c4',1.2,[4,4],L(11));s.seg([SX+.42+.74*.99,SY-.27,.02],[1.0,1.4,.02],'#9fb6c4',1.2,[4,4],L(11));
+   const ang=a=>a*D;
+   s.callout(pt(R,ang(150)),'epidermis','#6fdc8c',-45,-38);s.callout(pt(R-.27,ang(118)),'hypodermis','#9ed89d',-60,-62);s.callout(pt(1.36,ang(200)),'cortex','#d3f0c4',-60,50);s.callout(pt(1.2,ang(238)),'endodermis','#a8dcae',-80,80);
+   s.callout(pt(.8,ang(300)),'medullary ray','#e9f6ff',20,92);s.callout([SX,SY,.02],'pith','#e9f6ff',-80,72);
+   s.callout([2.0,-1.4+.27*2.8,.02],'xylem','#ff8787',60,22);s.callout([1.95,-1.4+.78*2.8,.02],'phloem','#8ce99a',70,-10);s.callout([2.1,-1.4+.6*2.8,.02],'cambium','#ffa94d',60,2);s.callout([1.95,-1.4+1.02*2.8,.02],'pericycle','#d6b48f',65,-18);
+   s.label([1.75,1.95,.02],'vascular bundle: conjoint, open','#e9f6ff',12);}
+  else{const M=stemMono();
+   ring(R-.2,80,.1,'#b59a5b','#7a6535',3,3);
+   for(const [x,y,r] of M.cells)s.ball([SX+x,SY+y,.02],r,'#ecf7df',{flat:true,stroke:'#8cc79a',lift:L(4)});
+   for(const [x,y,a,k] of M.B)bun(SX+x,SY+y,a,k,7,false);
+   bun(1.75,0,Math.PI/2,2.5,12,true);
+   s.seg([SX+1.36*Math.cos(.1)+.12,SY+1.36*Math.sin(.1)+.1,.02],[1.2,1.3,.02],'#9fb6c4',1.2,[4,4],L(11));s.seg([SX+1.36*Math.cos(.1)+.12,SY+1.36*Math.sin(.1)-.12,.02],[1.2,-1.3,.02],'#9fb6c4',1.2,[4,4],L(11));
+   const ang=a=>a*D;
+   s.callout(pt(R,ang(150)),'epidermis','#6fdc8c',-45,-38);s.callout(pt(R-.22,ang(118)),'hypodermis','#d6c38a',-60,-62);s.callout([SX-.9,SY+.3,.02],'ground tissue','#d3f0c4',-60,72);s.callout([SX+.55,SY-.95,.02],'vascular bundles','#e9f6ff',-30,88);
+   s.callout([1.75,.7,.02],'phloem','#8ce99a',70,-30);s.callout([1.95,-.15,.02],'xylem vessels','#ff8787',60,-6);s.callout([1.75,-.65,.02],'water cavity','#e9f6ff',70,25);s.callout([2.55,-.05,.02],'bundle sheath','#d6b48f',30,-40);
+   s.label([1.75,1.75,.02],'vascular bundle: closed','#e9f6ff',12);}
+  s.render();tag(c,dic?'red: xylem   green: phloem   orange: cambium':'red: xylem   green: phloem   (no cambium)',44,98,C.muted,13)};
 add({...ch(6,'Anatomy of Flowering Plants',U2),id:'bio-stem-anatomy',title:'Dicot vs monocot stem',
  description:'Compare transverse sections of dicot and monocot stems: arrangement and type of vascular bundles.',
  formula:'Open bundles (with cambium) → secondary growth possible',
@@ -326,11 +366,7 @@ add({...ch(6,'Anatomy of Flowering Plants',U2),id:'bio-stem-anatomy',title:'Dico
  tryText:'Which stem could later thicken by secondary growth? Why?',
  controls:[S('type','Stem','dicot',[['dicot','Dicot (e.g. sunflower)'],['monocot','Monocot (e.g. maize)']])],
  metrics:p=>{const d=STEM[p.type];return[N('Vascular bundles',d[0]),N('Bundle type',d[1]),N('Pith',d[2]),N('Hypodermis',d[3])]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,pitch:.55,cy:290}),H=1.4,Rr=2;s.cyl([0,0,0],[0,1,0],Rr,H,'#b2f2bb',{cap:'#d3f9d8',segs:40});s.ring([0,H/2+.01,0],[0,1,0],Rr-.06,'#2b8a3e',3);s.ring([0,H/2+.01,0],[0,1,0],Rr-.25,'#69db7c',2);
-  const bundle=(x,z,r)=>{const d=Math.max(.12,Math.hypot(x,z)),ux=x/d,uz=z/d;s.cyl([x,H/2+.005,z],[0,1,0],r,.02,'#e9ecef',{caps:true,cap:'#f1f3f5'});s.ball([x-ux*r*.4,H/2+.03,z-uz*r*.4],r*.45,'#e03131',{flat:true});s.ball([x+ux*r*.45,H/2+.03,z+uz*r*.45],r*.4,'#2f9e44',{flat:true})};
-  if(p.type==='dicot'){s.ring([0,H/2+.01,0],[0,1,0],1.25,'#ffa94d',2,[3,3]);for(let i=0;i<12;i++){const a=TAU*i/12;bundle(1.25*Math.cos(a),1.25*Math.sin(a),.18)}s.label([0,H/2+.15,0],'pith',C.muted,12)}
-  else for(let i=0;i<34;i++){const r=1.75*Math.sqrt(hash(i)),a=TAU*hash(i+40);bundle(r*Math.cos(a),r*Math.sin(a),.08+.08*(1-r/1.8))}if(p.type==='dicot'){s.callout([1.25,H/2+.03,0],'vascular bundle (conjoint, open)','#e9f6ff',50,-40);s.callout([0,H/2+.02,1.25],'cambium ring','#ffa94d',40,40)}else{s.callout([.6,H/2+.03,.5],'scattered vascular bundles (closed)','#e9f6ff',60,-50);s.callout([-.9,H/2+.02,.3],'ground tissue','#e9f6ff',-50,-40)}s.callout([-Rr+.03,H/2,0],'epidermis','#2b8a3e',-50,-10);s.callout([-.7,H/2,-Rr+.35],'cortex / hypodermis','#69db7c',-70,-60);
-  s.render();tag(c,'red: xylem   green: phloem   orange dashes: cambium ring',44,98,C.muted,13)},
+draw:(c,p,t)=>stemDraw(c,p,t/*DBG*/),
  assumption:'Simplified transverse section; xylem shown toward the centre (endarch) as in stems.'});
 
 add({...ch(6,'Anatomy of Flowering Plants',U2),id:'bio-annual-rings',title:'Secondary growth and annual rings',
