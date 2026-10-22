@@ -5,7 +5,7 @@ const {R,S,N,f,clamp,cycle,tag,chart,pack,PI,TAU,C}=window.PhysicaLab;
 const P3=window.Physica3D,V=P3.vec,{atom,bond,beaker,hash,stick,glassBeaker,lobe,tint}=window.PhysicaChem,PC=window.PhysicaChem,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:11,chapterNo:no,chapter,group,subject:'chemistry'});
 const PH='PHYSICAL CHEMISTRY',IN='INORGANIC CHEMISTRY',OR='ORGANIC CHEMISTRY';
-const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3+i*6/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.6,h,.6],on?'#ffd43b':col);s.engrave([x,h+.25,.32],lab,on?'#ffd43b':'#e9f6ff',9,9e5);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
+const bars=(s,list,sel,col,k,fmt)=>{list.forEach(([lab,v],i)=>{const h=Math.max(.05,v*k),x=-3+i*6/Math.max(1,list.length-1),on=i===sel;s.box([x,h/2,0],[.6,h,.6],on?'#ffd43b':col);s.label([x,-.3-(i%3)*.4,.3],lab,on?'#ffd43b':'#cfe6f5',on?12:11);if(on)s.callout([x,h,0],fmt(v),'#ffd43b',40,-50)})};
 
 /* 1 Some Basic Concepts */
 add({...ch(1,'Some Basic Concepts of Chemistry',PH),id:'chem-dilution',title:'Molarity and dilution',
@@ -96,7 +96,7 @@ add({...ch(5,'Thermodynamics',PH),id:'chem-hess-law',title:'Hess’s law: two ro
  tryText:'Use the two-step path. Add up the steps.',
  controls:[S('route','Route','two',[['one','Direct'],['two','Through CO']]),R('mol','Moles of carbon',.5,3,.5,1,'mol',1)],
  metrics:p=>[N('Step 1',p.route==='two'?`${f(-110.5*p.mol,1)} kJ (C → CO)`:`${f(-393.5*p.mol,1)} kJ (C → CO₂)`),N('Step 2',p.route==='two'?`${f(-283*p.mol,1)} kJ (CO → CO₂)`:'—'),N('Total ΔH',-393.5*p.mol,'kJ',1)],
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:48,cx:260,cy:300,pitch:.15}),k=4/393.5,y0=1.8,lev=(y,lab,x0=-2.4,x1=-.6)=>{s.box([(x0+x1)/2,y,0],[x1-x0,.08,.6],'#42d9ca');s.label([x1+.15,y,0],lab,C.white,12,'left')};
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:40,cx:230,cy:235,pitch:.03}),k=4/393.5,y0=1.8,lev=(y,lab,x0=-2.4,x1=-.6)=>{s.box([(x0+x1)/2,y,0],[x1-x0,.08,.6],'#42d9ca');s.label([x1+.15,y,0],lab,C.white,12,'left')};
   lev(y0,'C + O₂');lev(y0-393.5*k,'CO₂');if(p.route==='two'){lev(y0-110.5*k,'CO + ½O₂',.6,2.4);s.arrow([.9,y0,0],[.9,y0-110.5*k,0],'#ffd43b',3,9,'−110.5 kJ');s.arrow([1.6,y0-110.5*k,0],[1.6,y0-393.5*k,0],'#ff8787',3,9,'−283.0 kJ')}s.arrow([-1.5,y0,0],[-1.5,y0-393.5*k,0],'#69db7c',4,10,'−393.5 kJ');s.render();tag(c,`ΔH (total) = ${f(-393.5*p.mol,1)} kJ for ${p.mol} mol C`,44,98,C.gold,15)},
  assumption:'Standard enthalpies at 298 K; per mole of carbon (graphite).'});
 
@@ -108,8 +108,9 @@ add({...ch(6,'Equilibrium',PH),id:'chem-buffer',title:'Buffer solutions (Henders
  tryText:'Add 0.01 mol of HCl to the buffer and to pure water. Compare the pH changes.',
  controls:[R('ha','Acetic acid',.01,.2,.01,.1,'mol',2),R('a','Sodium acetate',.01,.2,.01,.1,'mol',2),R('add','Strong acid (+) / base (−) added',-.05,.05,.005,0,'mol',3)],
  metrics:p=>{const HA=p.ha+p.add,A=p.a-p.add,ok=HA>0&&A>0,pH=ok?4.76+Math.log10(A/HA):NaN,water=p.add>0?-Math.log10(p.add):p.add<0?14+Math.log10(-p.add):7;return[N('pH of buffer',ok?pH:'capacity exceeded','',2),N('pH if added to 1 L water',water,'',2),N('[A⁻]/[HA]',ok?A/HA:'—','',2)]},
- draw:(c,p,t)=>{const HA=Math.max(0,p.ha+p.add),A=Math.max(0,p.a-p.add),pH=4.76+Math.log10(Math.max(1e-6,A)/Math.max(1e-6,HA)),s=P3.scene(c,{scale:56,cx:250,cy:290});beaker(s,[0,-1.9,0],1.3,2.8,pH<4.5?'#ffa94d':pH<5?'#fab005':'#94d82d',.75);
-  for(let i=0;i<Math.round(HA*80);i++)s.ball([(hash(i)-.5)*2,-1.7+hash(i+5)*1.8,(hash(i+9)-.5)*1.4],.08,'#ff8787');for(let i=0;i<Math.round(A*80);i++)s.ball([(hash(i+70)-.5)*2,-1.7+hash(i+75)*1.8,(hash(i+79)-.5)*1.4],.08,'#74c0fc');s.callout([.6,-.4,.5],'HA (acetic acid)','#ff8787',60,-50);s.callout([-.6,-1,.5],'A⁻ (acetate)','#74c0fc',-60,40);s.render();tag(c,`pH = 4.76 + log(${f(A,3)}/${f(HA,3)}) = ${f(pH,2)}`,44,98,C.gold,15)},
+ draw:(c,p,t)=>{const HA=Math.max(0,p.ha+p.add),A=Math.max(0,p.a-p.add),pH=4.76+Math.log10(Math.max(1e-6,A)/Math.max(1e-6,HA)),s=P3.scene(c,{scale:50,cx:250,cy:268});glassBeaker(s,[0,-1.7,0],1.3,2.8,pH<4.5?'#ffa94d':pH<5?'#fab005':'#94d82d',.75,{alpha:.3});
+  const w=(i,k)=>.05*Math.sin(t*1.4+i*2.1+k);
+  for(let i=0;i<Math.round(HA*80);i++)s.ball([(hash(i)-.5)*2+w(i,0),-1.5+hash(i+5)*1.7+w(i,1),(hash(i+9)-.5)*1.4+w(i,2)],.09,'#ff8787',{spec:.6});for(let i=0;i<Math.round(A*80);i++)s.ball([(hash(i+70)-.5)*2+w(i,3),-1.5+hash(i+75)*1.7+w(i,4),(hash(i+79)-.5)*1.4+w(i,5)],.09,'#74c0fc',{spec:.6});s.callout([.8,-.5,.5],'HA (acetic acid)','#ff8787',70,-30);s.callout([-.8,-1,.5],'A⁻ (acetate)','#74c0fc',-70,10);s.render();tag(c,`pH = 4.76 + log(${f(A,3)}/${f(HA,3)}) = ${f(pH,2)}`,44,98,C.gold,15)},
  assumption:'1 L of solution; added acid or base reacts completely with the conjugate base or acid.'});
 
 add({...ch(6,'Equilibrium',PH),id:'chem-solubility-product',title:'Solubility product and common ion effect',
@@ -139,7 +140,7 @@ add({...ch(7,'Redox Reactions',IN),id:'chem-oxidation-number',title:'Finding oxi
  tryText:'Work out the oxidation number of Cr in K₂Cr₂O₇ before checking.',
  controls:[R('i','Compound',1,9,1,1)],
  metrics:p=>{const [cmp,el,v]=OXN[p.i-1];return[N('Compound',cmp),N('Element',el),N('Oxidation number',cmp==='Na₂S₂O₃'?'+2 (average of the two S)':Number.isInteger(v)?(v>0?'+':'')+v:'+8/3 (average)')]},
- draw:(c,p,t)=>{const s=P3.scene(c,{scale:42,cx:300,cy:300,pitch:.4,yaw:-.2});bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.35,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.4,3*.35,.5],[3.4,3*.35,.5],'#ffd43b',1.5,[4,4]);s.engrave([-3.6,3*.35+.15,.5],'0','#ffd43b',10,9e5);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
+ draw:(c,p,t)=>{const s=P3.scene(c,{scale:30,cx:280,cy:250,pitch:.12,yaw:-.1});bars(s,OXN.map(([cmp,el,v])=>[cmp,v+3]),p.i-1,'#b197fc',.35,v=>`ox. no. ${f(v-3,2)}`);s.seg([-3.4,3*.35,.5],[3.4,3*.35,.5],'#ffd43b',1.5,[4,4]);s.engrave([-3.6,3*.35+.15,.5],'0','#ffd43b',10,9e5);s.render();tag(c,'bar height = oxidation number (dashed line = zero)',44,98,C.muted,13)},
  assumption:'Standard IUPAC rules for assigning oxidation numbers.'});
 
 /* 8 Organic basics */
