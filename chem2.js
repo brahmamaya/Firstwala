@@ -53,12 +53,12 @@ add({...ch(2,'Electrochemistry',PH),id:'chem-faraday-electrolysis',title:'Electr
  formula:'m = M I t / (n F) ;  F = 96 485 C mol⁻¹',
  observe:'The mass deposited is proportional to the charge passed; for the same charge, metals deposit in the ratio of their M/n.',
  tryText:'Pass 2 A for 30 minutes through CuSO₄. How much copper is deposited?',
- controls:[S('met','Metal ion','Cu',Object.keys(MET).map(k=>[k,MET[k][0]])),R('I','Current',.1,5,.1,2,'A',1),R('t','Time',1,120,1,30,'min')],
+ controls:[S('met','Metal ion','Cu',Object.keys(MET).map(k=>[k,MET[k][0]+(k==='Al'?' (from molten Al₂O₃, not aqueous)':'')])),R('I','Current',.1,5,.1,2,'A',1),R('t','Time',1,120,1,30,'min')],
  metrics:p=>{const [n0,M,n]=MET[p.met],Q=p.I*p.t*60;return[N('Charge passed',Q,'C',0),N('Moles of electrons',Q/96485,'mol',4),N('Mass deposited',M*Q/(n*96485),'g',3)]},
  draw:(c,p,t)=>{const [n0,M,n]=MET[p.met],m=M*p.I*p.t*60/(n*96485),s=P3.scene(c,{scale:56,cx:260,cy:300});beaker(s,[0,-2,0],1.6,2.6,p.met==='Cu'?'#4dabf7':'#e9ecef',.7);s.box([-.9,-.8,0],[.3,2.4,.6],'#868e96');s.box([.9,-.8,0],[.3+clamp(m*.05,0,.4),2.4,.6+clamp(m*.05,0,.4)],p.met==='Cu'?'#d9844a':p.met==='Ag'?'#dee2e6':'#ced4da');
   s.box([0,1.3,0],[1,.5,.5],'#212529');s.tube([[-.9,.4,0],[-.9,1.3,0],[-.5,1.3,0]],.03,'#e03131',{segs:5});s.tube([[.9,.4,0],[.9,1.3,0],[.5,1.3,0]],.03,'#343a40',{segs:5});for(let k=0;k<8;k++){const u=cycle(t*.5+k/8,1);s.ball([-.7+u*1.4,-1.4+hash(k)*1.6,(hash(k+4)-.5)*.6],.07,'#69db7c',{flat:true})}
   s.callout([-.9,0,.3],'anode (+)','#ff8787',-50,-50);s.callout([.9,0,.3],`cathode (−): ${f(m,3)} g ${n0.toLowerCase()} deposited`,'#e9f6ff',40,-60);s.callout([0,-1,.3],`${p.met}${['','⁺','²⁺','³⁺'][n]} ions move to the cathode`,'#69db7c',50,50);s.render();tag(c,`m = ${M} × ${p.I} × ${p.t*60} / (${n} × 96485) = ${f(m,3)} g`,44,98,C.gold,14)},
- assumption:'100 % current efficiency; only metal deposition occurs at the cathode.'});
+ assumption:'100 % current efficiency; only metal deposition occurs at the cathode. Aluminium is never deposited from aqueous solution (water is reduced instead); it is made by electrolysis of molten Al₂O₃ in cryolite.'});
 
 /* ---------- 3 Chemical Kinetics ---------- */
 const conc=(o,k,A0,t)=>o===0?Math.max(0,A0-k*t):o===1?A0*Math.exp(-k*t):1/(1/A0+k*t);
@@ -127,7 +127,7 @@ add({...ch(6,'Haloalkanes and Haloarenes',OR),id:'chem-sn1-sn2',title:'SN2 and S
  draw:(c,p,t)=>{const s=P3.scene(c,{scale:62,cx:260,yaw:.3,pitch:.2}),q=p.prog/100,umb=1-2*q,C0=[0,0,0],sub=p.sub;atom(s,C0,'C',1);const R=['methyl','primary','secondary','tertiary'].indexOf(sub);
   for(let i=0;i<3;i++){const a=TAU*i/3,pos=[-.38*umb,.95*Math.cos(a),.95*Math.sin(a)];bond(s,C0,pos);atom(s,pos,i<R?'C':'H',i<R?.9:1)}
   const br=[.95+q*1.5,0,0],nu=[-2.6+q*1.65,0,0];bond(s,C0,br,1,q>.5?'#495057':'#ced4da',q>.5?.03:.06);atom(s,br,'Br');bond(s,C0,nu,1,q<.5?'#495057':'#ced4da',q<.5?.03:.06);atom(s,nu,'O');atom(s,V.add(nu,[-.45,.25,0]),'H',.9);
-  s.callout(nu,'OH⁻ attacks from the back','#ff8787',-40,-60);s.callout(br,q>.6?'Br⁻ leaves':'C–Br bond breaking','#c2410c',40,-60);s.callout([-.38*umb,.95,0],q>.5?'configuration inverted (umbrella flips)':'groups flatten at the transition state','#e9f6ff',-30,70);s.render();tag(c,`${SUBST[sub][0]}: SN2 rel. ${SUBST[sub][1]} · SN1 rel. ${SUBST[sub][2]}`,44,98,C.gold,14)},
+  s.callout(nu,'OH⁻ attacks from the back','#ff8787',-40,-60);s.callout(br,q>.6?'Br⁻ leaves':'C–Br bond breaking','#c2410c',40,-60);s.callout([-.38*umb,.95,0],q>.5?'configuration inverted (umbrella flips)':'groups flatten at the transition state','#e9f6ff',-30,70);s.render();tag(c,`${SUBST[sub][0]}: SN2 rel. ${SUBST[sub][1]} · SN1 rel. ${SUBST[sub][2]}${SUBST[sub][2]>SUBST[sub][1]?' · SN1 dominates; animation shows SN2':''}`,44,98,C.gold,14)},
  assumption:'Relative rates are approximate orders of magnitude for teaching; the animation shows the SN2 pathway.'});
 
 /* ---------- 7 Alcohols, Phenols and Ethers ---------- */
@@ -177,7 +177,7 @@ add({...ch(10,'Biomolecules','BIOMOLECULES'),id:'chem-glucose-mutarotation',titl
  metrics:p=>{const r=mut(p);return[N('α-anomer',r.a*100,'%',1),N('β-anomer',(1-r.a)*100,'%',1),N('Specific rotation',r.rot,'°',1)]},
  draw:(c,p,t)=>{const r=mut(p),s=P3.scene(c,{scale:56,cx:230,yaw:t*.2,pitch:.35}),ring=[];for(let i=0;i<6;i++){const a=TAU*i/6,q=[.9*Math.cos(a),.18*(i%2?1:-1),.9*Math.sin(a)];ring.push(q)}
   ring.forEach((q,i)=>{bond(s,q,ring[(i+1)%6]);atom(s,q,i===0?'O':'C',i===0?.9:.8)});const anomeric=ring[1],isA=r.a>=.5;const oh=V.add(anomeric,[.35,isA?-.6:.6,.2]);bond(s,anomeric,oh);atom(s,oh,'O',.8);atom(s,V.add(oh,[.25,isA?-.2:.2,0]),'H',.7);
-  for(let i=2;i<6;i++){const q=V.add(ring[i],[V.norm(ring[i])[0]*.45,i%2?.5:-.5,V.norm(ring[i])[2]*.45]);bond(s,ring[i],q);atom(s,q,'O',.7)}const c6=V.add(ring[5],[.3,.8,-.2]);bond(s,ring[5],c6);atom(s,c6,'C',.8);
+  for(let i=2;i<5;i++){const q=V.add(ring[i],[V.norm(ring[i])[0]*.45,i%2?.5:-.5,V.norm(ring[i])[2]*.45]);bond(s,ring[i],q);atom(s,q,'O',.7)}const c6=V.add(ring[5],[.3,.8,-.2]);bond(s,ring[5],c6);atom(s,c6,'C',.8);
   s.callout(anomeric,`C1 (anomeric): OH ${isA?'down = α':'up = β'}`,'#ffd43b',60,-60);s.callout(ring[0],'ring O','#ff8787',-60,-40);s.render();
   chart(c,420,96,236,170,{title:'Specific rotation vs time',xl:'min',xmin:0,xmax:240,ymin:0,ymax:120,series:[{fn:m=>mut({...p,min:m}).rot,col:C.gold},{fn:()=>52.7,col:'#8ca6b9',dash:[4,4]}],marker:[p.min,r.rot]})},
  assumption:'First-order approach to equilibrium (36 % α, 64 % β) with a half-time of about 40 min at room temperature (illustrative).'});

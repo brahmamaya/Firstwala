@@ -7,7 +7,7 @@ const P3=window.Physica3D,V=P3.vec,{add,done}=pack();
 const ch=(no,chapter,group)=>({grade:11,chapterNo:no,chapter,group,subject:'chemistry'});
 const hash=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 // ---- Molecule kit (CPK colours, radii in scene units) ----
-const CPK={H:['#f1f3f5',.17],C:['#495057',.27],N:['#4c6ef5',.26],O:['#fa5252',.26],F:['#94d82d',.24],Cl:['#40c057',.3],Br:['#a5432a',.32],S:['#fcc419',.31],P:['#fd7e14',.3],B:['#ffa8a8',.25],Be:['#c0eb75',.25],Xe:['#4dabf7',.34],Na:['#9775fa',.3],Cu:['#d9844a',.3],Zn:['#adb5bd',.3],I:['#7048e8',.34],X:['#e9ecef',.26]};
+const CPK={H:['#f1f3f5',.17],C:['#495057',.27],N:['#4c6ef5',.26],O:['#fa5252',.26],F:['#94d82d',.24],Cl:['#40c057',.3],Br:['#a5432a',.32],S:['#fcc419',.31],P:['#fd7e14',.3],B:['#ffa8a8',.25],Be:['#c0eb75',.25],Xe:['#4dabf7',.34],Na:['#9775fa',.3],Cu:['#d9844a',.3],Co:['#f090a0',.3],Zn:['#adb5bd',.3],I:['#7048e8',.34],X:['#e9ecef',.26]};
 const atom=(s,p,el,k=1,opt={})=>{const [col,r]=CPK[el]||CPK.X;s.ball(p,r*k,col,{spec:.6,...opt});return s};
 const bond=(s,a,b,order=1,col='#ced4da',r=.06)=>{const d=V.sub(b,a),n=V.norm(d),side=V.norm(Math.abs(n[1])<.9?V.cross(n,[0,1,0]):V.cross(n,[1,0,0]));if(order===1)s.tube([a,b],r,col,{segs:8});else for(let i=0;i<order;i++){const o=V.mul(side,(i-(order-1)/2)*.13);s.tube([V.add(a,o),V.add(b,o)],r*.75,col,{segs:6})}return s};
 const beaker=(s,p,r,h,liq,fill=.7)=>{s.cyl(V.add(p,[0,h/2,0]),[0,1,0],r,h,'#e9f6ff',{alpha:.12,caps:false});s.cyl(V.add(p,[0,h*fill/2,0]),[0,1,0],r*.97,h*fill,liq,{alpha:.45});return s};
@@ -25,7 +25,7 @@ add({...ch(1,'Some Basic Concepts of Chemistry','PHYSICAL CHEMISTRY'),id:'chem-m
  draw:(c,p,t)=>{const M=MOL[p.sub][1],n=p.m/M,s=P3.scene(c,{scale:56,cy:280,cx:300});s.cyl([-1.6,-1.3,0],[0,1,0],1,.2,'#adb5bd',{cap:'#dee2e6'});s.box([-1.6,-1.6,0],[2.4,.4,1.6],'#343a40');
   const heap=Math.min(1.1,.25+Math.cbrt(p.m)*.18);s.lathe([-1.6,-1.2,0],[[heap,0],[heap*.6,heap*.5],[0,heap*.75]],p.sub==='NaCl'?'#f8f9fa':p.sub==='C6H12O6'?'#fff3bf':p.sub==='CO2'?'#e9ecef':'#74c0fc',{alpha:p.sub==='H2O'?.6:undefined});
   const geo=MOL[p.sub][2],q=[1.6,.4,0];if(geo){for(const [el,x,y,z] of geo){if(el!==geo[0][0]||x||y||z)bond(s,q,V.add(q,[x,y,z]),p.sub==='CO2'?2:1)}for(const [el,x,y,z] of geo)atom(s,V.add(q,[x,y,z]),el,1.3)}else{for(let i=0;i<6;i++){const a=TAU*i/6,r=[.55*Math.cos(a),.2*Math.sin(2*a),.55*Math.sin(a)],b=[.55*Math.cos(a+TAU/6),.2*Math.sin(2*a+TAU/3),.55*Math.sin(a+TAU/6)];bond(s,V.add(q,r),V.add(q,b));atom(s,V.add(q,r),i===5?'O':'C')}}
-  s.callout([-1.6,-.7,0],`${p.m} g on the balance`,'#e9f6ff',-60,-50);s.callout(V.add(q,[0,.6,0]),`1 molecule (M = ${M} g/mol)`,'#e9f6ff',40,-60);s.render();
+  s.callout([-1.6,-.7,0],`${p.m} g on the balance`,'#e9f6ff',-60,-50);s.callout(V.add(q,[0,.6,0]),`1 ${p.sub==='NaCl'?'formula unit':'molecule'} (M = ${M} g/mol)`,'#e9f6ff',40,-60);s.render();
   tag(c,`${p.m} g ÷ ${M} g/mol = ${f(n,3)} mol  →  ${f(n*6.022e23,3)} particles`,44,98,C.gold,15)},
  assumption:'Molar masses from IUPAC atomic masses; for NaCl the count is formula units, not molecules.'});
 
@@ -94,7 +94,7 @@ add({...ch(3,'Classification of Elements and Periodicity in Properties','INORGAN
   for(let Z=1;Z<=36;Z++){const [per,gr]=pos(Z),x=-4.25+(gr-1)*.5,z=-1.2+(per-1)*.8,v=PT[p.prop][Z-1],h=Math.max(.04,v/mx*3),on=Z===p.Z;s.box([x,h/2,z],[.42,h,.62],on?'#ffd43b':cols,{stroke:'#00000044'});s.engrave([x,h+.08,z+.33],SYM[Z-1],on?'#ffd43b':'#e9f6ff',9,9e5)}
   const [per,gr]=pos(p.Z),v=PT[p.prop][p.Z-1];s.callout([-4.25+(gr-1)*.5,Math.max(.04,v/mx*3),-1.2+(per-1)*.8],`${SYM[p.Z-1]}: ${p.prop==='EN'&&!v?'—':v+' '+({IE:'kJ/mol',R:'pm',EN:''}[p.prop])}`,'#ffd43b',40,-60);
   s.label([-4.6,0,-1.6],'group 1',C.muted,11);s.label([4.25,0,-1.6],'18',C.muted,11);s.render();tag(c,'bar height = property value · rows = periods 1–4',44,98,C.muted,13)},
- assumption:'Ionisation enthalpies (kJ/mol) and Pauling electronegativities from standard tables; covalent radii from Cordero et al. (2008). Noble-gas electronegativities are not defined in the Pauling scale.'});
+ assumption:'Ionisation enthalpies (kJ/mol) and Pauling electronegativities from standard tables; covalent radii from Cordero et al. (2008). Pauling electronegativities are not defined for He, Ne and Ar (shown as 0); Kr is given as 3.00.'});
 
 /* ---------- 4 Chemical Bonding and Molecular Structure ---------- */
 const VS={'2,0':['Linear','BeCl₂',180],'3,0':['Trigonal planar','BF₃',120],'2,1':['Bent (V-shape)','SO₂',119.5],'4,0':['Tetrahedral','CH₄',109.5],'3,1':['Trigonal pyramidal','NH₃',107],'2,2':['Bent (V-shape)','H₂O',104.5],'5,0':['Trigonal bipyramidal','PCl₅','90, 120'],'4,1':['See-saw','SF₄','~102, ~173'],'3,2':['T-shape','ClF₃','~87.5'],'2,3':['Linear','XeF₂',180],'6,0':['Octahedral','SF₆',90],'5,1':['Square pyramidal','BrF₅','~84.8'],'4,2':['Square planar','XeF₄',90]};
@@ -152,7 +152,7 @@ add({...ch(6,'Equilibrium','PHYSICAL CHEMISTRY'),id:'chem-le-chatelier',title:'L
  observe:'Higher pressure and lower temperature favour ammonia; adding N₂ also shifts the equilibrium to the right.',
  tryText:'Raise the temperature from 500 K to 800 K. Does the yield of NH₃ rise or fall?',
  controls:[R('P','Pressure',50,300,10,200,'atm'),R('T','Temperature',500,900,10,700,'K'),R('n2','Extra N₂ added',0,2,.1,0,'×')],
- metrics:p=>{const r=haber(p);return[N('NH₃ in mixture',r.y*100,'%',1),N('NH₃ formed per mol N₂ fed',2*r.x,'mol',3),N('Shift (vs 200 atm, 700 K, no extra N₂)',r.dir),N('Effect of temperature','Exothermic: heat lowers K')]},
+ metrics:p=>{const r=haber(p);return[N('NH₃ in mixture',r.y*100,'%',1),N('NH₃ formed per 1 N₂ + 3 H₂ fed',2*r.x,'mol',3),N('Shift (vs 200 atm, 700 K, no extra N₂)',r.dir),N('Effect of temperature','Exothermic: heat lowers K')]},
  draw:(c,p,t)=>{const r=haber(p),s=P3.scene(c,{scale:54,cx:260}),vol=2.6*Math.cbrt(200/p.P);s.box([0,0,0],[vol*1.4,vol,vol*.7],p.T>750?'#ff8787':'#e9f6ff',{alpha:.08});const tot=36,nA=Math.round(r.y*tot),nN=Math.round((1-r.y)*tot*(.25+.1*p.n2)/(1+.1*p.n2)),nH=tot-nA-nN;let i=0;
   const spot=()=>{const j=i++;return[(hash(j)-.5)*vol*1.25+.06*Math.sin(t*3+j),(hash(j+70)-.5)*vol*.85,(hash(j+140)-.5)*vol*.55]};for(let j=0;j<nN;j++){const q=spot();atom(s,V.add(q,[-.13,0,0]),'N',.7);atom(s,V.add(q,[.13,0,0]),'N',.7)}for(let j=0;j<nH;j++){const q=spot();atom(s,V.add(q,[-.1,0,0]),'H',.7);atom(s,V.add(q,[.1,0,0]),'H',.7)}
   for(let j=0;j<nA;j++){const q=spot();atom(s,q,'N',.75);for(let k=0;k<3;k++){const a=TAU*k/3;atom(s,V.add(q,[.17*Math.cos(a),-.1,.17*Math.sin(a)]),'H',.6)}}s.callout([vol*.7,vol*.5,0],`${p.P} atm, ${p.T} K`,'#e9f6ff',40,-50);s.render();tag(c,'blue pairs: N₂ · white pairs: H₂ · blue + 3 white: NH₃',44,98,C.muted,13)},
@@ -182,7 +182,7 @@ add({...ch(7,'Redox Reactions','INORGANIC CHEMISTRY'),id:'chem-redox-displacemen
  metrics:p=>{const d={'Zn-Cu':['Yes','Zn: 0 → +2 (oxidised)','Cu²⁺: +2 → 0 (reduced)'],'Cu-Zn':['No','Zn is more reactive than Cu','—'],'Cu-Ag':['Yes','Cu: 0 → +2 (oxidised)','Ag⁺: +1 → 0 (reduced)']}[p.pair];return[N('Reaction?',d[0]),N('Oxidation',d[1]),N('Reduction',d[2]),N('Extent',d[0]==='Yes'?`${Math.round(100*(1-Math.exp(-p.time/20)))} %`:'0 %')]},
  draw:(c,p,t)=>{const go=p.pair!=='Cu-Zn',x=go?1-Math.exp(-p.time/20):0,s=P3.scene(c,{scale:60,cx:260,cy:290}),liq=p.pair==='Zn-Cu'?(x<.5?'#4dabf7':x<.85?'#a5d8ff':'#e7f5ff'):p.pair==='Cu-Ag'?(x>.3?'#a5d8ff':'#f1f3f5'):'#f1f3f5';beaker(s,[0,-1.7,0],1.2,2.8,liq,.75);
   const strip=p.pair==='Zn-Cu'?'#adb5bd':'#d9844a';s.box([0,-.5,0],[.5,2.6,.08],strip);if(go)for(let i=0;i<Math.round(x*40);i++){const y=-1.6+hash(i)*1.8;s.ball([(hash(i+5)-.5)*.5,y,(i%2?1:-1)*.06],.06,p.pair==='Zn-Cu'?'#c2410c':'#e9ecef',{flat:true})}
-  s.callout([0,.4,.04],p.pair==='Zn-Cu'?'zinc strip':'copper strip',strip,60,-50);if(go&&x>.05)s.callout([0,-1.2,.08],p.pair==='Zn-Cu'?'copper deposit':'silver crystals','#e8590c',-70,30);s.callout([.9,-.6,0],p.pair==='Zn-Cu'?'Cu²⁺ (blue) fades':p.pair==='Cu-Ag'?'solution turns blue (Cu²⁺)':'no change',liq,50,30);s.render();tag(c,go?'Electrons flow from the more reactive metal to the ions':'No reaction: copper cannot reduce Zn²⁺',44,98,go?C.mint:C.red,14)},
+  s.callout([0,.4,.04],p.pair==='Zn-Cu'?'zinc strip':'copper strip',strip,60,-50);if(go&&x>.05)s.callout([0,-1.2,.08],p.pair==='Zn-Cu'?'copper deposit':'silver crystals',p.pair==='Zn-Cu'?'#e8590c':'#ced4da',-70,30);s.callout([.9,-.6,0],p.pair==='Zn-Cu'?'Cu²⁺ (blue) fades':p.pair==='Cu-Ag'?'solution turns blue (Cu²⁺)':'no change',liq,50,30);s.render();tag(c,go?'Electrons flow from the more reactive metal to the ions':'No reaction: copper cannot reduce Zn²⁺',44,98,go?C.mint:C.red,14)},
  assumption:'Extent follows a simple exponential approach for illustration; the direction follows the reactivity (electrochemical) series.'});
 
 /* ---------- 8 Organic Chemistry: Basic Principles and Techniques ---------- */
