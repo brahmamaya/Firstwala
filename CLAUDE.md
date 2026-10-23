@@ -7,6 +7,7 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 ## Owner's credit rule (always)
 - Work ONLY on the files the task names. Do not scan the whole repo, re-read whole conversations or unrelated files; open only what the task needs (use grep for a symbol, read only the needed lines). Scanning wastes the owner's credits.
 - Do only what is asked: no extra audits, extra refactors or extra checks. Merge finished work to main without asking; do not repeat explanations or the same check twice.
+- PYQ imports from the owner's PDFs (`rank-pyq-*.js`): include EVERY question, including diagram questions (draw an original `fig`, never copy the publisher's art), match-the-column, paragraph and tail questions. Never skip a question because it is hard or the key looks wrong: add it with the answer you establish by solving, put a short 'Note:' in its solution, and tell the owner in the report. Finish by counting PDF questions against entries (target: zero missing).
 - Pending work list: `docs/NEXT-WORK.md` (when the owner says "NEXT-WORK.md ka kaam shuru karo", start it at once, no explanation).
 
 ## Map
