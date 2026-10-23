@@ -141,7 +141,7 @@ function prefetchPyq(){clearTimeout(pfT);if(!ov||!X.pyq||navigator.connection?.s
   window.requestIdleCallback?requestIdleCallback(go,{timeout:5000}):(pfT=setTimeout(go,1500))}
 let exWait=null;const loadExport=()=>window.PhysicaRankExport?Promise.resolve():exWait||(exWait=new Promise((ok,no)=>{const s=document.createElement('script');s.src='__EXPORT_URL__';s.async=true;s.onload=ok;s.onerror=()=>{exWait=null;s.remove();no()};document.head.append(s)}));
 let selOn=false;const selSet=new Set();
-const ABC='abcd',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
+const ABC='abcde',PTN=n=>n.map(i=>'('+ABC[i]+')').join(' and ');
 /* topic list from the index (no chapter data yet): same headings and sub-topic buttons as the full view; a tap loads the chapter and opens that sub-topic */
 function pyqIdx(p,g){const T=PQ_IDX[g]||[],ch=CH(),skel=()=>{const s=el('div','rk-skel');s.setAttribute('role','status');s.append(el('span','rk-sr','Loading questions…'),el('i'),el('i'),el('i'));return s};
   const live=()=>p.isConnected&&ov&&tab==='pyq'&&CH()===ch&&view.className==='rk-view',up=key=>{if(!live())return;p.replaceChildren();p._items=null;pyq(p,key);masonry(p)};
@@ -230,7 +230,7 @@ function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';view.classNa
     let body;
     if(q.o){const order=shuffle([0,1,2,3]);body=el('div','rk-opts');
       order.forEach((oi,pos)=>{const b=btn('rk-opt',null,()=>{const ok=oi===q.c;finish(ok,()=>{b.classList.add(ok?'right':'wrong');if(!ok)body.children[order.indexOf(q.c)].classList.add('right');for(const x of body.children)x.disabled=true})});
-        b.append(el('span','rk-l','ABCD'[pos]),el('span','rk-t',q.o[oi]));b.dataset.testid='rk-opt';b.dataset.correct=String(oi===q.c);body.append(b)})}
+        b.append(el('span','rk-l','ABCDE'[pos]),el('span','rk-t',q.o[oi]));b.dataset.testid='rk-opt';b.dataset.correct=String(oi===q.c);body.append(b)})}
     else{body=el('div','rk-nat');const inp=el('input','rk-in');inp.type='text';inp.inputMode='decimal';inp.autocomplete='off';inp.placeholder='Type your answer (a number)';inp.setAttribute('aria-label','Your answer');inp.dataset.testid='rk-nat';
       inp.addEventListener('input',()=>{inp.value=inp.value.replace(/[^0-9.\-]/g,'')});
       const go=()=>{const v=parseFloat(inp.value);if(Number.isNaN(v)){inp.focus();return}const ok=Math.abs(v-q.n)<=.01;finish(ok,()=>{inp.disabled=true;chk.disabled=true},ok?'':'Not quite. The answer is '+q.n+'.')};
