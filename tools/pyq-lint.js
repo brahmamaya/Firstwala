@@ -21,7 +21,7 @@ for (const f of FILES) {
     const kinds = (q.o ? 1 : 0) + (q.n != null ? 1 : 0) + (q.a != null ? 1 : 0);
     if (kinds !== 1) e('needs exactly one of o+c, n, a');
     if (q.o) {
-      if (q.o.length < 2 || q.o.length > 4) e('option count');
+      if (q.o.length < 2 || q.o.length > 5) e('option count');
       const cs = [].concat(q.c); if (!cs.length || cs.some(k => !Number.isInteger(k) || k < 0 || k >= q.o.length)) e('answer index out of range');
     }
     for (const s of [q.q, q.s, q.a, ...(q.o || [])].filter(x => typeof x === 'string')) {

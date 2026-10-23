@@ -47,7 +47,7 @@ async function logoCanvas(){try{await document.fonts.load('800 40px Orbitron')}c
   g.font=`800 ${27*1.15}px Orbitron,${FONT}`;g.textBaseline='middle';g.fillText('physica.',mx+24*s,my+2);return c}
 
 /* ---------- slide specs: one list of elements, drawn on canvas (PDF) and written as shapes (PPT) ---------- */
-const letters=(q)=>[].concat(q.c??[]).map(i=>'abcd'[i]);
+const letters=(q)=>[].concat(q.c??[]).map(i=>'abcde'[i]);
 const answerText=q=>q.o?letters(q).join(', '):q.n!=null?String(q.n):String(q.a||'').replace(/\s{2,}/g,'   ');
 const txt=(x,y,w,paras)=>({t:'text',x,y,w,paras,h:0});
 function fit(make,from,to,maxH){for(let fs=from;fs>=to;fs-=2){const r=make(fs);if(r.h<=maxH||fs-2<to)return r}}
@@ -73,7 +73,7 @@ async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,
   const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
   if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
   let y=top+blk.ql.h;
-  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcd'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
+  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcde'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
   if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=Math.max(y+36,bottom+30),room=H-80-sy;
     els.push(rect(PAD,bottom+6,W-PAD*2,2,C.line));
     const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},34,16,room);
