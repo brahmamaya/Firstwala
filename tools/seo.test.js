@@ -20,8 +20,17 @@ const { loadSims, STATIC, SITE } = require('./seo.js'), root = path.join(__dirna
     urls.push(url);
   }
   const sm = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8'), locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
-  assert.deepStrictEqual([...locs].sort(), [...STATIC.map(p => `${SITE}/${p}`), ...urls].sort(), 'sitemap URLs differ from pages: run node tools/seo.js');
+  const extra = fs.readdirSync(root).filter(f => /^(simulations|jee-main-.*|class-\d+-.*simulations|[a-z]+-simulations)\.html$/.test(f)).map(f => `${SITE}/${f}`);
+  assert.deepStrictEqual([...locs].sort(), [...STATIC.map(p => `${SITE}/${p}`), ...extra, ...urls].sort(), 'sitemap URLs differ from pages: run node tools/seo.js');
+  // hub and chapter pages: one h1, unique title, description <= 160, valid JSON-LD, every internal .html link exists
+  const T = new Set(titles), existing = f => fs.existsSync(path.join(root, f.replace(/^\//, '').split('#')[0]));
+  for (const u of extra) { const f = u.slice(SITE.length + 1), h = fs.readFileSync(path.join(root, f), 'utf8'), t = (h.match(/<title>([^<]+)<\/title>/) || [])[1];
+    assert(t && !T.has(t), f + ': title missing or duplicate'); T.add(t); assert.strictEqual((h.match(/<h1>/g) || []).length, 1, f + ': exactly one h1');
+    const d = (h.match(/<meta name="description" content="([^"]*)">/) || [])[1]; assert(d && d.length >= 60 && d.length <= 160, f + ': description length ' + (d || '').length);
+    assert(h.includes(`<link rel="canonical" href="${u}">`), f + ': canonical'); [...h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].forEach(m => JSON.parse(m[1]));
+    for (const m of h.matchAll(/href="(\/[^"#?]*\.html)"/g)) assert(existing(m[1]), f + ': broken link ' + m[1]); assert(!/undefined|NaN|\[object/.test(h), f + ': bad token'); }
+  for (const f of files) { const h = fs.readFileSync(path.join(dir, f), 'utf8'); for (const m of h.matchAll(/href="(\/[^"#?]*\.html)"/g)) assert(existing(m[1]), 'sim/' + f + ': broken link ' + m[1]); }
   assert(/Sitemap: https:\/\/physica\.in\/sitemap\.xml/.test(fs.readFileSync(path.join(root, 'robots.txt'), 'utf8')), 'robots.txt sitemap line');
   assert(fs.statSync(path.join(root, 'og.png')).size > 5000, 'og.png');
-  console.log(`seo.test OK: ${files.length} pages, ${locs.length} sitemap URLs`);
+  console.log(`seo.test OK: ${files.length} sim pages, ${extra.length} hub/chapter pages, ${locs.length} sitemap URLs`);
 })().catch(e => { console.error('seo.test FAILED:', e.message); process.exit(1); });
