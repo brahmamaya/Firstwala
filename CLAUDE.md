@@ -32,6 +32,7 @@ node tools/pyq-ingest/ingest.test.js     # PDF import tool (needs Chromium: NODE
 node tools/qgen/verify.test.js; node tools/qgen/verify.js   # question generator: verifier test + all generated questions + qbank/ is up to date (regenerate: node tools/qgen/build.js)
 node tools/perf-budget.js                   # gzip size budgets
 node tools/private-guard.js                 # nothing private tracked
+node tools/security-guard.js --self && node tools/security-guard.js   # CSP on every page, no HTML sinks, safe workflows, no key files
 node -e "require('./tools/secret-guard.js')('.')"
 ```
 Browser e2e + axe + phone (~60 checks, ~3 min): `cd tools/e2e && npm i && node e2e.js` (needs Chromium).

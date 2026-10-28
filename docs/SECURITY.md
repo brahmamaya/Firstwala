@@ -10,5 +10,6 @@ Physica is a static website on GitHub Pages. There is **no server of ours, no da
 | Tampering with the live site | `tools/watchdog.js` (GitHub Action) compares the live files with a fresh build, checks the TLS certificate and that internal files are not readable. |
 | Answer-key leakage | Accepted trade-off of a server-less design: `tests/` is public. Therefore only free tests are published and the key is fetched only after submitting. |
 | Cheating | Not preventable without a server (the timer is on the student's device). Be honest about this in marketing. |
+| Regressions of the above | `tools/security-guard.js` (CSP on every page, no HTML sinks, safe workflows) runs in CI; CodeQL and Dependabot run on GitHub. Full audit: `docs/SECURITY-AUDIT.md`. |
 
 Report a problem: easy@physica.in.
