@@ -1283,3 +1283,5 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 :root[data-theme="light"] .jump-btn:hover,:root[data-theme="light"] .jump-back:hover,:root[data-theme="light"] .jump-x:hover{background:#e8e8e8}
 :root[data-theme="light"] .jump-dlg :focus-visible{outline-color:#000}
 .sim-sub .land-mode{justify-content:center!important;text-align:center}
+
+.rk-find{flex-wrap:nowrap;align-items:center;margin-top:12px}.rk-find input{flex:1 1 auto;min-width:0;min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--t-4d9bff77);background:rgb(var(--k-0a1e54) / .8);color:var(--t-cfe6ff);font:600 16px 'Exo 2',sans-serif}.rk-find input::placeholder{color:var(--t-9e9e9e)}.rk-find input:focus{outline:2px solid #4d9bff;outline-offset:1px}
