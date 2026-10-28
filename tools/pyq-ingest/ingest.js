@@ -78,7 +78,7 @@ function prep(pdf, out) {
   // questions: the best chain of markers with increasing numbers in reading order (dynamic programming). Spurious numbers
   // (table rows, list items, page numbers) fall out of the chain; numbers the OCR missed become gaps, not stops.
   const C = [];
-  for (let i = 0; i < Math.min(sol, P); i++) for (const x of all[i].sort((p, q) => p.col - q.col || p.y - q.y)) if (!(i === sol - 1 && x.bare)) C.push({ ...x, orig: x, page: i + 1, w: x.bare ? 0.5 : 1 });
+  for (let i = 0; i < Math.min(sol, P); i++) for (const x of all[i].sort((p, q) => p.col - q.col || p.y - q.y)) if (x.n >= first && !(i === sol - 1 && x.bare)) C.push({ ...x, orig: x, page: i + 1, w: x.bare ? 0.5 : 1 });
   const sc = new Array(C.length), from = new Array(C.length).fill(-1);
   for (let j = 0; j < C.length; j++) {
     sc[j] = C[j].w - (C[j].n > first ? 0.2 * Math.min(C[j].n - first, 5) : 0);
@@ -157,7 +157,7 @@ function check(out, entries, g) {
     if (d.fig && !e.fig && withPn) bad.push(`Q${d.n}: looks like a diagram question but has no fig`);
     if (d.key != null) { compared++; const mine = e.o ? [].concat(e.c ?? []).map(x => ABC[x]).join(',') : String(e.n ?? e.a), want = e.o ? String(d.key).replace(/[;&\s]/g, '').replace(/,+/g, ',') : d.key;
       const same = mine === want || (!e.o && isFinite(+mine) && isFinite(+want) && Math.abs(+mine - +want) <= 1e-6 * Math.max(1, Math.abs(+want)));
-      if (same) agree++; else if (!/note:/i.test(e.s || '')) bad.push(`Q${d.n}: key in PDF ${d.key}, entry ${mine}, no Note: in the solution`) } }
+      if (same || (e.a != null && String(e.a).includes(String(d.key)))) agree++; else if (!/note:/i.test(e.s || '')) bad.push(`Q${d.n}: key in PDF ${d.key}, entry ${mine}, no Note: in the solution`) } }
   console.log(`PDF questions ${D.length}, matched ${D.length - miss.length}${withPn ? ' (by pn)' : ' (by text similarity)'}, not matched ${miss.length}${miss.length ? ': ' + miss.join(',') : ''}`);
   console.log(`answer keys compared ${compared}, equal ${agree}${weak.length ? '; weak text match (look at these) ' + weak.join(',') : ''}`);
   bad.forEach(x => console.log('  ' + x)); process.exitCode = miss.length || bad.length ? 1 : 0;
@@ -170,12 +170,14 @@ function batches(out, size, only) {
   console.log(files.length + ' batch files in ' + out);
 }
 /* assemble: entries-*.jsonl (one JSON entry per line, each with pn) -> the rank-pyq-<chapter>.js source file, sorted by pn */
-const normY = y => String(y || '').trim().replace(/^JEE Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Advanced (\d{4})$/, 'JEE Advanced $1').replace(/^Main (\d{4})$/, 'JEE Main $1').replace(/^JEE Main (\d+ \w+) · Shift (\d) (\d{4})$/, 'JEE Main $3 · $1 · Shift $2').replace(/\(year not legible\)/i, '(year not printed)');   // labels as tools/pyq-lint.js wants them
+const normY = y => String(y || '').trim().replace(/^JEE Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Advanced (\d{4})$/, 'JEE Advanced $1').replace(/^Main (\d{4})$/, 'JEE Main $1').replace(/^JEE Main (\d+ \w+) · Shift (\d) (\d{4})$/, 'JEE Main $3 · $1 · Shift $2').replace(/\(year not legible\)/i, '(year not printed)').replace(/^JEE Main (\d{4}) \(Online\)$/, 'JEE Main $1 · Online');   // labels as tools/pyq-lint.js wants them
+/* the Rank page reads { } as fraction markup and removes the braces of a set: write them as fullwidth ｛ ｝ (a real fraction {a;b} is left alone) */
+const fullBraces = t => typeof t !== 'string' ? t : t.replace(/\{([^{}]*;[^{}]*)\}/g, '\u0001$1\u0002').replace(/\{/g, '｛').replace(/\}/g, '｝').replace(/\u0001/g, '{').replace(/\u0002/g, '}');
 function assemble(dir, outFile, g, header) {
   const rows = fs.readdirSync(dir).filter(f => /^entries.*\.jsonl$/.test(f)).flatMap(f => fs.readFileSync(path.join(dir, f), 'utf8').split('\n').filter(l => l.trim()).map((l, i) => { try { return JSON.parse(l) } catch (e) { throw new Error(f + ' line ' + (i + 1) + ': ' + e.message) } }));
   const seen = new Set(), dup = rows.filter(r => seen.has(r.pn) || !seen.add(r.pn)).map(r => r.pn).filter((v, i, a) => a.indexOf(v) === i && rows.filter(r => r.pn === v).length > 1);
   if (dup.length) throw new Error('duplicate pn: ' + dup.join(','));
-  const gaps = rows.filter(r => r.gap); rows.splice(0, rows.length, ...rows.filter(r => !r.gap)); rows.forEach(r => { r.y = normY(r.y) });     // {pn, gap}: the agent could not see the whole question; never published
+  const gaps = rows.filter(r => r.gap); rows.splice(0, rows.length, ...rows.filter(r => !r.gap)); rows.forEach(r => { r.y = normY(r.y); for (const k of ['q', 's', 'a']) r[k] = fullBraces(r[k]); if (r.o) r.o = r.o.map(fullBraces) });     // {pn, gap}: the agent could not see the whole question; never published
   fs.writeFileSync(path.join(dir, 'gaps.json'), JSON.stringify(gaps, null, 1)); if (gaps.length) console.log('GAPS (text missing in the PDF crops, supply or re-crop): ' + gaps.map(g => 'Q' + g.pn + ' ' + g.gap).join(' | '));
   rows.sort((p, q) => p.pn - q.pn);
   fs.writeFileSync(outFile, `/* ${header || 'Past-year questions for Rank mode'} */\nwindow.${g}=[\n` + rows.map(r => JSON.stringify(r)).join(',\n') + '\n];\n');
