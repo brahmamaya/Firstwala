@@ -1115,6 +1115,77 @@ Object.assign(XF,{edband,edpn,ediv,edhw,edfw,edzen,edgate});
 /* <<< FIGS devices */
 
 /* >>> FIGS skills: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function xsvern(){const s=hs(330,160,'Vernier callipers scale. The main scale is in millimetres. The zero of the vernier scale lies just after the 23 mm mark. The sixth line of the vernier scale coincides with a line of the main scale. The reading is 23 mm plus 6 times 0.1 mm, which is 23.6 mm.');
+  const X=m=>20+(m-20)*22,x0=X(23.6);
+  mk(s,'rect',{x:14,y:38,width:300,height:36,fill:'none',stroke:DIM,'stroke-width':1.3});
+  for(let m=20;m<=33;m++)hl(s,X(m),74,X(m),m%5===0?58:66);
+  ht(s,X(20),52,'2 cm',INK,'middle',12);ht(s,X(30),52,'3 cm',INK,'middle',12);
+  mk(s,'rect',{x:x0-8,y:74,width:214,height:34,fill:'none',stroke:BLUE,'stroke-width':1.3});
+  for(let k=0;k<=10;k++)hl(s,x0+k*19.8,74,x0+k*19.8,k%5===0?98:88,BLUE);
+  ht(s,x0,120,'0',BLUE,'middle',12);ht(s,x0+99,120,'5',BLUE,'middle',12);ht(s,x0+198,120,'10',BLUE,'middle',12);
+  hv(s,x0,30,x0,72,HI,1.6);ht(s,x0+8,24,'vernier zero',HI,'start',11);
+  hl(s,x0+118.8,56,x0+118.8,100,HI);ht(s,x0+118.8,134,'6th line coincides',HI,'middle',11);
+  cp(s,156,'MSR = 23 mm (zero is just after 23)|LC = 1 mm − 0.9 mm = 0.1 mm|reading = 23 + 6 × 0.1 = 23.6 mm = 2.36 cm');return fin(s)}
+function xsscrew(){const s=hs(330,200,'Screw gauge reading. The pitch is 0.5 mm and the circular scale has 50 divisions, so the least count is 0.01 mm. The thimble edge has uncovered the 4 mm mark and the half millimetre mark after it, so the main scale reading is 4.5 mm. The 28th division of the circular scale is on the reference line. The reading is 4.5 plus 28 times 0.01, which is 4.78 mm.');
+  const ex=20+4.78*20;
+  hl(s,20,75,140,75,INK);
+  for(let k=0;k<=4;k++){hl(s,20+20*k,75,20+20*k,62);ht(s,20+20*k,56,String(k),INK,'middle',11)}
+  for(let k=0;k<=4;k++)hl(s,30+20*k,75,30+20*k,86);
+  ht(s,60,104,'sleeve (mm)',DIM,'middle',11);
+  mk(s,'rect',{x:ex,y:28,width:140,height:94,fill:'none',stroke:BLUE,'stroke-width':1.5});
+  for(let n=23;n<=33;n++){const y=75+(n-28)*8.4;hl(s,ex,y,ex+(n%5===0?16:9),y,BLUE);if(n%5===0&&n!==28)ht(s,ex+22,y+4,String(n),BLUE,'start',11)}
+  hl(s,ex,75,ex+16,75,HI);ht(s,ex+22,79,'28',HI,'start',12);
+  ht(s,ex+98,100,'thimble',BLUE,'middle',11);ht(s,ex+98,114,'(circular scale)',BLUE,'middle',11);
+  cp(s,150,'pitch 0.5 mm, 50 divisions, LC = 0.5/50 = 0.01 mm|MSR = 4.5 mm, CSR = 28 (on the reference line)|reading = 4.5 + 28 × 0.01 = 4.78 mm');return fin(s)}
+function xspend(){const s=hs(340,230,'Simple pendulum and its graph. Left: a bob on a string of effective length L, which is the string length plus the bob radius. Right: a graph of T squared against L, a straight line through the origin with slope 4 pi squared over g.');
+  hl(s,40,24,120,24,INK);for(let x=46;x<120;x+=10)hl(s,x,24,x-6,16,DIM);
+  hl(s,80,24,80,150,INK);mk(s,'circle',{cx:80,cy:160,r:10,fill:'none',stroke:BLUE,'stroke-width':1.6});dot(s,80,160,BLUE,2);
+  hl(s,80,160,90,160,HI);ht(s,100,164,'r',HI,'start',11);
+  dsh(s,80,24,80+Math.sin(0.28)*136,24+Math.cos(0.28)*136);
+  hv(s,48,92,48,24,DIM,1.1);hv(s,48,92,48,160,DIM,1.1);ht(s,40,96,'L',DIM,'end',13);ht(s,130,64,'L = l + r',DIM,'start',11);
+  hl(s,176,180,300,180,INK);hl(s,176,180,176,30,INK);ht(s,300,198,'L',INK,'end',13);ht(s,170,38,'T²',INK,'end',13);
+  hl(s,176,180,290,56,HI,'');
+  for(const [x,y] of [[200,158],[222,137],[244,112],[266,86],[282,68]])dot(s,x,y,BLUE,2.6);
+  ht(s,296,48,'slope = 4π²/g',HI,'end',12);
+  cp(s,222,'T = 2π√(L/g);  g = 4π² ÷ slope of the T²–L line');return fin(s)}
+function xsmb(){const s=hs(340,260,'Metre bridge. A uniform wire AC one metre long lies along a scale. Across the top, an unknown resistance R in the left gap and a known resistance S in the right gap meet at the point B. A galvanometer joins B to a jockey that slides on the wire. A cell with a key is joined across A and C. At balance the jockey is at a distance l from A, and R over S equals l over 100 minus l.');
+  hl(s,40,150,300,150,INK,2.4);ht(s,34,146,'A',INK,'end',13);ht(s,306,146,'C',INK,'start',13);
+  hl(s,40,60,90,60);mk(s,'rect',{x:90,y:50,width:40,height:20,fill:'none',stroke:INK,'stroke-width':1.4});hl(s,130,60,170,60);mk(s,'rect',{x:170,y:50,width:40,height:20,fill:'none',stroke:INK,'stroke-width':1.4});hl(s,210,60,300,60);
+  hl(s,40,60,40,150);hl(s,300,60,300,150);
+  ht(s,110,44,'R',INK,'middle',14);ht(s,190,44,'S',INK,'middle',14);ht(s,164,80,'B',INK,'start',13);dot(s,150,60,INK,3);
+  hl(s,150,60,150,88);mk(s,'circle',{cx:150,cy:100,r:12,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,150,105,'G',INK,'middle',13);
+  hl(s,138,100,104,100);hl(s,104,100,104,128);hv(s,104,122,104,148,HI,1.8);ht(s,96,118,'J',HI,'end',13);
+  dim(s,40,168,104,168,'',0,0);ht(s,72,184,'l',HI,'middle',13);dim(s,104,168,300,168,'',0,0);ht(s,202,184,'100 − l',HI,'middle',13);
+  hl(s,40,150,40,214);hl(s,40,214,140,214);hl(s,140,204,140,224);hl(s,148,208,148,220);hl(s,148,214,300,214);hl(s,300,150,300,214);
+  ht(s,224,208,'cell + key',DIM,'middle',11);
+  cp(s,246,'balance (no galvanometer current): R/S = l/(100 − l)');return fin(s)}
+function xspot(){const s=hs(340,260,'Potentiometer circuit. A long uniform wire AB is joined to a driver cell and key. A cell of emf E1 in series with a galvanometer is connected from the end A to a jockey that slides on the wire. At the null point the length from A to the jockey is l1, and E1 equals the potential drop along that length.');
+  hl(s,40,120,300,120,INK,2.4);ht(s,34,116,'A',INK,'end',13);ht(s,306,116,'B',INK,'start',13);
+  hl(s,40,120,40,50);hl(s,40,50,76,50);hl(s,76,38,76,62);hl(s,84,43,84,57);hl(s,84,50,138,50);
+  ht(s,80,30,'E₁',INK,'middle',13);mk(s,'circle',{cx:150,cy:50,r:12,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,150,55,'G',INK,'middle',13);
+  hl(s,162,50,200,50);hl(s,200,50,200,92);hv(s,200,88,200,118,HI,1.8);ht(s,208,76,'J',HI,'start',13);
+  dim(s,40,138,200,138,'',0,0);ht(s,120,154,'l₁',HI,'middle',13);
+  hl(s,40,150,40,214);hl(s,40,214,140,214);hl(s,140,204,140,224);hl(s,148,208,148,220);hl(s,148,214,300,214);hl(s,300,120,300,214);
+  ht(s,224,208,'driver cell + key',DIM,'middle',11);
+  cp(s,246,'E₁/E₂ = l₁/l₂  (driver emf must be larger)|internal resistance r = R(l₁ − l₂)/l₂');return fin(s)}
+function xsres(){const s=hs(320,250,'Resonance tube. A vertical glass tube dips in water. A vibrating tuning fork is held over its open top. At the first resonance the air column of length L1 holds a quarter of a wave: an antinode a little above the open end, an end correction e, and a node at the water surface. The second resonance is at length L2.');
+  mk(s,'rect',{x:100,y:40,width:44,height:160,fill:'none',stroke:DIM,'stroke-width':1.6});
+  mk(s,'rect',{x:101,y:120,width:42,height:79,fill:'#17314f',opacity:.8});ht(s,122,168,'water',INK,'middle',11);
+  hl(s,114,8,114,20,INK);hl(s,130,8,130,20,INK);hl(s,114,20,130,20,INK);ht(s,140,16,'fork f',INK,'start',12);
+  let d='';for(let y=28;y<=120;y+=4){const x=122+16*Math.cos(Math.PI/2*(y-28)/92);d+=(d?'L':'M')+x.toFixed(1)+' '+y}
+  pth(s,d,HI,1.6);
+  dsh(s,102,28,142,28);ht(s,92,32,'A',HI,'end',11);ht(s,92,124,'N',HI,'end',11);
+  hv(s,176,80,176,40,DIM,1.1);hv(s,176,80,176,120,DIM,1.1);ht(s,188,84,'L₁',INK,'start',14);ht(s,188,36,'e',INK,'start',12);
+  cp(s,222,'L₁ + e = λ/4,  L₂ + e = 3λ/4|λ = 2(L₂ − L₁),  v = 2f(L₂ − L₁)|e = (L₂ − 3L₁)/2');return fin(s)}
+function xsid(){const s=hs(320,250,'Angle of deviation against angle of incidence for a prism. A U-shaped curve with its lowest point at the minimum deviation. At that point the angle of incidence equals the angle of emergence. Any other deviation occurs at two angles of incidence, i and e.');
+  hl(s,40,170,300,170,INK);hl(s,40,170,40,20,INK);ht(s,300,188,'i',INK,'end',13);ht(s,32,28,'δ',INK,'end',13);
+  let d='';for(let x=62;x<=248;x+=4){const y=140-0.0062*(x-155)*(x-155);d+=(d?'L':'M')+x+' '+y.toFixed(1)}
+  pth(s,d,HI,2);
+  dsh(s,155,140,155,170);dsh(s,40,140,155,140);ht(s,34,144,'δm',HI,'end',13);ht(s,155,186,'i = e',INK,'middle',13);
+  dsh(s,40,112,222,112);dsh(s,88,112,88,170);dsh(s,222,112,222,170);ht(s,88,186,'i',DIM,'middle',12);ht(s,222,186,'e',DIM,'middle',12);
+  ht(s,165,154,'minimum deviation',HI,'start',11);
+  cp(s,212,'A = 60°, δm = 37°: n = sin[(A + δm)/2] / sin(A/2)|= sin 48.5° ÷ sin 30° = 1.50');return fin(s)}
+Object.assign(XF,{xsvern,xsscrew,xspend,xsmb,xspot,xsres,xsid});
 /* <<< FIGS skills */
 
 window.PhysicaRankFigs={...XF,dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
