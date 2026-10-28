@@ -266,11 +266,22 @@ function qbRun(ent,tp,n){const tok=++qbTok;qbAgain=()=>qbRun(ent,tp,n);ov.datase
     if(!fresh.length){view.replaceChildren(el('p','rk-how','No questions for this choice yet.'),btn('rk-link','Back',home));return}
     runSet(fresh.map((q,j)=>j),'Question bank'+(again?' · revision':''),fresh)},
   ()=>{if(!ov||tok!==qbTok)return;const e=el('div','rk-fail');e.setAttribute('role','alert');e.append(el('p','rk-how','Could not load the questions. Check your internet.'),btn('rk-mini','Try again',()=>qbRun(ent,tp,n)),btn('rk-link','Back',home));view.replaceChildren(e)})}
+function qbBrowse(ent,tp,pg){const tok=++qbTok;ov.dataset.run='1';view.className='rk-view run';paint(true);view.replaceChildren(qbSkel());ov.scrollTop=0;
+  const ids=tp?ent.tp[tp].c:[...new Set(Object.values(ent.tp).flatMap(t=>t.c))];
+  Promise.all(ids.map(ci=>qbGet(ent,ci))).then(r=>{if(!ov||tok!==qbTok)return;const all=r.flat().filter(q=>!qbDiff||q.d===qbDiff),per=20,pages=Math.max(1,Math.ceil(all.length/per));pg=Math.min(Math.max(0,pg),pages-1);
+    const c=el('div','rk-card wide');c.append(el('h3','',(tp?ent.tp[tp].nm:'All topics')+' · '+all.length+' questions'),el('p','rk-meta','Page '+(pg+1)+' of '+pages));
+    const nav=()=>{const row=el('div','rk-two');const a=btn('rk-mini','Previous',()=>qbBrowse(ent,tp,pg-1)),b=btn('rk-mini','Next',()=>qbBrowse(ent,tp,pg+1));a.disabled=pg===0;b.disabled=pg>=pages-1;row.append(a,btn('rk-link','Back',home),b);return row};
+    c.append(nav());
+    all.slice(pg*per,pg*per+per).forEach((q,i)=>{const d=el('div','rk-card wide');d.dataset.testid='rk-qb-item';d.append(el('p','rk-meta','Q'+(pg*per+i+1)+' · '+['','Easy','Medium','Hard'][q.d]),el('p','rk-how',q.q));
+      if(q.o){const u=el('ol','');u.type='A';q.o.forEach(t=>u.append(el('li','',t)));d.append(u)}
+      const ans=q.o?'Answer: '+'ABCDE'[q.c]+') '+q.o[q.c]:'Answer: '+q.n,dt=el('details');dt.append(el('summary','','Show answer and solution'),el('p','rk-how',ans),el('p','rk-how',q.s));d.append(dt);c.append(d)});
+    c.append(nav());view.replaceChildren(c);ov.scrollTop=0},
+  ()=>{if(!ov||tok!==qbTok)return;const e=el('div','rk-fail');e.setAttribute('role','alert');e.append(el('p','rk-how','Could not load the questions. Check your internet.'),btn('rk-link','Back',home));view.replaceChildren(e)})}
 function qbPane(p){const ent=qbEnt();if(!ent){guide(p);return}
   const c=el('div','rk-card wide');c.append(el('h3','','Question bank · '+ent.name),el('p','rk-how',ent.n+' practice questions made by Physica, each with a step-by-step solution. These are not past-year questions. Your answers stay on this device.'),el('span','rk-label','Difficulty'));
   const chips=el('div','rk-chips');['Any','Easy','Medium','Hard'].forEach((l,k)=>{const b=btn('rk-chip'+(qbDiff===k?' on':''),l,()=>{qbDiff=k;home()});b.setAttribute('aria-pressed',String(qbDiff===k));b.dataset.testid='rk-qb-d'+k;chips.append(b)});c.append(chips);p.append(c);
   const cnt=t=>qbDiff?t.d[qbDiff-1]:t.n,add=(tp,name,t,k)=>{const n=cnt(t),d=el('div','rk-card');d.dataset.testid='rk-qb-topic';d.append(el('h3','',name),el('p','rk-meta',n+' questions'+(qbDiff?' · '+['','Easy','Medium','Hard'][qbDiff]:'')));
-    if(n){const row=el('div','rk-two');for(const m of [10,25]){const b=btn('rk-mini','Practice '+m,()=>qbRun(ent,tp,m));b.dataset.testid='rk-qb-'+(tp||'all')+'-'+m;row.append(b)}d.append(row)}p.append(d)};
+    if(n){const row=el('div','rk-two');for(const m of [10,25]){const b=btn('rk-mini','Practice '+m,()=>qbRun(ent,tp,m));b.dataset.testid='rk-qb-'+(tp||'all')+'-'+m;row.append(b)}const bb=btn('rk-mini','Browse all',()=>qbBrowse(ent,tp,0));bb.dataset.testid='rk-qb-browse-'+(tp||'all');row.append(bb);d.append(row)}p.append(d)};
   add(null,'All topics (mixed)',{n:ent.n,d:Object.values(ent.tp).reduce((a,t)=>a.map((v,i)=>v+t.d[i]),[0,0,0])});
   for(const tp in ent.tp)add(tp,ent.tp[tp].nm,ent.tp[tp])}
 
