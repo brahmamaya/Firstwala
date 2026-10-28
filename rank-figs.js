@@ -942,6 +942,50 @@ Object.assign(XF,{mgwire,mgsol,mghel,mgvs,mgbar,mgearth});
 /* <<< FIGS mag */
 
 /* >>> FIGS emi: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function eifar(){const s=hs(300,230,'A square loop in a magnetic field pointing into the page. The field is increasing. By Lenz law the induced current flows anticlockwise so that its own field points out of the page and opposes the increase.');
+  for(let x=70;x<=230;x+=40)for(let y=34;y<=124;y+=30)ht(s,x,y+5,'×',DIM,'middle',16);
+  mk(s,'rect',{x:100,y:50,width:100,height:70,fill:'none',stroke:BLUE,'stroke-width':2});
+  hv(s,140,120,166,120,HI,2);hv(s,200,95,200,75,HI,2);hv(s,160,50,134,50,HI,2);hv(s,100,75,100,95,HI,2);
+  ht(s,150,92,'I (induced)',HI,'middle',12);ht(s,240,28,'B in, growing',INK,'middle',12);
+  cp(s,158,'ε = −dΦ/dt; Φ = BA cosθ|Lenz: induced current opposes the change; flux in is growing, so I is anticlockwise (its field points out)');return fin(s)}
+function eirail(){const s=hs(300,230,'A conducting rod of length l slides to the right with speed v on two horizontal rails joined by a resistor R, in a magnetic field into the page. The induced emf is B l v. The current in the rod flows upward in the figure and the magnetic force on the rod points left, opposing the motion.');
+  for(let x=90;x<=250;x+=40)for(let y=62;y<=116;y+=27)ht(s,x,y+5,'×',DIM,'middle',15);
+  hl(s,40,40,260,40,INK);hl(s,40,140,260,140,INK);hl(s,40,40,40,76,INK);hl(s,40,104,40,140,INK);
+  mk(s,'rect',{x:32,y:76,width:16,height:28,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,26,94,'R',INK,'end',13);
+  hl(s,160,34,160,146,BLUE);hl(s,162,34,162,146,BLUE);
+  hv(s,172,90,226,90,GRN,2);ht(s,214,80,'v',GRN,'middle',14);
+  hv(s,150,120,150,60,HI,2);ht(s,142,96,'I',HI,'end',13);
+  hv(s,150,158,106,158,RED,2);ht(s,128,176,'F = B²l²v/R',RED,'middle',12);
+  dim(s,276,40,276,140,'l',286,94);
+  cp(s,196,'ε = Blv; I = Blv/R|force on the rod F = BIl = B²l²v/R opposes v; power P = Fv = B²l²v²/R');return fin(s)}
+function eirl(){const s=hs(300,230,'Current against time in an RL circuit. On connecting the battery the current grows as one minus e to the minus t over tau towards E over R, reaching sixty three percent after one time constant. On removing the battery the current decays as e to the minus t over tau, reaching thirty seven percent after one time constant.');
+  hv(s,44,160,290,160,DIM,1.4);hv(s,50,170,50,16,DIM,1.4);ht(s,290,178,'t',INK,'end',14);ht(s,44,24,'I',INK,'end',14);
+  const X=t=>50+t*50,Y=f=>160-f*120;let a='',b='';
+  for(let t=0;t<=4.6;t+=.1){a+=(a?'L':'M')+X(t)+' '+Y(1-Math.exp(-t));b+=(b?'L':'M')+X(t)+' '+Y(Math.exp(-t))}
+  pth(s,a,HI,2);pth(s,b,BLUE,2);dsh(s,50,Y(1),X(4.6),Y(1));ht(s,44,Y(1)+4,'E/R',INK,'end',12);
+  dsh(s,X(1),Y(.632),X(1),160);dsh(s,50,Y(.632),X(1),Y(.632));dsh(s,50,Y(.368),X(1),Y(.368));
+  ht(s,X(1),176,'τ',INK,'middle',13);ht(s,46,Y(.632)+4,'63 %',HI,'end',11);ht(s,46,Y(.368)+4,'37 %',BLUE,'end',11);
+  ht(s,X(3),Y(.82),'growth',HI,'middle',13);ht(s,X(2.4),Y(.2),'decay',BLUE,'middle',13);
+  cp(s,196,'τ = L/R; I = (E/R)(1 − e^(−t/τ)) or I₀e^(−t/τ)|at t = 0 an inductor acts like a break; at t = ∞ like a plain wire');return fin(s)}
+function eirlc(){const s=hs(300,230,'Resonance curves of a series LCR circuit. Current against frequency has a peak E over R at the resonant frequency f0. A larger resistance gives a lower and wider curve. At the half power points f1 and f2 the current falls to one over root two of the peak. The bandwidth is f2 minus f1.');
+  hv(s,30,160,290,160,DIM,1.4);hv(s,40,170,40,16,DIM,1.4);ht(s,290,178,'f',INK,'end',14);ht(s,34,24,'I',INK,'end',14);
+  const X=x=>40+(x-.5)*160,cv=(Q,c)=>{let d='';for(let x=.5;x<=1.5;x+=.01){const i=1/Math.sqrt(1+Q*Q*Math.pow(x-1/x,2));d+=(d?'L':'M')+X(x)+' '+(160-i*130)}pth(s,d,c,2)};
+  cv(8,HI);cv(3,BLUE);
+  dsh(s,X(1),30,X(1),160);ht(s,X(1),176,'f₀',INK,'middle',13);ht(s,X(1)-6,26,'E/R',INK,'end',12);
+  const y=160-130*.7071;dsh(s,40,y,X(1.07),y);ht(s,36,y+4,'0.707',DIM,'end',11);
+  const f1=X(1-.0625),f2=X(1+.0625);dsh(s,f1,y,f1,160);dsh(s,f2,y,f2,160);ht(s,f1-2,176,'f₁',INK,'end',12);ht(s,f2+2,176,'f₂',INK,'start',12);
+  ht(s,X(1.2),60,'small R, large Q',HI,'start',12);ht(s,X(1.2),130,'large R, small Q',BLUE,'start',12);
+  cp(s,196,'f₀ = 1/(2π√(LC)); Q = ω₀L/R = f₀/(f₂ − f₁)|at resonance Z = R, I is maximum and in phase with E');return fin(s)}
+function eiphas(){const s=hs(300,230,'Phasor diagram of a series LCR circuit with inductive reactance larger than capacitive. The resistor voltage is along the current, the inductor voltage leads by ninety degrees upward, the capacitor voltage lags by ninety degrees downward. The supply voltage is the sum and leads the current by angle phi, with tan phi equal to VL minus VC over VR.');
+  const ox=40,oy=120;
+  hv(s,ox,oy,ox+130,oy,BLUE,2);ht(s,ox+60,oy+16,'V_R (along I)',BLUE,'middle',12);
+  hv(s,ox+130,oy,ox+130,oy-90,GRN,2);ht(s,ox+138,oy-60,'V_L',GRN,'start',13);
+  hv(s,ox+130,oy,ox+130,oy+45,RED,2);ht(s,ox+138,oy+40,'V_C',RED,'start',13);
+  hv(s,ox,oy,ox+130,oy-45,HI,2);ht(s,ox+52,oy-40,'V',HI,'end',14);
+  arcp(s,ox,oy,50,71,90,INK,1.3);ht(s,ox+66,oy-8,'φ',INK,'middle',14);
+  ht(s,ox+138,oy-18,'V_L − V_C',DIM,'start',11);
+  cp(s,196,'V² = V_R² + (V_L − V_C)²; tan φ = (V_L − V_C)/V_R|L leads I by 90°, C lags I by 90°; Z = √(R² + (X_L − X_C)²)');return fin(s)}
+Object.assign(XF,{eifar,eirail,eirl,eirlc,eiphas});
 /* <<< FIGS emi */
 
 /* >>> FIGS atoms: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
