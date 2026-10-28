@@ -9,6 +9,7 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 - Do only what is asked: no extra audits, extra refactors or extra checks. Merge finished work to main without asking; do not repeat explanations or the same check twice.
 - PYQ imports from the owner's PDFs: use the low-credit method in `docs/PYQ-INGEST.md` (`tools/pyq-ingest/ingest.js prep` -> crops + draft keys, cheap agents per batch of crops, `assemble`, `check`). Do not read whole PDF pages with a model.
 - PYQ imports from the owner's PDFs (`rank-pyq-*.js`): include EVERY question, including diagram questions (draw an original `fig`, never copy the publisher's art), match-the-column, paragraph and tail questions. Never skip a question because it is hard or the key looks wrong: add it with the answer you establish by solving, put a short 'Note:' in its solution, and tell the owner in the report. Finish by counting PDF questions against entries (target: zero missing).
+- Credit saving is a standing target (about half the credits per task, same quality): read `docs/CREDIT-SAVING.md`. Use `node tools/ship.js check|commit|sync|after-merge` for the repeated chores, quiet output, one build/check/e2e at the end, subagents on `sonnet`. If a kind of task repeats and has no tool, build a tested tool first. Tell the owner when part of a task is better done in ChatGPT (drafts of long text, brainstorming).
 - Pending work list: `docs/NEXT-WORK.md` (when the owner says "NEXT-WORK.md ka kaam shuru karo", start it at once, no explanation).
 
 ## Map
