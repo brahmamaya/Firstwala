@@ -1,0 +1,11 @@
+# Weekly update PRs for the pinned GitHub Actions and the dev-only test dependencies (nothing here ships to the site).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /tools/e2e
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3

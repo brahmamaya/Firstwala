@@ -19,9 +19,10 @@ jobs:
         with: { node-version: 20 }
       - run: node tools/publish.js
       - id: wd
+        env: { WATCHDOG_URL: '${{ vars.WATCHDOG_URL }}' }
         run: |
           set +e
-          node tools/watchdog.js "${{ vars.WATCHDOG_URL }}" _site 2> problems.txt | tee result.json
+          node tools/watchdog.js "$WATCHDOG_URL" _site 2> problems.txt | tee result.json
           echo "code=$?" >> "$GITHUB_OUTPUT"
       - name: Open / update an alert issue on failure
         if: steps.wd.outputs.code != '0'

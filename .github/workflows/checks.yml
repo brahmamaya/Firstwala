@@ -15,6 +15,7 @@ jobs:
         with: { node-version: 20 }
       - run: node -e "require('./tools/secret-guard.js')('.')"
       - run: node tools/private-guard.js
+      - run: node tools/security-guard.js --self && node tools/security-guard.js
       - run: node tools/series-import.test.js
       - run: node tools/watchdog.test.js
       - run: node tools/qgen/verify.test.js

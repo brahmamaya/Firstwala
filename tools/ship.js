@@ -20,7 +20,7 @@ const fail = m => { console.error('FAIL ' + m); process.exit(1) };
 function build() { if (!fs.existsSync(ESB)) fail('esbuild 0.24.2 missing: mkdir -p /tmp/claude-0/esb/v0.24.2 && cd /tmp/claude-0/esb/v0.24.2 && npm i esbuild@0.24.2'); const r = run('node', ['tools/build.js'], { env: { ESBUILD: ESB } }); if (r.status) fail('build\n' + tail(r.stderr + r.stdout)); console.log('build ok') }
 
 function check(e2e) {
-  const steps = [['perf budget', 'node', ['tools/perf-budget.js'], /FAIL/], ['private guard', 'node', ['tools/private-guard.js']], ['secret guard', 'node', ['-e', "require('./tools/secret-guard.js')('.')"]],
+  const steps = [['perf budget', 'node', ['tools/perf-budget.js'], /FAIL/], ['private guard', 'node', ['tools/private-guard.js']], ['security guard', 'node', ['tools/security-guard.js']], ['secret guard', 'node', ['-e', "require('./tools/secret-guard.js')('.')"]],
     ['watchdog test', 'node', ['tools/watchdog.test.js']], ['series-import test', 'node', ['tools/series-import.test.js']], ['qgen verify test', 'node', ['tools/qgen/verify.test.js']], ['qgen verify', 'node', ['tools/qgen/verify.js']], ['qbank up to date', 'node', ['tools/qgen/build.js', '--check']]];
   const env = { NODE_PATH: '/tmp/nm:/tmp/claude-0/esb/e2e/node_modules', CHROMIUM: '/opt/pw-browsers/chromium', PW: 'playwright-core' };
   if (e2e) steps.push(['browser e2e', 'node', ['tools/e2e/e2e.js'], /FAIL/]);
