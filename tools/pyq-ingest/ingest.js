@@ -5,7 +5,7 @@
    crops (about 20x fewer image tokens than whole pages) and write the entries.
    usage: node tools/pyq-ingest/ingest.js prep <pdf> [outdir (default content/pyq-work/<pdf name>, git-ignored)] [--dpi 110] [--first 1] [--sol-from <page>] [--cols 2]
           node tools/pyq-ingest/ingest.js check <outdir> <entries.js> [globalName]   (completeness + key audit)
-          node tools/pyq-ingest/ingest.js batches <outdir> [size 12]                  (agent work lists)
+          node tools/pyq-ingest/ingest.js batches <outdir> [size 12] [n,n,...]       (agent work lists; a list of numbers makes redo-NN.md for just those)
           node tools/pyq-ingest/ingest.js assemble <outdir> <rank-pyq-x.js> <PhysicaRankPyqX>   (entries-*.jsonl -> source file) */
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process');
@@ -96,10 +96,21 @@ function prep(pdf, out) {
     const hdr = 36, ftr = pg.h - 30, y0 = Math.max(hdr, m.y - 4), y1 = below ? below.y - 3 : ftr;
     q.box = { x0: Math.max(0, m.x - 6), x1: m.col === 0 && ncols === 2 ? edge - 8 : pg.w - 12, y0, y1 };
     q.endsAtColumnBottom = !below;
+    // a question that runs to the bottom of its column continues at the top of the next column (or page): crop that part too
+    if (!below) {
+      const np = m.col === 0 && ncols === 2 ? q.page : q.page + 1, c2 = m.col === 0 && ncols === 2 ? 1 : 0;
+      if (np <= Math.min(sol, P)) {
+        const pg2 = pages[np - 1], mk2 = all[np - 1].filter(x => x.col === c2 && qs.some(z => z.m === x)).sort((p, r) => p.y - r.y), med = a => { const v = a.map(x => x.x).sort((p, r) => p - r); return v.length ? v[Math.floor(v.length / 2)] : null },
+          lx = med(all[np - 1].filter(x => x.col === 0)) ?? m.x, rx2 = med(all[np - 1].filter(x => x.col === 1)) ?? grx, by = mk2.length ? mk2[0].y - 3 : pg2.h - 30;
+        const box2 = { page: np, x0: Math.max(0, (c2 === 1 ? rx2 : lx) - 6), x1: c2 === 0 && ncols === 2 ? rx2 - 8 : pg2.w - 12, y0: hdr, y1: by }, w2 = pg2.ws.filter(w => w.x0 >= box2.x0 && w.x1 <= box2.x1 + 2 && w.y0 >= box2.y0 && w.y1 <= box2.y1 + 1);
+        if (by - hdr > 18 && w2.length >= 3) { q.box2 = box2; q.words2 = w2 }
+      }
+    }
     const inb = pg.ws.filter(w => w.x0 >= q.box.x0 && w.x1 <= q.box.x1 + 2 && w.y0 >= y0 - 1 && w.y1 <= y1 + 1).sort((p, r) => Math.abs(p.y0 - r.y0) < 4 ? p.x0 - r.x0 : p.y0 - r.y0);
     let ln = [], cur = null, lastY = -99;
     for (const w of inb) { if (Math.abs(w.y0 - lastY) > 4) { cur = []; ln.push(cur) } cur.push(w.t); lastY = w.y0 }
     q.words = inb; q.ocr = ln.map(l => l.join(' ')).join('\n').replace(/^\d{1,3}[.:]\s*/, '');
+    if (q.words2) { let l2 = [], c2 = null, ly = -99; for (const w of q.words2.slice().sort((p, r) => Math.abs(p.y0 - r.y0) < 4 ? p.x0 - r.x0 : p.y0 - r.y0)) { if (Math.abs(w.y0 - ly) > 4) { c2 = []; l2.push(c2) } c2.push(w.t); ly = w.y0 } q.ocr += '\n' + l2.map(l => l.join(' ')).join('\n') }
     const tag = /\(\s*((?:Main|JEE|Adv|AIEEE|IIT|NEET|AIPMT|CBSE)[^)]{3,60})\)/i.exec(q.ocr); q.y = tag ? tag[1].replace(/\s+/g, ' ') : null;
     const optCount = (q.ocr.match(/\(\s*[a-d]\s*\)/gi) || []).length;
     q.options = optCount; q.type = optCount >= 3 ? 'mcq' : /\(\s*[A-E]\s*\)|Column|Match|Statement/i.test(q.ocr) ? 'mixed' : 'numeric?';
@@ -113,13 +124,15 @@ function prep(pdf, out) {
     const s = dpi / 72, f = path.join(out, 'crops', 'q' + String(q.n).padStart(3, '0'));
     sh('pdftoppm', ['-r', String(dpi), '-f', String(q.page), '-l', String(q.page), '-x', String(Math.round(q.box.x0 * s)), '-y', String(Math.round(q.box.y0 * s)), '-W', String(Math.round((q.box.x1 - q.box.x0) * s)), '-H', String(Math.round((q.box.y1 - q.box.y0) * s)), '-png', '-singlefile', pdf, f]);
     q.crop = 'crops/q' + String(q.n).padStart(3, '0') + '.png';
+    if (q.box2) { const b2 = q.box2, f2 = path.join(out, 'crops', 'q' + String(q.n).padStart(3, '0') + '-b');
+      sh('pdftoppm', ['-r', String(dpi), '-f', String(b2.page), '-l', String(b2.page), '-x', String(Math.round(b2.x0 * s)), '-y', String(Math.round(b2.y0 * s)), '-W', String(Math.round((b2.x1 - b2.x0) * s)), '-H', String(Math.round((b2.y1 - b2.y0) * s)), '-png', '-singlefile', pdf, f2]); q.crop2 = 'crops/q' + String(q.n).padStart(3, '0') + '-b.png' }
   }
   figScan(need, out, dpi);
   // answer keys
   const keys = {};     // every 'N. (x)' pair in the answer section (answer-key grid first, then the explanations); first one wins
   for (let i = sol - 1; i < P; i++) { const ws = pages[i].ws;
     for (const w of ws) { const mm = NUM.exec(w.t); if (!mm || !/[.:]$/.test(w.t)) continue; const k = ws.filter(z => Math.abs(z.y0 - w.y0) < 4 && z.x0 > w.x1 - 1 && z.x0 < w.x1 + 22 && KEY.test(z.t))[0]; if (k && keys[+mm[1]] === undefined) keys[+mm[1]] = KEY.exec(k.t)[1].toLowerCase() } }
-  const draft = qs.map(q => ({ n: q.n, page: q.page, missing: !!q.missing || undefined, y: q.y || undefined, type: q.type, options: q.options, fig: q.fig, figMaybe: q.maybe || undefined, figMention: q.scanned && q.kw && !q.blobBig ? true : undefined, blob: q.blob, continues: q.endsAtColumnBottom || undefined, also: q.also, key: keys[q.n] ?? null, crop: q.crop, ocr: q.ocr }));
+  const draft = qs.map(q => ({ n: q.n, page: q.page, missing: !!q.missing || undefined, y: q.y || undefined, type: q.type, options: q.options, fig: q.fig, figMaybe: q.maybe || undefined, figMention: q.scanned && q.kw && !q.blobBig ? true : undefined, blob: q.blob, continues: q.endsAtColumnBottom || undefined, crop2: q.crop2, also: q.also, key: keys[q.n] ?? null, crop: q.crop, ocr: q.ocr }));
   fs.writeFileSync(path.join(out, 'draft.json'), JSON.stringify({ pdf: path.basename(pdf), pages: P, solFrom: sol, draft }, null, 1));
   const miss = draft.filter(d => d.missing).map(d => d.n), nokey = draft.filter(d => d.key === null).map(d => d.n);
   console.log(`pages ${P}, answer section from page ${sol}, questions found ${draft.length - miss.length}, last n ${draft.at(-1)?.n}`);
@@ -150,21 +163,24 @@ function check(out, entries, g) {
   bad.forEach(x => console.log('  ' + x)); process.exitCode = miss.length || bad.length ? 1 : 0;
 }
 
-function batches(out, size) {
-  const D = JSON.parse(fs.readFileSync(path.join(out, 'draft.json'), 'utf8')).draft, files = [];
-  for (let i = 0; i < D.length; i += size) { const part = D.slice(i, i + size), f = path.join(out, `batch-${String(i / size + 1).padStart(2, '0')}.md`);
-    fs.writeFileSync(f, `# Questions ${part[0].n}-${part.at(-1).n}\nRead ONLY the crop of each question (path below); the OCR text is a rough hint (maths is often wrong).\n\n` + part.map(d => `## Q${d.n}${d.missing ? ' (no crop: the number is inside the previous crop)' : ''}\ncrop: ${out}/${d.crop || '(none)'}\nexam tag guess: ${d.y || '?'} | type guess: ${d.type} | key in PDF: ${d.key ?? 'none'} | diagram: ${d.fig ? 'YES (drawing found and the text mentions a figure): give a fig' : d.figMaybe ? 'a drawing-like block was found (may be a big formula): draw a fig only if the crop really has a diagram' : d.figMention ? 'text mentions a figure but no drawing found: check the crop' : 'none seen'}${d.continues ? ' | may continue in next column/page' : ''}${d.also ? ' | THIS CROP ALSO HOLDS Q' + d.also.join(', Q') + ' (number not found by OCR)' : ''}\nocr: ${(d.ocr || '').replace(/\n/g, ' ').slice(0, 400)}\n`).join('\n')); files.push(f) }
+function batches(out, size, only) {
+  const all = JSON.parse(fs.readFileSync(path.join(out, 'draft.json'), 'utf8')).draft, keep = only ? new Set(only.split(',').map(Number)) : null, D = keep ? all.filter(d => keep.has(d.n)) : all, files = [], tag = only ? 'redo' : 'batch';
+  for (let i = 0; i < D.length; i += size) { const part = D.slice(i, i + size), f = path.join(out, `${tag}-${String(i / size + 1).padStart(2, '0')}.md`);
+    fs.writeFileSync(f, `# Questions ${part[0].n}-${part.at(-1).n}\nRead ONLY the crop of each question (path below); the OCR text is a rough hint (maths is often wrong).\n\n` + part.map(d => `## Q${d.n}${d.missing ? ' (no crop: the number is inside the previous crop)' : ''}\ncrop: ${out}/${d.crop || '(none)'}${d.crop2 ? '\ncrop (continues here, read it too): ' + out + '/' + d.crop2 : ''}\nexam tag guess: ${d.y || '?'} | type guess: ${d.type} | key in PDF: ${d.key ?? 'none'} | diagram: ${d.fig ? 'YES (drawing found and the text mentions a figure): give a fig' : d.figMaybe ? 'a drawing-like block was found (may be a big formula): draw a fig only if the crop really has a diagram' : d.figMention ? 'text mentions a figure but no drawing found: check the crop' : 'none seen'}${d.continues ? ' | may continue in next column/page' : ''}${d.also ? ' | THIS CROP ALSO HOLDS Q' + d.also.join(', Q') + ' (number not found by OCR)' : ''}\nocr: ${(d.ocr || '').replace(/\n/g, ' ').slice(0, 400)}\n`).join('\n')); files.push(f) }
   console.log(files.length + ' batch files in ' + out);
 }
 /* assemble: entries-*.jsonl (one JSON entry per line, each with pn) -> the rank-pyq-<chapter>.js source file, sorted by pn */
+const normY = y => String(y || '').trim().replace(/^JEE Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Advanced (\d{4})$/, 'JEE Advanced $1').replace(/^Main (\d{4})$/, 'JEE Main $1').replace(/^JEE Main (\d+ \w+) · Shift (\d) (\d{4})$/, 'JEE Main $3 · $1 · Shift $2').replace(/\(year not legible\)/i, '(year not printed)');   // labels as tools/pyq-lint.js wants them
 function assemble(dir, outFile, g, header) {
   const rows = fs.readdirSync(dir).filter(f => /^entries.*\.jsonl$/.test(f)).flatMap(f => fs.readFileSync(path.join(dir, f), 'utf8').split('\n').filter(l => l.trim()).map((l, i) => { try { return JSON.parse(l) } catch (e) { throw new Error(f + ' line ' + (i + 1) + ': ' + e.message) } }));
   const seen = new Set(), dup = rows.filter(r => seen.has(r.pn) || !seen.add(r.pn)).map(r => r.pn).filter((v, i, a) => a.indexOf(v) === i && rows.filter(r => r.pn === v).length > 1);
   if (dup.length) throw new Error('duplicate pn: ' + dup.join(','));
+  const gaps = rows.filter(r => r.gap); rows.splice(0, rows.length, ...rows.filter(r => !r.gap)); rows.forEach(r => { r.y = normY(r.y) });     // {pn, gap}: the agent could not see the whole question; never published
+  fs.writeFileSync(path.join(dir, 'gaps.json'), JSON.stringify(gaps, null, 1)); if (gaps.length) console.log('GAPS (text missing in the PDF crops, supply or re-crop): ' + gaps.map(g => 'Q' + g.pn + ' ' + g.gap).join(' | '));
   rows.sort((p, q) => p.pn - q.pn);
   fs.writeFileSync(outFile, `/* ${header || 'Past-year questions for Rank mode'} */\nwindow.${g}=[\n` + rows.map(r => JSON.stringify(r)).join(',\n') + '\n];\n');
   console.log(rows.length + ' entries written to ' + outFile);
 }
 const [cmd, a, b, c, d] = process.argv.slice(2);
 const dflt = f => path.join('content', 'pyq-work', path.basename(f, '.pdf').replace(/[^A-Za-z0-9._-]+/g, '-'));     // content/ is git-ignored and guarded: never commit book pages
-if (cmd === 'prep' && !b && a) { const o = dflt(a); console.log('work dir: ' + o); prep(a, o) } else if (cmd === 'assemble') assemble(a, b, c, d); else if (cmd === 'prep') prep(a, b); else if (cmd === 'check') check(a, b, c); else if (cmd === 'batches') batches(a, +b || 12); else console.log(fs.readFileSync(__filename, 'utf8').split('*/')[0]);
+if (cmd === 'prep' && !b && a) { const o = dflt(a); console.log('work dir: ' + o); prep(a, o) } else if (cmd === 'assemble') assemble(a, b, c, d); else if (cmd === 'prep') prep(a, b); else if (cmd === 'check') check(a, b, c); else if (cmd === 'batches') batches(a, +b || 12, c); else console.log(fs.readFileSync(__filename, 'utf8').split('*/')[0]);

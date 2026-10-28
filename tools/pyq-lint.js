@@ -6,7 +6,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const FILES = fs.readdirSync(root).filter(f => /^rank-pyq-.+\.js$/.test(f) && !f.endsWith('.min.js'));
-const LABEL = /^(JEE Main|JEE Advanced|IIT-JEE|AIEEE) (19|20)\d\d( · .+)?$/;
+const LABEL = /^(JEE Main|JEE Advanced|IIT-JEE|AIEEE) ((19|20)\d\d( · .+)?|\(year not printed\))$/;
 const SHAPES = { l: 4, c: 3, r: 4, t: 2, p: 0 };
 let bad = 0, total = 0;
 for (const f of FILES) {
