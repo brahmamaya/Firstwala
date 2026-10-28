@@ -903,6 +903,55 @@ const XF={};
 /* <<< FIGS emi */
 
 /* >>> FIGS atoms: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function anscat(){const s=hs(300,240,'Alpha particle scattering from a gold nucleus. Three alpha particles come from the left. One aimed straight at the nucleus stops at the distance of closest approach r0 and turns back. One with impact parameter b is deflected through a large angle. One far from the axis is hardly deflected.');
+  dot(s,150,100,HI,6);ht(s,150,134,'nucleus +Ze',HI,'middle',12);
+  hv(s,14,100,108,100,BLUE,1.8);hl(s,108,103,24,103,BLUE);hv(s,60,103,30,103,BLUE,1.4);ht(s,20,120,'α',BLUE,'start',13);
+  pth(s,'M14 62Q150 62 262 14',GRN,1.8);hv(s,236,26,262,14,GRN,1.8);
+  dsh(s,40,62,40,100);ht(s,34,84,'b',INK,'end',13);
+  pth(s,'M14 28Q190 28 280 8',DIM,1.6);ht(s,100,47,'large b: small angle',DIM,'middle',11);
+  dsh(s,108,100,150,100);ht(s,128,92,'r₀',INK,'middle',13);
+  cp(s,176,'closest approach (head-on): K = {2Ze²}/{4πε₀r₀}|b = (r₀/2) cot(θ/2); b = 0 gives θ = 180°');return fin(s)}
+function anorb(){const s=hs(300,240,'Bohr orbits of hydrogen. Three circles around the nucleus with radii in the ratio 1 to 4 to 9 for n equal to 1, 2 and 3. The electron is shown on each. Radius grows as n squared, speed falls as 1 over n and the energy rises towards zero as minus 13.6 over n squared.');
+  const cx=96,cy=96;dot(s,cx,cy,HI,4);
+  [[9,'n = 1',200],[36,'n = 2',300],[81,'n = 3',40]].forEach(([r,l,a])=>{mk(s,'circle',{cx,cy,r,fill:'none',stroke:DIM,'stroke-width':1.3});const [x,y]=[cx+r*Math.cos(a*Math.PI/180),cy-r*Math.sin(a*Math.PI/180)];dot(s,x,y,BLUE,3.5)});
+  ht(s,cx+14,cy+4,'1',INK,'start',11);ht(s,cx+36+2,cy+4,'4',INK,'start',11);ht(s,cx+81-14,cy+4,'9',INK,'end',11);
+  hl(s,cx,cy,cx+81,cy,DIM,'3 3');
+  ht(s,196,34,'r = 0.529 n²/Z Å',INK,'start',12);ht(s,196,56,'v = 2.19×10⁶ Z/n',INK,'start',12);ht(s,196,78,'(m/s)',INK,'start',12);
+  ht(s,196,102,'E = −13.6 Z²/n²',HI,'start',12);ht(s,196,124,'(eV)',HI,'start',12);ht(s,196,148,'L = n h/2π',GRN,'start',12);
+  cp(s,196,'radius in the ratio 1 : 4 : 9 (n = 1, 2, 3)|v ∝ Z/n, T ∝ n³/Z², E ∝ −Z²/n²');return fin(s)}
+function anlev(){const s=hs(300,240,'Energy levels of hydrogen (heights not to scale) with energy in electron volt: n equals 1 at minus 13.6, n equals 2 at minus 3.4, n equals 3 at minus 1.51, and the levels crowd together towards zero. Arrows end on n equals 1 for the Lyman series, on n equals 2 for the Balmer series and on n equals 3 for the Paschen series.');
+  const Y=n=>[0,170,92,64,48,38][n];
+  hl(s,90,26,196,26,DIM,'4 3');ht(s,86,30,'∞',INK,'end',12);ht(s,200,30,'0',INK,'start',11);
+  [1,2,3,4,5].forEach(n=>{hl(s,90,Y(n),196,Y(n),INK);if(n<4)ht(s,86,Y(n)+4,'n='+n,INK,'end',12)});
+  ht(s,86,Y(4)+4,'n=4',INK,'end',11);ht(s,86,Y(5)+4,'n=5',INK,'end',11);
+  ht(s,200,Y(1)+4,'−13.6',INK,'start',11);ht(s,200,Y(2)+4,'−3.4',INK,'start',11);ht(s,200,Y(3)+4,'−1.51',INK,'start',11);
+  hv(s,112,Y(5),112,Y(1)-3,BLUE,1.8);hv(s,148,Y(5),148,Y(2)-3,HI,1.8);hv(s,176,Y(5),176,Y(3)-3,GRN,1.8);
+  ht(s,264,Y(1)-14,'Lyman',BLUE,'middle',12);ht(s,264,Y(1)-1,'(UV)',BLUE,'middle',11);
+  ht(s,264,Y(2)-14,'Balmer',HI,'middle',12);ht(s,264,Y(2)-1,'(visible)',HI,'middle',11);
+  ht(s,264,Y(3)-14,'Paschen',GRN,'middle',12);ht(s,264,Y(3)-1,'(infrared)',GRN,'middle',11);
+  cp(s,198,'En = −13.6/n² eV; series end on n = 1, 2, 3|1/λ = R(1/n₁² − 1/n₂²), R = 1.097×10⁷ m⁻¹');return fin(s)}
+function anbe(){const s=hs(300,240,'Binding energy per nucleon plotted against mass number. The curve rises steeply for light nuclei, with a peak at helium 4, reaches a broad maximum of about 8.8 mega electron volt near iron 56, and falls slowly to about 7.6 for uranium 238. Fusion of light nuclei and fission of heavy nuclei both move towards the peak.');
+  const X=a=>50+a*.96,Y=e=>176-e*15;
+  hv(s,50,176,290,176,DIM,1.3);hv(s,50,176,50,24,DIM,1.3);ht(s,290,194,'A',INK,'end',13);ht(s,56,20,'BE/A (MeV)',INK,'start',12);
+  [[1,0],[2,1.11],[3,2.57],[4,7.07],[6,5.33],[12,7.68],[16,7.98],[28,8.45],[56,8.79],[90,8.7],[120,8.5],[160,8.1],[200,7.85],[238,7.6]].forEach(([a,e],i,arr)=>{});
+  pth(s,'M'+X(2)+' '+Y(1.11)+'L'+X(3)+' '+Y(2.57)+'L'+X(4)+' '+Y(7.07)+'L'+X(6)+' '+Y(5.33)+'L'+X(12)+' '+Y(7.68)+'L'+X(16)+' '+Y(7.98)+'L'+X(28)+' '+Y(8.45)+'L'+X(56)+' '+Y(8.79)+'L'+X(90)+' '+Y(8.7)+'L'+X(120)+' '+Y(8.5)+'L'+X(160)+' '+Y(8.1)+'L'+X(200)+' '+Y(7.85)+'L'+X(238)+' '+Y(7.6),BLUE,2);
+  dsh(s,50,Y(8.79),X(56),Y(8.79));ht(s,46,Y(8.79)+4,'8.8',INK,'end',11);
+  dot(s,X(56),Y(8.79),HI,4);ht(s,X(56)+4,Y(8.79)-8,'Fe-56',HI,'start',12);
+  dot(s,X(4),Y(7.07),GRN,3.5);ht(s,X(4)+6,Y(7.07)-4,'He-4',GRN,'start',11);
+  dot(s,X(2),Y(1.11),INK,3);ht(s,X(2)+6,Y(1.11)+12,'H-2',INK,'start',11);
+  dot(s,X(238),Y(7.6),INK,3);ht(s,X(238),Y(7.6)+16,'U-238 (7.6)',INK,'end',11);
+  hv(s,X(8),Y(3.5),X(40),Y(3.5),GRN,1.6);ht(s,X(24),Y(3.5)-6,'fusion',GRN,'middle',12);
+  hv(s,X(236),Y(5.2),X(160),Y(5.2),RED,1.6);ht(s,X(198),Y(5.2)-6,'fission',RED,'middle',12);
+  cp(s,214,'peak near A = 56; energy is released when nuclei move towards the peak|Q = Σ(BE of products) − Σ(BE of reactants)');return fin(s)}
+function andec(){const s=hs(300,240,'Radioactive decay curve. The number of nuclei N falls exponentially with time. After one half-life it is N0 over 2, after two half-lives N0 over 4 and after three half-lives N0 over 8. At the mean life tau equal to 1.44 half-lives, N is N0 over e, about 37 percent.');
+  const X=t=>50+t*68,Y=n=>176-n*130;
+  hv(s,50,176,280,176,DIM,1.3);hv(s,50,176,50,24,DIM,1.3);ht(s,280,194,'t',INK,'end',13);ht(s,44,28,'N',INK,'end',13);
+  let d='';for(let t=0;t<=3.4;t+=.1)d+=(d?'L':'M')+X(t)+' '+Y(Math.pow(.5,t));pth(s,d,BLUE,2);
+  [[1,'N₀/2'],[2,'N₀/4'],[3,'N₀/8']].forEach(([k,l])=>{const n=Math.pow(.5,k);dsh(s,50,Y(n),X(k),Y(n));dsh(s,X(k),Y(n),X(k),176);dot(s,X(k),Y(n),HI,3.5);ht(s,46,Y(n)+4,l,INK,'end',11);ht(s,X(k),190,k+'T',INK,'middle',12)});
+  ht(s,46,Y(1)+4,'N₀',INK,'end',11);
+  const tt=1/Math.LN2;dot(s,X(tt),Y(Math.exp(-1)),GRN,3.5);dsh(s,X(tt),Y(Math.exp(-1)),X(tt),176);ht(s,X(tt)+8,Y(Math.exp(-1))-6,'τ: N₀/e',GRN,'start',12);
+  cp(s,208,'N = N₀e^(−λt) = N₀/2^(t/T); T = 0.693/λ, τ = 1/λ = 1.44 T|activity A = λN falls in the same way');return fin(s)}
+Object.assign(XF,{anscat,anorb,anlev,anbe,andec});
 /* <<< FIGS atoms */
 
 /* >>> FIGS devices: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
