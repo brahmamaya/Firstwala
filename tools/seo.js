@@ -39,37 +39,44 @@ function controlText(c) {
   return c.label;
 }
 
-function renderPage(s, siblings) {
-  const url = `${SITE}/sim/${s.id}.html`, subj = SUBJECT[s.subject] || s.subject, desc = metaDesc(s), title = pageTitle(s), others = siblings.filter(x => x.id !== s.id);
-  const ld = { '@context': 'https://schema.org', '@type': 'LearningResource', name: s.title, description: desc, educationalLevel: `Class ${s.grade}`, about: s.chapter, teaches: s.chapter, inLanguage: 'en',
-    learningResourceType: 'Interactive simulation', isAccessibleForFree: true, url };
-  const ldJson = JSON.stringify(ld).replace(/</g, '\\u003c');
-  const ctrls = (s.controls || []).filter(c => c.label);
-  const L = [];
-  L.push('<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">', '<meta name="referrer" content="strict-origin-when-cross-origin">', '<script src="/framebust.js"></script>',
+/* one page = shared head (title, description, canonical, Open Graph, Twitter, JSON-LD) + header + <main> + footer */
+function shell({ title, desc, url, ld, body }) {
+  const ldTags = [].concat(ld).map(o => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`);
+  return ['<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">', '<meta name="referrer" content="strict-origin-when-cross-origin">', '<script src="/framebust.js"></script>',
     `<meta http-equiv="Content-Security-Policy" content="${CSP}">`, '<meta name="viewport" content="width=device-width, initial-scale=1">', `<title>${esc(title)}</title>`,
     `<meta name="description" content="${esc(desc)}">`, `<link rel="canonical" href="${url}">`, '<meta name="color-scheme" content="light dark">', '<link rel="icon" href="/icons/icon-192.png">', '<link rel="stylesheet" href="/sim-page.css">',
     '<meta property="og:type" content="website">', '<meta property="og:site_name" content="Physica">', `<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="${esc(desc)}">`,
     `<meta property="og:url" content="${url}">`, `<meta property="og:image" content="${SITE}/og.png">`, '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="630">',
     '<meta name="twitter:card" content="summary_large_image">', `<meta name="twitter:title" content="${esc(title)}">`, `<meta name="twitter:description" content="${esc(desc)}">`, `<meta name="twitter:image" content="${SITE}/og.png">`,
-    `<script type="application/ld+json">${ldJson}</script>`, '</head>', '<body>', '<a class="skip" href="#main">Skip to content</a>',
-    '<header class="sh"><a class="brand" href="/"><img src="/icons/icon-192.png" alt="" width="28" height="28">PHYSICA</a></header>', '<main id="main">',
-    `<p class="crumb">Class ${s.grade} · ${esc(subj)} · ${esc(s.chapter)}</p>`, `<h1>${esc(s.title)}</h1>`, `<p class="lead">${esc(s.description || '')}</p>`,
-    `<p><a class="cta" href="/#${encodeURIComponent(s.id)}">Open the simulation</a></p>`);
-  if (s.observe) L.push('<h2>What to notice</h2>', `<p>${esc(s.observe)}</p>`);
-  if (s.formula) L.push('<h2>Key relation</h2>', `<p class="formula">${esc(s.formula)}</p>`);
-  if (s.tryText) L.push('<h2>Try this</h2>', `<p>${esc(s.tryText)}</p>`);
-  if (ctrls.length) L.push('<h2>What you can change</h2>', '<ul>', ...ctrls.map(c => `<li>${esc(controlText(c))}</li>`), '</ul>');
-  if (others.length) L.push(`<h2>More in ${esc(s.chapter)}</h2>`, '<ul class="links">', ...others.map(x => `<li><a href="/sim/${x.id}.html">${esc(x.title)}</a></li>`), '</ul>');
-  L.push('</main>', '<footer class="sf"><a href="/">Physica home</a><a href="/about.html">About</a><a href="/help.html">Help</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a></footer>', '</body>', '</html>', '');
-  return L.join('\n');
+    ...ldTags, '</head>', '<body>', '<a class="skip" href="#main">Skip to content</a>',
+    '<header class="sh"><a class="brand" href="/"><img src="/icons/icon-192.png" alt="" width="28" height="28">PHYSICA</a></header>', '<main id="main">', ...body, '</main>',
+    '<footer class="sf"><a href="/">Physica home</a><a href="/simulations.html">All simulations</a><a href="/jee-main-chapters.html">JEE Main chapters</a><a href="/about.html">About</a><a href="/help.html">Help</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a></footer>', '</body>', '</html>', ''].join('\n');
+}
+const crumbLd = items => ({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: url })) });
+const hubFile = (g, sub) => `class-${g}-${sub}-simulations.html`;
+
+function renderPage(s, siblings) {
+  const url = `${SITE}/sim/${s.id}.html`, subj = SUBJECT[s.subject] || s.subject, desc = metaDesc(s), title = pageTitle(s), others = siblings.filter(x => x.id !== s.id);
+  const ld = { '@context': 'https://schema.org', '@type': 'LearningResource', name: s.title, description: desc, educationalLevel: `Class ${s.grade}`, about: s.chapter, teaches: s.chapter, inLanguage: 'en',
+    learningResourceType: 'Interactive simulation', isAccessibleForFree: true, url };
+  const ctrls = (s.controls || []).filter(c => c.label), hub = `/${hubFile(s.grade, s.subject)}`;
+  const body = [`<p class="crumb"><a href="${hub}">Class ${s.grade} ${esc(subj)} simulations</a> · ${esc(s.chapter)}</p>`, `<h1>${esc(s.title)}</h1>`, `<p class="lead">${esc(s.description || '')}</p>`,
+    `<p><a class="cta" href="/#${encodeURIComponent(s.id)}">Open the simulation</a></p>`];
+  if (s.observe) body.push('<h2>What to notice</h2>', `<p>${esc(s.observe)}</p>`);
+  if (s.formula) body.push('<h2>Key relation</h2>', `<p class="formula">${esc(s.formula)}</p>`);
+  if (s.tryText) body.push('<h2>Try this</h2>', `<p>${esc(s.tryText)}</p>`);
+  if (ctrls.length) body.push('<h2>What you can change</h2>', '<ul>', ...ctrls.map(c => `<li>${esc(controlText(c))}</li>`), '</ul>');
+  if (others.length) body.push(`<h2>More in ${esc(s.chapter)}</h2>`, '<ul class="links">', ...others.map(x => `<li><a href="/sim/${x.id}.html">${esc(x.title)}</a></li>`), '</ul>');
+  body.push(`<p>See all <a href="${hub}">Class ${s.grade} ${esc(subj)} simulations</a> or <a href="/simulations.html">every Physica simulation</a>.</p>`);
+  return shell({ title, desc, url, ld: [ld, crumbLd([['Physica', SITE + '/'], [`Class ${s.grade} ${subj} simulations`, `${SITE}${hub}`], [s.title, url]])], body });
 }
 
 function render(sims, date) {
   const files = {}, byCh = new Map();
   for (const s of sims) { const k = [s.grade, s.subject, s.chapter].join('|'); (byCh.get(k) || byCh.set(k, []).get(k)).push(s); }
   for (const s of sims) files[`sim/${s.id}.html`] = renderPage(s, byCh.get([s.grade, s.subject, s.chapter].join('|')));
-  const urls = [...STATIC.map(p => `${SITE}/${p}`), ...sims.map(s => `${SITE}/sim/${s.id}.html`)];
+  const ex = require('./seo-pages.js').pages({ sims, shell, esc, clip, crumbLd, hubFile, SITE, SUBJECT, root }); Object.assign(files, ex.files);
+  const urls = [...STATIC.map(p => `${SITE}/${p}`), ...ex.urls, ...sims.map(s => `${SITE}/sim/${s.id}.html`)];
   files['sitemap.xml'] = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => `<url><loc>${u}</loc><lastmod>${date}</lastmod></url>`).join('\n') + '\n</urlset>\n';
   files['robots.txt'] = `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`;
   return files;
@@ -94,7 +101,8 @@ async function main() {
   for (const f of fs.readdirSync(dir)) if (f.endsWith('.html') && !files['sim/' + f]) fs.unlinkSync(path.join(dir, f)); // sim removed -> page removed
   for (const [f, c] of Object.entries(files)) fs.writeFileSync(path.join(root, f), c);
   if (process.argv.includes('--og') || !fs.existsSync(path.join(root, 'og.png'))) await makeOg();
-  console.log(`seo: ${sims.length} sim pages, sitemap ${STATIC.length + sims.length} URLs, lastmod ${date}`);
+  console.log(`seo: ${sims.length} sim pages, sitemap ${STATIC.length + sims.length + Object.keys(files).filter(f => f.endsWith('.html') && !f.startsWith('sim/')).length} URLs, lastmod ${date}`);
 }
 module.exports = { loadSims, render, pageTitle, STATIC, SITE };
+
 if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });
