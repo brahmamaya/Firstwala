@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Screenshots of one Rank-mode JEE chapter (for visual checks), served from the current checkout. No model calls.
-   NODE_PATH=/tmp/nm CHROMIUM=/opt/pw-browsers/chromium node tools/chapter-shot.js "<chapter name>" <outdir> [figName,figName,...] [light|dark]
+   SUBJ=Maths (for a Maths chapter) NODE_PATH=/tmp/nm CHROMIUM=/opt/pw-browsers/chromium node tools/chapter-shot.js "<chapter name>" <outdir> [figName,figName,...] [light|dark]
    Writes: tab-guide/formulas/revise/asked.png (desktop 900 px, first screen of each tab) and figs.png (every named figure on the page
    background, in the chosen theme) so figure text, overlaps and clipping can be looked at. Prints page errors. */
 'use strict';
@@ -14,7 +14,7 @@ const srv = http.createServer((q, r) => { let f = path.join(root, decodeURICompo
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM }), p = await b.newPage({ viewport: { width: 900, height: 1000 } });
   p.on('pageerror', e => console.log('PAGE ERROR', e.message)); p.on('console', m => { if (m.type() === 'error') console.log('CONSOLE ERROR', m.text()) });
   await p.goto('http://localhost:' + srv.address().port + '/'); await p.waitForTimeout(3000); await p.click('.sn-x').catch(() => {});
-  await p.click('.land-rank'); await p.waitForTimeout(700); await p.click('text=JEE Mains'); await p.waitForTimeout(1200); await p.click('text=' + chap, { timeout: 8000 }); await p.waitForTimeout(1500);
+  await p.click('.land-rank'); await p.waitForTimeout(700); await p.click('text=JEE Mains'); await p.waitForTimeout(1200); if (process.env.SUBJ) { await p.click(`button:has-text("${process.env.SUBJ}")`); await p.waitForTimeout(500) } await p.click('text=' + chap, { timeout: 8000 }); await p.waitForTimeout(1500);
   if (theme) await p.evaluate(t => { document.documentElement.dataset.theme = t }, theme);
   for (const [tab, label] of [['guide', 'Guide'], ['formulas', 'Formulas'], ['revise', 'Revise'], ['asked', 'Most asked']]) { await p.click(`button:has-text("${label}")`).catch(() => {}); await p.waitForTimeout(900); await p.screenshot({ path: path.join(out, 'tab-' + tab + '.png') }) }
   const n = await p.evaluate(() => document.querySelectorAll('.rank-ov .rk-fig, .rank-ov svg.rk-hand, .rank-ov svg.rk-fig').length); console.log('figures drawn on the last tab: ' + n);
