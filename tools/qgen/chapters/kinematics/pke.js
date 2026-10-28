@@ -1,0 +1,156 @@
+/* Kinematics templates: tp pke = equations of motion, stopping distance, free fall.
+   Template = { id, tp, st, diff 1-3, type, n, gen(r)->params, make(p)->{q,ans,unit,steps,wrong:[[value,"mistake"]]}, check(p)->number (other method) } */
+'use strict';
+const { fmt: f, simpson, bisect } = require('../../lib');
+const sq = Math.sqrt;
+/* time-stepping simulation (position update is exact for constant acceleration) */
+const stopDist = (u, a, dt = 1e-3) => { let v = u, x = 0; while (v > 0) { x += v * dt - 0.5 * a * dt * dt; v -= a * dt; } return x; };
+
+module.exports = [
+{ id: 'pke-v', tp: 'pke', st: 'Equations of motion', diff: 1, type: ['mcq', 'numeric'], n: 50,
+  gen: r => ({ u: r.int(0, 20), a: r.int(2, 9), t: r.int(2, 12) }),
+  make: p => ({ q: `A car moving at ${p.u} m/s speeds up uniformly at ${p.a} m/s² for ${p.t} s. What is its speed at the end of this time?`, ans: p.u + p.a * p.t, unit: 'm/s',
+    steps: ['Uniform acceleration, so use v = u + at.', `u = ${p.u} m/s, a = ${p.a} m/s², t = ${p.t} s`, `v = ${p.u} + ${p.a} × ${p.t} = ${p.u} + ${p.a * p.t}`, `v = ${p.u + p.a * p.t} m/s`],
+    wrong: [[p.u - p.a * p.t, 'sign error: subtracted at'], [p.a * p.t, 'forgot the initial speed'], [p.u + p.a * p.t * p.t, 'used t² instead of t'], [(p.u + p.a) * p.t, 'multiplied (u + a) by t']] }),
+  check: p => sq(p.u * p.u + 2 * p.a * (p.u * p.t + 0.5 * p.a * p.t * p.t)) },
+
+{ id: 'pke-s', tp: 'pke', st: 'Equations of motion', diff: 1, type: ['mcq', 'numeric'], n: 50,
+  gen: r => ({ u: r.int(0, 15), a: r.int(2, 8), t: r.int(2, 10) }),
+  make: p => { const s = p.u * p.t + 0.5 * p.a * p.t * p.t; return { q: `A body starts with a speed of ${p.u} m/s and moves with a uniform acceleration of ${p.a} m/s². How far does it travel in ${p.t} s?`, ans: s, unit: 'm',
+    steps: ['Use s = ut + ½at².', `s = ${p.u} × ${p.t} + ½ × ${p.a} × ${p.t}²`, `s = ${p.u * p.t} + ${f(0.5 * p.a * p.t * p.t)}`, `s = ${f(s)} m`],
+    wrong: [[p.u * p.t + p.a * p.t * p.t, 'missed the ½ in ½at²'], [0.5 * p.a * p.t * p.t, 'dropped the ut term'], [p.u * p.t + 0.5 * p.a * p.t, 'used t instead of t²'], [(p.u + p.a * p.t) * p.t, 'used final speed × t']] }; },
+  check: p => { const v = p.u + p.a * p.t; return (p.u + v) / 2 * p.t; } },
+
+{ id: 'pke-stop', tp: 'pke', st: 'Stopping distance and retardation', diff: 1, type: ['mcq', 'numeric'], n: 50, tol: 3e-3,
+  gen: r => ({ u: r.step(10, 40, 2), a: r.pick([2, 2.5, 4, 5, 8]) }),
+  make: p => { const s = p.u * p.u / (2 * p.a); return { q: `A car moving at ${p.u} m/s is brought to rest by brakes giving a uniform retardation of ${p.a} m/s². Find the distance it travels before stopping.`, ans: s, unit: 'm',
+    steps: ['Final speed v = 0, so use v² = u² − 2as.', `0 = ${p.u}² − 2 × ${p.a} × s`, `s = ${p.u * p.u} ÷ ${f(2 * p.a)}`, `s = ${f(s)} m`],
+    wrong: [[p.u * p.u / p.a, 'missing the factor 2 in v² = u² − 2as'], [p.u / p.a, 'found the time instead of the distance'], [p.u * p.u / (2 * p.a * p.a), 'divided by a twice'], [p.u * p.u * p.a / 2, 'multiplied by a instead of dividing']] }; },
+  check: p => stopDist(p.u, p.a) },
+
+{ id: 'pke-kmh', tp: 'pke', st: 'Stopping distance and retardation', diff: 2, type: ['mcq', 'numeric'], n: 50,
+  gen: r => { const um = r.pick([5, 10, 15, 20, 25, 30, 35, 40]), a = r.pick([0.5, 1, 1.25, 2, 2.5, 4, 5, 8]); return { um, a, kmh: um * 3.6, d: um * um / (2 * a) }; },
+  make: p => ({ q: `A train running at ${f(p.kmh)} km h⁻¹ is stopped by uniform braking within ${f(p.d)} m. Find the magnitude of the retardation.`, ans: p.a, unit: 'm/s²',
+    steps: [`Convert first: ${f(p.kmh)} km h⁻¹ = ${f(p.kmh)} × {5;18} = ${p.um} m/s.`, 'Use v² = u² − 2as with v = 0.', `a = u² ÷ 2s = ${p.um * p.um} ÷ ${f(2 * p.d)}`, `a = ${f(p.a)} m/s²`],
+    wrong: [[p.kmh * p.kmh / (2 * p.d), 'used km h⁻¹ without converting to m/s'], [p.um * p.um / p.d, 'missing the factor 2'], [Math.pow(p.kmh / 3.6 / 3.6, 2) / (2 * p.d), 'divided by 3.6 twice'], [p.um / p.d, 'used u ÷ s']] }),
+  check: p => { const u = p.kmh * 1000 / 3600; return (u / 2) * u / p.d; } },
+
+{ id: 'pke-nth', tp: 'pke', st: 'Equations of motion', diff: 2, type: ['mcq', 'numeric'], n: 50,
+  gen: r => ({ u: r.int(0, 10), a: r.step(2, 10, 2), n: r.int(3, 10) }),
+  make: p => { const s = p.u + p.a * (2 * p.n - 1) / 2; return { q: `A particle starts with speed ${p.u} m/s and moves with a uniform acceleration of ${p.a} m/s². Find the distance it covers in the ${p.n}th second of its motion.`, ans: s, unit: 'm',
+    steps: ['Distance in the nth second: s(n) = u + {a;2}(2n − 1).', `s = ${p.u} + {${p.a};2}(2 × ${p.n} − 1)`, `s = ${p.u} + ${p.a / 2} × ${2 * p.n - 1}`, `s = ${f(s)} m`],
+    wrong: [[p.u + p.a * p.n, 'used n instead of (n − ½)'], [p.u * p.n + 0.5 * p.a * p.n * p.n, 'gave the distance in n seconds'], [p.u + p.a * (2 * p.n + 1) / 2, 'used (2n + 1)'], [p.a * (2 * p.n - 1), 'missing the factor ½ and u']] }; },
+  check: p => { const S = t => p.u * t + 0.5 * p.a * t * t; return S(p.n) - S(p.n - 1); } },
+
+{ id: 'pke-stage', tp: 'pke', st: 'Equations of motion', diff: 2, type: ['mcq', 'numeric'], n: 50,
+  gen: r => ({ a: r.int(1, 4), t1: r.int(4, 10), t2: r.int(5, 20), t3: r.int(3, 10) }),
+  make: p => { const v = p.a * p.t1, s1 = 0.5 * p.a * p.t1 * p.t1, s2 = v * p.t2, s3 = 0.5 * v * p.t3; return { q: `A train starts from rest and speeds up at ${p.a} m/s² for ${p.t1} s. It then runs at constant speed for ${p.t2} s and finally slows uniformly to rest in ${p.t3} s. Find the total distance travelled.`, ans: s1 + s2 + s3, unit: 'm',
+    steps: [`Top speed v = at = ${p.a} × ${p.t1} = ${v} m/s.`, `Speeding up: s₁ = ½at² = ${f(s1)} m.`, `Constant speed: s₂ = v × ${p.t2} = ${f(s2)} m.`, `Slowing down (average speed v/2): s₃ = {v;2} × ${p.t3} = ${f(s3)} m.`, `Total = ${f(s1)} + ${f(s2)} + ${f(s3)} = ${f(s1 + s2 + s3)} m.`],
+    wrong: [[s1 + s2, 'forgot the slowing-down part'], [v * (p.t1 + p.t2 + p.t3), 'used top speed for the whole time'], [s1 + s2 + v * p.t3, 'used full speed (not average) while slowing'], [s2 + s3, 'forgot the speeding-up part']] }; },
+  check: p => { const v = p.a * p.t1, T = p.t1 + p.t2 + p.t3; return simpson(t => t < p.t1 ? p.a * t : t < p.t1 + p.t2 ? v : v * (T - t) / p.t3, 0, T, 4000); }, tol: 2e-4 },
+
+{ id: 'pke-ratio', tp: 'pke', st: 'Stopping distance and retardation', diff: 1, type: ['mcq', 'numeric'], n: 40,
+  gen: r => ({ k: r.int(2, 4), d: r.int(4, 25) }),
+  make: p => ({ q: `A car travelling at a certain speed stops in ${p.d} m when the brakes are applied. If the speed were ${p.k} times as large and the same retardation acted, in what distance would it stop?`, ans: p.k * p.k * p.d, unit: 'm',
+    steps: ['With the same retardation, v² = 2as gives s ∝ u².', `New speed is ${p.k}u, so the distance becomes ${p.k}² = ${p.k * p.k} times larger.`, `s = ${p.k * p.k} × ${p.d} = ${p.k * p.k * p.d} m`],
+    wrong: [[p.k * p.d, 'took s proportional to u'], [2 * p.k * p.d, 'doubled the linear scaling'], [p.k * p.k * p.k * p.d, 'cubed the factor'], [p.d * (p.k + 1), 'added instead of multiplying']] }),
+  check: p => { const u = 10, a = u * u / (2 * p.d); return Math.pow(p.k * u, 2) / (2 * a); } },
+
+{ id: 'pke-time-frac', tp: 'pke', st: 'Equations of motion', diff: 2, type: ['mcq', 'numeric'], n: 40,
+  gen: r => { const k = r.int(2, 5); return { k, D: k * k * r.int(2, 9), T: r.int(2, 5) * k }; },
+  make: p => ({ q: `A body starting from rest with uniform acceleration covers ${p.D} m in ${p.T} s. How far does it travel in the first ${f(p.T / p.k)} s?`, ans: p.D / (p.k * p.k), unit: 'm',
+    steps: ['From rest s = ½at², so s ∝ t².', `The time is reduced to {1;${p.k}} of ${p.T} s, so the distance is {1;${p.k * p.k}} of ${p.D} m.`, `s = ${p.D} ÷ ${p.k * p.k} = ${f(p.D / (p.k * p.k))} m`],
+    wrong: [[p.D / p.k, 'took s proportional to t'], [p.D / (2 * p.k), 'halved the linear scaling'], [p.D * p.k, 'multiplied instead of dividing'], [p.D / (p.k * p.k * p.k), 'used t³']] }),
+  check: p => { const a = 2 * p.D / (p.T * p.T), t = p.T / p.k; return 0.5 * a * t * t; } },
+
+{ id: 'pke-plank', tp: 'pke', st: 'Stopping distance and retardation', diff: 3, type: ['mcq', 'numeric'], n: 40,
+  gen: r => { const n = r.int(2, 4); return { n, d: n * n * r.int(2, 9) }; },
+  make: p => ({ q: `A bullet fired into a fixed wooden block stops after penetrating ${p.d} cm. Assuming a constant resistance, how deep has it gone when its speed has fallen to {1;${p.n}} of the entering speed?`, ans: p.d * (1 - 1 / (p.n * p.n)), unit: 'cm',
+    steps: ['Constant resistance means constant retardation: v² = u² − 2as.', `Full stop: 0 = u² − 2a(${p.d}), so 2a = u² ÷ ${p.d}.`, `At speed u/${p.n}: s = (u² − u²/${p.n * p.n}) ÷ 2a = ${p.d}(1 − {1;${p.n * p.n}})`, `s = ${f(p.d * (1 - 1 / (p.n * p.n)))} cm`],
+    wrong: [[p.d / (p.n * p.n), 'gave the remaining depth instead'], [p.d * (1 - 1 / p.n), 'used speed instead of speed squared'], [p.d / p.n, 'assumed depth proportional to speed'], [p.d * (p.n * p.n - 1), 'inverted the fraction']] }),
+  check: p => { const u = p.n * 3, a = u * u / (2 * p.d), w = 3; return (u * u - w * w) / (2 * a); } },
+
+{ id: 'pke-reaction', tp: 'pke', st: 'Stopping distance and retardation', diff: 2, type: ['mcq', 'numeric'], n: 50, tol: 3e-3,
+  gen: r => ({ tr: r.pick([0.5, 1, 1.5, 2]), u: r.step(10, 30, 5), a: r.pick([4, 5, 8, 10]) }),
+  make: p => { const s1 = p.u * p.tr, s2 = p.u * p.u / (2 * p.a); return { q: `A driver travelling at ${p.u} m/s sees a hazard. Her reaction time is ${f(p.tr)} s, after which she brakes with a retardation of ${p.a} m/s². Find the total distance covered from the moment she sees the hazard until the car stops.`, ans: s1 + s2, unit: 'm',
+    steps: [`During the reaction time the speed is constant: s₁ = ${p.u} × ${f(p.tr)} = ${f(s1)} m.`, `Braking: s₂ = u² ÷ 2a = ${p.u * p.u} ÷ ${2 * p.a} = ${f(s2)} m.`, `Total = ${f(s1)} + ${f(s2)} = ${f(s1 + s2)} m.`],
+    wrong: [[s2, 'ignored the reaction distance'], [s1, 'ignored the braking distance'], [s1 + p.u * p.u / p.a, 'missing the factor 2 in the braking part'], [p.u * (p.tr + p.u / p.a), 'kept the speed constant while braking']] }; },
+  check: p => p.u * p.tr + stopDist(p.u, p.a) },
+
+{ id: 'pke-catch-t', tp: 'pke', st: 'Equations of motion', diff: 3, type: ['mcq', 'numeric'], n: 40,
+  gen: r => ({ v: r.step(8, 30, 2), a: r.pick([1, 2, 4, 5]) }),
+  make: p => ({ q: `A truck moving at a steady ${p.v} m/s passes a stationary police car. At that instant the police car starts from rest with a uniform acceleration of ${p.a} m/s². After how long does it catch up with the truck?`, ans: 2 * p.v / p.a, unit: 's',
+    steps: ['They meet when both have covered the same distance.', `Truck: s = vt = ${p.v}t.  Police car: s = ½at² = ${f(p.a / 2)}t².`, `${p.v}t = ${f(p.a / 2)}t², so t = {2 × ${p.v};${p.a}}`, `t = ${f(2 * p.v / p.a)} s`],
+    wrong: [[p.v / p.a, 'found the time of equal speeds'], [p.v / (2 * p.a), 'halved again'], [2 * p.v * p.a, 'multiplied by a'], [p.v * p.v / p.a, 'used v² ÷ a']] }),
+  check: p => bisect(t => 0.5 * p.a * t * t - p.v * t, 1e-6 + 0.5 * p.v / p.a, 10 * p.v / p.a) },
+
+{ id: 'pke-catch-d', tp: 'pke', st: 'Equations of motion', diff: 3, type: ['mcq', 'numeric'], n: 40,
+  gen: r => ({ v: r.step(8, 30, 2), a: r.pick([1, 2, 4, 5]) }),
+  make: p => ({ q: `A motorcycle starts from rest with a uniform acceleration of ${p.a} m/s² just as a car passes it at a steady ${p.v} m/s. How far from the starting point does the motorcycle overtake the car?`, ans: 2 * p.v * p.v / p.a, unit: 'm',
+    steps: ['Equal distances: vt = ½at², so t = 2v ÷ a.', `t = {2 × ${p.v};${p.a}} = ${f(2 * p.v / p.a)} s`, `Distance = vt = ${p.v} × ${f(2 * p.v / p.a)}`, `= ${f(2 * p.v * p.v / p.a)} m`],
+    wrong: [[p.v * p.v / p.a, 'used the time of equal speeds, t = v ÷ a'], [p.v * p.v / (2 * p.a), 'used ½ v² ÷ a (the distance when speeds are equal)'], [p.v * 2 / p.a, 'gave the time, not the distance'], [4 * p.v * p.v / p.a, 'doubled the time twice']] }),
+  check: p => { const t = bisect(x => 0.5 * p.a * x * x - p.v * x, 0.5 * p.v / p.a, 10 * p.v / p.a); return 0.5 * p.a * t * t; } },
+
+{ id: 'pke-maxsep', tp: 'pke', st: 'Equations of motion', diff: 3, type: ['mcq', 'numeric'], n: 40,
+  gen: r => ({ v: r.step(8, 30, 2), a: r.pick([1, 2, 4, 5]) }),
+  make: p => ({ q: `A car moving at ${p.v} m/s passes a point O. At that moment a second car starts from rest at O with a uniform acceleration of ${p.a} m/s² in the same direction. What is the greatest distance between the two cars before the second one overtakes?`, ans: p.v * p.v / (2 * p.a), unit: 'm',
+    steps: ['The gap is largest when both have the same speed.', `${p.a}t = ${p.v}, so t = ${f(p.v / p.a)} s.`, `Gap = vt − ½at² = ${p.v} × ${f(p.v / p.a)} − ${f(p.a / 2)} × ${f(p.v / p.a)}²`, `= ${f(p.v * p.v / (2 * p.a))} m`],
+    wrong: [[p.v * p.v / p.a, 'gave the distance travelled by the first car'], [p.v / p.a, 'gave the time instead'], [p.v * p.v / (4 * p.a), 'halved the gap'], [2 * p.v * p.v / p.a, 'gave the overtaking distance']] }),
+  check: p => { let best = 0; for (let t = 0; t <= 4 * p.v / p.a; t += 1e-3) best = Math.max(best, p.v * t - 0.5 * p.a * t * t); return best; }, tol: 1e-4 },
+
+{ id: 'pke-fall-t', tp: 'pke', st: 'Free fall and motion under gravity', diff: 1, type: ['mcq', 'numeric'], n: 40, tol: 2e-3,
+  gen: r => ({ h: r.step(5, 400, 5) }),
+  make: p => { const t = Math.sqrt(p.h / 5); return { q: `A stone is dropped from a height of ${p.h} m. How long does it take to reach the ground? (Take g = 10 m/s²)`, ans: t, unit: 's',
+    steps: ['Dropped from rest: h = ½gt².', `${p.h} = ½ × 10 × t² = 5t²`, `t² = ${f(p.h / 5)}`, `t = ${f(t)} s`],
+    wrong: [[p.h / 10, 'used t = h ÷ g'], [Math.sqrt(p.h / 10), 'used √(h ÷ g), forgetting the 2 in h = ½gt²'], [2 * p.h / 10, 'used 2h ÷ g without the square root'], [p.h / 5, 'stopped at t² and did not take the root']] }; },
+  check: p => { let v = 0, y = 0, t = 0; const dt = 1e-4; while (y < p.h) { v += 10 * dt; y += v * dt; t += dt; } return t; } },
+
+{ id: 'pke-fall-v', tp: 'pke', st: 'Free fall and motion under gravity', diff: 1, type: ['mcq', 'numeric'], n: 40,
+  gen: r => ({ h: r.step(5, 400, 5) }),
+  make: p => { const v = Math.sqrt(20 * p.h); return { q: `A ball is released from rest at a height of ${p.h} m. With what speed does it strike the ground? (Take g = 10 m/s², ignore air.)`, ans: v, unit: 'm/s',
+    steps: ['Dropped from rest: v² = 2gh.', `v² = 2 × 10 × ${p.h} = ${20 * p.h}`, `v = √${20 * p.h} = ${f(v)} m/s`],
+    wrong: [[Math.sqrt(10 * p.h), 'used v² = gh (missing the factor 2)'], [20 * p.h, 'forgot the square root'], [v / 2, 'used the average speed'], [p.h / 5, 'used v = h ÷ 5']] }; },
+  check: p => 10 * Math.sqrt(2 * p.h / 10) },
+
+{ id: 'pke-up-h', tp: 'pke', st: 'Free fall and motion under gravity', diff: 1, type: ['mcq', 'numeric'], n: 40, tol: 3e-3,
+  gen: r => ({ u: r.int(10, 60) }),
+  make: p => ({ q: `A ball is thrown vertically upwards with a speed of ${p.u} m/s. What maximum height does it reach? (g = 10 m/s²)`, ans: p.u * p.u / 20, unit: 'm',
+    steps: ['At the top v = 0. Use v² = u² − 2gh.', `0 = ${p.u}² − 2 × 10 × h`, `h = ${p.u * p.u} ÷ 20`, `h = ${f(p.u * p.u / 20)} m`],
+    wrong: [[p.u * p.u / 10, 'missing the factor 2'], [p.u * p.u / 40, 'divided by 4g'], [p.u / 10, 'found the time to the top'], [p.u * p.u / 5, 'used g/2 in v² = u² − 2gh']] }),
+  check: p => { let v = p.u, y = 0; const dt = 1e-3; while (v > 0) { y += v * dt - 5 * dt * dt; v -= 10 * dt; } return y; } },
+
+{ id: 'pke-up-t', tp: 'pke', st: 'Free fall and motion under gravity', diff: 1, type: ['mcq', 'numeric'], n: 40,
+  gen: r => ({ u: r.int(10, 80) }),
+  make: p => ({ q: `A stone is thrown straight up at ${p.u} m/s from the ground. After how long does it return to the ground? (g = 10 m/s²)`, ans: p.u / 5, unit: 's',
+    steps: ['Return to the starting level means displacement = 0.', `0 = ut − ½gt² = ${p.u}t − 5t²`, `t = {2u;g} = {2 × ${p.u};10}`, `t = ${f(p.u / 5)} s`],
+    wrong: [[p.u / 10, 'gave only the time to the top'], [p.u / 20, 'halved again'], [p.u * p.u / 10, 'used u² ÷ g'], [2 * p.u, 'multiplied instead of dividing by g']] }),
+  check: p => bisect(t => p.u * t - 5 * t * t, p.u / 10, 2 * p.u) },
+
+{ id: 'pke-cliff-h', tp: 'pke', st: 'Free fall and motion under gravity', diff: 2, type: ['mcq', 'numeric'], n: 40,
+  gen: r => { const u = r.step(10, 30, 5), t = r.int(Math.floor(u / 5) + 1, Math.floor(u / 5) + 4); return { u, t }; },
+  make: p => ({ q: `A stone is thrown vertically upwards at ${p.u} m/s from the top of a cliff. It hits the foot of the cliff ${p.t} s later. Find the height of the cliff. (g = 10 m/s²)`, ans: 5 * p.t * p.t - p.u * p.t, unit: 'm',
+    steps: ['Take upward as positive. The displacement at landing is −h.', `−h = ut − ½gt² = ${p.u} × ${p.t} − 5 × ${p.t}²`, `−h = ${p.u * p.t} − ${5 * p.t * p.t}`, `h = ${5 * p.t * p.t - p.u * p.t} m`],
+    wrong: [[5 * p.t * p.t + p.u * p.t, 'added ut instead of subtracting (treated throw as downward)'], [5 * p.t * p.t, 'forgot the initial speed'], [p.u * p.t, 'forgot gravity'], [5 * p.t * p.t - p.u * p.t / 2, 'halved the ut term']] }),
+  check: p => { let v = p.u, y = 0; const dt = 1e-4, n = Math.round(p.t / dt); for (let i = 0; i < n; i++) { y += v * dt - 5 * dt * dt; v -= 10 * dt; } return -y; }, tol: 1e-4 },
+
+{ id: 'pke-cliff-v', tp: 'pke', st: 'Free fall and motion under gravity', diff: 3, type: ['mcq', 'numeric'], n: 40,
+  gen: r => { const u = r.step(10, 30, 5), t = r.int(Math.floor(u / 5) + 1, Math.floor(u / 5) + 4); return { u, t, h: 5 * t * t - u * t }; },
+  make: p => ({ q: `A ball is thrown vertically upwards at ${p.u} m/s from the edge of a ${p.h} m high cliff and finally lands at the bottom. With what speed does it hit the ground? (g = 10 m/s²)`, ans: 10 * p.t - p.u, unit: 'm/s',
+    steps: ['Going up and coming back to the cliff top, the ball again has speed u (downwards).', 'From there it falls through h with initial speed u.', `v² = u² + 2gh = ${p.u * p.u} + 20 × ${p.h} = ${p.u * p.u + 20 * p.h}`, `v = √${p.u * p.u + 20 * p.h} = ${10 * p.t - p.u} m/s`],
+    wrong: [[Math.sqrt(20 * p.h), 'dropped the initial speed (v² = 2gh)'], [Math.sqrt(Math.abs(p.u * p.u - 20 * p.h)), 'sign error: v² = u² − 2gh'], [p.u + 10 * p.t, 'added u and gt'], [p.u * p.u + 20 * p.h, 'forgot the square root']] }),
+  check: p => { let v = p.u, y = 0; const dt = 1e-4; while (y > -p.h) { y += v * dt - 5 * dt * dt; v -= 10 * dt; } return -v; }, tol: 2e-3 },
+
+{ id: 'pke-lastsec', tp: 'pke', st: 'Free fall and motion under gravity', diff: 3, type: ['mcq', 'numeric'], n: 19, min: 10,
+  gen: r => { const T = r.int(6, 24) / 2; return { T, h: 5 * T * T }; },
+  make: p => ({ q: `A ball dropped from a tower ${p.h} m high reaches the ground. How far does it fall in the last second of its motion? (g = 10 m/s²)`, ans: 5 * (2 * p.T - 1), unit: 'm',
+    steps: [`Total time: ${p.h} = 5T², so T = ${p.T} s.`, `Distance in ${p.T - 1} s = 5 × ${p.T - 1}² = ${5 * (p.T - 1) * (p.T - 1)} m.`, `Last second = ${p.h} − ${5 * (p.T - 1) * (p.T - 1)} = ${5 * (2 * p.T - 1)} m.`],
+    wrong: [[10 * p.T, 'used the final speed × 1 s'], [5 * (2 * p.T + 1), 'used (2T + 1)'], [5 * p.T, 'used 5T instead of 5(2T − 1)'], [p.h / p.T, 'used the average speed over the whole fall']] }),
+  check: p => { const y = t => 0.5 * 10 * t * t; return y(p.T) - y(p.T - 1); } },
+
+{ id: 'pke-twopass', tp: 'pke', st: 'Free fall and motion under gravity', diff: 3, type: ['mcq', 'numeric'], n: 30,
+  gen: r => { const u = r.step(20, 50, 5), v = r.step(5, u - 5, 5); return { u, v, h: (u * u - v * v) / 20 }; },
+  make: p => ({ q: `A ball is thrown upwards at ${p.u} m/s. It passes a window ${f(p.h)} m above the throwing point on the way up and again on the way down. Find the time between the two passes. (g = 10 m/s²)`, ans: p.v / 5, unit: 's',
+    steps: [`Speed at the window: v² = u² − 2gh = ${p.u * p.u} − 20 × ${f(p.h)} = ${p.v * p.v}, so v = ${p.v} m/s.`, `Going up the speed is ${p.v} m/s upwards; coming down it is ${p.v} m/s downwards.`, `Change of velocity = 2 × ${p.v} = ${2 * p.v} m/s in time Δt = ${2 * p.v} ÷ 10`, `Δt = ${f(p.v / 5)} s`],
+    wrong: [[p.v / 10, 'used the change of speed v instead of 2v'], [p.u / 5, 'gave the whole flight time'], [(p.u - p.v) / 10, 'used the time between launch and the window'], [2 * p.v / 5, 'doubled the right answer']] }),
+  check: p => { const f2 = t => p.u * t - 5 * t * t - p.h, tm = p.u / 10, t1 = bisect(f2, 0, tm), t2 = bisect(f2, tm, p.u / 5); return t2 - t1; }, tol: 1e-6 },
+];

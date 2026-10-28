@@ -12,4 +12,14 @@ for (const [f, max] of Object.entries(BUDGET)) {
   const okk = gz <= max; if (!okk) bad++;
   console.log(`${okk ? 'PASS' : 'FAIL'}  ${f.padEnd(24)} ${String(gz).padStart(7)} B gzip  (budget ${max})`);
 }
+/* generated question bank: fetched lazily, one chunk (<= 500 questions of one topic) at a time; the index is read first */
+const QDIR = path.join(root, 'qbank');
+if (fs.existsSync(QDIR)) {
+  const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+  for (const p of walk(QDIR)) {
+    const rel = path.relative(root, p).split(path.sep).join('/'), max = rel === 'qbank/index.json' ? 6000 : 40000, gz = zlib.gzipSync(fs.readFileSync(p), { level: 9 }).length;
+    if (gz > max) { bad++; console.log(`FAIL  ${rel.padEnd(34)} ${String(gz).padStart(7)} B gzip  (budget ${max})`); }
+  }
+  console.log('PASS  qbank chunks and index within budget (chunk <= 40000 B gzip, index <= 6000 B gzip)');
+}
 process.exit(bad ? 1 : 0);
