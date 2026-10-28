@@ -24,7 +24,7 @@ const JEE_CH=[['Class 11',['Units and Measurements','Kinematics','Laws of Motion
 const COMBO={'Properties of Solids and Liquids':['Mechanical Properties of Solids','Mechanical Properties of Fluids','Thermal Properties of Matter'],'Oscillations and Waves':['Oscillations','Waves'],Electrostatics:['Electric Charges and Fields','Electrostatic Potential and Capacitance'],Optics:['Ray Optics and Optical Instruments','Wave Optics']};
 const mixBank=(parts,B)=>{const out={topics:Object.assign({},...parts.map(p=>B[p].topics))};for(const k of ['jee','neet']){const n=45,m=parts.length,r=[];parts.forEach((p,j)=>{const a=B[p][k]||[],c=Math.floor(n/m)+(j<n%m?1:0);for(let i=0;i<c&&a.length;i++)r.push(a[Math.floor(i*a.length/c)])});out[k]=r}return out};
 const CHAPS={'Units and Measurements':{d:'PhysicaRankUnitsJee',q:'PhysicaRankPyq'},Kinematics:{d:'PhysicaRankKinJee',q:'PhysicaRankPyqKin',mock:'Motion in a Straight Line',k:'-kin'},'Laws of Motion':{d:'PhysicaRankLomJee',q:'PhysicaRankPyqLom',k:'-lom'},'Work, Energy and Power':{d:'PhysicaRankWepJee',q:'PhysicaRankPyqWep',k:'-wep'},'Rotational Motion':{d:'PhysicaRankRotJee',q:'PhysicaRankPyqRot',mock:'System of Particles and Rotational Motion',k:'-rot'},Gravitation:{d:'PhysicaRankGravJee',q:'PhysicaRankPyqGrav',k:'-grav'},'Properties of Solids and Liquids':{d:'PhysicaRankPropJee',q:'PhysicaRankPyqProp',mock:'Properties of Solids and Liquids',k:'-prop'},Thermodynamics:{d:'PhysicaRankThermoJee',q:'PhysicaRankPyqThermo',k:'-thermo'},'Kinetic Theory of Gases':{d:'PhysicaRankKtgJee',q:'PhysicaRankPyqKtg',mock:'Kinetic Theory',k:'-ktg'},'Oscillations and Waves':{d:'PhysicaRankOscJee',q:'PhysicaRankPyqOsc',mock:'Oscillations and Waves',k:'-osc'},Electrostatics:{d:'PhysicaRankElectroJee',q:'PhysicaRankPyqEs',mock:'Electrostatics',k:'-electro'},'Current Electricity':{d:'PhysicaRankCurrentJee',mock:'Current Electricity',k:'-current'},'Electromagnetic Waves':{d:'PhysicaRankEmJee',q:'PhysicaRankPyqEm',mock:'Electromagnetic Waves',k:'-em'},Optics:{d:'PhysicaRankOpticsJee',q:'PhysicaRankPyqOptics',mock:'Optics',k:'-optics'}},READY=Object.keys(CHAPS),PYQ_CH=READY.filter(k=>CHAPS[k].q);
-const picking=()=>X.pick&&!chap,ready=()=>!X.pick||READY.includes(chap),TABS=[['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['pyq','PYQs'],['mock','Mock test']],SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['maths','Maths']];
+const picking=()=>X.pick&&!chap,ready=()=>!X.pick||READY.includes(chap),TABS=[['guide','Guide'],['formulas','Formulas'],['notes','Revise'],['asked','Most asked'],['pyq','PYQs'],['qb','Question bank'],['mock','Mock test']],SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['maths','Maths']];
 const SECS0=['Dimensions','Units','Significant figures','Errors','Instruments'],secs=()=>U().secs||SECS0;
 function close(){if(!ov)return;stopT();ov.remove();ov=null;view=null;tabsEl=null;document.body.classList.remove('rank-open');removeEventListener('keydown',esc);removeEventListener('resize',onRz);if(!document.getElementById('landing')?.hidden)window.PhysicaLandingBG?.start();const f=onClose;onClose=null;f?.()}
 function goBack(){if(ov.dataset.run==='1')home();else if(X.pick&&chap){chap=null;tab='guide';setHead();home()}else close()}
@@ -33,9 +33,9 @@ function esc(e){if(e.key==='Escape'&&ov)goBack()}
 function setHead(){const back=btn('rk-back','← Back',goBack);back.dataset.testid='rk-back';
   const t=el('div','rk-title');t.append(el('b','',picking()?X.label:(chap||CH())),el('span','',picking()?'Rank mode · choose a subject':'Rank mode · '+X.label+(X.pick?' · Physics':'')));
   tabsEl=el('div','rk-htabs');tabsEl.setAttribute('role','tablist');
-  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>x[0]!=='pyq'||(X.pyq&&PYQ_CH.includes(CH())))){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
+  for(const [k,l] of picking()?SUBJ:TABS.filter(x=>(x[0]!=='pyq'||(X.pyq&&PYQ_CH.includes(CH())))&&(x[0]!=='qb'||qbHas()))){const b=btn('rk-pill'+(k==='mock'?' act':''),l,()=>go(k));b.dataset.k=k;b.dataset.testid=(picking()?'rk-sub-':'rk-tab-')+k;tabsEl.append(b)}
   const sb=btn('rk-pill rk-series','📝 Test Series',()=>{});sb.dataset.seriesExam=X.bank==='neet'?'NEET':'JEE_MAIN';sb.dataset.testid='rk-series';sb.setAttribute('aria-label','Open the full-length Test Series for '+X.label);
-  head.replaceChildren(back,t,tabsEl,sb);window.PhysicaTheme?.mountToggle(head,'rk-theme');ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''))}
+  head.replaceChildren(back,t,tabsEl,sb);window.PhysicaTheme?.mountToggle(head,'rk-theme');ov.setAttribute('aria-label','Rank mode: '+X.label+(chap?', '+chap:''));qbEnsure()}
 function open(cb,ex){X=EX[ex]||EX.neet;if(ov||!U())return;load();window.PhysicaLandingBG?.stop();onClose=cb||null;
   ov=el('div','rank-ov rk-ov');ov.setAttribute('role','dialog');ov.dataset.testid='rank-neet-page';
   head=el('div','rk-head');chap=null;subj='physics';tab='guide';setHead();
@@ -65,7 +65,7 @@ function masonry(pane){const items=pane._items||(pane._items=[...pane.children])
     cols.reduce((a,b)=>a.offsetHeight<=b.offsetHeight?a:b).append(it)}}
 let rz=0;const onRz=()=>{clearTimeout(rz);rz=setTimeout(()=>{if(view?.className==='rk-view')for(const m of view.querySelectorAll('.rk-pane:not([hidden])'))masonry(m)},150)};
 function home(){if(!view)return;stopT();ov.dataset.run='0';view.className='rk-view';view.replaceChildren();ov.scrollTop=0;paint(false);
-  const pane=el('div','rk-pane');(picking()?chooser:ready()?({guide,formulas,notes,asked,pyq,mock:mockPane})[tab]:soonPane)(pane);view.append(pane);masonry(pane)}
+  const pane=el('div','rk-pane');(picking()?chooser:ready()?({guide,formulas,notes,asked,pyq,qb:qbPane,mock:mockPane})[tab]:soonPane)(pane);view.append(pane);masonry(pane)}
 /* JEE: pick a subject, then a chapter. Only Units and Measurements has content so far; the others open the same page with "coming soon". */
 function chooser(p){if(subj!=='physics'){const c=el('div','rk-card rk-center wide');c.append(el('h3','',SUBJ.find(x=>x[0]===subj)[1]+' chapters are coming soon'),el('p','rk-how','Physics is ready to explore. Open it from the buttons above.'));p.append(c);return}
   for(const [cls,list] of JEE_CH){const c=el('div','rk-card'),l=el('div','rk-chlist');c.append(el('h3','',cls+' Physics'));
@@ -214,19 +214,19 @@ function asked(p){p.append(el('p','rk-lead wide','These question types come up a
 
 /* ---------- a set of questions ---------- */
 let tm=0;const stopT=()=>{clearInterval(tm);tm=0};
-function runSet(ids,title){if(!ids.length)return;ov.dataset.run='1';view.className='rk-view run';paint(true);let k=0;const res=[];
-  const show=()=>{stopT();if(k>=ids.length)return summary(res,title);const i=ids[k],q=bank()[i];view.replaceChildren();ov.scrollTop=0;
+function runSet(ids,title,qs){if(!ids.length)return;ov.dataset.run='1';view.className='rk-view run';paint(true);let k=0;const res=[];
+  const show=()=>{stopT();if(k>=ids.length)return summary(res,title);const i=ids[k],q=(qs||bank())[i];view.replaceChildren();ov.scrollTop=0;
     const clock=el('span','rk-clock','⏱ 0:00');clock.title='Aim for '+X.target+' seconds per question';const t0=Date.now();
     tm=setInterval(()=>{const t=Math.round((Date.now()-t0)/1000);clock.textContent='⏱ '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0');clock.classList.toggle('late',t>X.target)},1000);
     const top=el('div','rk-qtop');top.append(el('span','rk-chip on',title),el('span','rk-count',`${k+1} / ${ids.length}`),clock,btn('rk-link','End',()=>summary(res,title)));
     const bar=el('div','rk-bar'),fill=el('i');fill.style.width=(k/ids.length*100)+'%';bar.append(fill);
-    const card=el('div','rk-card');card.append(el('p','rk-meta',tname(q.tp)+(q.o?'':' · numerical answer')),el('p','rk-q',q.q));{const g=window.PhysicaFig?.(q.fig);if(g){g.classList.add('rk-fig');card.append(g)}}
+    const card=el('div','rk-card');card.append(el('p','rk-meta',(q.g?'Practice question · ':'')+qtn(q)+(q.o?'':' · numerical answer')),el('p','rk-q',q.q));{const g=window.PhysicaFig?.(q.fig);if(g){g.classList.add('rk-fig');card.append(g)}}
     const hint=el('div','rk-hint'),fb=el('div','rk-fb'),lines=String(q.s||'').split('\n').filter(Boolean);hint.hidden=true;fb.hidden=true;let done=false,hl=0;
-    const H=[`Topic: ${tname(q.tp)}. Write what is given, what is asked, and the formula that connects them.`,lines.length>1?`First step: ${lines[0]}`:'Check the units or dimensions of each term, then try again.'];
+    const H=[`Topic: ${qtn(q)}. Write what is given, what is asked, and the formula that connects them.`,lines.length>1?`First step: ${lines[0]}`:'Check the units or dimensions of each term, then try again.'];
     const hb=btn('rk-hintbtn','Help me start',()=>{if(done)return;hl++;hint.hidden=false;hint.replaceChildren();for(let n=0;n<Math.min(hl,2);n++)hint.append(el('p','',H[n]));if(hl>=3){hint.append(el('b','','Solution'));for(const l of lines)hint.append(el('p','',l))}hb.textContent=hl===1?'Another hint':hl===2?'Show solution':'Solution shown';if(hl>=3)hb.disabled=true});hb.dataset.testid='rk-hint';
     const next=btn('rk-btn',k+1<ids.length?'Next →':'Finish',()=>{k++;show()});next.hidden=true;next.dataset.testid='rk-next';
     const finish=(ok,mark,said)=>{if(done)return;done=true;stopT();mark?.();hb.hidden=true;fb.hidden=false;fb.append(el('p',ok?'rk-ok':'rk-no',ok?(hl?'Correct, with help.':'Correct!'):(said||'Not quite.')));for(const l of lines)fb.append(el('p','rk-sol',l));
-      res.push({q,ok,hints:hl,s:Math.round((Date.now()-t0)/1000)});if(!seen.includes(i))seen.push(i);save();next.hidden=false;next.focus()};
+      res.push({q,ok,hints:hl,s:Math.round((Date.now()-t0)/1000)});if(qs)qbMark(q);else{if(!seen.includes(i))seen.push(i);save()}next.hidden=false;next.focus()};
     let body;
     if(q.o){const order=shuffle([0,1,2,3]);body=el('div','rk-opts');
       order.forEach((oi,pos)=>{const b=btn('rk-opt',null,()=>{const ok=oi===q.c;finish(ok,()=>{b.classList.add(ok?'right':'wrong');if(!ok)body.children[order.indexOf(q.c)].classList.add('right');for(const x of body.children)x.disabled=true})});
@@ -241,9 +241,38 @@ function summary(res,title){stopT();ov.dataset.run='0';view.className='rk-view r
   const c=el('div','rk-card rk-center');c.append(el('h3','',title+' · done'));const t=el('div','rk-tiles');
   for(const [v,l] of [[`${ok} / ${n}`,'Correct'],[avg+' s','Average time (aim '+X.target+' s)'],[n-ok,'To revise']]){const d=el('div','rk-tile');d.append(el('b','',String(v)),el('span','',l));t.append(d)}c.append(t);
   if(n)c.append(el('p','rk-note',`Solved without help: ${alone}.`+(avg>X.target?' You are slower than the aim. Use the shortcuts in the Guide to save time.':'')));
-  const wrong=[...new Set(res.filter(r=>!r.ok).map(r=>tname(r.q.tp)))];if(wrong.length){c.append(el('p','rk-note','Go back to the formulas for:'));for(const w of wrong)c.append(el('p','rk-meta','• '+w))}
+  const wrong=[...new Set(res.filter(r=>!r.ok).map(r=>qtn(r.q)))];if(wrong.length){c.append(el('p','rk-note','Go back to the formulas for:'));for(const w of wrong)c.append(el('p','rk-meta','• '+w))}
   else if(n)c.append(el('p','rk-note','Clean set. Try the mock test next.'));
-  const row=el('div','rk-two');row.append(btn('rk-btn','Back to the chapter',home));c.append(row);view.append(c)}
+  const row=el('div','rk-two');if(qbAgain&&res[0]?.q.g){const nb=btn('rk-btn','New set',qbAgain);nb.dataset.testid='rk-qb-new';row.append(nb)}row.append(btn(qbAgain&&res[0]?.q.g?'rk-link':'rk-btn','Back to the chapter',home));c.append(row);view.append(c)}
+
+/* ---------- Question bank: practice questions generated by tools/qgen (checked by code). Index and chunks load only when needed. ---------- */
+const QB='./qbank/',QBS='physica-qb-seen',qtn=q=>q.g?q.tpn:tname(q.tp);
+let qbIdx=null,qbWait=null,qbTried=false,qbDiff=0,qbAgain=null,qbTok=0,qbCur=null;const qbChunks=new Map();
+const qbJson=u=>fetch(u).then(r=>{if(!r.ok)throw new Error('http');return r.json()});
+const qbEnt=()=>{if(!X.pick||!chap||!qbIdx)return null;const o=qbIdx.subjects?.physics||{};for(const k in o)if(o[k].name===chap)return Object.assign({key:k,sub:'physics'},o[k]);return null},qbHas=()=>!!qbEnt();
+function qbEnsure(){if(qbIdx||qbTried||!X.pick||!chap)return;qbTried=true;(qbWait||(qbWait=qbJson(QB+'index.json'))).then(j=>{qbIdx=j;if(ov&&chap&&qbHas()){setHead();paint(ov.dataset.run==='1')}},()=>{qbTried=false;qbWait=null})}
+/* seen questions: one string of 5-character keys per chapter, newest last, at most 3000 (15 KB) */
+const qbSeenOf=key=>{const set=new Set();try{const t=JSON.parse(localStorage.getItem(QBS))?.[key];if(typeof t==='string')for(let i=0;i+5<=t.length;i+=5)set.add(t.slice(i,i+5))}catch{}return set};
+function qbMark(q){if(!qbCur||!q.k)return;qbCur.seen.delete(q.k);qbCur.seen.add(q.k);try{let all={};try{all=JSON.parse(localStorage.getItem(QBS))||{}}catch{}all[qbCur.key]=[...qbCur.seen].slice(-3000).join('');localStorage.setItem(QBS,JSON.stringify(all))}catch{}}
+const qbGet=(ent,ci)=>{const c=ent.ch[ci],id=ent.key+'/'+ci;if(qbChunks.has(id))return Promise.resolve(qbChunks.get(id));
+  return qbJson(QB+ent.sub+'/'+ent.key+'/'+c.f+'?v='+c.h).then(a=>{if(!Array.isArray(a))throw new Error('bad');const t=ent.tp[c.tp],o=a.map(q=>Object.assign({g:1,tp:c.tp,tpn:t.nm,stn:t.st[q.u]||''},q));qbChunks.set(id,o);return o})};
+const qbSkel=()=>{const x=el('div','rk-skel');x.setAttribute('role','status');x.append(el('span','rk-sr','Loading questions…'),el('i'),el('i'),el('i'));return x};
+function qbRun(ent,tp,n){const tok=++qbTok;qbAgain=()=>qbRun(ent,tp,n);ov.dataset.run='1';view.className='rk-view run';paint(true);view.replaceChildren(qbSkel());ov.scrollTop=0;
+  const seen=qbSeenOf(ent.key);qbCur={key:ent.key,seen};
+  const ok=q=>!qbDiff||q.d===qbDiff,cand=tp?ent.tp[tp].c.slice():Object.values(ent.tp).map(t=>t.c).filter(c=>c.length),first=tp?null:shuffle(cand).map(c=>c[Math.floor(Math.random()*c.length)]),order=tp?shuffle(cand):[...first,...shuffle(cand.flatMap(c=>c)).filter(c=>!first.includes(c))];
+  let pool=[],i=0;const more=()=>{if(i>=order.length)return Promise.resolve();return qbGet(ent,order[i++]).then(a=>{pool=pool.concat(a.filter(ok));const fresh=pool.filter(q=>!seen.has(q.k)).length;if(tp?fresh<n:i<3)return more()})};
+  more().then(()=>{if(!ov||tok!==qbTok)return;const fresh=shuffle(pool.filter(q=>!seen.has(q.k))).slice(0,n);let again=false;
+    if(fresh.length<n){again=true;fresh.push(...shuffle(pool.filter(q=>seen.has(q.k))).slice(0,n-fresh.length))}
+    if(!fresh.length){view.replaceChildren(el('p','rk-how','No questions for this choice yet.'),btn('rk-link','Back',home));return}
+    runSet(fresh.map((q,j)=>j),'Question bank'+(again?' · revision':''),fresh)},
+  ()=>{if(!ov||tok!==qbTok)return;const e=el('div','rk-fail');e.setAttribute('role','alert');e.append(el('p','rk-how','Could not load the questions. Check your internet.'),btn('rk-mini','Try again',()=>qbRun(ent,tp,n)),btn('rk-link','Back',home));view.replaceChildren(e)})}
+function qbPane(p){const ent=qbEnt();if(!ent){guide(p);return}
+  const c=el('div','rk-card wide');c.append(el('h3','','Question bank · '+ent.name),el('p','rk-how',ent.n+' practice questions made by Physica, each with a step-by-step solution. These are not past-year questions. Your answers stay on this device.'),el('span','rk-label','Difficulty'));
+  const chips=el('div','rk-chips');['Any','Easy','Medium','Hard'].forEach((l,k)=>{const b=btn('rk-chip'+(qbDiff===k?' on':''),l,()=>{qbDiff=k;home()});b.setAttribute('aria-pressed',String(qbDiff===k));b.dataset.testid='rk-qb-d'+k;chips.append(b)});c.append(chips);p.append(c);
+  const cnt=t=>qbDiff?t.d[qbDiff-1]:t.n,add=(tp,name,t,k)=>{const n=cnt(t),d=el('div','rk-card');d.dataset.testid='rk-qb-topic';d.append(el('h3','',name),el('p','rk-meta',n+' questions'+(qbDiff?' · '+['','Easy','Medium','Hard'][qbDiff]:'')));
+    if(n){const row=el('div','rk-two');for(const m of [10,25]){const b=btn('rk-mini','Practice '+m,()=>qbRun(ent,tp,m));b.dataset.testid='rk-qb-'+(tp||'all')+'-'+m;row.append(b)}d.append(row)}p.append(d)};
+  add(null,'All topics (mixed)',{n:ent.n,d:Object.values(ent.tp).reduce((a,t)=>a.map((v,i)=>v+t.d[i]),[0,0,0])});
+  for(const tp in ent.tp)add(tp,ent.tp[tp].nm,ent.tp[tp])}
 
 window.PhysicaRankNeet={open,close};
 })();
