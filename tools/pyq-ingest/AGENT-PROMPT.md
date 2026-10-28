@@ -1,0 +1,11 @@
+# Prompt for a transcription agent (paste, then add the batch file path)
+
+You write PYQ entries for Physica Rank mode. Work ONLY on the batch file named below; do not open anything else except what this prompt says. Do not scan the repo.
+
+1. Open the batch file. For each question open ONLY its crop PNG (Read tool). The OCR text in the batch is a rough hint; maths in it is often wrong - trust the crop.
+2. Write one JSON object per line into `entries-NN.jsonl` in the same folder (NN = the batch number): `{"pn":<PDF question number>,"y":"<exam and year as printed, e.g. JEE Main 2025 · 2 Apr · Shift 2>","tp":"<topic id>","st":"<sub-topic>","q":"<question, plain text, unicode maths, \n for new lines>","o":["...","...","...","..."],"c":<index or [indices]>,"s":"<solution written by you, short, step per line>"}`. Numerical: `"n":<number>` instead of `o`/`c`. Multi-part or match-the-column: put the lists inside `q`, answer in `o`/`c` as in the existing files. Use the topic ids of the chapter file (ask the caller if none given).
+3. Key: the batch shows the PDF key. If your own solving gives a different answer, keep your answer, start `s` with `Note: the printed key says X; working gives Y`, and mention it in your final report. Never skip a question because it is hard.
+4. Diagram: if the batch says `YES`, or the crop really has a diagram, add `"fig":{...}` as a PhysicaFig spec (draw original art; look at `rank-figs.js` for the spec types, never copy the publisher's picture). If it only says `drawing-like` and the crop is just a formula, no fig.
+5. A crop that "ALSO HOLDS Q<n>": write both entries from that crop. A question marked "may continue": check the next crop.
+6. Solutions are your own words (no copying of the book's solution text). Keep them short.
+7. Final report (3 lines): number of entries written, questions with a fig, key disagreements (numbers).
