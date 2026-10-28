@@ -897,6 +897,48 @@ function dndg(){const s=hs(300,230,'Davisson and Germer experiment. An electron 
   cp(s,170,'peak at φ = 50° for 54 V: 2d sinθ = λ, θ = 65°, d = 0.091 nm|λ = 0.165 nm; de Broglie 12.27/√54 = 0.167 nm; φ = 180° − 2θ');return fin(s)}
 const XF={};
 /* >>> FIGS mag: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function mgwire(){const s=hs(300,230,'Magnetic field of a long straight wire. The current comes out of the page. The field lines are concentric circles around the wire, drawn anticlockwise, and they are closer together near the wire. The field falls as one over the distance.');
+  const cx=120,cy=88;for(const r of [24,46,68])mk(s,'circle',{cx,cy,r,fill:'none',stroke:DIM,'stroke-width':1.2});
+  dot(s,cx,cy,HI,4);mk(s,'circle',{cx,cy,r:9,fill:'none',stroke:HI,'stroke-width':1.5});
+  for(const r of [46,68])for(const a of [45,135,225,315]){const q=a*Math.PI/180,x=cx+r*Math.cos(q),y=cy-r*Math.sin(q),tx=-Math.sin(q),ty=-Math.cos(q);hv(s,x-7*tx,y-7*ty,x+7*tx,y+7*ty,BLUE,1.8)}
+  ht(s,210,40,'I out of page',HI,'start',12);ht(s,210,60,'B along circles',BLUE,'start',12);
+  dsh(s,cx,cy,cx-48,cy+48);ht(s,cx-34,cy+30,'r',INK,'end',13);
+  cp(s,178,'B = μ₀I/(2πr), so B ∝ 1/r|right-hand rule: thumb along I, fingers curl along B');return fin(s)}
+function mgsol(){const s=hs(300,230,'Solenoid. A long coil of closely wound turns carries a current. Inside, the field is uniform and along the axis. Outside, the return field lines are spread out and weak.');
+  hl(s,46,60,224,60);hl(s,46,120,224,120);for(let i=0;i<10;i++){const x=50+i*18;hl(s,x,58,x+8,122,INK)}
+  for(const y of [76,90,104])hv(s,64,y,206,y,BLUE,2);
+  pth(s,'M228 90 C 292 90 292 14 138 14 C -14 14 -14 90 34 90',DIM,1.2);pth(s,'M228 90 C 292 90 292 166 138 166 C -14 166 -14 90 34 90',DIM,1.2);
+  hv(s,26,90,38,90,DIM,1.2);ht(s,135,134,'B = μ₀nI inside',BLUE,'middle',12);
+  ht(s,135,36,'weak outside',DIM,'middle',12);ht(s,135,156,'n = N/L turns per metre',DIM,'middle',12);
+  cp(s,190,'inside: B = μ₀nI, uniform; at an end: B = μ₀nI/2|outside a long solenoid: B ≈ 0');return fin(s)}
+function mghel(){const s=hs(300,230,'Helical path of a charged particle. The velocity makes an angle theta with a uniform magnetic field. The component along the field is unchanged and the component across it turns the particle in a circle, so the path is a helix with pitch p.');
+  const X=t=>40+7*t+22*Math.cos(t),Y=t=>92+34*Math.sin(t);let d='';for(let t=0;t<=6*Math.PI+.01;t+=.15)d+=(d?'L':'M')+X(t).toFixed(1)+' '+Y(t).toFixed(1);pth(s,d,HI,2);
+  dsh(s,24,92,270,92);hv(s,160,170,260,170,BLUE,2);ht(s,268,174,'B',BLUE,'start',14);
+  const x1=40+7*Math.PI/2,x2=x1+14*Math.PI;dsh(s,x1,126,x1,150);dsh(s,x2,126,x2,150);dim(s,x1,146,x2,146,'pitch',(x1+x2)/2,164);
+  ht(s,150,18,'r = mv sinθ/(qB)',INK,'middle',13);ht(s,150,38,'v∥ = v cosθ along B',INK,'middle',13);
+  cp(s,196,'p = 2πm v cosθ/(qB), period T = 2πm/(qB)|v cosθ is not changed by B; v sinθ goes round a circle');return fin(s)}
+function mgvs(){const s=hs(300,230,'Velocity selector. A positive charge moves to the right between two plates. The electric field points down, giving a downward force qE. The magnetic field points into the page, giving an upward force qvB. When the two are equal the particle goes straight.');
+  hl(s,50,44,250,44,INK);hl(s,50,134,250,134,INK);ht(s,40,48,'+',RED,'end',14);ht(s,40,138,'−',BLUE,'end',14);
+  for(const x of [80,120,180,220])hv(s,x,50,x,76,GRN,1.6);ht(s,258,66,'E',GRN,'start',13);
+  for(const x of [80,120,180,220]){hl(s,x-4,106,x+4,114,BLUE);hl(s,x+4,106,x-4,114,BLUE)}ht(s,258,116,'B in',BLUE,'start',13);
+  hv(s,14,92,150,92,DIM,1.6);hv(s,150,92,286,92,DIM,1.6);dot(s,150,92,HI,5);ht(s,22,86,'v',INK,'start',13);
+  hv(s,150,96,150,122,RED,2);ht(s,158,120,'qE',RED,'start',12);hv(s,150,88,150,62,GRN,2);ht(s,158,68,'qvB',GRN,'start',12);
+  cp(s,164,'straight path when qE = qvB, so v = E/B|the answer does not depend on the charge or the mass');return fin(s)}
+function mgbar(){const s=hs(300,230,'Bar magnet. Field lines leave the north pole, loop round outside and enter the south pole. The magnetic moment points from south to north. On the axis the field is along the moment and is twice as large as at the same distance on the equatorial line, where it is opposite to the moment.');
+  mk(s,'rect',{x:100,y:88,width:50,height:24,fill:'none',stroke:BLUE,'stroke-width':1.6});mk(s,'rect',{x:150,y:88,width:50,height:24,fill:'none',stroke:RED,'stroke-width':1.6});
+  ht(s,125,105,'S',BLUE,'middle',14);ht(s,175,105,'N',RED,'middle',14);
+  pth(s,'M200 100 C 262 100 262 40 150 40 C 38 40 38 100 100 100',DIM,1.2);pth(s,'M200 100 C 262 100 262 160 150 160 C 38 160 38 100 100 100',DIM,1.2);
+  hv(s,156,40,142,40,DIM,1.3);hv(s,156,160,142,160,DIM,1.3);
+  hv(s,110,128,190,128,HI,2);ht(s,150,146,'m',HI,'middle',13);
+  dot(s,268,100,INK,3);ht(s,268,88,'P axial',INK,'middle',12);dsh(s,200,100,268,100);
+  dot(s,150,66,INK,3);dsh(s,150,88,150,66);ht(s,160,64,'Q equatorial',INK,'start',12);
+  cp(s,184,'axial: B = (μ₀/4π)(2m/r³), along m|equatorial: B = (μ₀/4π)(m/r³), opposite to m');return fin(s)}
+function mgearth(){const s=hs(300,230,'Earth magnetic field components. The total field B points downwards at the angle of dip delta below the horizontal. Its horizontal component is BH and its vertical component is BV.');
+  hv(s,50,76,205,76,BLUE,2);hv(s,205,76,205,185,GRN,2);hv(s,50,76,205,185,HI,2);dsh(s,50,76,50,40);
+  ht(s,128,68,'BH',BLUE,'middle',14);ht(s,214,134,'BV',GRN,'start',14);ht(s,112,142,'B',HI,'end',14);
+  arcp(s,50,76,44,90,125,INK,1.3);ht(s,100,100,'δ',INK,'middle',14);ht(s,50,32,'horizontal plane, magnetic meridian',DIM,'start',12);
+  cp(s,214,'BH = B cos δ, BV = B sin δ, tan δ = BV/BH|B = √(BH² + BV²)');return fin(s)}
+Object.assign(XF,{mgwire,mgsol,mghel,mgvs,mgbar,mgearth});
 /* <<< FIGS mag */
 
 /* >>> FIGS emi: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
