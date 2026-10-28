@@ -170,11 +170,12 @@ function batches(out, size, only) {
   console.log(files.length + ' batch files in ' + out);
 }
 /* assemble: entries-*.jsonl (one JSON entry per line, each with pn) -> the rank-pyq-<chapter>.js source file, sorted by pn */
+const normY = y => String(y || '').trim().replace(/^JEE Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Main Online (\d{4})$/, 'JEE Main $1 · Online').replace(/^Advanced (\d{4})$/, 'JEE Advanced $1').replace(/^Main (\d{4})$/, 'JEE Main $1').replace(/^JEE Main (\d+ \w+) · Shift (\d) (\d{4})$/, 'JEE Main $3 · $1 · Shift $2').replace(/\(year not legible\)/i, '(year not printed)');   // labels as tools/pyq-lint.js wants them
 function assemble(dir, outFile, g, header) {
   const rows = fs.readdirSync(dir).filter(f => /^entries.*\.jsonl$/.test(f)).flatMap(f => fs.readFileSync(path.join(dir, f), 'utf8').split('\n').filter(l => l.trim()).map((l, i) => { try { return JSON.parse(l) } catch (e) { throw new Error(f + ' line ' + (i + 1) + ': ' + e.message) } }));
   const seen = new Set(), dup = rows.filter(r => seen.has(r.pn) || !seen.add(r.pn)).map(r => r.pn).filter((v, i, a) => a.indexOf(v) === i && rows.filter(r => r.pn === v).length > 1);
   if (dup.length) throw new Error('duplicate pn: ' + dup.join(','));
-  const gaps = rows.filter(r => r.gap); rows.splice(0, rows.length, ...rows.filter(r => !r.gap));     // {pn, gap}: the agent could not see the whole question; never published
+  const gaps = rows.filter(r => r.gap); rows.splice(0, rows.length, ...rows.filter(r => !r.gap)); rows.forEach(r => { r.y = normY(r.y) });     // {pn, gap}: the agent could not see the whole question; never published
   fs.writeFileSync(path.join(dir, 'gaps.json'), JSON.stringify(gaps, null, 1)); if (gaps.length) console.log('GAPS (text missing in the PDF crops, supply or re-crop): ' + gaps.map(g => 'Q' + g.pn + ' ' + g.gap).join(' | '));
   rows.sort((p, q) => p.pn - q.pn);
   fs.writeFileSync(outFile, `/* ${header || 'Past-year questions for Rank mode'} */\nwindow.${g}=[\n` + rows.map(r => JSON.stringify(r)).join(',\n') + '\n];\n');
