@@ -878,7 +878,7 @@ function dnkf(){const s=hs(300,230,'Graph of the maximum kinetic energy against 
   const m=.62;hl(s,110,140,260,140-m*150,BLUE);hl(s,110,140,86,140+m*24,BLUE,'4 3');
   hl(s,150,140,260,140-m*110,HI);hl(s,150,140,126,140+m*24,HI,'4 3');
   ht(s,110,156,'f₀',BLUE,'middle',13);ht(s,150,156,'f₀′',HI,'middle',13);ht(s,70,140+m*24+4,'−φ',BLUE,'end',13);
-  ht(s,258,140-m*150-8,'metal 1',BLUE,'end',12);ht(s,258,140-m*110-8,'metal 2 (larger φ)',HI,'end',12);
+  ht(s,258,140-m*150-8,'metal 1',BLUE,'end',12);ht(s,262,140-m*110+22,'metal 2 (larger φ)',HI,'end',12);
   const sx=200,sy=140-m*(sx-110);hl(s,sx,sy,sx+40,sy,DIM,'3 3');hl(s,sx+40,sy,sx+40,sy-m*40,DIM,'3 3');ht(s,sx-8,sy-22,'slope = h',INK,'end',12);
   cp(s,196,'Kmax = hf − φ; V₀ = (h/e) f − φ/e|slope h (or h/e) is the same for every metal; f-intercept f₀');return fin(s)}
 function dnlam(){const s=hs(300,230,'Graph of the de Broglie wavelength in angstrom against one over the square root of the accelerating voltage. Straight lines through the origin. The electron line has slope 12.27, the proton 0.286 and the alpha particle 0.101 angstrom volt to the half.');
@@ -895,5 +895,21 @@ function dndg(){const s=hs(300,230,'Davisson and Germer experiment. An electron 
   ht(s,250,28,'detector',INK,'middle',12);arcp(s,154,97,34,90,140,INK,1.3);ht(s,206,112,'φ = 50°',INK,'middle',13);
   hl(s,154,97,240,97,DIM,'4 3');
   cp(s,170,'peak at φ = 50° for 54 V: 2d sinθ = λ, θ = 65°, d = 0.091 nm|λ = 0.165 nm; de Broglie 12.27/√54 = 0.167 nm; φ = 180° − 2θ');return fin(s)}
-window.PhysicaRankFigs={dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
+const XF={};
+/* >>> FIGS mag: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+/* <<< FIGS mag */
+
+/* >>> FIGS emi: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+/* <<< FIGS emi */
+
+/* >>> FIGS atoms: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+/* <<< FIGS atoms */
+
+/* >>> FIGS devices: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+/* <<< FIGS devices */
+
+/* >>> FIGS skills: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+/* <<< FIGS skills */
+
+window.PhysicaRankFigs={...XF,dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
 })();
