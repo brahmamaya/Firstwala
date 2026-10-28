@@ -16,12 +16,14 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 - `ga.js`: Google Analytics in 3 modes: STANDARD (default, owner's decision to see visits / new users / daily users: GA first-party cookie, 90-day expiry, signals and ad personalisation off, page/simulation views only, nothing while the Test Series is open, off on DNT/GPC), NO COOKIES (page views only, random ID per load) and OFF. Never add custom events, ads features or personal data; keep the privacy page text in sync with ga.js. Owner was told about the DPDP s.9 risk for minors and chose STANDARD; a lawyer should review. `stats.js` (GoatCounter) is inactive until its site code is set.
 - No backend: Physica is static (GitHub Pages). Test Series runs on the student's device from public JSON in `tests/` (free tests 1-3 only; see `docs/CONTENT-GUIDE.md`). Exam patterns: `tools/patterns.json`. Content tool: `tools/series-import.js`. Browser e2e: `tools/e2e/`. `docs/`: security, content guide, private files.
 - Test Series files: `series.js` (hub, login, results) + `series-exam.js` (the exam screen, loaded only when a test starts) + `series-loader.js` (entry points: Rank-mode pills, landing notice).
+- `tools/qgen/` + `qbank/`: generated practice-question bank (templates with independent verification; see `docs/QBANK.md`). Rank mode shows a Question bank tab for chapters in `qbank/index.json`.
 - `tools/watchdog.js`: live-site integrity monitor. `tools/perf-budget.js`: size budget. `tools/secret-guard.js`: blocks secrets.
 
 ## Commands that must pass before pushing
 ```
 node tools/series-import.test.js            # content tool
 node tools/watchdog.test.js                 # watchdog catches tamper/outage
+node tools/qgen/verify.test.js; node tools/qgen/verify.js   # question generator: verifier test + all generated questions + qbank/ is up to date (regenerate: node tools/qgen/build.js)
 node tools/perf-budget.js                   # gzip size budgets
 node tools/private-guard.js                 # nothing private tracked
 node -e "require('./tools/secret-guard.js')('.')"
