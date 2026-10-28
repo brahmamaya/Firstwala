@@ -1114,6 +1114,74 @@ function edgate(){const s=hs(320,300,'Symbols and outputs of five logic gates fo
 Object.assign(XF,{edband,edpn,ediv,edhw,edfw,edzen,edgate});
 /* <<< FIGS devices */
 
+/* >>> FIGS sets: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function stven2(){const s=hs(300,230,'Venn diagram of two sets A and B inside the universal set U. Two overlapping circles. The left part is A only, the middle is A intersection B, the right part is B only, and the region outside both circles is neither A nor B. Formula: n of A union B equals n of A plus n of B minus n of A intersection B.');
+  mk(s,'rect',{x:16,y:12,width:268,height:150,rx:4,fill:'none',stroke:DIM,'stroke-width':1.4});ht(s,26,30,'U',DIM,'start',14);
+  mk(s,'circle',{cx:115,cy:88,r:58,fill:BLUE,'fill-opacity':.16,stroke:BLUE,'stroke-width':1.8});
+  mk(s,'circle',{cx:185,cy:88,r:58,fill:HI,'fill-opacity':.16,stroke:HI,'stroke-width':1.8});
+  ht(s,70,34,'A',BLUE,'middle',15);ht(s,230,34,'B',HI,'middle',15);
+  ht(s,86,92,'A only',INK,'middle',12);ht(s,150,92,'A∩B',INK,'middle',12);ht(s,214,92,'B only',INK,'middle',12);
+  ht(s,24,154,'A′∩B′ = neither',DIM,'start',11);
+  cp(s,184,'n(A∪B) = n(A) + n(B) − n(A∩B)|only A = n(A) − n(A∩B)|neither = N − n(A∪B)');return fin(s)}
+function stven3(){const s=hs(300,250,'Venn diagram of three sets A, B and C. Three overlapping circles make seven regions: a is A only, b is B only, c is C only, x is A and B only, y is B and C only, z is A and C only, and t is in all three sets.');
+  mk(s,'rect',{x:14,y:8,width:272,height:184,rx:4,fill:'none',stroke:DIM,'stroke-width':1.4});ht(s,22,24,'U',DIM,'start',14);
+  mk(s,'circle',{cx:116,cy:76,r:46,fill:BLUE,'fill-opacity':.16,stroke:BLUE,'stroke-width':1.8});
+  mk(s,'circle',{cx:184,cy:76,r:46,fill:HI,'fill-opacity':.16,stroke:HI,'stroke-width':1.8});
+  mk(s,'circle',{cx:150,cy:132,r:46,fill:GRN,'fill-opacity':.16,stroke:GRN,'stroke-width':1.8});
+  ht(s,72,32,'A',BLUE,'middle',15);ht(s,228,32,'B',HI,'middle',15);ht(s,200,180,'C',GRN,'middle',15);
+  for(const [x,y,t] of [[92,70,'a'],[208,70,'b'],[150,162,'c'],[150,62,'x'],[180,112,'y'],[120,112,'z'],[150,98,'t']])ht(s,x,y,t,INK,'middle',15);
+  cp(s,214,'n(A∪B∪C) = ΣA − ΣAB + n(A∩B∩C)|a, b, c: one set; x, y, z: two sets|t: all three sets');return fin(s)}
+function stmap(){const s=hs(300,240,'Three mapping diagrams from a set X on the left to a set Y on the right. Row 1: X has 2 elements and Y has 3, each input goes to a different output and one element of Y is not used, so the function is one-one but not onto. Row 2: X has 3 elements and Y has 2, two inputs go to the same output, so it is many-one and onto. Row 3: 3 elements to 3 elements, each used once, so it is one-one and onto.');
+  const rows=[[[0,1],3,'one-one','not onto'],[[0,0,1],2,'many-one','onto'],[[0,1,2],3,'one-one','and onto']];
+  rows.forEach(([m,ny,a,b],r)=>{const y0=12+r*66,cy=y0+30,nx=m.length;
+    mk(s,'ellipse',{cx:70,cy,rx:28,ry:28,fill:'none',stroke:DIM,'stroke-width':1.4});mk(s,'ellipse',{cx:170,cy,rx:28,ry:28,fill:'none',stroke:DIM,'stroke-width':1.4});
+    const yl=i=>cy+(i-(nx-1)/2)*18,yr=j=>cy+(j-(ny-1)/2)*18;
+    ht(s,36,y0+12,'X',DIM,'end',12);ht(s,204,y0+12,'Y',DIM,'start',12);
+    m.forEach((j,i)=>{hv(s,76,yl(i),164,yr(j),HI,1.5)});
+    for(let i=0;i<nx;i++){dot(s,70,yl(i),INK);ht(s,56,yl(i)+4,String(i+1),INK,'end',11)}
+    for(let j=0;j<ny;j++){const used=m.includes(j);dot(s,170,yr(j),used?INK:RED);ht(s,184,yr(j)+4,'abc'[j],used?INK:RED,'start',11)}
+    ht(s,220,cy-2,a,r===1?BLUE:GRN,'start',13);ht(s,220,cy+15,b,INK,'start',13)});
+  cp(s,214,'red element: no arrow arrives (not onto)|many-one (row 2): two inputs share one output');return fin(s)}
+function stgrf(){const s=hs(300,230,'Horizontal line test. Left: the graph of y equals x squared, a parabola; a horizontal line cuts it at two points, so the function is many-one. Right: the graph of y equals x cubed; every horizontal line cuts it at one point, so the function is one-one.');
+  const Xa=x=>80+45*x,Ya=x=>128-60*x*x,Xb=x=>220+45*x,Yb=x=>128-28*x*x*x;
+  hv(s,18,128,142,128,DIM,1.3);hv(s,80,176,80,36,DIM,1.3);hv(s,158,128,282,128,DIM,1.3);hv(s,220,176,220,36,DIM,1.3);
+  let d='',e='';for(let x=-1.2;x<=1.201;x+=.05){d+=(d?'L':'M')+Xa(x)+' '+Ya(x);if(Math.abs(x)<1.151)e+=(e?'L':'M')+Xb(x)+' '+Yb(x)}
+  pth(s,d,BLUE,2);pth(s,e,GRN,2);
+  ht(s,80,26,'y = x²',BLUE,'middle',14);ht(s,220,26,'y = x³',GRN,'middle',14);
+  dsh(s,20,80,140,80);dot(s,Xa(-.894),80,RED,4);dot(s,Xa(.894),80,RED,4);
+  dsh(s,160,95,280,95);dot(s,Xb(1.057),95,GRN,4);
+  ht(s,80,192,'2 points: many-one',RED,'middle',12);ht(s,220,192,'1 point: one-one',GRN,'middle',12);
+  cp(s,212,'one-one if every horizontal line y = c|cuts the graph at most once');return fin(s)}
+function stcmp(){const s=hs(300,200,'Composition of functions. Set A maps to set B by f, and set B maps to set C by g. A single input x goes to f of x and then to g of f of x. The curved arrow below goes straight from A to C and is the composite g after f.');
+  for(const [cx,n] of [[50,'A'],[150,'B'],[250,'C']]){mk(s,'ellipse',{cx,cy:70,rx:34,ry:42,fill:'none',stroke:DIM,'stroke-width':1.4});ht(s,cx,20,n,INK,'middle',14)}
+  dot(s,50,60,INK);dot(s,150,60,INK);dot(s,250,60,INK);
+  ht(s,50,50,'x',INK,'middle',12);ht(s,150,50,'f(x)',INK,'middle',12);ht(s,250,50,'g(f(x))',INK,'middle',10);
+  hv(s,54,60,146,60,BLUE,1.8);hv(s,154,60,246,60,GRN,1.8);ht(s,100,76,'f',BLUE,'middle',14);ht(s,200,76,'g',GRN,'middle',14);
+  pth(s,'M50 64Q150 150 250 64',HI,1.8);hv(s,239.6,69.4,250,62,HI,1.8);ht(s,150,128,'g∘f',HI,'middle',14);
+  cp(s,150,'(g∘f)(x) = g(f(x)): f acts first|x must be in the domain of f, and f(x) in the domain of g|g∘f and f∘g are usually different');return fin(s)}
+function stgi(){const s=hs(300,230,'Two graphs. Left: y equals the greatest integer of x, a staircase with horizontal steps; each step includes its left end (filled dot) and excludes its right end (open circle). Right: y equals the fractional part of x, a sawtooth of parallel slanted segments rising from 0 to 1 and repeating with period 1.');
+  const u=26,oy=104,XL=x=>44+u*x,XR=x=>194+u*x,Y=y=>oy-u*y;
+  hv(s,10,oy,132,oy,DIM,1.3);hv(s,XL(0),oy+38,XL(0),18,DIM,1.3);hv(s,160,oy,284,oy,DIM,1.3);hv(s,XR(0),oy+38,XR(0),18,DIM,1.3);
+  ht(s,70,14,'y = [x]',BLUE,'middle',14);ht(s,222,14,'y = {x}',GRN,'middle',14);
+  for(let k=-1;k<=2;k++){hl(s,XL(k),Y(k),XL(k+1),Y(k),BLUE);dot(s,XL(k),Y(k),BLUE,3.2);mk(s,'circle',{cx:XL(k+1),cy:Y(k),r:3.2,fill:'none',stroke:BLUE,'stroke-width':1.4})}
+  for(let k=-1;k<=2;k++){hl(s,XR(k),Y(0),XR(k+1),Y(1),GRN);dot(s,XR(k),Y(0),GRN,3.2);mk(s,'circle',{cx:XR(k+1),cy:Y(1),r:3.2,fill:'none',stroke:GRN,'stroke-width':1.4})}
+  dsh(s,XR(-1),Y(1),XR(3),Y(1));
+  for(const k of [1,2])ht(s,XL(0)-6,Y(k)+4,String(k),DIM,'end',11);ht(s,XL(0)-6,Y(-1)+4,'−1',DIM,'end',11);ht(s,XR(0)-6,Y(1)+4,'1',DIM,'end',11);
+  for(const k of [1,2,3]){ht(s,XL(k),oy+14,String(k),DIM,'middle',11);ht(s,XR(k),oy+14,String(k),DIM,'middle',11)}
+  cp(s,170,'[x] = greatest integer ≤ x|{x} = x − [x]; 0 ≤ {x} < 1, period 1|[x] + [−x] = −1 (x not an integer) or 0');return fin(s)}
+function stinv(){const s=hs(300,230,'Inverse function as a reflection. The graph of y equals x squared for x at least zero, the graph of its inverse y equals the square root of x, and the line y equals x. The two curves are mirror images in the line y equals x. The point (a, b) on f maps to the point (b, a) on the inverse.');
+  const X=x=>40+50*x,Y=y=>190-50*y;
+  hv(s,30,190,282,190,DIM,1.3);hv(s,40,200,40,16,DIM,1.3);
+  dsh(s,X(0),Y(0),X(3.3),Y(3.3));ht(s,X(3.3)+6,Y(3.3)+6,'y = x',DIM,'start',12);
+  let d='',e='';for(let x=0;x<=1.8001;x+=.05)d+=(d?'L':'M')+X(x)+' '+Y(x*x);for(let x=0;x<=3.2401;x+=.05)e+=(e?'L':'M')+X(x)+' '+Y(Math.sqrt(x));
+  pth(s,d,BLUE,2);pth(s,e,GRN,2);
+  ht(s,X(1.8)-8,Y(3.24)+4,'y = f(x)',BLUE,'end',12);ht(s,X(3.24)+6,Y(1.8)-2,'y = f⁻¹(x)',GRN,'start',12);
+  dsh(s,X(1.4),Y(1.96),X(1.96),Y(1.4));dot(s,X(1.4),Y(1.96),BLUE,4);dot(s,X(1.96),Y(1.4),GRN,4);
+  ht(s,X(1.4)-6,Y(1.96)-4,'(a, b)',BLUE,'end',12);ht(s,X(1.96)+8,Y(1.4)+16,'(b, a)',GRN,'start',12);
+  cp(s,214,'graph of f⁻¹ = mirror image of f in the line y = x|domain and range of f swap places in f⁻¹');return fin(s)}
+Object.assign(XF,{stven2,stven3,stmap,stgrf,stcmp,stgi,stinv});
+/* <<< FIGS sets */
+
 /* >>> FIGS skills: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
 function xsvern(){const s=hs(330,160,'Vernier callipers scale. The main scale is in millimetres. The zero of the vernier scale lies just after the 23 mm mark. The sixth line of the vernier scale coincides with a line of the main scale. The reading is 23 mm plus 6 times 0.1 mm, which is 23.6 mm.');
   const X=m=>20+(m-20)*22,x0=X(23.6);
@@ -1188,5 +1256,6 @@ function xsid(){const s=hs(320,250,'Angle of deviation against angle of incidenc
 Object.assign(XF,{xsvern,xsscrew,xspend,xsmb,xspot,xsres,xsid});
 /* <<< FIGS skills */
 
+window.PhysicaRankFigKit={svg,mk,line,text,hs,ht,hl,dsh,hv,dot,pt,arcp,dim,fin,cp,pth,pls,INK,DIM,HI,BLUE,GRN,RED,add:f=>Object.assign(window.PhysicaRankFigs,f)};   // lazy chapter files draw their own figures with this kit, so the main Rank bundle does not grow
 window.PhysicaRankFigs={...XF,dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
 })();

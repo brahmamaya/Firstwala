@@ -6,7 +6,7 @@ require('./secret-guard.js')(root); // no API keys or tokens may ever ship
 const CORE=['compat.js','mathtext.js','theme.js','physica3d.js'];
 const MAIN=['physics.js','extras.js','enhancements.js','third.js','fourth.js','fifth.js','sixth.js','labkit.js','seventh.js','eighth.js','ninth.js','tenth.js','eleventh.js','class10-new.js','biokit.js','.subjects.tmp.js','phys3d-a.js','phys3d-b.js','phys3d-c.js','phys3d-d.js','instruments2d.js','optics2d.js','mirrors2d.js','experience.js','class10.js','app.js','focus.js','recorder.js','landing.js','feedback.js','install.js','series-loader.js','tutor-speech.js','tutor.js','lazy.js','stats.js'];
 const TUTOR=['tutor-content.js','tutor-chapters.js','tutor-teacher-content.js','tutor-learned.js','phys-fig.js','tutor-mock.js']; // loaded only when a student opens the AI Tutor
-const EXAM=['tutor-exam.js']; // Board/JEE/NEET questions and mock tests: loaded only when the Exam tab opens
+const EXAM=['tutor-exam.js','tutor-exam-math.js']; // Board/JEE/NEET questions and mock tests: loaded only when the Exam tab opens
 // Botany/Zoology and Chemistry ship as their own packs; the main bundle carries only their index (tools/subject-manifest.js)
 const SUBJECTS={bio:['bio1.js','bio2.js','bio3.js','bio4.js','bio5.js'],chem:['chem1.js','chem2.js','chem3.js','chem4.js']};
 const PACK=['real3d-11a.js','real3d-11b.js','real3d-11c.js','real3d-11d.js','real3d-11e.js','ultra3d.js'];
@@ -24,7 +24,7 @@ for(const f of PYQ_FILES){const box={};require('vm').runInNewContext(fs.readFile
   PYQ_IDX[g]=[...T].map(([tp,m])=>[tp,[...m]]);bundle([f],out);PYQ_MAP[g]=out}
 bundle(['rank-export.js'],'physica-export.min.js');
 // Chapter text that is loaded only when its chapter is opened (keeps the Rank bundle small for slow phones): global name -> bundle
-const CH_LAZY={'rank-mag-jee.js':'PhysicaRankMagJee','rank-emi-jee.js':'PhysicaRankEmiJee','rank-nuc-jee.js':'PhysicaRankAtomsJee','rank-semi-jee.js':'PhysicaRankDevicesJee','rank-skills-jee.js':'PhysicaRankSkillsJee'},CH_MAP={};
+const CH_LAZY={'rank-mag-jee.js':'PhysicaRankMagJee','rank-emi-jee.js':'PhysicaRankEmiJee','rank-nuc-jee.js':'PhysicaRankAtomsJee','rank-semi-jee.js':'PhysicaRankDevicesJee','rank-skills-jee.js':'PhysicaRankSkillsJee','rank-sets-jee.js':'PhysicaRankSetsJee'},CH_MAP={};
 for(const f in CH_LAZY){const out='physica-ch-'+f.slice(5,-7)+'.min.js';bundle([f],out);CH_MAP[CH_LAZY[f]]=out}
 bundle(['series-exam.js'],'physica-series-exam.min.js'); // the exam screen, fetched when a test starts
 bundle(['series.js'],'physica-series.min.js');           // Test Series hub, login, results; fetched when a student opens it
