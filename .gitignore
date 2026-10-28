@@ -21,3 +21,4 @@ private/
 .wrangler/
 supabase/.temp/
 *.sql.private
+__pycache__/
