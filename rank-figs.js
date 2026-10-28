@@ -906,6 +906,77 @@ const XF={};
 /* <<< FIGS atoms */
 
 /* >>> FIGS devices: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+const edw=(s,x0,y0,per,A,n,mode,c)=>{let d='';for(let x=0;x<=n*per;x+=2){let v=Math.sin(2*Math.PI*x/per);if(mode===1)v=Math.max(v,0);if(mode===2)v=Math.abs(v);d+=(x?'L':'M')+(x0+x)+' '+(y0-A*v)}return pth(s,d,c,2)};
+const edax=(s,x0,y0,per,A,n)=>{hv(s,x0-8,y0,x0+n*per+16,y0,DIM,1.2);hv(s,x0,y0+A+8,x0,y0-A-12,DIM,1.2);ht(s,x0+n*per+16,y0+14,'t',INK,'end',12)};
+const edres=(s,x,y,h)=>mk(s,'rect',{x:x-6,y,width:12,height:h,fill:'none',stroke:INK,'stroke-width':1.4});
+const eddio=(s,x,y,c=INK)=>{mk(s,'polygon',{points:`${x},${y-8} ${x},${y+8} ${x+22},${y}`,fill:'none',stroke:c,'stroke-width':1.4});hl(s,x+22,y-8,x+22,y+8,c)};
+function edband(){const s=hs(320,230,'Energy bands of three kinds of solids. Conductor: the valence band and conduction band overlap. Semiconductor: a small gap, about 1 electron volt for silicon. Insulator: a wide gap, more than 3 electron volt.');
+  const P=[[14,'conductor','ρ < 10⁻⁵ Ω m'],[116,'semiconductor','10⁻⁵ to 10⁶ Ω m'],[218,'insulator','ρ > 10⁸ Ω m']],W=88,B=[[[30,85],[75,140]],[[30,65],[105,140]],[[30,45],[125,140]]];
+  P.forEach(([x,n,r],k)=>{ht(s,x+W/2,20,n,INK,'middle',13);const [cb,vb]=B[k];
+    mk(s,'rect',{x,y:cb[0],width:W,height:cb[1]-cb[0],fill:BLUE,'fill-opacity':.22,stroke:BLUE,'stroke-width':1.4});
+    mk(s,'rect',{x,y:vb[0],width:W,height:vb[1]-vb[0],fill:HI,'fill-opacity':.22,stroke:HI,'stroke-width':1.4});
+    ht(s,x+6,cb[0]+13,'CB',BLUE,'start',11);ht(s,x+6,vb[1]-6,'VB',HI,'start',11);ht(s,x+W/2,156,r,DIM,'middle',10.5);
+    if(k===0)ht(s,x+W/2+8,83,'overlap',INK,'middle',10);
+    else{const m=(cb[1]+vb[0])/2;hv(s,x+10,m,x+10,cb[1]+1,DIM,1.1);hv(s,x+10,m,x+10,vb[0]-1,DIM,1.1);ht(s,x+20,m+4,k===1?'Eg ≈ 1 eV':'Eg > 3 eV',INK,'start',11)}});
+  cp(s,178,'Eg = gap from top of VB to bottom of CB|Si 1.1 eV, Ge 0.67 eV');return fin(s)}
+function edpn(){const s=hs(320,230,'A p-n junction. The p side on the left has holes and negative acceptor ions. The n side on the right has free electrons and positive donor ions. In the middle is the depletion layer, about one micrometre wide, which has only fixed ions. The built-in electric field points from the n side to the p side.');
+  mk(s,'rect',{x:20,y:40,width:110,height:70,fill:RED,'fill-opacity':.1,stroke:DIM,'stroke-width':1.3});
+  mk(s,'rect',{x:190,y:40,width:110,height:70,fill:BLUE,'fill-opacity':.1,stroke:DIM,'stroke-width':1.3});
+  mk(s,'rect',{x:130,y:40,width:60,height:70,fill:HI,'fill-opacity':.14,stroke:HI,'stroke-width':1.2,'stroke-dasharray':'4 3'});
+  for(const [x,y] of [[42,58],[78,52],[60,82],[100,70],[92,98],[36,100],[116,92]])mk(s,'circle',{cx:x,cy:y,r:3.4,fill:'none',stroke:RED,'stroke-width':1.4});
+  for(const [x,y] of [[212,56],[246,50],[228,80],[272,66],[258,98],[290,90],[210,100]])dot(s,x,y,BLUE,3);
+  for(const y of [58,80,102]){pls(s,146,y,'−');pls(s,174,y,'+')}
+  ht(s,75,32,'p-type',RED,'middle',13);ht(s,245,32,'n-type',BLUE,'middle',13);ht(s,160,32,'depletion',HI,'middle',12);
+  ht(s,52,126,'○ holes',RED,'middle',11);ht(s,248,126,'● electrons',BLUE,'middle',11);
+  hv(s,160,128,190,128,DIM,1.1);hv(s,160,128,130,128,DIM,1.1);ht(s,160,144,'width ≈ 1 μm',DIM,'middle',11);
+  hv(s,186,162,134,162,HI,2);ht(s,160,178,'built-in field E (n → p)',HI,'middle',11);
+  cp(s,194,'barrier potential: Si 0.7 V, Ge 0.3 V|forward bias: p to +, layer gets thinner|reverse bias: p to −, layer gets wider');return fin(s)}
+function ediv(){const s=hs(320,230,'Current voltage characteristic of a p-n junction diode. For forward bias the current is negligible until about 0.7 volt for silicon, then rises sharply. For reverse bias the current is a tiny leakage of microampere size until the breakdown voltage, where it increases suddenly.');
+  hv(s,30,120,296,120,DIM,1.4);hv(s,170,186,170,14,DIM,1.4);ht(s,294,136,'V',INK,'end',13);ht(s,162,22,'I',INK,'end',13);
+  const X=v=>170+v*110,Y=i=>120-i*3;let d='';for(let v=0;v<=1;v+=.01){const i=.0004*(Math.exp(v/.07)-1);if(Y(i)<26)break;d+=(d?'L':'M')+X(v)+' '+Y(i)}pth(s,d,BLUE,2);
+  pth(s,'M170 124L64 124Q58 140 56 176',HI,2);
+  dsh(s,X(.7),120,X(.7),132);ht(s,X(.7),146,'0.7 V',INK,'middle',11);
+  ht(s,178,48,'forward (mA)',BLUE,'start',12);ht(s,40,110,'reverse (μA)',HI,'start',12);
+  ht(s,72,146,'−V_br',INK,'start',11);ht(s,72,164,'breakdown',HI,'start',11);
+  cp(s,200,'forward: sharp rise after ≈ 0.7 V (Si)|reverse: tiny current, then breakdown');return fin(s)}
+function edhw(){const s=hs(320,260,'Half wave rectifier. An alternating source, one diode and a load resistor are in series. Below the circuit, the input is a full sine wave and the output across the load has only the positive half cycles. The output has the same frequency as the input.');
+  mk(s,'circle',{cx:40,cy:60,r:14,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,40,65,'~',INK,'middle',16);
+  hl(s,40,46,40,36);hl(s,40,36,100,36);eddio(s,100,36);hl(s,122,36,250,36);hl(s,250,36,250,46);edres(s,250,46,30);hl(s,250,76,250,90);hl(s,250,90,40,90);hl(s,40,90,40,74);
+  ht(s,111,22,'diode',DIM,'middle',11);ht(s,268,66,'R',INK,'start',13);
+  edax(s,40,150,120,22,2);ht(s,48,118,'input',INK,'start',12);edw(s,40,150,120,22,2,0,BLUE);
+  edax(s,40,222,120,22,2);ht(s,48,190,'output across R',INK,'start',12);edw(s,40,222,120,22,2,1,HI);
+  cp(s,248,'conducts in positive half cycles only|output frequency = input frequency f');return fin(s)}
+function edfw(){const s=hs(320,300,'Full wave rectifier with a centre tapped transformer and two diodes. Each diode conducts in one half cycle, so the current through the load always has the same direction. Below the circuit the input is a sine wave and the output has two humps for each input cycle, so the output frequency is twice the input frequency.');
+  let d='M50 20';for(let k=0;k<4;k++)d+='a10 10 0 0 1 0 20';pth(s,d,INK,1.6);
+  hl(s,50,20,90,20);eddio(s,90,20);hl(s,112,20,200,20);hl(s,50,100,90,100);eddio(s,90,100);hl(s,112,100,200,100);
+  hl(s,200,20,200,100);dot(s,200,60);hl(s,200,60,224,60);mk(s,'rect',{x:224,y:54,width:26,height:12,fill:'none',stroke:INK,'stroke-width':1.4});
+  hl(s,250,60,262,60);hl(s,262,60,262,118);hl(s,262,118,30,118);hl(s,30,118,30,60);hl(s,30,60,50,60);dot(s,50,60);
+  ht(s,101,12,'D1',INK,'middle',11);ht(s,101,92,'D2',INK,'middle',11);ht(s,237,84,'R',INK,'middle',13);ht(s,26,52,'tap',DIM,'end',10);
+  edax(s,40,176,120,20,2);ht(s,48,148,'input',INK,'start',12);edw(s,40,176,120,20,2,0,BLUE);
+  edax(s,40,252,120,20,2);ht(s,48,224,'output across R',INK,'start',12);edw(s,40,252,60,20,4,2,HI);
+  cp(s,282,'D1 and D2 conduct in alternate half cycles|output frequency = 2 × input frequency');return fin(s)}
+function edzen(){const s=hs(320,230,'Zener diode as a voltage regulator. A source with voltage V feeds a series resistor Rs. A Zener diode, reverse biased, is connected across the load resistor RL. The output voltage across the load equals the Zener voltage Vz. The current in Rs splits into the Zener current and the load current.');
+  hl(s,30,60,30,40);hl(s,30,40,70,40);mk(s,'rect',{x:70,y:34,width:40,height:12,fill:'none',stroke:INK,'stroke-width':1.4});hl(s,110,40,250,40);
+  hl(s,22,60,38,60);hl(s,26,68,34,68);hl(s,30,68,30,120);ht(s,18,66,'+',RED,'end',13);ht(s,90,26,'Rs',INK,'middle',13);ht(s,14,96,'V',INK,'end',13);
+  hl(s,170,40,170,66);hl(s,160,66,180,66);hl(s,160,66,156,72);hl(s,180,66,184,60);mk(s,'polygon',{points:'170,66 160,88 180,88',fill:'none',stroke:INK,'stroke-width':1.4});hl(s,170,88,170,120);
+  ht(s,150,86,'Zener',INK,'end',11);dot(s,170,40);dot(s,170,120);
+  hl(s,250,40,250,58);edres(s,250,58,34);hl(s,250,92,250,120);ht(s,238,80,'RL',INK,'end',13);hl(s,30,120,250,120);
+  hv(s,120,32,150,32,HI,1.6);ht(s,135,24,'I',HI,'middle',11);hv(s,176,92,176,102,BLUE,1.6);ht(s,192,100,'Iz',BLUE,'middle',11);hv(s,222,44,222,58,GRN,1.6);ht(s,230,56,'IL',GRN,'start',11);
+  hv(s,296,80,296,42,DIM,1.1);hv(s,296,80,296,118,DIM,1.1);ht(s,302,84,'Vz',INK,'start',12);hl(s,250,40,296,40,DIM,'2 3');hl(s,250,120,296,120,DIM,'2 3');
+  cp(s,146,'Vout = Vz while the Zener is in breakdown|I = Iz + IL, I = (V − Vz)/Rs, IL = Vz/RL|Iz is least for least V and greatest IL');return fin(s)}
+function edgate(){const s=hs(320,300,'Symbols and outputs of five logic gates for inputs A B equal to 00, 01, 10, 11. AND gives 0 0 0 1. OR gives 0 1 1 1. NOT gives 1 0 for input 0 1. NAND gives 1 1 1 0. NOR gives 1 0 0 0. A small circle at the output means NOT.');
+  ht(s,20,16,'inputs A B in order 00, 01, 10, 11 → output Y',DIM,'start',11);
+  const rows=[['AND','Y = A·B','Y: 0 0 0 1'],['OR','Y = A + B','Y: 0 1 1 1'],['NOT','Y = A̅','A = 0, 1: Y = 1, 0'],['NAND','Y = NOT(A·B)','Y: 1 1 1 0'],['NOR','Y = NOT(A+B)','Y: 1 0 0 0']];
+  rows.forEach(([g,e,t],k)=>{const x=44,y=40+k*46,two=g!=='NOT';
+    if(g==='AND'||g==='NAND')pth(s,`M${x} ${y}h22a14 14 0 0 1 0 28h-22z`,INK,1.5);
+    else if(g==='OR'||g==='NOR')pth(s,`M${x} ${y}Q${x+24} ${y} ${x+38} ${y+14}Q${x+24} ${y+28} ${x} ${y+28}Q${x+10} ${y+14} ${x} ${y}Z`,INK,1.5);
+    else pth(s,`M${x} ${y}L${x} ${y+28}L${x+30} ${y+14}Z`,INK,1.5);
+    const bub=g==='NOT'||g==='NAND'||g==='NOR',ox=g==='NOT'?x+30:g==='NAND'?x+36:x+38;
+    if(bub){mk(s,'circle',{cx:ox+4,cy:y+14,r:4,fill:'none',stroke:INK,'stroke-width':1.5});hl(s,ox+8,y+14,ox+18,y+14)}else hl(s,ox,y+14,ox+14,y+14);
+    if(two){hl(s,x-14,y+7,x+4,y+7);hl(s,x-14,y+21,x+4,y+21);ht(s,x-18,y+11,'A',INK,'end',11);ht(s,x-18,y+25,'B',INK,'end',11)}else{hl(s,x-14,y+14,x,y+14);ht(s,x-18,y+18,'A',INK,'end',11)}
+    ht(s,x-34,y-4,g,HI,'start',11);ht(s,138,y+12,e,INK,'start',12);ht(s,138,y+28,t,BLUE,'start',12)});
+  cp(s,276,'NAND and NOR are universal gates');return fin(s)}
+Object.assign(XF,{edband,edpn,ediv,edhw,edfw,edzen,edgate});
 /* <<< FIGS devices */
 
 /* >>> FIGS skills: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
