@@ -21,7 +21,7 @@ function build() { if (!fs.existsSync(ESB)) fail('esbuild 0.24.2 missing: mkdir 
 
 function check(e2e) {
   const steps = [['perf budget', 'node', ['tools/perf-budget.js'], /FAIL/], ['private guard', 'node', ['tools/private-guard.js']], ['security guard', 'node', ['tools/security-guard.js']], ['secret guard', 'node', ['-e', "require('./tools/secret-guard.js')('.')"]],
-    ['watchdog test', 'node', ['tools/watchdog.test.js']], ['series-import test', 'node', ['tools/series-import.test.js']], ['qgen verify test', 'node', ['tools/qgen/verify.test.js']], ['qgen verify', 'node', ['tools/qgen/verify.js']], ['qbank up to date', 'node', ['tools/qgen/build.js', '--check']]];
+    ['watchdog test', 'node', ['tools/watchdog.test.js']], ['series-import test', 'node', ['tools/series-import.test.js']], ['qgen verify test', 'node', ['tools/qgen/verify.test.js']], ['qgen verify', 'node', ['tools/qgen/verify.js']], ['qbank up to date', 'node', ['tools/qgen/build.js', '--check']], ['pyq view buttons', 'node', ['tools/e2e/pyq-view.js']]];
   const env = { NODE_PATH: '/tmp/nm:/tmp/claude-0/esb/e2e/node_modules', CHROMIUM: '/opt/pw-browsers/chromium', PW: 'playwright-core' };
   if (e2e) steps.push(['browser e2e', 'node', ['tools/e2e/e2e.js'], /FAIL/]);
   let bad = 0;
