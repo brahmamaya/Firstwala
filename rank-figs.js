@@ -878,7 +878,7 @@ function dnkf(){const s=hs(300,230,'Graph of the maximum kinetic energy against 
   const m=.62;hl(s,110,140,260,140-m*150,BLUE);hl(s,110,140,86,140+m*24,BLUE,'4 3');
   hl(s,150,140,260,140-m*110,HI);hl(s,150,140,126,140+m*24,HI,'4 3');
   ht(s,110,156,'f₀',BLUE,'middle',13);ht(s,150,156,'f₀′',HI,'middle',13);ht(s,70,140+m*24+4,'−φ',BLUE,'end',13);
-  ht(s,258,140-m*150-8,'metal 1',BLUE,'end',12);ht(s,258,140-m*110-8,'metal 2 (larger φ)',HI,'end',12);
+  ht(s,258,140-m*150-8,'metal 1',BLUE,'end',12);ht(s,262,140-m*110+22,'metal 2 (larger φ)',HI,'end',12);
   const sx=200,sy=140-m*(sx-110);hl(s,sx,sy,sx+40,sy,DIM,'3 3');hl(s,sx+40,sy,sx+40,sy-m*40,DIM,'3 3');ht(s,sx-8,sy-22,'slope = h',INK,'end',12);
   cp(s,196,'Kmax = hf − φ; V₀ = (h/e) f − φ/e|slope h (or h/e) is the same for every metal; f-intercept f₀');return fin(s)}
 function dnlam(){const s=hs(300,230,'Graph of the de Broglie wavelength in angstrom against one over the square root of the accelerating voltage. Straight lines through the origin. The electron line has slope 12.27, the proton 0.286 and the alpha particle 0.101 angstrom volt to the half.');
@@ -895,5 +895,298 @@ function dndg(){const s=hs(300,230,'Davisson and Germer experiment. An electron 
   ht(s,250,28,'detector',INK,'middle',12);arcp(s,154,97,34,90,140,INK,1.3);ht(s,206,112,'φ = 50°',INK,'middle',13);
   hl(s,154,97,240,97,DIM,'4 3');
   cp(s,170,'peak at φ = 50° for 54 V: 2d sinθ = λ, θ = 65°, d = 0.091 nm|λ = 0.165 nm; de Broglie 12.27/√54 = 0.167 nm; φ = 180° − 2θ');return fin(s)}
-window.PhysicaRankFigs={dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
+const XF={};
+/* >>> FIGS mag: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function mgwire(){const s=hs(300,230,'Magnetic field of a long straight wire. The current comes out of the page. The field lines are concentric circles around the wire, drawn anticlockwise, and they are closer together near the wire. The field falls as one over the distance.');
+  const cx=120,cy=88;for(const r of [24,46,68])mk(s,'circle',{cx,cy,r,fill:'none',stroke:DIM,'stroke-width':1.2});
+  dot(s,cx,cy,HI,4);mk(s,'circle',{cx,cy,r:9,fill:'none',stroke:HI,'stroke-width':1.5});
+  for(const r of [46,68])for(const a of [45,135,225,315]){const q=a*Math.PI/180,x=cx+r*Math.cos(q),y=cy-r*Math.sin(q),tx=-Math.sin(q),ty=-Math.cos(q);hv(s,x-7*tx,y-7*ty,x+7*tx,y+7*ty,BLUE,1.8)}
+  ht(s,210,40,'I out of page',HI,'start',12);ht(s,210,60,'B along circles',BLUE,'start',12);
+  dsh(s,cx,cy,cx-48,cy+48);ht(s,cx-34,cy+30,'r',INK,'end',13);
+  cp(s,178,'B = μ₀I/(2πr), so B ∝ 1/r|right-hand rule: thumb along I, fingers curl along B');return fin(s)}
+function mgsol(){const s=hs(300,230,'Solenoid. A long coil of closely wound turns carries a current. Inside, the field is uniform and along the axis. Outside, the return field lines are spread out and weak.');
+  hl(s,46,60,224,60);hl(s,46,120,224,120);for(let i=0;i<10;i++){const x=50+i*18;hl(s,x,58,x+8,122,INK)}
+  for(const y of [76,90,104])hv(s,64,y,206,y,BLUE,2);
+  pth(s,'M228 90 C 292 90 292 14 138 14 C -14 14 -14 90 34 90',DIM,1.2);pth(s,'M228 90 C 292 90 292 166 138 166 C -14 166 -14 90 34 90',DIM,1.2);
+  hv(s,26,90,38,90,DIM,1.2);ht(s,135,134,'B = μ₀nI inside',BLUE,'middle',12);
+  ht(s,135,36,'weak outside',DIM,'middle',12);ht(s,135,156,'n = N/L turns per metre',DIM,'middle',12);
+  cp(s,190,'inside: B = μ₀nI, uniform; at an end: B = μ₀nI/2|outside a long solenoid: B ≈ 0');return fin(s)}
+function mghel(){const s=hs(300,230,'Helical path of a charged particle. The velocity makes an angle theta with a uniform magnetic field. The component along the field is unchanged and the component across it turns the particle in a circle, so the path is a helix with pitch p.');
+  const X=t=>40+7*t+22*Math.cos(t),Y=t=>92+34*Math.sin(t);let d='';for(let t=0;t<=6*Math.PI+.01;t+=.15)d+=(d?'L':'M')+X(t).toFixed(1)+' '+Y(t).toFixed(1);pth(s,d,HI,2);
+  dsh(s,24,92,270,92);hv(s,160,170,260,170,BLUE,2);ht(s,268,174,'B',BLUE,'start',14);
+  const x1=40+7*Math.PI/2,x2=x1+14*Math.PI;dsh(s,x1,126,x1,150);dsh(s,x2,126,x2,150);dim(s,x1,146,x2,146,'pitch',(x1+x2)/2,164);
+  ht(s,150,18,'r = mv sinθ/(qB)',INK,'middle',13);ht(s,150,38,'v∥ = v cosθ along B',INK,'middle',13);
+  cp(s,196,'p = 2πm v cosθ/(qB), period T = 2πm/(qB)|v cosθ is not changed by B; v sinθ goes round a circle');return fin(s)}
+function mgvs(){const s=hs(300,230,'Velocity selector. A positive charge moves to the right between two plates. The electric field points down, giving a downward force qE. The magnetic field points into the page, giving an upward force qvB. When the two are equal the particle goes straight.');
+  hl(s,50,44,250,44,INK);hl(s,50,134,250,134,INK);ht(s,40,48,'+',RED,'end',14);ht(s,40,138,'−',BLUE,'end',14);
+  for(const x of [80,120,180,220])hv(s,x,50,x,76,GRN,1.6);ht(s,258,66,'E',GRN,'start',13);
+  for(const x of [80,120,180,220]){hl(s,x-4,106,x+4,114,BLUE);hl(s,x+4,106,x-4,114,BLUE)}ht(s,258,116,'B in',BLUE,'start',13);
+  hv(s,14,92,150,92,DIM,1.6);hv(s,150,92,286,92,DIM,1.6);dot(s,150,92,HI,5);ht(s,22,86,'v',INK,'start',13);
+  hv(s,150,96,150,122,RED,2);ht(s,158,120,'qE',RED,'start',12);hv(s,150,88,150,62,GRN,2);ht(s,158,68,'qvB',GRN,'start',12);
+  cp(s,164,'straight path when qE = qvB, so v = E/B|the answer does not depend on the charge or the mass');return fin(s)}
+function mgbar(){const s=hs(300,230,'Bar magnet. Field lines leave the north pole, loop round outside and enter the south pole. The magnetic moment points from south to north. On the axis the field is along the moment and is twice as large as at the same distance on the equatorial line, where it is opposite to the moment.');
+  mk(s,'rect',{x:100,y:88,width:50,height:24,fill:'none',stroke:BLUE,'stroke-width':1.6});mk(s,'rect',{x:150,y:88,width:50,height:24,fill:'none',stroke:RED,'stroke-width':1.6});
+  ht(s,125,105,'S',BLUE,'middle',14);ht(s,175,105,'N',RED,'middle',14);
+  pth(s,'M200 100 C 262 100 262 40 150 40 C 38 40 38 100 100 100',DIM,1.2);pth(s,'M200 100 C 262 100 262 160 150 160 C 38 160 38 100 100 100',DIM,1.2);
+  hv(s,156,40,142,40,DIM,1.3);hv(s,156,160,142,160,DIM,1.3);
+  hv(s,110,128,190,128,HI,2);ht(s,150,146,'m',HI,'middle',13);
+  dot(s,268,100,INK,3);ht(s,268,88,'P axial',INK,'middle',12);dsh(s,200,100,268,100);
+  dot(s,150,66,INK,3);dsh(s,150,88,150,66);ht(s,160,64,'Q equatorial',INK,'start',12);
+  cp(s,184,'axial: B = (μ₀/4π)(2m/r³), along m|equatorial: B = (μ₀/4π)(m/r³), opposite to m');return fin(s)}
+function mgearth(){const s=hs(300,230,'Earth magnetic field components. The total field B points downwards at the angle of dip delta below the horizontal. Its horizontal component is BH and its vertical component is BV.');
+  hv(s,50,76,205,76,BLUE,2);hv(s,205,76,205,185,GRN,2);hv(s,50,76,205,185,HI,2);dsh(s,50,76,50,40);
+  ht(s,128,68,'BH',BLUE,'middle',14);ht(s,214,134,'BV',GRN,'start',14);ht(s,112,142,'B',HI,'end',14);
+  arcp(s,50,76,44,90,125,INK,1.3);ht(s,100,100,'δ',INK,'middle',14);ht(s,50,32,'horizontal plane, magnetic meridian',DIM,'start',12);
+  cp(s,214,'BH = B cos δ, BV = B sin δ, tan δ = BV/BH|B = √(BH² + BV²)');return fin(s)}
+Object.assign(XF,{mgwire,mgsol,mghel,mgvs,mgbar,mgearth});
+/* <<< FIGS mag */
+
+/* >>> FIGS emi: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function eifar(){const s=hs(300,230,'A square loop in a magnetic field pointing into the page. The field is increasing. By Lenz law the induced current flows anticlockwise so that its own field points out of the page and opposes the increase.');
+  for(let x=70;x<=230;x+=40)for(let y=34;y<=124;y+=30)ht(s,x,y+5,'×',DIM,'middle',16);
+  mk(s,'rect',{x:100,y:50,width:100,height:70,fill:'none',stroke:BLUE,'stroke-width':2});
+  hv(s,140,120,166,120,HI,2);hv(s,200,95,200,75,HI,2);hv(s,160,50,134,50,HI,2);hv(s,100,75,100,95,HI,2);
+  ht(s,150,92,'I (induced)',HI,'middle',12);ht(s,240,28,'B in, growing',INK,'middle',12);
+  cp(s,158,'ε = −dΦ/dt; Φ = BA cosθ|Lenz: induced current opposes the change; flux in is growing, so I is anticlockwise (its field points out)');return fin(s)}
+function eirail(){const s=hs(300,230,'A conducting rod of length l slides to the right with speed v on two horizontal rails joined by a resistor R, in a magnetic field into the page. The induced emf is B l v. The current in the rod flows upward in the figure and the magnetic force on the rod points left, opposing the motion.');
+  for(let x=90;x<=250;x+=40)for(let y=62;y<=116;y+=27)ht(s,x,y+5,'×',DIM,'middle',15);
+  hl(s,40,40,260,40,INK);hl(s,40,140,260,140,INK);hl(s,40,40,40,76,INK);hl(s,40,104,40,140,INK);
+  mk(s,'rect',{x:32,y:76,width:16,height:28,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,26,94,'R',INK,'end',13);
+  hl(s,160,34,160,146,BLUE);hl(s,162,34,162,146,BLUE);
+  hv(s,172,90,226,90,GRN,2);ht(s,214,80,'v',GRN,'middle',14);
+  hv(s,150,120,150,60,HI,2);ht(s,142,96,'I',HI,'end',13);
+  hv(s,150,158,106,158,RED,2);ht(s,128,176,'F = B²l²v/R',RED,'middle',12);
+  dim(s,276,40,276,140,'l',286,94);
+  cp(s,196,'ε = Blv; I = Blv/R|force on the rod F = BIl = B²l²v/R opposes v; power P = Fv = B²l²v²/R');return fin(s)}
+function eirl(){const s=hs(300,230,'Current against time in an RL circuit. On connecting the battery the current grows as one minus e to the minus t over tau towards E over R, reaching sixty three percent after one time constant. On removing the battery the current decays as e to the minus t over tau, reaching thirty seven percent after one time constant.');
+  hv(s,44,160,290,160,DIM,1.4);hv(s,50,170,50,16,DIM,1.4);ht(s,290,178,'t',INK,'end',14);ht(s,44,24,'I',INK,'end',14);
+  const X=t=>50+t*50,Y=f=>160-f*120;let a='',b='';
+  for(let t=0;t<=4.6;t+=.1){a+=(a?'L':'M')+X(t)+' '+Y(1-Math.exp(-t));b+=(b?'L':'M')+X(t)+' '+Y(Math.exp(-t))}
+  pth(s,a,HI,2);pth(s,b,BLUE,2);dsh(s,50,Y(1),X(4.6),Y(1));ht(s,44,Y(1)+4,'E/R',INK,'end',12);
+  dsh(s,X(1),Y(.632),X(1),160);dsh(s,50,Y(.632),X(1),Y(.632));dsh(s,50,Y(.368),X(1),Y(.368));
+  ht(s,X(1),176,'τ',INK,'middle',13);ht(s,46,Y(.632)+4,'63 %',HI,'end',11);ht(s,46,Y(.368)+4,'37 %',BLUE,'end',11);
+  ht(s,X(3),Y(.82),'growth',HI,'middle',13);ht(s,X(2.4),Y(.2),'decay',BLUE,'middle',13);
+  cp(s,196,'τ = L/R; I = (E/R)(1 − e^(−t/τ)) or I₀e^(−t/τ)|at t = 0 an inductor acts like a break; at t = ∞ like a plain wire');return fin(s)}
+function eirlc(){const s=hs(300,230,'Resonance curves of a series LCR circuit. Current against frequency has a peak E over R at the resonant frequency f0. A larger resistance gives a lower and wider curve. At the half power points f1 and f2 the current falls to one over root two of the peak. The bandwidth is f2 minus f1.');
+  hv(s,30,160,290,160,DIM,1.4);hv(s,40,170,40,16,DIM,1.4);ht(s,290,178,'f',INK,'end',14);ht(s,34,24,'I',INK,'end',14);
+  const X=x=>40+(x-.5)*160,cv=(Q,c)=>{let d='';for(let x=.5;x<=1.5;x+=.01){const i=1/Math.sqrt(1+Q*Q*Math.pow(x-1/x,2));d+=(d?'L':'M')+X(x)+' '+(160-i*130)}pth(s,d,c,2)};
+  cv(8,HI);cv(3,BLUE);
+  dsh(s,X(1),30,X(1),160);ht(s,X(1),176,'f₀',INK,'middle',13);ht(s,X(1)-6,26,'E/R',INK,'end',12);
+  const y=160-130*.7071;dsh(s,40,y,X(1.07),y);ht(s,36,y+4,'0.707',DIM,'end',11);
+  const f1=X(1-.0625),f2=X(1+.0625);dsh(s,f1,y,f1,160);dsh(s,f2,y,f2,160);ht(s,f1-2,176,'f₁',INK,'end',12);ht(s,f2+2,176,'f₂',INK,'start',12);
+  ht(s,X(1.2),60,'small R, large Q',HI,'start',12);ht(s,X(1.2),130,'large R, small Q',BLUE,'start',12);
+  cp(s,196,'f₀ = 1/(2π√(LC)); Q = ω₀L/R = f₀/(f₂ − f₁)|at resonance Z = R, I is maximum and in phase with E');return fin(s)}
+function eiphas(){const s=hs(300,230,'Phasor diagram of a series LCR circuit with inductive reactance larger than capacitive. The resistor voltage is along the current, the inductor voltage leads by ninety degrees upward, the capacitor voltage lags by ninety degrees downward. The supply voltage is the sum and leads the current by angle phi, with tan phi equal to VL minus VC over VR.');
+  const ox=40,oy=120;
+  hv(s,ox,oy,ox+130,oy,BLUE,2);ht(s,ox+60,oy+16,'V_R (along I)',BLUE,'middle',12);
+  hv(s,ox+130,oy,ox+130,oy-90,GRN,2);ht(s,ox+138,oy-60,'V_L',GRN,'start',13);
+  hv(s,ox+130,oy,ox+130,oy+45,RED,2);ht(s,ox+138,oy+40,'V_C',RED,'start',13);
+  hv(s,ox,oy,ox+130,oy-45,HI,2);ht(s,ox+52,oy-40,'V',HI,'end',14);
+  arcp(s,ox,oy,50,71,90,INK,1.3);ht(s,ox+66,oy-8,'φ',INK,'middle',14);
+  ht(s,ox+138,oy-18,'V_L − V_C',DIM,'start',11);
+  cp(s,196,'V² = V_R² + (V_L − V_C)²; tan φ = (V_L − V_C)/V_R|L leads I by 90°, C lags I by 90°; Z = √(R² + (X_L − X_C)²)');return fin(s)}
+Object.assign(XF,{eifar,eirail,eirl,eirlc,eiphas});
+/* <<< FIGS emi */
+
+/* >>> FIGS atoms: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function anscat(){const s=hs(300,240,'Alpha particle scattering from a gold nucleus. Three alpha particles come from the left. One aimed straight at the nucleus stops at the distance of closest approach r0 and turns back. One with impact parameter b is deflected through a large angle. One far from the axis is hardly deflected.');
+  dot(s,150,100,HI,6);ht(s,150,134,'nucleus +Ze',HI,'middle',12);
+  hv(s,14,100,108,100,BLUE,1.8);hl(s,108,103,24,103,BLUE);hv(s,60,103,30,103,BLUE,1.4);ht(s,20,120,'α',BLUE,'start',13);
+  pth(s,'M14 62Q150 62 262 14',GRN,1.8);hv(s,236,26,262,14,GRN,1.8);
+  dsh(s,40,62,40,100);ht(s,34,84,'b',INK,'end',13);
+  pth(s,'M14 28Q190 28 280 8',DIM,1.6);ht(s,100,47,'large b: small angle',DIM,'middle',11);
+  dsh(s,108,100,150,100);ht(s,128,92,'r₀',INK,'middle',13);
+  cp(s,176,'closest approach (head-on): K = {2Ze²}/{4πε₀r₀}|b = (r₀/2) cot(θ/2); b = 0 gives θ = 180°');return fin(s)}
+function anorb(){const s=hs(300,240,'Bohr orbits of hydrogen. Three circles around the nucleus with radii in the ratio 1 to 4 to 9 for n equal to 1, 2 and 3. The electron is shown on each. Radius grows as n squared, speed falls as 1 over n and the energy rises towards zero as minus 13.6 over n squared.');
+  const cx=96,cy=96;dot(s,cx,cy,HI,4);
+  [[9,'n = 1',200],[36,'n = 2',300],[81,'n = 3',40]].forEach(([r,l,a])=>{mk(s,'circle',{cx,cy,r,fill:'none',stroke:DIM,'stroke-width':1.3});const [x,y]=[cx+r*Math.cos(a*Math.PI/180),cy-r*Math.sin(a*Math.PI/180)];dot(s,x,y,BLUE,3.5)});
+  ht(s,cx+14,cy+4,'1',INK,'start',11);ht(s,cx+36+2,cy+4,'4',INK,'start',11);ht(s,cx+81-14,cy+4,'9',INK,'end',11);
+  hl(s,cx,cy,cx+81,cy,DIM,'3 3');
+  ht(s,196,34,'r = 0.529 n²/Z Å',INK,'start',12);ht(s,196,56,'v = 2.19×10⁶ Z/n',INK,'start',12);ht(s,196,78,'(m/s)',INK,'start',12);
+  ht(s,196,102,'E = −13.6 Z²/n²',HI,'start',12);ht(s,196,124,'(eV)',HI,'start',12);ht(s,196,148,'L = n h/2π',GRN,'start',12);
+  cp(s,196,'radius in the ratio 1 : 4 : 9 (n = 1, 2, 3)|v ∝ Z/n, T ∝ n³/Z², E ∝ −Z²/n²');return fin(s)}
+function anlev(){const s=hs(300,240,'Energy levels of hydrogen (heights not to scale) with energy in electron volt: n equals 1 at minus 13.6, n equals 2 at minus 3.4, n equals 3 at minus 1.51, and the levels crowd together towards zero. Arrows end on n equals 1 for the Lyman series, on n equals 2 for the Balmer series and on n equals 3 for the Paschen series.');
+  const Y=n=>[0,170,92,64,48,38][n];
+  hl(s,90,26,196,26,DIM,'4 3');ht(s,86,30,'∞',INK,'end',12);ht(s,200,30,'0',INK,'start',11);
+  [1,2,3,4,5].forEach(n=>{hl(s,90,Y(n),196,Y(n),INK);if(n<4)ht(s,86,Y(n)+4,'n='+n,INK,'end',12)});
+  ht(s,86,Y(4)+4,'n=4',INK,'end',11);ht(s,86,Y(5)+4,'n=5',INK,'end',11);
+  ht(s,200,Y(1)+4,'−13.6',INK,'start',11);ht(s,200,Y(2)+4,'−3.4',INK,'start',11);ht(s,200,Y(3)+4,'−1.51',INK,'start',11);
+  hv(s,112,Y(5),112,Y(1)-3,BLUE,1.8);hv(s,148,Y(5),148,Y(2)-3,HI,1.8);hv(s,176,Y(5),176,Y(3)-3,GRN,1.8);
+  ht(s,264,Y(1)-14,'Lyman',BLUE,'middle',12);ht(s,264,Y(1)-1,'(UV)',BLUE,'middle',11);
+  ht(s,264,Y(2)-14,'Balmer',HI,'middle',12);ht(s,264,Y(2)-1,'(visible)',HI,'middle',11);
+  ht(s,264,Y(3)-14,'Paschen',GRN,'middle',12);ht(s,264,Y(3)-1,'(infrared)',GRN,'middle',11);
+  cp(s,198,'En = −13.6/n² eV; series end on n = 1, 2, 3|1/λ = R(1/n₁² − 1/n₂²), R = 1.097×10⁷ m⁻¹');return fin(s)}
+function anbe(){const s=hs(300,240,'Binding energy per nucleon plotted against mass number. The curve rises steeply for light nuclei, with a peak at helium 4, reaches a broad maximum of about 8.8 mega electron volt near iron 56, and falls slowly to about 7.6 for uranium 238. Fusion of light nuclei and fission of heavy nuclei both move towards the peak.');
+  const X=a=>50+a*.96,Y=e=>176-e*15;
+  hv(s,50,176,290,176,DIM,1.3);hv(s,50,176,50,24,DIM,1.3);ht(s,290,194,'A',INK,'end',13);ht(s,56,20,'BE/A (MeV)',INK,'start',12);
+  [[1,0],[2,1.11],[3,2.57],[4,7.07],[6,5.33],[12,7.68],[16,7.98],[28,8.45],[56,8.79],[90,8.7],[120,8.5],[160,8.1],[200,7.85],[238,7.6]].forEach(([a,e],i,arr)=>{});
+  pth(s,'M'+X(2)+' '+Y(1.11)+'L'+X(3)+' '+Y(2.57)+'L'+X(4)+' '+Y(7.07)+'L'+X(6)+' '+Y(5.33)+'L'+X(12)+' '+Y(7.68)+'L'+X(16)+' '+Y(7.98)+'L'+X(28)+' '+Y(8.45)+'L'+X(56)+' '+Y(8.79)+'L'+X(90)+' '+Y(8.7)+'L'+X(120)+' '+Y(8.5)+'L'+X(160)+' '+Y(8.1)+'L'+X(200)+' '+Y(7.85)+'L'+X(238)+' '+Y(7.6),BLUE,2);
+  dsh(s,50,Y(8.79),X(56),Y(8.79));ht(s,46,Y(8.79)+4,'8.8',INK,'end',11);
+  dot(s,X(56),Y(8.79),HI,4);ht(s,X(56)+4,Y(8.79)-8,'Fe-56',HI,'start',12);
+  dot(s,X(4),Y(7.07),GRN,3.5);ht(s,X(4)+6,Y(7.07)-4,'He-4',GRN,'start',11);
+  dot(s,X(2),Y(1.11),INK,3);ht(s,X(2)+6,Y(1.11)+12,'H-2',INK,'start',11);
+  dot(s,X(238),Y(7.6),INK,3);ht(s,X(238),Y(7.6)+16,'U-238 (7.6)',INK,'end',11);
+  hv(s,X(8),Y(3.5),X(40),Y(3.5),GRN,1.6);ht(s,X(24),Y(3.5)-6,'fusion',GRN,'middle',12);
+  hv(s,X(236),Y(5.2),X(160),Y(5.2),RED,1.6);ht(s,X(198),Y(5.2)-6,'fission',RED,'middle',12);
+  cp(s,214,'peak near A = 56; energy is released when nuclei move towards the peak|Q = Σ(BE of products) − Σ(BE of reactants)');return fin(s)}
+function andec(){const s=hs(300,240,'Radioactive decay curve. The number of nuclei N falls exponentially with time. After one half-life it is N0 over 2, after two half-lives N0 over 4 and after three half-lives N0 over 8. At the mean life tau equal to 1.44 half-lives, N is N0 over e, about 37 percent.');
+  const X=t=>50+t*68,Y=n=>176-n*130;
+  hv(s,50,176,280,176,DIM,1.3);hv(s,50,176,50,24,DIM,1.3);ht(s,280,194,'t',INK,'end',13);ht(s,44,28,'N',INK,'end',13);
+  let d='';for(let t=0;t<=3.4;t+=.1)d+=(d?'L':'M')+X(t)+' '+Y(Math.pow(.5,t));pth(s,d,BLUE,2);
+  [[1,'N₀/2'],[2,'N₀/4'],[3,'N₀/8']].forEach(([k,l])=>{const n=Math.pow(.5,k);dsh(s,50,Y(n),X(k),Y(n));dsh(s,X(k),Y(n),X(k),176);dot(s,X(k),Y(n),HI,3.5);ht(s,46,Y(n)+4,l,INK,'end',11);ht(s,X(k),190,k+'T',INK,'middle',12)});
+  ht(s,46,Y(1)+4,'N₀',INK,'end',11);
+  const tt=1/Math.LN2;dot(s,X(tt),Y(Math.exp(-1)),GRN,3.5);dsh(s,X(tt),Y(Math.exp(-1)),X(tt),176);ht(s,X(tt)+8,Y(Math.exp(-1))-6,'τ: N₀/e',GRN,'start',12);
+  cp(s,208,'N = N₀e^(−λt) = N₀/2^(t/T); T = 0.693/λ, τ = 1/λ = 1.44 T|activity A = λN falls in the same way');return fin(s)}
+Object.assign(XF,{anscat,anorb,anlev,anbe,andec});
+/* <<< FIGS atoms */
+
+/* >>> FIGS devices: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+const edw=(s,x0,y0,per,A,n,mode,c)=>{let d='';for(let x=0;x<=n*per;x+=2){let v=Math.sin(2*Math.PI*x/per);if(mode===1)v=Math.max(v,0);if(mode===2)v=Math.abs(v);d+=(x?'L':'M')+(x0+x)+' '+(y0-A*v)}return pth(s,d,c,2)};
+const edax=(s,x0,y0,per,A,n)=>{hv(s,x0-8,y0,x0+n*per+16,y0,DIM,1.2);hv(s,x0,y0+A+8,x0,y0-A-12,DIM,1.2);ht(s,x0+n*per+16,y0+14,'t',INK,'end',12)};
+const edres=(s,x,y,h)=>mk(s,'rect',{x:x-6,y,width:12,height:h,fill:'none',stroke:INK,'stroke-width':1.4});
+const eddio=(s,x,y,c=INK)=>{mk(s,'polygon',{points:`${x},${y-8} ${x},${y+8} ${x+22},${y}`,fill:'none',stroke:c,'stroke-width':1.4});hl(s,x+22,y-8,x+22,y+8,c)};
+function edband(){const s=hs(320,230,'Energy bands of three kinds of solids. Conductor: the valence band and conduction band overlap. Semiconductor: a small gap, about 1 electron volt for silicon. Insulator: a wide gap, more than 3 electron volt.');
+  const P=[[14,'conductor','ρ < 10⁻⁵ Ω m'],[116,'semiconductor','10⁻⁵ to 10⁶ Ω m'],[218,'insulator','ρ > 10⁸ Ω m']],W=88,B=[[[30,85],[75,140]],[[30,65],[105,140]],[[30,45],[125,140]]];
+  P.forEach(([x,n,r],k)=>{ht(s,x+W/2,20,n,INK,'middle',13);const [cb,vb]=B[k];
+    mk(s,'rect',{x,y:cb[0],width:W,height:cb[1]-cb[0],fill:BLUE,'fill-opacity':.22,stroke:BLUE,'stroke-width':1.4});
+    mk(s,'rect',{x,y:vb[0],width:W,height:vb[1]-vb[0],fill:HI,'fill-opacity':.22,stroke:HI,'stroke-width':1.4});
+    ht(s,x+6,cb[0]+13,'CB',BLUE,'start',11);ht(s,x+6,vb[1]-6,'VB',HI,'start',11);ht(s,x+W/2,156,r,DIM,'middle',10.5);
+    if(k===0)ht(s,x+W/2+8,83,'overlap',INK,'middle',10);
+    else{const m=(cb[1]+vb[0])/2;hv(s,x+10,m,x+10,cb[1]+1,DIM,1.1);hv(s,x+10,m,x+10,vb[0]-1,DIM,1.1);ht(s,x+20,m+4,k===1?'Eg ≈ 1 eV':'Eg > 3 eV',INK,'start',11)}});
+  cp(s,178,'Eg = gap from top of VB to bottom of CB|Si 1.1 eV, Ge 0.67 eV');return fin(s)}
+function edpn(){const s=hs(320,230,'A p-n junction. The p side on the left has holes and negative acceptor ions. The n side on the right has free electrons and positive donor ions. In the middle is the depletion layer, about one micrometre wide, which has only fixed ions. The built-in electric field points from the n side to the p side.');
+  mk(s,'rect',{x:20,y:40,width:110,height:70,fill:RED,'fill-opacity':.1,stroke:DIM,'stroke-width':1.3});
+  mk(s,'rect',{x:190,y:40,width:110,height:70,fill:BLUE,'fill-opacity':.1,stroke:DIM,'stroke-width':1.3});
+  mk(s,'rect',{x:130,y:40,width:60,height:70,fill:HI,'fill-opacity':.14,stroke:HI,'stroke-width':1.2,'stroke-dasharray':'4 3'});
+  for(const [x,y] of [[42,58],[78,52],[60,82],[100,70],[92,98],[36,100],[116,92]])mk(s,'circle',{cx:x,cy:y,r:3.4,fill:'none',stroke:RED,'stroke-width':1.4});
+  for(const [x,y] of [[212,56],[246,50],[228,80],[272,66],[258,98],[290,90],[210,100]])dot(s,x,y,BLUE,3);
+  for(const y of [58,80,102]){pls(s,146,y,'−');pls(s,174,y,'+')}
+  ht(s,75,32,'p-type',RED,'middle',13);ht(s,245,32,'n-type',BLUE,'middle',13);ht(s,160,32,'depletion',HI,'middle',12);
+  ht(s,52,126,'○ holes',RED,'middle',11);ht(s,248,126,'● electrons',BLUE,'middle',11);
+  hv(s,160,128,190,128,DIM,1.1);hv(s,160,128,130,128,DIM,1.1);ht(s,160,144,'width ≈ 1 μm',DIM,'middle',11);
+  hv(s,186,162,134,162,HI,2);ht(s,160,178,'built-in field E (n → p)',HI,'middle',11);
+  cp(s,194,'barrier potential: Si 0.7 V, Ge 0.3 V|forward bias: p to +, layer gets thinner|reverse bias: p to −, layer gets wider');return fin(s)}
+function ediv(){const s=hs(320,230,'Current voltage characteristic of a p-n junction diode. For forward bias the current is negligible until about 0.7 volt for silicon, then rises sharply. For reverse bias the current is a tiny leakage of microampere size until the breakdown voltage, where it increases suddenly.');
+  hv(s,30,120,296,120,DIM,1.4);hv(s,170,186,170,14,DIM,1.4);ht(s,294,136,'V',INK,'end',13);ht(s,162,22,'I',INK,'end',13);
+  const X=v=>170+v*110,Y=i=>120-i*3;let d='';for(let v=0;v<=1;v+=.01){const i=.0004*(Math.exp(v/.07)-1);if(Y(i)<26)break;d+=(d?'L':'M')+X(v)+' '+Y(i)}pth(s,d,BLUE,2);
+  pth(s,'M170 124L64 124Q58 140 56 176',HI,2);
+  dsh(s,X(.7),120,X(.7),132);ht(s,X(.7),146,'0.7 V',INK,'middle',11);
+  ht(s,178,48,'forward (mA)',BLUE,'start',12);ht(s,40,110,'reverse (μA)',HI,'start',12);
+  ht(s,72,146,'−V_br',INK,'start',11);ht(s,72,164,'breakdown',HI,'start',11);
+  cp(s,200,'forward: sharp rise after ≈ 0.7 V (Si)|reverse: tiny current, then breakdown');return fin(s)}
+function edhw(){const s=hs(320,260,'Half wave rectifier. An alternating source, one diode and a load resistor are in series. Below the circuit, the input is a full sine wave and the output across the load has only the positive half cycles. The output has the same frequency as the input.');
+  mk(s,'circle',{cx:40,cy:60,r:14,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,40,65,'~',INK,'middle',16);
+  hl(s,40,46,40,36);hl(s,40,36,100,36);eddio(s,100,36);hl(s,122,36,250,36);hl(s,250,36,250,46);edres(s,250,46,30);hl(s,250,76,250,90);hl(s,250,90,40,90);hl(s,40,90,40,74);
+  ht(s,111,22,'diode',DIM,'middle',11);ht(s,268,66,'R',INK,'start',13);
+  edax(s,40,150,120,22,2);ht(s,48,118,'input',INK,'start',12);edw(s,40,150,120,22,2,0,BLUE);
+  edax(s,40,222,120,22,2);ht(s,48,190,'output across R',INK,'start',12);edw(s,40,222,120,22,2,1,HI);
+  cp(s,248,'conducts in positive half cycles only|output frequency = input frequency f');return fin(s)}
+function edfw(){const s=hs(320,300,'Full wave rectifier with a centre tapped transformer and two diodes. Each diode conducts in one half cycle, so the current through the load always has the same direction. Below the circuit the input is a sine wave and the output has two humps for each input cycle, so the output frequency is twice the input frequency.');
+  let d='M50 20';for(let k=0;k<4;k++)d+='a10 10 0 0 1 0 20';pth(s,d,INK,1.6);
+  hl(s,50,20,90,20);eddio(s,90,20);hl(s,112,20,200,20);hl(s,50,100,90,100);eddio(s,90,100);hl(s,112,100,200,100);
+  hl(s,200,20,200,100);dot(s,200,60);hl(s,200,60,224,60);mk(s,'rect',{x:224,y:54,width:26,height:12,fill:'none',stroke:INK,'stroke-width':1.4});
+  hl(s,250,60,262,60);hl(s,262,60,262,118);hl(s,262,118,30,118);hl(s,30,118,30,60);hl(s,30,60,50,60);dot(s,50,60);
+  ht(s,101,12,'D1',INK,'middle',11);ht(s,101,92,'D2',INK,'middle',11);ht(s,237,84,'R',INK,'middle',13);ht(s,26,52,'tap',DIM,'end',10);
+  edax(s,40,176,120,20,2);ht(s,48,148,'input',INK,'start',12);edw(s,40,176,120,20,2,0,BLUE);
+  edax(s,40,252,120,20,2);ht(s,48,224,'output across R',INK,'start',12);edw(s,40,252,60,20,4,2,HI);
+  cp(s,282,'D1 and D2 conduct in alternate half cycles|output frequency = 2 × input frequency');return fin(s)}
+function edzen(){const s=hs(320,230,'Zener diode as a voltage regulator. A source with voltage V feeds a series resistor Rs. A Zener diode, reverse biased, is connected across the load resistor RL. The output voltage across the load equals the Zener voltage Vz. The current in Rs splits into the Zener current and the load current.');
+  hl(s,30,60,30,40);hl(s,30,40,70,40);mk(s,'rect',{x:70,y:34,width:40,height:12,fill:'none',stroke:INK,'stroke-width':1.4});hl(s,110,40,250,40);
+  hl(s,22,60,38,60);hl(s,26,68,34,68);hl(s,30,68,30,120);ht(s,18,66,'+',RED,'end',13);ht(s,90,26,'Rs',INK,'middle',13);ht(s,14,96,'V',INK,'end',13);
+  hl(s,170,40,170,66);hl(s,160,66,180,66);hl(s,160,66,156,72);hl(s,180,66,184,60);mk(s,'polygon',{points:'170,66 160,88 180,88',fill:'none',stroke:INK,'stroke-width':1.4});hl(s,170,88,170,120);
+  ht(s,150,86,'Zener',INK,'end',11);dot(s,170,40);dot(s,170,120);
+  hl(s,250,40,250,58);edres(s,250,58,34);hl(s,250,92,250,120);ht(s,238,80,'RL',INK,'end',13);hl(s,30,120,250,120);
+  hv(s,120,32,150,32,HI,1.6);ht(s,135,24,'I',HI,'middle',11);hv(s,176,92,176,102,BLUE,1.6);ht(s,192,100,'Iz',BLUE,'middle',11);hv(s,222,44,222,58,GRN,1.6);ht(s,230,56,'IL',GRN,'start',11);
+  hv(s,296,80,296,42,DIM,1.1);hv(s,296,80,296,118,DIM,1.1);ht(s,302,84,'Vz',INK,'start',12);hl(s,250,40,296,40,DIM,'2 3');hl(s,250,120,296,120,DIM,'2 3');
+  cp(s,146,'Vout = Vz while the Zener is in breakdown|I = Iz + IL, I = (V − Vz)/Rs, IL = Vz/RL|Iz is least for least V and greatest IL');return fin(s)}
+function edgate(){const s=hs(320,300,'Symbols and outputs of five logic gates for inputs A B equal to 00, 01, 10, 11. AND gives 0 0 0 1. OR gives 0 1 1 1. NOT gives 1 0 for input 0 1. NAND gives 1 1 1 0. NOR gives 1 0 0 0. A small circle at the output means NOT.');
+  ht(s,20,16,'inputs A B in order 00, 01, 10, 11 → output Y',DIM,'start',11);
+  const rows=[['AND','Y = A·B','Y: 0 0 0 1'],['OR','Y = A + B','Y: 0 1 1 1'],['NOT','Y = A̅','A = 0, 1: Y = 1, 0'],['NAND','Y = NOT(A·B)','Y: 1 1 1 0'],['NOR','Y = NOT(A+B)','Y: 1 0 0 0']];
+  rows.forEach(([g,e,t],k)=>{const x=44,y=40+k*46,two=g!=='NOT';
+    if(g==='AND'||g==='NAND')pth(s,`M${x} ${y}h22a14 14 0 0 1 0 28h-22z`,INK,1.5);
+    else if(g==='OR'||g==='NOR')pth(s,`M${x} ${y}Q${x+24} ${y} ${x+38} ${y+14}Q${x+24} ${y+28} ${x} ${y+28}Q${x+10} ${y+14} ${x} ${y}Z`,INK,1.5);
+    else pth(s,`M${x} ${y}L${x} ${y+28}L${x+30} ${y+14}Z`,INK,1.5);
+    const bub=g==='NOT'||g==='NAND'||g==='NOR',ox=g==='NOT'?x+30:g==='NAND'?x+36:x+38;
+    if(bub){mk(s,'circle',{cx:ox+4,cy:y+14,r:4,fill:'none',stroke:INK,'stroke-width':1.5});hl(s,ox+8,y+14,ox+18,y+14)}else hl(s,ox,y+14,ox+14,y+14);
+    if(two){hl(s,x-14,y+7,x+4,y+7);hl(s,x-14,y+21,x+4,y+21);ht(s,x-18,y+11,'A',INK,'end',11);ht(s,x-18,y+25,'B',INK,'end',11)}else{hl(s,x-14,y+14,x,y+14);ht(s,x-18,y+18,'A',INK,'end',11)}
+    ht(s,x-34,y-4,g,HI,'start',11);ht(s,138,y+12,e,INK,'start',12);ht(s,138,y+28,t,BLUE,'start',12)});
+  cp(s,276,'NAND and NOR are universal gates');return fin(s)}
+Object.assign(XF,{edband,edpn,ediv,edhw,edfw,edzen,edgate});
+/* <<< FIGS devices */
+
+/* >>> FIGS skills: the chapter author adds figure functions here and registers them with Object.assign(XF,{...}) */
+function xsvern(){const s=hs(330,160,'Vernier callipers scale. The main scale is in millimetres. The zero of the vernier scale lies just after the 23 mm mark. The sixth line of the vernier scale coincides with a line of the main scale. The reading is 23 mm plus 6 times 0.1 mm, which is 23.6 mm.');
+  const X=m=>20+(m-20)*22,x0=X(23.6);
+  mk(s,'rect',{x:14,y:38,width:300,height:36,fill:'none',stroke:DIM,'stroke-width':1.3});
+  for(let m=20;m<=33;m++)hl(s,X(m),74,X(m),m%5===0?58:66);
+  ht(s,X(20),52,'2 cm',INK,'middle',12);ht(s,X(30),52,'3 cm',INK,'middle',12);
+  mk(s,'rect',{x:x0-8,y:74,width:214,height:34,fill:'none',stroke:BLUE,'stroke-width':1.3});
+  for(let k=0;k<=10;k++)hl(s,x0+k*19.8,74,x0+k*19.8,k%5===0?98:88,BLUE);
+  ht(s,x0,120,'0',BLUE,'middle',12);ht(s,x0+99,120,'5',BLUE,'middle',12);ht(s,x0+198,120,'10',BLUE,'middle',12);
+  hv(s,x0,30,x0,72,HI,1.6);ht(s,x0+8,24,'vernier zero',HI,'start',11);
+  hl(s,x0+118.8,56,x0+118.8,100,HI);ht(s,x0+118.8,134,'6th line coincides',HI,'middle',11);
+  cp(s,156,'MSR = 23 mm (zero is just after 23)|LC = 1 mm − 0.9 mm = 0.1 mm|reading = 23 + 6 × 0.1 = 23.6 mm = 2.36 cm');return fin(s)}
+function xsscrew(){const s=hs(330,200,'Screw gauge reading. The pitch is 0.5 mm and the circular scale has 50 divisions, so the least count is 0.01 mm. The thimble edge has uncovered the 4 mm mark and the half millimetre mark after it, so the main scale reading is 4.5 mm. The 28th division of the circular scale is on the reference line. The reading is 4.5 plus 28 times 0.01, which is 4.78 mm.');
+  const ex=20+4.78*20;
+  hl(s,20,75,140,75,INK);
+  for(let k=0;k<=4;k++){hl(s,20+20*k,75,20+20*k,62);ht(s,20+20*k,56,String(k),INK,'middle',11)}
+  for(let k=0;k<=4;k++)hl(s,30+20*k,75,30+20*k,86);
+  ht(s,60,104,'sleeve (mm)',DIM,'middle',11);
+  mk(s,'rect',{x:ex,y:28,width:140,height:94,fill:'none',stroke:BLUE,'stroke-width':1.5});
+  for(let n=23;n<=33;n++){const y=75+(n-28)*8.4;hl(s,ex,y,ex+(n%5===0?16:9),y,BLUE);if(n%5===0&&n!==28)ht(s,ex+22,y+4,String(n),BLUE,'start',11)}
+  hl(s,ex,75,ex+16,75,HI);ht(s,ex+22,79,'28',HI,'start',12);
+  ht(s,ex+98,100,'thimble',BLUE,'middle',11);ht(s,ex+98,114,'(circular scale)',BLUE,'middle',11);
+  cp(s,150,'pitch 0.5 mm, 50 divisions, LC = 0.5/50 = 0.01 mm|MSR = 4.5 mm, CSR = 28 (on the reference line)|reading = 4.5 + 28 × 0.01 = 4.78 mm');return fin(s)}
+function xspend(){const s=hs(340,230,'Simple pendulum and its graph. Left: a bob on a string of effective length L, which is the string length plus the bob radius. Right: a graph of T squared against L, a straight line through the origin with slope 4 pi squared over g.');
+  hl(s,40,24,120,24,INK);for(let x=46;x<120;x+=10)hl(s,x,24,x-6,16,DIM);
+  hl(s,80,24,80,150,INK);mk(s,'circle',{cx:80,cy:160,r:10,fill:'none',stroke:BLUE,'stroke-width':1.6});dot(s,80,160,BLUE,2);
+  hl(s,80,160,90,160,HI);ht(s,100,164,'r',HI,'start',11);
+  dsh(s,80,24,80+Math.sin(0.28)*136,24+Math.cos(0.28)*136);
+  hv(s,48,92,48,24,DIM,1.1);hv(s,48,92,48,160,DIM,1.1);ht(s,40,96,'L',DIM,'end',13);ht(s,130,64,'L = l + r',DIM,'start',11);
+  hl(s,176,180,300,180,INK);hl(s,176,180,176,30,INK);ht(s,300,198,'L',INK,'end',13);ht(s,170,38,'T²',INK,'end',13);
+  hl(s,176,180,290,56,HI,'');
+  for(const [x,y] of [[200,158],[222,137],[244,112],[266,86],[282,68]])dot(s,x,y,BLUE,2.6);
+  ht(s,296,48,'slope = 4π²/g',HI,'end',12);
+  cp(s,222,'T = 2π√(L/g);  g = 4π² ÷ slope of the T²–L line');return fin(s)}
+function xsmb(){const s=hs(340,260,'Metre bridge. A uniform wire AC one metre long lies along a scale. Across the top, an unknown resistance R in the left gap and a known resistance S in the right gap meet at the point B. A galvanometer joins B to a jockey that slides on the wire. A cell with a key is joined across A and C. At balance the jockey is at a distance l from A, and R over S equals l over 100 minus l.');
+  hl(s,40,150,300,150,INK,2.4);ht(s,34,146,'A',INK,'end',13);ht(s,306,146,'C',INK,'start',13);
+  hl(s,40,60,90,60);mk(s,'rect',{x:90,y:50,width:40,height:20,fill:'none',stroke:INK,'stroke-width':1.4});hl(s,130,60,170,60);mk(s,'rect',{x:170,y:50,width:40,height:20,fill:'none',stroke:INK,'stroke-width':1.4});hl(s,210,60,300,60);
+  hl(s,40,60,40,150);hl(s,300,60,300,150);
+  ht(s,110,44,'R',INK,'middle',14);ht(s,190,44,'S',INK,'middle',14);ht(s,164,80,'B',INK,'start',13);dot(s,150,60,INK,3);
+  hl(s,150,60,150,88);mk(s,'circle',{cx:150,cy:100,r:12,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,150,105,'G',INK,'middle',13);
+  hl(s,138,100,104,100);hl(s,104,100,104,128);hv(s,104,122,104,148,HI,1.8);ht(s,96,118,'J',HI,'end',13);
+  dim(s,40,168,104,168,'',0,0);ht(s,72,184,'l',HI,'middle',13);dim(s,104,168,300,168,'',0,0);ht(s,202,184,'100 − l',HI,'middle',13);
+  hl(s,40,150,40,214);hl(s,40,214,140,214);hl(s,140,204,140,224);hl(s,148,208,148,220);hl(s,148,214,300,214);hl(s,300,150,300,214);
+  ht(s,224,208,'cell + key',DIM,'middle',11);
+  cp(s,246,'balance (no galvanometer current): R/S = l/(100 − l)');return fin(s)}
+function xspot(){const s=hs(340,260,'Potentiometer circuit. A long uniform wire AB is joined to a driver cell and key. A cell of emf E1 in series with a galvanometer is connected from the end A to a jockey that slides on the wire. At the null point the length from A to the jockey is l1, and E1 equals the potential drop along that length.');
+  hl(s,40,120,300,120,INK,2.4);ht(s,34,116,'A',INK,'end',13);ht(s,306,116,'B',INK,'start',13);
+  hl(s,40,120,40,50);hl(s,40,50,76,50);hl(s,76,38,76,62);hl(s,84,43,84,57);hl(s,84,50,138,50);
+  ht(s,80,30,'E₁',INK,'middle',13);mk(s,'circle',{cx:150,cy:50,r:12,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,150,55,'G',INK,'middle',13);
+  hl(s,162,50,200,50);hl(s,200,50,200,92);hv(s,200,88,200,118,HI,1.8);ht(s,208,76,'J',HI,'start',13);
+  dim(s,40,138,200,138,'',0,0);ht(s,120,154,'l₁',HI,'middle',13);
+  hl(s,40,150,40,214);hl(s,40,214,140,214);hl(s,140,204,140,224);hl(s,148,208,148,220);hl(s,148,214,300,214);hl(s,300,120,300,214);
+  ht(s,224,208,'driver cell + key',DIM,'middle',11);
+  cp(s,246,'E₁/E₂ = l₁/l₂  (driver emf must be larger)|internal resistance r = R(l₁ − l₂)/l₂');return fin(s)}
+function xsres(){const s=hs(320,250,'Resonance tube. A vertical glass tube dips in water. A vibrating tuning fork is held over its open top. At the first resonance the air column of length L1 holds a quarter of a wave: an antinode a little above the open end, an end correction e, and a node at the water surface. The second resonance is at length L2.');
+  mk(s,'rect',{x:100,y:40,width:44,height:160,fill:'none',stroke:DIM,'stroke-width':1.6});
+  mk(s,'rect',{x:101,y:120,width:42,height:79,fill:'#17314f',opacity:.8});ht(s,122,168,'water',INK,'middle',11);
+  hl(s,114,8,114,20,INK);hl(s,130,8,130,20,INK);hl(s,114,20,130,20,INK);ht(s,140,16,'fork f',INK,'start',12);
+  let d='';for(let y=28;y<=120;y+=4){const x=122+16*Math.cos(Math.PI/2*(y-28)/92);d+=(d?'L':'M')+x.toFixed(1)+' '+y}
+  pth(s,d,HI,1.6);
+  dsh(s,102,28,142,28);ht(s,92,32,'A',HI,'end',11);ht(s,92,124,'N',HI,'end',11);
+  hv(s,176,80,176,40,DIM,1.1);hv(s,176,80,176,120,DIM,1.1);ht(s,188,84,'L₁',INK,'start',14);ht(s,188,36,'e',INK,'start',12);
+  cp(s,222,'L₁ + e = λ/4,  L₂ + e = 3λ/4|λ = 2(L₂ − L₁),  v = 2f(L₂ − L₁)|e = (L₂ − 3L₁)/2');return fin(s)}
+function xsid(){const s=hs(320,250,'Angle of deviation against angle of incidence for a prism. A U-shaped curve with its lowest point at the minimum deviation. At that point the angle of incidence equals the angle of emergence. Any other deviation occurs at two angles of incidence, i and e.');
+  hl(s,40,170,300,170,INK);hl(s,40,170,40,20,INK);ht(s,300,188,'i',INK,'end',13);ht(s,32,28,'δ',INK,'end',13);
+  let d='';for(let x=62;x<=248;x+=4){const y=140-0.0062*(x-155)*(x-155);d+=(d?'L':'M')+x+' '+y.toFixed(1)}
+  pth(s,d,HI,2);
+  dsh(s,155,140,155,170);dsh(s,40,140,155,140);ht(s,34,144,'δm',HI,'end',13);ht(s,155,186,'i = e',INK,'middle',13);
+  dsh(s,40,112,222,112);dsh(s,88,112,88,170);dsh(s,222,112,222,170);ht(s,88,186,'i',DIM,'middle',12);ht(s,222,186,'e',DIM,'middle',12);
+  ht(s,165,154,'minimum deviation',HI,'start',11);
+  cp(s,212,'A = 60°, δm = 37°: n = sin[(A + δm)/2] / sin(A/2)|= sin 48.5° ÷ sin 30° = 1.50');return fin(s)}
+Object.assign(XF,{xsvern,xsscrew,xspend,xsmb,xspot,xsres,xsid});
+/* <<< FIGS skills */
+
+window.PhysicaRankFigs={...XF,dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
 })();

@@ -23,12 +23,15 @@ for(const f of PYQ_FILES){const box={};require('vm').runInNewContext(fs.readFile
   const T=new Map();for(const q of box[g]){if(!T.has(q.tp))T.set(q.tp,new Map());const m=T.get(q.tp);m.set(q.st,(m.get(q.st)||0)+1)}
   PYQ_IDX[g]=[...T].map(([tp,m])=>[tp,[...m]]);bundle([f],out);PYQ_MAP[g]=out}
 bundle(['rank-export.js'],'physica-export.min.js');
+// Chapter text that is loaded only when its chapter is opened (keeps the Rank bundle small for slow phones): global name -> bundle
+const CH_LAZY={'rank-mag-jee.js':'PhysicaRankMagJee','rank-emi-jee.js':'PhysicaRankEmiJee','rank-nuc-jee.js':'PhysicaRankAtomsJee','rank-semi-jee.js':'PhysicaRankDevicesJee','rank-skills-jee.js':'PhysicaRankSkillsJee'},CH_MAP={};
+for(const f in CH_LAZY){const out='physica-ch-'+f.slice(5,-7)+'.min.js';bundle([f],out);CH_MAP[CH_LAZY[f]]=out}
 bundle(['series-exam.js'],'physica-series-exam.min.js'); // the exam screen, fetched when a test starts
 bundle(['series.js'],'physica-series.min.js');           // Test Series hub, login, results; fetched when a student opens it
 {const sp=path.join(root,'physica-series.min.js');fs.writeFileSync(sp,fs.readFileSync(sp,'utf8').replace('__SERIES_EXAM_URL__','./physica-series-exam.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-series-exam.min.js'))).digest('hex').slice(0,8)))}
 bundle(['phys-fig.js','rank-figs.js','rank-units.js','rank-units-jee.js','rank-kin-jee.js','rank-lom-jee.js','rank-wep-jee.js','rank-rot-jee.js','rank-grav-jee.js','rank-prop-jee.js','rank-thermo-jee.js','rank-ktg-jee.js','rank-osc-jee.js','rank-electro-jee.js','rank-current-jee.js','rank-em-jee.js','rank-optics-jee.js','rank-dual-jee.js','rank-neet.js'],'physica-rank.min.js');
 {const rp=path.join(root,'physica-rank.min.js'),hh=f=>require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,f))).digest('hex').slice(0,8),map={};for(const g of Object.keys(PYQ_MAP))map[g]='./'+PYQ_MAP[g]+'?v='+hh(PYQ_MAP[g]);
-  fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('__PYQ_IDX__',()=>JSON.stringify(PYQ_IDX)).replace('__PYQ_MAP__',()=>JSON.stringify(map)).replace('__EXPORT_URL__','./physica-export.min.js?v='+hh('physica-export.min.js')))}
+  fs.writeFileSync(rp,fs.readFileSync(rp,'utf8').replace('__PYQ_IDX__',()=>JSON.stringify(PYQ_IDX)).replace('__PYQ_MAP__',()=>JSON.stringify(map)).replace('__CHAP_MAP__',()=>JSON.stringify(Object.fromEntries(Object.entries(CH_MAP).map(([g,f])=>[g,'./'+f+'?v='+hh(f)])))).replace('__EXPORT_URL__','./physica-export.min.js?v='+hh('physica-export.min.js')))}
 {const box={};require('vm').runInNewContext(fs.readFileSync(path.join(root,'tutor-exam.js'),'utf8'),{window:box});fs.writeFileSync(path.join(root,'.examidx.tmp.js'),'window.PhysicaExamChapters='+JSON.stringify(Object.keys(box.PhysicaExam))+';')}
 try{bundle([...TUTOR,'.hlvoice.tmp.js','.examidx.tmp.js'],'physica-tutor.min.js')}finally{fs.unlinkSync(path.join(root,'.hlvoice.tmp.js'));fs.unlinkSync(path.join(root,'.examidx.tmp.js'))}
 {const tp=path.join(root,'physica-tutor.min.js'),eh=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-exam.min.js'))).digest('hex').slice(0,8);fs.writeFileSync(tp,fs.readFileSync(tp,'utf8').replace('__EXAM_URL__','./physica-exam.min.js?v='+eh))}
