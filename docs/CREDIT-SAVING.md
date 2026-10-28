@@ -10,6 +10,12 @@ Rule for every task: first ask "can code do this once, so no model is needed nex
 5. Subagents only for big parallel work, with `model: "sonnet"` (or haiku for mechanical edits), a short prompt that names the files, and "report in 3 lines". The strongest model only for diagrams, physics checking, or hard design.
 6. No explanation or recap in the answer beyond what the owner needs (short Hinglish bullets).
 
+## Write short code with the newest built-ins (fewer tokens, no new dependencies)
+Checked here: Node 22.22 and Python 3.13. Prefer these over hand-written helpers or npm/pip packages:
+- Node: `node:test` + `assert` for tests, `util.parseArgs` for options, `fs.globSync`, `fs/promises`, `fetch`, `Object.groupBy`, `Array.prototype.toSorted/toReversed/at/findLast`, `structuredClone`, `Promise.withResolvers`, `Array.fromAsync`, optional chaining and `??`, `import.meta`/`node:` prefixed modules. Run one-off checks with `node -e`.
+- Python: `pathlib`, `dataclasses`, `itertools.batched`/`pairwise`, `statistics.fmean`, `collections.Counter`, `json`/`csv`/`argparse` from the standard library, f-strings, `match`, type hints only where they help. Pillow and numpy are already installed (see `tools/pyq-ingest/figscan.py`); install nothing else.
+- Keep a script to what the job needs: no classes, no config files, no wrappers around one call; reuse `tools/ship.js` and the other tools instead of writing a new script.
+
 ## What is already code (use it, do not redo by hand)
 | Task | Tool |
 |---|---|
