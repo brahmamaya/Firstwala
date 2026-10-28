@@ -78,7 +78,7 @@ function prep(pdf, out) {
   // questions: the best chain of markers with increasing numbers in reading order (dynamic programming). Spurious numbers
   // (table rows, list items, page numbers) fall out of the chain; numbers the OCR missed become gaps, not stops.
   const C = [];
-  for (let i = 0; i < Math.min(sol, P); i++) for (const x of all[i].sort((p, q) => p.col - q.col || p.y - q.y)) if (!(i === sol - 1 && x.bare)) C.push({ ...x, orig: x, page: i + 1, w: x.bare ? 0.5 : 1 });
+  for (let i = 0; i < Math.min(sol, P); i++) for (const x of all[i].sort((p, q) => p.col - q.col || p.y - q.y)) if (x.n >= first && !(i === sol - 1 && x.bare)) C.push({ ...x, orig: x, page: i + 1, w: x.bare ? 0.5 : 1 });
   const sc = new Array(C.length), from = new Array(C.length).fill(-1);
   for (let j = 0; j < C.length; j++) {
     sc[j] = C[j].w - (C[j].n > first ? 0.2 * Math.min(C[j].n - first, 5) : 0);
