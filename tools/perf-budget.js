@@ -4,7 +4,7 @@
 const fs = require('fs'), zlib = require('zlib'), path = require('path');
 const root = path.join(__dirname, '..');
 const BUDGET = { 'physica-series.min.js': 16000, 'physica-series-exam.min.js': 12000, 'ga.js': 4000, 'physica-core.min.js': 12500, 'physica.min.js': 365000, 'styles.min.css': 33000, 'index.html': 8000,
-  'physica-rank.min.js': 225000 /* carries the PYQ index (~4.6 KB gzip); raised from 210000 for the JEE Current Electricity chapter (~17 KB gzip of text) */, 'physica-pyq-es.min.js': 170000 /* largest PYQ chapter bundle; every other physica-pyq-*.min.js is held to the same cap */ };
+  'physica-rank.min.js': 240000 /* raised from 225000 for the JEE Dual Nature chapter (~11 KB gzip of text and 5 figures); */ /* carries the PYQ index (~4.6 KB gzip); raised from 210000 for the JEE Current Electricity chapter (~17 KB gzip of text) */, 'physica-pyq-es.min.js': 170000 /* largest PYQ chapter bundle; every other physica-pyq-*.min.js is held to the same cap */ };
 for (const f of fs.readdirSync(root)) if (/^physica-pyq-.*\.min\.js$/.test(f) && !(f in BUDGET)) BUDGET[f] = 170000;
 let bad = 0;
 for (const [f, max] of Object.entries(BUDGET)) {

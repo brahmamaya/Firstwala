@@ -851,5 +851,49 @@ function cerc(){const s=hs(300,230,'Charging and discharging of a capacitor thro
   ht(s,226,Y(.78),'charging',HI,'middle',13);ht(s,190,Y(.12)-12,'discharging',BLUE,'middle',13);
   cp(s,196,'τ = RC; q = Q₀(1 − e^(−t/τ)) or Q₀e^(−t/τ)|half left after 0.693τ');return fin(s)}
 
-window.PhysicaRankFigs={vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
+
+/* Dual nature (JEE): photocell, I-V curves, K-f graph, de Broglie wavelength lines, Davisson-Germer */
+function dnpe(){const s=hs(300,230,'Photoelectric effect set-up. Light of frequency f falls on the emitter plate inside an evacuated tube. Photoelectrons leave it and reach the collector plate. A variable battery and a microammeter are connected between the plates. The current is zero when the retarding voltage equals the stopping potential.');
+  mk(s,'rect',{x:60,y:36,width:170,height:90,rx:18,fill:'none',stroke:DIM,'stroke-width':1.6});
+  hl(s,100,56,100,106,INK);hl(s,104,56,104,106,INK);hl(s,196,56,196,106,INK);hl(s,200,56,200,106,INK);
+  ht(s,102,28,'emitter',INK,'middle',12);ht(s,198,28,'collector',INK,'middle',12);
+  hv(s,14,40,92,70,HI,2);ht(s,22,34,'light  f',HI,'start',13);
+  for(const y of [66,82,98])hv(s,112,y,186,y+(y-82)/6,BLUE,1.4);ht(s,150,112,'e⁻',BLUE,'middle',13);
+  hl(s,102,106,102,170);hl(s,198,106,198,170);hl(s,102,170,128,170);hl(s,172,170,198,170);
+  mk(s,'circle',{cx:150,cy:170,r:20,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,150,176,'μA',INK,'middle',13);
+  hl(s,102,170,102,196);hl(s,198,170,198,196);hl(s,102,196,134,196);hl(s,166,196,198,196);
+  hl(s,134,186,134,206);hl(s,142,192,142,200);hl(s,150,186,150,206);hl(s,158,192,158,200);hl(s,166,186,166,206);
+  ht(s,150,224,'variable voltage V',DIM,'middle',12);
+  cp(s,238,'hf = φ + Kmax|no emission below f₀; current ∝ intensity; no time lag');return fin(s)}
+function dniv(){const s=hs(300,230,'Photocurrent against collector voltage. Three curves. Curve 1 and curve 2 use the same frequency, so they stop at the same negative voltage, but curve 2 has twice the intensity and a plateau twice as high. Curve 3 has a higher frequency, so it stops at a more negative voltage, with the same plateau as curve 1.');
+  hv(s,30,150,290,150,DIM,1.4);hv(s,150,176,150,16,DIM,1.4);ht(s,290,168,'V',INK,'end',14);ht(s,142,24,'I',INK,'end',14);
+  const X=v=>150+v*60,Y=i=>150-i*55,cv=(V0,Is,c)=>{let d='';for(let v=-V0;v<=2.2;v+=.05){const i=Is*(1-Math.exp(-3.2*(v+V0)));d+=(d?'L':'M')+X(v)+' '+Y(i)}pth(s,d,c,2)};
+  cv(1,1,BLUE);cv(1,2,HI);cv(1.9,1,GRN);
+  hl(s,X(-1.9),150,X(-1.9),156,DIM);ht(s,X(-1.9),168,'−V₀′',GRN,'middle',12);ht(s,X(-1),168,'−V₀',INK,'middle',12);
+  dsh(s,150,Y(1),X(2.2),Y(1));dsh(s,150,Y(2),X(2.2),Y(2));ht(s,144,Y(1)+4,'Is',INK,'end',12);ht(s,144,Y(2)+4,'2Is',INK,'end',12);
+  ht(s,236,Y(2)-6,'1: f, I',BLUE,'middle',12);ht(s,236,Y(2)+16,'2: f, 2I',HI,'middle',12);ht(s,236,Y(1)+14,'3: higher f',GRN,'middle',12);
+  cp(s,190,'same f: same V₀, plateau ∝ intensity|higher f: larger V₀ (same photon rate: same plateau)');return fin(s)}
+function dnkf(){const s=hs(300,230,'Graph of the maximum kinetic energy against frequency. Straight lines for two metals, parallel with the same slope h. The line cuts the frequency axis at the threshold frequency f0, and its extension cuts the energy axis at minus the work function. The metal with the smaller work function has its line to the left.');
+  hv(s,40,140,290,140,DIM,1.4);hv(s,80,176,80,16,DIM,1.4);ht(s,290,158,'f',INK,'end',14);ht(s,72,22,'Kmax (or V₀)',INK,'end',13);
+  const m=.62;hl(s,110,140,260,140-m*150,BLUE);hl(s,110,140,86,140+m*24,BLUE,'4 3');
+  hl(s,150,140,260,140-m*110,HI);hl(s,150,140,126,140+m*24,HI,'4 3');
+  ht(s,110,156,'f₀',BLUE,'middle',13);ht(s,150,156,'f₀′',HI,'middle',13);ht(s,70,140+m*24+4,'−φ',BLUE,'end',13);
+  ht(s,258,140-m*150-8,'metal 1',BLUE,'end',12);ht(s,258,140-m*110-8,'metal 2 (larger φ)',HI,'end',12);
+  const sx=200,sy=140-m*(sx-110);hl(s,sx,sy,sx+40,sy,DIM,'3 3');hl(s,sx+40,sy,sx+40,sy-m*40,DIM,'3 3');ht(s,sx-8,sy-22,'slope = h',INK,'end',12);
+  cp(s,196,'Kmax = hf − φ; V₀ = (h/e) f − φ/e|slope h (or h/e) is the same for every metal; f-intercept f₀');return fin(s)}
+function dnlam(){const s=hs(300,230,'Graph of the de Broglie wavelength in angstrom against one over the square root of the accelerating voltage. Straight lines through the origin. The electron line has slope 12.27, the proton 0.286 and the alpha particle 0.101 angstrom volt to the half.');
+  hv(s,50,150,290,150,DIM,1.4);hv(s,50,150,50,16,DIM,1.4);ht(s,290,168,'1/√V',INK,'end',14);ht(s,44,24,'λ (Å)',INK,'end',14);
+  hl(s,50,150,250,28,BLUE);ht(s,252,30,'electron: slope 12.27',BLUE,'end',12);
+  hl(s,50,150,250,134,HI);ht(s,252,126,'proton: 0.286',HI,'end',12);
+  hl(s,50,150,250,142,GRN);ht(s,252,162,'α particle: 0.101',GRN,'end',12);
+  cp(s,184,'λ = h/√(2mqV) = k/√V|same V: λ ∝ 1/√(mq); same K: λ ∝ 1/√m; same p: same λ');return fin(s)}
+function dndg(){const s=hs(300,230,'Davisson and Germer experiment. An electron gun accelerates electrons through 54 volt towards a nickel crystal. A movable detector on an arc records the scattered electrons. The intensity is greatest at a scattering angle of 50 degrees. The Bragg glancing angle is 65 degrees.');
+  mk(s,'rect',{x:20,y:84,width:44,height:26,rx:4,fill:'none',stroke:INK,'stroke-width':1.4});ht(s,42,102,'gun',INK,'middle',12);ht(s,42,128,'54 V',DIM,'middle',12);
+  hv(s,64,97,138,97,BLUE,2);mk(s,'rect',{x:138,y:70,width:16,height:54,fill:'#17314f',stroke:BLUE,'stroke-width':1.6});ht(s,146,142,'Ni crystal',INK,'middle',12);
+  arcp(s,146,97,92,0,150,DIM,1.1);hv(s,154,97,154+90*Math.sin(50*Math.PI/180),97-90*Math.cos(50*Math.PI/180),HI,2);
+  mk(s,'rect',{x:154+90*Math.sin(50*Math.PI/180)-6,y:97-90*Math.cos(50*Math.PI/180)-14,width:16,height:16,rx:3,fill:'none',stroke:INK,'stroke-width':1.4,transform:'rotate(50 '+(154+90*Math.sin(50*Math.PI/180))+' '+(97-90*Math.cos(50*Math.PI/180))+')'});
+  ht(s,250,28,'detector',INK,'middle',12);arcp(s,154,97,34,90,140,INK,1.3);ht(s,206,112,'φ = 50°',INK,'middle',13);
+  hl(s,154,97,240,97,DIM,'4 3');
+  cp(s,170,'peak at φ = 50° for 54 V: 2d sinθ = λ, θ = 65°, d = 0.091 nm|λ = 0.165 nm; de Broglie 12.27/√54 = 0.167 nm; φ = 180° − 2θ');return fin(s)}
+window.PhysicaRankFigs={dnpe,dniv,dnkf,dnlam,dndg,vecAdd,river,rain,horiz,lami,table,roughInc,bank,conical,springW,hemiBlock,ballistic,torque,parAx,pulleyM,rodHinge,rollInc,sat,gHD,hydr,pipe,torri,stokes,cond,engine,fridge,maxwell,shmCircle,springMass,pendulum,stringHarm,pipes,doppler,ringAxis,discAxis,arcCentre,hemi,sheet,plates,solidSph,cylHollow,coul,balls,bis,defl,flux,ppc,sphcap,rcg,rodSide,rodAxis,acc,vernier,screw,prefix,sphero,vt,proj,incline,atwood,fx,vloop,coll,roll,ladder,shell,orbit,ss,capil,pv,carnot,dipole,gaussE,shellV,capDiel,capNet,share,emw,emdc,emsp,omir,olens,otir,oprism,oyd,oslit,opol,cedrift,cesp,cewb,cemb,cepot,cecell,cekir,cemet,cerc};
 })();
