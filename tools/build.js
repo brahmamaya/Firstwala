@@ -24,7 +24,7 @@ for(const f of PYQ_FILES){const box={};require('vm').runInNewContext(fs.readFile
   PYQ_IDX[g]=[...T].map(([tp,m])=>[tp,[...m]]);bundle([f],out);PYQ_MAP[g]=out}
 bundle(['rank-export.js'],'physica-export.min.js');
 // Chapter text that is loaded only when its chapter is opened (keeps the Rank bundle small for slow phones): global name -> bundle
-const CH_LAZY={'rank-mag-jee.js':'PhysicaRankMagJee','rank-emi-jee.js':'PhysicaRankEmiJee','rank-nuc-jee.js':'PhysicaRankAtomsJee','rank-semi-jee.js':'PhysicaRankDevicesJee','rank-skills-jee.js':'PhysicaRankSkillsJee','rank-sets-jee.js':'PhysicaRankSetsJee','rank-binomial-jee.js':'PhysicaRankBinomialJee','rank-complex-jee.js':'PhysicaRankComplexJee','rank-pc-jee.js':'PhysicaRankPcJee'},CH_MAP={};
+const CH_LAZY={'rank-mag-jee.js':'PhysicaRankMagJee','rank-emi-jee.js':'PhysicaRankEmiJee','rank-nuc-jee.js':'PhysicaRankAtomsJee','rank-semi-jee.js':'PhysicaRankDevicesJee','rank-skills-jee.js':'PhysicaRankSkillsJee','rank-sets-jee.js':'PhysicaRankSetsJee','rank-binomial-jee.js':'PhysicaRankBinomialJee','rank-complex-jee.js':'PhysicaRankComplexJee','rank-pc-jee.js':'PhysicaRankPcJee','rank-ss-jee.js':'PhysicaRankSsJee'},CH_MAP={};
 for(const f in CH_LAZY){const out='physica-ch-'+f.slice(5,-7)+'.min.js';bundle([f],out);CH_MAP[CH_LAZY[f]]=out}
 bundle(['series-exam.js'],'physica-series-exam.min.js'); // the exam screen, fetched when a test starts
 bundle(['series.js'],'physica-series.min.js');           // Test Series hub, login, results; fetched when a student opens it
