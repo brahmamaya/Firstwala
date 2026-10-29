@@ -35,7 +35,7 @@ const links=el('nav',{class:'fb-links','aria-label':'About Physica'},[['about.ht
 if(pop)pop.append(el('a',{href:'help.html',role:'menuitem','data-testid':'help-more',class:'more-help'},[el('span',{'aria-hidden':'true',text:'❓ '}),document.createTextNode('Help & queries')]));
 dlg.append(box);document.body.append(dlg);
 // Also used by the tutor to pass on questions it cannot answer yet.
-window.PhysicaSendFeedback=(n,c,t)=>{const b=new URLSearchParams();b.append(F.name,n);b.append(F.country,c);b.append(F.text,(window.PhysicaReportContext?.()||'')+t);return fetch(FORM,{method:'POST',mode:'no-cors',body:b})};
+window.PhysicaSendFeedback=(n,c,t)=>{const b=new URLSearchParams();b.append(F.name,n);b.append(F.country,c);b.append(F.text,t);return fetch(FORM,{method:'POST',mode:'no-cors',body:b})};
 let last=null;
 function show(){last=document.activeElement;dlg.hidden=false;requestAnimationFrame(()=>dlg.classList.add('on'));msg.textContent='';msg.className='fb-msg';send.disabled=false;box.classList.remove('done');setTimeout(()=>name.focus(),60)}
 function hide(){dlg.classList.remove('on');setTimeout(()=>{dlg.hidden=true},220);last?.focus?.()}
@@ -50,7 +50,7 @@ box.addEventListener('submit',async e=>{e.preventDefault();
   let wait=0;try{wait=30000-(Date.now()-Number(localStorage.getItem('physica-fb')||0))}catch{}
   if(wait>0){msg.textContent=`Thanks! Please wait ${Math.ceil(wait/1000)} s before sending again.`;msg.className='fb-msg err';return}
   send.disabled=true;send.textContent='Sending…';
-  const body=new URLSearchParams();body.append(F.name,v[0]);body.append(F.country,v[1]);body.append(F.text,(window.PhysicaReportContext?.()||'')+v[2]);
+  const body=new URLSearchParams();body.append(F.name,v[0]);body.append(F.country,v[1]);body.append(F.text,v[2]);
   try{await fetch(FORM,{method:'POST',mode:'no-cors',body});try{localStorage.setItem('physica-fb',String(Date.now()))}catch{}
     box.classList.add('done');msg.textContent='Thank you! Your feedback has been sent.';msg.className='fb-msg ok';text.value='';setTimeout(hide,1800)}
   catch{msg.textContent='Could not send - please check your internet and try again.';msg.className='fb-msg err'}

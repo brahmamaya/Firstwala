@@ -3,7 +3,7 @@
 'use strict';
 const fs = require('fs'), zlib = require('zlib'), path = require('path');
 const root = path.join(__dirname, '..');
-const BUDGET = { 'physica-series.min.js': 16000, 'physica-series-exam.min.js': 12000, 'ga.js': 4000, 'physica-core.min.js': 12500, 'physica.min.js': 365000, 'styles.min.css': 34500, 'index.html': 8000,
+const BUDGET = { 'physica-series.min.js': 16000, 'physica-series-exam.min.js': 12000, 'ga.js': 4000, 'physica-core.min.js': 12500, 'physica.min.js': 365000, 'styles.min.css': 33000, 'index.html': 8000,
   'physica-rank.min.js': 255000 /* raised to 255000 for the Sets chapter figures; new chapters keep their figures in their own lazy file (PhysicaRankFigKit); raised to 250000 for the figures of 5 more JEE chapters (their text is lazy-loaded: physica-ch-*.min.js); raised from 225000 for the JEE Dual Nature chapter (~11 KB gzip of text and 5 figures); */ /* carries the PYQ index (~4.6 KB gzip); raised from 210000 for the JEE Current Electricity chapter (~17 KB gzip of text) */, 'physica-pyq-es.min.js': 170000 /* largest PYQ chapter bundle; every other physica-pyq-*.min.js is held to the same cap */ };
 for (const f of fs.readdirSync(root)) if (/^physica-ch-.*\.min\.js$/.test(f) && !(f in BUDGET)) BUDGET[f] = 60000;   // one JEE chapter's text, loaded when the chapter opens
 for (const f of fs.readdirSync(root)) if (/^physica-pyq-.*\.min\.js$/.test(f) && !(f in BUDGET)) BUDGET[f] = 170000;
