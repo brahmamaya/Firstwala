@@ -22,7 +22,7 @@ function paint(){for(const p of PANELS)body.classList.toggle('hide-'+p.key,hidde
   for(const p of shown){const b=document.createElement('button');b.type='button';b.className='restore-chip';b.textContent=p.label;b.title='Show again';b.dataset.testid='show-'+p.key;b.addEventListener('click',()=>{hidden.delete(p.key);save();paint()});bar.append(b)}
   if(shown.length>1){const all=document.createElement('button');all.type='button';all.className='restore-chip restore-all';all.textContent='Show all';all.addEventListener('click',()=>{hidden.clear();save();paint()});bar.append(all)}}
 for(const p of PANELS){const host=$(p.where);if(!host)continue;const x=document.createElement('button');x.type='button';x.className='panel-close'+(p.desk?' desk-only':'');x.textContent='✕';x.title='Hide';x.setAttribute('aria-label','Hide '+p.label.replace(/^\S+\s/,''));x.dataset.testid='hide-'+p.key;
-  x.addEventListener('click',e=>{e.stopPropagation();hidden.add(p.key);save();paint()});host.classList.add('closable');host.append(x)}
+  x.addEventListener('click',e=>{e.stopPropagation();if(p.key==='library'&&matchMedia('(max-width:760px)').matches){$('#sidebar')?.classList.remove('open');$('#mobile-topics')?.setAttribute('aria-expanded','false');return}hidden.add(p.key);save();paint()});host.classList.add('closable');host.append(x)}
 // Focus mode
 // Focus lives on the simulation itself (top-right corner, an empty area of every experiment) as a special glass button.
 const cvs=document.getElementById('simulation');let wrap=null;if(cvs){wrap=document.createElement('div');wrap.className='canvas-wrap';cvs.before(wrap);wrap.append(cvs)}
