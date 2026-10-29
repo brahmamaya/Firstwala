@@ -1395,3 +1395,4 @@ body.simple .tutor-switch{transform:scale(.82);transform-origin:right center}
 body.simple .brand-word{font-size:16px}
 }
 @media(max-width:600px){body.simple .brand-word{display:none}body.simple .browse-btn{padding:0 12px}}
+body.simple .rec-menu{top:auto;bottom:calc(100% + 6px)}

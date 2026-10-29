@@ -77,7 +77,7 @@ $$('.panel-close, #rail-toggle').forEach(e => e.remove());
 
 /* ---------- 4. the action bar ---------- */
 const tr = $('.transport'), play = $('#play'), restart = $('#restart'), full = $('#fullscreen-btn'), snap = $('#snapshot-btn'), recg = $('.rec-group'), clock = $('.running-time');
-restart.innerHTML = ''; restart.append(el('span', '', '↺'), document.createTextNode(' Reset')); restart.title = 'Reset: restart the motion from the beginning (key R). Your variable values stay.'; restart.setAttribute('aria-label', 'Reset: restart the motion from the beginning');
+restart.replaceChildren(el('span', '', '↺'), document.createTextNode(' Reset')); restart.title = 'Reset: restart the motion from the beginning (key R). Your variable values stay.'; restart.setAttribute('aria-label', 'Reset: restart the motion from the beginning');
 /* one Fullscreen/Focus experience: Focus mode (the simulation + its controls) and, where the browser allows, real fullscreen */
 const focusBtn = $('#focus-btn'), focusExit = $('.focus-exit');
 const fs2 = full.cloneNode(false); fs2.id = 'fullscreen-btn'; fs2.className = 'bar-btn'; fs2.dataset.testid = 'fullscreen-btn'; fs2.type = 'button'; fs2.title = 'Fullscreen with the controls (Esc to exit)'; fs2.setAttribute('aria-label', 'Fullscreen'); fs2.setAttribute('aria-pressed', 'false'); fs2.append(el('span', '', '⛶'), document.createTextNode(' Fullscreen'));
