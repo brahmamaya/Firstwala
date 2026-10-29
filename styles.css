@@ -1347,7 +1347,7 @@ body.simple .intro{flex-wrap:nowrap}
 body.simple .action-bar>.bar-btn,body.simple .action-bar .pop-wrap>.bar-btn{width:auto!important;min-width:0!important;height:auto!important;padding:0 14px!important;white-space:nowrap}
 body.simple .action-bar #play,body.simple .action-bar #restart{width:auto!important}
 body.simple .action-bar .rec-group{flex:0 1 auto}
-@media(max-width:600px){body.simple .action-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px}body.simple .action-bar>.bar-btn,body.simple .action-bar .pop-wrap,body.simple .action-bar .pop-wrap>.bar-btn{width:100%!important;justify-content:center}body.simple .action-bar .rec-group{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}body.simple .action-bar .rec-btn,body.simple .action-bar .rec-quality{width:100%!important}.pop{left:0;right:auto}.running-time{grid-column:1/-1}}
+@media(max-width:600px){body.simple .action-bar{display:grid}body.simple .action-bar>.bar-btn,body.simple .action-bar .pop-wrap,body.simple .action-bar .pop-wrap>.bar-btn{width:100%!important;justify-content:center}body.simple .action-bar .rec-group{display:grid}body.simple .action-bar .rec-btn,body.simple .action-bar .rec-quality{width:100%!important}.running-time{grid-column:1/-1}}
 body.simple .stage{position:relative!important;top:auto!important;height:auto!important;overflow:visible!important}
 body.simple .transport{overflow:visible!important;height:auto!important}
 body.simple .stage-bottom{height:auto!important;min-height:0!important;display:block;padding:4px 12px 10px!important}
@@ -1358,3 +1358,40 @@ body.simple .stage{z-index:5}body.simple .understand,body.simple .advanced{posit
 body.simple .adv-row button,body.simple .adv-sound button{font-size:14px!important;width:auto!important;padding:0 14px!important;min-height:44px}
 body.simple .adv-row #defaults span{display:none}
 body.simple .pop #view3d-bar{align-items:stretch}body.simple .pop #view3d-bar>*{justify-content:flex-start}
+/* phone: one clear header row, canvas first, three tidy rows of controls */
+@media(max-width:600px){
+body.simple .topbar{display:grid;align-items:center;min-height:0}
+body.simple .browse-btn{justify-content:center;min-height:44px;font-size:15px}
+body.simple .topbar-right{margin:0}
+body.simple .tutor-switch .tutor-label,body.simple .tutor-switch span:not(.tutor-knob){font-size:11px}
+body.simple .head-nav{grid-column:1/-1;order:5;font-size:11px}
+body.simple .head-nav .tabs-nav-buttons button{min-height:36px;padding:0 14px}
+body.simple .intro{padding:10px 14px 4px!important}
+body.simple .intro h1{font-size:22px}
+body.simple .stage{border-radius:12px}
+body.simple .action-bar{grid-template-columns:repeat(6,1fr);gap:8px}
+body.simple .action-bar #play{grid-column:span 4;min-height:52px;font-size:16px!important}
+body.simple .action-bar #restart{grid-column:span 2}
+body.simple .action-bar .rec-group{grid-column:1/-1;grid-template-columns:3fr 2fr}
+body.simple .action-bar #fullscreen-btn{grid-column:span 2}
+body.simple .action-bar>.pop-wrap{grid-column:span 2}
+body.simple .action-bar .bar-btn,body.simple .action-bar .rec-btn,body.simple .action-bar .rec-quality{min-height:48px;padding:0 6px!important}
+.pop{position:fixed!important;left:12px!important;right:12px!important;bottom:12px!important;top:auto!important;max-width:none;max-height:70dvh;overflow:auto;z-index:300}
+body.simple .controls-card{padding:8px 10px}
+}
+.pop-done{display:none}
+@media(max-width:600px){
+.pop-done{display:block;order:99;min-height:48px;border:0;border-radius:8px;background:var(--mint);color:#04120c;font:inherit;font-weight:700}
+body.simple #controls input[type=range]{min-height:0}
+body.simple .browse-tx{font-size:14px;white-space:nowrap}
+body.simple .browse-ic{display:none}
+}
+@media(max-width:600px){
+body.simple #tab-count{display:none}
+body.simple .head-nav{justify-content:flex-start;gap:8px}
+body.simple .topbar{grid-template-columns:auto minmax(0,1fr) auto;padding:8px 10px;gap:8px}
+body.simple .topbar-right,body.simple .tutor-switch{min-width:0;max-width:100%}
+body.simple .tutor-switch{transform:scale(.82);transform-origin:right center}
+body.simple .brand-word{font-size:16px}
+}
+@media(max-width:600px){body.simple .brand-word{display:none}body.simple .browse-btn{padding:0 12px}}

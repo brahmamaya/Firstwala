@@ -24,7 +24,8 @@ function menu(label, id, testid) {
   b.setAttribute('aria-haspopup', 'true'); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', id + '-panel'); pop.id = id + '-panel'; pop.hidden = true;
   const set = on => { pop.hidden = !on; b.setAttribute('aria-expanded', String(on)); wrap.classList.toggle('open', on); };
   b.addEventListener('click', e => { e.stopPropagation(); const on = pop.hidden; closers.forEach(c => c()); set(on); if (on) pop.querySelector('button:not([hidden]),select,input,a')?.focus?.({ preventScroll: true }); });
-  closers.push(() => set(false)); wrap.append(b, pop); wrap._set = set; wrap._pop = pop; wrap._btn = b; return wrap;
+  closers.push(() => set(false)); const done = el('button', 'pop-done', 'Done'); done.type = 'button'; done.addEventListener('click', e => { e.stopPropagation(); set(false); b.focus(); }); pop.append(done);
+  wrap.append(b, pop); wrap._set = set; wrap._pop = pop; wrap._btn = b; return wrap;
 }
 document.addEventListener('click', e => { if (!e.target.closest('.pop-wrap')) closers.forEach(c => c()); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { const open = $('.pop-wrap.open'); if (open) { closers.forEach(c => c()); open._btn.focus(); } } });
