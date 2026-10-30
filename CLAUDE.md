@@ -22,7 +22,7 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 - No backend: Physica is static (GitHub Pages). Test Series runs on the student's device from public JSON in `tests/` (free tests 1-3 only; see `docs/CONTENT-GUIDE.md`). Exam patterns: `tools/patterns.json`. Content tool: `tools/series-import.js`. Browser e2e: `tools/e2e/`. `docs/`: security, content guide, private files.
 - Test Series files: `series.js` (hub, login, results) + `series-exam.js` (the exam screen, loaded only when a test starts) + `series-loader.js` (entry points: Rank-mode pills, landing notice).
 - `tools/qgen/` + `qbank/`: generated practice-question bank (templates with independent verification; see `docs/QBANK.md`). Rank mode shows a Question bank tab for chapters in `qbank/index.json`.
-- SEO: `tools/seo.js` + `tools/seo-pages.js` generate sim pages, hub pages, JEE chapter pages and the sitemap; run them after adding a simulation or a Rank chapter, then `tools/seo.test.js` (see `docs/SEO.md`).
+- SEO: `tools/seo.js` + `tools/seo-pages.js` generate sim pages, hub pages, JEE chapter pages and the sitemap; run them after adding a simulation or a Rank chapter, then `tools/seo.test.js` (see `docs/SEO.md`). Then `node tools/seo-audit.js` (errors must be 0). SEO skills: `.claude/skills/{seo,seo-audit,geo-seo,seo-machine,programmatic-seo}`.
 - `tools/watchdog.js`: live-site integrity monitor. `tools/perf-budget.js`: size budget. `tools/secret-guard.js`: blocks secrets.
 
 ## Commands that must pass before pushing

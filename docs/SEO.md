@@ -6,7 +6,9 @@
 - Hub pages: `simulations.html`, `class-N-simulations.html`, `class-N-<subject>-simulations.html`, `<subject>-simulations.html`, `biology-simulations.html` (keyword titles such as "Class 12 Physics Simulations – Free Interactive NCERT, JEE & NEET").
 - `jee-main-<chapter>.html` for every Rank chapter that has content (formulas with examples, quick revision, most-asked types, myths, mistakes, related simulations; JSON-LD LearningResource + FAQPage + BreadcrumbList) and `jee-main-chapters.html` (the list). A new chapter file `rank-*-jee.js` gets its page automatically.
 - `index.html`: keyword title and description, JSON-LD (WebSite, EducationalOrganization), robots meta, a small "explore" link row that links to every hub and to the JEE chapter list.
-- `sitemap.xml` (all pages with lastmod), `robots.txt`, `og.png`, `404.html`.
+- `sitemap.xml` (all pages with lastmod), `robots.txt`, `llms.txt` (a plain-text map of the site for AI assistants), `og.png`, `404.html`.
+- Every page gets a unique description (the simulation's own sentence plus class, subject and chapter) and a title of at most 66 characters (several forms are tried, the longest that fits is used).
+- `node tools/seo-audit.js` audits all generated pages (title, description, canonical, viewport, lang, h1, JSON-LD, alt, broken links, duplicates, sitemap, llms.txt): errors must be 0. Repeatable skills for this are in `.claude/skills/` (`seo`, `seo-audit`, `geo-seo`, `seo-machine`, `programmatic-seo`).
 
 ## Honest expectations
 Nobody can promise position 1 for every education search. Giants (Khan Academy, PhET, Vedantu, Physics Wallah, Careers360, SATHEE) have huge authority. What works for a new site: be the best answer for specific searches ("<topic> simulation class 12", "<chapter> JEE Main formulas", "<chapter> important questions") with real content on its own URL, many internal links, fast mobile pages, and then earn links. Indexing takes days to weeks; rankings move over months. The pages above give about 500 indexable URLs, each with real text.

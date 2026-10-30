@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<script src="/framebust.js"></script>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permutations and Combinations – JEE Main | Physica</title>
+<meta name="description" content="Free Permutations and Combinations JEE Main Maths formula sheet: 13 formulas with solved examples, quick-revision notes, the most asked question types and…">
+<link rel="canonical" href="https://physica.in/jee-main-permutations-and-combinations.html">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="/sim-page.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Physica">
+<meta property="og:title" content="Permutations and Combinations – JEE Main | Physica">
+<meta property="og:description" content="Free Permutations and Combinations JEE Main Maths formula sheet: 13 formulas with solved examples, quick-revision notes, the most asked question types and…">
+<meta property="og:url" content="https://physica.in/jee-main-permutations-and-combinations.html">
+<meta property="og:image" content="https://physica.in/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Permutations and Combinations – JEE Main | Physica">
+<meta name="twitter:description" content="Free Permutations and Combinations JEE Main Maths formula sheet: 13 formulas with solved examples, quick-revision notes, the most asked question types and…">
+<meta name="twitter:image" content="https://physica.in/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Permutations and Combinations: JEE Main Maths formulas and notes","description":"Free Permutations and Combinations JEE Main Maths formula sheet: 13 formulas with solved examples, quick-revision notes, the most asked question types and…","educationalLevel":"Class 11, JEE Main","about":"Permutations and Combinations","teaches":"Permutations and Combinations","inLanguage":"en","learningResourceType":"Study notes","isAccessibleForFree":true,"url":"https://physica.in/jee-main-permutations-and-combinations.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I solve “Arrangements of letters or digits” questions in JEE Main?","acceptedAnswer":{"@type":"Answer","text":"A word or a set of digits is given with repeats and conditions. Count the arrangements or numbers. 1. Count the total objects and the repeats; start with n!/(p!q!…). 2. Fill the restricted places first (last digit for even, first digit not 0). 3. For together or apart, use the block method or total − together. Example: MISSISSIPPI has 34650 arrangements."}},{"@type":"Question","name":"How do I solve “Selections and committees” questions in JEE Main?","acceptedAnswer":{"@type":"Answer","text":"A group is chosen from several kinds of people or objects with conditions. 1. Choose from each kind and multiply the choices. 2. Add the cases when the condition allows several splits. 3. For at least one, use total − none. Example: 5 of 9 with two fixed ones included: ⁷C₃ = 35."}},{"@type":"Question","name":"How do I solve “Geometrical counting” questions in JEE Main?","acceptedAnswer":{"@type":"Answer","text":"Points, lines or a polygon are given. Count lines, triangles or diagonals. 1. Choose points: ⁿC₂ for lines, ⁿC₃ for triangles. 2. Subtract the lines or triangles lost to collinear points. 3. For diagonals of an n-gon use ⁿC₂ − n. Example: An octagon has 20 diagonals."}},{"@type":"Question","name":"How do I solve “Distributions and non-negative solutions” questions in JEE Main?","acceptedAnswer":{"@type":"Answer","text":"Objects are shared among people, or the number of solutions of x₁ + … + xₖ = n is asked. 1. Identical objects: stars and bars, ⁿ⁺ᵏ⁻¹Cₖ₋₁. 2. Different objects: each object has a choice of person, so kⁿ (or use groups). 3. Adjust for lower bounds first. Example: x + y + z = 10 has 66 solutions."}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Physica","item":"https://physica.in/"},{"@type":"ListItem","position":2,"name":"JEE Main chapters","item":"https://physica.in/jee-main-chapters.html"},{"@type":"ListItem","position":3,"name":"Permutations and Combinations","item":"https://physica.in/jee-main-permutations-and-combinations.html"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="sh"><a class="brand" href="/"><img src="/icons/icon-192.png" alt="" width="28" height="28">PHYSICA</a></header>
+<main id="main">
+<p class="crumb"><a href="/jee-main-chapters.html">JEE Main chapters</a> · Class 11 · Maths</p>
+<h1>Permutations and Combinations: JEE Main Maths formulas and notes</h1>
+<p class="lead">Permutations and Combinations give 1 to 2 questions in JEE Mains in most years: an arrangement with a restriction, a selection with a condition, or a geometrical count. About 6 hours in 4 days is enough. The idea also feeds binomial theorem and probability.</p>
+<p><a class="cta" href="/">Practise this chapter free in Rank mode</a></p>
+<p>Open Physica, choose Rank mode, JEE Mains, then Maths and this chapter for the guide, formulas, most-asked questions, past-year questions and a mock test.</p>
+<h2>Quick revision</h2>
+<ul>
+<li>rule of sum: either-or; rule of product: one after the other</li>
+<li>ⁿPᵣ = n!/(n − r)!, ⁿCᵣ = n!/(r!(n − r)!), ⁿPᵣ = r!·ⁿCᵣ</li>
+<li>alike objects: n!/(p!q!…); together: block method; apart: gap method</li>
+<li>circular: (n − 1)!; non-negative solutions of x₁+…+xₖ = n: ⁿ⁺ᵏ⁻¹Cₖ₋₁</li>
+<li>at least one: total − none</li>
+</ul>
+<h2>Formulas with solved examples</h2>
+<h3>Counting principles and factorials</h3>
+<h4>Rule of sum and rule of product</h4>
+<ul>
+<li>if one job can be done in m ways OR another in n ways (not both), the total is m + n</li>
+<li>if one job is done in m ways AND THEN another in n ways, the total is m × n</li>
+<li>it extends to any number of jobs</li>
+</ul>
+<p><b>How to apply.</b> Ask: are the choices either-or (add) or one after the other (multiply)? Split into cases when a condition changes the number of choices.</p>
+<p><b>Example.</b> A number plate with 2 letters (26 choices each) then 3 digits (10 each): 26² × 10³ = 676000.</p>
+<h4>Factorial and its use</h4>
+<ul>
+<li>n! = n(n − 1)(n − 2) … 2·1</li>
+<li>0! = 1</li>
+<li>n! = n·(n − 1)!</li>
+<li>n objects in a row can be arranged in n! ways</li>
+</ul>
+<p><b>How to apply.</b> Reduce a ratio of factorials by cancelling the common part.</p>
+<p><b>Example.</b> 7!/5! = 7 × 6 = 42.</p>
+<h3>Permutations</h3>
+<h4>Permutations ⁿPᵣ</h4>
+<ul>
+<li>ⁿPᵣ = n!/(n − r)! = n(n − 1)(n − 2) … (n − r + 1)</li>
+<li>ⁿPₙ = n!</li>
+<li>with repetition allowed the number is nʳ</li>
+<li>a particular object included: r·ⁿ⁻¹Pᵣ₋₁</li>
+</ul>
+<p><b>How to apply.</b> Fill the places one by one and count the choices for each place from the left. Handle the most restricted place first.</p>
+<p><b>Example.</b> 4-digit numbers from the digits 1 to 5 with no repetition: ⁵P₄ = 120.</p>
+<h4>Arrangements of alike objects</h4>
+<ul>
+<li>n objects with p of one kind, q of another and r of a third: n!/(p! q! r!)</li>
+<li>letters of a word: count total letters and the repeats</li>
+</ul>
+<p><b>How to apply.</b> Divide n! by the factorial of the count of each repeated letter.</p>
+<p><b>Example.</b> MISSISSIPPI: 11!/(4!·4!·2!) = 34650. APPLE: 5!/2! = 60.</p>
+<h4>Restrictions: together, apart, fixed places</h4>
+<ul>
+<li>r objects together: tie them as one block, arrange the block with the rest, then arrange inside: (n − r + 1)!·r!</li>
+<li>not together = total − together</li>
+<li>for objects with no two together, arrange the others first and place these in the gaps</li>
+</ul>
+<p><b>How to apply.</b> Choose between the block method (together) and the gap method (never together). Use the complement when it is shorter.</p>
+<p><b>Example.</b> 3 of 7 students together: 5!·3! = 720.</p>
+<h4>Numbers and words with conditions</h4>
+<ul>
+<li>a number is even if the last digit is even: fill the last place first</li>
+<li>a number is divisible by 5 if it ends in 0 or 5</li>
+<li>divisible by 3 when the digit sum is a multiple of 3</li>
+<li>for numbers greater than a given number, count by the first digit and add</li>
+</ul>
+<p><b>How to apply.</b> Fill the restricted place first, then the first place (it cannot be 0), then the rest.</p>
+<p><b>Example.</b> 4-digit even numbers from 1 to 5 with no repetition: 2 × 4 × 3 × 2 = 48.</p>
+<h3>Combinations and selections</h3>
+<h4>Combinations ⁿCᵣ</h4>
+<ul>
+<li>ⁿCᵣ = n!/(r!(n − r)!)</li>
+<li>ⁿCᵣ = ⁿCₙ₋ᵣ</li>
+<li>ⁿCᵣ + ⁿCᵣ₋₁ = ⁿ⁺¹Cᵣ</li>
+<li>ⁿCₓ = ⁿCᵧ ⇒ x = y or x + y = n</li>
+<li>ⁿPᵣ = r!·ⁿCᵣ</li>
+</ul>
+<p><b>How to apply.</b> Use combinations when only the group matters, not the order. Use the symmetry to make r the smaller number.</p>
+<p><b>Example.</b> C(10, 3) = 120.</p>
+<h4>Selections with conditions</h4>
+<ul>
+<li>p particular things always included: ⁿ⁻ᵖCᵣ₋ₚ</li>
+<li>p particular things always excluded: ⁿ⁻ᵖCᵣ</li>
+<li>at least one: total − none</li>
+<li>selection from different kinds is a product of the selections</li>
+<li>all ways of selecting zero or more of n different things: 2ⁿ (so at least one: 2ⁿ − 1)</li>
+</ul>
+<p><b>How to apply.</b> Break the selection into groups (men, women) and multiply; add the cases when the condition has several possibilities.</p>
+<p><b>Example.</b> Choose 5 of 9 with two fixed ones included: ⁷C₃ = 35; excluded: ⁷C₅ = 21.</p>
+<h4>Geometrical counting</h4>
+<ul>
+<li>lines from n points, no three collinear: ⁿC₂</li>
+<li>triangles: ⁿC₃</li>
+<li>diagonals of an n-gon: ⁿC₂ − n</li>
+<li>if m points are collinear subtract ᵐC₂ (lines) or ᵐC₃ (triangles) and add 1 for the line</li>
+<li>parallelograms in a grid of m and n lines: ᵐC₂·ⁿC₂</li>
+</ul>
+<p><b>How to apply.</b> Count all selections first and subtract those that are not valid because of collinearity.</p>
+<p><b>Example.</b> An octagon has ⁸C₂ − 8 = 20 diagonals and ⁸C₃ = 56 triangles from its vertices.</p>
+<h3>Circular arrangements</h3>
+<h4>Circular arrangements</h4>
+<ul>
+<li>n different objects in a circle: (n − 1)!</li>
+<li>if clockwise and anticlockwise are the same (necklace): (n − 1)!/2</li>
+<li>r of n in a circle: ⁿPᵣ/r</li>
+<li>fix one object to break the symmetry</li>
+</ul>
+<p><b>How to apply.</b> Fix one person and arrange the rest in a line. For a necklace or garland divide by 2.</p>
+<p><b>Example.</b> 6 people at a round table: 5! = 120.</p>
+<h3>Distributions, groups and solutions</h3>
+<h4>Non-negative solutions</h4>
+<ul>
+<li>x₁ + x₂ + … + xₖ = n has ⁿ⁺ᵏ⁻¹Cₖ₋₁ solutions in whole numbers ≥ 0</li>
+<li>for each xᵢ ≥ 1 it is ⁿ⁻¹Cₖ₋₁</li>
+<li>for a lower bound, subtract it first</li>
+</ul>
+<p><b>How to apply.</b> Treat the n units as stars and k − 1 bars to separate the k groups.</p>
+<p><b>Example.</b> x + y + z = 10 has C(12, 2) = 66 whole-number solutions.</p>
+<h4>Groups and distribution of objects</h4>
+<ul>
+<li>dividing m + n objects into groups of m and n: (m + n)!/(m! n!)</li>
+<li>equal groups of size r (k groups): (kr)!/((r!)ᵏ·k!) if the groups are not named</li>
+<li>multiply by k! if the groups go to different people</li>
+<li>identical objects to different persons use the stars-and-bars rule</li>
+</ul>
+<p><b>How to apply.</b> Decide whether the groups are named. Equal-size unnamed groups need the division by k!.</p>
+<p><b>Example.</b> 6 people into 3 unnamed pairs: 6!/(2!³·3!) = 15.</p>
+<h4>Derangements</h4>
+<ul>
+<li>number of arrangements of n objects with none in its own place: Dₙ = n!(1 − 1/1! + 1/2! − … + (−1)ⁿ/n!)</li>
+<li>D₂ = 1, D₃ = 2, D₄ = 9, D₅ = 44</li>
+</ul>
+<p><b>How to apply.</b> Use inclusion and exclusion for small n, or the formula.</p>
+<p><b>Example.</b> 4 letters in 4 addressed envelopes, none correct: D₄ = 9.</p>
+<h2>Most asked question types</h2>
+<h3>How do I solve “Arrangements of letters or digits” questions in JEE Main?</h3>
+<p>A word or a set of digits is given with repeats and conditions. Count the arrangements or numbers. 1. Count the total objects and the repeats; start with n!/(p!q!…). 2. Fill the restricted places first (last digit for even, first digit not 0). 3. For together or apart, use the block method or total − together. Example: MISSISSIPPI has 34650 arrangements.</p>
+<h3>How do I solve “Selections and committees” questions in JEE Main?</h3>
+<p>A group is chosen from several kinds of people or objects with conditions. 1. Choose from each kind and multiply the choices. 2. Add the cases when the condition allows several splits. 3. For at least one, use total − none. Example: 5 of 9 with two fixed ones included: ⁷C₃ = 35.</p>
+<h3>How do I solve “Geometrical counting” questions in JEE Main?</h3>
+<p>Points, lines or a polygon are given. Count lines, triangles or diagonals. 1. Choose points: ⁿC₂ for lines, ⁿC₃ for triangles. 2. Subtract the lines or triangles lost to collinear points. 3. For diagonals of an n-gon use ⁿC₂ − n. Example: An octagon has 20 diagonals.</p>
+<h3>How do I solve “Distributions and non-negative solutions” questions in JEE Main?</h3>
+<p>Objects are shared among people, or the number of solutions of x₁ + … + xₖ = n is asked. 1. Identical objects: stars and bars, ⁿ⁺ᵏ⁻¹Cₖ₋₁. 2. Different objects: each object has a choice of person, so kⁿ (or use groups). 3. Adjust for lower bounds first. Example: x + y + z = 10 has 66 solutions.</p>
+<h2>Common myths and the truth</h2>
+<ul>
+<li>ⁿCᵣ and ⁿPᵣ are the same. ⁿPᵣ = r!·ⁿCᵣ: arrangements count the order, selections do not.</li>
+<li>Circular arrangements of n people give n!. Only one position is fixed to break the symmetry, so it is (n − 1)!.</li>
+</ul>
+<h2>Mistakes to avoid</h2>
+<ul>
+<li>Using ⁿPᵣ when the order does not matter.</li>
+<li>Forgetting the first digit cannot be 0.</li>
+<li>Counting an arrangement twice when objects are alike.</li>
+<li>Missing the division by k! for unnamed equal groups.</li>
+</ul>
+<p>More: <a href="/jee-main-chapters.html">all JEE Main chapters</a>.</p>
+</main>
+<footer class="sf"><a href="/">Physica home</a><a href="/simulations.html">All simulations</a><a href="/jee-main-chapters.html">JEE Main chapters</a><a href="/about.html">About</a><a href="/help.html">Help</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

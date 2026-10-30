@@ -42,7 +42,7 @@ exports.pages = ({ sims, shell, esc, clip, crumbLd, hubFile, SITE, SUBJECT, root
   const grades = [...new Set(sims.map(s => s.grade))].sort(), subjects = [...new Set(sims.map(s => s.subject))];
   for (const g of grades) for (const sub of subjects) {
     const arr = sims.filter(s => s.grade === g && s.subject === sub); if (!arr.length) continue; const label = SUBJECT[sub] || sub, ch = byChapter(arr), jee = chaptersFor(g, sub);
-    hubPage({ file: hubFile(g, sub), title: `Class ${g} ${label} Simulations – Free Interactive NCERT, JEE & NEET | Physica`, h1: `Class ${g} ${label} simulations`,
+    hubPage({ file: hubFile(g, sub), title: `Class ${g} ${label} Simulations – Free, Interactive | Physica`, h1: `Class ${g} ${label} simulations`,
       intro: `${arr.length} free interactive Class ${g} ${label} simulations covering ${ch.length} NCERT chapters, including ${ch.slice(0, 3).map(c => c[0]).join(', ')}. Change the variables, watch the result, and learn for school exams, JEE Main and NEET.`,
       sections: [...ch.map(([name, a]) => [`${name} (${a.length} simulations)`, simItems(a)]), ...(jee.length ? [[`JEE Main Class ${g} Physics chapter notes and formulas`, jee.map(c => [`/${c.file}`, `${c.name}: JEE Main formulas and notes`, ''])]] : [])],
       crumbs: `<a href="/simulations.html">All simulations</a> · Class ${g} · ${esc(label)}` });
@@ -50,23 +50,23 @@ exports.pages = ({ sims, shell, esc, clip, crumbLd, hubFile, SITE, SUBJECT, root
   for (const sub of [...subjects, 'biology']) {
     const arr = sub === 'biology' ? sims.filter(s => s.subject === 'botany' || s.subject === 'zoology') : sims.filter(s => s.subject === sub); if (!arr.length) continue; const label = SUBJ_LABEL[sub] || sub;
     const gs = [...new Set(arr.map(s => s.grade))].sort();
-    hubPage({ file: `${sub}-simulations.html`, title: `${label.replace(' (Botany and Zoology)', '')} Simulations for Class ${gs[0]}–${gs.at(-1)} – Free Interactive Lab | Physica`, h1: `${label} simulations`,
+    hubPage({ file: `${sub}-simulations.html`, title: `${label.replace(' (Botany and Zoology)', '')} Simulations, Class ${gs[0]}–${gs.at(-1)} – Free Lab | Physica`, h1: `${label} simulations`,
       intro: `${arr.length} free interactive ${label.replace(' (Botany and Zoology)', '')} simulations for Class ${gs.join(', ')}, with explanations, key relations and things to try. Built for NCERT, NEET and JEE preparation.`,
       sections: gs.map(g => [`Class ${g} ${label.replace(' (Botany and Zoology)', '')} (${arr.filter(s => s.grade === g).length} simulations)`, byChapter(arr.filter(s => s.grade === g)).map(([n, a]) => [`/${sub === 'biology' ? hubFile(g, a[0].subject) : hubFile(g, sub)}`, `${n} — ${a.length} simulations`, ''])]),
       crumbs: `<a href="/simulations.html">All simulations</a> · ${esc(label)}` });
   }
   for (const g of grades) { const arr = sims.filter(s => s.grade === g);
-    hubPage({ file: `class-${g}-simulations.html`, title: `Class ${g} Science Simulations – Physics, Chemistry & Biology | Physica`, h1: `Class ${g} simulations`,
+    hubPage({ file: `class-${g}-simulations.html`, title: `Class ${g} Science Simulations – Physics, Chem, Bio | Physica`, h1: `Class ${g} simulations`,
       intro: `${arr.length} free interactive Class ${g} simulations across ${[...new Set(arr.map(s => SUBJECT[s.subject]))].join(', ')}. Pick a subject, then a chapter, and experiment with the variables.`,
       sections: [[`Class ${g} subjects`, [...new Set(arr.map(s => s.subject))].map(sub => [`/${hubFile(g, sub)}`, `Class ${g} ${SUBJECT[sub]} simulations`, `${arr.filter(s => s.subject === sub).length} simulations`])]], crumbs: `<a href="/simulations.html">All simulations</a> · Class ${g}` }); }
-  hubPage({ file: 'simulations.html', title: 'Free Physics, Chemistry & Biology Simulations for Class 10, 11, 12 | Physica', h1: 'All Physica simulations',
+  hubPage({ file: 'simulations.html', title: 'Free Physics, Chemistry & Biology Simulations, Class 10–12 | Physica', h1: 'All Physica simulations',
     intro: `${sims.length} free interactive simulations for Class 10, 11 and 12 Physics, Chemistry, Botany and Zoology, in 2D and ultra-realistic views, with JEE Main and NEET chapter notes, formulas, most-asked questions and mock tests.`,
     sections: [['By class', grades.map(g => [`/class-${g}-simulations.html`, `Class ${g} simulations`, `${sims.filter(s => s.grade === g).length} simulations`])], ['By subject', [...subjects, 'biology'].filter(x => sims.some(s => x === 'biology' ? s.subject === 'botany' || s.subject === 'zoology' : s.subject === x)).map(x => [`/${x}-simulations.html`, `${(SUBJ_LABEL[x] || x)} simulations`, ''])],
       ['JEE Main chapter notes', [['/jee-main-chapters.html', 'JEE Main Physics and Maths chapters: formulas, notes and most-asked questions', '']]]], crumbs: 'All simulations' });
 
   // ---- JEE Main chapter pages ----
   for (const c of chapters) {
-    const d = c.d, url = `${SITE}/${c.file}`, nF = d.formulas.length, title = `${c.name} – JEE Main ${c.subject} Formulas, Notes & Questions | Physica`;
+    const d = c.d, url = `${SITE}/${c.file}`, nF = d.formulas.length, title = [`${c.name} – JEE Main ${c.subject} Formulas, Notes & Questions | Physica`, `${c.name} – JEE Main Formulas & Notes | Physica`, `${c.name} – JEE Main | Physica`, `${c.name} | Physica`].find(x => x.length <= 66) || `${c.name} | Physica`; /* the longest title that Google shows in full */
     const desc = clip(`Free ${c.name} JEE Main ${c.subject} formula sheet: ${nF} formulas with solved examples, quick-revision notes, the most asked question types and common mistakes. Practise on Physica.`, 160);
     const rel = simsOf(c), body = [`<p class="crumb"><a href="/jee-main-chapters.html">JEE Main chapters</a> · ${esc(c.cls)} · ${esc(c.subject)}</p>`, `<h1>${esc(c.name)}: JEE Main ${esc(c.subject)} formulas and notes</h1>`];
     if (d.guide?.intro) body.push(`<p class="lead">${esc(plain(d.guide.intro))}</p>`);
@@ -89,6 +89,6 @@ exports.pages = ({ sims, shell, esc, clip, crumbLd, hubFile, SITE, SUBJECT, root
   const cu = `${SITE}/jee-main-chapters.html`, cd = clip(`JEE Main Physics and Maths chapter-wise formulas, notes and most-asked questions: ${chapters.length} chapters of Class 11 and 12, free on Physica.`, 160);
   const cbody = ['<p class="crumb"><a href="/simulations.html">All simulations</a> · JEE Main chapters</p>', '<h1>JEE Main chapter-wise formulas, notes and questions</h1>', `<p class="lead">${esc(cd)}</p>`, '<p><a class="cta" href="/">Open Rank mode</a></p>'];
   for (const [subject, cl] of LISTS) for (const [cls, names] of cl) { const cs = chapters.filter(c => c.subject === subject && c.cls === cls); if (cs.length) cbody.push(`<h2>${esc(cls)} ${esc(subject)}</h2>`, '<ul class="links">', ...cs.map(c => `<li><a href="/${c.file}">${esc(c.name)}</a> — ${c.d.formulas.length} formulas</li>`), '</ul>'); }
-  add('jee-main-chapters.html', shell({ title: 'JEE Main Physics & Maths Chapter-wise Formulas, Notes, Questions | Physica', desc: cd, url: cu, ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'JEE Main chapter-wise formulas and notes', description: cd, url: cu, inLanguage: 'en', isAccessibleForFree: true }, crumbLd([['Physica', SITE + '/'], ['JEE Main chapters', cu]])], body: cbody }));
+  add('jee-main-chapters.html', shell({ title: 'JEE Main Chapter-wise Formulas, Notes & Questions | Physica', desc: cd, url: cu, ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'JEE Main chapter-wise formulas and notes', description: cd, url: cu, inLanguage: 'en', isAccessibleForFree: true }, crumbLd([['Physica', SITE + '/'], ['JEE Main chapters', cu]])], body: cbody }));
   return { files, urls };
 };
