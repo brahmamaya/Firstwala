@@ -41,10 +41,9 @@ function drawLay(L,x,y,w,col,al){let by=y;L.lines.forEach((l,i)=>{by+=(i?L.lead:
 
 /* ---------- logo (white, see-through), drawn the same way as the site's brand mark ---------- */
 async function logoCanvas(){try{await document.fonts.load('800 40px Orbitron')}catch{}
-  const k=3,c=document.createElement('canvas');c.width=LOGO.w*k;c.height=LOGO.h*k;const g=c.getContext('2d');g.scale(k,k);g.globalAlpha=P.logoA;g.strokeStyle=P.logo;g.fillStyle=P.logo;g.lineWidth=2.6;
-  const s=1.5,mx=24*s,my=LOGO.h/2;g.save();g.translate(mx,my);g.rotate(-30*Math.PI/180);g.beginPath();g.arc(0,0,16*s,0,7);g.stroke();
-  g.save();g.rotate(-25*Math.PI/180);g.beginPath();g.ellipse(0,0,18.5*s,6.5*s,0,0,7);g.stroke();g.restore();g.beginPath();g.arc(0,0,3.5*s,0,7);g.fill();g.restore();
-  g.font=`800 ${27*1.15}px Orbitron,${FONT}`;g.textBaseline='middle';g.fillText('physica.',mx+24*s,my+2);return c}
+  const k=6,c=document.createElement('canvas');c.width=LOGO.w*k;c.height=LOGO.h*k;const g=c.getContext('2d');g.scale(k,k);g.globalAlpha=P.logoA;g.fillStyle=P.logo;g.textAlign='right';g.textBaseline='middle';
+  let fs=34;g.font=`800 ${fs}px Orbitron,${FONT}`;while(fs>14&&g.measureText('physica.in').width>LOGO.w-4){fs--;g.font=`800 ${fs}px Orbitron,${FONT}`}
+  g.fillText('physica.in',LOGO.w-2,LOGO.h/2+2);return c}
 
 /* ---------- slide specs: one list of elements, drawn on canvas (PDF) and written as shapes (PPT) ---------- */
 const letters=(q)=>[].concat(q.c??[]).map(i=>'abcde'[i]);
@@ -141,7 +140,8 @@ function topicsSlide(meta){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LO
   els.push(txt(W-PAD-400,H-70,400,[{s:'physica.in',fs:30,c:C.dim,al:'r'}]));return els}
 
 /* ---------- canvas drawing (for the PDF) ---------- */
-function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=W;cv.height=H;cx=cv.getContext('2d');cx.lineCap='round';
+const SS=2; /* PDF pages are drawn at 2x (3840x2160) so text stays sharp when zoomed */
+function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=W*SS;cv.height=H*SS;cx=cv.getContext('2d');cx.scale(SS,SS);cx.lineCap='round';
   for(const e of els){
     if(e.t==='rect'){cx.fillStyle=e.fill;cx.fillRect(e.x,e.y,e.w,e.h)}
     else if(e.t==='pill'){const r=e.h/2;cx.beginPath();cx.moveTo(e.x+r,e.y);cx.arcTo(e.x+e.w,e.y,e.x+e.w,e.y+e.h,r);cx.arcTo(e.x+e.w,e.y+e.h,e.x,e.y+e.h,r);cx.arcTo(e.x,e.y+e.h,e.x,e.y,r);cx.arcTo(e.x,e.y,e.x+e.w,e.y,r);cx.closePath();cx.fillStyle=e.fill;cx.fill();cx.lineWidth=2.5;cx.strokeStyle=e.stroke;cx.stroke();
@@ -223,7 +223,7 @@ async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress
   if(format==='ppt')return makePPTX(specs,logo);
   const jp=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');jp.push(encJpg(drawSlide(specs[i],logo))); /* encoding runs off the main thread while the next slide is drawn */
     onProgress?.(N+1,N+1,i+1,specs.length);if(i%3===2)await Promise.all(jp);else await yld()}
-  return makePDF(await Promise.all(jp))}
+  return makePDF(await Promise.all(jp),960,540,W*SS,H*SS)}
 /* ---------- formula sheet: every formula of a chapter on 1-5 A4 pages (PDF, printable, light) ---------- */
 async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
   setPalette('light');const AW=1240,AH=1754,M=70,GAP=40,CW=(AW-M*2-GAP)/2,TOP=250,BOT=AH-90;
@@ -237,7 +237,7 @@ async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
   const out=[];
   for(let i=0;i<pages.length;i++){if(cancelled?.())throw new Error('cancelled');
     const cv=document.createElement('canvas');cv.width=AW;cv.height=AH;cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);
-    cx.drawImage(logo,M,34,LOGO.w*.8,LOGO.h*.8);
+    cx.drawImage(logo,AW-M-LOGO.w*.8,34,LOGO.w*.8,LOGO.h*.8);
     cx.fillStyle=P.acc;cx.font=F(24,1);cx.textBaseline='alphabetic';cx.fillText('FORMULA SHEET · '+exam.toUpperCase(),M,150);
     const t=layout(chapter,56,AW-M*2,1);drawLay(t,M,162,AW-M*2,P.tx);cx.fillStyle=P.line;cx.fillRect(M,TOP-24,AW-M*2,2);
     pages[i].forEach((colList,c)=>{const x=M+c*(CW+GAP);for(const {b,y} of colList){
