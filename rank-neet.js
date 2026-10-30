@@ -204,8 +204,7 @@ function dialog(L){const idx=[...selSet].sort((a,b)=>a-b),items=idx.map(i=>({q:L
     try{await loadExport();if(items.some(x=>x.q.fig))await window.PhysicaLoadTutorPack?.();
       const paper=y=>y.replace(/\s+(19|20)\d\d.*$/,''),papers=PAPERS.filter(a=>items.some(x=>paper(x.q.y)===a)),tps=[];
       for(const x of items){let t=tps.find(z=>z.tp===x.q.tp);if(!t)tps.push(t={tp:x.q.tp,name:tname(x.q.tp),n:0,subs:[]});t.n++;const s2=t.subs.find(z=>z[0]===x.q.st);s2?s2[1]++:t.subs.push([x.q.st,1])}
-      const tn=tps.map(t=>t.name.toLowerCase()),Wd=z=>z.toLowerCase().split(/[^a-z]+/).filter(w=>w.length>3),F=(U().formulas||[]).filter(f=>f.p===1&&f.f.includes('=')),hit=F.filter(f=>tn.some(n=>Wd(n).some(w=>Wd(f.g).includes(w)))),eqs=(hit.length>=3?hit:F).map(f=>f.f.split(' · ')[0]).filter(e=>e.includes('='));
-      const meta={chapter:CH(),exam:X.label,subject:CHAPS[CH()]?.s==='maths'?'Maths':'Physics',cls:([...JEE_CH,...JEE_MATH].find(c=>c[1].includes(CH()))||['Class 11'])[0],papers,topics:tps,eqs};
+      const meta={chapter:CH(),exam:X.label,subject:CHAPS[CH()]?.s==='maths'?'Maths':'Physics',cls:([...JEE_CH,...JEE_MATH].find(c=>c[1].includes(CH()))||['Class 11'])[0],papers,topics:tps};
       const blob=await window.PhysicaRankExport.make({items,withSol:inc==='qs',blank,format:fmt,meta,theme:bgc,perSlide:per,cancelled:()=>stop,onProgress:(i,n,j,t)=>{const v=j?(n+j)/(n+t):i/(n+t);fill.style.width=Math.round(v*100)+'%';pr.textContent=j?'Saving page '+j+' of '+t+'…':'Making slide '+i+' of '+n+'…'}});
       if(stop)return;const nm=['Physica',X.label,CH(),'PYQs',inc==='qs'?'with-solutions':'questions',stamp()].join('-').replace(/[^A-Za-z0-9-]+/g,'-')+(fmt==='ppt'?'.pptx':'.pdf'),url=URL.createObjectURL(blob),
         /* iPad / iPhone: a blob download there can be saved as a .txt file, so never use a download link on them.

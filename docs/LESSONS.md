@@ -30,3 +30,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Export: 2x PDF pages made download too slow; keep SS=1 (owner preferred the old quality/speed).
 - Cover slide now holds the topics (no separate topics slide); preview a cover with many topics (fit shrinks, falls back to names only) before shipping layout changes.
 - Cover shows up to 6 key equations (must-know formulas with '='); chapters without Formulas content just show none.
+- Owner does not want key equations on the cover slide; do not add them back.
