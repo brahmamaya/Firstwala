@@ -94,10 +94,10 @@ const jokeFor=ch=>(JOKE.find(([r])=>r.test(ch))||[0,'Practise a little every day
 const ART=[[/^Sets|^Relations/,'venn grid'],[/Trigonometric/,'sine circ'],[/Binomial/,'pascal grid'],[/Complex/,'circ nums:i'],[/Permutations/,'dots nums:pc'],[/Sequences/,'bars nums:seq'],[/Straight|Conic|Three Dim|Vector/,'grid conic'],[/Limits|Continuity|Derivatives|Integrals|Differential/,'curve grid'],[/Statistics|Probability/,'bell bars'],[/Logarithm/,'curve nums:log'],[/Matrices/,'matrix grid'],[/Units|Experimental/,'ruler dots'],[/Kinematics|Laws|Work|Rotational/,'arc orbit'],[/Gravitation|Atoms|Dual/,'orbit dots'],[/Solids|Thermo|Kinetic/,'dots curve'],[/Oscillations|Waves/,'sine sine'],[/Electrostatics|Current|Devices/,'field dots'],[/Magnetic|Induction/,'loops sine'],[/Optics/,'rays circ']];
 function chapterArt(meta){const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
   const pr=(ART.find(([r])=>r.test(meta.chapter))||[0,meta.subject==='Maths'?'grid arc':'sine orbit'])[1].split(' ');
-  const anchors=[[150,110,1],[W-520,90,1],[120,H-420,1],[W-470,H-410,1],[40,H/2-210,.8],[W-330,H/2-210,.8],[W/2-300,60,.7],[W/2-300,H-235,.7]];
-  g.lineWidth=3;g.lineCap='round';g.font=F(46,1);g.textBaseline='middle';
+  const anchors=[[60,70,1.25],[W-430,60,1.25],[50,H-430,1.2],[W-400,H-420,1.2],[30,H/2-200,.9],[W-300,H/2-200,.9]];
+  g.lineWidth=4;g.lineCap='round';g.font=F(46,1);g.textBaseline='middle';
   const col=(a,k)=>{g.strokeStyle=g.fillStyle=(k?C.tx:C.acc);g.globalAlpha=a};
-  const draw=(nm,x,y,s)=>{const R=s*170;g.save();g.translate(x,y);col(.34);
+  const draw=(nm,x,y,s)=>{const R=s*170;g.save();g.translate(x,y);col(.7);
     if(nm==='grid'){for(let k=0;k<=5;k++){g.beginPath();g.moveTo(k*R/5,0);g.lineTo(k*R/5,R);g.moveTo(0,k*R/5);g.lineTo(R,k*R/5);g.stroke()}}
     else if(nm==='sine'||nm==='curve'){g.beginPath();for(let k=0;k<=60;k++){const t=k/60,X=t*R*2.2,Y=nm==='sine'?R/2+Math.sin(t*Math.PI*4)*R*.38:R-(t*t*1.7+t*.2)*R*.9;k?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke();if(nm==='curve'){col(.3,1);g.beginPath();g.moveTo(R*.5,R*.9);g.lineTo(R*1.5,R*.2);g.stroke()}}
     else if(nm==='arc'){g.beginPath();g.moveTo(0,R);g.quadraticCurveTo(R*.9,-R*.4,R*1.8,R);g.stroke();for(let k=0;k<5;k++){const t=(k+.5)/5,X=t*R*1.8,Y=R-4*R*.7*t*(1-t)*1.0;g.beginPath();g.arc(X,Y,7,0,7);g.fill()}}
@@ -117,27 +117,27 @@ function chapterArt(meta){const cv=document.createElement('canvas');cv.width=W;c
     g.restore()};
   const list=pr.flatMap(n=>[n,n,n]);anchors.forEach((a,k)=>{const nm=list[k%list.length];if(nm.startsWith('nums')&&k<6)return;draw(nm,a[0],a[1],a[2])});
   /* keep the middle (the title) clear: erase the centre softly so nothing overlaps the text */
-  g.globalAlpha=1;g.globalCompositeOperation='destination-out';const gr=g.createRadialGradient(W/2,H/2,160,W/2,H/2,820);gr.addColorStop(0,'rgba(0,0,0,.98)');gr.addColorStop(.6,'rgba(0,0,0,.72)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);
+  g.globalAlpha=1;g.globalCompositeOperation='destination-out';g.save();g.translate(W/2,H/2);g.scale(1.9,1);const gr=g.createRadialGradient(0,0,300,0,0,640);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(.55,'rgba(0,0,0,.8)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(-W,-H,W*2,H*2);g.restore();
   g.globalCompositeOperation='source-over';
   /* overall faintness (the art is a background, not a picture): redraw at low opacity */
-  const out=document.createElement('canvas');out.width=W;out.height=H;const o=out.getContext('2d');o.globalAlpha=P.name==='light'?.32:.3;o.drawImage(cv,0,0);return out}
+  const out=document.createElement('canvas');out.width=W;out.height=H;const o=out.getContext('2d');o.globalAlpha=P.name==='light'?.5:.45;o.drawImage(cv,0,0);return out}
 function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'art',x:0,y:0,w:W,h:H,canvas:chapterArt(meta)},{t:'img',k:'logo',...LOGO}];
-  const ch=fit(fs=>{const l=layout(meta.chapter,fs,W-PAD*2-160,1);return{fs,h:l.h}},112,60,330);
+  const ch=fit(fs=>{const l=layout(meta.chapter,fs,W-PAD*2-160,1);return{fs,h:l.h}},100,56,230);
   const subj=meta.exam+'  ·  '+meta.subject+'  ·  '+meta.cls,joke='“'+jokeFor(meta.chapter)+'”';
-  const hs=layout(subj,50,W-PAD*2,1).h,hj=layout(joke,34,W-PAD*2-300,0).h,gap=34,total=40+gap+ch.h+gap+4+gap+hs+gap+hj;let y=Math.max(150,(H-total)/2-10);
-  els.push(txt(PAD,y,W-PAD*2,[{s:'PREVIOUS YEAR QUESTIONS',fs:32,c:C.acc,b:1,al:'c'}]));y+=40+gap;
+  const hs=layout(subj,44,W-PAD*2,1).h,hj=layout(joke,30,W-PAD*2-300,0).h,gap=22;let y=118;
+  els.push(txt(PAD,y,W-PAD*2,[{s:'PREVIOUS YEAR QUESTIONS',fs:28,c:C.acc,b:1,al:'c'}]));y+=34+gap;
   const e=txt(PAD+80,y,W-PAD*2-160,[{s:meta.chapter,fs:ch.fs,c:C.tx,b:1,al:'c'}]);e.h=ch.h;els.push(e);y+=ch.h+gap;
   els.push(rect(W/2-90,y,180,4,C.acc));y+=4+gap;
-  els.push(txt(PAD,y,W-PAD*2,[{s:subj,fs:50,c:C.tx,b:1,al:'c'}]));y+=hs+gap;
-  els.push(txt(PAD+150,y,W-PAD*2-300,[{s:joke,fs:34,c:C.dim,al:'c'}]));
-  els.push(txt(PAD,H-70,1200,[{s:N+' questions  ·  '+(withSol?'questions with solutions':'questions only'),fs:30,c:C.dim}]),txt(W-PAD-400,H-70,400,[{s:'physica.in',fs:30,c:C.dim,al:'r'}]));
+  els.push(txt(PAD,y,W-PAD*2,[{s:subj,fs:44,c:C.tx,b:1,al:'c'}]));y+=hs+gap*.6;
+  els.push(txt(PAD+150,y,W-PAD*2-300,[{s:joke,fs:30,c:C.dim,al:'c'}]));y+=hj+gap*1.4;
+  /* topics on the same page: the largest text that fits the space left */
+  const TW=1300,TX=(W-TW)/2,room=H-100-y,pp=meta.papers.length?{s:'Papers: '+meta.papers.join('  ·  '),c:C.dim}:null;
+  const build=full=>[...(pp?[pp]:[]),...meta.topics.flatMap(t=>full?[{s:t.name+'  ('+t.n+')',b:1,c:C.tx},{s:t.subs.map(s=>s[0]+' ('+s[1]+')').join('   ·   '),c:C.dim}]:[{s:t.name+'  ('+t.n+')',b:1,c:C.tx}])];
+  const size=ps=>fit(fs=>{const ls=ps.map(p=>layout(p.s,fs,TW,p.b));return{fs,h:ls.reduce((a,l)=>a+l.h,0)+fs*.3*(ls.length-1)}},28,15,room);
+  let ps=build(true),r=size(ps);if(r.h>room){ps=build(false);r=size(ps)}
+  const te=txt(TX,y,TW,ps.map(p=>({...p,fs:r.fs,gap:r.fs*.3,al:'c'})));te.h=r.h;els.push(te);
+  els.push(txt(PAD,H-70,1200,[{s:N+' questions  ·  '+(withSol?'questions with solutions':'questions only'),fs:26,c:C.dim}]));
   return els}
-function topicsSlide(meta){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}];
-  els.push(txt(PAD,120,1300,[{s:'TOPICS INCLUDED',fs:32,c:C.acc,b:1}]),txt(PAD,176,W-PAD*2,[{s:meta.chapter,fs:56,c:C.tx,b:1}]),txt(PAD,262,W-PAD*2,[{s:'Papers: '+meta.papers.join('  ·  '),fs:30,c:C.dim}]),rect(PAD,330,W-PAD*2,2,C.line));
-  const paras=meta.topics.flatMap(t=>[{s:t.name+'  ('+t.n+')',b:1,c:C.tx},{s:t.subs.map(s=>s[0]+' ('+s[1]+')').join('   ·   '),c:C.dim}]);
-  const r=fit(fs=>{const ls=paras.map(p=>layout(p.s,fs,W-PAD*2,p.b));return{fs,h:ls.reduce((a,l)=>a+l.h,0)+fs*.35*(ls.length-1)}},34,16,H-420);
-  const e=txt(PAD,366,W-PAD*2,paras.map(p=>({...p,fs:r.fs,gap:r.fs*.35})));e.h=r.h;els.push(e);
-  els.push(txt(W-PAD-400,H-70,400,[{s:'physica.in',fs:30,c:C.dim,al:'r'}]));return els}
 
 /* ---------- canvas drawing (for the PDF) ---------- */
 const SS=1; /* page scale: 1 = 1920x1080 (fast); 2 was too slow to download */
@@ -217,7 +217,7 @@ const yld=()=>self.scheduler?.yield?scheduler.yield():new Promise(r=>setTimeout(
 async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled}){
   setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
-  const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol),topicsSlide(meta)];
+  const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol)];
   for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');const two=perSlide===2&&i+1<N;specs.push(two?await pairSlide(items[i].q,i,items[i+1].q,N,withSol,meta):await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);if(two)i++;onProgress?.(i+1,N+1);if(i%4===3)await yld()}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);

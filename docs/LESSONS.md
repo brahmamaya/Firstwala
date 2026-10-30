@@ -28,3 +28,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Export: encode slide JPEGs in parallel (toBlob off-thread) and yield with scheduler.yield; no setTimeout clamps. Measure speed claims before stating numbers.
 - Export: PDF pages drawn at 2x (SS) and logo is vector text 'physica.in' at 6x; keep sizes in sync with makePDF iw/ih.
 - Export: 2x PDF pages made download too slow; keep SS=1 (owner preferred the old quality/speed).
+- Cover slide now holds the topics (no separate topics slide); preview a cover with many topics (fit shrinks, falls back to names only) before shipping layout changes.
