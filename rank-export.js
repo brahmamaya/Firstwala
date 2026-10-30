@@ -60,26 +60,34 @@ async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const 
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(g));await img.decode();const k=3,c=document.createElement('canvas');c.width=w*k;c.height=h*k;c.getContext('2d').drawImage(img,0,0,w*k,h*k);return{c,ar:w/h}}catch{return null}}
 const rect=(x,y,w,h,fill)=>({t:'rect',x,y,w,h,fill});
 function frame(meta,n,N){return[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO},txt(PAD,H-58,500,[{s:n+' / '+N,fs:24,c:C.dim}])]}
-async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,N),fig=await figCanvas(q);
-  /* header: question number (green) and exam + year (yellow), both as bold pills at the top left */
+/* one question laid out in a box: the whole slide (half=null) or its left / right half (two questions on one slide) */
+async function questionEls(q,i,withSol,half){const els=[],fig=await figCanvas(q),X0=half==='R'?W/2+PAD/2:PAD,CW=half?W/2-PAD*1.5:W-PAD*2;
+  /* header: question number (green) and exam + year (yellow), both as bold pills at the top left of the box */
   const hy=LOGO.y+8,hh=56;cx.font=F(30,1);const qn='Q'+(i+1),qw=cx.measureText(qn).width+40;
-  els.push({t:'pill',x:PAD,y:hy,w:qw,h:hh,fill:P.qn[0],stroke:P.qn[1],text:qn,color:P.qn[2],fs:30});
-  cx.font=F(26,1);const yr=String(q.y),yw=cx.measureText(yr).width+40;
-  els.push({t:'pill',x:PAD+qw+14,y:hy,w:Math.min(yw,W-PAD*2-qw-14-LOGO.w-30),h:hh,fill:P.yr[0],stroke:P.yr[1],text:yr,color:P.yr[2],fs:26});
+  els.push({t:'pill',x:X0,y:hy,w:qw,h:hh,fill:P.qn[0],stroke:P.qn[1],text:qn,color:P.qn[2],fs:30});
+  const yr=String(q.y),avail=(half==='R'?W-PAD-LOGO.w-30-X0:half?CW:W-PAD-LOGO.w-30-X0)-qw-14;let yf=26;cx.font=F(yf,1);while(yf>18&&cx.measureText(yr).width+40>avail){yf-=2;cx.font=F(yf,1)}
+  const yw=cx.measureText(yr).width+40;
+  els.push({t:'pill',x:X0+qw+14,y:hy,w:Math.min(yw,avail),h:hh,fill:P.yr[0],stroke:P.yr[1],text:yr,color:P.yr[2],fs:yf});
   /* the question stays in the upper part of the slide with a smaller type size: the rest of the slide is the teacher's working space (questions-only deck) or the solution */
   const top=BAND+20,bottom=withSol?560:520;
-  const areaH=bottom-top,figW=fig?Math.min(560,Math.round(areaH*.95*fig.ar)):0,qW=W-PAD*2-(fig?figW+50:0);
-  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,fig?qW:W-PAD*2):null,left=ql.h+(ob?fs*.8+ob.h:0);return{fs,ql,ob,h:fig?Math.max(left,figW/fig.ar):left}},34,18,areaH);
-  const qEl=txt(PAD,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
-  if(fig)els.push({t:'img',k:'fig'+i,x:W-PAD-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
+  const areaH=bottom-top,figW=fig?Math.min(half?340:560,Math.round(areaH*.95*fig.ar)):0,qW=CW-(fig?figW+(half?30:50):0);
+  const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,fig?qW:CW):null,left=ql.h+(ob?fs*.8+ob.h:0);return{fs,ql,ob,h:fig?Math.max(left,figW/fig.ar):left}},34,18,areaH);
+  const qEl=txt(X0,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
+  if(fig)els.push({t:'img',k:'fig'+i,x:X0+CW-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
   let y=top+blk.ql.h;
-  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(PAD+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcde'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
+  if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(X0+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcde'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
   if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=Math.max(y+36,bottom+30),room=H-80-sy;
-    els.push(rect(PAD,bottom+6,W-PAD*2,2,C.line));
-    const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,W-PAD*2,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},34,16,room);
-    const e=txt(PAD,sy,W-PAD*2,lines.map((s2,j)=>({s:s2,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
-  else{const e=txt(W-PAD-760,H-76,760,[{s:'Ans: '+answerText(q),fs:36,c:C.acc,b:1,al:'r'}]);e.h=52;els.push(e)}
+    els.push(rect(X0,bottom+6,CW,2,C.line));
+    const r=fit(fs=>{const ls=lines.map((s2,j)=>layout(s2,fs,CW,j===0));return{fs,ls,h:ls.reduce((a2,l)=>a2+l.h,0)+fs*.55*(ls.length-1)}},34,half?14:16,room);
+    const e=txt(X0,sy,CW,lines.map((s2,j)=>({s:s2,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
+  else{const aw=Math.min(760,CW),e=txt(X0+CW-aw,H-76,aw,[{s:'Ans: '+answerText(q),fs:half?30:36,c:C.acc,b:1,al:'r'}]);e.h=52;els.push(e)}
   return els}
+async function questionSlide(q,i,N,withSol,meta,topic){return[...frame(meta,i+1,N),...await questionEls(q,i,withSol,null)]}
+/* two questions on one slide: the first on the left half, the second on the right half, a faint dotted line (30% strength) between them */
+const mixHex=(a,b,t)=>{const h=c=>[1,3,5].map(k=>parseInt(c.slice(k,k+2),16)),x=h(a),y=h(b);return'#'+x.map((v,k)=>Math.round(v*t+y[k]*(1-t)).toString(16).padStart(2,'0')).join('')};
+async function pairSlide(q1,i,q2,N,withSol,meta){const els=frame(meta,(i+1)+'–'+(i+2),N),col=mixHex(P.tx,P.bg,.3);
+  els.push(...await questionEls(q1,i,withSol,'L'),...await questionEls(q2,i+1,withSol,'R'));
+  for(let y=BAND+14;y<H-96;y+=28)els.push(rect(W/2-2,y,4,14,col));return els}
 /* ---------- cover slide: centred bold chapter and exam, faint chapter-themed art behind (edges only), one light line ---------- */
 const JOKE=[[/^Units/,'Because “5” is not an answer. “5 metres” is.'],[/Kinematics/,'Every journey is just a graph, and every graph is just a journey.'],[/Laws of Motion/,'Newton gave us physics and a good reason to blame friction.'],[/Work, Energy/,'Studying hard is not “work” in physics unless something moves. Sorry!'],[/Rotational/,'Everything goes in circles here, including your doubts until they are solved.'],[/Gravitation/,'What goes up must come down. Your marks should not.'],[/Solids and Liquids/,'Solids hold their shape, liquids go with the flow. Be a bit of both.'],[/Thermodynamics/,'Entropy always increases, just like the mess on your study table.'],[/Kinetic/,'Billions of tiny molecules, and not one of them has ever asked for notes.'],[/Oscillations/,'Up, down, repeat, just like a Monday morning.'],[/Electrostatics/,'Opposites attract, likes repel. Your classroom knew this already.'],[/Current Elec/,'Stay positive and keep the current flowing.'],[/Magnetic Eff/,'Magnets know the secret of attraction. We only know the formulas.'],[/Induction/,'Change is the only constant, and Faraday would nod.'],[/Electromagnetic Waves/,'Light, radio, X-rays: one family, very different party manners.'],[/^Optics/,'Let us see things clearly, at least in the exam.'],[/Dual Nature/,'Is it a wave or a particle? Yes.'],[/Atoms and Nuclei/,'Small things, big energy, just like you before an exam.'],[/Electronic Devices/,'Diodes: the only ones who truly believe in one-way traffic.'],[/Experimental/,'Least count: the smallest thing that can cost you a mark.'],
   [/^Sets/,'Every element has its place. Find yours.'],[/Trigonometric Functions/,'Triangles are simple, until someone asks for sin 75°.'],[/Binomial/,'Expand your mind, and the bracket too.'],[/Complex Numbers/,'Imaginary numbers, very real marks.'],[/Permutations/,'Order matters here. Unlike in your school bag.'],[/Sequences/,'Terms and conditions apply to every term.'],[/Straight Lines/,'The shortest path between two points is a straight line, and a straight answer.'],[/Conic/,'Cut a cone, get a parabola. Cut the syllabus, get peace.'],[/Limits/,'Getting closer and closer without ever getting there, like the weekend.'],[/Statistics/,'Nine out of ten students prefer questions that come with answers.'],[/Logarithm/,'Making big numbers feel small since 1614.'],[/^Relations and Functions/,'Every input has exactly one output, unlike your plans for Sunday.'],[/Inverse Trig/,'Undoing sin, one angle at a time.'],[/Matrices/,'Rows and columns: organising numbers better than your desk.'],[/Continuity/,'Smooth curves only. Sharp corners are not allowed.'],[/Application of Derivatives/,'Maximise marks, minimise worry.'],[/^Integrals/,'Adding up infinitely many tiny pieces: patience, with symbols.'],[/Application of Integrals/,'Finding the area under the curve, because every curve deserves its due.'],[/Differential/,'Solve the change and the rest will follow.'],[/Vector/,'Direction matters. So does magnitude.'],[/Three Dim/,'One more dimension, one more reason to draw a neat diagram.'],[/Probability/,'Chance of passing: very high, if you practise.']];
@@ -205,11 +213,11 @@ async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=
   return zip([...out,...files.map(f=>({name:'ppt/'+f.name,data:f.data}))])}
 
 /* ---------- public: build the file ---------- */
-async function make({items,withSol,blank,format,meta,theme,onProgress,cancelled}){
+async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled}){
   setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
   const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol),topicsSlide(meta)];
-  for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');specs.push(await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
+  for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');const two=perSlide===2&&i+1<N;specs.push(two?await pairSlide(items[i].q,i,items[i+1].q,N,withSol,meta):await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);if(two)i++;onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
   const jpgs=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');const cv=drawSlide(specs[i],logo);jpgs.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(N+1,N+1,i+1,specs.length);await new Promise(r=>setTimeout(r))}
