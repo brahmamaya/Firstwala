@@ -213,15 +213,17 @@ async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=
   return zip([...out,...files.map(f=>({name:'ppt/'+f.name,data:f.data}))])}
 
 /* ---------- public: build the file ---------- */
+const yld=()=>self.scheduler?.yield?scheduler.yield():new Promise(r=>setTimeout(r)),encJpg=cv=>new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer()).then(a=>new Uint8Array(a));
 async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled}){
   setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
   const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol),topicsSlide(meta)];
-  for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');const two=perSlide===2&&i+1<N;specs.push(two?await pairSlide(items[i].q,i,items[i+1].q,N,withSol,meta):await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);if(two)i++;onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
+  for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');const two=perSlide===2&&i+1<N;specs.push(two?await pairSlide(items[i].q,i,items[i+1].q,N,withSol,meta):await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);if(two)i++;onProgress?.(i+1,N+1);if(i%4===3)await yld()}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
-  const jpgs=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');const cv=drawSlide(specs[i],logo);jpgs.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(N+1,N+1,i+1,specs.length);await new Promise(r=>setTimeout(r))}
-  return makePDF(jpgs)}
+  const jp=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');jp.push(encJpg(drawSlide(specs[i],logo))); /* encoding runs off the main thread while the next slide is drawn */
+    onProgress?.(N+1,N+1,i+1,specs.length);if(i%3===2)await Promise.all(jp);else await yld()}
+  return makePDF(await Promise.all(jp))}
 /* ---------- formula sheet: every formula of a chapter on 1-5 A4 pages (PDF, printable, light) ---------- */
 async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
   setPalette('light');const AW=1240,AH=1754,M=70,GAP=40,CW=(AW-M*2-GAP)/2,TOP=250,BOT=AH-90;
