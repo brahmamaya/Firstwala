@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node tools/*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(grep *)",
+      "Bash(ls *)"
+    ],
+    "deny": [
+      "Read(./**/*.min.js)",
+      "Read(./styles.min.css)",
+      "Read(./sw.js)",
+      "Read(./**/package-lock.json)",
+      "Read(./content/**)"
+    ]
+  },
+  "env": {
+    "BASH_MAX_OUTPUT_LENGTH": "20000"
+  }
+}
