@@ -36,3 +36,4 @@ JEE Main and JEE Advanced Test 1, NEET/JEE Tests 2 and 3: original questions onl
 - Jan/April 2026 JEE Main and NEET PYQs: needs the paper text and the right to use it from the owner.
 - Legal review of privacy.html / terms.html by a lawyer.
 - Custom domain physica.in: owner sets it in repo Settings -> Pages.
+- Chemistry, Botany and Zoology PYQs are coming soon (owner, 2026-10-30): same method (docs/PYQ-INGEST.md, PYQs only, stub chapter file unless the owner asks for content); they need the Rank mode subject and chapter lists extended first (Botany/Zoology are NEET subjects). The promo poster says 'jaldi' for them; update it when they are live.
