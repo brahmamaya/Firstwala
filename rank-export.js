@@ -37,7 +37,7 @@ function layout(text,fs,maxW,b){cx.font=F(fs,b);const sp=cx.measureText(' ').wid
     for(const wd of words(parse(raw))){const m=mNodes(wd,fs,b);if(ln.ws.length&&ln.w+sp+m.w>maxW){lines.push(ln);ln={ws:[],w:0,a:fs*.78,d:fs*.22}}ln.w+=(ln.ws.length?sp:0)+m.w;ln.ws.push({wd,m});ln.a=Math.max(ln.a,m.a);ln.d=Math.max(ln.d,m.d)}
     lines.push(ln)}
   let h=0;lines.forEach((l,i)=>{h+=l.a+l.d+(i?lead:0)});return{lines,h,sp,lead,fs,b,maxLine:Math.max(...lines.map(l=>l.w))}}
-function drawLay(L,x,y,w,col,al){let by=y;L.lines.forEach((l,i)=>{by+=(i?L.lead:0)+l.a;let px=al==='r'?x+w-l.w:x;for(const {wd,m} of l.ws){dNodes(wd,L.fs,px,by,col,L.b);px+=m.w+L.sp}by+=l.d})}
+function drawLay(L,x,y,w,col,al){let by=y;L.lines.forEach((l,i)=>{by+=(i?L.lead:0)+l.a;let px=al==='r'?x+w-l.w:al==='c'?x+(w-l.w)/2:x;for(const {wd,m} of l.ws){dNodes(wd,L.fs,px,by,col,L.b);px+=m.w+L.sp}by+=l.d})}
 
 /* ---------- logo (white, see-through), drawn the same way as the site's brand mark ---------- */
 async function logoCanvas(){try{await document.fonts.load('800 40px Orbitron')}catch{}
@@ -80,15 +80,57 @@ async function questionSlide(q,i,N,withSol,meta,topic){const els=frame(meta,i+1,
     const e=txt(PAD,sy,W-PAD*2,lines.map((s2,j)=>({s:s2,fs:r.fs,c:j?C.tx:C.ok,b:j===0,gap:r.fs*.55})));e.h=r.h;els.push(e)}
   else{const e=txt(W-PAD-760,H-76,760,[{s:'Ans: '+answerText(q),fs:36,c:C.acc,b:1,al:'r'}]);e.h=52;els.push(e)}
   return els}
-function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}];
-  els.push(txt(PAD,120,1300,[{s:'PREVIOUS YEAR QUESTIONS',fs:32,c:C.acc,b:1}]),txt(PAD,176,W-PAD*2,[{s:meta.chapter,fs:88,c:C.tx,b:1}]),
-    txt(PAD,300,W-PAD*2,[{s:meta.exam+'  ·  '+meta.subject+'  ·  '+meta.cls,fs:42,c:C.tx}]),txt(PAD,364,W-PAD*2,[{s:'Papers: '+meta.papers.join('  ·  '),fs:30,c:C.dim}]));
-  els.push(rect(PAD,430,W-PAD*2,2,C.line),txt(PAD,446,600,[{s:'TOPICS INCLUDED',fs:24,c:C.acc,b:1}]));
-  const paras=meta.topics.flatMap(t=>[{s:t.name+'  ('+t.n+')',b:1,c:C.tx},{s:t.subs.map(s=>s[0]+' ('+s[1]+')').join('   ·   '),c:C.dim}]);
-  const r=fit(fs=>{const ls=paras.map(p=>layout(p.s,fs,W-PAD*2,p.b));return{fs,h:ls.reduce((a,l)=>a+l.h,0)+fs*.35*(ls.length-1)}},32,16,500);
-  const e=txt(PAD,490,W-PAD*2,paras.map(p=>({...p,fs:r.fs,gap:r.fs*.35})));e.h=r.h;els.push(e);
+/* ---------- cover slide: centred bold chapter and exam, faint chapter-themed art behind (edges only), one light line ---------- */
+const JOKE=[[/^Units/,'Because “5” is not an answer. “5 metres” is.'],[/Kinematics/,'Every journey is just a graph, and every graph is just a journey.'],[/Laws of Motion/,'Newton gave us physics and a good reason to blame friction.'],[/Work, Energy/,'Studying hard is not “work” in physics unless something moves. Sorry!'],[/Rotational/,'Everything goes in circles here, including your doubts until they are solved.'],[/Gravitation/,'What goes up must come down. Your marks should not.'],[/Solids and Liquids/,'Solids hold their shape, liquids go with the flow. Be a bit of both.'],[/Thermodynamics/,'Entropy always increases, just like the mess on your study table.'],[/Kinetic/,'Billions of tiny molecules, and not one of them has ever asked for notes.'],[/Oscillations/,'Up, down, repeat, just like a Monday morning.'],[/Electrostatics/,'Opposites attract, likes repel. Your classroom knew this already.'],[/Current Elec/,'Stay positive and keep the current flowing.'],[/Magnetic Eff/,'Magnets know the secret of attraction. We only know the formulas.'],[/Induction/,'Change is the only constant, and Faraday would nod.'],[/Electromagnetic Waves/,'Light, radio, X-rays: one family, very different party manners.'],[/^Optics/,'Let us see things clearly, at least in the exam.'],[/Dual Nature/,'Is it a wave or a particle? Yes.'],[/Atoms and Nuclei/,'Small things, big energy, just like you before an exam.'],[/Electronic Devices/,'Diodes: the only ones who truly believe in one-way traffic.'],[/Experimental/,'Least count: the smallest thing that can cost you a mark.'],
+  [/^Sets/,'Every element has its place. Find yours.'],[/Trigonometric Functions/,'Triangles are simple, until someone asks for sin 75°.'],[/Binomial/,'Expand your mind, and the bracket too.'],[/Complex Numbers/,'Imaginary numbers, very real marks.'],[/Permutations/,'Order matters here. Unlike in your school bag.'],[/Sequences/,'Terms and conditions apply to every term.'],[/Straight Lines/,'The shortest path between two points is a straight line, and a straight answer.'],[/Conic/,'Cut a cone, get a parabola. Cut the syllabus, get peace.'],[/Limits/,'Getting closer and closer without ever getting there, like the weekend.'],[/Statistics/,'Nine out of ten students prefer questions that come with answers.'],[/Logarithm/,'Making big numbers feel small since 1614.'],[/^Relations and Functions/,'Every input has exactly one output, unlike your plans for Sunday.'],[/Inverse Trig/,'Undoing sin, one angle at a time.'],[/Matrices/,'Rows and columns: organising numbers better than your desk.'],[/Continuity/,'Smooth curves only. Sharp corners are not allowed.'],[/Application of Derivatives/,'Maximise marks, minimise worry.'],[/^Integrals/,'Adding up infinitely many tiny pieces: patience, with symbols.'],[/Application of Integrals/,'Finding the area under the curve, because every curve deserves its due.'],[/Differential/,'Solve the change and the rest will follow.'],[/Vector/,'Direction matters. So does magnitude.'],[/Three Dim/,'One more dimension, one more reason to draw a neat diagram.'],[/Probability/,'Chance of passing: very high, if you practise.']];
+const jokeFor=ch=>(JOKE.find(([r])=>r.test(ch))||[0,'Practise a little every day and the marks will take notice.'])[1];
+const ART=[[/^Sets|^Relations/,'venn grid'],[/Trigonometric/,'sine circ'],[/Binomial/,'pascal grid'],[/Complex/,'circ nums:i'],[/Permutations/,'dots nums:pc'],[/Sequences/,'bars nums:seq'],[/Straight|Conic|Three Dim|Vector/,'grid conic'],[/Limits|Continuity|Derivatives|Integrals|Differential/,'curve grid'],[/Statistics|Probability/,'bell bars'],[/Logarithm/,'curve nums:log'],[/Matrices/,'matrix grid'],[/Units|Experimental/,'ruler dots'],[/Kinematics|Laws|Work|Rotational/,'arc orbit'],[/Gravitation|Atoms|Dual/,'orbit dots'],[/Solids|Thermo|Kinetic/,'dots curve'],[/Oscillations|Waves/,'sine sine'],[/Electrostatics|Current|Devices/,'field dots'],[/Magnetic|Induction/,'loops sine'],[/Optics/,'rays circ']];
+function chapterArt(meta){const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  const pr=(ART.find(([r])=>r.test(meta.chapter))||[0,meta.subject==='Maths'?'grid arc':'sine orbit'])[1].split(' ');
+  const anchors=[[150,110,1],[W-520,90,1],[120,H-420,1],[W-470,H-410,1],[40,H/2-210,.8],[W-330,H/2-210,.8],[W/2-300,60,.7],[W/2-300,H-235,.7]];
+  g.lineWidth=3;g.lineCap='round';g.font=F(46,1);g.textBaseline='middle';
+  const col=(a,k)=>{g.strokeStyle=g.fillStyle=(k?C.tx:C.acc);g.globalAlpha=a};
+  const draw=(nm,x,y,s)=>{const R=s*170;g.save();g.translate(x,y);col(.34);
+    if(nm==='grid'){for(let k=0;k<=5;k++){g.beginPath();g.moveTo(k*R/5,0);g.lineTo(k*R/5,R);g.moveTo(0,k*R/5);g.lineTo(R,k*R/5);g.stroke()}}
+    else if(nm==='sine'||nm==='curve'){g.beginPath();for(let k=0;k<=60;k++){const t=k/60,X=t*R*2.2,Y=nm==='sine'?R/2+Math.sin(t*Math.PI*4)*R*.38:R-(t*t*1.7+t*.2)*R*.9;k?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke();if(nm==='curve'){col(.3,1);g.beginPath();g.moveTo(R*.5,R*.9);g.lineTo(R*1.5,R*.2);g.stroke()}}
+    else if(nm==='arc'){g.beginPath();g.moveTo(0,R);g.quadraticCurveTo(R*.9,-R*.4,R*1.8,R);g.stroke();for(let k=0;k<5;k++){const t=(k+.5)/5,X=t*R*1.8,Y=R-4*R*.7*t*(1-t)*1.0;g.beginPath();g.arc(X,Y,7,0,7);g.fill()}}
+    else if(nm==='circ'||nm==='orbit'||nm==='loops'){const n=nm==='loops'?3:1;for(let k=1;k<=n;k++){g.beginPath();g.ellipse(R/2,R/2,R/2*k/n,nm==='orbit'?R*.22*k/n:R/2*k/n,nm==='orbit'?-.5:0,0,7);g.stroke()}
+      if(nm==='circ'){g.beginPath();g.moveTo(0,R/2);g.lineTo(R,R/2);g.moveTo(R/2,0);g.lineTo(R/2,R);g.stroke();g.beginPath();g.moveTo(R/2,R/2);g.lineTo(R*.85,R*.2);g.stroke()}
+      else{g.beginPath();g.arc(R/2,R/2,10,0,7);g.fill()}}
+    else if(nm==='venn'){for(const [dx,dy] of [[.3,.3],[.62,.3],[.46,.6]]){g.beginPath();g.arc(dx*R*1.2,dy*R*1.2,R*.3,0,7);g.stroke()}}
+    else if(nm==='bars'||nm==='bell'){if(nm==='bars'){for(let k=0;k<6;k++){g.fillRect(k*R/5,R-R*(.15+k*.14),R/8,R*(.15+k*.14))}}else{g.beginPath();for(let k=0;k<=40;k++){const t=k/40*2-1,X=(t+1)*R,Y=R-Math.exp(-t*t*4)*R*.9;k?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke()}}
+    else if(nm==='dots'){for(let a=0;a<4;a++)for(let b2=0;b2<4;b2++){g.beginPath();g.arc(a*R/4+10,b2*R/4+10,(a+b2)%3?6:11,0,7);g.fill()}}
+    else if(nm==='rays'){g.beginPath();g.ellipse(R*.7,R/2,R*.1,R*.45,0,0,7);g.stroke();for(const dy of [.15,.4,.65,.9]){g.beginPath();g.moveTo(0,dy*R);g.lineTo(R*.7,R/2);g.lineTo(R*1.6,R*(1-dy)*.9+R*.05);g.stroke()}}
+    else if(nm==='conic'){g.beginPath();g.ellipse(R*.5,R/2,R*.5,R*.28,.4,0,7);g.stroke();g.beginPath();g.moveTo(R*1.1,R*.1);g.quadraticCurveTo(R*1.5,R*.5,R*1.1,R*.95);g.stroke()}
+    else if(nm==='field'){for(let k=-2;k<=2;k++){g.beginPath();g.moveTo(0,R/2);g.quadraticCurveTo(R*.6,R/2+k*R*.45,R*1.2,R/2);g.stroke()}g.beginPath();g.arc(0,R/2,10,0,7);g.fill();g.beginPath();g.arc(R*1.2,R/2,10,0,7);g.stroke()}
+    else if(nm==='ruler'){g.beginPath();g.moveTo(0,R*.5);g.lineTo(R*1.8,R*.5);g.stroke();for(let k=0;k<=18;k++){g.beginPath();g.moveTo(k*R/10,R*.5);g.lineTo(k*R/10,R*.5-(k%5?14:30));g.stroke()}}
+    else if(nm==='matrix'){g.font=F(46,1);for(let a=0;a<3;a++)for(let b2=0;b2<3;b2++)g.fillText(String((a*3+b2*2+1)%9+1),b2*R*.3+30,a*R*.3+30);g.beginPath();g.moveTo(10,0);g.lineTo(0,0);g.lineTo(0,R*.9);g.lineTo(10,R*.9);g.stroke()}
+    else if(nm==='pascal'){g.font=F(44,1);for(let a=0;a<5;a++){let v=1;for(let b2=0;b2<=a;b2++){g.fillText(String(v),R*.5+(b2-a/2)*R*.34,a*R*.28+20);v=v*(a-b2)/(b2+1)}}}
+    else if(nm.startsWith('nums')){const T={i:'i² = −1  ·  z = x + iy  ·  |z|',pc:'n!  ·  ⁿPᵣ  ·  ⁿCᵣ',seq:'a, a+d, a+2d  ·  Σ  ·  ar',log:'log  ·  ln  ·  eˣ'}[nm.slice(5)]||'';g.font=F(38,1);g.fillText(T,0,R/2)}
+    g.restore()};
+  const list=pr.flatMap(n=>[n,n,n]);anchors.forEach((a,k)=>{const nm=list[k%list.length];if(nm.startsWith('nums')&&k<6)return;draw(nm,a[0],a[1],a[2])});
+  /* keep the middle (the title) clear: erase the centre softly so nothing overlaps the text */
+  g.globalAlpha=1;g.globalCompositeOperation='destination-out';const gr=g.createRadialGradient(W/2,H/2,160,W/2,H/2,820);gr.addColorStop(0,'rgba(0,0,0,.98)');gr.addColorStop(.6,'rgba(0,0,0,.72)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='source-over';
+  /* overall faintness (the art is a background, not a picture): redraw at low opacity */
+  const out=document.createElement('canvas');out.width=W;out.height=H;const o=out.getContext('2d');o.globalAlpha=P.name==='light'?.32:.3;o.drawImage(cv,0,0);return out}
+function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'art',x:0,y:0,w:W,h:H,canvas:chapterArt(meta)},{t:'img',k:'logo',...LOGO}];
+  const ch=fit(fs=>{const l=layout(meta.chapter,fs,W-PAD*2-160,1);return{fs,h:l.h}},112,60,330);
+  const subj=meta.exam+'  ·  '+meta.subject+'  ·  '+meta.cls,joke='“'+jokeFor(meta.chapter)+'”';
+  const hs=layout(subj,50,W-PAD*2,1).h,hj=layout(joke,34,W-PAD*2-300,0).h,gap=34,total=40+gap+ch.h+gap+4+gap+hs+gap+hj;let y=Math.max(150,(H-total)/2-10);
+  els.push(txt(PAD,y,W-PAD*2,[{s:'PREVIOUS YEAR QUESTIONS',fs:32,c:C.acc,b:1,al:'c'}]));y+=40+gap;
+  const e=txt(PAD+80,y,W-PAD*2-160,[{s:meta.chapter,fs:ch.fs,c:C.tx,b:1,al:'c'}]);e.h=ch.h;els.push(e);y+=ch.h+gap;
+  els.push(rect(W/2-90,y,180,4,C.acc));y+=4+gap;
+  els.push(txt(PAD,y,W-PAD*2,[{s:subj,fs:50,c:C.tx,b:1,al:'c'}]));y+=hs+gap;
+  els.push(txt(PAD+150,y,W-PAD*2-300,[{s:joke,fs:34,c:C.dim,al:'c'}]));
   els.push(txt(PAD,H-70,1200,[{s:N+' questions  ·  '+(withSol?'questions with solutions':'questions only'),fs:30,c:C.dim}]),txt(W-PAD-400,H-70,400,[{s:'physica.in',fs:30,c:C.dim,al:'r'}]));
   return els}
+function topicsSlide(meta){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}];
+  els.push(txt(PAD,120,1300,[{s:'TOPICS INCLUDED',fs:32,c:C.acc,b:1}]),txt(PAD,176,W-PAD*2,[{s:meta.chapter,fs:56,c:C.tx,b:1}]),txt(PAD,262,W-PAD*2,[{s:'Papers: '+meta.papers.join('  ·  '),fs:30,c:C.dim}]),rect(PAD,330,W-PAD*2,2,C.line));
+  const paras=meta.topics.flatMap(t=>[{s:t.name+'  ('+t.n+')',b:1,c:C.tx},{s:t.subs.map(s=>s[0]+' ('+s[1]+')').join('   ·   '),c:C.dim}]);
+  const r=fit(fs=>{const ls=paras.map(p=>layout(p.s,fs,W-PAD*2,p.b));return{fs,h:ls.reduce((a,l)=>a+l.h,0)+fs*.35*(ls.length-1)}},34,16,H-420);
+  const e=txt(PAD,366,W-PAD*2,paras.map(p=>({...p,fs:r.fs,gap:r.fs*.35})));e.h=r.h;els.push(e);
+  els.push(txt(W-PAD-400,H-70,400,[{s:'physica.in',fs:30,c:C.dim,al:'r'}]));return els}
 
 /* ---------- canvas drawing (for the PDF) ---------- */
 function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=W;cv.height=H;cx=cv.getContext('2d');cx.lineCap='round';
@@ -166,7 +208,7 @@ async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=
 async function make({items,withSol,blank,format,meta,theme,onProgress,cancelled}){
   setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
-  const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol)];
+  const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol),topicsSlide(meta)];
   for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');specs.push(await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);onProgress?.(i+1,N+1);if(i%4===3)await new Promise(r=>setTimeout(r))}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
