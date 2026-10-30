@@ -140,7 +140,7 @@ function topicsSlide(meta){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LO
   els.push(txt(W-PAD-400,H-70,400,[{s:'physica.in',fs:30,c:C.dim,al:'r'}]));return els}
 
 /* ---------- canvas drawing (for the PDF) ---------- */
-const SS=2; /* PDF pages are drawn at 2x (3840x2160) so text stays sharp when zoomed */
+const SS=1; /* page scale: 1 = 1920x1080 (fast); 2 was too slow to download */
 function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=W*SS;cv.height=H*SS;cx=cv.getContext('2d');cx.scale(SS,SS);cx.lineCap='round';
   for(const e of els){
     if(e.t==='rect'){cx.fillStyle=e.fill;cx.fillRect(e.x,e.y,e.w,e.h)}

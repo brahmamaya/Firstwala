@@ -27,3 +27,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 | 2026-10-30 | Download dialog was long (explanations under every choice, nothing preselected) | one compact row per choice, defaults Only questions / PDF / Dark / 1 per slide ticked, no explanations; 2 questions per slide = left and right half with a 30%-strength dotted divider (pairSlide in rank-export.js); render both layouts to an image before shipping |
 - Export: encode slide JPEGs in parallel (toBlob off-thread) and yield with scheduler.yield; no setTimeout clamps. Measure speed claims before stating numbers.
 - Export: PDF pages drawn at 2x (SS) and logo is vector text 'physica.in' at 6x; keep sizes in sync with makePDF iw/ih.
+- Export: 2x PDF pages made download too slow; keep SS=1 (owner preferred the old quality/speed).
