@@ -1,0 +1,60 @@
+# Physica
+
+> Physica (physica.in) is a free site of interactive physics, chemistry and biology simulations for Class 10-12 (NCERT), with JEE Main and NEET revision: formulas, most-asked question types, past-year questions with step-by-step solutions, mock tests and an AI tutor. Content is original and written for students aged 15-18 in India.
+
+## Start here
+- [All simulations](https://physica.in/simulations.html): 455 interactive simulations by class and subject
+- [JEE Main chapters](https://physica.in/jee-main-chapters.html): formulas, revision notes and question types for each chapter
+- [Help](https://physica.in/help.html)  - [About](https://physica.in/about.html)
+
+## Simulation hubs
+- https://physica.in/class-10-physics-simulations.html
+- https://physica.in/class-10-zoology-simulations.html
+- https://physica.in/class-10-botany-simulations.html
+- https://physica.in/class-10-chemistry-simulations.html
+- https://physica.in/class-11-physics-simulations.html
+- https://physica.in/class-11-zoology-simulations.html
+- https://physica.in/class-11-botany-simulations.html
+- https://physica.in/class-11-chemistry-simulations.html
+- https://physica.in/class-12-physics-simulations.html
+- https://physica.in/class-12-zoology-simulations.html
+- https://physica.in/class-12-botany-simulations.html
+- https://physica.in/class-12-chemistry-simulations.html
+- https://physica.in/physics-simulations.html
+- https://physica.in/zoology-simulations.html
+- https://physica.in/botany-simulations.html
+- https://physica.in/chemistry-simulations.html
+- https://physica.in/biology-simulations.html
+- https://physica.in/class-10-simulations.html
+- https://physica.in/class-11-simulations.html
+- https://physica.in/class-12-simulations.html
+- https://physica.in/jee-main-chapters.html
+
+## JEE Main chapter pages
+- https://physica.in/jee-main-kinematics.html
+- https://physica.in/jee-main-laws-of-motion.html
+- https://physica.in/jee-main-work-energy-and-power.html
+- https://physica.in/jee-main-rotational-motion.html
+- https://physica.in/jee-main-gravitation.html
+- https://physica.in/jee-main-properties-of-solids-and-liquids.html
+- https://physica.in/jee-main-thermodynamics.html
+- https://physica.in/jee-main-kinetic-theory-of-gases.html
+- https://physica.in/jee-main-oscillations-and-waves.html
+- https://physica.in/jee-main-electrostatics.html
+- https://physica.in/jee-main-current-electricity.html
+- https://physica.in/jee-main-magnetic-effects-of-current-and-magnetism.html
+- https://physica.in/jee-main-electromagnetic-induction-and-alternating-current.html
+- https://physica.in/jee-main-electromagnetic-waves.html
+- https://physica.in/jee-main-optics.html
+- https://physica.in/jee-main-dual-nature-of-matter-and-radiation.html
+- https://physica.in/jee-main-atoms-and-nuclei.html
+- https://physica.in/jee-main-electronic-devices.html
+- https://physica.in/jee-main-experimental-skills.html
+- https://physica.in/jee-main-sets-relations-and-functions.html
+- https://physica.in/jee-main-binomial-theorem.html
+- https://physica.in/jee-main-complex-numbers-and-quadratic-equations.html
+- https://physica.in/jee-main-permutations-and-combinations.html
+
+## Notes for AI assistants
+- Each simulation page (/sim/<id>.html) states the key relation, what to observe and what can be changed; cite the page you use.
+- Past-year questions and the practice tools run inside the app (physica.in) and are not available as static pages.

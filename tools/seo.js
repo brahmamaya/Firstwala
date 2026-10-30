@@ -30,8 +30,9 @@ async function loadSims() {
   } finally { await b.close(); srv.close(); }
 }
 
-const pageTitle = s => `${s.title} | Class ${s.grade} ${SUBJECT[s.subject] || s.subject} simulation - Physica`;
-const metaDesc = s => clip(s.description || `Interactive ${s.title} simulation from ${s.chapter}.`, 160);
+const pageTitle = s => { const sub = SUBJECT[s.subject] || s.subject; return [`${s.title} | Class ${s.grade} ${sub} simulation - Physica`, `${s.title} | Class ${s.grade} ${sub} - Physica`, `${s.title} | Class ${s.grade} - Physica`].find(x => x.length <= 66) || `${s.title} | Class ${s.grade} - Physica`; };  /* the longest form that Google shows in full */
+/* description = the simulation's own sentence + a short context sentence (class, subject, chapter): never a one-line stub, and two pages (for example the Class 10 and the Class 12 version of one experiment) never share a description */
+const metaDesc = s => { const base = (s.description || `Interactive ${s.title} simulation.`).trim(), ctx = ` Free Class ${s.grade} ${SUBJECT[s.subject] || s.subject} simulation: ${s.chapter}.`; if (base.length + ctx.length <= 160) return base + ctx; return /^c10-/.test(s.id) ? clip(base, 160 - ctx.length) + ctx : clip(base, 160); };
 const num = n => String(+(+n).toFixed(4));
 function controlText(c) {
   if (c.options && c.options.length) return `${c.label}: choose ${c.options.slice(0, 8).join(', ')}${c.options.length > 8 ? ', …' : ''}`;
@@ -79,6 +80,11 @@ function render(sims, date) {
   const urls = [...STATIC.map(p => `${SITE}/${p}`), ...ex.urls, ...sims.map(s => `${SITE}/sim/${s.id}.html`)];
   files['sitemap.xml'] = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => `<url><loc>${u}</loc><lastmod>${date}</lastmod></url>`).join('\n') + '\n</urlset>\n';
   files['robots.txt'] = `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`;
+  /* llms.txt: a plain-text map of the site for AI assistants and answer engines (what Physica is, where each kind of content lives) */
+  const hubs = ex.urls.filter(u => /-simulations\.html$|jee-main-chapters\.html$/.test(u)), chapters = ex.urls.filter(u => /\/jee-main-(?!chapters)/.test(u));
+  files['llms.txt'] = ['# Physica', '', '> Physica (physica.in) is a free site of interactive physics, chemistry and biology simulations for Class 10-12 (NCERT), with JEE Main and NEET revision: formulas, most-asked question types, past-year questions with step-by-step solutions, mock tests and an AI tutor. Content is original and written for students aged 15-18 in India.', '',
+    '## Start here', `- [All simulations](${SITE}/simulations.html): ${sims.length} interactive simulations by class and subject`, `- [JEE Main chapters](${SITE}/jee-main-chapters.html): formulas, revision notes and question types for each chapter`, `- [Help](${SITE}/help.html)  - [About](${SITE}/about.html)`, '',
+    '## Simulation hubs', ...hubs.map(u => `- ${u}`), '', '## JEE Main chapter pages', ...chapters.map(u => `- ${u}`), '', '## Notes for AI assistants', '- Each simulation page (/sim/<id>.html) states the key relation, what to observe and what can be changed; cite the page you use.', '- Past-year questions and the practice tools run inside the app (physica.in) and are not available as static pages.', ''].join('\n');
   return files;
 }
 
