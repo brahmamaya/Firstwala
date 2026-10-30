@@ -131,11 +131,13 @@ function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'ar
   els.push(txt(PAD,y,W-PAD*2,[{s:subj,fs:44,c:C.tx,b:1,al:'c'}]));y+=hs+gap*.6;
   els.push(txt(PAD+150,y,W-PAD*2-300,[{s:joke,fs:30,c:C.dim,al:'c'}]));y+=hj+gap*1.4;
   /* topics on the same page: the largest text that fits the space left */
-  const TW=1300,TX=(W-TW)/2,room=H-100-y,pp=meta.papers.length?{s:'Papers: '+meta.papers.join('  ·  '),c:C.dim}:null;
+  const TW=1300,TX=(W-TW)/2,eq=(meta.eqs||[]).filter(e=>layout(e,26,TW/2-50,0).lines.length===1).slice(0,6),band=eq.length?44+Math.ceil(eq.length/2)*44+12:0,room=H-100-y-band,pp=meta.papers.length?{s:'Papers: '+meta.papers.join('  ·  '),c:C.dim}:null;
   const build=full=>[...(pp?[pp]:[]),...meta.topics.flatMap(t=>full?[{s:t.name+'  ('+t.n+')',b:1,c:C.tx},{s:t.subs.map(s=>s[0]+' ('+s[1]+')').join('   ·   '),c:C.dim}]:[{s:t.name+'  ('+t.n+')',b:1,c:C.tx}])];
   const size=ps=>fit(fs=>{const ls=ps.map(p=>layout(p.s,fs,TW,p.b));return{fs,h:ls.reduce((a,l)=>a+l.h,0)+fs*.3*(ls.length-1)}},28,15,room);
   let ps=build(true),r=size(ps);if(r.h>room){ps=build(false);r=size(ps)}
   const te=txt(TX,y,TW,ps.map(p=>({...p,fs:r.fs,gap:r.fs*.3,al:'c'})));te.h=r.h;els.push(te);
+  if(eq.length){const ey=H-100-band;els.push(rect(TX,ey,TW,2,C.line),txt(PAD,ey+10,W-PAD*2,[{s:'KEY EQUATIONS',fs:22,c:C.acc,b:1,al:'c'}]));
+    eq.forEach((e,i)=>els.push(txt(TX+(i%2)*(TW/2)+20,ey+50+Math.floor(i/2)*44,TW/2-50,[{s:e,fs:26,c:C.tx}])))}
   els.push(txt(PAD,H-70,1200,[{s:N+' questions  ·  '+(withSol?'questions with solutions':'questions only'),fs:26,c:C.dim}]));
   return els}
 
