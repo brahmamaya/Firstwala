@@ -25,7 +25,7 @@ function startGA(cookieless) {
   window.gtag('consent', 'default', { analytics_storage: cookieless ? 'denied' : 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
   window.gtag('js', new Date());
   const rnd = () => Math.floor(Math.random() * 2147483647);
-  const cfg = { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false };
+  const cfg = { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false, anonymize_ip: true };
   if (cookieless) cfg.client_id = rnd() + '.' + rnd(); else { cfg.cookie_expires = 7776000; cfg.cookie_flags = 'SameSite=Lax;Secure'; }
   window.gtag('config', ID, cfg);
   let last = '';
