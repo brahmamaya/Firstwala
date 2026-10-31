@@ -62,7 +62,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
     ok(/INCOMING/.test(tl) && /Test Series/.test(tl) && /2027/.test(tl) && /Revise/.test(tl) && /Formulas/.test(tl) && /Mock test/.test(tl), 'learner card: Test Series incoming, Revise, Formulas, Mock test');
     await X.page.keyboard.press('Escape');
     await X.page.click('[data-testid=land-card-teach]', { force: true }); const tt = await X.page.textContent('#lc-teach');
-    ok(/PYQs tab/.test(tt) && /PDF ya PowerPoint/.test(tt), 'teacher card: how to make PDF / PPT from PYQs');
+    ok(/PYQs tab/.test(tt) && /PDF or PowerPoint/.test(tt), 'teacher card: how to make PDF / PPT from PYQs');
     await X.page.keyboard.press('Escape');
     ok(X.st.ext.length === 0, 'landing page: no external requests'); await X.ctx.close(); }
 
