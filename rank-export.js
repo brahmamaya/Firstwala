@@ -224,27 +224,39 @@ async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress
   const jp=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');jp.push(encJpg(drawSlide(specs[i],logo))); /* encoding runs off the main thread while the next slide is drawn */
     onProgress?.(N+1,N+1,i+1,specs.length);if(i%3===2)await Promise.all(jp);else await yld()}
   return makePDF(await Promise.all(jp),960,540,W*SS,H*SS)}
-/* ---------- formula sheet: every formula of a chapter on 1-5 A4 pages (PDF, printable, light) ---------- */
+/* the Rank diagrams are drawn for a dark page; swap their colours for white paper (one pass, so no colour is replaced twice) */
+const PAPER={'#e6f1ff':'#0b1220','#7f8ca3':'#5b6b82','#ffb347':'#c26200','#6fa8f5':'#1a56c4','#ff8a8a':'#c62828','#7ee0a1':'#0b7a45','#17314f':'#dbe7f7','#0b1220':'#ffffff','#4a5876':'#8ea0bd','#2b5d93':'#9fc2ee'};
+async function sheetFigs(key){const out=[];for(const k of String(key||'').split(',').slice(0,2)){try{const g=window.PhysicaRankFigs?.[k]?.();if(!g)continue;const vb=g.viewBox.baseVal,w=vb.width||300,h=vb.height||200;g.setAttribute('width',w);g.setAttribute('height',h);g.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(g).replace(/#[0-9a-fA-F]{6}/g,m=>PAPER[m.toLowerCase()]||m));await img.decode();
+  const q=4,c=document.createElement('canvas');c.width=w*q;c.height=h*q;c.getContext('2d').drawImage(img,0,0,w*q,h*q);out.push({c,ar:w/h})}catch{}}return out}
+const points=t=>String(t||'').split(/(?<=[.;])\s+/).map(x=>x.trim().replace(/[.;]$/,'')).filter(Boolean).slice(0,4);
+/* ---------- formula sheet: every formula of a chapter with its diagram, short use-points and an example, on A4 pages (PDF, printable, light) ---------- */
 async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
-  setPalette('light');const AW=1240,AH=1754,M=70,GAP=40,CW=(AW-M*2-GAP)/2,TOP=250,BOT=AH-90;
+  setPalette('light');const SC=1.5,AW=1240,AH=1754,M=60,GAP=30,CW=(AW-M*2-GAP)/2,TOP=240,BOT=AH-80,IN=12;
   const c0=document.createElement('canvas');c0.width=AW;c0.height=AH;cx=c0.getContext('2d');const logo=await logoCanvas();
-  const blocks=fs=>formulas.map(f=>{const nm=layout(f.n,fs*.85,CW-28,1),eq=layout(f.f.split(' · ').join('\n'),fs,CW-28,0),h=nm.h+eq.h+fs*.5+34;return{nm,eq,h}});
-  let fs=26,pages;
-  for(;fs>=13;fs-=1){const bl=blocks(fs);pages=[[[],[]]];let col=0,y=TOP,pg=0;
-    for(const b of bl){const lim=BOT;if(y+b.h>lim){if(col===0){col=1;y=TOP}else{pages.push([[],[]]);pg++;col=0;y=TOP}}pages[pg][col].push({b,y});y+=b.h+14}
+  const figs=[];for(const f of formulas){figs.push(await sheetFigs(f.fig));if(cancelled?.())throw new Error('cancelled')}
+  const blocks=fs=>formulas.map((f,i)=>{const W=CW-IN*2,nm=layout(f.n,fs*.92,W,1),eq=layout(f.f.split(' · ').join('\n'),fs,W,0),pt=points(f.how).map(t=>layout('• '+t,fs*.8,W-6,0)),ex=f.ex?layout('Eg. '+f.ex,fs*.8,W,0):null,g=figs[i];
+    const fw=g.length?Math.min(W,g.length>1?W/2-6:W):0,fh=g.length?Math.min(Math.max(...g.map(x=>fw/x.ar)),fs*11):0,gp=fs*.35;
+    const h=IN+nm.h+gp+eq.h+(pt.length?gp+pt.reduce((a,l)=>a+l.h+2,0):0)+(g.length?gp+fh:0)+(ex?gp+ex.h:0)+IN;return{nm,eq,pt,ex,g,fw,fh,gp,h}});
+  let fs=20,pages,best;
+  for(;fs>=14;fs-=1){const bl=blocks(fs);pages=[[[],[]]];let col=0,y=TOP,pg=0;
+    for(const b of bl){if(y+b.h>BOT){if(col===0){col=1;y=TOP}else{pages.push([[],[]]);pg++;col=0;y=TOP}}pages[pg][col].push({b,y});y+=b.h+10}
     if(pages.length<=5)break}
-  fs=Math.max(fs,13);
+  fs=Math.max(fs,14);
   const out=[];
   for(let i=0;i<pages.length;i++){if(cancelled?.())throw new Error('cancelled');
-    const cv=document.createElement('canvas');cv.width=AW;cv.height=AH;cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);
-    cx.drawImage(logo,AW-M-LOGO.w*.8,34,LOGO.w*.8,LOGO.h*.8);
-    cx.fillStyle=P.acc;cx.font=F(24,1);cx.textBaseline='alphabetic';cx.fillText('FORMULA SHEET · '+exam.toUpperCase(),M,150);
-    const t=layout(chapter,56,AW-M*2,1);drawLay(t,M,162,AW-M*2,P.tx);cx.fillStyle=P.line;cx.fillRect(M,TOP-24,AW-M*2,2);
+    const cv=document.createElement('canvas');cv.width=AW*SC;cv.height=AH*SC;cx=cv.getContext('2d');cx.scale(SC,SC);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);
+    cx.drawImage(logo,AW-M-LOGO.w*.8,30,LOGO.w*.8,LOGO.h*.8);
+    cx.fillStyle=P.acc;cx.font=F(22,1);cx.textBaseline='alphabetic';cx.fillText('FORMULA SHEET · '+exam.toUpperCase(),M,140);
+    const t=layout(chapter,50,AW-M*2,1);drawLay(t,M,152,AW-M*2,P.tx);cx.fillStyle=P.line;cx.fillRect(M,TOP-20,AW-M*2,2);
     pages[i].forEach((colList,c)=>{const x=M+c*(CW+GAP);for(const {b,y} of colList){
-      cx.fillStyle='#f3f7fd';cx.strokeStyle=P.line;cx.lineWidth=2;cx.beginPath();cx.roundRect(x,y,CW,b.h,12);cx.fill();cx.stroke();
-      drawLay(b.nm,x+14,y+12,CW-28,P.acc);drawLay(b.eq,x+14,y+12+b.nm.h+fs*.5,CW-28,P.tx)}});
-    cx.fillStyle=P.dim;cx.font=F(20);cx.fillText('physica.in  ·  page '+(i+1)+' of '+pages.length,M,AH-40);
-    out.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer())));onProgress?.(i+1,pages.length);await new Promise(r=>setTimeout(r))}
-  return makePDF(out,595,842,AW,AH)}
+      cx.fillStyle='#f3f7fd';cx.strokeStyle=P.line;cx.lineWidth=1.5;cx.beginPath();cx.roundRect(x,y,CW,b.h,10);cx.fill();cx.stroke();
+      let yy=y+IN;drawLay(b.nm,x+IN,yy,CW-IN*2,P.acc);yy+=b.nm.h+b.gp;drawLay(b.eq,x+IN,yy,CW-IN*2,P.tx);yy+=b.eq.h;
+      if(b.pt.length){yy+=b.gp;for(const l of b.pt){drawLay(l,x+IN+6,yy,CW-IN*2-6,P.dim);yy+=l.h+2}}
+      if(b.g.length){yy+=b.gp;const n=b.g.length,w=n>1?CW/2-IN-6:CW-IN*2;b.g.forEach((fg,k)=>{const h=Math.min(b.fh,w/fg.ar),ww=h*fg.ar;cx.drawImage(fg.c,x+IN+k*(w+12)+(w-ww)/2,yy+(b.fh-h)/2,ww,h)});yy+=b.fh}
+      if(b.ex){yy+=b.gp;drawLay(b.ex,x+IN,yy,CW-IN*2,P.ok)}}});
+    cx.fillStyle=P.dim;cx.font=F(18);cx.fillText('physica.in  ·  page '+(i+1)+' of '+pages.length,M,AH-36);
+    out.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.92)).then(b=>b.arrayBuffer())));onProgress?.(i+1,pages.length);await yld()}
+  return makePDF(out,595,842,AW*SC,AH*SC)}
 window.PhysicaRankExport={make,makeSheet};
 })();
