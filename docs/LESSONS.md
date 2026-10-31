@@ -32,3 +32,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Cover shows up to 6 key equations (must-know formulas with '='); chapters without Formulas content just show none.
 - Owner does not want key equations on the cover slide; do not add them back.
 - Owner does not want key equations on the cover slide; do not add them back.
+- Landing has two dancing cards (landing.js, #land-cards): Playwright cannot click an infinitely animating element, use {force:true} in e2e. The 10 s Test Series notice was removed on purpose.

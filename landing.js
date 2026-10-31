@@ -78,3 +78,56 @@ function render(){body.replaceChildren();backBtn.hidden=st.step===1;stepEl.textC
   paint();h.focus()}
 window.addEventListener('physica-jump',e=>{opener=e.detail?.back||null;if(!dlg)build();st={step:1,subject:'',chap:null,q:''};render();dlg.showModal()});
 })();
+/* Two scratch-style cards beside the landing page: one for learners, one for teachers. Art is drawn on a canvas (no images, no network);
+   a card opens a short dialog. Built with createElement/textContent only. */
+(()=>{const host=document.getElementById('land-cards'),land=document.getElementById('landing');if(!host||!land)return;
+const S=176,TAU=Math.PI*2;
+const doodles={
+ burst:(g,x,y,r)=>{for(let k=0;k<8;k++){const a=k*TAU/8;g.beginPath();g.moveTo(x+Math.cos(a)*r*.45,y+Math.sin(a)*r*.45);g.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);g.stroke()}g.beginPath();g.arc(x,y,r*.18,0,TAU);g.fill()},
+ medal:(g,x,y,r)=>{g.beginPath();g.arc(x,y,r*.55,0,TAU);g.stroke();g.beginPath();g.arc(x,y,r*.28,0,TAU);g.fill();g.beginPath();g.moveTo(x-r*.35,y+r*.45);g.lineTo(x-r*.6,y+r*1.1);g.lineTo(x-r*.2,y+r*.9);g.lineTo(x,y+r*.55);g.moveTo(x+r*.35,y+r*.45);g.lineTo(x+r*.6,y+r*1.1);g.lineTo(x+r*.2,y+r*.9);g.lineTo(x,y+r*.55);g.stroke()},
+ trophy:(g,x,y,r)=>{g.beginPath();g.moveTo(x-r*.5,y-r*.6);g.lineTo(x+r*.5,y-r*.6);g.quadraticCurveTo(x+r*.5,y+r*.3,x,y+r*.35);g.quadraticCurveTo(x-r*.5,y+r*.3,x-r*.5,y-r*.6);g.closePath();g.fill();g.beginPath();g.arc(x-r*.58,y-r*.25,r*.2,Math.PI*.5,Math.PI*1.5);g.arc(x+r*.58,y-r*.25,r*.2,-Math.PI*.5,Math.PI*.5);g.stroke();g.beginPath();g.moveTo(x,y+r*.35);g.lineTo(x,y+r*.75);g.moveTo(x-r*.35,y+r*.8);g.lineTo(x+r*.35,y+r*.8);g.stroke()},
+ gift:(g,x,y,r)=>{g.beginPath();g.moveTo(x-r*.55,y-r*.2);g.lineTo(x+r*.55,y-r*.2);g.lineTo(x+r*.45,y+r*.7);g.lineTo(x-r*.45,y+r*.7);g.closePath();g.fill();g.beginPath();g.arc(x,y-r*.25,r*.3,Math.PI,0);g.stroke()},
+ moon:(g,x,y,r)=>{g.beginPath();g.arc(x,y,r*.5,Math.PI*.3,Math.PI*1.4);g.stroke()},
+ dots:(g,x,y,r)=>{for(const [a,b,c] of [[0,0,.12],[.5,.3,.08],[.1,.6,.1],[.7,.7,.06]]){g.beginPath();g.arc(x+a*r,y+b*r,c*r,0,TAU);g.fill()}},
+ cross:(g,x,y,r)=>{g.beginPath();g.moveTo(x-r*.3,y-r*.3);g.lineTo(x+r*.3,y+r*.3);g.moveTo(x+r*.3,y-r*.3);g.lineTo(x-r*.3,y+r*.3);g.stroke()},
+ cap:(g,x,y,r)=>{g.beginPath();g.moveTo(x,y-r*.5);g.lineTo(x+r*.85,y-r*.1);g.lineTo(x,y+r*.3);g.lineTo(x-r*.85,y-r*.1);g.closePath();g.fill();g.beginPath();g.moveTo(x-r*.5,y+r*.12);g.lineTo(x-r*.5,y+r*.55);g.quadraticCurveTo(x,y+r*.85,x+r*.5,y+r*.55);g.lineTo(x+r*.5,y+r*.12);g.stroke()},
+ book:(g,x,y,r)=>{g.beginPath();g.moveTo(x,y-r*.3);g.quadraticCurveTo(x-r*.5,y-r*.55,x-r*.85,y-r*.35);g.lineTo(x-r*.85,y+r*.5);g.quadraticCurveTo(x-r*.5,y+r*.3,x,y+r*.55);g.quadraticCurveTo(x+r*.5,y+r*.3,x+r*.85,y+r*.5);g.lineTo(x+r*.85,y-r*.35);g.quadraticCurveTo(x+r*.5,y-r*.55,x,y-r*.3);g.moveTo(x,y-r*.3);g.lineTo(x,y+r*.55);g.stroke()},
+ atom:(g,x,y,r)=>{for(let k=0;k<3;k++){g.beginPath();g.ellipse(x,y,r*.85,r*.32,k*Math.PI/3,0,TAU);g.stroke()}g.beginPath();g.arc(x,y,r*.14,0,TAU);g.fill()},
+ pencil:(g,x,y,r)=>{g.save();g.translate(x,y);g.rotate(-.8);g.beginPath();g.rect(-r*.18,-r*.8,r*.36,r*1.1);g.stroke();g.beginPath();g.moveTo(-r*.18,r*.3);g.lineTo(0,r*.75);g.lineTo(r*.18,r*.3);g.closePath();g.fill();g.restore()},
+ bulb:(g,x,y,r)=>{g.beginPath();g.arc(x,y-r*.15,r*.48,Math.PI*.8,Math.PI*.2);g.stroke();g.beginPath();g.moveTo(x-r*.22,y+r*.5);g.lineTo(x+r*.22,y+r*.5);g.moveTo(x-r*.16,y+r*.68);g.lineTo(x+r*.16,y+r*.68);g.stroke()},
+ board:(g,x,y,r)=>{g.beginPath();g.rect(x-r*.85,y-r*.55,r*1.7,r*1.05);g.stroke();for(const k of [-.2,.05,.3]){g.beginPath();g.moveTo(x-r*.55,y+k*r);g.lineTo(x+(k===.3?r*.1:r*.55),y+k*r);g.stroke()}g.beginPath();g.moveTo(x-r*.5,y+r*.5);g.lineTo(x-r*.7,y+r*.85);g.moveTo(x+r*.5,y+r*.5);g.lineTo(x+r*.7,y+r*.85);g.stroke()},
+ screen:(g,x,y,r)=>{g.beginPath();g.rect(x-r*.8,y-r*.55,r*1.6,r*.95);g.stroke();g.beginPath();g.moveTo(x-r*.15,y-r*.3);g.lineTo(x+r*.25,y-r*.08);g.lineTo(x-r*.15,y+r*.14);g.closePath();g.fill();g.beginPath();g.moveTo(x,y+r*.4);g.lineTo(x,y+r*.8);g.moveTo(x-r*.35,y+r*.82);g.lineTo(x+r*.35,y+r*.82);g.stroke()},
+ page:(g,x,y,r,t)=>{g.beginPath();g.moveTo(x-r*.5,y-r*.7);g.lineTo(x+r*.2,y-r*.7);g.lineTo(x+r*.5,y-r*.4);g.lineTo(x+r*.5,y+r*.7);g.lineTo(x-r*.5,y+r*.7);g.closePath();g.stroke();g.beginPath();g.moveTo(x+r*.2,y-r*.7);g.lineTo(x+r*.2,y-r*.4);g.lineTo(x+r*.5,y-r*.4);g.stroke();g.font='800 '+r*.36+'px Orbitron,system-ui,sans-serif';g.textAlign='center';g.fillText(t,x,y+r*.2)},
+ ruler:(g,x,y,r)=>{g.save();g.translate(x,y);g.rotate(-.6);g.beginPath();g.rect(-r*.9,-r*.2,r*1.8,r*.4);g.stroke();for(let k=-3;k<=3;k++){g.beginPath();g.moveTo(k*r*.24,-r*.2);g.lineTo(k*r*.24,-r*(k%2?.02:.08));g.stroke()}g.restore()},
+ text:(g,x,y,r,t)=>{g.font='800 '+r*.7+'px Orbitron,system-ui,sans-serif';g.textAlign='center';g.fillText(t,x,y+r*.25)}};
+const THEMES={
+ learn:{a:'#5b9bff',b:'#2f6fe0',ink:'#1d4fb3',list:[['burst',30,28,24],['text',128,26,24,'π'],['atom',140,92,24],['book',34,98,24],['cap',86,142,24],['pencil',150,146,20],['bulb',22,150,20],['text',42,66,16,'E=mc²'],['medal',128,60,16],['dots',60,24,22],['cross',110,112,18],['moon',160,40,16]]},
+ teach:{a:'#ffbe2e',b:'#f08a00',ink:'#b45f00',list:[['burst',30,28,24],['board',132,30,22],['screen',32,98,22],['page',140,98,20,'PDF'],['trophy',90,146,22],['ruler',150,150,20],['gift',22,150,18],['page',30,64,12,'PPT'],['medal',128,62,14],['dots',60,24,22],['cross',110,112,18],['moon',160,40,16]]}};
+const paint=(cv,k)=>{const T=THEMES[k],d=Math.min(3,Math.max(2,Math.ceil(devicePixelRatio||2))),g=cv.getContext('2d');cv.width=cv.height=S*d;g.scale(d,d);
+ const grad=g.createLinearGradient(0,0,S,S);grad.addColorStop(0,T.a);grad.addColorStop(1,T.b);g.fillStyle=grad;g.fillRect(0,0,S,S);
+ g.strokeStyle=T.ink;g.fillStyle=T.ink;g.lineWidth=3;g.lineCap=g.lineJoin='round';g.globalAlpha=.8;
+ for(const [n,x,y,r,t] of T.list)doodles[n](g,x,y,r,t);
+ g.globalAlpha=1;g.fillStyle='rgba(255,255,255,.22)';g.beginPath();g.arc(S/2,70,38,0,TAU);g.fill();g.strokeStyle='rgba(255,255,255,.55)';g.lineWidth=3;g.stroke();
+ g.fillStyle='#fff';g.font='900 46px Orbitron,system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('P',S/2,73)};
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x)e.textContent=x;return e};
+const openRank=()=>{const r=document.querySelector('[data-testid=mode-rank]');if(r){r.click();r.scrollIntoView?.({block:'center',behavior:'smooth'})}};
+const dialog=(id,kind,build)=>{const d=el('dialog','lc-dlg lc-'+kind);d.id=id;d.setAttribute('aria-labelledby',id+'-t');
+ const x=el('button','lc-x','✕');x.type='button';x.setAttribute('aria-label','Close');x.addEventListener('click',()=>d.close());
+ const go=el('button','lc-go','Rank mode kholo →');go.type='button';go.dataset.testid=id+'-go';go.addEventListener('click',()=>{d.close();openRank()});
+ d.append(x);build(d);d.append(go);d.addEventListener('click',e=>{if(e.target===d)d.close()});land.append(d);return d};
+const list=(tag,items)=>{const l=el(tag,'lc-list');for(const [b,t] of items){const li=el('li');if(b)li.append(el('b','',b),document.createTextNode(' '));li.append(document.createTextNode(t));l.append(li)}return l};
+const learn=dialog('lc-learn','learn',d=>{
+ d.append(el('p','lc-tag','FOR LEARNERS'));const h=el('h2','','Padhai ka poora saath');h.id='lc-learn-t';d.append(h);
+ const ts=el('div','lc-hot');ts.append(el('span','lc-pill','INCOMING'),el('h3','','📝 Full-length Test Series'),el('p','','NEET 2027, JEE Main 2027 aur JEE Advanced 2027: real exam pattern, har exam ke 30 tests. Pehle 3 tests free.'),el('p','lc-where','Kahan milega: Rank mode → apna exam → 📝 Test Series'));
+ d.append(ts,el('p','lc-sub','Abhi Rank mode mein milta hai'),list('ul',[['Revise','chapter ke short notes'],['Formulas','zaroori formulas, PDF download ke saath'],['Mock test','chapter-wise mock, exam jaisa']]))});
+const teach=dialog('lc-teach','teach',d=>{
+ d.append(el('p','lc-tag','FOR TEACHERS'));const h=el('h2','','PYQ ki slides, sirf 1 minute mein');h.id='lc-teach-t';d.append(h);
+ d.append(el('p','lc-hook','Raat bhar slides banane ki zaroorat nahi. Chapter kholo, questions tick karo, download dabao.'),
+  list('ol',[['','Rank mode → JEE Mains → apna chapter → PYQs tab'],['','“Select questions to make slides” dabao, jitne chahiye tick karo'],['','Download: PDF ya PowerPoint, Dark ya Light, 1 ya 2 questions per slide']]),
+  el('p','lc-sub','Cover page topics ke saath milta hai. Print karo, projector par chalao ya WhatsApp par bhejo.'))});
+for(const [k,label,sub,dlg] of [['learn','For learners','Test Series incoming',learn],['teach','For teachers','PYQ slides & PDF',teach]]){
+ const b=el('button','lc-card lc-c-'+k);b.type='button';b.dataset.testid='land-card-'+k;b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-label',label+': '+sub);
+ const cv=el('canvas');cv.setAttribute('aria-hidden','true');const t=el('span','lc-label'),s=el('small','',sub);t.append(document.createTextNode(label),s);b.append(cv,t);
+ b.addEventListener('click',()=>{try{dlg.showModal()}catch{}});host.append(b);paint(cv,k);
+ try{document.fonts?.load('900 46px Orbitron').then(()=>paint(cv,k))}catch{}}
+})();
