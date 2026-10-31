@@ -165,7 +165,7 @@ add({base:'projectile',id:'conical-pendulum',title:'Conical pendulum',
 const PQ=['#ff7b72','#ffc36b','#42d9ca','#7baaff','#c4a1ff','#8ce99a'],ABC='ABCDEF';
 const pursuit=N_=>{const sN=Math.sin(PI/N_),cN=Math.cos(PI/N_);return p=>{const R_=p.a/(2*sN),vr=p.v*sN,T=R_/vr;return{R:R_,vr,T,th:t=>cN/sN*Math.log(R_/(R_-vr*Math.min(t,T*.9995))),r:t=>Math.max(0,R_-vr*t)}}};
 const pursuitDraw=(N_,model)=>(c,p,t)=>{const m=model(p),cx=225,cy=262,px=Math.min(150/m.R,60),u=clamp(cycle(t*.16,1.35),0,1),tt=u*m.T,r=m.r(tt),th=m.th(tt);
-  const at=(k,rr,a)=>[cx+px*rr*Math.cos(2*PI*k/N_+a),cy-px*rr*Math.sin(2*PI*k/N_+a)];
+  const off=N_===3?PI/2:0,at=(k,rr,a)=>[cx+px*rr*Math.cos(off+2*PI*k/N_+a),cy-px*rr*Math.sin(off+2*PI*k/N_+a)]; /* the triangle starts upright: apex up, base flat */
   c.save();c.lineCap='round';c.lineJoin='round';
   // start polygon (dashed) and the centre O
   c.setLineDash([5,5]);c.strokeStyle='#ffffff40';c.lineWidth=1.2;c.beginPath();for(let k=0;k<=N_;k++){const q=at(k%N_,m.R,0);k?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])}c.stroke();c.setLineDash([]);
