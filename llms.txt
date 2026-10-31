@@ -3,7 +3,7 @@
 > Physica (physica.in) is a free site of interactive physics, chemistry and biology simulations for Class 10-12 (NCERT), with JEE Main and NEET revision: formulas, most-asked question types, past-year questions with step-by-step solutions, mock tests and an AI tutor. Content is original and written for students aged 15-18 in India.
 
 ## Start here
-- [All simulations](https://physica.in/simulations.html): 455 interactive simulations by class and subject
+- [All simulations](https://physica.in/simulations.html): 457 interactive simulations by class and subject
 - [JEE Main chapters](https://physica.in/jee-main-chapters.html): formulas, revision notes and question types for each chapter
 - [Help](https://physica.in/help.html)  - [About](https://physica.in/about.html)
 
