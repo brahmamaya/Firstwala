@@ -126,7 +126,7 @@ const teach=dialog('lc-teach','teach',d=>{
   list('ol',[['','Rank mode → JEE Mains → your chapter → PYQs tab'],['','Press “Select questions to make slides” and tick the questions you want'],['','Download: PDF or PowerPoint, Dark or Light, 1 or 2 questions per slide']]),
   el('p','lc-sub','You also get a cover page listing the topics. Print it, project it or share it on WhatsApp.'));
  /* Teachly: the whiteboard app, downloaded straight from physica.in (a plain same-site file link, nothing sent anywhere). */
- const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ Download Teachly (Android app)');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
+ const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ Download Teachly');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
  tb.append(el('span','lc-pill','NEW'),el('h3','','✏️ Teachly: whiteboard for smart boards'),
   el('p','','Smooth writing with no lag, instant graphs, shapes and ruler, write on PDF and PPT, laser pointer, question timer and auto-save. Your notes stay on your device.'),
   dl);d.append(tb)});
