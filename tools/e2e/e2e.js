@@ -54,12 +54,16 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
 
-  console.log('\n=== 0. landing page notice (10 s, shows the path) ===');
+  console.log('\n=== 0. landing page cards (for learners / for teachers); no timed notice ===');
   { const X = await newPage(browser); await X.page.goto(BASE, { waitUntil: 'load' });
-    await X.page.waitForSelector('[data-testid=series-note]'); const t = await X.page.textContent('[data-testid=series-note]');
-    ok(/Rank mode/.test(t) && /Test Series/.test(t) && /2027/.test(t), 'notice says the Test Series exists, names 2027 exams and the path (Rank mode -> exam -> Test Series)');
-    await X.page.hover('[data-testid=series-note]', { force: true }); await sleep(11000); ok(await X.page.locator('[data-testid=series-note]').count() === 1, 'it pauses while the pointer is on it');
-    await X.page.mouse.move(5, 5); await X.page.waitForSelector('[data-testid=series-note]', { state: 'detached', timeout: 14000 }); ok(true, 'and disappears by itself');
+    await X.page.waitForSelector('[data-testid=land-card-learn]'); await sleep(1500);
+    ok(await X.page.locator('[data-testid=series-note]').count() === 0, 'no 10-second Test Series notice any more');
+    await X.page.click('[data-testid=land-card-learn]', { force: true }); const tl = await X.page.textContent('#lc-learn');
+    ok(/INCOMING/.test(tl) && /Test Series/.test(tl) && /2027/.test(tl) && /Revise/.test(tl) && /Formulas/.test(tl) && /Mock test/.test(tl), 'learner card: Test Series incoming, Revise, Formulas, Mock test');
+    await X.page.keyboard.press('Escape');
+    await X.page.click('[data-testid=land-card-teach]', { force: true }); const tt = await X.page.textContent('#lc-teach');
+    ok(/PYQs tab/.test(tt) && /PDF ya PowerPoint/.test(tt), 'teacher card: how to make PDF / PPT from PYQs');
+    await X.page.keyboard.press('Escape');
     ok(X.st.ext.length === 0, 'landing page: no external requests'); await X.ctx.close(); }
 
   console.log('\n=== 1. hub: 30 tests, 3 free and playable, 27 coming soon ===');
@@ -194,7 +198,7 @@ const attempts = page => page.evaluate(() => JSON.parse(localStorage.getItem('ph
       const res = await X.page.evaluate(async sc => { const r = await axe.run(document.querySelector(sc) || document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } }); return r.violations.map(v => ({ id: v.id, impact: v.impact, sample: v.nodes[0].html.slice(0, 120) })); }, scope);
       ok(res.length === 0, `axe ${label} [${theme}]` + (res.length ? ' -> ' + res.map(v => `${v.id} ${v.sample}`).join(' | ') : '')); } };
     await X.page.goto(BASE, { waitUntil: 'load' }); await X.page.addScriptTag({ content: axeSrc });
-    await X.page.waitForSelector('[data-testid=series-note]'); await axe('landing notice', '.sn');
+    await X.page.waitForSelector('[data-testid=land-card-learn]'); await X.page.click('[data-testid=land-card-learn]', { force: true }); await axe('landing card dialog', '#lc-learn'); await X.page.keyboard.press('Escape');
     await X.page.click('[data-testid=mode-simulations]'); await X.page.click('[data-testid=sim-jump]'); await axe('Jump panel: subjects', 'dialog.jump-dlg');
     await X.page.click('[data-testid=jump-subject-physics]'); await axe('Jump panel: chapters', 'dialog.jump-dlg');
     await X.page.click('[data-testid=jump-chap]'); await axe('Jump panel: topics', 'dialog.jump-dlg'); await X.page.keyboard.press('Escape');
