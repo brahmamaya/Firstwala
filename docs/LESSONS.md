@@ -36,3 +36,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Formula sheet PDF: includes the Rank diagram (colours swapped for white paper), use-points and example, 1.5x resolution; chapters or formulas with no fig key show no diagram.
 - Flat 2D sims draw in a 960x505 canvas but the live-measurements box covers the right ~25%: keep charts/text left of x≈660 and check with tools/e2e/shot.js. Pursuit sims (HC Verma) are in seventh.js; sources are credited in description and on the canvas.
 - Owner rule (2026-10-31): all website text in English only (no Hinglish) — landing cards and ONE-TOOL were converted; keep new site text English.
+- 2D sim canvas (960x505): safe area is about x<=660 and y>=75 (page title, Focus button and the measurements box cover the rest); check with tools/e2e/shot.js.
