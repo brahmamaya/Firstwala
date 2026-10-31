@@ -158,6 +158,53 @@ add({base:'projectile',id:'conical-pendulum',title:'Conical pendulum',
   tag(c,'red: centripetal (net) force   blue: weight',44,98,C.muted,13)},
  assumption:'Light inextensible string, steady circular motion, no air resistance.'});
 
+/* ---------- Pursuit on a regular polygon (H. C. Verma, Concept of Physics, ch. 3) ---------- */
+// N particles at the corners of a regular N-gon of side a. Each moves at speed v straight toward the next one.
+// The velocity makes angle (π/2 − π/N) with the line to the centre O, so the distance to O shrinks at v·sin(π/N)
+// and the particles meet at O after T = R / (v sin(π/N)) = a / (2 v sin²(π/N)). Triangle: 2a/3v. Hexagon: 2a/v.
+const PQ=['#ff7b72','#ffc36b','#42d9ca','#7baaff','#c4a1ff','#8ce99a'],ABC='ABCDEF';
+const pursuit=N_=>{const sN=Math.sin(PI/N_),cN=Math.cos(PI/N_);return p=>{const R_=p.a/(2*sN),vr=p.v*sN,T=R_/vr;return{R:R_,vr,T,th:t=>cN/sN*Math.log(R_/(R_-vr*Math.min(t,T*.9995))),r:t=>Math.max(0,R_-vr*t)}}};
+const pursuitDraw=(N_,model)=>(c,p,t)=>{const m=model(p),cx=225,cy=262,px=Math.min(150/m.R,60),u=clamp(cycle(t*.16,1.35),0,1),tt=u*m.T,r=m.r(tt),th=m.th(tt);
+  const at=(k,rr,a)=>[cx+px*rr*Math.cos(2*PI*k/N_+a),cy-px*rr*Math.sin(2*PI*k/N_+a)];
+  c.save();c.lineCap='round';c.lineJoin='round';
+  // start polygon (dashed) and the centre O
+  c.setLineDash([5,5]);c.strokeStyle='#ffffff40';c.lineWidth=1.2;c.beginPath();for(let k=0;k<=N_;k++){const q=at(k%N_,m.R,0);k?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])}c.stroke();c.setLineDash([]);
+  // pursuit curves so far
+  for(let k=0;k<N_;k++){c.beginPath();for(let i=0;i<=140;i++){const s=tt*i/140,q=at(k,m.r(s),m.th(s));i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])}c.strokeStyle=PQ[k]+'cc';c.lineWidth=2;c.stroke()}
+  // the polygon the particles form now (it shrinks and turns, but stays regular)
+  c.beginPath();for(let k=0;k<=N_;k++){const q=at(k%N_,r,th);k?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])}c.strokeStyle='#e9f6ff66';c.lineWidth=1.2;c.stroke();
+  // each velocity points at the next particle
+  for(let k=0;k<N_;k++){const a=at(k,r,th),b=at((k+1)%N_,r,th),d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d>14){const ux=(b[0]-a[0])/d,uy=(b[1]-a[1])/d,L=Math.min(30,d*.45),e=[a[0]+ux*L,a[1]+uy*L];c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(e[0],e[1]);c.moveTo(e[0],e[1]);c.lineTo(e[0]-ux*7-uy*4,e[1]-uy*7+ux*4);c.moveTo(e[0],e[1]);c.lineTo(e[0]-ux*7+uy*4,e[1]-uy*7-ux*4);c.strokeStyle='#ffffff';c.lineWidth=2;c.stroke()}}
+  for(let k=0;k<N_;k++){const a=at(k,r,th);c.beginPath();c.arc(a[0],a[1],6.5,0,TAU);c.fillStyle=PQ[k];c.fill();c.strokeStyle='#081624';c.lineWidth=1.5;c.stroke();if(u<.9){const o=at(k,m.r(tt)+(m.R*.14),th);tag(c,ABC[k],o[0],o[1],PQ[k],13,'center','700')}}
+  c.beginPath();c.arc(cx,cy,3.5,0,TAU);c.fillStyle='#ffffff';c.fill();tag(c,'O',cx+9,cy-10,'#ffffff',13,'left','700');c.restore();
+  tag(c,u>=.999?`They meet at O at t = ${f(m.T)} s`:`t = ${f(tt)} s    distance from O = ${f(r)} m`,44,30,u>=.999?'#8ce99a':'#ffc36b',16);
+  // right panel: distance to O against time, then the idea in three lines
+  chart(c,428,52,228,128,{xmin:0,xmax:m.T,ymin:0,ymax:m.R*1.05,series:[{fn:s=>m.r(s),col:'#42d9ca'}],marker:[tt,r,'#ffc36b'],title:'distance from O (m) vs time (s)',xl:'time',yl:'r'});
+  const L=[['Velocity points at the next particle','#e9f6ff'],[`Angle with the line to O: ${f(90-180/N_,0)}°`,'#e9f6ff'],[`Speed to O = v sin ${f(180/N_,0)}° = ${f(m.vr)} m/s`,'#ffc36b'],[`Distance to cover = R = ${f(m.R)} m`,'#e9f6ff'],[`T = R ÷ speed = ${f(m.T)} s`,'#8ce99a']];
+  L.forEach(([s,col],i)=>tag(c,s,432,214+i*27,col,12.5));
+  tag(c,'Source: Concept of Physics, H. C. Verma',44,54,'#8ca6b9',12)};
+const triModel=pursuit(3),hexModel=pursuit(6);
+add({base:'projectile',id:'pursuit-triangle',flat:true,title:'Three particles chasing each other (HC Verma)',
+ description:'Three particles at the corners of an equilateral triangle each move at speed v straight toward the next. Find when they meet. Source: Concept of Physics, H. C. Verma.',
+ formula:'T = 2a / 3v   (speed toward the centre = v cos 30°)',
+ observe:'The triangle shrinks and turns but stays equilateral; each path is a spiral that ends at the centre O.',
+ tryText:'Double the side a. Does the meeting time double? Double the speed v. What happens to T?',
+ controls:[R('a','Side a',1,10,.5,4,'m',1),R('v','Speed v',.5,5,.1,2,'m/s',1)],
+ presets:[['Starting values',{a:4,v:2}],['Long side, slow',{a:8,v:1}],['Short side, fast',{a:2,v:4}]],
+ metrics:p=>{const m=triModel(p);return[N('Time to meet T',m.T,'s'),N('Distance each travels',p.v*m.T,'m'),N('Distance to centre R',m.R,'m'),N('Speed toward centre',m.vr,'m/s')]},
+ draw:pursuitDraw(3,triModel),
+ assumption:'Point particles with constant speed; each always heads straight at the next one, so the three stay at the corners of a shrinking equilateral triangle. Source: Concept of Physics, H. C. Verma.'});
+add({base:'projectile',id:'pursuit-hexagon',flat:true,title:'Six particles chasing on a hexagon (HC Verma)',
+ description:'Six particles at the corners of a regular hexagon of side a each move at constant speed v toward the particle at the next corner. Find the time they take to meet. Source: Concept of Physics, H. C. Verma.',
+ formula:'T = 2a / v   (speed toward the centre = v sin 30° = v/2)',
+ observe:'In a regular hexagon R = a, and the speed toward the centre is v/2, so the particles meet after T = a ÷ (v/2) = 2a/v.',
+ tryText:'Set a = 4 m and v = 2 m/s. Check T = 2a/v = 4 s, then double v.',
+ controls:[R('a','Side a',1,10,.5,4,'m',1),R('v','Speed v',.5,5,.1,2,'m/s',1)],
+ presets:[['Starting values',{a:4,v:2}],['Long side, slow',{a:8,v:1}],['Short side, fast',{a:2,v:4}]],
+ metrics:p=>{const m=hexModel(p);return[N('Time to meet T',m.T,'s'),N('Distance each travels',p.v*m.T,'m'),N('Distance to centre R = a',m.R,'m'),N('Speed toward centre',m.vr,'m/s')]},
+ draw:pursuitDraw(6,hexModel),
+ assumption:'Point particles with constant speed; each always heads straight at the next one, so the six stay at the corners of a shrinking regular hexagon. Source: Concept of Physics, H. C. Verma.'});
+
 /* ---------- Laws of Motion ---------- */
 add({base:'forces',id:'incline-pulley',title:'Block on an incline with a hanging mass',
  description:'Connect a block on a rough incline over a pulley to a hanging mass. Predict which way the system moves.',

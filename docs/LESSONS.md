@@ -34,3 +34,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Owner does not want key equations on the cover slide; do not add them back.
 - Landing has two dancing cards (landing.js, #land-cards): Playwright cannot click an infinitely animating element, use {force:true} in e2e. The 10 s Test Series notice was removed on purpose.
 - Formula sheet PDF: includes the Rank diagram (colours swapped for white paper), use-points and example, 1.5x resolution; chapters or formulas with no fig key show no diagram.
+- Flat 2D sims draw in a 960x505 canvas but the live-measurements box covers the right ~25%: keep charts/text left of x≈660 and check with tools/e2e/shot.js. Pursuit sims (HC Verma) are in seventh.js; sources are credited in description and on the canvas.
