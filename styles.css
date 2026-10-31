@@ -1329,3 +1329,5 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .lc-pill{display:inline-block;padding:3px 10px;border-radius:999px;background:#ffd54a;color:#201600;font-size:11px;font-weight:900;letter-spacing:.12em}
 .lc-go{display:block;width:100%;margin-top:6px;padding:13px;border-radius:14px;border:0;background:#3b82f6;color:#fff;font-weight:800;font-size:15px;cursor:pointer}.lc-teach .lc-go{background:#f59e0b;color:#1b1100}
 .lc-go:focus-visible,.lc-x:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.lc-teachly{margin-top:14px}
+.lc-dl{display:block;margin:10px 0;padding:12px;border-radius:12px;background:#f59e0b;color:#1b1100;text-align:center;font-weight:800;text-decoration:none}
