@@ -175,14 +175,23 @@ const pursuitDraw=(N_,model)=>(c,p,t)=>{const m=model(p),cx=225,cy=262,px=Math.m
   c.beginPath();for(let k=0;k<=N_;k++){const q=at(k%N_,r,th);k?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])}c.strokeStyle='#e9f6ff66';c.lineWidth=1.2;c.stroke();
   // each velocity points at the next particle
   for(let k=0;k<N_;k++){const a=at(k,r,th),b=at((k+1)%N_,r,th),d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d>14){const ux=(b[0]-a[0])/d,uy=(b[1]-a[1])/d,L=Math.min(30,d*.45),e=[a[0]+ux*L,a[1]+uy*L];c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(e[0],e[1]);c.moveTo(e[0],e[1]);c.lineTo(e[0]-ux*7-uy*4,e[1]-uy*7+ux*4);c.moveTo(e[0],e[1]);c.lineTo(e[0]-ux*7+uy*4,e[1]-uy*7-ux*4);c.strokeStyle='#ffffff';c.lineWidth=2;c.stroke()}}
+  for(let k=0;k<N_;k++){const a=at(k,r,th);c.setLineDash([4,4]);c.strokeStyle=k?'#ffffff33':'#ffffffaa';c.lineWidth=1.2;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(cx,cy);c.stroke();c.setLineDash([])}
+  {const A=at(0,r,th),B=at(1,r,th),a1=Math.atan2(cy-A[1],cx-A[0]),a2=Math.atan2(B[1]-A[1],B[0]-A[0]),d=((a2-a1+PI)%TAU+TAU)%TAU-PI;if(r*px>34){c.beginPath();c.arc(A[0],A[1],24,a1,a1+d,d<0);c.strokeStyle='#ffc36b';c.lineWidth=2;c.stroke();const mid=a1+d/2;tag(c,`${f(90-180/N_,0)}°`,A[0]+Math.cos(mid)*42,A[1]+Math.sin(mid)*42,'#ffc36b',12.5,'center','700')}}
   for(let k=0;k<N_;k++){const a=at(k,r,th);c.beginPath();c.arc(a[0],a[1],6.5,0,TAU);c.fillStyle=PQ[k];c.fill();c.strokeStyle='#081624';c.lineWidth=1.5;c.stroke();if(u<.9){const o=at(k,m.r(tt)+(m.R*.14),th);tag(c,ABC[k],o[0],o[1],PQ[k],13,'center','700')}}
   c.beginPath();c.arc(cx,cy,3.5,0,TAU);c.fillStyle='#ffffff';c.fill();tag(c,'O',cx+9,cy-10,'#ffffff',13,'left','700');c.restore();
-  tag(c,u>=.999?`They meet at O at t = ${f(m.T)} s`:`t = ${f(tt)} s    distance from O = ${f(r)} m`,44,30,u>=.999?'#8ce99a':'#ffc36b',16);
-  // right panel: distance to O against time, then the idea in three lines
-  chart(c,428,52,228,128,{xmin:0,xmax:m.T,ymin:0,ymax:m.R*1.05,series:[{fn:s=>m.r(s),col:'#42d9ca'}],marker:[tt,r,'#ffc36b'],title:'distance from O (m) vs time (s)',xl:'time',yl:'r'});
-  const L=[['Velocity points at the next particle','#e9f6ff'],[`Angle with the line to O: ${f(90-180/N_,0)}°`,'#e9f6ff'],[`Speed to O = v sin ${f(180/N_,0)}° = ${f(m.vr)} m/s`,'#ffc36b'],[`Distance to cover = R = ${f(m.R)} m`,'#e9f6ff'],[`T = R ÷ speed = ${f(m.T)} s`,'#8ce99a']];
-  L.forEach(([s,col],i)=>tag(c,s,432,214+i*27,col,12.5));
-  tag(c,'Source: Concept of Physics, H. C. Verma',44,54,'#8ca6b9',12)};
+  tag(c,u>=.999?`They meet at O at t = ${f(m.T)} s`:`t = ${f(tt)} s    distance from O = ${f(r)} m`,44,82,u>=.999?'#8ce99a':'#ffc36b',13.5);
+  // values, small, top right
+  c.save();[`a = ${f(p.a,1)} m,  v = ${f(p.v,1)} m/s`,`R = ${f(m.R)} m`,`speed to O = ${f(m.vr)} m/s`,`T = ${f(m.T)} s`].forEach((s,i)=>tag(c,s,652,84+i*15,i===3?'#8ce99a':'#b8cbe0',11.5,'right',i===3?'700':'500'));c.restore();
+  // how to read: one sample per symbol
+  const key=(y,draw,s)=>{c.save();c.lineWidth=2;draw(c);c.restore();tag(c,s,452,y,'#e9f6ff',12)};
+  tag(c,'How to read',418,160,'#ffc36b',13.5,'left','700');
+  key(182,g=>{g.strokeStyle='#fff';g.beginPath();g.moveTo(420,182);g.lineTo(448,182);g.lineTo(441,178);g.moveTo(448,182);g.lineTo(441,186);g.stroke()},'velocity: toward next particle');
+  key(204,g=>{g.setLineDash([4,4]);g.strokeStyle='#ffffffaa';g.beginPath();g.moveTo(420,204);g.lineTo(448,204);g.stroke()},'line from particle to centre O');
+  key(226,g=>{g.strokeStyle=PQ[2];g.beginPath();g.moveTo(420,232);g.quadraticCurveTo(434,216,448,226);g.stroke()},'path so far');
+  key(248,g=>{g.strokeStyle='#ffc36b';g.beginPath();g.arc(422,254,14,-.9,.1);g.stroke()},`angle stays ${f(90-180/N_,0)}°`);
+  tag(c,'Why they meet',418,278,'#ffc36b',13.5,'left','700');
+  [`Only the part of v pointing to O`,`brings a particle closer.`,`That part = v sin ${f(180/N_,0)}° = ${f(m.vr)} m/s`,`T = R ÷ ${f(m.vr)} = ${f(m.T)} s  (R = ${f(m.R)} m)`].forEach((s,i)=>tag(c,s,418,300+i*19,i===3?'#8ce99a':'#e9f6ff',12.5,'left',i===3?'700':'500'));
+  tag(c,'Source: Concept of Physics, H. C. Verma',44,99,'#8ca6b9',11)};
 const triModel=pursuit(3),hexModel=pursuit(6);
 add({base:'projectile',id:'pursuit-triangle',flat:true,title:'Three particles chasing each other (HC Verma)',
  description:'Three particles at the corners of an equilateral triangle each move at speed v straight toward the next. Find when they meet. Source: Concept of Physics, H. C. Verma.',
