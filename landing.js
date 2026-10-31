@@ -113,18 +113,18 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x)e.t
 const openRank=()=>{const r=document.querySelector('[data-testid=mode-rank]');if(r){r.click();r.scrollIntoView?.({block:'center',behavior:'smooth'})}};
 const dialog=(id,kind,build)=>{const d=el('dialog','lc-dlg lc-'+kind);d.id=id;d.setAttribute('aria-labelledby',id+'-t');
  const x=el('button','lc-x','✕');x.type='button';x.setAttribute('aria-label','Close');x.addEventListener('click',()=>d.close());
- const go=el('button','lc-go','Rank mode kholo →');go.type='button';go.dataset.testid=id+'-go';go.addEventListener('click',()=>{d.close();openRank()});
+ const go=el('button','lc-go','Open Rank mode →');go.type='button';go.dataset.testid=id+'-go';go.addEventListener('click',()=>{d.close();openRank()});
  d.append(x);build(d);d.append(go);d.addEventListener('click',e=>{if(e.target===d)d.close()});land.append(d);return d};
 const list=(tag,items)=>{const l=el(tag,'lc-list');for(const [b,t] of items){const li=el('li');if(b)li.append(el('b','',b),document.createTextNode(' '));li.append(document.createTextNode(t));l.append(li)}return l};
 const learn=dialog('lc-learn','learn',d=>{
- d.append(el('p','lc-tag','FOR LEARNERS'));const h=el('h2','','Padhai ka poora saath');h.id='lc-learn-t';d.append(h);
- const ts=el('div','lc-hot');ts.append(el('span','lc-pill','INCOMING'),el('h3','','📝 Full-length Test Series'),el('p','','NEET 2027, JEE Main 2027 aur JEE Advanced 2027: real exam pattern, har exam ke 30 tests. Pehle 3 tests free.'),el('p','lc-where','Kahan milega: Rank mode → apna exam → 📝 Test Series'));
- d.append(ts,el('p','lc-sub','Abhi Rank mode mein milta hai'),list('ul',[['Revise','chapter ke short notes'],['Formulas','zaroori formulas, PDF download ke saath'],['Mock test','chapter-wise mock, exam jaisa']]))});
+ d.append(el('p','lc-tag','FOR LEARNERS'));const h=el('h2','','Everything you need to study');h.id='lc-learn-t';d.append(h);
+ const ts=el('div','lc-hot');ts.append(el('span','lc-pill','INCOMING'),el('h3','','📝 Full-length Test Series'),el('p','','NEET 2027, JEE Main 2027 and JEE Advanced 2027: real exam pattern, 30 tests for each exam. The first 3 tests are free.'),el('p','lc-where','Where to find it: Rank mode → your exam → 📝 Test Series'));
+ d.append(ts,el('p','lc-sub','Available now in Rank mode'),list('ul',[['Revise','short notes for every chapter'],['Formulas','the formulas you need, with a PDF download'],['Mock test','chapter-wise mock tests in exam style']]))});
 const teach=dialog('lc-teach','teach',d=>{
- d.append(el('p','lc-tag','FOR TEACHERS'));const h=el('h2','','PYQ ki slides, sirf 1 minute mein');h.id='lc-teach-t';d.append(h);
- d.append(el('p','lc-hook','Raat bhar slides banane ki zaroorat nahi. Chapter kholo, questions tick karo, download dabao.'),
-  list('ol',[['','Rank mode → JEE Mains → apna chapter → PYQs tab'],['','“Select questions to make slides” dabao, jitne chahiye tick karo'],['','Download: PDF ya PowerPoint, Dark ya Light, 1 ya 2 questions per slide']]),
-  el('p','lc-sub','Cover page topics ke saath milta hai. Print karo, projector par chalao ya WhatsApp par bhejo.'))});
+ d.append(el('p','lc-tag','FOR TEACHERS'));const h=el('h2','','PYQ slides in just 1 minute');h.id='lc-teach-t';d.append(h);
+ d.append(el('p','lc-hook','No more late nights making slides. Open a chapter, tick the questions, press Download.'),
+  list('ol',[['','Rank mode → JEE Mains → your chapter → PYQs tab'],['','Press “Select questions to make slides” and tick the questions you want'],['','Download: PDF or PowerPoint, Dark or Light, 1 or 2 questions per slide']]),
+  el('p','lc-sub','You also get a cover page listing the topics. Print it, project it or share it on WhatsApp.'))});
 for(const [k,label,sub,dlg] of [['learn','For learners','Test Series incoming',learn],['teach','For teachers','PYQ slides & PDF',teach]]){
  const b=el('button','lc-card lc-c-'+k);b.type='button';b.dataset.testid='land-card-'+k;b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-label',label+': '+sub);
  const cv=el('canvas');cv.setAttribute('aria-hidden','true');const t=el('span','lc-label'),s=el('small','',sub);t.append(document.createTextNode(label),s);b.append(cv,t);
