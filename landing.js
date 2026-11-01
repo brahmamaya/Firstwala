@@ -127,8 +127,8 @@ const teach=dialog('lc-teach','teach',d=>{
   el('p','lc-sub','You also get a cover page listing the topics. Print it, project it or share it on WhatsApp.'));
  /* Teachly: the whiteboard app, downloaded straight from physica.in (a plain same-site file link, nothing sent anywhere). */
  const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ Download Teachly');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
- tb.append(el('span','lc-pill','NEW'),el('h3','','✏️ Teachly: whiteboard for smart boards'),
-  el('p','','Smooth writing with no lag, instant graphs, shapes and ruler, write on PDF and PPT, laser pointer, question timer and auto-save. Your notes stay on your device.'),
+ tb.append(el('span','lc-pill','NEW'),el('h3','','✏️ Teachly: Notes making app'),
+  el('p','','Smooth writing with no lag, instant graphs, shapes and ruler, write on PDF and PPT, laser pointer, question timer and auto-save. Works great on tablets now. Digital board support comes in the next update.'),
   dl);d.append(tb)});
 for(const [k,label,sub,dlg] of [['learn','For learners','Test Series incoming',learn],['teach','For teachers','PYQ slides & PDF',teach]]){
  const b=el('button','lc-card lc-c-'+k);b.type='button';b.dataset.testid='land-card-'+k;b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-label',label+': '+sub);
