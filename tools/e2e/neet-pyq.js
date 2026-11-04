@@ -55,8 +55,25 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
       assert(/\.docx$/.test(nm) && /NEET-2026/.test(nm), 'Word name ' + nm);
       assert(bb.slice(0, 2).toString() === 'PK' && bb.includes('word/document.xml') && bb.length > 300000, 'a real Word file was made (' + bb.length + ' bytes)');
     }
+    // slides: the PDF is vector (text can be copied) and PowerPoint has real subscripts (B_y -> subscript run, no literal underscore)
+    { const ing = require('../pyq-ingest/docx-ingest.js');
+      await p.evaluate(() => document.querySelector('.rk-modal')?.remove()); await p.$eval('[data-testid=rk-sub-physics]', e => e.click()); await p.waitForTimeout(300); await p.click('[data-testid=rk-nch-physics-8b]'); await p.waitForTimeout(1500);
+      await p.click('[data-testid=rk-select]'); await p.waitForTimeout(800); await p.click('button:has-text("Open all")'); await p.waitForTimeout(1500); for (const bt of await p.locator('button:has-text("Select all")').all()) await bt.click();
+      for (const fmt of ['pdf', 'ppt']) {
+        await p.evaluate(() => document.querySelector('.rk-modal')?.remove()); await p.click('[data-testid=rk-download]'); await p.waitForTimeout(500); if (fmt === 'ppt') await p.click('.rk-modal >> text=PowerPoint');
+        const [d6] = await Promise.all([p.waitForEvent('download', { timeout: 120000 }), p.click('[data-testid=dl-go]')]); const b6 = fs.readFileSync(await d6.path());
+        if (fmt === 'pdf') {
+          assert(b6.slice(0, 5).toString() === '%PDF-' && b6.length < 400000, 'slides PDF is vector and small (' + b6.length + ' bytes)');
+          const tf = path.join(os.tmpdir(), 'physica-e2e-slides-' + process.pid + '.pdf'); fs.writeFileSync(tf, b6);
+          try { const txt = execFileSync('pdftotext', [tf, '-'], { encoding: 'utf8' }); assert(/electromagnetic wave travelling/.test(txt) && /B_?y|By/.test(txt) && !/B_y/.test(txt), 'slides PDF text can be copied, subscript without underscore') } catch (e) { if (e.code !== 'ENOENT') throw e } finally { fs.rmSync(tf, { force: true }) }
+        } else {
+          const z = ing.readZip(b6), names = [...z.keys()].filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n)), xml = names.map(n => z.get(n)().toString('utf8')).join('');
+          assert(xml.includes('baseline="-25000"') && !/[A-Za-z]_[A-Za-z]/.test(xml.replace(/<[^>]+>/g, '')), 'PowerPoint: real subscript runs, no literal underscore');
+        }
+      }
+    }
     // chapters with and without NEET questions are told apart
-    await p.$eval('[data-testid=rk-sub-physics]', e => e.click()); await p.waitForTimeout(400);
+    await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(300); await p.$eval('[data-testid=rk-sub-physics]', e => e.click()); await p.waitForTimeout(400);
     assert((await p.$$('.rk-ch.soon')).length > 0 && (await p.$$('.rk-ch:not(.soon)')).length > 0, 'chapters with and without questions are told apart');
     assert(!errs.length, 'page errors: ' + errs.join(';')); console.log('PASS NEET subjects, chapters, PYQs, download');
   } catch (e) { console.error('FAIL neet pyq:', e.message); process.exitCode = 1 } finally { await b.close(); srv.close() }
