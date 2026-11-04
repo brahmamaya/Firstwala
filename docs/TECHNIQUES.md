@@ -32,3 +32,8 @@
 
 ## Privacy / legal (never invent facts)
 - ga.js: STANDARD by default, `anonymize_ip: true`, privacy.html section 6 lists exactly what Google Analytics receives; keep both in sync. Owner has no lawyer: legal text is unreviewed, say so.
+
+## Vector PDF (paper download)
+- A PDF made of page IMAGES is blurry when zoomed, big, slow (JPEG encoding ~260 ms/page) and not copyable. A vector PDF with embedded subset TrueType fonts (Identity-H, ToUnicode map) fixes all four: `ttf.js` (parse + subset), `pdf-vec.js` (PdfDoc/PdfCtx: the same typesetter draws into it), pictures as soft-masked black pixels, `PhysicaFig` specs as vector paths. Layout is measured with the same font metrics that the PDF uses.
+- Check with poppler: `pdftotext` (copyable text with spaces), `pdffonts` (embedded), `pdfinfo`; `tools/pdf-vec.test.js` does it. Characters Liberation lacks (superscript minus, some subscript letters, ∝, ⇌) come from the DejaVu fallback font.
+- Playwright: `page.route` globs must match the query string too (`**/fonts/pp-*`); service workers bypass routes (use `serviceWorkers:'block'` in the context).
