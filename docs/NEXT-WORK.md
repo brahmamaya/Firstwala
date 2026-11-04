@@ -37,3 +37,5 @@ JEE Main and JEE Advanced Test 1, NEET/JEE Tests 2 and 3: original questions onl
 - Legal review of privacy.html / terms.html by a lawyer.
 - Custom domain physica.in: owner sets it in repo Settings -> Pages.
 - Chemistry, Botany and Zoology PYQs are coming soon (owner, 2026-10-30): same method (docs/PYQ-INGEST.md, PYQs only, stub chapter file unless the owner asks for content); they need the Rank mode subject and chapter lists extended first (Botany/Zoology are NEET subjects). The promo poster says 'jaldi' for them; update it when they are live.
+
+- NEET (done 2026-11-04): Rank mode -> NEET has Physics, Chemistry, Botany, Zoology with NCERT chapters (`tools/pyq-ingest/neet-chapters.json`); NEET 2026 (21 Jun re-exam) is in 73 chapter files `rank-pyq-neet-*`. Next NEET years: follow docs/PYQ-INGEST.md (NEET section), same chapter files, no UI work. Chapter content (Guide, Formulas, Revise, mock) for NEET chapters is NOT written (owner's rule). Botany/Zoology split of mixed Biology questions was decided by content: owner may reassign.

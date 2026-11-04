@@ -23,15 +23,14 @@ const srv = http.createServer((q, r) => { let f = path.join(root, decodeURICompo
     assert(await p.$('.rk-card .rk-fig'), 'a diagram question shows its figure');
     await p.click('.rk-card .rk-mini >> nth=0'); await p.waitForTimeout(200); assert(await p.$('.rk-ok'), 'Show answer reveals the answer');
     // select and download as PDF
-    await p.click('[data-testid=rk-select]'); await p.waitForTimeout(600); await p.click('text=Select all'); await p.waitForTimeout(300);
-    await p.click('text=/Download \\(\\d+\\)/'); await p.waitForTimeout(500);
+    await p.click('[data-testid=rk-select]'); await p.waitForTimeout(900); await p.click('.rk-subbtn >> nth=0'); await p.waitForTimeout(500); await p.click('button:has-text("Select all")'); await p.waitForTimeout(300);
+    await p.click('[data-testid=rk-download]'); await p.waitForTimeout(500);
     const [dl] = await Promise.all([p.waitForEvent('download', { timeout: 60000 }), p.click('[data-testid=dl-go]').catch(() => p.click('.rk-dlg button:has-text("Download")'))]);
     assert(/\.pdf$/.test(dl.suggestedFilename()) && /NEET/.test(dl.suggestedFilename()), 'PDF name: ' + dl.suggestedFilename());
     const buf = fs.readFileSync(await dl.path()); assert(buf.slice(0, 5).toString() === '%PDF-' && buf.length > 20000, 'a real PDF was made');
-    // a chapter with no PYQs yet is marked Soon and still opens
-    assert((await p.$$('.rk-ch.soon')).length >= 0);
-    // JEE is untouched
-    await p.click('text=Back'); await p.waitForTimeout(300); await p.click('text=Back'); await p.waitForTimeout(500);
+    // chapters with and without NEET questions are told apart
+    await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(600);
+    assert((await p.$$('.rk-ch.soon')).length > 0 && (await p.$$('.rk-ch:not(.soon)')).length > 0, 'chapters with and without questions are told apart');
     assert(!errs.length, 'page errors: ' + errs.join(';')); console.log('PASS NEET subjects, chapters, PYQs, download');
   } catch (e) { console.error('FAIL neet pyq:', e.message); process.exitCode = 1 } finally { await b.close(); srv.close() }
 });
