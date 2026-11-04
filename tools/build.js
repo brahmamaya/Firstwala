@@ -26,7 +26,9 @@ for(const f of PYQ_FILES){const box={};require('vm').runInNewContext(fs.readFile
   PYQ_IDX[g]=[...T].map(([tp,m])=>[tp,[...m]]);bundle([f],out);PYQ_MAP[g]=out}
 // one file per NEET year (every question of that paper, in paper order) for the 'Previous year papers' download
 for(const y of Object.keys(NEET_YEAR)){const tmp='.neetyear-'+y+'.tmp.js',out='physica-neetyear-'+y+'.min.js';fs.writeFileSync(path.join(root,tmp),'(window.PhysicaNeetYear=window.PhysicaNeetYear||{})['+y+']='+JSON.stringify(NEET_YEAR[y].sort((a,b)=>a.pn-b.pn))+';');try{bundle([tmp],out)}finally{fs.unlinkSync(path.join(root,tmp))}NEET_YV[y]=require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,out))).digest('hex').slice(0,8)}
+bundle(['enc-worker.js'],'physica-enc.min.js');
 bundle(['rank-export.js'],'physica-export.min.js');
+{const ep=path.join(root,'physica-export.min.js');fs.writeFileSync(ep,fs.readFileSync(ep,'utf8').replace('__ENC_URL__','./physica-enc.min.js?v='+require('crypto').createHash('md5').update(fs.readFileSync(path.join(root,'physica-enc.min.js'))).digest('hex').slice(0,8)))}
 // Chapter text that is loaded only when its chapter is opened (keeps the Rank bundle small for slow phones): global name -> bundle
 const CH_LAZY={'rank-mag-jee.js':'PhysicaRankMagJee','rank-emi-jee.js':'PhysicaRankEmiJee','rank-nuc-jee.js':'PhysicaRankAtomsJee','rank-semi-jee.js':'PhysicaRankDevicesJee','rank-skills-jee.js':'PhysicaRankSkillsJee','rank-sets-jee.js':'PhysicaRankSetsJee','rank-binomial-jee.js':'PhysicaRankBinomialJee','rank-complex-jee.js':'PhysicaRankComplexJee','rank-pc-jee.js':'PhysicaRankPcJee','rank-ss-jee.js':'PhysicaRankSsJee'},CH_MAP={};
 for(const f in CH_LAZY){const out='physica-ch-'+f.slice(5,-7)+'.min.js';bundle([f],out);CH_MAP[CH_LAZY[f]]=out}
