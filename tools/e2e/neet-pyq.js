@@ -41,6 +41,12 @@ const srv = http.createServer((q, r) => { let f = path.join(root, decodeURICompo
       assert(/NEET-2026/.test(nm) && (k === 'sol' ? /solutions/.test(nm) : !/solutions/.test(nm)), 'paper name ' + nm);
       assert(bb.slice(0, 5).toString() === '%PDF-' && bb.length > 500000, 'a real paper PDF was made (' + bb.length + ' bytes)');
     }
+    for (const k of ['q-docx', 'sol-docx']) {
+      const [d3] = await Promise.all([p.waitForEvent('download', { timeout: 120000 }), p.click('[data-testid=rk-paper-' + k + ']')]);
+      const nm = d3.suggestedFilename(), bb = fs.readFileSync(await d3.path());
+      assert(/\.docx$/.test(nm) && /NEET-2026/.test(nm), 'Word name ' + nm);
+      assert(bb.slice(0, 2).toString() === 'PK' && bb.includes('word/document.xml') && bb.length > 300000, 'a real Word file was made (' + bb.length + ' bytes)');
+    }
     // chapters with and without NEET questions are told apart
     await p.$eval('[data-testid=rk-sub-physics]', e => e.click()); await p.waitForTimeout(400);
     assert((await p.$$('.rk-ch.soon')).length > 0 && (await p.$$('.rk-ch:not(.soon)')).length > 0, 'chapters with and without questions are told apart');

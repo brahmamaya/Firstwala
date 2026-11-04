@@ -170,14 +170,14 @@ function makePDF(pages,pw=960,ph=540,iw=W,ih=H){const enc=new TextEncoder(),part
 /* ---------- ZIP (stored) + PPTX ---------- */
 const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 const crc32=u=>{let c=-1;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return(c^-1)>>>0};
-function zip(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+function zip(files,type){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
   for(const f of files){const name=enc.encode(f.name),data=typeof f.data==='string'?enc.encode(f.data):f.data,crc=crc32(data);
     const lh=new DataView(new ArrayBuffer(30));lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(10,0,true);lh.setUint16(12,0x21,true);lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,name.length,true);
     parts.push(new Uint8Array(lh.buffer),name,data);
     const ch=new DataView(new ArrayBuffer(46));ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(14,0x21,true);ch.setUint32(16,crc,true);ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,name.length,true);ch.setUint32(42,off,true);
     cen.push(new Uint8Array(ch.buffer),name);off+=30+name.length+data.length}
   let cl=0;for(const c of cen)cl+=c.length;const end=new DataView(new ArrayBuffer(22));end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cl,true);end.setUint32(16,off,true);
-  return new Blob([...parts,...cen,new Uint8Array(end.buffer)],{type:'application/vnd.openxmlformats-officedocument.presentationml.presentation'})}
+  return new Blob([...parts,...cen,new Uint8Array(end.buffer)],{type:type||'application/vnd.openxmlformats-officedocument.presentationml.presentation'})}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 const SUPM={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','−':'⁻','+':'⁺','(':'⁽',')':'⁾','n':'ⁿ'};
 const flat=ns=>ns.map(x=>x.k==='t'?x.s:x.k==='sup'?[...flat(x.c)].map(c=>SUPM[c]||c).join(''):x.k==='fr'?par(flat(x.n))+'/'+par(flat(x.d)):'√'+par(flat(x.c))).join('');
@@ -294,5 +294,42 @@ async function makePaper({items,year,withSol,onProgress,cancelled}){
     return makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
   finally{FONT=FONT0}}
 const oh2=b=>Math.ceil(b.opl.length/2)*(Math.max(...b.opl.map(l=>l.h))+8);
-window.PhysicaRankExport={make,makeSheet,makePaper};
+
+/* ---------- the same past-year paper as a Word file (.docx): editable text in Arial, figures as pictures, year and logo in the page header ---------- */
+async function makeDocx({items,year,withSol,onProgress,cancelled}){
+  setPalette('paper');
+  try{
+    const XH='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n',esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),png=async c=>new Uint8Array(await new Promise(r=>c.toBlob(r,'image/png')).then(b=>b.arrayBuffer()));
+    const rp=(sz,b,va)=>'<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>'+(b?'<w:b/>':'')+'<w:sz w:val="'+sz+'"/>'+(va?'<w:vertAlign w:val="'+va+'"/>':'')+'</w:rPr>';
+    const run=(t,sz,b,va)=>t?'<w:r>'+rp(sz,b,va)+'<w:t xml:space="preserve">'+esc(t)+'</w:t></w:r>':'';
+    const runs=(t,sz,b)=>{const s=String(t),re=/([_^])(\(([^()]*)\)|[A-Za-z0-9′'+\-−]+)/g;let out='',i=0,m;while((m=re.exec(s))){out+=run(s.slice(i,m.index),sz,b)+run(m[3]!=null?m[3]:m[2],sz,b,m[1]==='_'?'subscript':'superscript');i=re.lastIndex}return out+run(s.slice(i),sz,b)};
+    const para=(inner,ppr)=>'<w:p><w:pPr>'+(ppr||'')+'</w:pPr>'+inner+'</w:p>';
+    const imgs=[];let did=0;
+    const pic=(rid,w,h)=>{const cx=Math.round(w*9525),cy=Math.round(h*9525),id=++did;return '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:docPr id="'+id+'" name="Picture '+id+'"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="'+id+'" name="figure'+id+'.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="'+rid+'"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>'};
+    const figPara=async spec=>{const g=await figSpecCanvas(spec);if(!g)return '';const w=Math.min(330,g.c.width/3),h=w/g.ar,rid='rIdI'+(imgs.length+1);imgs.push({name:'media/figure'+(imgs.length+1)+'.png',rid,data:await png(g.c)});return para(pic(rid,w,h),'<w:ind w:left="567"/><w:spacing w:before="80" w:after="80"/>')};
+    try{await document.fonts.load('800 40px Orbitron')}catch{}
+    const c0=document.createElement('canvas');c0.width=300;c0.height=100;cx=c0.getContext('2d');
+    const lg=await logoCanvas(),logoPng=await png(lg),list=[...items].sort((a,b)=>(a.pn||0)-(b.pn||0));let body='';
+    for(let i=0;i<list.length;i++){if(cancelled?.())throw new Error('cancelled');const q=list[i],n=q.pn||i+1;
+      body+=para('<w:r>'+rp(22,1)+'<w:t>'+n+'.</w:t></w:r><w:r>'+rp(22)+'<w:tab/></w:r>'+runs(q.q,22),'<w:keepNext/><w:tabs><w:tab w:val="left" w:pos="567"/></w:tabs><w:spacing w:before="260" w:after="80"/><w:ind w:left="567" w:hanging="567"/>');
+      body+=await figPara(q.fig);
+      (q.o||[]).forEach((o,k)=>{body+=para(runs('('+(k+1)+') '+o,22),'<w:ind w:left="567"/><w:spacing w:after="30"/>')});
+      if(withSol){const cs=[].concat(q.c??[]),at=q.o&&cs.length?'Answer: '+cs.map(k=>'('+(k+1)+') '+q.o[k]).join('; '):'Answer: '+(q.n!=null?q.n:q.a||'');
+        body+=para(runs(at,22,1),'<w:ind w:left="567"/><w:spacing w:before="100" w:after="40"/>');
+        for(const l of String(q.s||'').split('\n').filter(Boolean))body+=para(runs(l,20),'<w:ind w:left="567"/><w:spacing w:after="30"/>');
+        body+=await figPara(q.sfig)}
+      onProgress?.(i+1,list.length);if(i%10===9)await yld()}
+    const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+    const doc=XH+'<w:document '+NS+'><w:body>'+body+'<w:sectPr><w:headerReference w:type="default" r:id="rIdH"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1700" w:right="1000" w:bottom="1000" w:left="1000" w:header="500" w:footer="500" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    const lw=LOGO.w*.6,lh=LOGO.h*.6,hdr=XH+'<w:hdr '+NS+'>'+para('<w:r>'+rp(40,1)+'<w:t>NEET '+year+'</w:t></w:r><w:r>'+rp(20)+'<w:t xml:space="preserve">   '+(withSol?'Questions and solutions':'Questions')+'</w:t></w:r><w:r><w:tab/></w:r>'+pic('rIdL',lw,lh),'<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="000000"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9906"/></w:tabs>')+'</w:hdr>';
+    const R='http://schemas.openxmlformats.org/officeDocument/2006/relationships/';
+    return zip([
+      {name:'[Content_Types].xml',data:XH+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/></Types>'},
+      {name:'_rels/.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+R+'officeDocument" Target="word/document.xml"/></Relationships>'},
+      {name:'word/document.xml',data:doc},{name:'word/header1.xml',data:hdr},
+      {name:'word/_rels/document.xml.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdH" Type="'+R+'header" Target="header1.xml"/>'+imgs.map(m=>'<Relationship Id="'+m.rid+'" Type="'+R+'image" Target="'+m.name+'"/>').join('')+'</Relationships>'},
+      {name:'word/_rels/header1.xml.rels',data:XH+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdL" Type="'+R+'image" Target="media/logo.png"/></Relationships>'},
+      {name:'word/media/logo.png',data:logoPng},...imgs.map(m=>({name:'word/'+m.name,data:m.data}))],'application/vnd.openxmlformats-officedocument.wordprocessingml.document')}
+  finally{FONT=FONT0}}
+window.PhysicaRankExport={make,makeSheet,makePaper,makeDocx};
 })();
