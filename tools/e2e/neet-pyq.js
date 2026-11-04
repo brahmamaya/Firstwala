@@ -2,7 +2,7 @@
    NODE_PATH=/tmp/nm PW=playwright-core CHROMIUM=/opt/pw-browsers/chromium node tools/e2e/neet-pyq.js */
 const { chromium } = require(process.env.PW || 'playwright-core'), http = require('http'), fs = require('fs'), path = require('path'), assert = require('assert');
 const root = path.join(__dirname, '..', '..'), mt = { '.js': 'text/javascript', '.html': 'text/html', '.css': 'text/css', '.json': 'application/json' };
-const srv = http.createServer((q, r) => { let f = path.join(root, decodeURIComponent(q.url.split('?')[0])); if (f.endsWith('/')) f += 'index.html'; fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end() } else { r.writeHead(200, { 'content-type': mt[path.extname(f)] || 'application/octet-stream' }); r.end(d) } }) }).listen(0, async () => {
+const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]); let f = path.resolve(root, '.' + u); if (u.endsWith('/')) f = path.join(f, 'index.html'); if (!f.startsWith(root + path.sep)) { r.writeHead(403); r.end(); return } fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end() } else { r.writeHead(200, { 'content-type': mt[path.extname(f)] || 'application/octet-stream' }); r.end(d) } }) }).listen(0, async () => {
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM, args: ['--no-sandbox'] }), p = await b.newPage({ viewport: { width: 1000, height: 900 }, acceptDownloads: true }); const errs = []; p.on('pageerror', e => errs.push(e.message));
   try {
     await p.goto('http://localhost:' + srv.address().port + '/'); await p.waitForTimeout(1500);
