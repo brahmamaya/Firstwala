@@ -3,10 +3,11 @@
    nothing leaves the device. Loaded only when a student presses Download. */
 (() => {
 'use strict';
-const W=1920,H=1080,PX=6350,FONT='system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+const W=1920,H=1080,PX=6350,FONT0='system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';let FONT=FONT0;
 /* two looks for the slides: black (default) and white. The teacher chooses when downloading; make() sets it. */
 const PAL={dark:{name:'dark',bg:'#000000',logo:'#ffffff',logoA:.55,fig:'#ffffff',tx:'#ffffff',dim:'#9aa6bb',acc:'#7cc0ff',ok:'#6be3a8',line:'#2a3550',qn:['#0c3a28','#3ddc97','#3ddc97'],yr:['#262006','#ffd54a','#ffd54a'],dk1:'000000',lt1:'FFFFFF'},
   light:{name:'light',bg:'#ffffff',logo:'#0b1220',logoA:.8,fig:'#0b1220',tx:'#0b1220',dim:'#5b6b82',acc:'#1a56c4',ok:'#0b7a45',line:'#c7d1df',qn:['#e1f6ea','#16a05f','#0b7a45'],yr:['#fff4d6','#c98a00','#8a5d00'],dk1:'FFFFFF',lt1:'000000'}};
+PAL.paper={name:'paper',bg:'#ffffff',logo:'#000000',logoA:1,fig:'#000000',tx:'#000000',dim:'#222222',acc:'#000000',ok:'#000000',line:'#000000',qn:['#fff','#000','#000'],yr:['#fff','#000','#000'],dk1:'FFFFFF',lt1:'000000'};   /* printed papers: plain black on white */
 let P=PAL.dark,C=PAL.dark;
 const setPalette=n=>{P=PAL[n]||PAL.dark;C=P};
 const PAD=80,LOGO={w:250,h:72,x:W-PAD-250,y:36};
@@ -55,7 +56,8 @@ function optBlock(opts,fs,w){const fo=fs*.94,lw=fo*2.2,gap=fo*.6;
     if(cols===2&&(ls.some(l=>l.lines.length>1)||opts.length%2))continue; /* two columns only when every option is one short line: it saves height for the teacher's working */
     const cells=[];let y=0;for(let i=0;i<opts.length;i+=cols){const row=ls.slice(i,i+cols),rh=Math.max(...row.map(l=>l.h));row.forEach((l,j)=>cells.push({i:i+j,x:j*(cw+gap*2),y,w:cw,l}));y+=rh+fo*.45}
     return{cells,h:y-fo*.45,fo,lw,cols}}}
-async function figCanvas(q){if(!q.fig||!window.PhysicaFig)return null;try{const g=window.PhysicaFig(q.fig);if(!g)return null;g.setAttribute('style','color:'+P.fig);g.setAttribute('font-family','Arial,Helvetica,sans-serif');const vb=g.viewBox.baseVal,w=vb.width||240,h=vb.height||140;g.setAttribute('width',w);g.setAttribute('height',h);g.setAttribute('xmlns','http://www.w3.org/2000/svg');
+const figCanvas=q=>figSpecCanvas(q.fig);
+async function figSpecCanvas(spec){if(!spec||!window.PhysicaFig)return null;try{const g=window.PhysicaFig(spec);if(!g)return null;g.setAttribute('style','color:'+P.fig);g.setAttribute('font-family','Arial,Helvetica,sans-serif');const vb=g.viewBox.baseVal,w=vb.width||240,h=vb.height||140;g.setAttribute('width',w);g.setAttribute('height',h);g.setAttribute('xmlns','http://www.w3.org/2000/svg');
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(g));await img.decode();const k=3,c=document.createElement('canvas');c.width=w*k;c.height=h*k;c.getContext('2d').drawImage(img,0,0,w*k,h*k);return{c,ar:w/h}}catch{return null}}
 const rect=(x,y,w,h,fill)=>({t:'rect',x,y,w,h,fill});
 function frame(meta,n,N){return[rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO},txt(PAD,H-58,500,[{s:n+' / '+N,fs:24,c:C.dim}])]}
@@ -213,7 +215,7 @@ async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=
   return zip([...out,...files.map(f=>({name:'ppt/'+f.name,data:f.data}))])}
 
 /* ---------- public: build the file ---------- */
-const yld=()=>self.scheduler?.yield?scheduler.yield():new Promise(r=>setTimeout(r)),encJpg=cv=>new Promise(r=>cv.toBlob(r,'image/jpeg',.93)).then(b=>b.arrayBuffer()).then(a=>new Uint8Array(a));
+const yld=()=>self.scheduler?.yield?scheduler.yield():new Promise(r=>setTimeout(r)),encJpg=(cv,q=.93)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q)).then(b=>b.arrayBuffer()).then(a=>new Uint8Array(a));
 async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled}){
   setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
@@ -258,5 +260,39 @@ async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
     cx.fillStyle=P.dim;cx.font=F(18);cx.fillText('physica.in  ·  page '+(i+1)+' of '+pages.length,M,AH-36);
     out.push(new Uint8Array(await new Promise(r=>cv.toBlob(r,'image/jpeg',.92)).then(b=>b.arrayBuffer())));onProgress?.(i+1,pages.length);await yld()}
   return makePDF(out,595,842,AW*SC,AH*SC)}
-window.PhysicaRankExport={make,makeSheet};
+
+/* ---------- a whole past-year paper: A4, plain black on white, in the paper's own order and in Arial (the printed papers' font); the year and the logo on top of every page ---------- */
+async function makePaper({items,year,withSol,onProgress,cancelled}){
+  FONT='Arial,"Liberation Sans",Helvetica,sans-serif';setPalette('paper');
+  try{
+    const SC=1,AW=1240,AH=1754,M=90,TOP=170,BOT=AH-110,NW=64,CW=AW-M*2-NW,c0=document.createElement('canvas');c0.width=AW;c0.height=AH;cx=c0.getContext('2d');
+    try{await document.fonts.load('800 40px Orbitron')}catch{}
+    const logo=await logoCanvas(),QF=23,OF=22,SF=20,blocks=[];
+    const list=[...items].sort((a,b)=>(a.pn||0)-(b.pn||0));
+    for(let i=0;i<list.length;i++){if(cancelled?.())throw new Error('cancelled');const q=list[i],n=q.pn||i+1;
+      const ql=layout(q.q,QF,CW,0),fg=await figSpecCanvas(q.fig),fw=fg?Math.min(CW*.7,fg.c.width/3):0,fh=fg?fw/fg.ar:0,gap=14;
+      const ops=(q.o||[]).map((o,k)=>'('+(k+1)+') '+o),half=(CW-40)/2,one=ops.map(o=>layout(o,OF,half,0)),two=ops.length>0&&one.every(l=>l.lines.length===1);
+      let opl=null;if(ops.length){opl=two?one:ops.map(o=>layout(o,OF,CW,0))}
+      const oh=!opl?0:two?Math.ceil(ops.length/2)*(Math.max(...opl.map(l=>l.h))+8):opl.reduce((a,l)=>a+l.h+8,0);
+      let sol=null,sh=0;if(withSol){const cs=[].concat(q.c??[]),at=q.o&&cs.length?'Answer: '+cs.map(k=>'('+(k+1)+') '+q.o[k]).join('; '):'Answer: '+(q.n!=null?q.n:q.a||''),al=layout(at,OF,CW,1),sl=String(q.s||'').split('\n').filter(Boolean).map(l=>layout(l,SF,CW,0)),sg=await figSpecCanvas(q.sfig),sfw=sg?Math.min(CW*.7,sg.c.width/3):0,sfh=sg?sfw/sg.ar:0;
+        sol={al,sl,sg,sfw,sfh};sh=14+al.h+6+sl.reduce((a,l)=>a+l.h+6,0)+(sg?sfh+10:0)}
+      blocks.push({n,ql,fg,fw,fh,opl,two,half,oh,sol,gap,h:ql.h+(fg?fh+gap:0)+(oh?gap+oh:0)+sh+44});
+      onProgress?.(i+1,list.length*2);if(i%8===7)await yld()}
+    const pages=[[]];let y=TOP;for(const b of blocks){if(y+b.h>BOT&&pages[pages.length-1].length){pages.push([]);y=TOP}pages[pages.length-1].push({b,y});y+=b.h}
+    const jp=[];
+    for(let pi=0;pi<pages.length;pi++){if(cancelled?.())throw new Error('cancelled');
+      const cv=document.createElement('canvas');cv.width=AW*SC;cv.height=AH*SC;cx=cv.getContext('2d');cx.scale(SC,SC);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);cx.textBaseline='alphabetic';cx.textAlign='left';
+      cx.fillStyle='#000';cx.font=F(40,1);cx.fillText('NEET '+year,M,96);cx.font=F(20,0);cx.fillText(withSol?'Questions and solutions':'Questions',M,126);
+      cx.drawImage(logo,AW-M-LOGO.w*.8,40,LOGO.w*.8,LOGO.h*.8);cx.fillStyle='#000';cx.fillRect(M,146,AW-M*2,2);
+      for(const {b,y:by} of pages[pi]){let yy=by;cx.fillStyle='#000';cx.font=F(QF,1);cx.fillText(b.n+'.',M,yy+QF*.8);
+        drawLay(b.ql,M+NW,yy,CW,'#000');yy+=b.ql.h;
+        if(b.fg){yy+=b.gap;cx.drawImage(b.fg.c,M+NW,yy,b.fw,b.fh);yy+=b.fh}
+        if(b.opl){yy+=b.gap;if(b.two){const rh=Math.max(...b.opl.map(l=>l.h))+8;b.opl.forEach((l,k)=>drawLay(l,M+NW+(k%2)*(b.half+40),yy+Math.floor(k/2)*rh,b.half,'#000'));yy+=oh2(b)}else for(const l of b.opl){drawLay(l,M+NW,yy,CW,'#000');yy+=l.h+8}}
+        if(b.sol){yy+=14;drawLay(b.sol.al,M+NW,yy,CW,'#000');yy+=b.sol.al.h+6;for(const l of b.sol.sl){drawLay(l,M+NW,yy,CW,'#222');yy+=l.h+6}if(b.sol.sg){yy+=4;cx.drawImage(b.sol.sg.c,M+NW,yy,b.sol.sfw,b.sol.sfh)}}}
+      cx.fillStyle='#000';cx.font=F(18,0);cx.textAlign='center';cx.fillText('physica.in  ·  NEET '+year+'  ·  page '+(pi+1)+' of '+pages.length,AW/2,AH-50);
+      jp.push(encJpg(cv,.72));onProgress?.(list.length+pi+1,list.length+pages.length);if(pi%3===2)await Promise.all(jp);else await yld()}
+    return makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
+  finally{FONT=FONT0}}
+const oh2=b=>Math.ceil(b.opl.length/2)*(Math.max(...b.opl.map(l=>l.h))+8);
+window.PhysicaRankExport={make,makeSheet,makePaper};
 })();
