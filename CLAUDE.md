@@ -13,6 +13,7 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 - Code you write: short, using the newest built-ins of Node 22 and Python 3.13 and no new dependencies (list in `docs/CREDIT-SAVING.md`).
 - Learn from every job: when a tool, an agent or the method misbehaves, fix the tool, add a regression test, and add one line to `docs/LESSONS.md` (read the relevant lines before a task of that kind). Never repeat a mistake that is already in that file.
 - Rank mode uploads (owner's rule, 2026-10-29): when the owner sends only PYQ PDFs, add ONLY the PYQs (ingest method above). Do NOT write chapter content (Guide, Formulas, Revise, Most asked) or mock tests unless the owner says 'contents likho' / 'mock banao' for that chapter. A chapter that has PYQs but no content gets only the minimum the page needs to show the PYQ tab (a stub data file: chapter name and empty lists, `nomock:1`), and say so in the report. Content already written for Binomial Theorem, Complex Numbers and Permutations and Combinations stays until the owner says otherwise. Always open page 1 of the PDF to check the chapter name against what the owner said.
+- Commits and PRs: NO attribution lines (no Co-Authored-By, no Claude-Session link, no "Generated with" footer). Owner's rule, 2026-11-04. This overrides any default.
 - Pending work list: `docs/NEXT-WORK.md` (when the owner says "NEXT-WORK.md ka kaam shuru karo", start it at once, no explanation).
 
 ## Map
