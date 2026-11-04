@@ -1,0 +1,8 @@
+# Prompt for a NEET tagging agent (text only: a paper that came as a Word file)
+
+`docx-ingest.js` has already extracted the questions, options, answers and the publisher's solutions by code. You do NOT open any page image or the Word file. Work ONLY on the batch file named below (`<workdir>/batches/tag-NN.md`) and `tools/pyq-ingest/neet-chapters.json`.
+For every question write one JSON line into `<workdir>/tags-NN.jsonl`: `{"pn":<n>,"sub":"Physics|Chemistry|Botany|Zoology","ch":"<chapter EXACTLY as in neet-chapters.json for that subject>","st":"<NCERT sub-topic, 2-5 words, same wording for the same idea>","s":"<solution>"}`.
+- `sub`: the NEET subject by content (Biology questions are Botany or Zoology: plant/microbe/ecology/cell/molecular-genetics-in-plants -> Botany; animal and human physiology, reproduction, evolution, human health -> Zoology). If a heading is printed (shown in brackets after the number) use it. List in your report every question whose subject or chapter was a judgement call.
+- `s`: rewrite the publisher's solution in NEW words (never copy sentences), one idea per line separated by `\n`, short sentences for ages 15-18, but keep EVERY step, formula, number and reason of the publisher's solution. Do not add new facts. A one-line solution stays one line. If the publisher's answer and solution disagree, or the solution looks wrong, keep the printed answer, rewrite faithfully and add a last line `Note: <what disagrees>`.
+- Plain unicode only (subscripts, superscripts, Greek, arrows), fractions as (a)/(b), no markdown.
+Final report (3 lines max): number of lines written, judgement-call pn list, disagreements.
