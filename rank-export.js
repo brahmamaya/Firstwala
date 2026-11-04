@@ -143,7 +143,8 @@ function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'ar
 
 /* ---------- canvas drawing (for the PDF) ---------- */
 const SS=1; /* page scale: 1 = 1920x1080 (fast); 2 was too slow to download */
-function drawSlide(els,logo){const cv=document.createElement('canvas');cv.width=W*SS;cv.height=H*SS;cx=cv.getContext('2d');cx.scale(SS,SS);cx.lineCap='round';
+let slideCv=null;
+function drawSlide(els,logo){const cv=slideCv||(slideCv=document.createElement('canvas'));if(cv.width!==W*SS){cv.width=W*SS;cv.height=H*SS}cx=cv.getContext('2d');cx.setTransform(SS,0,0,SS,0,0);cx.clearRect(0,0,W,H);cx.lineCap='round';
   for(const e of els){
     if(e.t==='rect'){cx.fillStyle=e.fill;cx.fillRect(e.x,e.y,e.w,e.h)}
     else if(e.t==='pill'){const r=e.h/2;cx.beginPath();cx.moveTo(e.x+r,e.y);cx.arcTo(e.x+e.w,e.y,e.x+e.w,e.y+e.h,r);cx.arcTo(e.x+e.w,e.y+e.h,e.x,e.y+e.h,r);cx.arcTo(e.x,e.y+e.h,e.x,e.y,r);cx.arcTo(e.x,e.y,e.x+e.w,e.y,r);cx.closePath();cx.fillStyle=e.fill;cx.fill();cx.lineWidth=2.5;cx.strokeStyle=e.stroke;cx.stroke();
@@ -215,7 +216,14 @@ async function makePPTX(slides,logo){const files=[],N=slides.length,png=async c=
   return zip([...out,...files.map(f=>({name:'ppt/'+f.name,data:f.data}))])}
 
 /* ---------- public: build the file ---------- */
-const yld=()=>self.scheduler?.yield?scheduler.yield():new Promise(r=>setTimeout(r)),encJpg=(cv,q=.93)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q)).then(b=>b.arrayBuffer()).then(a=>new Uint8Array(a));
+const yld=()=>self.scheduler?.yield?scheduler.yield():new Promise(r=>setTimeout(r)),toJpg=(cv,q)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q)).then(b=>b.arrayBuffer()).then(a=>new Uint8Array(a));
+/* JPEG encoding runs in a small pool of workers (enc-worker.js) so pages are encoded at the same time and the page stays free; without worker support it falls back to toBlob on the page */
+let POOL=null,rr=0,jid=0;
+const getPool=()=>{if(POOL!==null)return POOL;try{if(!window.OffscreenCanvas||!window.Worker||!window.createImageBitmap)throw 0;const n=Math.max(2,Math.min(4,(navigator.hardwareConcurrency||4)-1));POOL=Array.from({length:n},()=>{const w=new Worker('__ENC_URL__');w.p=new Map();w.onmessage=e=>{const r=w.p.get(e.data.id);w.p.delete(e.data.id);e.data.err?r.no():r.ok(new Uint8Array(e.data.buf))};w.onerror=()=>{for(const r of w.p.values())r.no();w.p.clear()};return w})}catch{POOL=false}return POOL};
+const fromBmp=(bmp,q)=>{const c=document.createElement('canvas');c.width=bmp.width;c.height=bmp.height;c.getContext('2d').drawImage(bmp,0,0);return toJpg(c,q)};
+const encJpg=(cv,q=.93)=>{const P=getPool();if(!P)return toJpg(cv,q);
+  return createImageBitmap(cv).then(bmp=>new Promise((ok,no)=>{const w=P[rr++%P.length],id=++jid;w.p.set(id,{ok,no});w.postMessage({id,bmp,q})}).catch(()=>fromBmp(bmp,q)).finally(()=>bmp.close?.()),()=>toJpg(cv,q))};
+
 async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled}){
   setPalette(theme);
   const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
@@ -223,8 +231,8 @@ async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress
   for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');const two=perSlide===2&&i+1<N;specs.push(two?await pairSlide(items[i].q,i,items[i+1].q,N,withSol,meta):await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);if(two)i++;onProgress?.(i+1,N+1);if(i%4===3)await yld()}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
-  const jp=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');jp.push(encJpg(drawSlide(specs[i],logo))); /* encoding runs off the main thread while the next slide is drawn */
-    onProgress?.(N+1,N+1,i+1,specs.length);if(i%3===2)await Promise.all(jp);else await yld()}
+  const jp=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');jp.push(encJpg(drawSlide(specs[i],logo))); /* toBlob keeps a copy of the page, so the same canvas is redrawn at once while the encoding runs off the main thread */
+    onProgress?.(N+1,N+1,i+1,specs.length);await yld()}
   return makePDF(await Promise.all(jp),960,540,W*SS,H*SS)}
 /* the Rank diagrams are drawn for a dark page; swap their colours for white paper (one pass, so no colour is replaced twice) */
 const PAPER={'#e6f1ff':'#0b1220','#7f8ca3':'#5b6b82','#ffb347':'#c26200','#6fa8f5':'#1a56c4','#ff8a8a':'#c62828','#7ee0a1':'#0b7a45','#17314f':'#dbe7f7','#0b1220':'#ffffff','#4a5876':'#8ea0bd','#2b5d93':'#9fc2ee'};
@@ -269,19 +277,20 @@ async function makePaper({items,year,withSol,onProgress,cancelled}){
     try{await document.fonts.load('800 40px Orbitron')}catch{}
     const logo=await logoCanvas(),QF=23,OF=22,SF=20,blocks=[];
     const list=[...items].sort((a,b)=>(a.pn||0)-(b.pn||0));
+    const figs=await Promise.all(list.map(q=>Promise.all([figSpecCanvas(q.fig),withSol?figSpecCanvas(q.sfig):null])));   /* all pictures decode at the same time */
     for(let i=0;i<list.length;i++){if(cancelled?.())throw new Error('cancelled');const q=list[i],n=q.pn||i+1;
-      const ql=layout(q.q,QF,CW,0),fg=await figSpecCanvas(q.fig),fw=fg?Math.min(CW*.7,fg.c.width/3):0,fh=fg?fw/fg.ar:0,gap=14;
+      const ql=layout(q.q,QF,CW,0),fg=figs[i][0],fw=fg?Math.min(CW*.7,fg.c.width/3):0,fh=fg?fw/fg.ar:0,gap=14;
       const ops=(q.o||[]).map((o,k)=>'('+(k+1)+') '+o),half=(CW-40)/2,one=ops.map(o=>layout(o,OF,half,0)),two=ops.length>0&&one.every(l=>l.lines.length===1);
       let opl=null;if(ops.length){opl=two?one:ops.map(o=>layout(o,OF,CW,0))}
       const oh=!opl?0:two?Math.ceil(ops.length/2)*(Math.max(...opl.map(l=>l.h))+8):opl.reduce((a,l)=>a+l.h+8,0);
-      let sol=null,sh=0;if(withSol){const cs=[].concat(q.c??[]),at=q.o&&cs.length?'Answer: '+cs.map(k=>'('+(k+1)+') '+q.o[k]).join('; '):'Answer: '+(q.n!=null?q.n:q.a||''),al=layout(at,OF,CW,1),sl=String(q.s||'').split('\n').filter(Boolean).map(l=>layout(l,SF,CW,0)),sg=await figSpecCanvas(q.sfig),sfw=sg?Math.min(CW*.7,sg.c.width/3):0,sfh=sg?sfw/sg.ar:0;
+      let sol=null,sh=0;if(withSol){const cs=[].concat(q.c??[]),at=q.o&&cs.length?'Answer: '+cs.map(k=>'('+(k+1)+') '+q.o[k]).join('; '):'Answer: '+(q.n!=null?q.n:q.a||''),al=layout(at,OF,CW,1),sl=String(q.s||'').split('\n').filter(Boolean).map(l=>layout(l,SF,CW,0)),sg=figs[i][1],sfw=sg?Math.min(CW*.7,sg.c.width/3):0,sfh=sg?sfw/sg.ar:0;
         sol={al,sl,sg,sfw,sfh};sh=14+al.h+6+sl.reduce((a,l)=>a+l.h+6,0)+(sg?sfh+10:0)}
       blocks.push({n,ql,fg,fw,fh,opl,two,half,oh,sol,gap,h:ql.h+(fg?fh+gap:0)+(oh?gap+oh:0)+sh+44});
       onProgress?.(i+1,list.length*2);if(i%8===7)await yld()}
     const pages=[[]];let y=TOP;for(const b of blocks){if(y+b.h>BOT&&pages[pages.length-1].length){pages.push([]);y=TOP}pages[pages.length-1].push({b,y});y+=b.h}
-    const jp=[];
+    const jp=[],cv=document.createElement('canvas');cv.width=AW*SC;cv.height=AH*SC;   /* one page canvas for every page: toBlob keeps a copy, so it can be redrawn at once */
     for(let pi=0;pi<pages.length;pi++){if(cancelled?.())throw new Error('cancelled');
-      const cv=document.createElement('canvas');cv.width=AW*SC;cv.height=AH*SC;cx=cv.getContext('2d');cx.scale(SC,SC);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);cx.textBaseline='alphabetic';cx.textAlign='left';
+      cx=cv.getContext('2d');cx.setTransform(SC,0,0,SC,0,0);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);cx.textBaseline='alphabetic';cx.textAlign='left';
       cx.fillStyle='#000';cx.font=F(40,1);cx.fillText('NEET '+year,M,96);cx.font=F(20,0);cx.fillText(withSol?'Questions and solutions':'Questions',M,126);
       cx.drawImage(logo,AW-M-LOGO.w*.8,40,LOGO.w*.8,LOGO.h*.8);cx.fillStyle='#000';cx.fillRect(M,146,AW-M*2,2);
       for(const {b,y:by} of pages[pi]){let yy=by;cx.fillStyle='#000';cx.font=F(QF,1);cx.fillText(b.n+'.',M,yy+QF*.8);
@@ -290,7 +299,7 @@ async function makePaper({items,year,withSol,onProgress,cancelled}){
         if(b.opl){yy+=b.gap;if(b.two){const rh=Math.max(...b.opl.map(l=>l.h))+8;b.opl.forEach((l,k)=>drawLay(l,M+NW+(k%2)*(b.half+40),yy+Math.floor(k/2)*rh,b.half,'#000'));yy+=oh2(b)}else for(const l of b.opl){drawLay(l,M+NW,yy,CW,'#000');yy+=l.h+8}}
         if(b.sol){yy+=14;drawLay(b.sol.al,M+NW,yy,CW,'#000');yy+=b.sol.al.h+6;for(const l of b.sol.sl){drawLay(l,M+NW,yy,CW,'#222');yy+=l.h+6}if(b.sol.sg){yy+=4;cx.drawImage(b.sol.sg.c,M+NW,yy,b.sol.sfw,b.sol.sfh)}}}
       cx.fillStyle='#000';cx.font=F(18,0);cx.textAlign='center';cx.fillText('physica.in  ·  NEET '+year+'  ·  page '+(pi+1)+' of '+pages.length,AW/2,AH-50);
-      jp.push(encJpg(cv,.72));onProgress?.(list.length+pi+1,list.length+pages.length);if(pi%3===2)await Promise.all(jp);else await yld()}
+      jp.push(encJpg(cv,.72));onProgress?.(list.length+pi+1,list.length+pages.length);await yld()}
     return makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
   finally{FONT=FONT0}}
 const oh2=b=>Math.ceil(b.opl.length/2)*(Math.max(...b.opl.map(l=>l.h))+8);
