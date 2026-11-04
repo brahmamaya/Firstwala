@@ -31,7 +31,6 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Cover slide now holds the topics (no separate topics slide); preview a cover with many topics (fit shrinks, falls back to names only) before shipping layout changes.
 - Cover shows up to 6 key equations (must-know formulas with '='); chapters without Formulas content just show none.
 - Owner does not want key equations on the cover slide; do not add them back.
-- Owner does not want key equations on the cover slide; do not add them back.
 - Landing has two dancing cards (landing.js, #land-cards): Playwright cannot click an infinitely animating element, use {force:true} in e2e. The 10 s Test Series notice was removed on purpose.
 - Formula sheet PDF: includes the Rank diagram (colours swapped for white paper), use-points and example, 1.5x resolution; chapters or formulas with no fig key show no diagram.
 - Flat 2D sims draw in a 960x505 canvas but the live-measurements box covers the right ~25%: keep charts/text left of x≈660 and check with tools/e2e/shot.js. Pursuit sims (HC Verma) are in seventh.js; sources are credited in description and on the canvas.
@@ -47,3 +46,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Word prompt for ChatGPT saved in docs/WORD-PROMPT.md (matches what docx-ingest.js reads); the owner sends the paper PDF to ChatGPT and gives the .docx to Claude.
 - Paper PDF was blurry on zoom, 6-11 MB and not copyable because pages were JPEG images; rewritten as a vector PDF (ttf.js + pdf-vec.js, fonts/pp-*.ttf): 180/335 KB, ~0.3 s, selectable text. Esbuild turns `()=>({...})` around a build token into a block: put build tokens inside a call (`JSON.parse(__TOKEN__)`).
 - PYQ slide PDF/PPT: draw slides with the vector writer (copyable text) and use real sub/superscript runs; e2e must go back to the chooser before clicking a subject pill.
+- tests/ is public: private-guard now fails on any tests/ file outside the free index (n<=3); a paid test copied by hand can no longer ship.
