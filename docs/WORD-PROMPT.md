@@ -1,6 +1,6 @@
 # Prompt for ChatGPT: turn a question-paper PDF (with solutions) into a Word file that `docx-ingest.js` can read
 
-Give ChatGPT the PDF (best: in parts of about 30-45 questions) and paste the prompt below. Then give the Word file(s) to Claude.
+Give ChatGPT the PDF (best: in parts of about 30-45 questions) and paste the prompt below. Then give the Word file(s) to the assistant.
 What the tool needs in the file: question numbers, 4 options labelled (1)-(4), "Answer (n)" and "Sol." lines, subject headings, real text (not a picture of text), figures as pictures in the right place. Nothing else.
 
 ## Prompt (copy from here)
@@ -31,8 +31,8 @@ IF SOMETHING IS UNCLEAR: never guess. Write [UNCLEAR: what is unclear] at that p
 AT THE END, in the chat (not in the Word file), tell me: (a) the total number of questions you put in the file and the first and last question numbers, (b) the question numbers that contain pictures, (c) any question where you were not sure, (d) any question whose printed answer is not a plain option number. Then give me the .docx file for download.
 ```
 
-## Before sending the file to Claude (30 seconds)
+## Before sending the file to the assistant (30 seconds)
 - Open the Word file: the first and last question numbers and the total must match the paper (180 for a NEET paper). If ChatGPT did the paper in parts, either send the parts one by one or join them in order.
 - Pick 3 questions at random and compare with the PDF: options, answer, a formula, a picture.
-- Look for "[UNCLEAR" and fix or tell Claude.
-- Tell Claude: the exam name and year (for example "NEET 2025") and whether the options are (1)-(4) or (a)-(d).
+- Look for "[UNCLEAR" and fix or tell the assistant.
+- Tell the assistant: the exam name and year (for example "NEET 2025") and whether the options are (1)-(4) or (a)-(d).
