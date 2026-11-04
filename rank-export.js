@@ -74,7 +74,7 @@ async function questionEls(q,i,withSol,half){const els=[],fig=await figCanvas(q)
   const areaH=bottom-top,figW=fig?Math.min(half?340:560,Math.round(areaH*.95*fig.ar)):0,qW=CW-(fig?figW+(half?30:50):0);
   const blk=fit(fs=>{const ql=layout(q.q,fs,qW),ob=q.o?optBlock(q.o,fs,fig?qW:CW):null,left=ql.h+(ob?fs*.8+ob.h:0);return{fs,ql,ob,h:fig?Math.max(left,figW/fig.ar):left}},34,18,areaH);
   const qEl=txt(X0,top,qW,[{s:q.q,fs:blk.fs,c:C.tx}]);qEl.h=blk.ql.h;els.push(qEl);
-  if(fig)els.push({t:'img',k:'fig'+i,x:X0+CW-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c});
+  if(fig)els.push({t:'img',k:'fig'+i,x:X0+CW-figW,y:top,w:figW,h:figW/fig.ar,canvas:fig.c,spec:q.fig});
   let y=top+blk.ql.h;
   if(blk.ob){y+=blk.fs*.8;for(const c of blk.ob.cells){const e=txt(X0+c.x,y+c.y,c.w,[{s:q.o[c.i],fs:blk.ob.fo,c:C.tx,label:'('+'abcde'[c.i]+')',lw:blk.ob.lw}]);e.h=c.l.h;els.push(e)}y+=blk.ob.h}if(fig)y=Math.max(y,top+figW/fig.ar);
   if(withSol){const lines=['Answer: '+(q.o?letters(q).map(l=>'('+l+')').join(' ')+'  '+[].concat(q.c).map(k=>q.o[k]).join(';  '):answerText(q)),...String(q.s||'').split('\n').filter(Boolean)],sy=Math.max(y+36,bottom+30),room=H-80-sy;
@@ -144,12 +144,12 @@ function titleSlide(meta,N,withSol){const els=[rect(0,0,W,H,P.bg),{t:'img',k:'ar
 /* ---------- canvas drawing (for the PDF) ---------- */
 const SS=1; /* page scale: 1 = 1920x1080 (fast); 2 was too slow to download */
 let slideCv=null;
-function drawSlide(els,logo){const cv=slideCv||(slideCv=document.createElement('canvas'));if(cv.width!==W*SS){cv.width=W*SS;cv.height=H*SS}cx=cv.getContext('2d');cx.setTransform(SS,0,0,SS,0,0);cx.clearRect(0,0,W,H);cx.lineCap='round';
+function drawSlide(els,logo,vec){let cv=null;if(vec)cx=vec;else{cv=slideCv||(slideCv=document.createElement('canvas'));if(cv.width!==W*SS){cv.width=W*SS;cv.height=H*SS}cx=cv.getContext('2d');cx.setTransform(SS,0,0,SS,0,0);cx.clearRect(0,0,W,H)}cx.lineCap='round';
   for(const e of els){
     if(e.t==='rect'){cx.fillStyle=e.fill;cx.fillRect(e.x,e.y,e.w,e.h)}
     else if(e.t==='pill'){const r=e.h/2;cx.beginPath();cx.moveTo(e.x+r,e.y);cx.arcTo(e.x+e.w,e.y,e.x+e.w,e.y+e.h,r);cx.arcTo(e.x+e.w,e.y+e.h,e.x,e.y+e.h,r);cx.arcTo(e.x,e.y+e.h,e.x,e.y,r);cx.arcTo(e.x,e.y,e.x+e.w,e.y,r);cx.closePath();cx.fillStyle=e.fill;cx.fill();cx.lineWidth=2.5;cx.strokeStyle=e.stroke;cx.stroke();
       cx.font=F(e.fs,1);cx.fillStyle=e.color;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(e.text,e.x+e.w/2,e.y+e.h/2+1);cx.textAlign='left';cx.textBaseline='alphabetic'}
-    else if(e.t==='img')cx.drawImage(e.k==='logo'?logo:e.canvas,e.x,e.y,e.w,e.h);
+    else if(e.t==='img'){if(vec&&e.spec)cx.drawFig(e.spec,e.x,e.y,e.w,P.fig);else cx.drawImage(e.k==='logo'?logo:e.canvas,e.x,e.y,e.w,e.h)}
     else{let y=e.y;for(const p of e.paras){const lw=p.lw||0,L=layout(p.s,p.fs,e.w-lw,p.b);
       if(p.label){cx.font=F(p.fs,1);cx.fillStyle=C.acc;cx.textBaseline='alphabetic';cx.fillText(p.label,e.x,y+L.lines[0].a)}
       drawLay(L,e.x+lw,y,e.w-lw,p.c,p.al);y+=L.h+(p.gap||0)}}}
@@ -183,14 +183,14 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const SUPM={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','−':'⁻','+':'⁺','(':'⁽',')':'⁾','n':'ⁿ'};
 const flat=ns=>ns.map(x=>x.k==='t'?x.s:x.k==='sup'?[...flat(x.c)].map(c=>SUPM[c]||c).join(''):x.k==='fr'?par(flat(x.n))+'/'+par(flat(x.d)):'√'+par(flat(x.c))).join('');
 const par=s=>/^[\wα-ωΔ₀-₉⁰-⁹²³′.]+$/.test(s)?s:'('+s+')';
-const runs=ns=>ns.flatMap(x=>x.k==='sup'?[{s:flat(x.c),sup:1}]:x.k==='t'?[{s:x.s}]:[{s:flat([x])}]);
+const runs=ns=>ns.flatMap(x=>x.k==='sup'?[{s:flat(x.c),sup:1}]:x.k==='t'?(window.PhysicaMath?.has(x.s)?window.PhysicaMath.parse(x.s).map(g=>({s:g.t,sup:g.k==='p'?1:0,sub:g.k==='b'?1:0})):[{s:x.s}]):[{s:flat([x])}]);   /* k_B and 10^3 become real subscripts and superscripts */
 const hex=c=>c.replace('#','').toUpperCase(),emu=v=>Math.round(v*PX);
-const run=(s,fs,col,b,sup)=>'<a:r><a:rPr lang="en-US" sz="'+Math.round(fs*50)+'" b="'+(b?1:0)+'"'+(sup?' baseline="30000"':'')+' dirty="0"><a:solidFill><a:srgbClr val="'+hex(col)+'"/></a:solidFill><a:latin typeface="Arial"/><a:cs typeface="Arial"/></a:rPr><a:t>'+esc(s)+'</a:t></a:r>';
+const run=(s,fs,col,b,sup,sub)=>'<a:r><a:rPr lang="en-US" sz="'+Math.round(fs*50)+'" b="'+(b?1:0)+'"'+(sup?' baseline="30000"':sub?' baseline="-25000"':'')+' dirty="0"><a:solidFill><a:srgbClr val="'+hex(col)+'"/></a:solidFill><a:latin typeface="Arial"/><a:cs typeface="Arial"/></a:rPr><a:t>'+esc(s)+'</a:t></a:r>';
 function shape(e,id,rel){const xf='<a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)+'"/><a:ext cx="'+emu(e.w)+'" cy="'+emu(e.h)+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>';
   if(e.t==='pill')return'<p:sp><p:nvSpPr><p:cNvPr id="'+id+'" name="Tag '+id+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)+'"/><a:ext cx="'+emu(e.w)+'" cy="'+emu(e.h)+'"/></a:xfrm><a:prstGeom prst="roundRect"><a:avLst><a:gd name="adj" fmla="val 50000"/></a:avLst></a:prstGeom><a:solidFill><a:srgbClr val="'+hex(e.fill)+'"/></a:solidFill><a:ln w="31750"><a:solidFill><a:srgbClr val="'+hex(e.stroke)+'"/></a:solidFill></a:ln></p:spPr><p:txBody><a:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="ctr"><a:noAutofit/></a:bodyPr><a:lstStyle/><a:p><a:pPr algn="ctr"/>'+run(e.text,e.fs,e.color,1,0)+'</a:p></p:txBody></p:sp>';
   if(e.t==='rect')return'<p:sp><p:nvSpPr><p:cNvPr id="'+id+'" name="Panel '+id+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr>'+xf+'<a:solidFill><a:srgbClr val="'+hex(e.fill)+'"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>';
   if(e.t==='img')return'<p:pic><p:nvPicPr><p:cNvPr id="'+id+'" name="'+(e.k==='logo'?'Physica logo':'Diagram')+'"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr><p:blipFill><a:blip r:embed="'+rel+'"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr>'+xf+'</p:spPr></p:pic>';
-  const ps=e.paras.map(p=>{const rs=[];if(p.label)rs.push(run(p.label+'  ',p.fs,C.acc,1));for(const r of runs(parse(p.s)))rs.push(run(r.s,p.fs,p.c,p.b,r.sup));
+  const ps=e.paras.map(p=>{const rs=[];if(p.label)rs.push(run(p.label+'  ',p.fs,C.acc,1));for(const r of runs(parse(p.s)))rs.push(run(r.s,p.fs,p.c,p.b,r.sup,r.sub));
     return'<a:p><a:pPr algn="'+(p.al==='r'?'r':p.al==='c'?'ctr':'l')+'"><a:spcBef><a:spcPts val="0"/></a:spcBef><a:spcAft><a:spcPts val="'+Math.round((p.gap||0)*50)+'"/></a:spcAft></a:pPr>'+rs.join('')+'</a:p>'});
   return'<p:sp><p:nvSpPr><p:cNvPr id="'+id+'" name="Text '+id+'"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="'+emu(e.x)+'" y="'+emu(e.y)+'"/><a:ext cx="'+emu(e.w)+'" cy="'+emu(Math.max(e.h*1.12,e.paras[0].fs*1.5))+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr><p:txBody><a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" rtlCol="0" anchor="t"><a:noAutofit/></a:bodyPr><a:lstStyle/>'+ps.join('')+'</p:txBody></p:sp>'}
 const NS='xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"',XH='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n',REL='http://schemas.openxmlformats.org/officeDocument/2006/relationships/',GRP='<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>';
@@ -224,13 +224,16 @@ const fromBmp=(bmp,q)=>{const c=document.createElement('canvas');c.width=bmp.wid
 const encJpg=(cv,q=.93)=>{const P=getPool();if(!P)return toJpg(cv,q);
   return createImageBitmap(cv).then(bmp=>new Promise((ok,no)=>{const w=P[rr++%P.length],id=++jid;w.p.set(id,{ok,no});w.postMessage({id,bmp,q})}).catch(()=>fromBmp(bmp,q)).finally(()=>bmp.close?.()),()=>toJpg(cv,q))};
 
-async function make({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled}){
+const ARIAL='Arial,"Liberation Sans",Helvetica,sans-serif';
+async function make(o){const V=o.format==='ppt'?null:await vecStart({pageW:960,pageH:540,unitW:W}),f0=FONT;if(V)FONT=ARIAL;try{return await makeCore(o,V)}finally{FONT=f0}}   /* slides as a PDF are vector too (real, copyable text) */
+async function makeCore({items,withSol,blank,format,meta,theme,perSlide=1,onProgress,cancelled},V){
   setPalette(theme);
-  const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=c0.getContext('2d');
+  const c0=document.createElement('canvas');c0.width=W;c0.height=H;cx=V?V.meter():c0.getContext('2d');
   const logo=await logoCanvas(),N=items.length,specs=[titleSlide(meta,N,withSol)];
   for(let i=0;i<N;i++){if(cancelled?.())throw new Error('cancelled');const two=perSlide===2&&i+1<N;specs.push(two?await pairSlide(items[i].q,i,items[i+1].q,N,withSol,meta):await questionSlide(items[i].q,i,N,withSol,meta,items[i].topic));if(blank)specs.push([rect(0,0,W,H,P.bg),{t:'img',k:'logo',...LOGO}]);if(two)i++;onProgress?.(i+1,N+1);if(i%4===3)await yld()}
   for(const sp of specs)for(const e of sp)if(e.t==='text')e.h=e.paras.reduce((a,p)=>a+layout(p.s,p.fs,e.w-(p.lw||0),p.b).h+(p.gap||0),0);
   if(format==='ppt')return makePPTX(specs,logo);
+  if(V){for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');drawSlide(specs[i],logo,V.page());onProgress?.(N+1,N+1,i+1,specs.length);if(i%6===5)await yld()}return V.finish('Physica '+meta.chapter+' PYQs')}
   const jp=[];for(let i=0;i<specs.length;i++){if(cancelled?.())throw new Error('cancelled');jp.push(encJpg(drawSlide(specs[i],logo))); /* toBlob keeps a copy of the page, so the same canvas is redrawn at once while the encoding runs off the main thread */
     onProgress?.(N+1,N+1,i+1,specs.length);await yld()}
   return makePDF(await Promise.all(jp),960,540,W*SS,H*SS)}
@@ -273,10 +276,10 @@ async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
 /* vector mode: real text with embedded fonts (ttf.js + pdf-vec.js); null when the fonts cannot be loaded (the caller then draws raster pages) */
 let FONTS=null;
 const paperFonts=()=>JSON.parse(__PAPER_FONTS__);   // replaced at build by a string literal of the JSON {sans:'./fonts/pp-sans.ttf?v=..',...}
-async function vecStart(){
+async function vecStart(opt){
   try{if(!window.PhysicaPdf||!window.PhysicaTTF)return null;
     if(!FONTS){const U=paperFonts();FONTS=Object.fromEntries(await Promise.all(Object.entries(U).map(async([k,u])=>{const r=await fetch(u);if(!r.ok)throw new Error(u);return[k,window.PhysicaTTF.parseTTF(new Uint8Array(await r.arrayBuffer()))]})))}
-    return new window.PhysicaPdf.PdfDoc(FONTS)}catch{FONTS=null;return null}}
+    return new window.PhysicaPdf.PdfDoc(FONTS,opt)}catch{FONTS=null;return null}}
 async function makePaper({items,year,withSol,onProgress,cancelled,raster}){
   FONT='Arial,"Liberation Sans",Helvetica,sans-serif';setPalette('paper');
   try{

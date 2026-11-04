@@ -50,21 +50,21 @@ function svgOps(d) {   // SVG path data -> { ops: PDF path operators, end: [x, y
   }
   return { ops, end: [x, y], dir };
 }
-function figOps(doc, ctx, spec, x, y, w) {
-  const page = ctx.page, a = w / (spec.w || 240), out = page.ops, K = .5523;
-  out.push('q ' + num(a) + ' 0 0 ' + num(a) + ' ' + num(x) + ' ' + num(y) + ' cm 0 0 0 rg 0 0 0 RG 1 j 1 J');
+function figOps(doc, ctx, spec, x, y, w, ink = '#000') {
+  const page = ctx.page, a = w / (spec.w || 240), out = page.ops, K = .5523, C = color(ink);
+  out.push('q ' + num(a) + ' 0 0 ' + num(a) + ' ' + num(x) + ' ' + num(y) + ' cm ' + C + ' rg ' + C + ' RG 1 j 1 J');
   const arrow = (ex, ey, dx, dy, sw) => { const L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, tx = ex + ux * .7 * sw, ty = ey + uy * .7 * sw, bx = ex - ux * 6.3 * sw, by = ey - uy * 6.3 * sw, hw = 3.5 * sw; out.push(num(tx) + ' ' + num(ty) + ' m ' + num(bx - uy * hw) + ' ' + num(by + ux * hw) + ' l ' + num(bx + uy * hw) + ' ' + num(by - ux * hw) + ' l h f') };
   for (const it of spec.d || []) {
     if (!Array.isArray(it)) continue; const t = it[0];
-    if (t === 't') { const [tx, ty, str, o = ''] = it.slice(1); if (typeof tx !== 'number' || typeof ty !== 'number') continue; ctx.font = (o.includes('s') ? 10 : 12) + 'px Arial'; ctx.textAlign = o.includes('m') ? 'center' : o.includes('e') ? 'right' : 'left'; ctx.fillStyle = '#000'; ctx.fillText(String(str ?? ''), tx, ty); ctx.textAlign = 'left'; continue }
+    if (t === 't') { const [tx, ty, str, o = ''] = it.slice(1); if (typeof tx !== 'number' || typeof ty !== 'number') continue; ctx.font = (o.includes('s') ? 10 : 12) + 'px Arial'; ctx.textAlign = o.includes('m') ? 'center' : o.includes('e') ? 'right' : 'left'; ctx.fillStyle = ink; ctx.fillText(String(str ?? ''), tx, ty); ctx.textAlign = 'left'; continue }
     const n = { l: 4, c: 3, r: 4, p: 0 }[t]; if (n === undefined) continue; const o = String(t === 'p' ? it[2] || '' : it[n + 1] || ''), sw = o.includes('B') ? 2.6 : 1.6;
     let path = '', end = null, start = null, sdir = null;
     if (t === 'l') { const [x1, y1, x2, y2] = it.slice(1, 5); if (![x1, y1, x2, y2].every(v => typeof v === 'number')) continue; path = num(x1) + ' ' + num(y1) + ' m ' + num(x2) + ' ' + num(y2) + ' l'; end = [x2, y2, x2 - x1, y2 - y1]; start = [x1, y1, x1 - x2, y1 - y2] }
     else if (t === 'c') { const [cx, cy, r] = it.slice(1, 4); if (![cx, cy, r].every(v => typeof v === 'number')) continue; const k = r * K; path = num(cx + r) + ' ' + num(cy) + ' m ' + [[cx + r, cy + k, cx + k, cy + r, cx, cy + r], [cx - k, cy + r, cx - r, cy + k, cx - r, cy], [cx - r, cy - k, cx - k, cy - r, cx, cy - r], [cx + k, cy - r, cx + r, cy - k, cx + r, cy]].map(q => q.map(num).join(' ') + ' c').join(' ') + ' h' }
     else if (t === 'r') { const [rx, ry, rw, rh] = it.slice(1, 5); if (![rx, ry, rw, rh].every(v => typeof v === 'number')) continue; path = [rx, ry, rw, rh].map(num).join(' ') + ' re' }
     else { if (typeof it[1] !== 'string' || !/^[MLHVCSQTAZmlhvcsqtaz0-9.,\s-]+$/.test(it[1])) continue; const r = svgOps(it[1]); path = r.ops.join(' '); end = [r.end[0], r.end[1], r.dir[0], r.dir[1]]; const m0 = /^\s*[Mm]\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/.exec(it[1]); start = m0 ? [+m0[1], +m0[2], 0, 0] : null }
-    if (o.includes('F')) out.push('0 g ' + path + ' f 0 G');
-    else if (o.includes('f')) out.push('0.84 g ' + path + ' f 0 g');
+    if (o.includes('F')) out.push(path + ' f');
+    else if (o.includes('f')) out.push('/GA16 gs ' + path + ' f /GA1 gs');
     out.push(num(sw) + ' w ' + (o.includes('d') ? '[5 4] 0 d ' : '[] 0 d ') + path + ' S [] 0 d');
     if ((o.includes('a') || o.includes('b')) && end) arrow(end[0], end[1], end[2], end[3], sw);
     if (o.includes('b') && start && t === 'l') arrow(start[0], start[1], start[2], start[3], sw);
@@ -98,7 +98,7 @@ class PdfDoc {
       fontRefs[f.id] = add('<< /Type /Font /Subtype /Type0 /BaseFont /' + pre + f.name + ' /Encoding /Identity-H /DescendantFonts [' + ref(cid) + '] /ToUnicode ' + ref(tu) + ' >>');
     }
     const imgRefs = {};
-    for (let i = 0; i < this.images.length; i++) { const im = this.images[i], am = add(await stream('/Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceGray /BitsPerComponent 8', im.gray)); imgRefs['Im' + (i + 1)] = add(await stream('/Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8 /SMask ' + ref(am), new Uint8Array([0]))) }
+    for (let i = 0; i < this.images.length; i++) { const im = this.images[i], am = add(await stream('/Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceGray /BitsPerComponent 8', im.gray)); imgRefs['Im' + (i + 1)] = im.rgb ? add(await stream('/Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /SMask ' + ref(am), im.rgb)) : add(await stream('/Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8 /SMask ' + ref(am), new Uint8Array([0]))) }
     const pageRefs = [];
     for (const p of this.pages) {
       const body = enc.encode(num(this.s) + ' 0 0 ' + num(-this.s) + ' 0 ' + num(this.H) + ' cm\n' + p.ops.join('\n')), c = add(await stream('', body));
@@ -106,7 +106,7 @@ class PdfDoc {
     }
     const info = add('<< /Title (' + String(title || 'Physica').replace(/[^\x20-\x7e]/g, '').replace(/[()\\]/g, '') + ') /Producer (physica.in) /Creator (physica.in) >>');
     objs[0] = '<< /Type /Catalog /Pages 2 0 R >>'; objs[1] = '<< /Type /Pages /Kids [' + pageRefs.map(ref).join(' ') + '] /Count ' + pageRefs.length + ' >>';
-    objs[2] = '<< /Font << ' + Object.entries(fontRefs).map(([k, v]) => '/' + k + ' ' + ref(v)).join(' ') + ' >> /XObject << ' + Object.entries(imgRefs).map(([k, v]) => '/' + k + ' ' + ref(v)).join(' ') + ' >> /ProcSet [/PDF /Text /ImageB] >>';
+    objs[2] = '<< /ExtGState << /GA16 << /ca 0.16 /CA 1 >> /GA1 << /ca 1 /CA 1 >> >> /Font << ' + Object.entries(fontRefs).map(([k, v]) => '/' + k + ' ' + ref(v)).join(' ') + ' >> /XObject << ' + Object.entries(imgRefs).map(([k, v]) => '/' + k + ' ' + ref(v)).join(' ') + ' >> /ProcSet [/PDF /Text /ImageB] >>';
     const parts = [], offs = []; let len = 0; const put = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length };
     put('%PDF-1.5\n%\xe2\xe3\xcf\xd3\n');
     objs.forEach((o, i) => { offs[i] = len; put((i + 1) + ' 0 obj\n'); if (typeof o === 'string') put(o); else { put(o.dict); put('\nstream\n'); put(o.bytes); put('\nendstream') } put('\nendobj\n') });
@@ -126,11 +126,18 @@ class PdfCtx {
     return out;
   }
   _width(gl, size) { let w = 0; for (const x of gl) w += x.f.font.advance(x.g) * size / x.f.font.upem; return w }
-  measureText(s) { const { size, bold } = this._fs(); return { width: this._width(this._glyphs(s, bold), size) } }
+  _segs(s) { const M = typeof window !== 'undefined' && window.PhysicaMath; return M && M.has(String(s)) ? M.parse(String(s)) : null }   // "k_B", "10^(-3)": real sub/superscripts, as on the page and in the canvas drawings
+  measureText(s) { const { size, bold } = this._fs(), sg = this._segs(s); if (!sg) return { width: this._width(this._glyphs(s, bold), size) }; return { width: sg.reduce((w, g) => w + this._width(this._glyphs(g.t, bold), g.k === 'n' ? size : size * .72), 0) } }
   fillText(s, x, y) {
-    const { size, bold } = this._fs(), gl = this._glyphs(s, bold); if (!gl.length) return;
-    let w = this._width(gl, size); if (this.textAlign === 'center') x -= w / 2; else if (this.textAlign === 'right') x -= w;
-    if (!this.page) return;
+    const { size, bold } = this._fs(), sg = this._segs(s) || [{ t: String(s), k: 'n' }];
+    const W = sg.reduce((w, g) => w + this._width(this._glyphs(g.t, bold), g.k === 'n' ? size : size * .72), 0);
+    if (this.textAlign === 'center') x -= W / 2; else if (this.textAlign === 'right') x -= W;
+    y += this.textBaseline === 'middle' ? size * .35 : this.textBaseline === 'top' ? size * .8 : 0;
+    for (const g of sg) { const z = g.k === 'n' ? size : size * .72, dy = g.k === 'b' ? size * .28 : g.k === 'p' ? -size * .4 : 0; x = this._run(g.t, x, y + dy, z, bold) }
+  }
+  _run(s, x, y, size, bold) {
+    const gl = this._glyphs(s, bold); if (!gl.length) return x;
+    if (!this.page) return x + this._width(gl, size);
     const col = color(this.fillStyle), L = this._last;
     if (L && Math.abs(L.y - y) < 1 && x - L.x1 > size * .12 && L.sp) { this.page.ops[L.idx] = this.page.ops[L.idx].replace(/> Tj ET$/, h4(L.sp) + '> Tj ET'); L.sp = 0 }   // a gap between words: put a space in the text so copy-paste keeps words apart
     let cx = x;
@@ -141,16 +148,30 @@ class PdfCtx {
       const sp = f.font.cmap.get(32); if (sp !== undefined) { f.used.add(sp); f.uni.set(sp, 32) }
       this._last = { idx, y, x1: cx + rw, sp: sp || 0 }; cx += rw; i = j;
     }
+    return cx;
   }
   fillRect(x, y, w, h) { if (this.page) this.page.ops.push(color(this.fillStyle) + ' rg ' + num(x) + ' ' + num(y) + ' ' + num(w) + ' ' + num(h) + ' re f') }
-  beginPath() { this._p = [] }
-  moveTo(x, y) { this._p.push(num(x) + ' ' + num(y) + ' m') }
-  lineTo(x, y) { this._p.push(num(x) + ' ' + num(y) + ' l') }
+  beginPath() { this._p = []; this._c = null }
+  moveTo(x, y) { this._p.push(num(x) + ' ' + num(y) + ' m'); this._c = [x, y] }
+  lineTo(x, y) { this._p.push(num(x) + ' ' + num(y) + ' l'); this._c = [x, y] }
+  closePath() { this._p.push('h') }
+  arcTo(x1, y1, x2, y2, r) {   // rounded corners (the slides' tags)
+    const c = this._c || [x1, y1], v0 = [c[0] - x1, c[1] - y1], v2 = [x2 - x1, y2 - y1], l0 = Math.hypot(...v0), l2 = Math.hypot(...v2);
+    if (!l0 || !l2) { this.lineTo(x1, y1); return } const u0 = [v0[0] / l0, v0[1] / l0], u2 = [v2[0] / l2, v2[1] / l2], cos = u0[0] * u2[0] + u0[1] * u2[1], ang = Math.acos(Math.max(-1, Math.min(1, cos)));
+    if (Math.abs(Math.sin(ang)) < 1e-6) { this.lineTo(x1, y1); return } const t = r / Math.tan(ang / 2), p0 = [x1 + u0[0] * t, y1 + u0[1] * t], p1 = [x1 + u2[0] * t, y1 + u2[1] * t], h = 4 / 3 * Math.tan((Math.PI - ang) / 4) * r;
+    this.lineTo(p0[0], p0[1]); this._p.push(num(p0[0] - u0[0] * h) + ' ' + num(p0[1] - u0[1] * h) + ' ' + num(p1[0] - u2[0] * h) + ' ' + num(p1[1] - u2[1] * h) + ' ' + num(p1[0]) + ' ' + num(p1[1]) + ' c'); this._c = p1;
+  }
+  fill() { if (this.page && this._p.length) this.page.ops.push(color(this.fillStyle) + ' rg ' + this._p.join(' ') + ' f') }
   stroke() { if (this.page && this._p.length) this.page.ops.push(color(this.strokeStyle) + ' RG ' + num(this.lineWidth) + ' w ' + (this.lineJoin === 'round' ? '1 j 1 J ' : '') + this._p.join(' ') + ' S') }
-  drawFig(spec, x, y, w) { if (this.page) figOps(this.doc, this, spec, x, y, w) }
-  drawImage(cv, x, y, w, h) {
+  drawFig(spec, x, y, w, ink) { if (this.page) figOps(this.doc, this, spec, x, y, w, ink) }
+  drawImage(cv, x, y, w, h) {   // black ink on transparent -> a soft mask of one black pixel; any other picture -> RGB + soft mask
     if (!this.page) return; const d = this.doc; let k = d.imgOf.get(cv);
-    if (k === undefined) { const cw = cv.width, ch = cv.height, px = cv.getContext('2d').getImageData(0, 0, cw, ch).data, u = new Uint32Array(px.buffer, px.byteOffset, cw * ch), gray = new Uint8Array(cw * ch); for (let i = 0; i < gray.length; i++) { const a = u[i] >>> 24; gray[i] = a < 4 ? 0 : a } /* the pictures are black ink on a transparent canvas: the alpha channel is the picture (little-endian RGBA), kept as a soft mask of a black pixel, so nothing is painted around the ink */ d.images.push({ w: cw, h: ch, gray }); k = d.images.length; d.imgOf.set(cv, k) }
+    if (k === undefined) {
+      const cw = cv.width, ch = cv.height, px = cv.getContext('2d').getImageData(0, 0, cw, ch).data, u = new Uint32Array(px.buffer, px.byteOffset, cw * ch), alpha = new Uint8Array(cw * ch); let ink = true;
+      for (let i = 0; i < alpha.length; i++) { const v = u[i], a = v >>> 24; alpha[i] = a < 4 ? 0 : a; if (a >= 4 && (v & 0xf8f8f8)) ink = false }
+      let rgb = null; if (!ink) { rgb = new Uint8Array(cw * ch * 3); for (let i = 0, j = 0; i < alpha.length; i++, j += 4) { const a = px[j + 3]; if (a) { rgb[i * 3] = Math.min(255, px[j] * 255 / a); rgb[i * 3 + 1] = Math.min(255, px[j + 1] * 255 / a); rgb[i * 3 + 2] = Math.min(255, px[j + 2] * 255 / a) } } }   // getImageData is premultiplied
+      d.images.push({ w: cw, h: ch, gray: alpha, rgb }); k = d.images.length; d.imgOf.set(cv, k)
+    }
     this.page.ops.push('q ' + num(w) + ' 0 0 ' + num(-h) + ' ' + num(x) + ' ' + num(y + h) + ' cm /Im' + k + ' Do Q');
   }
 }
