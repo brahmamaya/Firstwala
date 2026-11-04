@@ -19,3 +19,12 @@ Goal: the same quality as before (every question, diagrams as original `fig`, ke
 
 ## Measured on the owner's PDFs (regression)
 EM Waves (157 questions): all 151 numbers the OCR found were segmented and matched; the 6 missed numbers were reported; 146 of 148 keys equal the existing entries (the 2 others are reported for teacher review). Optics (577 numbered questions): 544 found, 540 matched, 426 of 439 keys equal, the rest listed. `node tools/pyq-ingest/ingest.test.js` (needs Chromium) tests the tool on a synthetic PDF made on the spot: numbering, missing number, crops, keys, diagram flags, exam tags, check and assemble.
+
+## NEET papers (image-only PDF with questions AND solutions, e.g. NEET 2026)
+NEET is organised Subject -> NCERT chapter (`tools/pyq-ingest/neet-chapters.json`: Physics, Chemistry, Botany, Zoology; key `Subject: Chapter`). Each chapter has its own lazy file `rank-pyq-neet-<subject>-<chapter>.js` (global `PhysicaRankPyqNeet_<subject>_<chapter>`), holding every year, so a new PDF only adds lines.
+1. No text layer -> `pdfimages -j <pdf> pages/raw`, rename to `pNN.jpg` in `content/pyq-work/<paper>/pages/` (git-ignored). The `prep` tool cannot segment these PDFs.
+2. One sonnet agent per ~6 pages with `tools/pyq-ingest/NEET-AGENT-PROMPT.md` -> `entries-NN.jsonl` (chapter, sub-topic, question, 4 options, printed answer index, solution in the same steps, `dia`/`sdia` = description of every picture, `flag` for any doubt). Overlapping pages give a free cross-check (compare the duplicated questions, then delete one copy).
+3. Diagrams: agents with `tools/pyq-ingest/NEET-FIG-PROMPT.md` draw `PhysicaFig` specs into `figs-<ID>.json`; `tools/pyq-ingest/fig-sheet.js` renders them to a PNG to compare with the page (chemistry structures: strongest model). Merge the parts into `figs.json` ({pn:{fig,sfig}}).
+4. `node tools/pyq-ingest/neet-assemble.js <workdir> "<exam label>" <year> <count> [--write]`: checks counts, chapters, 4 options, answers; ids `neet-<year>-qNNN`; re-running replaces the same paper and keeps other years; text duplicates of older entries are skipped and listed.
+5. `node tools/ship.js build` (new files are picked up; a file that does not match a chapter fails the build), then check/e2e as usual.
+Keys the PDF prints as "No option is correct" / "*" are kept as printed (`a` text, no `c`) with a `Note:` line; an answer the solution contradicts is never changed silently.
