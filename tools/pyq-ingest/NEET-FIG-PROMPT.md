@@ -1,0 +1,19 @@
+# Prompt for a NEET diagram agent (draws original SVG-style figures for questions and solutions)
+
+You draw the diagrams of NEET questions as `PhysicaFig` specs. Work ONLY on the question numbers (pn) named below. Open only: the entries file line for the pn (`content/pyq-work/neet2026/entries-NN.jsonl`, find it with grep), the printed page image(s) (`content/pyq-work/neet2026/pages/pNN.jpg`, the page range is given), the comment at the top of `phys-fig.js` (the spec format) and, if you want examples of finished figures, `grep -n "fig:" rank-pyq-sets.js | head` (any one file).
+
+Spec: `{"w":<width>,"h":<height>,"alt":"<what the figure shows, one sentence>","d":[items]}` with items `["l",x1,y1,x2,y2,opt]` line, `["p","<path d>",opt]` path (only M L H V C S Q T A Z and numbers), `["c",cx,cy,r,opt]` circle, `["r",x,y,w,h,opt]` box, `["t",x,y,"text",opt]` text. opt letters: d dashed, a arrow at the end, b arrows at both ends, f light fill, F solid fill, B thick, m centred text, e right-aligned text, s small text. Everything is drawn in one colour (the page text colour); keep w about 240-360 and h as needed (the site shows it at most ~520 px wide).
+
+For each pn: `dia` = the picture in the QUESTION (draw it as `fig`), `sdia` = a picture in the publisher's SOLUTION (draw it as `sfig`). Only draw what the entry marks. Draw an ORIGINAL redraw of what is printed: every label, value, direction, axis name, component, bond, charge, position and relation must match the printed page exactly; do not add, remove or "improve" anything. Do not trace or copy pixel art; redraw with lines, paths, circles and text.
+- Circuits: wires as lines, a resistor as a box with its value, a battery as two unequal parallel lines with its emf, diodes as a triangle plus bar, capacitors as two parallel plates, etc. Keep the topology identical.
+- Graphs: axes with arrows and names, the curve as a path, marked points and values. If the four OPTIONS are graphs, draw all four in ONE figure in a 2x2 (or 1x4) grid, each labelled (1) (2) (3) (4) exactly as printed.
+- Ray diagrams and field diagrams: same object and image positions, arrows and labels as printed.
+- Chemical structures: bonds as lines (use the same ring/chain geometry as the page, rings as polygons or paths), atoms/groups as text (use unicode subscripts and charges), wedge or dash bonds as thick or dashed lines. If options are structures, draw all four in one figure labelled (1)-(4).
+- Tables drawn as images: draw them with lines and text.
+- If a picture is too unclear on the page to redraw exactly, do not guess: put `"unclear":"<what is unclear>"` instead of the spec.
+If a solution picture only repeats what the solution text already says completely (for example a plain reaction arrow chain written in the text), you may skip that `sfig` and say so in the report.
+
+Check your drawings: write them to `content/pyq-work/neet2026/figs-<ID>.json` as `{"<pn>":{"fig":{...},"sfig":{...}},...}` and run
+`NODE_PATH=/tmp/nm CHROMIUM=/opt/pw-browsers/chromium node tools/pyq-ingest/fig-sheet.js content/pyq-work/neet2026/figs-<ID>.json /tmp/figsheet-<ID>.png`
+then Read the PNG and compare each drawing with the printed page; fix overlaps, clipped labels and wrong labels; repeat until each one matches. Do not edit any other file and do not commit.
+Final report (4 lines max): pn drawn (fig / sfig), pn skipped or unclear with the reason, anything you could not verify.
