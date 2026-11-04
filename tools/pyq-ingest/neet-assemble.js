@@ -31,6 +31,7 @@ for (const r of rows) {
   const list = CH[r.sub] && Object.values(CH[r.sub]).flat();
   if (!list) bad(r.pn, `unknown subject ${r.sub}`); else if (!list.includes(r.ch)) bad(r.pn, `chapter "${r.ch}" is not in the ${r.sub} list`);
   if (!r.q || !r.st || !r.s) bad(r.pn, 'q, st or s is empty');
+  if (r.raw) bad(r.pn, 'the solution is still the publisher text (raw): rewrite it in new words (NEET-DOCX-TAG-PROMPT.md) and merge with docx-ingest.js --tags');
   if (!Array.isArray(r.o) || r.o.length !== 4 || r.o.some(x => !String(x).trim())) bad(r.pn, 'needs exactly 4 options');
   if (r.c === null || r.c === undefined) { if (!r.a) bad(r.pn, 'no answer index and no `a` text') } else if (!(r.c >= 0 && r.c <= 3)) bad(r.pn, 'c out of range');
   if (/\bundefined\b|\bNaN\b/.test(JSON.stringify(r))) bad(r.pn, 'contains "undefined" or NaN');
