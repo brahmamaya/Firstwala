@@ -4,7 +4,7 @@ Owner rules: merge to main without asking, in batches of 10 sims. After each bat
 
 ## Setup (container is fresh each time)
 1. `cd /home/user/firstwala`, work on branch `ccr-28bb352c-9s4xnw`: `git fetch origin main && git checkout -B ccr-28bb352c-9s4xnw origin/main`.
-2. esbuild 0.24.2: `mkdir -p /tmp/claude-0/esb/v0.24.2 && cd /tmp/claude-0/esb/v0.24.2 && npm i esbuild@0.24.2`; build = `ESBUILD=/tmp/claude-0/esb/v0.24.2/node_modules/.bin/esbuild node tools/build.js`.
+2. esbuild 0.24.2: `mkdir -p /tmp/esb/v0.24.2 && cd /tmp/esb/v0.24.2 && npm i esbuild@0.24.2`; build = `ESBUILD=/tmp/esb/v0.24.2/node_modules/.bin/esbuild node tools/build.js`.
 3. Playwright: `ln -sfn /opt/node22/lib/node_modules/playwright /tmp/nm/playwright-core` (mkdir /tmp/nm first); env for tools: `NODE_PATH=/tmp/nm CHROMIUM=/opt/pw-browsers/chromium`.
 4. Screenshot: `PORT=<free> node tools/e2e/shot.js <outDir> id1,id2 ultra` (also `2d`), then view the PNG. Smoke: `MODES=2d,ultra PORT=<free> IDS=id1,id2 node tools/e2e/lab-smoke.js "" bio-` (or `chem-`).
 5. Phone fps check: Playwright context `{viewport:{width:390,height:800},hasTouch:true,isMobile:true,deviceScaleFactor:3}`, CDP `Emulation.setCPUThrottlingRate` rate 4, open the sim (`click text=Simulations`, `click text=Voice tutor, demos and quiz`, `location.hash='#<id>'`), measure rAF fps over 2 s. Must be >= 55.

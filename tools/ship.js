@@ -1,28 +1,27 @@
 #!/usr/bin/env node
 /* One command for the repeated chores, with QUIET output (only failures and one summary line), to save tokens and tool calls.
    node tools/ship.js check [--e2e]      fast checks from CLAUDE.md (perf budget, guards, tests); --e2e adds the browser suite
-   node tools/ship.js build              esbuild build (finds esbuild 0.24.2 under /tmp/claude-0/esb/v0.24.2 or $ESBUILD)
-   node tools/ship.js commit "message"   stage everything except .claude, node_modules, caches; commit with the attribution trailer
+   node tools/ship.js build              esbuild build (finds esbuild 0.24.2 under /tmp/esb/v0.24.2 or $ESBUILD)
+   node tools/ship.js commit "message"   stage everything except .claude, node_modules, caches; commit
    node tools/ship.js sync               merge origin/main; generated files (index.html, *.min.js, styles.min.css) conflict -> take ours + rebuild
    node tools/ship.js after-merge        after the squash merge: reset the work branch to origin/main, keep history, push (clears the stop-hook warning)
-   Pull requests are still made with the GitHub tools (no gh CLI here). Session id for the trailer: $CLAUDE_SESSION or the default below. */
+   Pull requests are still made with the GitHub tools (no gh CLI here). */
 'use strict';
 const cp = require('child_process'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..'), BR = process.env.WORK_BRANCH || 'ccr-28bb352c-9s4xnw';
-const ESB = process.env.ESBUILD || '/tmp/claude-0/esb/v0.24.2/node_modules/.bin/esbuild';
-const SESSION = process.env.CLAUDE_SESSION || 'https://claude.ai/code/session_01YK82CobsY8aTW3NchwsaVN';
+const ESB = process.env.ESBUILD || '/tmp/esb/v0.24.2/node_modules/.bin/esbuild';
 const run = (cmd, args, o = {}) => cp.spawnSync(cmd, args, { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28, env: { ...process.env, ...(o.env || {}) } });
 const git = (...a) => run('git', a);
 const tail = (s, n = 6) => String(s || '').trim().split('\n').slice(-n).join('\n');
 const GEN = f => f === 'index.html' || f === 'styles.min.css' || /\.min\.js$/.test(f) || f === 'sw.js';
 const fail = m => { console.error('FAIL ' + m); process.exit(1) };
 
-function build() { if (!fs.existsSync(ESB)) fail('esbuild 0.24.2 missing: mkdir -p /tmp/claude-0/esb/v0.24.2 && cd /tmp/claude-0/esb/v0.24.2 && npm i esbuild@0.24.2'); const r = run('node', ['tools/build.js'], { env: { ESBUILD: ESB } }); if (r.status) fail('build\n' + tail(r.stderr + r.stdout)); console.log('build ok') }
+function build() { if (!fs.existsSync(ESB)) fail('esbuild 0.24.2 missing: mkdir -p /tmp/esb/v0.24.2 && cd /tmp/esb/v0.24.2 && npm i esbuild@0.24.2'); const r = run('node', ['tools/build.js'], { env: { ESBUILD: ESB } }); if (r.status) fail('build\n' + tail(r.stderr + r.stdout)); console.log('build ok') }
 
 function check(e2e) {
   const steps = [['perf budget', 'node', ['tools/perf-budget.js'], /FAIL/], ['private guard', 'node', ['tools/private-guard.js']], ['security guard', 'node', ['tools/security-guard.js']], ['secret guard', 'node', ['-e', "require('./tools/secret-guard.js')('.')"]],
     ['watchdog test', 'node', ['tools/watchdog.test.js']], ['series-import test', 'node', ['tools/series-import.test.js']], ['qgen verify test', 'node', ['tools/qgen/verify.test.js']], ['qgen verify', 'node', ['tools/qgen/verify.js']], ['qbank up to date', 'node', ['tools/qgen/build.js', '--check']], ['pyq view buttons', 'node', ['tools/e2e/pyq-view.js']], ['docx ingest test', 'node', ['tools/pyq-ingest/docx-ingest.test.js']], ['pdf vec test', 'node', ['tools/pdf-vec.test.js']], ['neet pyq', 'node', ['tools/e2e/neet-pyq.js']]];
-  const env = { NODE_PATH: '/tmp/nm:/tmp/claude-0/esb/e2e/node_modules', CHROMIUM: '/opt/pw-browsers/chromium', PW: 'playwright-core' };
+  const env = { NODE_PATH: '/tmp/nm:/tmp/esb/e2e/node_modules', CHROMIUM: '/opt/pw-browsers/chromium', PW: 'playwright-core' };
   if (e2e) steps.push(['browser e2e', 'node', ['tools/e2e/e2e.js'], /FAIL/]);
   let bad = 0;
   for (const [name, c, a, re] of steps) { const r = run(c, a, { env }), out = r.stdout + r.stderr; if (r.status || (re && re.test(out))) { bad++; console.log('FAIL ' + name + '\n' + tail(out.split('\n').filter(l => !re || re.test(l) || !/^PASS/.test(l)).join('\n'), 12)) } else console.log('ok   ' + name) }
@@ -33,7 +32,7 @@ function commit(msg) {
   if (!msg) fail('commit message needed');
   git('add', '-A', '--', '.', ':!.claude', ':!tools/e2e/node_modules', ':!**/__pycache__');
   if (!git('diff', '--cached', '--name-only').stdout.trim()) return console.log('nothing to commit');
-  const r = git('commit', '-q', '-m', `${msg}\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\nClaude-Session: ${SESSION}`); if (r.status) fail('commit\n' + tail(r.stderr)); console.log('committed ' + git('rev-parse', '--short', 'HEAD').stdout.trim());
+  const r = git('commit', '-q', '-m', `${msg}`); if (r.status) fail('commit\n' + tail(r.stderr)); console.log('committed ' + git('rev-parse', '--short', 'HEAD').stdout.trim());
 }
 
 function sync() {

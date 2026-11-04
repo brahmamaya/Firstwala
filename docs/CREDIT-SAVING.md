@@ -26,12 +26,12 @@ Checked here: Node 22.22 and Python 3.13. Prefer these over hand-written helpers
 | Merge/checks/branch sync | `tools/ship.js` |
 | Size, secrets, private files, live-site integrity | `tools/perf-budget.js`, `secret-guard.js`, `private-guard.js`, `watchdog.js` |
 
-## Which tasks to move to ChatGPT (free of Claude credits)
-Good for ChatGPT, then paste the result for Claude to wire in (Claude then only edits, does not draft):
+## Which tasks to move to ChatGPT (free of AI credits)
+Good for ChatGPT, then paste the result for the assistant to wire in (the assistant then only edits, does not draft):
 - First drafts of long text: study-guide paragraphs, "common mistakes" and "revise" notes, Hinglish voice-tutor lines, blog/SEO text, WhatsApp/Play-store descriptions.
 - Brainstorming: question ideas per topic, mnemonics, names, app-store copy.
 - Reading a scanned page when the PDF has no text layer (give it the page image, ask for plain text), then the tool takes over.
-Keep with Claude (needs the repo or exact checking): any code change, merge/CI, diagrams (`fig`), keys and physics verification, anything touching security, privacy or the Test Series logic.
+Keep with the assistant (needs the repo or exact checking): any code change, merge/CI, diagrams (`fig`), keys and physics verification, anything touching security, privacy or the Test Series logic.
 Rule when moving work: ChatGPT output is a draft; the answer keys and formulas in it must still pass the tool checks (`check`, qgen verifier) before they ship.
 
 ## How to check the saving

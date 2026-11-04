@@ -30,7 +30,7 @@ CodeQL workflow and Dependabot config (they only run on GitHub after merge).
 ## Requires owner action (account access)
 1. Cloudflare (free) in front of physica.in, to send the real headers: add the site, proxy the DNS record, then Rules -> Transform Rules -> Modify Response Header and set the headers listed in `_headers` (CSP is already in the pages; add X-Frame-Options DENY, Permissions-Policy, Cross-Origin-Opener-Policy same-origin, X-Content-Type-Options nosniff, Referrer-Policy). Verify with https://securityheaders.com and https://observatory.mozilla.org. Rollback: pause Cloudflare for the site / switch the DNS record to DNS only.
 2. GitHub -> Settings -> Code security: enable Dependabot alerts, secret scanning and push protection (free for public repos); check that code scanning shows the CodeQL results.
-3. Settings -> Branches (or Rules): on `main` require a pull request and the "Checks" status check, block force pushes and deletion. Delete stale branches `brahmamaya-patch-1..3` and `claude/chat-session-qj0iii` if not needed. Turn on two-factor authentication for the GitHub account.
+3. Settings -> Branches (or Rules): on `main` require a pull request and the "Checks" status check, block force pushes and deletion. Delete stale branches `brahmamaya-patch-1..3` if not needed. Turn on two-factor authentication for the GitHub account.
 4. Supabase dashboard: if the old project still exists, pause or delete it (or rotate its publishable/secret keys). Nothing in this repository needs it any more.
 5. Google Form: keep the form owner's account on 2-step verification; consider switching on "limit to 1 response" is NOT possible without login, so watch the Sheet for spam.
 6. Renew `/.well-known/security.txt` before 2027-10-10 (the `Expires` field).
