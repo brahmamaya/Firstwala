@@ -1,6 +1,6 @@
 /* Rank mode · NEET: subjects, NCERT chapters, PYQs (NEET 2026), selection and the PDF download.
    NODE_PATH=/tmp/nm PW=playwright-core CHROMIUM=/opt/pw-browsers/chromium node tools/e2e/neet-pyq.js */
-const { chromium } = require(process.env.PW || 'playwright-core'), http = require('http'), fs = require('fs'), path = require('path'), assert = require('assert');
+const { chromium } = require(process.env.PW || 'playwright-core'), http = require('http'), fs = require('fs'), path = require('path'), assert = require('assert'), os = require('os'), { execFileSync } = require('child_process');
 const root = path.join(__dirname, '..', '..'), mt = { '.js': 'text/javascript', '.html': 'text/html', '.css': 'text/css', '.json': 'application/json' };
 const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]); let f = path.resolve(root, '.' + u); if (u.endsWith('/')) f = path.join(f, 'index.html'); if (!f.startsWith(root + path.sep)) { r.writeHead(403); r.end(); return } fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end() } else { r.writeHead(200, { 'content-type': mt[path.extname(f)] || 'application/octet-stream' }); r.end(d) } }) }).listen(0, async () => {
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM, args: ['--no-sandbox'] }), p = await b.newPage({ viewport: { width: 1000, height: 900 }, acceptDownloads: true }); const errs = []; p.on('pageerror', e => errs.push(e.message));
@@ -39,8 +39,16 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
       const [d2] = await Promise.all([p.waitForEvent('download', { timeout: 120000 }), p.click('[data-testid=rk-paper-' + k + ']')]);
       const nm = d2.suggestedFilename(), bb = fs.readFileSync(await d2.path());
       assert(/NEET-2026/.test(nm) && (k === 'sol' ? /solutions/.test(nm) : !/solutions/.test(nm)), 'paper name ' + nm);
-      assert(bb.slice(0, 5).toString() === '%PDF-' && bb.length > 500000, 'a real paper PDF was made (' + bb.length + ' bytes)');
+      assert(bb.slice(0, 5).toString() === '%PDF-' && bb.length > 100000 && bb.length < 3000000, 'a vector paper PDF was made (' + bb.length + ' bytes: real text, small)');
+      const tf = path.join(os.tmpdir(), 'physica-e2e-paper-' + process.pid + '-' + k + '.pdf'); fs.writeFileSync(tf, bb);
+      try { const txt = execFileSync('pdftotext', [tf, '-'], { encoding: 'utf8', maxBuffer: 1 << 26 }); assert(/An ideal gas is made of polyatomic molecules/.test(txt) && /H₂|10⁻/.test(txt), 'the PDF text can be selected and copied'); if (k === 'sol') assert(/Answer: \(4\) 4/.test(txt), 'solutions are text too') } catch (e) { if (e.code !== 'ENOENT') throw e } finally { fs.rmSync(tf, { force: true }) }
     }
+    // fonts cannot be fetched (fresh page, nothing cached): the paper still downloads, as raster pages
+    { const c2 = await b.newContext({ viewport: { width: 1000, height: 900 }, acceptDownloads: true, serviceWorkers: 'block' }), p2 = await c2.newPage(); await p2.route('**/fonts/pp-*', r => r.abort());
+      await p2.goto('http://localhost:' + srv.address().port + '/'); await p2.waitForTimeout(1200); await p2.click('[data-testid=mode-rank]'); await p2.waitForTimeout(600); await p2.click('[data-testid=rank-neet]'); await p2.waitForSelector('[data-testid=rank-neet-page]');
+      await p2.click('[data-testid=rk-sub-papers]'); await p2.click('[data-testid=rk-year-2026]');
+      const [d4] = await Promise.all([p2.waitForEvent('download', { timeout: 180000 }), p2.click('[data-testid=rk-paper-q]')]); const b4 = fs.readFileSync(await d4.path());
+      assert(b4.slice(0, 5).toString() === '%PDF-' && b4.length > 1000000, 'raster fallback PDF when the fonts are missing (' + b4.length + ' bytes)'); await c2.close() }
     for (const k of ['q-docx', 'sol-docx']) {
       const [d3] = await Promise.all([p.waitForEvent('download', { timeout: 120000 }), p.click('[data-testid=rk-paper-' + k + ']')]);
       const nm = d3.suggestedFilename(), bb = fs.readFileSync(await d3.path());

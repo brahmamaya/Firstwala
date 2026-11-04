@@ -270,37 +270,45 @@ async function makeSheet({formulas,chapter,exam,onProgress,cancelled}){
   return makePDF(out,595,842,AW*SC,AH*SC)}
 
 /* ---------- a whole past-year paper: A4, plain black on white, in the paper's own order and in Arial (the printed papers' font); the year and the logo on top of every page ---------- */
-async function makePaper({items,year,withSol,onProgress,cancelled}){
+/* vector mode: real text with embedded fonts (ttf.js + pdf-vec.js); null when the fonts cannot be loaded (the caller then draws raster pages) */
+let FONTS=null;
+const paperFonts=()=>JSON.parse(__PAPER_FONTS__);   // replaced at build by a string literal of the JSON {sans:'./fonts/pp-sans.ttf?v=..',...}
+async function vecStart(){
+  try{if(!window.PhysicaPdf||!window.PhysicaTTF)return null;
+    if(!FONTS){const U=paperFonts();FONTS=Object.fromEntries(await Promise.all(Object.entries(U).map(async([k,u])=>{const r=await fetch(u);if(!r.ok)throw new Error(u);return[k,window.PhysicaTTF.parseTTF(new Uint8Array(await r.arrayBuffer()))]})))}
+    return new window.PhysicaPdf.PdfDoc(FONTS)}catch{FONTS=null;return null}}
+async function makePaper({items,year,withSol,onProgress,cancelled,raster}){
   FONT='Arial,"Liberation Sans",Helvetica,sans-serif';setPalette('paper');
   try{
-    const SC=1,AW=1240,AH=1754,M=90,TOP=170,BOT=AH-110,NW=64,CW=AW-M*2-NW,c0=document.createElement('canvas');c0.width=AW;c0.height=AH;cx=c0.getContext('2d');
+    const V=raster?null:await vecStart(),SC=1,AW=1240,AH=1754,M=90,TOP=170,BOT=AH-110,NW=64,CW=AW-M*2-NW,c0=document.createElement('canvas');c0.width=AW;c0.height=AH;cx=V?V.meter():c0.getContext('2d');   /* the vector fonts measure the text, so lines break exactly where the PDF draws them */
     try{await document.fonts.load('800 40px Orbitron')}catch{}
     const logo=await logoCanvas(),QF=23,OF=22,SF=20,blocks=[];
     const list=[...items].sort((a,b)=>(a.pn||0)-(b.pn||0));
-    const figs=await Promise.all(list.map(q=>Promise.all([figSpecCanvas(q.fig),withSol?figSpecCanvas(q.sfig):null])));   /* all pictures decode at the same time */
+    const fig1=async sp=>V?(sp?{spec:sp,ar:(sp.w||240)/(sp.h||140),w:sp.w||240}:null):figSpecCanvas(sp),drawFg=(g,x,y,w,h)=>g.spec?cx.drawFig(g.spec,x,y,w):cx.drawImage(g.c,x,y,w,h);   /* vector: the figure spec is drawn as PDF lines and text */
+    const figs=await Promise.all(list.map(q=>Promise.all([fig1(q.fig),withSol?fig1(q.sfig):null])));   /* all pictures decode at the same time */
     for(let i=0;i<list.length;i++){if(cancelled?.())throw new Error('cancelled');const q=list[i],n=q.pn||i+1;
-      const ql=layout(q.q,QF,CW,0),fg=figs[i][0],fw=fg?Math.min(CW*.7,fg.c.width/3):0,fh=fg?fw/fg.ar:0,gap=14;
+      const ql=layout(q.q,QF,CW,0),fg=figs[i][0],fw=fg?Math.min(CW*.7,fg.w??fg.c.width/3):0,fh=fg?fw/fg.ar:0,gap=14;
       const ops=(q.o||[]).map((o,k)=>'('+(k+1)+') '+o),half=(CW-40)/2,one=ops.map(o=>layout(o,OF,half,0)),two=ops.length>0&&one.every(l=>l.lines.length===1);
       let opl=null;if(ops.length){opl=two?one:ops.map(o=>layout(o,OF,CW,0))}
       const oh=!opl?0:two?Math.ceil(ops.length/2)*(Math.max(...opl.map(l=>l.h))+8):opl.reduce((a,l)=>a+l.h+8,0);
-      let sol=null,sh=0;if(withSol){const cs=[].concat(q.c??[]),at=q.o&&cs.length?'Answer: '+cs.map(k=>'('+(k+1)+') '+q.o[k]).join('; '):'Answer: '+(q.n!=null?q.n:q.a||''),al=layout(at,OF,CW,1),sl=String(q.s||'').split('\n').filter(Boolean).map(l=>layout(l,SF,CW,0)),sg=figs[i][1],sfw=sg?Math.min(CW*.7,sg.c.width/3):0,sfh=sg?sfw/sg.ar:0;
+      let sol=null,sh=0;if(withSol){const cs=[].concat(q.c??[]),at=q.o&&cs.length?'Answer: '+cs.map(k=>'('+(k+1)+') '+q.o[k]).join('; '):'Answer: '+(q.n!=null?q.n:q.a||''),al=layout(at,OF,CW,1),sl=String(q.s||'').split('\n').filter(Boolean).map(l=>layout(l,SF,CW,0)),sg=figs[i][1],sfw=sg?Math.min(CW*.7,sg.w??sg.c.width/3):0,sfh=sg?sfw/sg.ar:0;
         sol={al,sl,sg,sfw,sfh};sh=14+al.h+6+sl.reduce((a,l)=>a+l.h+6,0)+(sg?sfh+10:0)}
       blocks.push({n,ql,fg,fw,fh,opl,two,half,oh,sol,gap,h:ql.h+(fg?fh+gap:0)+(oh?gap+oh:0)+sh+44});
       onProgress?.(i+1,list.length*2);if(i%8===7)await yld()}
     const pages=[[]];let y=TOP;for(const b of blocks){if(y+b.h>BOT&&pages[pages.length-1].length){pages.push([]);y=TOP}pages[pages.length-1].push({b,y});y+=b.h}
-    const jp=[],cv=document.createElement('canvas');cv.width=AW*SC;cv.height=AH*SC;   /* one page canvas for every page: toBlob keeps a copy, so it can be redrawn at once */
+    const jp=[],cv=V?null:document.createElement('canvas');if(cv){cv.width=AW*SC;cv.height=AH*SC}   /* one page canvas for every page: toBlob keeps a copy, so it can be redrawn at once */
     for(let pi=0;pi<pages.length;pi++){if(cancelled?.())throw new Error('cancelled');
-      cx=cv.getContext('2d');cx.setTransform(SC,0,0,SC,0,0);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH);cx.textBaseline='alphabetic';cx.textAlign='left';
+      if(V)cx=V.page();else{cx=cv.getContext('2d');cx.setTransform(SC,0,0,SC,0,0);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH)}cx.textBaseline='alphabetic';cx.textAlign='left';
       cx.fillStyle='#000';cx.font=F(40,1);cx.fillText('NEET '+year,M,96);cx.font=F(20,0);cx.fillText(withSol?'Questions and solutions':'Questions',M,126);
       cx.drawImage(logo,AW-M-LOGO.w*.8,40,LOGO.w*.8,LOGO.h*.8);cx.fillStyle='#000';cx.fillRect(M,146,AW-M*2,2);
       for(const {b,y:by} of pages[pi]){let yy=by;cx.fillStyle='#000';cx.font=F(QF,1);cx.fillText(b.n+'.',M,yy+QF*.8);
         drawLay(b.ql,M+NW,yy,CW,'#000');yy+=b.ql.h;
-        if(b.fg){yy+=b.gap;cx.drawImage(b.fg.c,M+NW,yy,b.fw,b.fh);yy+=b.fh}
+        if(b.fg){yy+=b.gap;drawFg(b.fg,M+NW,yy,b.fw,b.fh);yy+=b.fh}
         if(b.opl){yy+=b.gap;if(b.two){const rh=Math.max(...b.opl.map(l=>l.h))+8;b.opl.forEach((l,k)=>drawLay(l,M+NW+(k%2)*(b.half+40),yy+Math.floor(k/2)*rh,b.half,'#000'));yy+=oh2(b)}else for(const l of b.opl){drawLay(l,M+NW,yy,CW,'#000');yy+=l.h+8}}
-        if(b.sol){yy+=14;drawLay(b.sol.al,M+NW,yy,CW,'#000');yy+=b.sol.al.h+6;for(const l of b.sol.sl){drawLay(l,M+NW,yy,CW,'#222');yy+=l.h+6}if(b.sol.sg){yy+=4;cx.drawImage(b.sol.sg.c,M+NW,yy,b.sol.sfw,b.sol.sfh)}}}
+        if(b.sol){yy+=14;drawLay(b.sol.al,M+NW,yy,CW,'#000');yy+=b.sol.al.h+6;for(const l of b.sol.sl){drawLay(l,M+NW,yy,CW,'#222');yy+=l.h+6}if(b.sol.sg){yy+=4;drawFg(b.sol.sg,M+NW,yy,b.sol.sfw,b.sol.sfh)}}}
       cx.fillStyle='#000';cx.font=F(18,0);cx.textAlign='center';cx.fillText('physica.in  ·  NEET '+year+'  ·  page '+(pi+1)+' of '+pages.length,AW/2,AH-50);
-      jp.push(encJpg(cv,.72));onProgress?.(list.length+pi+1,list.length+pages.length);await yld()}
-    return makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
+      if(!V)jp.push(encJpg(cv,.72));onProgress?.(list.length+pi+1,list.length+pages.length);await yld()}
+    return V?await V.finish('NEET '+year+(withSol?' questions and solutions':' questions')):makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
   finally{FONT=FONT0}}
 const oh2=b=>Math.ceil(b.opl.length/2)*(Math.max(...b.opl.map(l=>l.h))+8);
 
