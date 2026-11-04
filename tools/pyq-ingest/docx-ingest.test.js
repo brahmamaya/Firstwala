@@ -33,7 +33,7 @@ const real = [
   P(t('(1) A-I\t(2) A-II')), P(t('(3) A-III\t(4) A-IV')), P(t('Answer: (2) A-II')), P(t('Sol. ') + pic('rId5')), P(t('The picture shows it.')),
   P(t('Consider the statements: ') + pic('rId6'), 1), P(t('(1) first statement')), P(t('(2) second statement')), P(t('(1) Only first\t(2) Only second')), P(t('(3) Both\t(4) Neither')), P(t('Answer (3)')), P(t('Sol. both hold.')),
 ].join('');
-const file = path.join(os.tmpdir(), 'physica-docx-test.docx'), work = fs.mkdtempSync(path.join(os.tmpdir(), 'physica-docx-'));
+const work = fs.mkdtempSync(path.join(os.tmpdir(), 'physica-docx-')), file = path.join(work, 'paper.docx');   // private folder (mkdtemp is 0700), never a fixed name in /tmp
 fs.writeFileSync(file, zip([
   ['[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"/>'],
   ['word/document.xml', `<?xml version="1.0"?><w:document ${W}><w:body>${real}</w:body></w:document>`],

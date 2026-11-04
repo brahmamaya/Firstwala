@@ -1,5 +1,6 @@
 /* JPEG encoder worker for the PDF export: draws a page bitmap on an OffscreenCanvas and encodes it away from the page thread. */
 self.onmessage = async e => {
+  if (e.origin && e.origin !== self.location.origin) return;   // only our own page posts here (a dedicated worker's origin is empty or the site's)
   const { id, bmp, q } = e.data;
   try {
     const oc = new OffscreenCanvas(bmp.width, bmp.height);

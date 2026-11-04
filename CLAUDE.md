@@ -24,6 +24,7 @@ readiness, tests, docs. Do not optimise one at the expense of another; if there 
 - NEET PYQs: Rank mode -> NEET -> Physics/Chemistry/Botany/Zoology -> NCERT chapter (`tools/pyq-ingest/neet-chapters.json`); one lazy file per chapter `rank-pyq-neet-<subject>-<chapter>.js` holding every year; add papers with `tools/pyq-ingest/neet-assemble.js` (docs/PYQ-INGEST.md, NEET section). Browser test: `tools/e2e/neet-pyq.js`.
 - `tools/qgen/` + `qbank/`: generated practice-question bank (templates with independent verification; see `docs/QBANK.md`). Rank mode shows a Question bank tab for chapters in `qbank/index.json`.
 - SEO: `tools/seo.js` + `tools/seo-pages.js` generate sim pages, hub pages, JEE chapter pages and the sitemap; run them after adding a simulation or a Rank chapter, then `tools/seo.test.js` (see `docs/SEO.md`). Then `node tools/seo-audit.js` (errors must be 0). SEO skills: `.claude/skills/{seo,seo-audit,geo-seo,seo-machine,programmatic-seo}`.
+- `docs/TECHNIQUES.md`: short list of the working methods (git/merge routine, PYQ import for text PDF, image PDF and Word, diagrams, testing tips, CodeQL fixes). Read it at the start of a session.
 - `tools/watchdog.js`: live-site integrity monitor. `tools/perf-budget.js`: size budget. `tools/secret-guard.js`: blocks secrets.
 
 ## Commands that must pass before pushing

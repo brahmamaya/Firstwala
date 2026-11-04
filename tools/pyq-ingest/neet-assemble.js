@@ -51,7 +51,7 @@ const by = new Map(); for (const x of out) { const k = fileOf(x.sub, x.ch); (by.
 const dups = [], written = [];
 for (const [file, g] of by) {
   let old = []; const p = path.join(root, file);
-  if (fs.existsSync(p)) { const box = {}; vm.runInNewContext(fs.readFileSync(p, 'utf8'), { window: box }); old = box[globalOf(g.sub, g.ch)] || [] }
+  try { const box = {}; vm.runInNewContext(fs.readFileSync(p, 'utf8'), { window: box }); old = box[globalOf(g.sub, g.ch)] || [] } catch (e) { if (e.code !== 'ENOENT') throw e }   // no file yet = first paper of this chapter
   const keep = old.filter(o => !g.add.some(a => a.id === o.id));
   const texts = new Map(keep.map(o => [norm(o.q), o.id]));
   const add = g.add.filter(a => { const t = texts.get(norm(a.q)); if (t) { dups.push(`${a.id} equals ${t}`); return false } return true });
