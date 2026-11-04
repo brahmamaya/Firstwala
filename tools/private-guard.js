@@ -15,6 +15,12 @@ for (const f of tracked) {
   const st = fs.statSync(path.join(root, f));
   if (st.size > 400000 && !false) problems.push(`large data file (is it a question bank?): ${f} (${Math.round(st.size / 1024)} KB)`);
 }
+/* Test Series: no server, so every file in tests/ is public. Only free tests 1-3 may exist: the index must list n <= 3 and no file may be outside it. */
+try {
+  const idx = JSON.parse(fs.readFileSync(path.join(root, 'tests/index.json'), 'utf8')), ok = new Set(['tests/index.json']);
+  for (const t of idx.tests || []) { const nn = String(t.n).padStart(2, '0'); if (!(t.n >= 1 && t.n <= 3)) problems.push('paid test in tests/index.json: ' + t.id); ok.add(`tests/${t.exam}/${nn}-${t.p}.json`); ok.add(`tests/${t.exam}/${nn}-${t.p}.key.json`) }
+  for (const f of tracked) if (/^tests\//.test(f) && !ok.has(f) && !/^tests\/img\//.test(f)) problems.push('tests/ file not in the free index (tests 1-3 only): ' + f);
+} catch (e) { if (e.code !== 'ENOENT') problems.push('tests/index.json unreadable: ' + e.message) }
 /* nothing from these folders may reach the public site */
 const pub = path.join(root, '_site');
 if (fs.existsSync(pub)) {
