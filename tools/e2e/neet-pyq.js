@@ -28,8 +28,21 @@ const srv = http.createServer((q, r) => { let f = path.join(root, decodeURICompo
     const [dl] = await Promise.all([p.waitForEvent('download', { timeout: 60000 }), p.click('[data-testid=dl-go]').catch(() => p.click('.rk-dlg button:has-text("Download")'))]);
     assert(/\.pdf$/.test(dl.suggestedFilename()) && /NEET/.test(dl.suggestedFilename()), 'PDF name: ' + dl.suggestedFilename());
     const buf = fs.readFileSync(await dl.path()); assert(buf.slice(0, 5).toString() === '%PDF-' && buf.length > 20000, 'a real PDF was made');
+    await p.evaluate(() => document.querySelector('.rk-modal')?.remove());
+    // previous year papers: years 2005-2026, a whole paper as a plain PDF
+    await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(400);
+    await p.$eval('[data-testid=rk-sub-papers]', e => e.click()); await p.waitForTimeout(300);
+    assert.strictEqual((await p.$$('[data-testid^=rk-year-]')).length, 22, 'years 2005 to 2026');
+    await p.click('[data-testid=rk-year-2010]'); assert(await p.$('[data-testid=rk-paper-none]') && !(await p.$('[data-testid=rk-paper-q]')), 'a year without questions says so and has no download');
+    await p.click('[data-testid=rk-year-2026]');
+    for (const k of ['q', 'sol']) {
+      const [d2] = await Promise.all([p.waitForEvent('download', { timeout: 120000 }), p.click('[data-testid=rk-paper-' + k + ']')]);
+      const nm = d2.suggestedFilename(), bb = fs.readFileSync(await d2.path());
+      assert(/NEET-2026/.test(nm) && (k === 'sol' ? /solutions/.test(nm) : !/solutions/.test(nm)), 'paper name ' + nm);
+      assert(bb.slice(0, 5).toString() === '%PDF-' && bb.length > 500000, 'a real paper PDF was made (' + bb.length + ' bytes)');
+    }
     // chapters with and without NEET questions are told apart
-    await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(600);
+    await p.$eval('[data-testid=rk-sub-physics]', e => e.click()); await p.waitForTimeout(400);
     assert((await p.$$('.rk-ch.soon')).length > 0 && (await p.$$('.rk-ch:not(.soon)')).length > 0, 'chapters with and without questions are told apart');
     assert(!errs.length, 'page errors: ' + errs.join(';')); console.log('PASS NEET subjects, chapters, PYQs, download');
   } catch (e) { console.error('FAIL neet pyq:', e.message); process.exitCode = 1 } finally { await b.close(); srv.close() }
