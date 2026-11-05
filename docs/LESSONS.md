@@ -47,4 +47,3 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Paper PDF was blurry on zoom, 6-11 MB and not copyable because pages were JPEG images; rewritten as a vector PDF (ttf.js + pdf-vec.js, fonts/pp-*.ttf): 180/335 KB, ~0.3 s, selectable text. Esbuild turns `()=>({...})` around a build token into a block: put build tokens inside a call (`JSON.parse(__TOKEN__)`).
 - PYQ slide PDF/PPT: draw slides with the vector writer (copyable text) and use real sub/superscript runs; e2e must go back to the chooser before clicking a subject pill.
 - tests/ is public: private-guard now fails on any tests/ file outside the free index (n<=3); a paid test copied by hand can no longer ship.
-- New paper = one command: `node tools/pyq-ingest/paper.js <paper.docx> "NEET 2025" 2025 [--write]`. ChatGPT/Astra does tagging + solution rewrite in the Word file (docs/WORD-PROMPT.md, Prompt 2); a model is needed only for unknown chapters and diagrams.

@@ -102,9 +102,6 @@ function docxLines(file, media) {
 }
 
 /* ---------- segmentation ---------- */
-const TAG = /^\s*(Chapter|Topic|Rewrite|Check)\s*:\s*(.*)$/i, norm1 = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-let CHS;   // the official chapter list, read once: finds the exact chapter (and the subject for BIOLOGY papers) from a name ChatGPT wrote
-const canon = (sub, name) => { CHS ||= JSON.parse(fs.readFileSync(path.join(__dirname, 'neet-chapters.json'), 'utf8')); for (const s of sub ? [sub] : ['Botany', 'Zoology']) for (const c of Object.values(CHS[s] || {}).flat()) if (norm1(c) === norm1(name)) return { sub: s, ch: c } };
 const SUBJ = /^\s*(PHYSICS|CHEMISTRY|BOTANY|ZOOLOGY|BIOLOGY)\b[\s:.-]*$/i, QRE = /^\s*(?:Q(?:uestion)?\.?\s*)?(\d{1,3})\s*[.)]\s+(.*)$/i, ANS = /^\s*(?:Answer|Ans\.?|Key)\s*[:\-]?\s*(.*)$/i, SOL = /^\s*Sol(?:ution)?\.?\s*[:\-]?\s*(.*)$/i;
 let STYLE = '1234';   // option labels: '1234' (NEET) or 'abcd' ((a)-(d) / (A)-(D), JEE)
 const OPTS = ['1', '2', '3', '4'], idx = l => ({ 1: 0, 2: 1, 3: 2, 4: 3, a: 0, b: 1, c: 2, d: 3 })[String(l).toLowerCase()];
@@ -124,9 +121,6 @@ function segment(lines) {
     const qm = QRE.exec(line);
     if (qm && +qm[1] === next && (!cur || mode !== 'o' || cur.o.length === 0 || cur.o.length >= 4 || mode === 's')) { cur = { pn: +qm[1], sub: sub === 'Biology' ? '' : sub, q: qm[2], o: [], figfiles: [], sfigfiles: [], s: '' }; Q.push(cur); mode = 'q'; next++; continue }
     if (!cur) continue;
-    /* optional lines written by ChatGPT (docs/WORD-PROMPT.md): Chapter / Topic / Rewrite (the solution in new words, may run over several lines) */
-    const tg = TAG.exec(line); if (tg) { const k = tg[1].toLowerCase(); if (k === 'rewrite') { cur.rew = tg[2]; mode = 'r' } else cur[{ chapter: 'tch', topic: 'tst', check: 'chk' }[k]] = tg[2].trim(); continue }
-    if (mode === 'r') { cur.rew += '\n' + line; continue }
     const am = ANS.exec(line), so = SOL.exec(line);
     if (mode !== 's' && am) { cur.ans = am[1]; mode = 'a'; continue }
     if (so) { mode = 's'; cur.s += (cur.s ? '\n' : '') + so[1]; continue }
@@ -147,11 +141,6 @@ function segment(lines) {
     if (q.figfiles.length) q.dia = 'picture(s) in the file: ' + q.figfiles.join(', ');
     if (q.sfigfiles.length) q.sdia = 'picture(s) in the file: ' + q.sfigfiles.join(', ');
     q.ch = '?'; q.st = ''; q.raw = 1;
-    /* ChatGPT already gave a known chapter and a rewritten solution (not the publisher's words): the question is ready, no model needed */
-    const rew = q.rew && strip(q.rew).t, hit = q.tch && canon(q.sub, q.tch);
-    if (rew && hit && norm1(rew) !== norm1(q.s)) { q.s = rew; q.sub = hit.sub; q.ch = hit.ch; q.st = q.tst || ''; delete q.raw }
-    if (q.chk) q.flag = (q.flag ? q.flag + '; ' : '') + 'checker note: ' + q.chk;
-    delete q.rew; delete q.tch; delete q.tst; delete q.chk;
   }
   return Q;
 }
@@ -161,20 +150,19 @@ function extract(file, work) {
   fs.mkdirSync(path.join(work, 'batches'), { recursive: true });
   const Q = segment(docxLines(file, path.join(work, 'media')));
   fs.writeFileSync(path.join(work, 'entries-docx.jsonl'), Q.map(q => JSON.stringify(q)).join('\n') + '\n');
-  const todo = Q.filter(q => q.raw);   // ready questions need no batch
-  for (let i = 0; i < todo.length; i += 12) {
+  for (let i = 0; i < Q.length; i += 12) {
     const nn = String(i / 12 + 1).padStart(2, '0');
-    fs.writeFileSync(path.join(work, 'batches', `tag-${nn}.md`), `# tag batch ${nn}\nWrite tags-${nn}.jsonl: one line per question {"pn","sub","ch","st","s"}. See tools/pyq-ingest/NEET-DOCX-TAG-PROMPT.md.\n\n` + todo.slice(i, i + 12).map(q => `## Q${q.pn}${q.sub ? ' (' + q.sub + ')' : ''}\n${q.q}\n${q.o.map((o, k) => `(${k + 1}) ${o}`).join('\n')}\nAnswer: ${q.c === null ? q.a : [].concat(q.c).map(k => '(' + (k + 1) + ')').join(', ')}\nPublisher solution (rewrite in new words, keep every step):\n${q.s}\n${q.dia ? '[question picture] ' + q.dia + '\n' : ''}${q.sdia ? '[solution picture] ' + q.sdia + '\n' : ''}`).join('\n'));
+    fs.writeFileSync(path.join(work, 'batches', `tag-${nn}.md`), `# tag batch ${nn}\nWrite tags-${nn}.jsonl: one line per question {"pn","sub","ch","st","s"}. See tools/pyq-ingest/NEET-DOCX-TAG-PROMPT.md.\n\n` + Q.slice(i, i + 12).map(q => `## Q${q.pn}${q.sub ? ' (' + q.sub + ')' : ''}\n${q.q}\n${q.o.map((o, k) => `(${k + 1}) ${o}`).join('\n')}\nAnswer: ${q.c === null ? q.a : [].concat(q.c).map(k => '(' + (k + 1) + ')').join(', ')}\nPublisher solution (rewrite in new words, keep every step):\n${q.s}\n${q.dia ? '[question picture] ' + q.dia + '\n' : ''}${q.sdia ? '[solution picture] ' + q.sdia + '\n' : ''}`).join('\n'));
   }
   const miss = []; for (let n = 1; n <= (Q.length ? Q[Q.length - 1].pn : 0); n++) if (!Q.some(q => q.pn === n)) miss.push(n);
   const odd = Q.filter(q => q.o.length !== 4).map(q => q.pn), noans = Q.filter(q => q.c === null && !q.a).map(q => q.pn);
-  console.log(`questions ${Q.length}; numbers missing in the sequence: ${miss.join(',') || 'none'}; not exactly 4 options: ${odd.join(',') || 'none'}; no answer: ${noans.join(',') || 'none'}; with pictures: ${Q.filter(q => q.dia || q.sdia).length}; ready (tagged and rewritten by ChatGPT) ${Q.length - todo.length}; need a tag batch ${todo.length}`);
+  console.log(`questions ${Q.length}; numbers missing in the sequence: ${miss.join(',') || 'none'}; not exactly 4 options: ${odd.join(',') || 'none'}; no answer: ${noans.join(',') || 'none'}; with pictures: ${Q.filter(q => q.dia || q.sdia).length}; batches ${Math.ceil(Q.length / 12)}`);
   return Q;
 }
 function applyTags(work, tagFiles) {
   const Q = fs.readFileSync(path.join(work, 'entries-docx.jsonl'), 'utf8').split('\n').filter(Boolean).map(JSON.parse), T = new Map();
   for (const f of tagFiles) for (const l of fs.readFileSync(f, 'utf8').split('\n').filter(Boolean)) { const t = JSON.parse(l); T.set(t.pn, t) }
-  const missing = []; const out = Q.map(q => { const t = T.get(q.pn); if (!q.raw) { const { figfiles, sfigfiles, ...e } = q; return e } if (!t || !t.ch || !t.s || !t.sub) { missing.push(q.pn); return null } const { raw, figfiles, sfigfiles, ...e } = q; return { ...e, sub: t.sub, ch: t.ch, st: t.st || e.st, s: t.s } }).filter(Boolean);
+  const missing = []; const out = Q.map(q => { const t = T.get(q.pn); if (!t || !t.ch || !t.s || !t.sub) { missing.push(q.pn); return null } const { raw, figfiles, sfigfiles, ...e } = q; return { ...e, sub: t.sub, ch: t.ch, st: t.st || e.st, s: t.s } }).filter(Boolean);
   fs.writeFileSync(path.join(work, 'entries-01.jsonl'), out.map(e => JSON.stringify(e)).join('\n') + '\n');
   console.log(`merged ${out.length} of ${Q.length}; still untagged or without a rewritten solution: ${missing.join(',') || 'none'} -> entries-01.jsonl`);
   return missing;
