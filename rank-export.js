@@ -280,6 +280,7 @@ async function vecStart(opt){
   try{if(!window.PhysicaPdf||!window.PhysicaTTF)return null;
     if(!FONTS){const U=paperFonts();FONTS=Object.fromEntries(await Promise.all(Object.entries(U).map(async([k,u])=>{const r=await fetch(u);if(!r.ok)throw new Error(u);return[k,window.PhysicaTTF.parseTTF(new Uint8Array(await r.arrayBuffer()))]})))}
     return new window.PhysicaPdf.PdfDoc(FONTS,opt)}catch{FONTS=null;return null}}
+const nm=y=>y==='2026r'?'Re-NEET 2026':'NEET '+y;   /* title of a paper: the Re-NEET 2026 re-exam has its own year code */
 async function makePaper({items,year,withSol,onProgress,cancelled,raster}){
   FONT='Arial,"Liberation Sans",Helvetica,sans-serif';setPalette('paper');
   try{
@@ -302,16 +303,16 @@ async function makePaper({items,year,withSol,onProgress,cancelled,raster}){
     const jp=[],cv=V?null:document.createElement('canvas');if(cv){cv.width=AW*SC;cv.height=AH*SC}   /* one page canvas for every page: toBlob keeps a copy, so it can be redrawn at once */
     for(let pi=0;pi<pages.length;pi++){if(cancelled?.())throw new Error('cancelled');
       if(V)cx=V.page();else{cx=cv.getContext('2d');cx.setTransform(SC,0,0,SC,0,0);cx.fillStyle='#fff';cx.fillRect(0,0,AW,AH)}cx.textBaseline='alphabetic';cx.textAlign='left';
-      cx.fillStyle='#000';cx.font=F(40,1);cx.fillText('NEET '+year,M,96);cx.font=F(20,0);cx.fillText(withSol?'Questions and solutions':'Questions',M,126);
+      cx.fillStyle='#000';cx.font=F(40,1);cx.fillText(nm(year),M,96);cx.font=F(20,0);cx.fillText(withSol?'Questions and solutions':'Questions',M,126);
       cx.drawImage(logo,AW-M-LOGO.w*.8,40,LOGO.w*.8,LOGO.h*.8);cx.fillStyle='#000';cx.fillRect(M,146,AW-M*2,2);
       for(const {b,y:by} of pages[pi]){let yy=by;cx.fillStyle='#000';cx.font=F(QF,1);cx.fillText(b.n+'.',M,yy+QF*.8);
         drawLay(b.ql,M+NW,yy,CW,'#000');yy+=b.ql.h;
         if(b.fg){yy+=b.gap;drawFg(b.fg,M+NW,yy,b.fw,b.fh);yy+=b.fh}
         if(b.opl){yy+=b.gap;if(b.two){const rh=Math.max(...b.opl.map(l=>l.h))+8;b.opl.forEach((l,k)=>drawLay(l,M+NW+(k%2)*(b.half+40),yy+Math.floor(k/2)*rh,b.half,'#000'));yy+=oh2(b)}else for(const l of b.opl){drawLay(l,M+NW,yy,CW,'#000');yy+=l.h+8}}
         if(b.sol){yy+=14;drawLay(b.sol.al,M+NW,yy,CW,'#000');yy+=b.sol.al.h+6;for(const l of b.sol.sl){drawLay(l,M+NW,yy,CW,'#222');yy+=l.h+6}if(b.sol.sg){yy+=4;drawFg(b.sol.sg,M+NW,yy,b.sol.sfw,b.sol.sfh)}}}
-      cx.fillStyle='#000';cx.font=F(18,0);cx.textAlign='center';cx.fillText('physica.in  ·  NEET '+year+'  ·  page '+(pi+1)+' of '+pages.length,AW/2,AH-50);
+      cx.fillStyle='#000';cx.font=F(18,0);cx.textAlign='center';cx.fillText('physica.in  ·  '+nm(year)+'  ·  page '+(pi+1)+' of '+pages.length,AW/2,AH-50);
       if(!V)jp.push(encJpg(cv,.72));onProgress?.(list.length+pi+1,list.length+pages.length);await yld()}
-    return V?await V.finish('NEET '+year+(withSol?' questions and solutions':' questions')):makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
+    return V?await V.finish(nm(year)+(withSol?' questions and solutions':' questions')):makePDF(await Promise.all(jp),595,842,AW*SC,AH*SC)}
   finally{FONT=FONT0}}
 const oh2=b=>Math.ceil(b.opl.length/2)*(Math.max(...b.opl.map(l=>l.h))+8);
 
@@ -341,7 +342,7 @@ async function makeDocx({items,year,withSol,onProgress,cancelled}){
       onProgress?.(i+1,list.length);if(i%10===9)await yld()}
     const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
     const doc=XH+'<w:document '+NS+'><w:body>'+body+'<w:sectPr><w:headerReference w:type="default" r:id="rIdH"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1700" w:right="1000" w:bottom="1000" w:left="1000" w:header="500" w:footer="500" w:gutter="0"/></w:sectPr></w:body></w:document>';
-    const lw=LOGO.w*.6,lh=LOGO.h*.6,hdr=XH+'<w:hdr '+NS+'>'+para('<w:r>'+rp(40,1)+'<w:t>NEET '+year+'</w:t></w:r><w:r>'+rp(20)+'<w:t xml:space="preserve">   '+(withSol?'Questions and solutions':'Questions')+'</w:t></w:r><w:r><w:tab/></w:r>'+pic('rIdL',lw,lh),'<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="000000"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9906"/></w:tabs>')+'</w:hdr>';
+    const lw=LOGO.w*.6,lh=LOGO.h*.6,hdr=XH+'<w:hdr '+NS+'>'+para('<w:r>'+rp(40,1)+'<w:t>'+nm(year)+'</w:t></w:r><w:r>'+rp(20)+'<w:t xml:space="preserve">   '+(withSol?'Questions and solutions':'Questions')+'</w:t></w:r><w:r><w:tab/></w:r>'+pic('rIdL',lw,lh),'<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="000000"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9906"/></w:tabs>')+'</w:hdr>';
     const R='http://schemas.openxmlformats.org/officeDocument/2006/relationships/';
     return zip([
       {name:'[Content_Types].xml',data:XH+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/></Types>'},
