@@ -32,9 +32,9 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     // previous year papers: years 2005-2026, a whole paper as a plain PDF
     await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(400);
     await p.$eval('[data-testid=rk-sub-papers]', e => e.click()); await p.waitForTimeout(300);
-    assert.strictEqual((await p.$$('[data-testid^=rk-year-]')).length, 22, 'years 2005 to 2026');
+    assert.strictEqual((await p.$$('[data-testid^=rk-year-]')).length, 23, 'years 2005 to 2026 plus Re-NEET 2026');
     await p.click('[data-testid=rk-year-2010]'); assert(await p.$('[data-testid=rk-paper-none]') && !(await p.$('[data-testid=rk-paper-q]')), 'a year without questions says so and has no download');
-    await p.click('[data-testid=rk-year-2026]');
+    await p.click('[data-testid=rk-year-2026r]');
     for (const k of ['q', 'sol']) {
       const [d2] = await Promise.all([p.waitForEvent('download', { timeout: 120000 }), p.click('[data-testid=rk-paper-' + k + ']')]);
       const nm = d2.suggestedFilename(), bb = fs.readFileSync(await d2.path());
@@ -46,7 +46,7 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     // fonts cannot be fetched (fresh page, nothing cached): the paper still downloads, as raster pages
     { const c2 = await b.newContext({ viewport: { width: 1000, height: 900 }, acceptDownloads: true, serviceWorkers: 'block' }), p2 = await c2.newPage(); await p2.route('**/fonts/pp-*', r => r.abort());
       await p2.goto('http://localhost:' + srv.address().port + '/'); await p2.waitForTimeout(1200); await p2.click('[data-testid=mode-rank]'); await p2.waitForTimeout(600); await p2.click('[data-testid=rank-neet]'); await p2.waitForSelector('[data-testid=rank-neet-page]');
-      await p2.click('[data-testid=rk-sub-papers]'); await p2.click('[data-testid=rk-year-2026]');
+      await p2.click('[data-testid=rk-sub-papers]'); await p2.click('[data-testid=rk-year-2026r]');
       const [d4] = await Promise.all([p2.waitForEvent('download', { timeout: 180000 }), p2.click('[data-testid=rk-paper-q]')]); const b4 = fs.readFileSync(await d4.path());
       assert(b4.slice(0, 5).toString() === '%PDF-' && b4.length > 1000000, 'raster fallback PDF when the fonts are missing (' + b4.length + ' bytes)'); await c2.close() }
     for (const k of ['q-docx', 'sol-docx']) {
