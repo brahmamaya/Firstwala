@@ -36,3 +36,26 @@ AT THE END, in the chat (not in the Word file), tell me: (a) the total number of
 - Pick 3 questions at random and compare with the PDF: options, answer, a formula, a picture.
 - Look for "[UNCLEAR" and fix or tell the assistant.
 - Tell the assistant: the exam name and year (for example "NEET 2025") and whether the options are (1)-(4) or (a)-(d).
+
+## Prompt 2 (ONE pass: also chapter, topic and a rewritten solution; the assistant then needs no model work for those questions)
+Use this instead of the prompt above when you want the least work on the assistant's side. Paste it, then the chapter list below it. After the "Sol." lines of each question, ChatGPT adds three lines:
+```
+Chapter: <exactly one name from the list below>
+Topic: <2-5 words, the sub-topic>
+Rewrite: <the solution in YOUR OWN words, every step and number kept, same order, no copying of sentences; may run over several lines>
+```
+Add this to the first prompt, before "AT THE END":
+```
+After the printed solution of every question add exactly these lines (they are for a checking tool, keep the labels):
+Chapter: one name copied letter for letter from the CHAPTER LIST below (the NCERT chapter the question belongs to)
+Topic: 2 to 5 words
+Rewrite: the printed solution rewritten in your own words. Keep every step, formula and number and the same order, but do not copy sentences. Do not change the answer. If you disagree with the printed answer, still write Answer as printed and add the line "Check: <why>".
+```
+CHAPTER LIST (copy into the chat after the prompt):
+```
+PHYSICS: Units and Measurements; Motion in a Straight Line; Motion in a Plane; Laws of Motion; Work, Energy and Power; System of Particles and Rotational Motion; Gravitation; Mechanical Properties of Solids; Mechanical Properties of Fluids; Thermal Properties of Matter; Thermodynamics; Kinetic Theory; Oscillations; Waves; Electric Charges and Fields; Electrostatic Potential and Capacitance; Current Electricity; Moving Charges and Magnetism; Magnetism and Matter; Electromagnetic Induction; Alternating Current; Electromagnetic Waves; Ray Optics and Optical Instruments; Wave Optics; Dual Nature of Radiation and Matter; Atoms; Nuclei; Semiconductor Electronics
+CHEMISTRY: Some Basic Concepts of Chemistry; Structure of Atom; Classification of Elements and Periodicity in Properties; Chemical Bonding and Molecular Structure; Thermodynamics (Chemistry); Equilibrium; Redox Reactions; Organic Chemistry: Some Basic Principles and Techniques; Hydrocarbons; States of Matter; Hydrogen; The s-Block Elements; Solutions; Electrochemistry; Chemical Kinetics; The d- and f-Block Elements; Coordination Compounds; Haloalkanes and Haloarenes; Alcohols, Phenols and Ethers; Aldehydes, Ketones and Carboxylic Acids; Amines; Biomolecules (Chemistry); The p-Block Elements; The Solid State; Surface Chemistry; Polymers; Chemistry in Everyday Life; Environmental Chemistry
+BOTANY: The Living World; Biological Classification; Plant Kingdom; Morphology of Flowering Plants; Anatomy of Flowering Plants; Cell: The Unit of Life; Biomolecules (Biology); Cell Cycle and Cell Division; Transport in Plants; Mineral Nutrition; Photosynthesis in Higher Plants; Respiration in Plants; Plant Growth and Development; Sexual Reproduction in Flowering Plants; Principles of Inheritance and Variation; Molecular Basis of Inheritance; Microbes in Human Welfare; Biotechnology: Principles and Processes; Biotechnology and its Applications; Organisms and Populations; Ecosystem; Biodiversity and Conservation
+ZOOLOGY: Animal Kingdom; Structural Organisation in Animals; Digestion and Absorption; Breathing and Exchange of Gases; Body Fluids and Circulation; Excretory Products and their Elimination; Locomotion and Movement; Neural Control and Coordination; Chemical Coordination and Integration; Human Reproduction; Reproductive Health; Principles of Inheritance and Variation; Molecular Basis of Inheritance; Evolution; Human Health and Disease; Biotechnology and its Applications; Microbes in Human Welfare; Biodiversity and Conservation
+```
+What the tool does with it: a question with a known chapter and a Rewrite that differs from the printed solution is ready at once. Anything else (unknown chapter name, no Rewrite, identical text) is sent to a tag batch. Run `node tools/pyq-ingest/paper.js paper.docx "NEET 2025" 2025` (add `--write` when the report is clean). Only diagrams still need a model.

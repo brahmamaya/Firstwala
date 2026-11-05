@@ -20,6 +20,8 @@ Goal: the same quality as before (every question, diagrams as original `fig`, ke
 ## Measured on the owner's PDFs (regression)
 EM Waves (157 questions): all 151 numbers the OCR found were segmented and matched; the 6 missed numbers were reported; 146 of 148 keys equal the existing entries (the 2 others are reported for teacher review). Optics (577 numbered questions): 544 found, 540 matched, 426 of 439 keys equal, the rest listed. `node tools/pyq-ingest/ingest.test.js` (needs Chromium) tests the tool on a synthetic PDF made on the spot: numbering, missing number, crops, keys, diagram flags, exam tags, check and assemble.
 
+**Fastest route (owner, 2026-11-05):** send the PDF to ChatGPT with Prompt 2 of `docs/WORD-PROMPT.md` (Word file with Chapter, Topic and a rewritten solution), then run `node tools/pyq-ingest/paper.js <paper.docx> "NEET <year>" <year>` (dry run; `--write` when clean). Questions with a known chapter and a rewrite are ready with no model; only unknown chapters and diagrams need an agent.
+
 ## NEET papers (image-only PDF with questions AND solutions, e.g. NEET 2026)
 NEET is organised Subject -> NCERT chapter (`tools/pyq-ingest/neet-chapters.json`: Physics, Chemistry, Botany, Zoology; key `Subject: Chapter`). Each chapter has its own lazy file `rank-pyq-neet-<subject>-<chapter>.js` (global `PhysicaRankPyqNeet_<subject>_<chapter>`), holding every year, so a new PDF only adds lines.
 1. No text layer -> `pdfimages -j <pdf> pages/raw`, rename to `pNN.jpg` in `content/pyq-work/<paper>/pages/` (git-ignored). The `prep` tool cannot segment these PDFs.

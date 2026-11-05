@@ -32,6 +32,8 @@ const real = [
   `<w:tbl><w:tr><w:tc><w:p>${t('List I')}</w:p></w:tc><w:tc><w:p>${t('List II')}</w:p></w:tc></w:tr><w:tr><w:tc><w:p>${t('A. PCl')}</w:p></w:tc><w:tc><w:p>${t('I. Tetrahedral')}</w:p></w:tc></w:tr></w:tbl>`,
   P(t('(1) A-I\t(2) A-II')), P(t('(3) A-III\t(4) A-IV')), P(t('Answer: (2) A-II')), P(t('Sol. ') + pic('rId5')), P(t('The picture shows it.')),
   P(t('Consider the statements: ') + pic('rId6'), 1), P(t('(1) first statement')), P(t('(2) second statement')), P(t('(1) Only first\t(2) Only second')), P(t('(3) Both\t(4) Neither')), P(t('Answer (3)')), P(t('Sol. both hold.')),
+  P(t('Unit of capacitance is:'), 1), P(t('(1) F\t(2) H')), P(t('(3) T\t(4) W')), P(t('Answer (1)')), P(t('Sol. Capacitance is measured in farad.')), P(t('Chapter: Electrostatic Potential and Capacitance')), P(t('Topic: Units')), P(t('Rewrite: The SI unit of capacitance is the farad.')), P(t('Charge divided by potential gives it.')),
+  P(t('Which is a vector?'), 1), P(t('(1) A\t(2) B')), P(t('(3) C\t(4) D')), P(t('Answer (2)')), P(t('Sol. B is a vector.')), P(t('Chapter: Not A Real Chapter')), P(t('Rewrite: B is a vector.')),
 ].join('');
 const work = fs.mkdtempSync(path.join(os.tmpdir(), 'physica-docx-')), file = path.join(work, 'paper.docx');   // private folder (mkdtemp is 0700), never a fixed name in /tmp
 fs.writeFileSync(file, zip([
@@ -43,8 +45,8 @@ fs.writeFileSync(file, zip([
 ]));
 const Q = ing.extract(file, work);
 const by = n => Q.find(q => q.pn === n);
-assert.strictEqual(Q.length, 4, 'four questions: ' + Q.map(q => q.pn));
-assert.deepStrictEqual(Q.map(q => q.pn), [1, 2, 3, 4], 'Word auto-numbering gives the question numbers');
+assert.strictEqual(Q.length, 6, 'six questions: ' + Q.map(q => q.pn));
+assert.deepStrictEqual(Q.map(q => q.pn), [1, 2, 3, 4, 5, 6], 'Word auto-numbering gives the question numbers');
 assert.strictEqual(by(1).sub, 'Physics', 'subject heading');
 assert.strictEqual(by(1).q, 'Ratio (a)/(b+1) and H₂O at 10³ K is:', 'equation fraction + sub/superscripts: ' + by(1).q);
 assert.deepStrictEqual(by(1).o, ['3', '2', '1', '4'], 'options from tab-separated lines');
@@ -58,12 +60,15 @@ assert.deepStrictEqual(by(4).figfiles, ['media/image6.png'], 'picture in the que
 assert(/\(1\) first statement/.test(by(4).q) && /\(2\) second statement/.test(by(4).q), 'a (1)-(2) statement list belongs to the stem');
 assert.deepStrictEqual(by(4).o, ['Only first', 'Only second', 'Both', 'Neither'], 'the last (1)-(4) group is the options');
 assert(fs.existsSync(path.join(work, 'media', 'image5.png')), 'pictures saved');
+// ChatGPT already tagged and rewrote Q5 (known chapter): ready, no model. Q6 has an unknown chapter: still needs a tag. Q1-Q4 have no tag lines.
+assert(!by(5).raw && by(5).ch === 'Electrostatic Potential and Capacitance' && by(5).sub === 'Physics' && by(5).st === 'Units' && /SI unit of capacitance is the farad\.\nCharge divided/.test(by(5).s) && !/Rewrite|Chapter:/.test(by(5).q + by(5).s), 'tagged + rewritten question is ready: ' + JSON.stringify(by(5)));
+assert(by(6).raw === 1 && by(6).ch === '?' && by(6).s === 'B is a vector.', 'unknown chapter: still needs a model: ' + JSON.stringify(by(6)));
 assert(fs.existsSync(path.join(work, 'batches', 'tag-01.md')) && by(1).raw === 1 && by(1).ch === '?', 'draft: tagging pending, solution raw');
 // tags merge: untagged -> reported; tagged -> entries-01.jsonl; the assembler refuses raw solutions
 fs.writeFileSync(path.join(work, 'tags-01.jsonl'), Q.slice(0, 3).map(q => JSON.stringify({ pn: q.pn, sub: 'Physics', ch: 'Thermodynamics', st: 'Heat', s: 'new words' })).join('\n') + '\n');
-assert.deepStrictEqual(ing.applyTags(work, [path.join(work, 'tags-01.jsonl')]), [4], 'untagged question is reported');
+assert.deepStrictEqual(ing.applyTags(work, [path.join(work, 'tags-01.jsonl')]), [4, 6], 'untagged questions are reported (Q5 was ready already)');
 const merged = fs.readFileSync(path.join(work, 'entries-01.jsonl'), 'utf8').split('\n').filter(Boolean).map(JSON.parse);
-assert(merged.length === 3 && merged.every(e => !e.raw && e.s === 'new words' && e.ch === 'Thermodynamics'), 'tags merged, raw cleared');
+assert(merged.length === 4 && merged.filter(e => e.pn <= 3).every(e => !e.raw && e.s === 'new words' && e.ch === 'Thermodynamics') && merged.some(e => e.pn === 5 && !e.raw), 'tags merged, raw cleared, the ready question kept');
 fs.writeFileSync(path.join(work, 'entries-02.jsonl'), JSON.stringify({ ...by(4), raw: 1, sub: 'Physics', ch: 'Thermodynamics', st: 'x' }) + '\n');
 let out = ''; try { execFileSync('node', [path.join(__dirname, 'neet-assemble.js'), work, 'NEET 2099', '2099', '4'], { encoding: 'utf8' }) } catch (e) { out = e.stdout || '' }
 assert(/still the publisher text/.test(out), 'neet-assemble refuses a solution that was not rewritten: ' + out.slice(-200));
