@@ -22,6 +22,8 @@ EM Waves (157 questions): all 151 numbers the OCR found were segmented and match
 
 Year codes: `2026` = NEET 2026 (3 May), `2026r` = Re-NEET 2026 (21 Jun re-exam). A re-exam gets its own code and label, e.g. `neet-assemble.js <dir> "Re-NEET 2026 · 21 Jun" 2026r 180`.
 
+**Text-layer papers (Career Point "Paper & Solution", NEET 2016-2024 PDFs):** `node tools/pyq-ingest/careerpoint-prep.js <pdf> <workdir> <firstPage> <lastPage> --batch 25` copies questions, options, keys and solutions out of the text layer into `drafts.jsonl` and `batches/b-NN.md`; agents (`CP-AGENT-PROMPT.md`, text first, page image only where flagged) tag the chapter, rewrite the solution and fix maths; then `textcheck.js`, figures (`NEET-FIG-PROMPT.md`), `neet-assemble.js`. Measured on NEET 2024: keys 200/200 and question words 194/200 identical to the verified entries.
+
 ## NEET papers (image-only PDF with questions AND solutions, e.g. NEET 2026)
 NEET is organised Subject -> NCERT chapter (`tools/pyq-ingest/neet-chapters.json`: Physics, Chemistry, Botany, Zoology; key `Subject: Chapter`). Each chapter has its own lazy file `rank-pyq-neet-<subject>-<chapter>.js` (global `PhysicaRankPyqNeet_<subject>_<chapter>`), holding every year, so a new PDF only adds lines.
 1. No text layer -> `pdfimages -j <pdf> pages/raw`, rename to `pNN.jpg` in `content/pyq-work/<paper>/pages/` (git-ignored). The `prep` tool cannot segment these PDFs.
