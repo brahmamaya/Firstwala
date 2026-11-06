@@ -12,7 +12,7 @@ const F = n => parseTTF(new Uint8Array(fs.readFileSync(path.join(__dirname, '..'
   const c = doc.page(); c.font = '700 40px Arial'; c.fillText('NEET 2026', 90, 96); c.font = '22px Arial';
   let x = 90; for (const w of ['Ratio', 'of', 'H₂SO₄', 'at', '10⁻⁶', 'K:', 'μ₀ε₀', '≈', '√2', '→', 'Fe³⁺', '∝', '⇌']) { c.fillText(w, x, 200); x += c.measureText(w).width + 7 }
   c.strokeStyle = '#000'; c.lineWidth = 2; c.beginPath(); c.moveTo(90, 230); c.lineTo(400, 230); c.stroke();
-  c.drawFig({ w: 100, h: 60, d: [['c', 30, 30, 20, 'f'], ['l', 55, 30, 95, 30, 'a'], ['p', 'M10 55 A20 20 0 0 1 50 55', 'd'], ['t', 50, 12, 'A₁', 'm']] }, 90, 300, 200);
+  c.drawFig({ w: 100, h: 60, d: [['c', 30, 30, 20, 'f'], ['l', 55, 30, 95, 30, 'a'], ['p', 'M10 55 A20 20 0 0 1 50 55', 'd'], ['t', 50, 12, 'A₁', 'm'], ['t', 10, 12, 'x', null]] }, 90, 300, 200);   // a null option on a text item (seen in NEET 2024 data) means none, not a crash
   const cv = { width: 4, height: 4, getContext: () => ({ getImageData: () => ({ data: new Uint8ClampedArray(64).fill(0).map((v, i) => i % 4 === 3 ? 255 : 0), }) }) }; c.drawImage(cv, 90, 400, 40, 40);
   const bytes = Buffer.from(await (await doc.finish('Test paper')).arrayBuffer());
   assert(bytes.slice(0, 5).toString() === '%PDF-' && bytes.length < 120000, 'small file: ' + bytes.length);

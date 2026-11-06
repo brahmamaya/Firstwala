@@ -74,7 +74,8 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     }
     // chapters with and without NEET questions are told apart
     await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(300); await p.$eval('[data-testid=rk-sub-physics]', e => e.click()); await p.waitForTimeout(400);
-    assert((await p.$$('.rk-ch.soon')).length > 0 && (await p.$$('.rk-ch:not(.soon)')).length > 0, 'chapters with and without questions are told apart');
+    // once every chapter of a subject has questions there is no Soon chapter left: then only the ready ones must show, and any Soon chapter must say so
+    { const soon = (await p.$$('.rk-ch.soon')).length, ready = (await p.$$('.rk-ch:not(.soon)')).length; assert(ready > 0 && (soon === 0 || (await p.$$('.rk-ch.soon b')).length === soon), 'ready chapters are open and every chapter without questions says Soon (' + ready + ' ready, ' + soon + ' soon)') }
     assert(!errs.length, 'page errors: ' + errs.join(';')); console.log('PASS NEET subjects, chapters, PYQs, download');
   } catch (e) { console.error('FAIL neet pyq:', e.message); process.exitCode = 1 } finally { await b.close(); srv.close() }
 });
