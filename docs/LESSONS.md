@@ -56,3 +56,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - NEET 2024 paper PDF failed ('Could not make the file') because 3 text items of the Q44 solution figure had a null option: destructuring defaults only cover undefined. pdf-vec.js now treats null as none (regression in tools/pdf-vec.test.js) and the e2e step 'chapters told apart' no longer needs a Soon chapter (every Physics chapter now has questions). ALWAYS download the new year's paper in the browser before merging a year.
 - Figure agents: the textbook-look paragraph at the end of NEET-FIG-PROMPT.md is mandatory (owner's rule).
 - Year bundle for 2023 merged after: text-layer first pass, 2 text verifiers on flagged/maths/figure questions (34+33), figure verifier x2 and a fix pass; Q34 printed 2* stored as c:null a:'2*'.
+- Text-layer papers: merge each finished year at once; PDF download smoke-test per year (NEET 2022: 63 pages ok).
