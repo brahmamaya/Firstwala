@@ -57,3 +57,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Figure agents: the textbook-look paragraph at the end of NEET-FIG-PROMPT.md is mandatory (owner's rule).
 - Year bundle for 2023 merged after: text-layer first pass, 2 text verifiers on flagged/maths/figure questions (34+33), figure verifier x2 and a fix pass; Q34 printed 2* stored as c:null a:'2*'.
 - Text-layer papers: merge each finished year at once; PDF download smoke-test per year (NEET 2022: 63 pages ok).
+- Never 'git add -A' while a merge has unresolved conflicts: markers got into 6 chapter files; grep for '^<<<<<<< ' before every commit.
