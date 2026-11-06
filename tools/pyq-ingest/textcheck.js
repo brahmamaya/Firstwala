@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Model-free check of transcribed entries against the PDF's own text layer (for papers that have one, e.g. the Career Point "Paper & Answer" files).
-     node tools/pyq-ingest/textcheck.js <paper.pdf> <entries.jsonl> [--min 0.85] [--sol 2]  (word and solution-number checks are off unless given)
+     node tools/pyq-ingest/textcheck.js <paper.pdf> <entries.jsonl> [--min 0.85] [--sol 2] [--pages first last]  (word and solution-number checks are off unless given)
    For every entry it finds the printed block "Q.<n> ... Ans. [k]" in the PDF text and reports
      ANSWER   the printed key k differs from the entry (c must be k-1; a non-plain key like "2 or 3" must be c:null)
      WORDS    fewer than --min of the entry's plain words/numbers (question + options) occur in the printed block (maths is garbled in the text layer, so only plain tokens count)
@@ -9,12 +9,12 @@
    Limit: reads the text in PDF order, so it is reliable only for SINGLE-COLUMN papers (NEET 2024 style: all 200 keys matched). In a two-column paper (NEET 2026 style) a question can pick up the other column's key and give false ANSWER alarms (7 of 180 there). */
 'use strict';
 const { execFileSync } = require('child_process'), fs = require('fs');
-const [pdf, file, ...rest] = process.argv.slice(2), min = +(rest[rest.indexOf('--min') + 1] || 0), sol = +(rest[rest.indexOf('--sol') + 1] || 0);
-if (!pdf || !file) { console.error('usage: textcheck.js <paper.pdf> <entries.jsonl> [--min 0.85] [--sol 2]  (word and solution-number checks are off unless given)'); process.exit(2) }
+const [pdf, file, ...rest] = process.argv.slice(2), pi = rest.indexOf('--pages'), pr = pi >= 0 ? ['-f', rest[pi + 1], '-l', rest[pi + 2]] : [], min = +(rest[rest.indexOf('--min') + 1] || 0), sol = +(rest[rest.indexOf('--sol') + 1] || 0);
+if (!pdf || !file) { console.error('usage: textcheck.js <paper.pdf> <entries.jsonl> [--min 0.85] [--sol 2] [--pages first last]  (word and solution-number checks are off unless given)'); process.exit(2) }
 const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉', plain = s => [...s].map(c => SUP.includes(c) ? String(SUP.indexOf(c) % 10) : c).join('');   // ² -> 2: the text layer writes exponents as plain digits
 const toks = s => plain(s).toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 2 || /^\d+$/.test(w));   // words of 3+ letters and any number
 // printed blocks: text between "Q.<n>" markers (the same number can occur twice if the paper misnumbers a question: keep every block)
-const text = execFileSync('pdftotext', ['-layout', pdf, '-'], { encoding: 'utf8', maxBuffer: 1 << 28 }), blocks = new Map();
+const text = execFileSync('pdftotext', ['-layout', ...pr, pdf, '-'], { encoding: 'utf8', maxBuffer: 1 << 28 }), blocks = new Map();
 const marks = [...text.matchAll(/^Q\.\s*(\d+)\b/gm)];
 marks.forEach((m, i) => { const b = text.slice(m.index, i + 1 < marks.length ? marks[i + 1].index : undefined); (blocks.get(+m[1]) || blocks.set(+m[1], []).get(+m[1])).push(b) });
 let bad = 0;
