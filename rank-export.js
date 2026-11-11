@@ -280,7 +280,7 @@ async function vecStart(opt){
   try{if(!window.PhysicaPdf||!window.PhysicaTTF)return null;
     if(!FONTS){const U=paperFonts();FONTS=Object.fromEntries(await Promise.all(Object.entries(U).map(async([k,u])=>{const r=await fetch(u);if(!r.ok)throw new Error(u);return[k,window.PhysicaTTF.parseTTF(new Uint8Array(await r.arrayBuffer()))]})))}
     return new window.PhysicaPdf.PdfDoc(FONTS,opt)}catch{FONTS=null;return null}}
-const nm=y=>({'2026r':'Re-NEET 2026','2022r':'Re-NEET 2022'})[y]||'NEET '+y;   /* title of a paper: the Re-NEET 2026 re-exam has its own year code */
+const nm=y=>({'2026r':'Re-NEET 2026','2022r':'Re-NEET 2022','2016':'AIPMT 2016 (1 May)','2016b':'AIPMT 2016 (24 Jul)'})[y]||'NEET '+y;   /* title of a paper: the Re-NEET 2026 re-exam has its own year code */
 async function makePaper({items,year,withSol,onProgress,cancelled,raster}){
   FONT='Arial,"Liberation Sans",Helvetica,sans-serif';setPalette('paper');
   try{
