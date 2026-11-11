@@ -32,7 +32,7 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     // previous year papers: years 2005-2026, a whole paper as a plain PDF
     await p.$eval('[data-testid=rk-back]', e => e.click()); await p.waitForTimeout(400);
     await p.$eval('[data-testid=rk-sub-papers]', e => e.click()); await p.waitForTimeout(300);
-    assert.strictEqual((await p.$$('[data-testid^=rk-year-]')).length, 24, 'years 2005 to 2026 plus two Re-NEET papers');
+    assert.strictEqual((await p.$$('[data-testid^=rk-year-]')).length, 25, 'years 2005 to 2026 plus two Re-NEET papers and the second AIPMT 2016 paper');
     await p.click('[data-testid=rk-year-2010]'); assert(await p.$('[data-testid=rk-paper-none]') && !(await p.$('[data-testid=rk-paper-q]')), 'a year without questions says so and has no download');
     await p.click('[data-testid=rk-year-2026r]');
     for (const k of ['q', 'sol']) {
