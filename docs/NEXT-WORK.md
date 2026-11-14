@@ -55,3 +55,4 @@ JEE Main and JEE Advanced Test 1, NEET/JEE Tests 2 and 3: original questions onl
 - Wave interference lab (waves2d.js, sim id wave-interference): whole-stage 2D lab with two lasers, probes + E(t) graph, tape, screen intensity; more media (water, sound) and slits could be added later.
 - Young's double slit (youngs2d.js, sim id doubleslit) rebuilt as a whole-stage 2D lab; shared wave helpers live in wavekit.js (used by waves2d.js too).
 - Labs 2026-11-14: Young's double slit has views Before / After / One slit / Realistic + a 3D Ultra-Realistic bench scene; well pulley has a boy or girl with a name board (tap to rename); Hide info works in all four wave/pulley labs; incline pulley is back in the lab list (removed from DROP in app.js).
+- JEE Current Electricity (430 q, rank-pyq-ce.js) merged 2026-11-14. Next in queue: Magnetic Effects PDF (see queue above). Perf budget for physica-pyq-ce.min.js is 215000.
