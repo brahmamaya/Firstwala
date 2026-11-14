@@ -58,3 +58,4 @@ Rule: at the end of every task ask "did a tool, an agent or my own method misbeh
 - Year bundle for 2023 merged after: text-layer first pass, 2 text verifiers on flagged/maths/figure questions (34+33), figure verifier x2 and a fix pass; Q34 printed 2* stored as c:null a:'2*'.
 - Text-layer papers: merge each finished year at once; PDF download smoke-test per year (NEET 2022: 63 pages ok).
 - Never 'git add -A' while a merge has unresolved conflicts: markers got into 6 chapter files; grep for '^<<<<<<< ' before every commit.
+- Perf budget: physica.min.js budget raised 365000 -> 380000 B gzip (2026-11-14; 3D bench scene and person drawing added) for the four 2D labs (wave interference, Young's double slit, incline pulley, well pulley, shared wavekit.js). Next time: lazy-load such labs instead.

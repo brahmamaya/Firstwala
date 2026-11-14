@@ -17,6 +17,9 @@ WK.check=(c,x,y,label,on,col='#e9f6ff')=>{c.save();c.strokeStyle=on?'#42d9ca':'#
   if(on){c.strokeStyle='#42d9ca';c.lineWidth=2.4;c.beginPath();c.moveTo(x+3.5,y);c.lineTo(x+7,y+4);c.lineTo(x+13,y-4.5);c.stroke()}c.restore();WK.txt(c,label,x+24,y,col,12.5);return{x,y:y-10,w:24+label.length*6.6,h:20}};
 // Dark rounded panel.
 WK.panel=(c,x,y,w,h)=>{c.save();c.fillStyle='#0d2132';c.strokeStyle='#294358';c.lineWidth=1;c.beginPath();c.roundRect(x,y,w,h,10);c.fill();c.stroke();c.restore()};
+// "Hide info" (Focus bar): when it is on the labs drop their readout panel and captions and centre the experiment. `shift` is the x move to centre content that spans left..right.
+WK.clean=()=>!!window.PhysicaClean;
+WK.shift=(left,right)=>WK.clean()?Math.round((960-(right-left))/2-left):0;
 // The wave clock: tau is the wave time in femtosecond-like units; 1 unit of wave time takes ~1.1 s on screen (a quarter of that when slow); nothing moves while paused.
 WK.clock=()=>({paused:false,slow:false,tau:0,lastT:null,
   tick(t){if(this.lastT===null||t<this.lastT)this.lastT=t;const dt=clamp(t-this.lastT,0,.1);this.lastT=t;if(!this.paused)this.tau+=dt*(this.slow?.2:.9)},
@@ -26,7 +29,7 @@ const TB={play:{x:64,y:474,r:17},step:{x:108,y:474,r:14},reset:{x:922,y:474,r:15
 WK.transport=(c,clk)=>{
   WK.button(c,TB.play,!clk.paused,(k,b)=>{if(clk.paused){k.beginPath();k.moveTo(b.x-5,b.y-8);k.lineTo(b.x+8,b.y);k.lineTo(b.x-5,b.y+8);k.closePath();k.fill()}else{k.fillRect(b.x-7,b.y-8,5,16);k.fillRect(b.x+2,b.y-8,5,16)}});
   WK.button(c,TB.step,false,(k,b)=>{k.beginPath();k.moveTo(b.x-6,b.y-7);k.lineTo(b.x+3,b.y);k.lineTo(b.x-6,b.y+7);k.closePath();k.fill();k.fillRect(b.x+5,b.y-7,3,14)});
-  WK.radio(c,NORM.x,NORM.y,'Normal',!clk.slow);WK.radio(c,SLOW.x,SLOW.y,'Slow',clk.slow);WK.txt(c,'Step moves the wave by 1/12 of a period',320,474,'#8ca6b9',11,'left',600);
+  WK.radio(c,NORM.x,NORM.y,'Normal',!clk.slow);WK.radio(c,SLOW.x,SLOW.y,'Slow',clk.slow);WK.txt(c,'Step = 1/12 of a period',320,474,'#8ca6b9',11,'left',600);
   WK.button(c,TB.reset,false,(k,b)=>{k.beginPath();k.arc(b.x,b.y,7,Math.PI*.25,Math.PI*1.85);k.stroke();k.beginPath();k.moveTo(b.x+9,b.y-6);k.lineTo(b.x+9,b.y+3);k.lineTo(b.x+1,b.y-1);k.closePath();k.fill()})};
 // A press on the bottom bar: returns true when it was handled; `T` is the wave period (for Step) and `onReset` restores the lab.
 WK.transportHit=(q,clk,T,onReset)=>{const near=(o,r)=>Math.hypot(q.x-o.x,q.y-o.y)<=r;

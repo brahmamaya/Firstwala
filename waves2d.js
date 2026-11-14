@@ -82,9 +82,9 @@ INT[ID]={allViews:true,
   c.save();c.strokeStyle='#e9f6ff';c.lineWidth=2;c.beginPath();c.moveTo(FX,FY-14);c.lineTo(FX+K*500,FY-14);c.moveTo(FX,FY-19);c.lineTo(FX,FY-9);c.moveTo(FX+K*500,FY-19);c.lineTo(FX+K*500,FY-9);c.stroke();c.restore();txt(c,'500 nm',FX+K*500+8,FY-14,'#e9f6ff',11,'left',700);
   for(const s of ss)laser(c,FX-56,s.y,col.join(','));
   if(ss.length===2){const x=FX+9;c.save();c.strokeStyle='rgba(255,255,255,.55)';c.setLineDash([3,3]);c.beginPath();c.moveTo(x,ss[0].y);c.lineTo(x,ss[1].y);c.stroke();c.restore();txt(c,`d`,x+8,CY,'#ffffff',12,'left',700)}
-  paintGraph(c,p,gy);paintReadout(c,p);
+  paintGraph(c,p,gy);if(!WK.clean())paintReadout(c,p);
   S0.probe.forEach((q,i)=>probe(c,q,i,i?'#ffa94d':'#42d9ca',gy+i*34));paintTape(c);
-  txt(c,'Drag the lasers, probes and tape. Dark and bright bands on the screen are interference fringes.',FX,FY-40,'#8ca6b9',11,'left',600);
+  if(!WK.clean())txt(c,'Drag the lasers, probes and tape. Dark and bright bands on the screen are interference fringes.',FX,FY-40,'#8ca6b9',11,'left',600);
   WK.transport(c,CLK);
  },
  // Pointer down: pick the first thing under the finger (buttons, probes, tape ends, lasers).
