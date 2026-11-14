@@ -4,20 +4,16 @@
    Physics: every source sends a circular wave E = a·sin(2πr/λ − ωt); the field is the sum of the waves, the screen shows I ∝ |ΣE|². */
 (() => {
 'use strict';
-const {R,S,N,f,clamp,pack,TAU}=window.PhysicaLab;
+const {R,S,N,f,clamp,pack,TAU}=window.PhysicaLab,{spectral,txt}=window.PhysicaWaveKit,WK=window.PhysicaWaveKit;
 const INT=window.PhysicaInteractive=window.PhysicaInteractive||{},{add,done}=pack();
 const ID='wave-interference',CNM=299.792458;                          // speed of light in nm per femtosecond
 const FX=60,FY=84,FW=520,FH=356,CY=FY+FH/2,XS=FX+FW,K=.075;          // field rectangle (px), screen x, pixels per nm
 const GW=Math.round(FW/3),GH=Math.round(FH/3);                         // the field is computed on a coarse grid and smoothed up
 const PX=700,PW=235;                                                   // right-hand graph panel
-const DEF=()=>({paused:false,slow:false,tau:0,lastT:null,probe:[{x:FX+215,y:CY-70},{x:FX+190,y:CY+88}],tape:[{x:FX+16,y:FY+46},{x:FX+16+K*500,y:FY+46}],mode:null,off:null});
+const CLK=WK.clock();
+const DEF=()=>({probe:[{x:FX+215,y:CY-70},{x:FX+190,y:CY+88}],tape:[{x:FX+16,y:FY+46},{x:FX+16+K*500,y:FY+46}],mode:null,off:null});
 let S0=DEF();
 // ---------- small helpers ----------
-// Approximate colour of a vacuum wavelength (nm) as [r,g,b] 0-255.
-function spectral(nm){let r=0,g=0,b=0;if(nm<440){r=(440-nm)/60;b=1}else if(nm<490){g=(nm-440)/50;b=1}else if(nm<510){g=1;b=(510-nm)/20}else if(nm<580){r=(nm-510)/70;g=1}else if(nm<645){r=1;g=(645-nm)/65}else r=1;
-  const k=nm<420?.35+.65*(nm-380)/40:nm>700?.35+.65*(750-nm)/50:1;return[r,g,b].map(v=>Math.round(255*clamp(v*Math.max(.35,k),0,1)))}
-// Text with the lab's usual font.
-function txt(c,s,x,y,col='#e9f6ff',size=12,align='left',w=600){c.save();c.font=`${w} ${size}px system-ui, sans-serif`;c.fillStyle=col;c.textAlign=align;c.textBaseline='middle';c.fillText(s,x,y);c.restore()}
 // The source positions (px) for the chosen number of sources and separation.
 const sources=p=>+p.n===1?[{x:FX,y:CY}]:[{x:FX,y:CY-p.sep*K/2},{x:FX,y:CY+p.sep*K/2}];
 // Distance fade of a circular wave (kept mild so the rings stay visible across the whole field).
@@ -38,15 +34,10 @@ function laser(c,x,y,col){c.save();c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=
 function probe(c,q,i,col,gy){c.save();c.strokeStyle=col;c.lineWidth=2;c.globalAlpha=.85;c.beginPath();c.moveTo(q.x,q.y);c.bezierCurveTo(q.x+90,q.y+30,PX-170,gy-20,PX-4,gy);c.stroke();c.globalAlpha=1;
   c.shadowColor='rgba(0,0,0,.6)';c.shadowBlur=8;c.fillStyle='rgba(20,28,34,.82)';c.beginPath();c.arc(q.x,q.y,14,0,TAU);c.fill();c.shadowColor='transparent';c.strokeStyle=col;c.lineWidth=2.4;c.beginPath();c.arc(q.x,q.y,14,0,TAU);c.stroke();
   c.lineWidth=1.4;c.beginPath();c.moveTo(q.x-9,q.y);c.lineTo(q.x+9,q.y);c.moveTo(q.x,q.y-9);c.lineTo(q.x,q.y+9);c.stroke();c.restore();txt(c,String(i+1),q.x+19,q.y-14,col,12,'left',800)}
-// Round or pill button with an icon drawn by `icon`.
-function button(c,b,on,icon){c.save();c.shadowColor='rgba(66,217,202,.5)';c.shadowBlur=on?14:6;const g=c.createLinearGradient(0,b.y-b.r,0,b.y+b.r);g.addColorStop(0,b.hot?'#ffb26b':'#6ff0e2');g.addColorStop(1,b.hot?'#e8590c':'#1fb5a6');c.fillStyle=g;c.beginPath();c.arc(b.x,b.y,b.r,0,TAU);c.fill();c.restore();c.save();c.fillStyle='#fff';c.strokeStyle='#fff';c.lineWidth=2.4;icon(c,b);c.restore()}
-// Radio button with a label.
-function radio(c,x,y,label,on){c.save();c.strokeStyle='#8ca6b9';c.lineWidth=1.6;c.beginPath();c.arc(x,y,7,0,TAU);c.stroke();if(on){c.fillStyle='#42d9ca';c.beginPath();c.arc(x,y,4,0,TAU);c.fill()}c.restore();txt(c,label,x+13,y,'#e9f6ff',13)}
-const BTN={play:{x:64,y:474,r:17},step:{x:108,y:474,r:14},reset:{x:922,y:474,r:15,hot:true}},NORM={x:158,y:474},SLOW={x:250,y:474};
 
 // ---------- the stage ----------
 // Fills the coarse grid with the wave field (colour = the light's colour, brightness = the instantaneous field) and smooths it onto the stage.
-function paintField(c,p){const lam=p.lam*K,w=TAU*CNM/p.lam,ss=sources(p),col=spectral(p.lam),n=ss.length,tau=S0.tau;
+function paintField(c,p){const lam=p.lam*K,w=TAU*CNM/p.lam,ss=sources(p),col=spectral(p.lam),n=ss.length,tau=CLK.tau;
   if(!S0.off){S0.off=document.createElement('canvas');S0.off.width=GW;S0.off.height=GH;S0.img=S0.off.getContext('2d').createImageData(GW,GH)}
   const d=S0.img.data,gain=.35+.65*p.amp;let i=0;
   for(let j=0;j<GH;j++){const y=FY+(j+.5)*FH/GH;for(let k=0;k<GW;k++){const x=FX+(k+.5)*FW/GW;let e=0;for(const s of ss){const r=Math.hypot(x-s.x,y-s.y);e+=p.amp*fade(r)*Math.sin(TAU*r/lam-w*tau)}
@@ -63,7 +54,7 @@ function paintGraph(c,p,gy){const x0=PX,y0=FY,h=176,mid=y0+h/2-8,W=4,pxfs=(PW-34
   c.save();c.fillStyle='#0d2132';c.strokeStyle='#294358';c.beginPath();c.roundRect(x0,y0,PW,h,10);c.fill();c.stroke();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;
   for(const k of[-.8,0,.8]){c.beginPath();c.moveTo(x0+12,mid+k*(h/2-26)*-1);c.lineTo(x0+PW-12,mid-k*(h/2-26)*-1);c.stroke()}c.restore();
   txt(c,'Electric field',x0+12,y0+14,'#e9f6ff',12,'left',700);
-  S0.probe.forEach((q,i)=>{c.save();c.strokeStyle=cols[i];c.lineWidth=2;c.beginPath();const T=120;let ex=0,ey=0;for(let j=0;j<=T;j++){const t=S0.tau-W+W*j/T,e=Efield(p,q.x,q.y,t)/(Math.max(1,n)*.9),X=x0+14+(W*j/T)*pxfs,Y=mid-clamp(e,-1,1)*(h/2-30);j?c.lineTo(X,Y):c.moveTo(X,Y);ex=X;ey=Y}c.stroke();c.fillStyle=cols[i];c.beginPath();c.arc(ex,ey,4.5,0,TAU);c.fill();c.restore()});
+  S0.probe.forEach((q,i)=>{c.save();c.strokeStyle=cols[i];c.lineWidth=2;c.beginPath();const T=120;let ex=0,ey=0;for(let j=0;j<=T;j++){const t=CLK.tau-W+W*j/T,e=Efield(p,q.x,q.y,t)/(Math.max(1,n)*.9),X=x0+14+(W*j/T)*pxfs,Y=mid-clamp(e,-1,1)*(h/2-30);j?c.lineTo(X,Y):c.moveTo(X,Y);ex=X;ey=Y}c.stroke();c.fillStyle=cols[i];c.beginPath();c.arc(ex,ey,4.5,0,TAU);c.fill();c.restore()});
   c.save();c.strokeStyle='#e9f6ff';c.lineWidth=2;c.beginPath();c.moveTo(x0+14,y0+h-14);c.lineTo(x0+14+pxfs,y0+h-14);c.moveTo(x0+14,y0+h-19);c.lineTo(x0+14,y0+h-9);c.moveTo(x0+14+pxfs,y0+h-19);c.lineTo(x0+14+pxfs,y0+h-9);c.stroke();c.restore();
   txt(c,'1 fs',x0+14+pxfs+8,y0+h-14,'#e9f6ff',11,'left',700);txt(c,'time →',x0+PW-12,y0+h-14,'#8ca6b9',11,'right',600);
   txt(c,'probe 1',x0+PW-72,y0+14,cols[0],11,'right',700);txt(c,'probe 2',x0+PW-12,y0+14,cols[1],11,'right',700)}
@@ -82,8 +73,8 @@ function paintTape(c){const [a,b]=S0.tape,dist=Math.hypot(b.x-a.x,b.y-a.y)/K;c.s
 
 INT[ID]={allViews:true,
  draw(c,p,t){
-  // advance the wave clock (not while paused); 1 fs of wave time takes about 1.1 s on screen, a quarter of that when slow
-  if(S0.lastT===null||t<S0.lastT)S0.lastT=t;const dt=clamp(t-S0.lastT,0,.1);S0.lastT=t;if(!S0.paused)S0.tau+=dt*(S0.slow?.2:.9);
+  // advance the wave clock (not while paused)
+  CLK.tick(t);
   const col=spectral(p.lam),ss=sources(p),gy=FY+88;
   c.save();c.fillStyle='#060b10';c.fillRect(0,0,960,505);c.restore();
   paintField(c,p);paintScreen(c,p);
@@ -94,17 +85,11 @@ INT[ID]={allViews:true,
   paintGraph(c,p,gy);paintReadout(c,p);
   S0.probe.forEach((q,i)=>probe(c,q,i,i?'#ffa94d':'#42d9ca',gy+i*34));paintTape(c);
   txt(c,'Drag the lasers, probes and tape. Dark and bright bands on the screen are interference fringes.',FX,FY-40,'#8ca6b9',11,'left',600);
-  button(c,BTN.play,!S0.paused,(k,b)=>{if(S0.paused){k.beginPath();k.moveTo(b.x-5,b.y-8);k.lineTo(b.x+8,b.y);k.lineTo(b.x-5,b.y+8);k.closePath();k.fill()}else{k.fillRect(b.x-7,b.y-8,5,16);k.fillRect(b.x+2,b.y-8,5,16)}});
-  button(c,BTN.step,false,(k,b)=>{k.beginPath();k.moveTo(b.x-6,b.y-7);k.lineTo(b.x+3,b.y);k.lineTo(b.x-6,b.y+7);k.closePath();k.fill();k.fillRect(b.x+5,b.y-7,3,14)});
-  radio(c,NORM.x,NORM.y,'Normal',!S0.slow);radio(c,SLOW.x,SLOW.y,'Slow',S0.slow);txt(c,'Step moves the wave by 1/12 of a period',320,474,'#8ca6b9',11,'left',600);
-  button(c,BTN.reset,false,(k,b)=>{k.beginPath();k.arc(b.x,b.y,7,Math.PI*.25,Math.PI*1.85);k.stroke();k.beginPath();k.moveTo(b.x+9,b.y-6);k.lineTo(b.x+9,b.y+3);k.lineTo(b.x+1,b.y-1);k.closePath();k.fill()});
+  WK.transport(c,CLK);
  },
  // Pointer down: pick the first thing under the finger (buttons, probes, tape ends, lasers).
  down(q,p){const near=(o,r)=>Math.hypot(q.x-o.x,q.y-o.y)<=r;
-  if(near(BTN.play,BTN.play.r+4)){S0.paused=!S0.paused;return}
-  if(near(BTN.step,BTN.step.r+4)){S0.paused=true;S0.tau+=p.lam/CNM/12;return}
-  if(near(BTN.reset,BTN.reset.r+4)){const keep={paused:S0.paused,slow:S0.slow,off:S0.off,img:S0.img};S0=Object.assign(DEF(),keep,{tau:0,lastT:null});return}
-  if(near(NORM,60)&&q.x<210){S0.slow=false;return}if(q.x>=210&&near(SLOW,50)){S0.slow=true;return}
+  if(WK.transportHit(q,CLK,p.lam/CNM,()=>{const keep={off:S0.off,img:S0.img};S0=Object.assign(DEF(),keep);CLK.tau=0;CLK.lastT=null}))return;
   for(let i=0;i<2;i++)if(near(S0.probe[i],20)){S0.mode={k:'probe',i};return}
   for(let i=0;i<2;i++)if(near(S0.tape[i],14)){S0.mode={k:'tape',i};return}
   if(+p.n===2&&q.x<FX+16&&Math.abs(q.y-CY)<FH/2){S0.mode={k:'laser'};this.move(q,p)}},
