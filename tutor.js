@@ -128,7 +128,7 @@ let tab='ask',tutorOn=false;try{tutorOn=localStorage.getItem('physica-tutor')===
 const tbtn=btn('tutor-switch','',()=>{tutorOn=!tutorOn;try{localStorage.setItem('physica-tutor',tutorOn?'1':'0')}catch{}render();if(tutorOn&&!card.hidden)card.scrollIntoView({behavior:'smooth',block:'nearest'})});
 tbtn.dataset.testid='ai-tutor';const tdot=el('span','tutor-switch-knob');tbtn.append(el('span','tutor-switch-ic','✦'),el('b','','AI Tutor'),tdot);
 document.querySelector('.topbar-right')?.prepend(tbtn);
-function render(){run++;hush();const c=content(),on=mode==='student'&&tutorOn;tbtn.hidden=mode!=='student';tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-student',on);
+function render(){run++;hush();const c=content(),on=false;tbtn.hidden=true;tbtn.setAttribute('aria-pressed',String(tutorOn));tbtn.title=tutorOn?'AI Tutor on - tap to turn off':'Turn on the AI Tutor';document.body.classList.toggle('mode-student',on);
   card.hidden=!on;if(!on)return;tabs.replaceChildren();body.replaceChildren();
   if(!window.PhysicaTeacher){body.append(el('p','tutor-loading','Loading your tutor…'));loadTutorPack().then(()=>{if(mode==='student'&&tutorOn)render()},()=>{body.replaceChildren(el('p','tutor-loading','Could not load the tutor - please check your internet and try again.'))});return}
   if(!c){if(examSet()){tab='exam';const b=btn('','🎯 Exam',()=>render());b.setAttribute('aria-pressed','true');tabs.append(b);window.PhysicaGlass?.(tabs);exam();return}
