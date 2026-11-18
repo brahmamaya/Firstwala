@@ -1077,7 +1077,7 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 @media(prefers-reduced-motion:reduce){.sim-sub{transition:none}}
 
 /* ---- Theme switch button + light theme for the landing page ---- */
-.theme-toggle{border:1px solid rgb(var(--ov) / .28);background:rgb(var(--bk) / .55);color:var(--text);border-radius:999px;padding:8px 14px;font:700 13px/1 'Exo 2',system-ui,sans-serif;letter-spacing:.04em;min-height:38px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.theme-toggle{border:1px solid rgb(var(--ov) / .28);background:rgb(var(--bk) / .55);color:var(--text);border-radius:999px;font:700 13px/1 'Exo 2',system-ui,sans-serif;letter-spacing:.04em;min-height:38px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .theme-toggle:hover{border-color:var(--mint)}
 .landing-theme{position:fixed;top:max(14px,env(safe-area-inset-top));right:14px;z-index:5;color:var(--t-fff)}
 :root[data-theme="light"] .landing-bg{filter:invert(1)}
@@ -1320,3 +1320,5 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 /* Simpler simulation page (owner, 2026-11): only what a student needs; the extras stay in the code but are not shown. */
 #favourite-toggle,#share-link,#sound-toggle,#randomise-btn,#help-open,#snapshot-btn,#fullscreen-btn,#rail-toggle,.restore-chip,#rec-quality,.rec-b,.restart-button.icon-tool{display:none!important}
 html body .panel-close,html body .restore-bar{display:none!important}
+html body .theme-picker,html body .sidebar-heading,html body .breadcrumbs,html body .tab-count,html body .live-label,html body .focus-btn:not(.info-btn){display:none!important}
+.theme-toggle{font-size:18px;width:42px;padding:0;display:inline-flex;align-items:center;justify-content:center}
