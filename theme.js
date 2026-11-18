@@ -66,13 +66,13 @@
   const toggle=()=>setTheme(selected==='light'?'dark':'light');
   /* a small Dark / Light switch that can be placed on any screen (landing page, Rank mode, information pages) */
   const toggles=new Set();
-  const paintToggle=b=>{const light=selected==='light';b.textContent=light?'☾ Dark':'☀ Light';b.setAttribute('aria-label',light?'Switch to the dark theme':'Switch to the light theme');b.title=b.getAttribute('aria-label')};
+  const paintToggle=b=>{const light=selected==='light';b.textContent=light?'☾':'☀';b.setAttribute('aria-label',light?'Switch to the dark theme':'Switch to the light theme');b.title=b.getAttribute('aria-label')};
   function mountToggle(parent,cls){if(!parent)return null;const old=parent.querySelector(':scope>.theme-toggle');if(old)return old;const b=document.createElement('button');b.type='button';b.className='theme-toggle'+(cls?' '+cls:'');b.dataset.testid='theme-toggle';b.addEventListener('click',toggle);toggles.add(b);paintToggle(b);parent.append(b);return b}
   window.addEventListener('physica-theme-change',()=>{for(const b of toggles){if(b.isConnected)paintToggle(b);else toggles.delete(b)}});
   window.PhysicaTheme={wrapContext,setTheme,toggle,mountToggle,get current(){return selected},names:Object.keys(themes)};
   let remembered;try{remembered=localStorage.getItem(key)}catch{}
   setTheme(remembered||'dark',false);
-  const connect=()=>{mountToggle(document.getElementById('landing'),'landing-theme');const select=document.getElementById('theme-select');if(!select)return;select.value=selected;select.addEventListener('change',()=>setTheme(select.value));};
+  const connect=()=>{mountToggle(document.getElementById('landing'),'landing-theme');const wa=document.querySelector('.wa-top');if(wa){const tb=mountToggle(wa.parentNode,'topbar-theme');if(tb)wa.parentNode.insertBefore(tb,wa)}const select=document.getElementById('theme-select');if(!select)return;select.value=selected;select.addEventListener('change',()=>setTheme(select.value));};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',connect,{once:true});else connect();
   window.addEventListener('storage',e=>{if(e.key===key)setTheme(e.newValue||'dark',false)});
 })();
