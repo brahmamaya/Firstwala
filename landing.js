@@ -28,11 +28,6 @@ for(const t of document.querySelectorAll('.grade-tab'))t.addEventListener('click
 const brand=document.querySelector('.topbar .brand');if(brand){brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Change class or mode';brand.style.cursor='pointer';brand.addEventListener('click',show);brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})}
 const hash=decodeURIComponent(location.hash.slice(1));if(hash&&sims.some(s=>s.id===hash))L.hidden=true;else{document.documentElement.classList.remove('deep');show()}
 })();
-/* ONE-TOOL: "launching soon" panel opened from the landing icons */
-(()=>{const b=document.getElementById('landing-one'),d=document.getElementById('one-tool-dlg');if(!b||!d||!d.showModal)return;
-b.addEventListener('click',()=>{try{d.showModal()}catch{}});
-d.querySelector('.one-close')?.addEventListener('click',()=>d.close());
-d.addEventListener('click',e=>{if(e.target===d)d.close()})})();
 /* Jump to simulation: a small dialog (subject -> chapter -> topic with search). Built lazily on first open from window.PhysicaSims; no extra download. */
 (()=>{const L=document.getElementById('landing');if(!L||!document.createElement('dialog').showModal)return;
 const SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['botany','Botany'],['zoology','Zoology']],KEY='physica-start';
