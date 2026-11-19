@@ -1325,3 +1325,4 @@ html body .theme-picker,html body .sidebar-heading,html body .breadcrumbs,html b
 /* Tighter simulation page: the stage starts higher and fills the width (owner: page felt empty). */
 @media(min-width:761px){html body .main{padding-top:16px;padding-left:18px;padding-right:18px}html body .intro{flex-wrap:nowrap!important;gap:14px;margin:0 0 8px}html body .intro h1{margin:0 0 2px!important;font-size:26px!important}html body #description{font-size:13.5px;line-height:1.35}html body .intro .formula-card{flex:0 0 38%;max-width:38%;padding:8px 12px;margin:0}html body .intro .formula-card strong{font-size:14px;line-height:1.3}html body .tabs-nav{margin:0 0 6px}html body .simulation-tabs{margin-bottom:6px}html body .lab-tools{margin:0 0 8px;gap:6px}html body .lab-layout{gap:12px;grid-template-columns:minmax(0,1fr) 270px!important}}
 html body .formula-card{display:none!important}
+.lc-teachly{margin-bottom:14px}.lc-ipad{background:#7cc0ff}
