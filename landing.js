@@ -28,11 +28,6 @@ for(const t of document.querySelectorAll('.grade-tab'))t.addEventListener('click
 const brand=document.querySelector('.topbar .brand');if(brand){brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Change class or mode';brand.style.cursor='pointer';brand.addEventListener('click',show);brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})}
 const hash=decodeURIComponent(location.hash.slice(1));if(hash&&sims.some(s=>s.id===hash))L.hidden=true;else{document.documentElement.classList.remove('deep');show()}
 })();
-/* ONE-TOOL: "launching soon" panel opened from the landing icons */
-(()=>{const b=document.getElementById('landing-one'),d=document.getElementById('one-tool-dlg');if(!b||!d||!d.showModal)return;
-b.addEventListener('click',()=>{try{d.showModal()}catch{}});
-d.querySelector('.one-close')?.addEventListener('click',()=>d.close());
-d.addEventListener('click',e=>{if(e.target===d)d.close()})})();
 /* Jump to simulation: a small dialog (subject -> chapter -> topic with search). Built lazily on first open from window.PhysicaSims; no extra download. */
 (()=>{const L=document.getElementById('landing');if(!L||!document.createElement('dialog').showModal)return;
 const SUBJ=[['physics','Physics'],['chemistry','Chemistry'],['botany','Botany'],['zoology','Zoology']],KEY='physica-start';
@@ -126,10 +121,11 @@ const teach=dialog('lc-teach','teach',d=>{
   list('ol',[['','Rank mode → JEE Mains → your chapter → PYQs tab'],['','Press “Select questions to make slides” and tick the questions you want'],['','Download: PDF or PowerPoint, Dark or Light, 1 or 2 questions per slide']]),
   el('p','lc-sub','You also get a cover page listing the topics. Print it, project it or share it on WhatsApp.'));
  /* Teachly: the whiteboard app, downloaded straight from physica.in (a plain same-site file link, nothing sent anywhere). */
- const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ Download Teachly');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
+ const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ For Android users: download Teachly');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
+ const ipad=el('a','lc-dl lc-ipad','For iPad users: open Teachly');ipad.href='https://brahmamaya.github.io/Teachly/';ipad.target='_blank';ipad.rel='noopener noreferrer';ipad.dataset.testid='lc-teachly-ipad';
  tb.append(el('span','lc-pill','NEW'),el('h3','','✏️ Teachly: Notes making app'),
   el('p','','Smooth writing with no lag, instant graphs, shapes and ruler, write on PDF and PPT, laser pointer, question timer and auto-save. Works great on tablets now. Digital board support comes in the next update'),
-  dl);d.append(tb)});
+  dl,ipad,el('p','lc-sub','On iPad: open the link in Chrome, tap Share, then “Add to Home Screen”.'));d.append(tb)});
 for(const [k,label,sub,dlg] of [['learn','For learners','Test Series incoming',learn],['teach','For teachers','PYQ slides & PDF',teach]]){
  const b=el('button','lc-card lc-c-'+k);b.type='button';b.dataset.testid='land-card-'+k;b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-label',label+': '+sub);
  const cv=el('canvas');cv.setAttribute('aria-hidden','true');const t=el('span','lc-label'),s=el('small','',sub);t.append(document.createTextNode(label),s);b.append(cv,t);

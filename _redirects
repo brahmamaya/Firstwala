@@ -20,7 +20,6 @@
 /enhancements.js /404.html 404!
 /experience.js /404.html 404!
 /extras.js /404.html 404!
-/feedback.js /404.html 404!
 /fifth.js /404.html 404!
 /focus.js /404.html 404!
 /fourth.js /404.html 404!
@@ -43,6 +42,7 @@
 /phys3d-d.js /404.html 404!
 /physica3d.js /404.html 404!
 /physics.js /404.html 404!
+/pulley2d.js /404.html 404!
 /rank-binomial-jee.js /404.html 404!
 /rank-complex-jee.js /404.html 404!
 /rank-current-jee.js /404.html 404!
@@ -64,6 +64,7 @@
 /rank-pc-jee.js /404.html 404!
 /rank-prop-jee.js /404.html 404!
 /rank-pyq-binomial.js /404.html 404!
+/rank-pyq-ce.js /404.html 404!
 /rank-pyq-complex.js /404.html 404!
 /rank-pyq-dual.js /404.html 404!
 /rank-pyq-em.js /404.html 404!
@@ -73,6 +74,7 @@
 /rank-pyq-kin.js /404.html 404!
 /rank-pyq-ktg.js /404.html 404!
 /rank-pyq-lom.js /404.html 404!
+/rank-pyq-mag.js /404.html 404!
 /rank-pyq-neet-botany-anatomyoffloweringplants.js /404.html 404!
 /rank-pyq-neet-botany-biodiversityandconservation.js /404.html 404!
 /rank-pyq-neet-botany-biologicalclassification.js /404.html 404!
@@ -213,6 +215,9 @@
 /tutor-teacher-content.js /404.html 404!
 /tutor.js /404.html 404!
 /ultra3d.js /404.html 404!
+/wavekit.js /404.html 404!
+/waves2d.js /404.html 404!
+/youngs2d.js /404.html 404!
 /tools/* /404.html 404!
 /supabase/* /404.html 404!
 /docs/* /404.html 404!

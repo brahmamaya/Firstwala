@@ -149,7 +149,7 @@ body.no-scroll{overflow:hidden}
 @media(max-width:760px){.panel-close.desk-only{display:none}}
 body.hide-about .intro,body.hide-tools .lab-tools,body.hide-observe .observe-card,body.hide-tips .controls-tip{display:none!important}
 @media(min-width:761px){body.hide-library .sidebar{display:none!important}body.hide-library .layout{grid-template-columns:minmax(0,1fr)!important}}
-.restore-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 12px}.restore-bar[hidden]{display:none}.restore-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-right:2px}.restore-chip{min-height:28px;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700}.restore-chip:hover{color:var(--text);border-style:solid}.restore-all{border-style:solid;color:var(--mint)}
+.restore-bar{flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 12px}.restore-bar[hidden]{display:none}.restore-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-right:2px}.restore-chip{min-height:28px;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700}.restore-chip:hover{color:var(--text);border-style:solid}.restore-all{border-style:solid;color:var(--mint)}
 .focus-btn{margin-left:10px}.focus-btn:hover,.focus-btn[aria-pressed=true]{border-color:var(--mint);color:var(--mint)}
 body.focus .topbar,body.focus .sidebar,body.focus .workspace-header,body.focus .intro,body.focus .tabs-nav,body.focus #simulation-tabs,body.focus .lab-tools,body.focus #wonder-card,body.focus .observe-card,body.focus #lesson-section,body.focus .footer,body.focus .restore-bar,body.focus .focus-btn:not(.info-btn){display:none!important}
 body.focus .layout{grid-template-columns:minmax(0,1fr)!important;min-height:100vh}body.focus .main{max-width:none;padding-top:12px}
@@ -1077,7 +1077,7 @@ html.board #landing *{-webkit-backdrop-filter:none!important;backdrop-filter:non
 @media(prefers-reduced-motion:reduce){.sim-sub{transition:none}}
 
 /* ---- Theme switch button + light theme for the landing page ---- */
-.theme-toggle{border:1px solid rgb(var(--ov) / .28);background:rgb(var(--bk) / .55);color:var(--text);border-radius:999px;padding:8px 14px;font:700 13px/1 'Exo 2',system-ui,sans-serif;letter-spacing:.04em;min-height:38px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.theme-toggle{border:1px solid rgb(var(--ov) / .28);background:rgb(var(--bk) / .55);color:var(--text);border-radius:999px;font:700 13px/1 'Exo 2',system-ui,sans-serif;letter-spacing:.04em;min-height:38px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .theme-toggle:hover{border-color:var(--mint)}
 .landing-theme{position:fixed;top:max(14px,env(safe-area-inset-top));right:14px;z-index:5;color:var(--t-fff)}
 :root[data-theme="light"] .landing-bg{filter:invert(1)}
@@ -1229,21 +1229,6 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 
 /* ONE-TOOL button (landing, between the email and WhatsApp icons) and its launch panel */
 .landing-icons{align-items:center}
-.landing-one{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:92px;min-height:76px;padding:8px 14px;border-radius:18px;border:1px solid rgb(var(--ovt) / .32);background:rgb(var(--ovt) / .08);color:var(--t-fff);cursor:pointer;font-family:'Orbitron',sans-serif;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.landing-one span{font-size:12px;font-weight:800;letter-spacing:.14em;line-height:1}
-.landing-one:hover,.landing-one:focus-visible{background:rgb(var(--ovt) / .18);border-color:rgb(var(--ovt) / .6)}
-:root[data-theme="light"] .landing-one{background:#fff;border-color:#c7d3e6;color:#0b1220}
-.one-dlg{width:min(92vw,380px);padding:22px 22px 18px;border-radius:18px;border:1px solid #2c4468;background:#05080d;color:#fff}
-.one-dlg::backdrop{background:rgba(0,0,0,.65)}
-.one-dlg h2{margin:0 0 4px;font-family:'Orbitron',sans-serif;font-size:22px;letter-spacing:.14em;font-weight:800}
-.one-sub{margin:0 0 12px;font-size:15px;font-weight:700}
-.one-dlg ul{margin:0 0 14px;padding-left:18px;font-size:14.5px;line-height:1.55}
-.one-soon{margin:0 0 14px;padding:8px 12px;border-radius:10px;background:#fff;color:#000;font-family:'Orbitron',sans-serif;font-weight:800;font-size:13px;letter-spacing:.08em;text-align:center}
-.one-close{width:100%;min-height:44px;border-radius:12px;border:1px solid #2c4468;background:#10223a;color:#fff;font:700 14px system-ui;cursor:pointer}
-.one-close:hover,.one-close:focus-visible{background:#18345a}
-:root[data-theme="light"] .one-dlg{background:#fff;color:#0b1220;border-color:#c7d3e6}
-:root[data-theme="light"] .one-soon{background:#0b1220;color:#fff}
-:root[data-theme="light"] .one-close{background:#f1f5fb;color:#0b1220;border-color:#c7d3e6}
 
 /* landing, dark theme: heading and the Simulate / Teach / Rank words are plain pure white (no gradient, no blue) */
 :root:not([data-theme="light"]) .landing h1,:root:not([data-theme="light"]) .landing h1 .landing-grad,:root:not([data-theme="light"]) .ls-words b,:root:not([data-theme="light"]) .ls-words .w1,:root:not([data-theme="light"]) .ls-words .w2,:root:not([data-theme="light"]) .ls-words .w3{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;animation:none!important}
@@ -1331,3 +1316,13 @@ html[data-theme="light"],:root[data-theme="light"] body{background:#f3f6fa}
 .lc-go:focus-visible,.lc-x:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .lc-teachly{margin-top:14px}
 .lc-dl{display:block;margin:10px 0;padding:12px;border-radius:12px;background:#f59e0b;color:#1b1100;text-align:center;font-weight:800;text-decoration:none}
+
+/* Simpler simulation page (owner, 2026-11): only what a student needs; the extras stay in the code but are not shown. */
+#favourite-toggle,#share-link,#sound-toggle,#randomise-btn,#help-open,#snapshot-btn,#rail-toggle,.restore-chip,#rec-quality,.rec-b,.restart-button.icon-tool:not(#fullscreen-btn){display:none!important}
+html body .panel-close,html body .restore-bar{display:none!important}
+html body .theme-picker,html body .sidebar-heading,html body .breadcrumbs,html body .tab-count,html body .live-label,html body .focus-btn:not(.info-btn){display:none!important}
+.theme-toggle{font-size:18px;width:42px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+/* Tighter simulation page: the stage starts higher and fills the width (owner: page felt empty). */
+@media(min-width:761px){html body .main{padding-top:16px;padding-left:18px;padding-right:18px}html body .intro{flex-wrap:nowrap!important;gap:14px;margin:0 0 8px}html body .intro h1{margin:0 0 2px!important;font-size:26px!important}html body #description{font-size:13.5px;line-height:1.35}html body .intro .formula-card{flex:0 0 38%;max-width:38%;padding:8px 12px;margin:0}html body .intro .formula-card strong{font-size:14px;line-height:1.3}html body .tabs-nav{margin:0 0 6px}html body .simulation-tabs{margin-bottom:6px}html body .lab-tools{margin:0 0 8px;gap:6px}html body .lab-layout{gap:12px;grid-template-columns:minmax(0,1fr) 270px!important}}
+html body .formula-card{display:none!important}
+.lc-teachly{margin-bottom:14px}.lc-ipad{background:#7cc0ff}
