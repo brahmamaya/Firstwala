@@ -5,7 +5,7 @@
 const fs = require('fs'), path = require('path'), http = require('http');
 const root = path.join(__dirname, '..'), SITE = 'https://physica.in';
 const SUBJECT = { physics: 'Physics', chemistry: 'Chemistry', botany: 'Botany', zoology: 'Zoology' };
-const STATIC = ['', 'about.html', 'help.html', 'terms.html', 'privacy.html'];
+const STATIC = ['', 'about.html', 'help.html', 'terms.html', 'privacy.html', 'teachly-privacy.html', 'teachly-terms.html'];
 const CSP = "default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests";
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const clip = (s, n) => { s = s.replace(/\s+/g, ' ').trim(); if (s.length <= n) return s; const c = s.slice(0, n - 1), i = c.lastIndexOf(' '); return c.slice(0, i > n * .6 ? i : n - 1).replace(/[,;:.\s]+$/, '') + '…'; };
