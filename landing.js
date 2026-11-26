@@ -120,10 +120,10 @@ const teach=dialog('lc-teach','teach',d=>{
  d.append(el('p','lc-hook','No more late nights making slides. Open a chapter, tick the questions, press Download.'),
   list('ol',[['','Rank mode → JEE Mains → your chapter → PYQs tab'],['','Press “Select questions to make slides” and tick the questions you want'],['','Download: PDF or PowerPoint, Dark or Light, 1 or 2 questions per slide']]),
   el('p','lc-sub','You also get a cover page listing the topics. Print it, project it or share it on WhatsApp.'));
- /* Teachly: the whiteboard app, downloaded straight from physica.in (a plain same-site file link, nothing sent anywhere). */
- const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ For Android users: download Teachly');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
- const ipad=el('a','lc-dl lc-ipad','For iPad users: open Teachly');ipad.href='https://brahmamaya.github.io/Teachly/';ipad.target='_blank';ipad.rel='noopener noreferrer';ipad.dataset.testid='lc-teachly-ipad';
- tb.append(el('span','lc-pill','NEW'),el('h3','','✏️ Teachly: Notes making app'),
+ /* Physica Notes: the whiteboard app, downloaded straight from physica.in (a plain same-site file link, nothing sent anywhere). */
+ const tb=el('div','lc-hot lc-teachly');const dl=el('a','lc-dl','⬇ For Android users: download Physica Notes');dl.href='downloads/Teachly.apk';dl.download='Teachly.apk';dl.dataset.testid='lc-teachly-dl';
+ const ipad=el('a','lc-dl lc-ipad','For iPad users: open Physica Notes');ipad.href='https://brahmamaya.github.io/Teachly/';ipad.target='_blank';ipad.rel='noopener noreferrer';ipad.dataset.testid='lc-teachly-ipad';
+ tb.append(el('span','lc-pill','NEW'),el('h3','','✏️ Physica Notes: notes making app'),
   el('p','','Smooth writing with no lag, instant graphs, shapes and ruler, write on PDF and PPT, laser pointer, question timer and auto-save. Works great on tablets now. Digital board support comes in the next update'),
   dl,ipad,el('p','lc-sub','On iPad: open the link in Chrome, tap Share, then “Add to Home Screen”.'));d.append(tb)});
 for(const [k,label,sub,dlg] of [['learn','For learners','Test Series incoming',learn],['teach','For teachers','PYQ slides & PDF',teach]]){
