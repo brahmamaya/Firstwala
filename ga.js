@@ -1,12 +1,13 @@
 /* Two separate things live here:
    (1) No first-party tracking of our own: Physica has no server, so nothing is stored about visitors by us.
    (2) Google Analytics, in three modes chosen by the visitor (localStorage "physica-analytics"):
-       - unset (default) = STANDARD: Google Analytics with its normal first-party cookie (expires after 90 days) so that
-         visits, new users and daily users can be counted. Google signals and ad personalisation are off, nothing typed,
-         no answers or scores, nothing while the Test Series is open, nothing if the browser sends Do Not Track / Global
-         Privacy Control.
-       - "2" = NO COOKIES: page views only, no cookie, a fresh random ID on every page load.
+       - unset or "2" (default) = NO COOKIES: page views only, no cookie, a fresh random ID on every page load. Chosen as the
+         default (2026-11) because most visitors are students aged 15-18 (DPDP Act s.9: no tracking of children).
+       - "1" = STANDARD (opt-in): normal first-party cookie (90 days) so visits, new and daily users can be counted. Google
+         signals and ad personalisation are off.
        - "0" = OFF.
+       In every mode: nothing typed, no answers or scores, nothing while the Test Series is open, nothing if the browser
+       sends Do Not Track / Global Privacy Control.
    Google still receives the normal web request (IP address, browser). Kept out of the HTML so the Content Security
    Policy can forbid inline scripts. */
 (() => {
@@ -47,16 +48,16 @@ const el = (t, a, ...k) => { const e = document.createElement(t); for (const x i
 const slot = document.getElementById('analytics-choice');
 if (slot) {
   const paint = () => {
-    const v = get(), mode = v === '0' ? 'OFF' : v === '2' ? 'NO COOKIES' : 'STANDARD (cookie, 90 days)';
+    const v = get(), mode = v === '0' ? 'OFF' : v === '1' ? 'STANDARD (cookie, 90 days)' : 'NO COOKIES (default)';
     slot.replaceChildren(el('p', null, 'Visit statistics are currently ', el('b', null, mode), ' in this browser. '),
       el('button', { type: 'button', onclick: () => { set('0'); paint(); } }, 'Turn off'), ' ',
       el('button', { type: 'button', onclick: () => { set('2'); paint(); } }, 'No cookies'), ' ',
-      el('button', { type: 'button', onclick: () => { try { localStorage.removeItem(KEY); } catch {} paint(); } }, 'Standard'));
+      el('button', { type: 'button', onclick: () => { set('1'); paint(); } }, 'Standard'));
   };
   paint();
 } else if (!dnt && !local && !navigator.webdriver) {
   const v = get();
-  if (v === '2') startGA(true);
-  else if (v !== '0') startGA(false);
+  if (v === '1') startGA(false);
+  else if (v !== '0') startGA(true);
 }
 })();
